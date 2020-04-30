@@ -48,6 +48,7 @@ references:
   page: 135-149
 ---
 ```{r, include = FALSE}
+rm(list=ls())
 knitr::opts_chunk$set(
   collapse = TRUE,
   comment = "#>"
@@ -57,7 +58,7 @@ knitr::opts_chunk$set(
 ```{r setup, echo=F}
 #library('rdecision')
 source('./rdecision-dev.R')
-options(warn=-1)
+options(warn=0)
 ```
 
 # Introduction
@@ -70,42 +71,57 @@ vascular catheters (Tegaderm CHG) was compared with a standard dressing.
 
 ## Model variables
 The following code creates the variables to be used in the model. The choice of
-variables, their distributions and their parameters are taken from table 3 
-of Jenks *et al* [-@jenks:2016a].
+variables, their distributions and their parameters are taken from table 4 
+of Jenks *et al* [-@jenks:2016a]. 
 ```{r variables, echo=T}
 # clinical variables
-rate.CRBSI <- NormalModelVariable$new(
+r.CRBSI <- NormalModelVariable$new(
   'Baseline CRBSI rate', 
-  'per 1000 catheter days',
+  '/1000 catheter days',
   mu=1.48, sigma=0.074
 )
-rate.LSI <- NormalModelVariable$new(
+hr.CRBSI <- LogNormalModelVariable$new(
+  'Tegaderm CRBSI HR',
+  'ratio',
+  mu=log(0.402), sigma=0.393
+)
+r.LSI <- NormalModelVariable$new(
   'Baseline LSI rate',
-  'per patient',
+  '/patient',
   mu=0.1, sigma=0.01
 )
-rate.Dermatitis <- NormalModelVariable$new(
+hr.LSI <- LogNormalModelVariable$new(
+  'Tegaderm LSI HR',
+  'ratio',
+  mu=log(0.402), sigma=0.393
+)
+r.Dermatitis <- NormalModelVariable$new(
   'Baseline dermatitis risk',
-  'per catheter',
+  '/catheter',
   mu = 0.0026, sigma=0.00026
+)
+rr.Dermatitis <- LogNormalModelVariable$new(
+  'Tegaderm Dermatitis RR',
+  'ratio',
+  mu=log(4.4), sigma=0.393
 )
 
 # cost variables
-cost.CRBSI <- GammaModelVariable$new('Cost of CRBSI', 'GBP', alpha=198, beta=50)
-cost.Dermatitis <- GammaModelVariable$new('Cost of dermatitis', 'GBP', alpha=30, beta=5)
-cost.LSI <- GammaModelVariable$new('Cost of LSI', 'GBP', alpha=50, beta=5)
-cost.Tegaderm <- ConstModelVariable$new('Cost of Tegaderm CHG', 'GBP', const=6.21)
-cost.Standard <- ConstModelVariable$new('Cost of standard dressing', 'GBP', const=1.34)
-n.cathdays <- NormalModelVariable$new('No. of days with catheter', NA, mu=10, sigma=2)
-n.dressings <- NormalModelVariable$new('No. of dressings', NA, mu=3, sigma=0.3)
+c.CRBSI <- GammaModelVariable$new('CRBSI cost', 'GBP', alpha=9990/50, beta=50)
+c.Dermatitis <- GammaModelVariable$new('Dermatitis cost', 'GBP', alpha=30, beta=5)
+c.LSI <- GammaModelVariable$new('LSI cost', 'GBP', alpha=50, beta=5)
+c.Tegaderm <- ConstModelVariable$new('Tegaderm CHG cost', 'GBP', const=6.21)
+c.Standard <- ConstModelVariable$new('Standard dressing cost', 'GBP', const=1.34)
+n.cathdays <- NormalModelVariable$new('No. days with catheter', 'days', mu=10, sigma=2)
+n.dressings <- NormalModelVariable$new('No. dressings', 'dressings', mu=3, sigma=0.3)
 ```
 
 
 ## Model variable expressions
 Variables in the model may be included in the decision tree via model variable expressions,
 which are mathematical expressions which involve model variables. The most simple
-form of model variable expression involving a model variable `X` is simply 
-`quote(X)`. More complex forms of expression involving R's numerical functions and
+form of model variable expression involving a model variable `X` is `quote(X)`. More
+complex forms of expression involving R's numerical functions and
 multiple model variables are supported, provided the expressions conform to R syntax.
 
 The following code creates the model variable expressions to be used as values in the
@@ -114,36 +130,48 @@ decision tree nodes.
 ```{r expressions, echo=T}
 # probabilities
 p.Dermatitis.S <- ModelVariableExpression$new(
-  quote(rate.Dermatitis),
+  quote(r.Dermatitis),
   'Probability of dermatitis with standard dressing'
 )
+p.Dermatitis.T <- ModelVariableExpression$new(
+  quote(r.Dermatitis*rr.Dermatitis),
+  'Probability of dermatitis with Tegaderm'
+)
 p.LSI.S <- ModelVariableExpression$new(
- quote(rate.LSI),
+ quote(r.LSI),
  'Probability of LSI with standard dressing'
 )
+p.LSI.T <- ModelVariableExpression$new(
+ quote(r.LSI*hr.LSI),
+ 'Probability of LSI with Tegaderm'
+)
 p.CRBSI.S <- ModelVariableExpression$new(
-  quote(rate.CRBSI*n.cathdays/1000),
+  quote(r.CRBSI*n.cathdays/1000),
+  'Probability of CRBSI with standard dressing'
+)
+p.CRBSI.T <- ModelVariableExpression$new(
+  quote(r.CRBSI*n.cathdays*hr.CRBSI/1000),
   'Probability of CRBSI with standard dressing'
 )
 
 # costs
-cost.Dermatitis.MVE <- ModelVariableExpression$new(
-  quote(cost.Dermatitis),
+c.Dermatitis.MVE <- ModelVariableExpression$new(
+  quote(c.Dermatitis),
   'Cost of dermatitis'
 )
-cost.LSI.MVE <- ModelVariableExpression$new(
-  quote(cost.LSI),
+c.LSI.MVE <- ModelVariableExpression$new(
+  quote(c.LSI),
   'Cost of LSI'
 )
-cost.CRBSI.MVE <- ModelVariableExpression$new(
-  quote(cost.CRBSI),
+c.CRBSI.MVE <- ModelVariableExpression$new(
+  quote(c.CRBSI),
   'Cost of CRBSI'
 )
-cost.S <- ModelVariableExpression$new(
-  quote(n.dressings*cost.Standard)
+c.S <- ModelVariableExpression$new(
+  quote(n.dressings*c.Standard)
 )
-cost.T <- ModelVariableExpression$new(
-  quote(n.dressings*cost.Tegaderm)
+c.T <- ModelVariableExpression$new(
+  quote(n.dressings*c.Tegaderm)
 )
 ```
 
@@ -167,9 +195,10 @@ leaf.S.NoComp <- LeafNode$new('No complication (Standard Dressing)')
 
 chance.S <- ChanceNode$new(
   children = list(leaf.S.Dermatitis, leaf.S.LSI, leaf.S.CRBSI, leaf.S.NoComp),
-  p = c(p.Dermatitis.S, p.LSI.S, p.CRBSI.S, as.numeric(NA)),
   edgelabels = c('Dermatitis', 'Local site infection', 'CRBSI', 'No complication'),
-  costs = c(cost.Dermatitis.MVE, cost.LSI.MVE, cost.CRBSI.MVE, 0)
+  costs = list(c.Dermatitis.MVE, c.LSI.MVE, c.CRBSI.MVE, 0),
+  p = list(p.Dermatitis.S, p.LSI.S, p.CRBSI.S, as.numeric(NA)),
+  ptype = 'MVE'
 )
 
 # Tegaderm dressing branch
@@ -180,16 +209,17 @@ leaf.T.NoComp <- LeafNode$new('No complication (Tegaderm CHG)')
 
 chance.T <- ChanceNode$new(
   children = list(leaf.T.Dermatitis, leaf.T.LSI, leaf.T.CRBSI, leaf.T.NoComp),
-  p = c(0.25, 0.25, 0.25, 0.25),
   edgelabels = c('Dermatitis', 'Local site infection', 'CRBSI', 'No complication'),
-  costs = c(cost.Dermatitis.MVE, cost.LSI.MVE, cost.CRBSI.MVE, 0)
+  costs = list(c.Dermatitis.MVE, c.LSI.MVE, c.CRBSI.MVE, 0),
+  p = list(p.Dermatitis.T, p.LSI.T, p.CRBSI.T, as.numeric(NA)), 
+  ptype='MVE'
 )
 
 # decision node
 d <- DecisionNode$new(
   children = list(chance.S, chance.T),
   edgelabels = c('Standard Dressing', 'Tegaderm CHG'),
-  costs = c(cost.S, cost.T)
+  costs = list(c.S, c.T)
 )
 
 ```
@@ -201,32 +231,41 @@ uncertain probabilities with draws from a Dirichlet distribution is preferred. C
 a `ChanceNode` with ModelVariableExpressions is permitted, but results
 in a warning being issued.
 
+# Documenting the model
+Package `rdecision` includes tools for automated documentation of the model structure
+and inputs. 
+
+## Model inputs
+The model variables associated with a node and its descendants can be tabulated
+using the method `tabulateModelVariables`. The method
+returns a data frame describing each variable, its description, units and uncertainty
+distribution. Variables inheriting from type `ModelVariable` will be included in the
+tabulation; regular numeric values will not be listed. For extensive models, variables
+associated with separate branches of a tree can be tabulated separately by calling
+the method for different head nodes. Selected columns are omitted from the 
+
+```{r modelinputs, echo=T}
+local({
+  DF <- d$tabulateModelVariables()
+  DF$Variable <- NULL
+  DF$SD <- NULL
+  knitr::kable(DF, row.names=F, format.args=list(scientific=F), digits=3)
+})
+```
 
 # Running the model
-The following code runs a single model scenario, using low-level
-functions to evaluate each pathway and decision option. The
-`path.apply` function applies a user-provided function to each
-node of every root-to-leaf path in the model. In the 
-model there are eight possible root-to-leaf paths, each of which
+The following code runs a single model scenario, using the `evaluate`
+method of a decision node to evaluate each pathway and decision option. In 
+the model there are eight possible root-to-leaf paths, each of which
 begins with the decision node and ends with a leaf node. For example,
 pathway `Dermatitis(Standard Dressing)` involves a traversal of nodes
-`d`, `chance.S`, and `leaf.S.Dermatitis`. 
+`d`, `chance.S`, and `leaf.S.Dermatitis`. This model did not consider 
+utility, and the columns associated with utility are removed.
 
-The following code extracts and calculates various features associated
-with each root-to-leaf node traversal, and puts them into a table. The
-extra parameter `expected=T` ensures that the expected values of the
-model variables are returned, rather than a sample from their
-distributions.
-
-```{r echo=T}
-RES <- data.frame(
-  'Choice' = unlist(path.apply(d, FUN=pathway.choice)),
-  'Pathway' = unlist(path.apply(d, FUN=pathway.name)),
-  'Probability' = unlist(path.apply(d, FUN=pathway.probability)),
-  'Cost' = unlist(path.apply(d, FUN=pathway.cost)),
-  'ExpectedCost' = NA
-)
-RES$ExpectedCost <- round(RES$Probability*RES$Cost,2)
+```{r basecase, echo=T}
+RES <- d$evaluate(expected=T)
+RES$Utility <- NULL
+RES$ExpectedUtility <- NULL
 ```
 
 # Model results
@@ -234,32 +273,71 @@ RES$ExpectedCost <- round(RES$Probability*RES$Cost,2)
 ## Base case
 The results of the scenario model, using the code from the previous section,
 yields the following result:
-```{r echo=F}
+```{r basecase-tabulate, echo=F}
 knitr::kable(RES)
 ```
 
 There are, as expected, eight root-to-leaf pathways, which `path.apply` has 
-worked out itself from the model structure. The total probability, expected
-cost for each choice can be calculated from the table as follows:
+worked out itself from the model structure. The total probability and expected
+cost for each choice can be calculated from the table as follows which gives 
+a result consistent with that reported by Jenks *et al* [-@jenks:2016a].
 
-```{r echo=T}
-#SUM <- aggregate(
-#  RES[,c('Probability', 'ExpectedCost')],
-#  by = list(RES$Choice),
-#  FUN = sum
-#)
-#names(SUM) <- c('Choice', 'Probability', 'Expected Cost')
-```
-which gives the following result, which is consistent with the result reported by
-Jenks *et al* [-@jenks:2016a].
-
-
-```{r echo=F}
-#knitr::kable(SUM)
+```{r basecase-summary, echo=T}
+local({
+  SUM <- aggregate(
+    RES[,c('Probability', 'ExpectedCost')],
+    by = list(RES$Choice),
+    FUN = sum  
+  )
+  names(SUM) <- c('Choice', 'Probability', 'Expected Cost')
+  knitr::kable(SUM)
+})
 ```
 
+## Probabilistic senstivity analysis
+When they are created, each `ModelVariable` returns its expected value when its
+method `value()` is called. Calling the method `sample()` of a model variable causes
+it to sample from its uncertainty distribution, and return the sampled value when
+method `value()` is next called. The same sampled value will be returned until
+`sample()` is called again. Calling `sample(expected=T)` causes `value()` to 
+return the expected value of the variable. 
+
+Probabilistic sensitivity analysis
+is supported through the use of sampling model variables. In practice, because the
+model variables are contained within model variable expressions embedded in the
+model, decision nodes expose a method called `sample()`. This causes each model
+variable associated with the decision node and its descendants to be sampled. The code
+needed to run $N$ samples of the model, and the results of the first 10 samples are 
+as follows:
+
+```{r PSA, echo=T}
+local({
+  N <- 1000
+  RES <<- data.frame(
+    Run = 1:N,
+    Tegaderm = numeric(length=N),
+    Standard = numeric(length=N)
+  )
+  for (i in 1:N) {
+    RUN <- d$evaluate(expected=F)
+    RES$Tegaderm[i] <<- sum(RUN$ExpectedCost[RUN$Choice=='Tegaderm CHG'])
+    RES$Standard[i] <<- sum(RUN$ExpectedCost[RUN$Choice=='Standard Dressing'])
+  }
+  RES$Difference <<- RES$Tegaderm - RES$Standard
+  knitr::kable(head(RES, n=10))
+})
+```
+
+From PSA, the median cost of treatment with Tegaderm was `r round(median(RES$Tegaderm),2)`,
+the median cost of treatment with standard dressings was `r round(median(RES$Standard),2)`
+and the median cost saving was `r round(median(RES$Difference),2)`. The 95% confidence 
+interval for cost saving was `r round(quantile(RES$Difference, probs=c(0.025)),2)` to 
+`r round(quantile(RES$Difference, probs=c(0.975)),2)`. 
+Overall, `r round(100*sum(RES$Difference<0)/nrow(RES),2)`% of runs found that Tegaderm
+was cost saving. These results replicate those reported by the manufucturer.
+
 ```{r echo=F}
-#rm(RES, SUM)
+rm(RES)
 ```
 
 # References
