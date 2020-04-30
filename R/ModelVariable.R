@@ -49,7 +49,7 @@ ModelVariable <- R6::R6Class(
     #'        expectation of the variable. Default is FALSE.
     #' @return Updated ModelVariable object.
     sample = function(expected=F) {
-      private$val = 0
+      private$val <- 0
       return(invisible(self))
     },
     

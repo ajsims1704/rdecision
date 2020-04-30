@@ -48,11 +48,13 @@ GammaModelVariable <- R6::R6Class(
     #'        expectation of the variable. Default is FALSE.
     #' @return Updated GammaModelVariable object.
     sample = function(expected=F) {
-      private$val <- ifelse(
-        expected,
-        private$alpha*private$beta,
-        rgamma(1, shape=private$alpha, scale=private$beta),
-      ) 
+      private$val <- NA
+      if (expected) {
+        private$val <- self$getMean()
+      }
+      else {
+        private$val <- rgamma(1, shape=private$alpha, scale=private$beta)
+      }
       return(invisible(self))
     },
     
@@ -76,6 +78,21 @@ GammaModelVariable <- R6::R6Class(
     #' @return Standard deviation as a numeric value
     getSD = function() {
       return(sqrt(private$alpha)*private$beta)
+    },
+
+    #' @description
+    #' Return the quantiles of the Gamma uncertainty distribution.
+    #' @param probs Vector of probabilities, in range [0,1].    
+    #' @return Vector of quantiles.
+    getQuantile = function(probs) {
+      sapply(probs, FUN=function(x) {
+        if (!is.numeric(probs)) {
+          stop("GammaModelVariable$getQuantile: argument must be a numeric vector")
+        }
+      })
+      q <- qgamma(probs, shape=private$alpha, scale=private$beta)
+      return(q)
     }
+
   )
 )

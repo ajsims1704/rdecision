@@ -49,11 +49,12 @@ NormalModelVariable <- R6::R6Class(
     #'        expectation of the variable. Default is FALSE.
     #' @return Updated NormalModelVariable object.
     sample = function(expected=F) {
-      private$val = ifelse(
-        expected,
-        private$mu,
-        rnorm(1, mean=private$mu, sd=private$sigma)
-      )
+      if (expected) {
+        private$val <- self$getMean()
+      }
+      else {
+        private$val <- rnorm(1, mean=private$mu, sd=private$sigma)
+      }
       invisible(self)
     },
     
@@ -77,6 +78,21 @@ NormalModelVariable <- R6::R6Class(
     #' @return Standard deviation as a numeric value
     getSD = function() {
       return(private$sigma)
+    },
+
+    #' @description
+    #' Return the quantiles of the Normal uncertainty distribution.
+    #' @param probs Vector of probabilities, in range [0,1].    
+    #' @return Vector of quantiles.
+    getQuantile = function(probs) {
+      sapply(probs, FUN=function(x) {
+        if (!is.numeric(probs)) {
+          stop("NormalModelVariable$getQuantile: argument must be a numeric vector")
+        }
+      })
+      q <- qnorm(probs, mean=private$mu, sd=private$sigma)
+      return(q)
     }
+    
   )
 )

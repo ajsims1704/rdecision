@@ -240,6 +240,27 @@ ChanceNode <- R6::R6Class(
       })
       # return list of model variables
       return(mvlist)
+    },
+    
+    #' @description 
+    #' Sample all model variables in this node and update edges.
+    #' @param expected If TRUE cause each model variable to return its expected
+    #'        value at the next call to `value()`. If FALSE each model variable
+    #'        will return the sampled value. Default is FALSE.
+    #' @return An updated ChanceNode object.
+    sample = function(expected=F) {
+      # get the model variables associated with this node
+      mvlist <- self$getModelVariables()
+      # sample them
+      sapply(mvlist, FUN=function(mv) {
+        mv$sample(expected)
+      })
+      # update edges
+      private$setEdgeCosts()
+      private$setEdgeP()
+      # return reference to updated node
+      return(invisible(self))  
     }
+
   )
 )

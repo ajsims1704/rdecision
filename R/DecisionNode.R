@@ -101,15 +101,14 @@ DecisionNode <- R6::R6Class(
       
       # set the costs for each edge
       private$setEdgeCosts()
-
     },
-    
+
     #' @description 
     #' Function to return a list of model variables associated with the node.
     #' @return List of model variables associated with the node.
     getModelVariables = function() {
       # make a list of all private objects that may be associated with model variables
-      objects <- c(private$edgelabels, private$costs)
+      objects <- c(private$costs)
       # iterate objects and create list of model variables
       mvlist <- list()
       lapply(objects, FUN=function(o) {
@@ -122,7 +121,67 @@ DecisionNode <- R6::R6Class(
       })
       # return list of model variables
       return(mvlist)
+    },
+    
+    #' @description 
+    #' Sample all model variables in this node and update edges.
+    #' @param expected If TRUE cause each model variable to return its expected
+    #'        value at the next call to `value()`. If FALSE each model variable
+    #'        will return the sampled value. Default is FALSE.
+    #' @return An updated DecisionNode object.
+    sample = function(expected=F) {
+      # get the model variables associated with this node
+      mvlist <- self$getModelVariables()
+      # sample them
+      sapply(mvlist, FUN=function(mv) {
+        mv$sample(expected)
+      })
+      # update edges
+      private$setEdgeCosts()
+      # return reference to updated node
+      return(invisible(self))  
+    },
+    
+    #' @description 
+    #' Evaluate a decision. Starting with this decision node, the function
+    #' works though all possible paths and computes the probability,
+    #' cost and utility of each. 
+    #' @param expected If TRUE, evaluate each model variable as its mean value,
+    #'        otherwise sample each one from their uncertainty distrbution.
+    #' @return A data frame with one row per path and columns organized as
+    #' follows:
+    #' \describe{
+    #' \item{Choice}{The choice with which the path is associated.}
+    #' \item{Pathway}{The leaf node on which the pathway ends; normally the 
+    #' clinical outcome.}
+    #' \item{Probability}{The probability of traversing the pathway. The total
+    #' probability of each choice should sum to unity; i.e. the sum of the 
+    #' Probability column should equal the number of branches leaving the 
+    #' decision node.}
+    #' \item{Cost}{The cost of traversing the pathway.}
+    #' \item{ExpectedCost}{Cost \eqn(*} probability of traversing the pathway).}
+    #' \item{Utility}{The utility associated with the outcome.}
+    #' \item{ExpectedUtility}{Utility \eqn{*} probability of traversing the pathway.}
+    #' }
+    evaluate = function(expected=T) {
+      # sample this node and all descendants
+      descendants <- self$descendantNodes()
+      lapply(descendants, FUN=function(n) {
+        n$sample(expected)
+      })
+      # evaluate cost and utility of each path
+      RES <- data.frame(
+        'Choice' = unlist(path.apply(self, FUN=pathway.choice)),
+        'Pathway' = unlist(path.apply(self, FUN=pathway.name)),
+        'Probability' = unlist(path.apply(self, FUN=pathway.probability)),
+        'Cost' = unlist(path.apply(self, FUN=pathway.cost)),
+        'ExpectedCost' = NA,
+        'Utility' = unlist(path.apply(self, FUN=pathway.utility)),
+        'ExpectedUtility' = NA
+      )
+      RES$ExpectedCost <- round(RES$Probability*RES$Cost,2)
+      RES$ExpectedUtility <- round(RES$Probability*RES$Utility,4)
+      return(RES)
     }
-
   )
 )

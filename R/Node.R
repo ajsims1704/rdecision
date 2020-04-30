@@ -62,6 +62,14 @@ Node <- R6::R6Class(
     },
     
     #' @description
+    #' Does the node have any child nodes? (DOM-style)
+    #' @return 
+    #' TRUE if node has children, FALSE if not
+    hasChildNodes = function() {
+      return(length(private$edges)>0)
+    },
+    
+    #' @description
     #' Return list of child nodes (DOM-style)
     #' @return 
     #' list of child Nodes
@@ -72,15 +80,26 @@ Node <- R6::R6Class(
       }
       return(children)
     },
-    
-    #' @description
-    #' Does the node have any child nodes? (DOM-style)
-    #' @return 
-    #' TRUE if node has children, FALSE if not
-    hasChildNodes = function() {
-      return(length(private$edges)>0)
+
+    #' @description 
+    #' Return list of descendent nodes.
+    #' @return List of descendent nodes.
+    descendantNodes = function() {
+      nodes <- list()
+      toLeaf <- function(node) {
+        # push current node to path
+        nodes[[length(nodes)+1]] <<- node
+        # process child nodes if not leaf
+        if (node$hasChildNodes()) {
+          for (child in node$childNodes()) {
+            toLeaf(child)
+          }
+        }
+      }
+      toLeaf(self)
+      return(nodes)
     },
-    
+
     #' @description
     #' Is this node the same as the argument? (DOM-style)
     #' @param otherNode node to compare with this one
@@ -177,9 +196,19 @@ Node <- R6::R6Class(
          Units = sapply(mvlist, FUN=function(x){x$getUnits()}),
          Distribution = sapply(mvlist, FUN=function(x){x$getDistribution()}),
          Mean = sapply(mvlist, FUN=function(x){x$getMean()}),
-         SD = sapply(mvlist, FUN=function(x){x$getSD()})
+         SD = sapply(mvlist, FUN=function(x){x$getSD()}),
+         Q2.5 = sapply(mvlist, FUN=function(x){x$getQuantile(probs=c(0.025))}),
+         Q97.5 = sapply(mvlist, FUN=function(x){x$getQuantile(probs=c(0.975))})
        )
        return(DF)
+    },
+    
+    #' @description 
+    #' Sample the model variables associated with the node and update edges
+    #' as necessary
+    #' @return Updated Node object
+    sample = function(expected=F) {
+      return(invisible(self))
     }
   )
 )

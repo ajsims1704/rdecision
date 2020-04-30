@@ -48,11 +48,12 @@ LogNormalModelVariable <- R6::R6Class(
     #'        expectation of the variable. Default is FALSE.
     #' @return Updated NormalModelVariable object.
     sample = function(expected=F) {
-      private$val = ifelse(
-        expected,
-        private$mu,
-        rlnorm(1, meanlog=private$mu, sdlog=private$sigma)
-      )
+      if (expected) {
+        private$val <- self$getMean()
+      }
+      else {
+        private$val <- rlnorm(1, meanlog=private$mu, sdlog=private$sigma)
+      }
       invisible(self)
     },
     
@@ -60,7 +61,7 @@ LogNormalModelVariable <- R6::R6Class(
     #' Accessor function for the name of the uncertainty distribution.
     #' @return Distribution name as character string.
     getDistribution = function() {
-      rv <- paste('logN(', private$mu, ',', private$sigma, ')', sep='')
+      rv <- paste('logN(', round(private$mu,3), ',', round(private$sigma,3), ')', sep='')
       return(rv)
     },
     
@@ -82,6 +83,21 @@ LogNormalModelVariable <- R6::R6Class(
       sigma <- private$sigma
       V <- (exp(sigma^2) - 1) * exp(2*mu + sigma^2)
       return(sqrt(V))
+    },
+
+    #' @description
+    #' Return the quantiles of the logNormal uncertainty distribution.
+    #' @param probs Vector of probabilities, in range [0,1].    
+    #' @return Vector of quantiles.
+    getQuantile = function(probs) {
+      sapply(probs, FUN=function(x) {
+        if (!is.numeric(probs)) {
+          stop("LogNormalModelVariable$getQuantile: argument must be a numeric vector")
+        }
+      })
+      q <- qlnorm(probs, meanlog=private$mu, sdlog=private$sigma)
+      return(q)
     }
+
   )
 )
