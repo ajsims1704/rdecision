@@ -57,7 +57,7 @@ knitr::opts_chunk$set(
 
 ```{r setup, echo=F}
 #library('rdecision')
-source('./rdecision-dev.R')
+source('rdecision-dev.R')
 options(warn=0)
 ```
 
@@ -75,45 +75,45 @@ variables, their distributions and their parameters are taken from table 4
 of Jenks *et al* [-@jenks:2016a]. 
 ```{r variables, echo=T}
 # clinical variables
-r.CRBSI <- NormalModelVariable$new(
+r.CRBSI <- GammaModelVariable$new(
   'Baseline CRBSI rate', 
   '/1000 catheter days',
-  mu=1.48, sigma=0.074
+  alpha=1.48*100, beta=1/100
 )
 hr.CRBSI <- LogNormalModelVariable$new(
   'Tegaderm CRBSI HR',
   'ratio',
   mu=log(0.402), sigma=0.393
 )
-r.LSI <- NormalModelVariable$new(
+r.LSI <- GammaModelVariable$new(
   'Baseline LSI rate',
-  '/patient',
-  mu=0.1, sigma=0.01
+  '/1000 catheter days',
+  alpha=1.4, beta=0.1
 )
 hr.LSI <- LogNormalModelVariable$new(
   'Tegaderm LSI HR',
   'ratio',
   mu=log(0.402), sigma=0.393
 )
-r.Dermatitis <- NormalModelVariable$new(
-  'Baseline dermatitis risk',
-  '/catheter',
-  mu = 0.0026, sigma=0.00026
+r.Dermatitis <- BetaModelVariable$new(
+  'Baseline dermatitis probability',
+  'probability',
+  alpha=1, beta=475
 )
 rr.Dermatitis <- LogNormalModelVariable$new(
   'Tegaderm Dermatitis RR',
   'ratio',
-  mu=log(4.4), sigma=0.393
+  mu=log(1), sigma=0.5
 )
 
 # cost variables
-c.CRBSI <- GammaModelVariable$new('CRBSI cost', 'GBP', alpha=9990/50, beta=50)
-c.Dermatitis <- GammaModelVariable$new('Dermatitis cost', 'GBP', alpha=30, beta=5)
-c.LSI <- GammaModelVariable$new('LSI cost', 'GBP', alpha=50, beta=5)
-c.Tegaderm <- ConstModelVariable$new('Tegaderm CHG cost', 'GBP', const=6.21)
-c.Standard <- ConstModelVariable$new('Standard dressing cost', 'GBP', const=1.34)
-n.cathdays <- NormalModelVariable$new('No. days with catheter', 'days', mu=10, sigma=2)
-n.dressings <- NormalModelVariable$new('No. dressings', 'dressings', mu=3, sigma=0.3)
+c.CRBSI <- GammaModelVariable$new('CRBSI cost', 'GBP', alpha=9990/3000, beta=3000)
+c.Dermatitis <- GammaModelVariable$new('Dermatitis cost', 'GBP', alpha=2, beta=3)
+c.LSI <- GammaModelVariable$new('LSI cost', 'GBP', alpha=100/30, beta=30)
+c.Tegaderm <- ConstModelVariable$new('Tegaderm CHG cost', 'GBP', const=6.26)
+c.Standard <- ConstModelVariable$new('Standard dressing cost', 'GBP', const=1.54)
+n.cathdays <- GammaModelVariable$new('No. days with catheter', 'days', alpha=10/5, beta=5)
+n.dressings <- GammaModelVariable$new('No. dressings', 'dressings', alpha=3/2, beta=2)
 ```
 
 
@@ -312,7 +312,7 @@ as follows:
 
 ```{r PSA, echo=T}
 local({
-  N <- 1000
+  N <- 10000
   RES <<- data.frame(
     Run = 1:N,
     Tegaderm = numeric(length=N),
@@ -328,9 +328,9 @@ local({
 })
 ```
 
-From PSA, the median cost of treatment with Tegaderm was `r round(median(RES$Tegaderm),2)`,
-the median cost of treatment with standard dressings was `r round(median(RES$Standard),2)`
-and the median cost saving was `r round(median(RES$Difference),2)`. The 95% confidence 
+From PSA, the median cost of treatment with Tegaderm was `r round(mean(RES$Tegaderm),2)`,
+the median cost of treatment with standard dressings was `r round(mean(RES$Standard),2)`
+and the median cost saving was `r round(mean(RES$Difference),2)`. The 95% confidence 
 interval for cost saving was `r round(quantile(RES$Difference, probs=c(0.025)),2)` to 
 `r round(quantile(RES$Difference, probs=c(0.975)),2)`. 
 Overall, `r round(100*sum(RES$Difference<0)/nrow(RES),2)`% of runs found that Tegaderm
