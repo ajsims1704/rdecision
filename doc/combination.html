@@ -1,0 +1,972 @@
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+
+<head>
+
+<meta charset="utf-8" />
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name="generator" content="pandoc" />
+<meta http-equiv="X-UA-Compatible" content="IE=EDGE" />
+
+<meta name="viewport" content="width=device-width, initial-scale=1">
+
+<meta name="author" content="Andrew J. Sims" />
+
+<meta name="date" content="2019-09-17" />
+
+<title>Combination versus monotherapy for HIV</title>
+
+
+
+<style type="text/css">code{white-space: pre;}</style>
+<style type="text/css" data-origin="pandoc">
+a.sourceLine { display: inline-block; line-height: 1.25; }
+a.sourceLine { pointer-events: none; color: inherit; text-decoration: inherit; }
+a.sourceLine:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode { white-space: pre; position: relative; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+code.sourceCode { white-space: pre-wrap; }
+a.sourceLine { text-indent: -1em; padding-left: 1em; }
+}
+pre.numberSource a.sourceLine
+  { position: relative; left: -4em; }
+pre.numberSource a.sourceLine::before
+  { content: attr(title);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; pointer-events: all; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+    color: #aaaaaa;
+  }
+pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
+div.sourceCode
+  {  }
+@media screen {
+a.sourceLine::before { text-decoration: underline; }
+}
+code span.al { color: #ff0000; font-weight: bold; } /* Alert */
+code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+code span.at { color: #7d9029; } /* Attribute */
+code span.bn { color: #40a070; } /* BaseN */
+code span.bu { } /* BuiltIn */
+code span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+code span.ch { color: #4070a0; } /* Char */
+code span.cn { color: #880000; } /* Constant */
+code span.co { color: #60a0b0; font-style: italic; } /* Comment */
+code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+code span.do { color: #ba2121; font-style: italic; } /* Documentation */
+code span.dt { color: #902000; } /* DataType */
+code span.dv { color: #40a070; } /* DecVal */
+code span.er { color: #ff0000; font-weight: bold; } /* Error */
+code span.ex { } /* Extension */
+code span.fl { color: #40a070; } /* Float */
+code span.fu { color: #06287e; } /* Function */
+code span.im { } /* Import */
+code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+code span.kw { color: #007020; font-weight: bold; } /* Keyword */
+code span.op { color: #666666; } /* Operator */
+code span.ot { color: #007020; } /* Other */
+code span.pp { color: #bc7a00; } /* Preprocessor */
+code span.sc { color: #4070a0; } /* SpecialChar */
+code span.ss { color: #bb6688; } /* SpecialString */
+code span.st { color: #4070a0; } /* String */
+code span.va { color: #19177c; } /* Variable */
+code span.vs { color: #4070a0; } /* VerbatimString */
+code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+
+</style>
+<script>
+// apply pandoc div.sourceCode style to pre.sourceCode instead
+(function() {
+  var sheets = document.styleSheets;
+  for (var i = 0; i < sheets.length; i++) {
+    if (sheets[i].ownerNode.dataset["origin"] !== "pandoc") continue;
+    try { var rules = sheets[i].cssRules; } catch (e) { continue; }
+    for (var j = 0; j < rules.length; j++) {
+      var rule = rules[j];
+      // check if there is a div.sourceCode rule
+      if (rule.type !== rule.STYLE_RULE || rule.selectorText !== "div.sourceCode") continue;
+      var style = rule.style.cssText;
+      // check if color or background-color is set
+      if (rule.style.color === '' && rule.style.backgroundColor === '') continue;
+      // replace div.sourceCode by a pre.sourceCode rule
+      sheets[i].deleteRule(j);
+      sheets[i].insertRule('pre.sourceCode{' + style + '}', j);
+    }
+  }
+})();
+</script>
+
+
+
+<style type="text/css">body {
+background-color: #fff;
+margin: 1em auto;
+max-width: 700px;
+overflow: visible;
+padding-left: 2em;
+padding-right: 2em;
+font-family: "Open Sans", "Helvetica Neue", Helvetica, Arial, sans-serif;
+font-size: 14px;
+line-height: 1.35;
+}
+#header {
+text-align: center;
+}
+#TOC {
+clear: both;
+margin: 0 0 10px 10px;
+padding: 4px;
+width: 400px;
+border: 1px solid #CCCCCC;
+border-radius: 5px;
+background-color: #f6f6f6;
+font-size: 13px;
+line-height: 1.3;
+}
+#TOC .toctitle {
+font-weight: bold;
+font-size: 15px;
+margin-left: 5px;
+}
+#TOC ul {
+padding-left: 40px;
+margin-left: -1.5em;
+margin-top: 5px;
+margin-bottom: 5px;
+}
+#TOC ul ul {
+margin-left: -2em;
+}
+#TOC li {
+line-height: 16px;
+}
+table {
+margin: 1em auto;
+border-width: 1px;
+border-color: #DDDDDD;
+border-style: outset;
+border-collapse: collapse;
+}
+table th {
+border-width: 2px;
+padding: 5px;
+border-style: inset;
+}
+table td {
+border-width: 1px;
+border-style: inset;
+line-height: 18px;
+padding: 5px 5px;
+}
+table, table th, table td {
+border-left-style: none;
+border-right-style: none;
+}
+table thead, table tr.even {
+background-color: #f7f7f7;
+}
+p {
+margin: 0.5em 0;
+}
+blockquote {
+background-color: #f6f6f6;
+padding: 0.25em 0.75em;
+}
+hr {
+border-style: solid;
+border: none;
+border-top: 1px solid #777;
+margin: 28px 0;
+}
+dl {
+margin-left: 0;
+}
+dl dd {
+margin-bottom: 13px;
+margin-left: 13px;
+}
+dl dt {
+font-weight: bold;
+}
+ul {
+margin-top: 0;
+}
+ul li {
+list-style: circle outside;
+}
+ul ul {
+margin-bottom: 0;
+}
+pre, code {
+background-color: #f7f7f7;
+border-radius: 3px;
+color: #333;
+white-space: pre-wrap; 
+}
+pre {
+border-radius: 3px;
+margin: 5px 0px 10px 0px;
+padding: 10px;
+}
+pre:not([class]) {
+background-color: #f7f7f7;
+}
+code {
+font-family: Consolas, Monaco, 'Courier New', monospace;
+font-size: 85%;
+}
+p > code, li > code {
+padding: 2px 0px;
+}
+div.figure {
+text-align: center;
+}
+img {
+background-color: #FFFFFF;
+padding: 2px;
+border: 1px solid #DDDDDD;
+border-radius: 3px;
+border: 1px solid #CCCCCC;
+margin: 0 5px;
+}
+h1 {
+margin-top: 0;
+font-size: 35px;
+line-height: 40px;
+}
+h2 {
+border-bottom: 4px solid #f7f7f7;
+padding-top: 10px;
+padding-bottom: 2px;
+font-size: 145%;
+}
+h3 {
+border-bottom: 2px solid #f7f7f7;
+padding-top: 10px;
+font-size: 120%;
+}
+h4 {
+border-bottom: 1px solid #f7f7f7;
+margin-left: 8px;
+font-size: 105%;
+}
+h5, h6 {
+border-bottom: 1px solid #ccc;
+font-size: 105%;
+}
+a {
+color: #0033dd;
+text-decoration: none;
+}
+a:hover {
+color: #6666ff; }
+a:visited {
+color: #800080; }
+a:visited:hover {
+color: #BB00BB; }
+a[href^="http:"] {
+text-decoration: underline; }
+a[href^="https:"] {
+text-decoration: underline; }
+
+code > span.kw { color: #555; font-weight: bold; } 
+code > span.dt { color: #902000; } 
+code > span.dv { color: #40a070; } 
+code > span.bn { color: #d14; } 
+code > span.fl { color: #d14; } 
+code > span.ch { color: #d14; } 
+code > span.st { color: #d14; } 
+code > span.co { color: #888888; font-style: italic; } 
+code > span.ot { color: #007020; } 
+code > span.al { color: #ff0000; font-weight: bold; } 
+code > span.fu { color: #900; font-weight: bold; }  code > span.er { color: #a61717; background-color: #e3d2d2; } 
+</style>
+
+
+
+
+</head>
+
+<body>
+
+
+
+
+<h1 class="title toc-ignore">Combination versus monotherapy for HIV</h1>
+<h3 class="subtitle">Chancellor et al, 1997</h3>
+<h4 class="author">Andrew J. Sims</h4>
+<h4 class="date">2019-09-17</h4>
+
+
+
+<div id="introduction" class="section level1">
+<h1>Introduction</h1>
+<p>This vignette is an example of a simple Markov model using the <code>rdecision</code> package. It is based on the example given by Briggs <span class="citation">(2006, Exercise 2.5)</span> which itself is based on a Markov model which compared a combination therapy of Lamivudine/Zidovudine versus Zidovudine monotherapy in people with HIV infection <span class="citation">(Chancellor et al. 1997)</span>.</p>
+</div>
+<div id="creating-the-model" class="section level1">
+<h1>Creating the model</h1>
+<p>The monotherapy model is created as follows:</p>
+<div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb1-1" title="1"><span class="co"># create Markov states for monotherapy (zidovudine only)</span></a>
+<a class="sourceLine" id="cb1-2" title="2">state.mono.A &lt;-<span class="st"> </span>MarkovState<span class="op">$</span><span class="kw">new</span>(<span class="st">&quot;A&quot;</span>, <span class="dv">1701</span><span class="op">+</span><span class="dv">1055</span><span class="op">+</span><span class="dv">2278</span>)</a>
+<a class="sourceLine" id="cb1-3" title="3">state.mono.B &lt;-<span class="st"> </span>MarkovState<span class="op">$</span><span class="kw">new</span>(<span class="st">&quot;B&quot;</span>, <span class="dv">1774</span><span class="op">+</span><span class="dv">1278</span><span class="op">+</span><span class="dv">2278</span>)</a>
+<a class="sourceLine" id="cb1-4" title="4">state.mono.C &lt;-<span class="st"> </span>MarkovState<span class="op">$</span><span class="kw">new</span>(<span class="st">&quot;C&quot;</span>, <span class="dv">6948</span><span class="op">+</span><span class="dv">2059</span><span class="op">+</span><span class="dv">2278</span>)</a>
+<a class="sourceLine" id="cb1-5" title="5">state.mono.D &lt;-<span class="st"> </span>MarkovState<span class="op">$</span><span class="kw">new</span>(<span class="st">&quot;D&quot;</span>, <span class="dv">0</span>)</a>
+<a class="sourceLine" id="cb1-6" title="6"><span class="co"># transition matrix for monotherapy</span></a>
+<a class="sourceLine" id="cb1-7" title="7">I.mono &lt;-<span class="st"> </span><span class="kw">matrix</span>(</a>
+<a class="sourceLine" id="cb1-8" title="8">  <span class="dt">data =</span> <span class="kw">c</span>(<span class="fl">0.721</span>, <span class="fl">0.202</span>, <span class="fl">0.067</span>, <span class="fl">0.010</span>,</a>
+<a class="sourceLine" id="cb1-9" title="9">           <span class="fl">0.000</span>, <span class="fl">0.581</span>, <span class="fl">0.407</span>, <span class="fl">0.012</span>,</a>
+<a class="sourceLine" id="cb1-10" title="10">           <span class="fl">0.000</span>, <span class="fl">0.000</span>, <span class="fl">0.750</span>, <span class="fl">0.250</span>,</a>
+<a class="sourceLine" id="cb1-11" title="11">           <span class="fl">0.000</span>, <span class="fl">0.000</span>, <span class="fl">0.000</span>, <span class="fl">1.000</span>),</a>
+<a class="sourceLine" id="cb1-12" title="12">  <span class="dt">nrow =</span> <span class="dv">4</span>,</a>
+<a class="sourceLine" id="cb1-13" title="13">  <span class="dt">ncol =</span> <span class="dv">4</span>, </a>
+<a class="sourceLine" id="cb1-14" title="14">  <span class="dt">byrow =</span> T,</a>
+<a class="sourceLine" id="cb1-15" title="15">  <span class="dt">dimnames =</span> <span class="kw">list</span>(<span class="kw">c</span>(<span class="st">&#39;A&#39;</span>, <span class="st">&#39;B&#39;</span>, <span class="st">&#39;C&#39;</span>, <span class="st">&#39;D&#39;</span>), <span class="kw">c</span>(<span class="st">&#39;A&#39;</span>, <span class="st">&#39;B&#39;</span>, <span class="st">&#39;C&#39;</span>, <span class="st">&#39;D&#39;</span>))</a>
+<a class="sourceLine" id="cb1-16" title="16">)</a>
+<a class="sourceLine" id="cb1-17" title="17"><span class="co"># construct the model</span></a>
+<a class="sourceLine" id="cb1-18" title="18">m.mono &lt;-<span class="st"> </span>MarkovModel<span class="op">$</span><span class="kw">new</span>(</a>
+<a class="sourceLine" id="cb1-19" title="19">  <span class="dt">states=</span><span class="kw">list</span>(state.mono.A, state.mono.B, state.mono.C, state.mono.D),</a>
+<a class="sourceLine" id="cb1-20" title="20">  <span class="dt">Ip=</span>I.mono,</a>
+<a class="sourceLine" id="cb1-21" title="21">  <span class="dt">discount=</span><span class="fl">6.0</span></a>
+<a class="sourceLine" id="cb1-22" title="22">)</a></code></pre></div>
+</div>
+<div id="checking-the-model" class="section level1">
+<h1>Checking the model</h1>
+<p>Although several checks are made on the model when it is created, such as transition probabilities from a state being less than unity, not all errors can be detected automatically. A summary of the model, suitable for printing with markdown or similar, may be created using the helper functions in class ’MarkovModel`.</p>
+<div id="summary-of-model-states" class="section level2">
+<h2>Summary of model states</h2>
+<div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb2-1" title="1">model.states &lt;-<span class="st"> </span>m.mono<span class="op">$</span><span class="kw">stateSummary</span>()</a></code></pre></div>
+<table>
+<thead>
+<tr class="header">
+<th align="left">Name</th>
+<th align="left">hasCycleLimit</th>
+<th align="left">cycleLimit</th>
+<th align="right">Entry.Cost</th>
+<th align="right">Annual.Cost</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left">A</td>
+<td align="left">FALSE</td>
+<td align="left">NA</td>
+<td align="right">0</td>
+<td align="right">5034</td>
+</tr>
+<tr class="even">
+<td align="left">B</td>
+<td align="left">FALSE</td>
+<td align="left">NA</td>
+<td align="right">0</td>
+<td align="right">5330</td>
+</tr>
+<tr class="odd">
+<td align="left">C</td>
+<td align="left">FALSE</td>
+<td align="left">NA</td>
+<td align="right">0</td>
+<td align="right">11285</td>
+</tr>
+<tr class="even">
+<td align="left">D</td>
+<td align="left">FALSE</td>
+<td align="left">NA</td>
+<td align="right">0</td>
+<td align="right">0</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div id="summary-of-annual-transition-probabilities" class="section level2">
+<h2>Summary of annual transition probabilities</h2>
+<div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb3-1" title="1">transition.matrix &lt;-<span class="st"> </span>m.mono<span class="op">$</span><span class="kw">transitionSummary</span>()</a></code></pre></div>
+<table>
+<thead>
+<tr class="header">
+<th></th>
+<th align="right">A</th>
+<th align="right">B</th>
+<th align="right">C</th>
+<th align="right">D</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>A</td>
+<td align="right">0.74234</td>
+<td align="right">0.1829051</td>
+<td align="right">0.0648048</td>
+<td align="right">0.0099502</td>
+</tr>
+<tr class="even">
+<td>B</td>
+<td align="right">0.00000</td>
+<td align="right">0.6537159</td>
+<td align="right">0.3343558</td>
+<td align="right">0.0119283</td>
+</tr>
+<tr class="odd">
+<td>C</td>
+<td align="right">0.00000</td>
+<td align="right">0.0000000</td>
+<td align="right">0.7788008</td>
+<td align="right">0.2211992</td>
+</tr>
+<tr class="even">
+<td>D</td>
+<td align="right">0.00000</td>
+<td align="right">0.0000000</td>
+<td align="right">0.0000000</td>
+<td align="right">1.0000000</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<div id="running-the-model" class="section level1">
+<h1>Running the model</h1>
+<div id="single-cycle" class="section level2">
+<h2>Single cycle</h2>
+<p>Model function <code>cycle</code> applies one cycle of a Markov model to a defined starting population in each state. It returns a table with one row per state, and each row containing several columns, including the population at the end of the state, and the cost of occupancy of states, normalized by the number of patients in the cohort, with discounting applied. For example, the first cycle of the model is as follows:</p>
+<div class="sourceCode" id="cb4"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb4-1" title="1"><span class="co"># create starting populations</span></a>
+<a class="sourceLine" id="cb4-2" title="2">populations &lt;-<span class="st"> </span><span class="kw">c</span>(<span class="st">&#39;A&#39;</span>=<span class="dv">1000</span>, <span class="st">&#39;B&#39;</span>=<span class="dv">0</span>, <span class="st">&#39;C&#39;</span>=<span class="dv">0</span>, <span class="st">&#39;D&#39;</span>=<span class="dv">0</span>)</a>
+<a class="sourceLine" id="cb4-3" title="3">m.mono<span class="op">$</span><span class="kw">setPopulations</span>(populations)</a>
+<a class="sourceLine" id="cb4-4" title="4"><span class="co"># run the model</span></a>
+<a class="sourceLine" id="cb4-5" title="5">DF &lt;-<span class="st"> </span>m.mono<span class="op">$</span><span class="kw">cycle</span>()</a></code></pre></div>
+<p>which returns the following result:</p>
+<table>
+<thead>
+<tr class="header">
+<th></th>
+<th align="right">Population</th>
+<th align="right">Normalized.Cycle.Cost</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>A</td>
+<td align="right">742.339963</td>
+<td align="right">3525.4145</td>
+</tr>
+<tr class="even">
+<td>B</td>
+<td align="right">182.905072</td>
+<td align="right">919.7019</td>
+</tr>
+<tr class="odd">
+<td>C</td>
+<td align="right">64.804799</td>
+<td align="right">689.9266</td>
+</tr>
+<tr class="even">
+<td>D</td>
+<td align="right">9.950166</td>
+<td align="right">0.0000</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div id="multiple-cycles" class="section level2">
+<h2>Multiple cycles</h2>
+<p>Multiple cycles are run by feeding the state populations at the end of one cycle into the next. Function <code>cycles</code> returns a data frame with one row per cycle, and each row containing the state populations and the aggregated cost of occupancy for all states, with discounting applied. If costs per state, per cycle, are needed, use the lower level function <code>cycle</code> to extract state values. Below, this is done for the first 20 cycles of the model. In addition, the proportion of patients alive at each cycle is added to the table.</p>
+<div class="sourceCode" id="cb5"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb5-1" title="1"><span class="co"># create starting populations</span></a>
+<a class="sourceLine" id="cb5-2" title="2">N &lt;-<span class="st"> </span><span class="dv">1000</span></a>
+<a class="sourceLine" id="cb5-3" title="3">populations &lt;-<span class="st"> </span><span class="kw">c</span>(<span class="st">&#39;A&#39;</span>=N, <span class="st">&#39;B&#39;</span>=<span class="dv">0</span>, <span class="st">&#39;C&#39;</span>=<span class="dv">0</span>, <span class="st">&#39;D&#39;</span>=<span class="dv">0</span>)</a>
+<a class="sourceLine" id="cb5-4" title="4">m.mono<span class="op">$</span><span class="kw">setPopulations</span>(populations)</a>
+<a class="sourceLine" id="cb5-5" title="5"><span class="co"># run 20 cycles</span></a>
+<a class="sourceLine" id="cb5-6" title="6">DF.mono &lt;-<span class="st"> </span>m.mono<span class="op">$</span><span class="kw">cycles</span>(<span class="dt">nCycles=</span><span class="dv">20</span>)</a>
+<a class="sourceLine" id="cb5-7" title="7"><span class="co"># calculate the proportion alive at each cycle</span></a>
+<a class="sourceLine" id="cb5-8" title="8">DF.mono<span class="op">$</span>Alive &lt;-<span class="st"> </span>(DF.mono<span class="op">$</span>A <span class="op">+</span><span class="st"> </span>DF.mono<span class="op">$</span>B <span class="op">+</span><span class="st"> </span>DF.mono<span class="op">$</span>C)<span class="op">/</span>N</a></code></pre></div>
+<p>This yields the following summary table for monotherapy:</p>
+<table>
+<thead>
+<tr class="header">
+<th align="right">Cycle</th>
+<th align="right">Cost</th>
+<th align="right">A</th>
+<th align="right">B</th>
+<th align="right">C</th>
+<th align="right">D</th>
+<th align="right">Alive</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="right">1</td>
+<td align="right">5135.0430</td>
+<td align="right">742.339963</td>
+<td align="right">182.905072</td>
+<td align="right">64.80480</td>
+<td align="right">9.950166</td>
+<td align="right">0.9900498</td>
+</tr>
+<tr class="even">
+<td align="right">2</td>
+<td align="right">5284.4912</td>
+<td align="right">551.068621</td>
+<td align="right">255.345699</td>
+<td align="right">159.73259</td>
+<td align="right">33.853087</td>
+<td align="right">0.9661469</td>
+</tr>
+<tr class="odd">
+<td align="right">3</td>
+<td align="right">5253.1397</td>
+<td align="right">409.080260</td>
+<td align="right">267.716790</td>
+<td align="right">245.48808</td>
+<td align="right">77.714873</td>
+<td align="right">0.9222851</td>
+</tr>
+<tr class="even">
+<td align="right">4</td>
+<td align="right">5011.7180</td>
+<td align="right">303.676625</td>
+<td align="right">249.833577</td>
+<td align="right">307.20934</td>
+<td align="right">139.280463</td>
+<td align="right">0.8607195</td>
+</tr>
+<tr class="odd">
+<td align="right">5</td>
+<td align="right">4607.6815</td>
+<td align="right">225.431294</td>
+<td align="right">218.864178</td>
+<td align="right">342.46788</td>
+<td align="right">213.236647</td>
+<td align="right">0.7867634</td>
+</tr>
+<tr class="even">
+<td align="right">6</td>
+<td align="right">4106.6312</td>
+<td align="right">167.346659</td>
+<td align="right">184.307521</td>
+<td align="right">354.50179</td>
+<td align="right">293.844027</td>
+<td align="right">0.7061560</td>
+</tr>
+<tr class="odd">
+<td align="right">7</td>
+<td align="right">3567.4593</td>
+<td align="right">124.228112</td>
+<td align="right">151.093310</td>
+<td align="right">348.55543</td>
+<td align="right">376.123147</td>
+<td align="right">0.6238769</td>
+</tr>
+<tr class="even">
+<td align="right">8</td>
+<td align="right">3034.2450</td>
+<td align="right">92.219492</td>
+<td align="right">121.494051</td>
+<td align="right">330.02475</td>
+<td align="right">456.261710</td>
+<td align="right">0.5437383</td>
+</tr>
+<tr class="odd">
+<td align="right">9</td>
+<td align="right">2535.8227</td>
+<td align="right">68.458215</td>
+<td align="right">96.290007</td>
+<td align="right">303.62204</td>
+<td align="right">531.629740</td>
+<td align="right">0.4683703</td>
+</tr>
+<tr class="even">
+<td align="right">10</td>
+<td align="right">2088.3502</td>
+<td align="right">50.819268</td>
+<td align="right">75.467663</td>
+<td align="right">273.09263</td>
+<td align="right">600.620443</td>
+<td align="right">0.3993796</td>
+</tr>
+<tr class="odd">
+<td align="right">11</td>
+<td align="right">1698.6114</td>
+<td align="right">37.725174</td>
+<td align="right">58.629514</td>
+<td align="right">241.21113</td>
+<td align="right">662.434178</td>
+<td align="right">0.3375658</td>
+</tr>
+<tr class="even">
+<td align="right">12</td>
+<td align="right">1367.0615</td>
+<td align="right">28.004904</td>
+<td align="right">45.227171</td>
+<td align="right">209.90331</td>
+<td align="right">716.864614</td>
+<td align="right">0.2831354</td>
+</tr>
+<tr class="odd">
+<td align="right">13</td>
+<td align="right">1090.2677</td>
+<td align="right">20.789160</td>
+<td align="right">34.687960</td>
+<td align="right">180.40968</td>
+<td align="right">764.113198</td>
+<td align="right">0.2358868</td>
+</tr>
+<tr class="even">
+<td align="right">14</td>
+<td align="right">862.7015</td>
+<td align="right">15.432624</td>
+<td align="right">26.478514</td>
+<td align="right">153.44856</td>
+<td align="right">804.640302</td>
+<td align="right">0.1953597</td>
+</tr>
+<tr class="odd">
+<td align="right">15</td>
+<td align="right">677.9697</td>
+<td align="right">11.456254</td>
+<td align="right">20.132131</td>
+<td align="right">129.35921</td>
+<td align="right">839.052404</td>
+<td align="right">0.1609476</td>
+</tr>
+<tr class="even">
+<td align="right">16</td>
+<td align="right">529.6019</td>
+<td align="right">8.504435</td>
+<td align="right">15.256101</td>
+<td align="right">108.21877</td>
+<td align="right">868.020694</td>
+<td align="right">0.1319793</td>
+</tr>
+<tr class="odd">
+<td align="right">17</td>
+<td align="right">411.5170</td>
+<td align="right">6.313182</td>
+<td align="right">11.528660</td>
+<td align="right">89.93296</td>
+<td align="right">892.225201</td>
+<td align="right">0.1077748</td>
+</tr>
+<tr class="even">
+<td align="right">18</td>
+<td align="right">318.2638</td>
+<td align="right">4.686527</td>
+<td align="right">8.691181</td>
+<td align="right">74.30366</td>
+<td align="right">912.318635</td>
+<td align="right">0.0876814</td>
+</tr>
+<tr class="odd">
+<td align="right">19</td>
+<td align="right">245.1162</td>
+<td align="right">3.478996</td>
+<td align="right">6.538753</td>
+<td align="right">61.07740</td>
+<td align="right">928.904848</td>
+<td align="right">0.0710952</td>
+</tr>
+<tr class="even">
+<td align="right">20</td>
+<td align="right">188.0765</td>
+<td align="right">2.582598</td>
+<td align="right">4.910813</td>
+<td align="right">49.97885</td>
+<td align="right">942.527734</td>
+<td align="right">0.0574723</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<div id="model-results" class="section level1">
+<h1>Model results</h1>
+<div id="expected-survival" class="section level2">
+<h2>Expected survival</h2>
+<p>The estimated life years is given by summing the proportions of patients left alive at each cycle <span class="citation">(Briggs, Claxton, and Sculpher 2006, Exercise 2.5)</span>. This is proved as follows. If patients are assumed to die at the start of the cycle, then the expected life years is equal to the probability of death in one cycle multiplied by the survival time. If <span class="math inline">\(p_i\)</span> is the proportion of patients alive at the start of cycle <span class="math inline">\(i\)</span>, then the expected life years is given by <span class="math display">\[
+\begin{aligned}
+E[LY] &amp;= (p_0 - p_1) \times 0 + (p_2 - p_1) \times 1 + \quad ... \quad + (p_{n-1}-p_n)\times (n-1)\\
+&amp;= \sum_1^N (p_{i-1} -p_i)\times (i-1)\\
+&amp;= \sum_1^N (ip_{i-1}-ip_i -p_{i-1} + p_i)\\
+&amp;= \sum_1^N (i-1)p_{i-1} - \sum_1^N i p_i + \sum_1^N p_i\\
+&amp;= -Np_n + \sum_1^N p_i\\
+\end{aligned}
+\]</span> If <span class="math inline">\(p_N = 0\)</span> (i.e. all patients have died by cycle <span class="math inline">\(N\)</span>), then <span class="math inline">\(E[LY] = \sum_1^N p_i\)</span>.</p>
+</div>
+<div id="combination-therapy" class="section level2">
+<h2>Combination therapy</h2>
+<p>For combination therapy, the model is constructed as follows:</p>
+<div class="sourceCode" id="cb6"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb6-1" title="1"><span class="co"># create Markov states for combination therapy (zidovudine and lamivudine)</span></a>
+<a class="sourceLine" id="cb6-2" title="2">state.comb.A &lt;-<span class="st"> </span>MarkovState<span class="op">$</span><span class="kw">new</span>(<span class="st">&quot;A&quot;</span>, <span class="dv">1701</span><span class="op">+</span><span class="dv">1055</span><span class="op">+</span><span class="dv">2278</span><span class="op">+</span><span class="dv">2086</span>)</a>
+<a class="sourceLine" id="cb6-3" title="3">state.comb.B &lt;-<span class="st"> </span>MarkovState<span class="op">$</span><span class="kw">new</span>(<span class="st">&quot;B&quot;</span>, <span class="dv">1774</span><span class="op">+</span><span class="dv">1278</span><span class="op">+</span><span class="dv">2278</span><span class="op">+</span><span class="dv">2086</span>)</a>
+<a class="sourceLine" id="cb6-4" title="4">state.comb.C &lt;-<span class="st"> </span>MarkovState<span class="op">$</span><span class="kw">new</span>(<span class="st">&quot;C&quot;</span>, <span class="dv">6948</span><span class="op">+</span><span class="dv">2059</span><span class="op">+</span><span class="dv">2278</span><span class="op">+</span><span class="dv">2086</span>)</a>
+<a class="sourceLine" id="cb6-5" title="5">state.comb.D &lt;-<span class="st"> </span>MarkovState<span class="op">$</span><span class="kw">new</span>(<span class="st">&quot;D&quot;</span>, <span class="dv">0</span>)</a>
+<a class="sourceLine" id="cb6-6" title="6"><span class="co"># transition matrix for combination therapy</span></a>
+<a class="sourceLine" id="cb6-7" title="7">I.comb &lt;-<span class="st"> </span><span class="kw">matrix</span>(</a>
+<a class="sourceLine" id="cb6-8" title="8">  <span class="dt">data =</span> <span class="kw">c</span>(<span class="fl">0.858</span>, <span class="fl">0.103</span>, <span class="fl">0.034</span>, <span class="fl">0.005</span>,</a>
+<a class="sourceLine" id="cb6-9" title="9">           <span class="fl">0.000</span>, <span class="fl">0.787</span>, <span class="fl">0.207</span>, <span class="fl">0.006</span>,</a>
+<a class="sourceLine" id="cb6-10" title="10">           <span class="fl">0.000</span>, <span class="fl">0.000</span>, <span class="fl">0.873</span>, <span class="fl">0.127</span>,</a>
+<a class="sourceLine" id="cb6-11" title="11">           <span class="fl">0.000</span>, <span class="fl">0.000</span>, <span class="fl">0.000</span>, <span class="fl">1.000</span>),</a>
+<a class="sourceLine" id="cb6-12" title="12">  <span class="dt">nrow =</span> <span class="dv">4</span>,</a>
+<a class="sourceLine" id="cb6-13" title="13">  <span class="dt">ncol =</span> <span class="dv">4</span>, </a>
+<a class="sourceLine" id="cb6-14" title="14">  <span class="dt">byrow =</span> T,</a>
+<a class="sourceLine" id="cb6-15" title="15">  <span class="dt">dimnames =</span> <span class="kw">list</span>(<span class="kw">c</span>(<span class="st">&#39;A&#39;</span>, <span class="st">&#39;B&#39;</span>, <span class="st">&#39;C&#39;</span>, <span class="st">&#39;D&#39;</span>), <span class="kw">c</span>(<span class="st">&#39;A&#39;</span>, <span class="st">&#39;B&#39;</span>, <span class="st">&#39;C&#39;</span>, <span class="st">&#39;D&#39;</span>))</a>
+<a class="sourceLine" id="cb6-16" title="16">)</a>
+<a class="sourceLine" id="cb6-17" title="17"><span class="co"># construct the model</span></a>
+<a class="sourceLine" id="cb6-18" title="18">m.comb &lt;-<span class="st"> </span>MarkovModel<span class="op">$</span><span class="kw">new</span>(</a>
+<a class="sourceLine" id="cb6-19" title="19">  <span class="dt">states =</span> <span class="kw">list</span>(state.comb.A, state.comb.B, state.comb.C, state.comb.D),</a>
+<a class="sourceLine" id="cb6-20" title="20">  <span class="dt">Ip =</span> I.comb,</a>
+<a class="sourceLine" id="cb6-21" title="21">  <span class="dt">discount =</span> <span class="fl">6.0</span></a>
+<a class="sourceLine" id="cb6-22" title="22">)</a></code></pre></div>
+<p>In this model, lamivudine is given for the first 2 years, with the treatment effect assumed to persist for the same period. The state populations and cycle numbers are retained by the model between calls to <code>cycle</code> or <code>cycles</code> making it easy to change probabilities or costs during a simulation. Helper functions <code>setAnnualCost</code>, <code>setEntryCost</code> (for a <code>MarkovState</code> object) and <code>setTransitions</code> (for a <code>MarkovModel</code> object) are provided for that purpose.</p>
+<div class="sourceCode" id="cb7"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb7-1" title="1"><span class="co"># run combination therapy model for 2 years</span></a>
+<a class="sourceLine" id="cb7-2" title="2">N &lt;-<span class="st"> </span><span class="dv">1000</span></a>
+<a class="sourceLine" id="cb7-3" title="3">populations &lt;-<span class="st"> </span><span class="kw">c</span>(<span class="st">&#39;A&#39;</span>=N, <span class="st">&#39;B&#39;</span>=<span class="dv">0</span>, <span class="st">&#39;C&#39;</span>=<span class="dv">0</span>, <span class="st">&#39;D&#39;</span>=<span class="dv">0</span>)</a>
+<a class="sourceLine" id="cb7-4" title="4">m.comb<span class="op">$</span><span class="kw">setPopulations</span>(populations)</a>
+<a class="sourceLine" id="cb7-5" title="5">DF.comb &lt;-<span class="st"> </span>m.comb<span class="op">$</span><span class="kw">cycles</span>(<span class="dt">nCycles=</span><span class="dv">2</span>)</a>
+<a class="sourceLine" id="cb7-6" title="6"><span class="co"># revise costs and transitions, and run model for next 18 years</span></a>
+<a class="sourceLine" id="cb7-7" title="7">state.comb.A<span class="op">$</span><span class="kw">setAnnualCost</span>(<span class="dv">1701</span><span class="op">+</span><span class="dv">1055</span><span class="op">+</span><span class="dv">2278</span>)</a>
+<a class="sourceLine" id="cb7-8" title="8">state.comb.B<span class="op">$</span><span class="kw">setAnnualCost</span>(<span class="dv">1774</span><span class="op">+</span><span class="dv">1278</span><span class="op">+</span><span class="dv">2278</span>)</a>
+<a class="sourceLine" id="cb7-9" title="9">state.comb.C<span class="op">$</span><span class="kw">setAnnualCost</span>(<span class="dv">6948</span><span class="op">+</span><span class="dv">2059</span><span class="op">+</span><span class="dv">2278</span>)</a>
+<a class="sourceLine" id="cb7-10" title="10">m.comb<span class="op">$</span><span class="kw">setTransitions</span>(I.mono)</a>
+<a class="sourceLine" id="cb7-11" title="11">DF.comb &lt;-<span class="st"> </span><span class="kw">rbind</span>(DF.comb, m.comb<span class="op">$</span><span class="kw">cycles</span>(<span class="dt">nCycles=</span><span class="dv">18</span>))</a>
+<a class="sourceLine" id="cb7-12" title="12"><span class="co"># calculate the proportion alive at end of each cycle</span></a>
+<a class="sourceLine" id="cb7-13" title="13">DF.comb<span class="op">$</span>Alive &lt;-<span class="st"> </span>(DF.comb<span class="op">$</span>A <span class="op">+</span><span class="st"> </span>DF.comb<span class="op">$</span>B <span class="op">+</span><span class="st"> </span>DF.comb<span class="op">$</span>C)<span class="op">/</span>N</a></code></pre></div>
+<p>The cycle history for combination therapy is as follows:</p>
+<table>
+<thead>
+<tr class="header">
+<th align="right">Cycle</th>
+<th align="right">Cost</th>
+<th align="right">A</th>
+<th align="right">B</th>
+<th align="right">C</th>
+<th align="right">D</th>
+<th align="right">Alive</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="right">1</td>
+<td align="right">6907.9441</td>
+<td align="right">863.710957</td>
+<td align="right">97.873026</td>
+<td align="right">33.42850</td>
+<td align="right">4.987521</td>
+<td align="right">0.9950125</td>
+</tr>
+<tr class="even">
+<td align="right">2</td>
+<td align="right">6718.2108</td>
+<td align="right">745.996618</td>
+<td align="right">163.521219</td>
+<td align="right">76.61449</td>
+<td align="right">13.867671</td>
+<td align="right">0.9861323</td>
+</tr>
+<tr class="odd">
+<td align="right">3</td>
+<td align="right">4971.1105</td>
+<td align="right">553.783102</td>
+<td align="right">243.342987</td>
+<td align="right">162.68586</td>
+<td align="right">40.188055</td>
+<td align="right">0.9598119</td>
+</tr>
+<tr class="even">
+<td align="right">4</td>
+<td align="right">4919.0557</td>
+<td align="right">411.095327</td>
+<td align="right">260.366918</td>
+<td align="right">243.95082</td>
+<td align="right">84.586938</td>
+<td align="right">0.9154131</td>
+</tr>
+<tr class="odd">
+<td align="right">5</td>
+<td align="right">4686.2760</td>
+<td align="right">305.172490</td>
+<td align="right">245.397416</td>
+<td align="right">303.68523</td>
+<td align="right">145.744866</td>
+<td align="right">0.8542551</td>
+</tr>
+<tr class="even">
+<td align="right">6</td>
+<td align="right">4308.0783</td>
+<td align="right">226.541735</td>
+<td align="right">216.237789</td>
+<td align="right">338.33699</td>
+<td align="right">218.883488</td>
+<td align="right">0.7811165</td>
+</tr>
+<tr class="odd">
+<td align="right">7</td>
+<td align="right">3841.3783</td>
+<td align="right">168.170983</td>
+<td align="right">182.793714</td>
+<td align="right">350.47846</td>
+<td align="right">298.556839</td>
+<td align="right">0.7014432</td>
+</tr>
+<tr class="even">
+<td align="right">8</td>
+<td align="right">3339.2643</td>
+<td align="right">124.840041</td>
+<td align="right">150.254484</td>
+<td align="right">344.96933</td>
+<td align="right">379.936146</td>
+<td align="right">0.6200639</td>
+</tr>
+<tr class="odd">
+<td align="right">9</td>
+<td align="right">2842.2083</td>
+<td align="right">92.673752</td>
+<td align="right">121.057622</td>
+<td align="right">326.99108</td>
+<td align="right">459.277549</td>
+<td align="right">0.5407225</td>
+</tr>
+<tr class="even">
+<td align="right">10</td>
+<td align="right">2377.0096</td>
+<td align="right">68.795429</td>
+<td align="right">96.087792</td>
+<td align="right">301.14293</td>
+<td align="right">533.973849</td>
+<td align="right">0.4660262</td>
+</tr>
+<tr class="odd">
+<td align="right">11</td>
+<td align="right">1958.8577</td>
+<td align="right">51.069597</td>
+<td align="right">75.397151</td>
+<td align="right">271.11613</td>
+<td align="right">602.417118</td>
+<td align="right">0.3975829</td>
+</tr>
+<tr class="even">
+<td align="right">12</td>
+<td align="right">1594.2536</td>
+<td align="right">37.911002</td>
+<td align="right">58.629205</td>
+<td align="right">239.66449</td>
+<td align="right">663.795304</td>
+<td align="right">0.3362047</td>
+</tr>
+<tr class="odd">
+<td align="right">13</td>
+<td align="right">1283.7809</td>
+<td align="right">28.142852</td>
+<td align="right">45.260958</td>
+<td align="right">208.71072</td>
+<td align="right">717.885468</td>
+<td align="right">0.2821145</td>
+</tr>
+<tr class="even">
+<td align="right">14</td>
+<td align="right">1024.3590</td>
+<td align="right">20.891564</td>
+<td align="right">34.735278</td>
+<td align="right">179.50113</td>
+<td align="right">764.872028</td>
+<td align="right">0.2351280</td>
+</tr>
+<tr class="odd">
+<td align="right">15</td>
+<td align="right">810.9134</td>
+<td align="right">15.508643</td>
+<td align="right">26.528177</td>
+<td align="right">152.76344</td>
+<td align="right">805.199744</td>
+<td align="right">0.1948003</td>
+</tr>
+<tr class="even">
+<td align="right">16</td>
+<td align="right">637.5285</td>
+<td align="right">11.512685</td>
+<td align="right">20.178501</td>
+<td align="right">128.84717</td>
+<td align="right">839.461646</td>
+<td align="right">0.1605384</td>
+</tr>
+<tr class="odd">
+<td align="right">17</td>
+<td align="right">498.1923</td>
+<td align="right">8.546326</td>
+<td align="right">15.296735</td>
+<td align="right">107.83915</td>
+<td align="right">868.317787</td>
+<td align="right">0.1316822</td>
+</tr>
+<tr class="even">
+<td align="right">18</td>
+<td align="right">387.2379</td>
+<td align="right">6.344280</td>
+<td align="right">11.562886</td>
+<td align="right">89.65361</td>
+<td align="right">892.439224</td>
+<td align="right">0.1075608</td>
+</tr>
+<tr class="odd">
+<td align="right">19</td>
+<td align="right">299.5754</td>
+<td align="right">4.709612</td>
+<td align="right">8.719243</td>
+<td align="right">74.09956</td>
+<td align="right">912.471584</td>
+<td align="right">0.0875284</td>
+</tr>
+<tr class="even">
+<td align="right">20</td>
+<td align="right">230.7850</td>
+<td align="right">3.496133</td>
+<td align="right">6.561320</td>
+<td align="right">60.92933</td>
+<td align="right">929.013216</td>
+<td align="right">0.0709868</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div id="comparison-of-treatments" class="section level2">
+<h2>Comparison of treatments</h2>
+<p>The ICER is calculated by running both models and calculating the incremental cost per life year gained.</p>
+<p>Over the 20 year time horizon, the expected life years for monotherapy was 8.936 years at a total cost per patient of 48,014 GBP. The expected life years with combination therapy was 9.824 at a total cost per patient of 53,636 GBP. The incremental change in life years was 0.888 years at an incremental cost of 5,622 GBP, giving an ICER of 6333.22 GBP.</p>
+</div>
+</div>
+<div id="references" class="section level1 unnumbered">
+<h1>References</h1>
+<div id="refs" class="references">
+<div id="ref-briggs:2002a">
+<p>Briggs, Andrew, Karl Claxton, and Mark Sculpher. 2006. <em>Decision Modelling for Health Economic Evaluation</em>. Oxford, UK: Oxford University Press.</p>
+</div>
+<div id="ref-chancellor:1997a">
+<p>Chancellor, Jeremy V., Andrew M. Hill, Caroline A. Sabin, Kit N. Simpson, and Mike Youle. 1997. “Modelling the Cost Effectiveness of Lamivudine/Zidovudine Combination Therapy in HIV Infection.” <em>Pharmacoeconomics</em>.</p>
+</div>
+</div>
+</div>
+
+
+
+<!-- code folding -->
+
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    script.src  = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+
+</body>
+</html>

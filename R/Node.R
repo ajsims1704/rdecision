@@ -1,0 +1,185 @@
+#' @title 
+#' Node
+#' 
+#' @description
+#' An R6 class to represent a node in a decision tree
+#' 
+#' @details 
+#' Base class to represent a single node in a decision tree. Non subclassed
+#' nodes are not expected to be created as model objects. Document Object
+#' Model (DOM) names are used for node methods as far as possibe.
+
+#' @docType class
+#' @author Andrew Sims \email{andrew.sims5@nhs.net}
+#' @export
+#' 
+Node <- R6::R6Class(
+  classname = "Node",
+  private = list(
+    
+    # field list of Edge objects linking to child objects
+    edges = 'list',
+    
+    # description
+    # Add an edge linking to a child node
+    # return 
+    # An updated Node object
+    addEdge = function(edge) {
+      if (inherits(x=edge, what='Edge')) {
+        private$edges <- c(private$edges, edge)
+      }
+      else {
+        stop('Argument to Node::addEdge must inherit from Edge')
+      }
+      return(invisible(self))
+    },
+    
+    # description
+    # find index of edge connected to a given child node
+    # param childNode child node to which to find edge
+    # return index of edge, or NA if no link to that child
+    whichEdge = function(childNode) {
+      re <- NA
+      for (i in 1:length(private$edges)) {
+        e <- private$edges[[i]]
+        toNode <- e$getToNode()
+        if (toNode$isSameNode(childNode)) {
+          re <- i
+          break
+        }
+      }
+      return(re)
+    }
+  ),
+  public = list(
+    
+    #' @description
+    #' Create new Node object.
+    #' @return A new Node object.
+    initialize = function() {
+      private$edges <- list()
+      return(invisible(self))
+    },
+    
+    #' @description
+    #' Return list of child nodes (DOM-style)
+    #' @return 
+    #' list of child Nodes
+    childNodes = function() {
+      children = list()
+      for (e in private$edges) {
+        children <- c(children, e$getToNode())
+      }
+      return(children)
+    },
+    
+    #' @description
+    #' Does the node have any child nodes? (DOM-style)
+    #' @return 
+    #' TRUE if node has children, FALSE if not
+    hasChildNodes = function() {
+      return(length(private$edges)>0)
+    },
+    
+    #' @description
+    #' Is this node the same as the argument? (DOM-style)
+    #' @param otherNode node to compare with this one
+    #' @return TRUE if `otherNode` is also this one
+    isSameNode = function(otherNode) {
+      return(identical(self, otherNode)) 
+    },
+    
+    #' @description
+    #' node type (DOM-style)
+    #' @return 
+    #' Node class, as character string
+    nodeType = function() {
+      c <- class(self)[1]
+      return(c)
+    },
+    
+    #' @description 
+    #' Return label of edge which links to specified child node
+    #' @param childNode child node to which find label of linking edge
+    #' @return label as character string
+    getLabel = function(childNode) {
+      rv <- NA
+      ie <- private$whichEdge(childNode)
+      if (!is.na(ie)){
+        edge <- private$edges[[ie]]
+        rv <- edge$getLabel()
+      }
+      return(rv)
+    },
+    
+    #' @description
+    #' Function to return the conditional probability of the edge which links to
+    #' the specified child node
+    #' @param childNode child node to which to find probability of linking edge 
+    #' @return numerical value of probability
+    getP = function(childNode) {
+      rv <- 0
+      ie <- private$whichEdge(childNode)
+      if (!is.na(ie)){
+        edge <- private$edges[[ie]]
+        rv <- edge$getP()
+      }
+      return(rv)
+    },
+    
+    #' @description
+    #' Function to return the pathway name, if defined
+    #' @return 
+    #' Name of pathway (final leaf node), character string
+    getPathway = function() {
+      return(NA)  
+    },
+    
+    #' @description
+    #' function to return the utility associated with the node
+    #' @return 
+    #' Utility, numeric
+    getUtility = function() {
+      return(NA)
+    },
+    
+    #' @description
+    #' Function to return the cost of the edge which links to the specified child node
+    #' @param childNode child node to identify edge with associated cost of traversal
+    #' @return Cost, numerical value
+    getCost = function(childNode) {
+      rv <- 0
+      ie <- private$whichEdge(childNode)
+      if (!is.na(ie)){
+        edge <- private$edges[[ie]]
+        rv <- edge$getCost()
+      }
+      return(rv)
+    },
+    
+    #' @description 
+    #' Function to return a list of model variables associated with the node
+    #' @return 
+    #' List of model variables associated with the node
+    getModelVariables = function() {
+      return(list())
+    },
+    
+    #' @description
+    #' Tabulate all model variables associated with this node and its 
+    #' descendants.
+    #' @return Data frame with one row per model variable.
+    tabulateModelVariables = function() {
+       mvlist <- node.apply(self, FUN=node.mvlist)
+       DF <- data.frame(
+         Variable = names(mvlist),
+         Description = sapply(mvlist, FUN=function(x){x$getDescription()}),
+         Units = sapply(mvlist, FUN=function(x){x$getUnits()}),
+         Distribution = sapply(mvlist, FUN=function(x){x$getDistribution()}),
+         Mean = sapply(mvlist, FUN=function(x){x$getMean()}),
+         SD = sapply(mvlist, FUN=function(x){x$getSD()})
+       )
+       return(DF)
+    }
+  )
+)

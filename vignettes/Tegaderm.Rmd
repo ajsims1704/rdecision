@@ -1,0 +1,265 @@
+---
+title: "Tegaderm CHG IV Securement Dressing for Central Venous and Arterial Catheter Insertion Sites"
+subtitle: "A decision tree example with probabilistic sensitivity analysis"
+author: "Andrew J. Sims"
+date: "`r Sys.Date()`"
+output: rmarkdown::pdf_document
+vignette: >
+  %\VignetteIndexEntry{Tegaderm CHG IV Securement Dressing}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+references:
+- id: briggs:2002a
+  type: book
+  author:
+    - family: Briggs
+      given: Andrew
+    - family: Claxton
+      given: Karl
+    - family: Sculpher
+      given: Mark
+  title: "Decision modelling for health economic evaluation"
+  publisher: "Oxford University Press"
+  publisher-place: "Oxford, UK"
+  isbn: 978-0-19-852662-9
+  issued:
+    - year: 2006
+- id: jenks:2016a
+  type: article
+  author:
+    - given: Michelle
+      family: Jenks
+    - given: Joyce
+      family: Craig
+    - given: William
+      family: Green
+    - given: Neil
+      family: Hewitt
+    - given: Mick
+      family: Arber
+    - given: Andrew J.
+      family: Sims
+  title: "Tegaderm CHG IV Securement Dressing for Central Venous and Arterial
+          Catheter Insertion Sites: A NICE Medical Technology Guidance"
+  container-title: "Applied Health Economics and Health Policy"
+  issued:
+    - year: 2016
+  volume: "14"
+  page: 135-149
+---
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+```{r setup, echo=F}
+#library('rdecision')
+source('./rdecision-dev.R')
+options(warn=-1)
+```
+
+# Introduction
+This vignette is an example of modelling a decision tree using the `rdecision`
+package, with probabilistic sensitivity analysis. It is based on the model reported
+by Jenks *et al* [-@jenks:2016a] in which a transparent dressing used to secure
+vascular catheters (Tegaderm CHG) was compared with a standard dressing.
+
+# Creating the model
+
+## Model variables
+The following code creates the variables to be used in the model. The choice of
+variables, their distributions and their parameters are taken from table 3 
+of Jenks *et al* [-@jenks:2016a].
+```{r variables, echo=T}
+# clinical variables
+rate.CRBSI <- NormalModelVariable$new(
+  'Baseline CRBSI rate', 
+  'per 1000 catheter days',
+  mu=1.48, sigma=0.074
+)
+rate.LSI <- NormalModelVariable$new(
+  'Baseline LSI rate',
+  'per patient',
+  mu=0.1, sigma=0.01
+)
+rate.Dermatitis <- NormalModelVariable$new(
+  'Baseline dermatitis risk',
+  'per catheter',
+  mu = 0.0026, sigma=0.00026
+)
+
+# cost variables
+cost.CRBSI <- GammaModelVariable$new('Cost of CRBSI', 'GBP', alpha=198, beta=50)
+cost.Dermatitis <- GammaModelVariable$new('Cost of dermatitis', 'GBP', alpha=30, beta=5)
+cost.LSI <- GammaModelVariable$new('Cost of LSI', 'GBP', alpha=50, beta=5)
+cost.Tegaderm <- ConstModelVariable$new('Cost of Tegaderm CHG', 'GBP', const=6.21)
+cost.Standard <- ConstModelVariable$new('Cost of standard dressing', 'GBP', const=1.34)
+n.cathdays <- NormalModelVariable$new('No. of days with catheter', NA, mu=10, sigma=2)
+n.dressings <- NormalModelVariable$new('No. of dressings', NA, mu=3, sigma=0.3)
+```
+
+
+## Model variable expressions
+Variables in the model may be included in the decision tree via model variable expressions,
+which are mathematical expressions which involve model variables. The most simple
+form of model variable expression involving a model variable `X` is simply 
+`quote(X)`. More complex forms of expression involving R's numerical functions and
+multiple model variables are supported, provided the expressions conform to R syntax.
+
+The following code creates the model variable expressions to be used as values in the
+decision tree nodes.
+
+```{r expressions, echo=T}
+# probabilities
+p.Dermatitis.S <- ModelVariableExpression$new(
+  quote(rate.Dermatitis),
+  'Probability of dermatitis with standard dressing'
+)
+p.LSI.S <- ModelVariableExpression$new(
+ quote(rate.LSI),
+ 'Probability of LSI with standard dressing'
+)
+p.CRBSI.S <- ModelVariableExpression$new(
+  quote(rate.CRBSI*n.cathdays/1000),
+  'Probability of CRBSI with standard dressing'
+)
+
+# costs
+cost.Dermatitis.MVE <- ModelVariableExpression$new(
+  quote(cost.Dermatitis),
+  'Cost of dermatitis'
+)
+cost.LSI.MVE <- ModelVariableExpression$new(
+  quote(cost.LSI),
+  'Cost of LSI'
+)
+cost.CRBSI.MVE <- ModelVariableExpression$new(
+  quote(cost.CRBSI),
+  'Cost of CRBSI'
+)
+cost.S <- ModelVariableExpression$new(
+  quote(n.dressings*cost.Standard)
+)
+cost.T <- ModelVariableExpression$new(
+  quote(n.dressings*cost.Tegaderm)
+)
+```
+
+## Constructing the decision tree
+The following code constructs the decision tree, node by node, based on figure 2
+of Jenks *et al* [-@jenks:2016a]. In the
+formulation used by `rdecision`, each node is a potentially recursive
+structure which is allowed to have zero or more child nodes; any child
+nodes must have already been declared before their parent node is declared.
+This implies that a tree should be constructed from right to left, starting
+with leaf nodes which have no children (leaf nodes are synonymous with
+pathways in Briggs' terminology [-@briggs:2002a]). The final node to be constructed 
+is the node representing the decision problem.
+
+```{r tree, echo=T}
+# standard dressing branch
+leaf.S.Dermatitis <- LeafNode$new('Dermatitis (Standard Dressing)')
+leaf.S.LSI <- LeafNode$new('Local site infection (Standard Dressing)')
+leaf.S.CRBSI <- LeafNode$new('CRBSI (Standard Dressing)')
+leaf.S.NoComp <- LeafNode$new('No complication (Standard Dressing)')
+
+chance.S <- ChanceNode$new(
+  children = list(leaf.S.Dermatitis, leaf.S.LSI, leaf.S.CRBSI, leaf.S.NoComp),
+  p = c(p.Dermatitis.S, p.LSI.S, p.CRBSI.S, as.numeric(NA)),
+  edgelabels = c('Dermatitis', 'Local site infection', 'CRBSI', 'No complication'),
+  costs = c(cost.Dermatitis.MVE, cost.LSI.MVE, cost.CRBSI.MVE, 0)
+)
+
+# Tegaderm dressing branch
+leaf.T.Dermatitis <- LeafNode$new('Dermatitis (Tegaderm CHG)')
+leaf.T.LSI <- LeafNode$new('Local site infection (Tegaderm CHG)')
+leaf.T.CRBSI <- LeafNode$new('CRBSI (Tegaderm CHG)')
+leaf.T.NoComp <- LeafNode$new('No complication (Tegaderm CHG)')
+
+chance.T <- ChanceNode$new(
+  children = list(leaf.T.Dermatitis, leaf.T.LSI, leaf.T.CRBSI, leaf.T.NoComp),
+  p = c(0.25, 0.25, 0.25, 0.25),
+  edgelabels = c('Dermatitis', 'Local site infection', 'CRBSI', 'No complication'),
+  costs = c(cost.Dermatitis.MVE, cost.LSI.MVE, cost.CRBSI.MVE, 0)
+)
+
+# decision node
+d <- DecisionNode$new(
+  children = list(chance.S, chance.T),
+  edgelabels = c('Standard Dressing', 'Tegaderm CHG'),
+  costs = c(cost.S, cost.T)
+)
+
+```
+In the manufacturer's model, the uncertainties in the probabilities associated
+with the polytomous chance nodes were modelled as independent variables. This is
+not recommended because there is a chance that a particular run of the PSA will
+yield probabilities that are outside the range [0,1]. Representing the 
+uncertain probabilities with draws from a Dirichlet distribution is preferred. Creating
+a `ChanceNode` with ModelVariableExpressions is permitted, but results
+in a warning being issued.
+
+
+# Running the model
+The following code runs a single model scenario, using low-level
+functions to evaluate each pathway and decision option. The
+`path.apply` function applies a user-provided function to each
+node of every root-to-leaf path in the model. In the 
+model there are eight possible root-to-leaf paths, each of which
+begins with the decision node and ends with a leaf node. For example,
+pathway `Dermatitis(Standard Dressing)` involves a traversal of nodes
+`d`, `chance.S`, and `leaf.S.Dermatitis`. 
+
+The following code extracts and calculates various features associated
+with each root-to-leaf node traversal, and puts them into a table. The
+extra parameter `expected=T` ensures that the expected values of the
+model variables are returned, rather than a sample from their
+distributions.
+
+```{r echo=T}
+RES <- data.frame(
+  'Choice' = unlist(path.apply(d, FUN=pathway.choice)),
+  'Pathway' = unlist(path.apply(d, FUN=pathway.name)),
+  'Probability' = unlist(path.apply(d, FUN=pathway.probability)),
+  'Cost' = unlist(path.apply(d, FUN=pathway.cost)),
+  'ExpectedCost' = NA
+)
+RES$ExpectedCost <- round(RES$Probability*RES$Cost,2)
+```
+
+# Model results
+
+## Base case
+The results of the scenario model, using the code from the previous section,
+yields the following result:
+```{r echo=F}
+knitr::kable(RES)
+```
+
+There are, as expected, eight root-to-leaf pathways, which `path.apply` has 
+worked out itself from the model structure. The total probability, expected
+cost for each choice can be calculated from the table as follows:
+
+```{r echo=T}
+#SUM <- aggregate(
+#  RES[,c('Probability', 'ExpectedCost')],
+#  by = list(RES$Choice),
+#  FUN = sum
+#)
+#names(SUM) <- c('Choice', 'Probability', 'Expected Cost')
+```
+which gives the following result, which is consistent with the result reported by
+Jenks *et al* [-@jenks:2016a].
+
+
+```{r echo=F}
+#knitr::kable(SUM)
+```
+
+```{r echo=F}
+#rm(RES, SUM)
+```
+
+# References
