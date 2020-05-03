@@ -22,6 +22,8 @@ Andrew J. Sims \email{andrew.sims5@nhs.net}
 \itemize{
 \item \href{#method-new}{\code{DecisionNode$new()}}
 \item \href{#method-getModelVariables}{\code{DecisionNode$getModelVariables()}}
+\item \href{#method-sample}{\code{DecisionNode$sample()}}
+\item \href{#method-evaluate}{\code{DecisionNode$evaluate()}}
 \item \href{#method-clone}{\code{DecisionNode$clone()}}
 }
 }
@@ -29,6 +31,7 @@ Andrew J. Sims \email{andrew.sims5@nhs.net}
 \out{<details ><summary>Inherited methods</summary>}
 \itemize{
 \item \out{<span class="pkg-link" data-pkg="rdecision" data-topic="Node" data-id="childNodes">}\href{../../rdecision/html/Node.html#method-childNodes}{\code{rdecision::Node$childNodes()}}\out{</span>}
+\item \out{<span class="pkg-link" data-pkg="rdecision" data-topic="Node" data-id="descendantNodes">}\href{../../rdecision/html/Node.html#method-descendantNodes}{\code{rdecision::Node$descendantNodes()}}\out{</span>}
 \item \out{<span class="pkg-link" data-pkg="rdecision" data-topic="Node" data-id="getCost">}\href{../../rdecision/html/Node.html#method-getCost}{\code{rdecision::Node$getCost()}}\out{</span>}
 \item \out{<span class="pkg-link" data-pkg="rdecision" data-topic="Node" data-id="getLabel">}\href{../../rdecision/html/Node.html#method-getLabel}{\code{rdecision::Node$getLabel()}}\out{</span>}
 \item \out{<span class="pkg-link" data-pkg="rdecision" data-topic="Node" data-id="getP">}\href{../../rdecision/html/Node.html#method-getP}{\code{rdecision::Node$getP()}}\out{</span>}
@@ -80,6 +83,65 @@ Function to return a list of model variables associated with the node.
 
 \subsection{Returns}{
 List of model variables associated with the node.
+}
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-sample"></a>}}
+\if{latex}{\out{\hypertarget{method-sample}{}}}
+\subsection{Method \code{sample()}}{
+Sample all model variables in this node and update edges.
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{DecisionNode$sample(expected = F)}\if{html}{\out{</div>}}
+}
+
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{expected}}{If TRUE cause each model variable to return its expected
+value at the next call to `value()`. If FALSE each model variable
+will return the sampled value. Default is FALSE.}
+}
+\if{html}{\out{</div>}}
+}
+\subsection{Returns}{
+An updated DecisionNode object.
+}
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-evaluate"></a>}}
+\if{latex}{\out{\hypertarget{method-evaluate}{}}}
+\subsection{Method \code{evaluate()}}{
+Evaluate a decision. Starting with this decision node, the function
+works though all possible paths and computes the probability,
+cost and utility of each.
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{DecisionNode$evaluate(expected = T)}\if{html}{\out{</div>}}
+}
+
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{expected}}{If TRUE, evaluate each model variable as its mean value,
+otherwise sample each one from their uncertainty distrbution.}
+}
+\if{html}{\out{</div>}}
+}
+\subsection{Returns}{
+A data frame with one row per path and columns organized as
+follows:
+\describe{
+\item{Choice}{The choice with which the path is associated.}
+\item{Pathway}{The leaf node on which the pathway ends; normally the 
+clinical outcome.}
+\item{Probability}{The probability of traversing the pathway. The total
+probability of each choice should sum to unity; i.e. the sum of the 
+Probability column should equal the number of branches leaving the 
+decision node.}
+\item{Cost}{The cost of traversing the pathway.}
+\item{ExpectedCost}{Cost \eqn{*} probability of traversing the pathway.}
+\item{Utility}{The utility associated with the outcome.}
+\item{ExpectedUtility}{Utility \eqn{*} probability of traversing the pathway.}
+}
 }
 }
 \if{html}{\out{<hr>}}

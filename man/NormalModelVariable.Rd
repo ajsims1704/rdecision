@@ -28,6 +28,7 @@ Andrew J. Sims \email{andrew.sims5@nhs.net}
 \item \href{#method-getDistribution}{\code{NormalModelVariable$getDistribution()}}
 \item \href{#method-getMean}{\code{NormalModelVariable$getMean()}}
 \item \href{#method-getSD}{\code{NormalModelVariable$getSD()}}
+\item \href{#method-getQuantile}{\code{NormalModelVariable$getQuantile()}}
 \item \href{#method-clone}{\code{NormalModelVariable$clone()}}
 }
 }
@@ -35,7 +36,6 @@ Andrew J. Sims \email{andrew.sims5@nhs.net}
 \out{<details open ><summary>Inherited methods</summary>}
 \itemize{
 \item \out{<span class="pkg-link" data-pkg="rdecision" data-topic="ModelVariable" data-id="getDescription">}\href{../../rdecision/html/ModelVariable.html#method-getDescription}{\code{rdecision::ModelVariable$getDescription()}}\out{</span>}
-\item \out{<span class="pkg-link" data-pkg="rdecision" data-topic="ModelVariable" data-id="getQuantile">}\href{../../rdecision/html/ModelVariable.html#method-getQuantile}{\code{rdecision::ModelVariable$getQuantile()}}\out{</span>}
 \item \out{<span class="pkg-link" data-pkg="rdecision" data-topic="ModelVariable" data-id="getUnits">}\href{../../rdecision/html/ModelVariable.html#method-getUnits}{\code{rdecision::ModelVariable$getUnits()}}\out{</span>}
 \item \out{<span class="pkg-link" data-pkg="rdecision" data-topic="ModelVariable" data-id="value">}\href{../../rdecision/html/ModelVariable.html#method-value}{\code{rdecision::ModelVariable$value()}}\out{</span>}
 }
@@ -130,6 +130,26 @@ Return the standard deviation of the distribution.
 
 \subsection{Returns}{
 Standard deviation as a numeric value
+}
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-getQuantile"></a>}}
+\if{latex}{\out{\hypertarget{method-getQuantile}{}}}
+\subsection{Method \code{getQuantile()}}{
+Return the quantiles of the Normal uncertainty distribution.
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{NormalModelVariable$getQuantile(probs)}\if{html}{\out{</div>}}
+}
+
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{probs}}{Vector of probabilities, in range [0,1].}
+}
+\if{html}{\out{</div>}}
+}
+\subsection{Returns}{
+Vector of quantiles.
 }
 }
 \if{html}{\out{<hr>}}

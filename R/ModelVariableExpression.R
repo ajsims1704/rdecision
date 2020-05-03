@@ -22,7 +22,7 @@
 #' @note
 #' TO DO: does not work if expr is not in the global namespace.
 #' 
-#' @author Andrew J. Sims \email{andrew.sims5@nhs.net}
+#' @author Andrew J. Sims \email{andrew.sims5@@nhs.net}
 #' @docType class
 #' @export
 #' 
@@ -31,8 +31,7 @@ ModelVariableExpression <- R6::R6Class(
   private = list(
     # fields
     expr = 'call',
-    expr.expected = 'call',
-    expr.sampled = 'call',
+    expr.value = 'call',
     description = 'character',
     
     # function to create an expression involving ModelVariables
@@ -40,7 +39,7 @@ ModelVariableExpression <- R6::R6Class(
       # paired list of variables to substitute
       mv <- list()
       # sampled or expected
-      meth <- ifelse(expected==T, 'value(expected=T)', 'value()')
+      meth <- 'value()'
       # substitute model variable names with call to value() method
       for (v in all.vars(expr)) {
         # v is a string containing a variable name
@@ -69,17 +68,15 @@ ModelVariableExpression <- R6::R6Class(
     #' @return An object of type ModelVariableExpression
     initialize = function(expr, description=NA) {
       private$expr <- expr
-      private$expr.expected <- private$parse.expr(expr, expected=T)
-      private$expr.sampled <- private$parse.expr(expr)
+      private$expr.value <- private$parse.expr(expr)
       private$description <- description
     },
     
     #' @description
     #' Evaluate the expression.
-    #' @param expected If TRUE, evaluate each model variable at its expectation.
     #' @return Numerical value of the evaluated expression.
-    eval = function(expected=F) {
-      rv <- ifelse(expected, eval(private$expr.expected), eval(private$expr.sampled))
+    eval = function() {
+      rv <- eval(private$expr.value)
       return(rv)  
     },
     

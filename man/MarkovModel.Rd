@@ -10,29 +10,6 @@ An R6 class for a Markov model
 \details{
 A class to represent a complete Markov model.
 }
-\section{Methods}{
-
-\describe{
-
-\item{getStatenames}{Returns a character list of state names}
-\item{setPopulations}{Sets the occupancy of each state. Takes argument
-        \code{populations} which is a named vector of populations for
-        the start of the state. The names should be the state names. 
-        Due to R's implementation of matrix algebra, \code{populations} 
-        must be a numeric type and is not restricted to being an integer.
-        Calling this resets the cycle count for the model to zero.}
-\item{setTransitions}{Sets the annual state transition rates. Argument
-        \code{Ip} must be a numeric square matrix of dimension
-        equal to the number of states, with row and column names equal
-        to Markov state names. Transition rates are from row state
-        to column state.}
-\item{stateSummary}{Creates a state summary data frame suitable for
-        printing with kable etc.}
-\item{transitionSummary}{Creates a table of the annual transition
-        probabilities.}
-}
-}
-
 \author{
 Andrew J. Sims \email{andrew.sims5@nhs.net}
 }
@@ -131,28 +108,59 @@ Data frame with cycle results.
 \if{html}{\out{<a id="method-getStatenames"></a>}}
 \if{latex}{\out{\hypertarget{method-getStatenames}{}}}
 \subsection{Method \code{getStatenames()}}{
+Returns a character list of state names.
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{MarkovModel$getStatenames()}\if{html}{\out{</div>}}
 }
 
+\subsection{Returns}{
+List of the names of each state.
+}
 }
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-setDiscount"></a>}}
 \if{latex}{\out{\hypertarget{method-setDiscount}{}}}
 \subsection{Method \code{setDiscount()}}{
+Set annual discount rate
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{MarkovModel$setDiscount(r)}\if{html}{\out{</div>}}
 }
 
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{r}}{Annual discount rate, expressed as a percentage.}
+}
+\if{html}{\out{</div>}}
+}
+\subsection{Returns}{
+Updated MarkovModel object.
+}
 }
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-setPopulations"></a>}}
 \if{latex}{\out{\hypertarget{method-setPopulations}{}}}
 \subsection{Method \code{setPopulations()}}{
+Sets the occupancy of each state. Takes argument
+Calling this resets the cycle count for the model to zero.
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{MarkovModel$setPopulations(populations)}\if{html}{\out{</div>}}
 }
 
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{populations}}{A named vector of populations for
+the start of the state. The names should be the state names. 
+Due to R's implementation of matrix algebra, \code{populations} 
+must be a numeric type and is not restricted to being an integer.}
+}
+\if{html}{\out{</div>}}
+}
+\subsection{Returns}{
+Updated MarkovModel object.
+Sets the annual state transition rates.
+}
 }
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-setTransitions"></a>}}
@@ -162,24 +170,44 @@ Data frame with cycle results.
 \if{html}{\out{<div class="r">}}\preformatted{MarkovModel$setTransitions(Ip)}\if{html}{\out{</div>}}
 }
 
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{Ip}}{A numeric square matrix of dimension equal to the number of
+states, with row and column names equal to Markov state names. Transition 
+rates are from row state to column state.}
+}
+\if{html}{\out{</div>}}
+}
+\subsection{Returns}{
+Updated MarkovModel object
+}
 }
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-stateSummary"></a>}}
 \if{latex}{\out{\hypertarget{method-stateSummary}{}}}
 \subsection{Method \code{stateSummary()}}{
+Creates a state summary data frame suitable for printing with kable etc.
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{MarkovModel$stateSummary()}\if{html}{\out{</div>}}
 }
 
+\subsection{Returns}{
+A dataframe with details of all states.
+}
 }
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-transitionSummary"></a>}}
 \if{latex}{\out{\hypertarget{method-transitionSummary}{}}}
 \subsection{Method \code{transitionSummary()}}{
+Creates a table of the annual transition probabilities.
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{MarkovModel$transitionSummary()}\if{html}{\out{</div>}}
 }
 
+\subsection{Returns}{
+A data frame of annual transition probabilities
+}
 }
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-clone"></a>}}

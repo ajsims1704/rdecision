@@ -19,8 +19,9 @@ Andrew Sims \email{andrew.sims5@nhs.net}
 \subsection{Public methods}{
 \itemize{
 \item \href{#method-new}{\code{Node$new()}}
-\item \href{#method-childNodes}{\code{Node$childNodes()}}
 \item \href{#method-hasChildNodes}{\code{Node$hasChildNodes()}}
+\item \href{#method-childNodes}{\code{Node$childNodes()}}
+\item \href{#method-descendantNodes}{\code{Node$descendantNodes()}}
 \item \href{#method-isSameNode}{\code{Node$isSameNode()}}
 \item \href{#method-nodeType}{\code{Node$nodeType()}}
 \item \href{#method-getLabel}{\code{Node$getLabel()}}
@@ -30,6 +31,7 @@ Andrew Sims \email{andrew.sims5@nhs.net}
 \item \href{#method-getCost}{\code{Node$getCost()}}
 \item \href{#method-getModelVariables}{\code{Node$getModelVariables()}}
 \item \href{#method-tabulateModelVariables}{\code{Node$tabulateModelVariables()}}
+\item \href{#method-sample}{\code{Node$sample()}}
 \item \href{#method-clone}{\code{Node$clone()}}
 }
 }
@@ -47,6 +49,19 @@ A new Node object.
 }
 }
 \if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-hasChildNodes"></a>}}
+\if{latex}{\out{\hypertarget{method-hasChildNodes}{}}}
+\subsection{Method \code{hasChildNodes()}}{
+Does the node have any child nodes? (DOM-style)
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{Node$hasChildNodes()}\if{html}{\out{</div>}}
+}
+
+\subsection{Returns}{
+TRUE if node has children, FALSE if not
+}
+}
+\if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-childNodes"></a>}}
 \if{latex}{\out{\hypertarget{method-childNodes}{}}}
 \subsection{Method \code{childNodes()}}{
@@ -60,16 +75,16 @@ list of child Nodes
 }
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-hasChildNodes"></a>}}
-\if{latex}{\out{\hypertarget{method-hasChildNodes}{}}}
-\subsection{Method \code{hasChildNodes()}}{
-Does the node have any child nodes? (DOM-style)
+\if{html}{\out{<a id="method-descendantNodes"></a>}}
+\if{latex}{\out{\hypertarget{method-descendantNodes}{}}}
+\subsection{Method \code{descendantNodes()}}{
+Return list of descendent nodes.
 \subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{Node$hasChildNodes()}\if{html}{\out{</div>}}
+\if{html}{\out{<div class="r">}}\preformatted{Node$descendantNodes()}\if{html}{\out{</div>}}
 }
 
 \subsection{Returns}{
-TRUE if node has children, FALSE if not
+List of descendent nodes.
 }
 }
 \if{html}{\out{<hr>}}
@@ -217,6 +232,28 @@ descendants.
 
 \subsection{Returns}{
 Data frame with one row per model variable.
+}
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-sample"></a>}}
+\if{latex}{\out{\hypertarget{method-sample}{}}}
+\subsection{Method \code{sample()}}{
+Sample the model variables associated with the node and update edges
+as necessary
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{Node$sample(expected = F)}\if{html}{\out{</div>}}
+}
+
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{expected}}{if TRUE, use the expected value of the moel variables in
+the node; otherwise sample from their uncertainty distributions.}
+}
+\if{html}{\out{</div>}}
+}
+\subsection{Returns}{
+Updated Node object
 }
 }
 \if{html}{\out{<hr>}}

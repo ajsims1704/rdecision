@@ -206,6 +206,8 @@ Node <- R6::R6Class(
     #' @description 
     #' Sample the model variables associated with the node and update edges
     #' as necessary
+    #' @param expected if TRUE, use the expected value of the moel variables in
+    #'        the node; otherwise sample from their uncertainty distributions.
     #' @return Updated Node object
     sample = function(expected=F) {
       return(invisible(self))

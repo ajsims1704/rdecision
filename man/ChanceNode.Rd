@@ -24,6 +24,7 @@ Andrew Sims \email{andrew.sims5@nhs.net}
 \itemize{
 \item \href{#method-new}{\code{ChanceNode$new()}}
 \item \href{#method-getModelVariables}{\code{ChanceNode$getModelVariables()}}
+\item \href{#method-sample}{\code{ChanceNode$sample()}}
 \item \href{#method-clone}{\code{ChanceNode$clone()}}
 }
 }
@@ -31,6 +32,7 @@ Andrew Sims \email{andrew.sims5@nhs.net}
 \out{<details ><summary>Inherited methods</summary>}
 \itemize{
 \item \out{<span class="pkg-link" data-pkg="rdecision" data-topic="Node" data-id="childNodes">}\href{../../rdecision/html/Node.html#method-childNodes}{\code{rdecision::Node$childNodes()}}\out{</span>}
+\item \out{<span class="pkg-link" data-pkg="rdecision" data-topic="Node" data-id="descendantNodes">}\href{../../rdecision/html/Node.html#method-descendantNodes}{\code{rdecision::Node$descendantNodes()}}\out{</span>}
 \item \out{<span class="pkg-link" data-pkg="rdecision" data-topic="Node" data-id="getCost">}\href{../../rdecision/html/Node.html#method-getCost}{\code{rdecision::Node$getCost()}}\out{</span>}
 \item \out{<span class="pkg-link" data-pkg="rdecision" data-topic="Node" data-id="getLabel">}\href{../../rdecision/html/Node.html#method-getLabel}{\code{rdecision::Node$getLabel()}}\out{</span>}
 \item \out{<span class="pkg-link" data-pkg="rdecision" data-topic="Node" data-id="getP">}\href{../../rdecision/html/Node.html#method-getP}{\code{rdecision::Node$getP()}}\out{</span>}
@@ -111,6 +113,28 @@ model variables may be associated with costs or probabilities.
 
 \subsection{Returns}{
 List of model variables.
+}
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-sample"></a>}}
+\if{latex}{\out{\hypertarget{method-sample}{}}}
+\subsection{Method \code{sample()}}{
+Sample all model variables in this node and update edges.
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{ChanceNode$sample(expected = F)}\if{html}{\out{</div>}}
+}
+
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{expected}}{If TRUE cause each model variable to return its expected
+value at the next call to `value()`. If FALSE each model variable
+will return the sampled value. Default is FALSE.}
+}
+\if{html}{\out{</div>}}
+}
+\subsection{Returns}{
+An updated ChanceNode object.
 }
 }
 \if{html}{\out{<hr>}}

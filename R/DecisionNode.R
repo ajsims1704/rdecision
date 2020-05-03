@@ -9,7 +9,7 @@
 #' is associated with one or more branches to child nodes.  
 #' 
 #' @docType class
-#' @author Andrew J. Sims \email{andrew.sims5@nhs.net}
+#' @author Andrew J. Sims \email{andrew.sims5@@nhs.net}
 #' @export
 #' 
 DecisionNode <- R6::R6Class(
@@ -159,7 +159,7 @@ DecisionNode <- R6::R6Class(
     #' Probability column should equal the number of branches leaving the 
     #' decision node.}
     #' \item{Cost}{The cost of traversing the pathway.}
-    #' \item{ExpectedCost}{Cost \eqn(*} probability of traversing the pathway).}
+    #' \item{ExpectedCost}{Cost \eqn{*} probability of traversing the pathway.}
     #' \item{Utility}{The utility associated with the outcome.}
     #' \item{ExpectedUtility}{Utility \eqn{*} probability of traversing the pathway.}
     #' }

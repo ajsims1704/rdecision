@@ -62,7 +62,11 @@ NormalModelVariable <- R6::R6Class(
     #' Accessor function for the name of the uncertainty distribution.
     #' @return Distribution name as character string.
     getDistribution = function() {
-      rv <- paste('N(', private$mu, ',', private$sigma, ')', sep='')
+      rv <- paste('N(', 
+                  format(private$mu, digits=4, scientific=F),
+                  ',', 
+                  format(private$sigma, digits=4, scientific=F), 
+                  ')', sep='')
       return(rv)
     },
     

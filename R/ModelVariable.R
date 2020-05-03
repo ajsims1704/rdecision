@@ -13,7 +13,7 @@
 #' parametrized with hyperparameters.
 #' 
 #' @docType class
-#' @author Andrew Sims \email{andrew.sims5@nhs.net}
+#' @author Andrew Sims \email{andrew.sims5@@nhs.net}
 #' @export 
 #' 
 ModelVariable <- R6::R6Class(
