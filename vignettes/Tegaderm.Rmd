@@ -67,10 +67,8 @@ package, with probabilistic sensitivity analysis. It is based on the model repor
 by Jenks *et al* [-@jenks:2016a] in which a transparent dressing used to secure
 vascular catheters (Tegaderm CHG) was compared with a standard dressing.
 
-# Creating the model
-
-## Model variables
-The following code creates the variables to be used in the model. The choice of
+# Model variables
+The following code creates the 13 variables used in the model. The choice of
 variables, their distributions and their parameters are taken from table 3 
 of Jenks *et al* [-@jenks:2016a], with the following corrections:
 
@@ -90,7 +88,6 @@ of Jenks *et al* [-@jenks:2016a], with the following corrections:
 * The relative risk for dermatitis was modelled as $logN(1.482,0.490)$.
 * The point estimate cost of CRBSI was £9900, not £9990, although the parameters
   (198,50) are quoted correctly.
-
 
 ```{r variables, echo=T}
 # clinical variables
@@ -135,6 +132,12 @@ n.cathdays <- NormalModelVariable$new('No. days with catheter', 'days', mu=10, s
 n.dressings <- NormalModelVariable$new('No. dressings', 'dressings', mu=3, sigma=0.3)
 ```
 
+
+# The decision tree approach
+Using `rdecision` the decision problem may be solved by constructing a decision tree
+comprising decision nodes, chance nodes and leaf nodes. The general approach is to
+create model variable expressions, which link model variables, construct a tree,
+and then evaluate the decision for the base case and proabilistically.
 
 ## Model variable expressions
 Variables in the model may be included in the decision tree via model variable expressions,
@@ -239,7 +242,6 @@ d <- DecisionNode$new(
   children = list(chance.S, chance.T),
   edgelabels = c('Standard Dressing', 'Tegaderm CHG'),
   costs = list(c.S, c.T)
-  #costs = list(0, 0)
 )
 
 ```
@@ -251,11 +253,11 @@ uncertain probabilities with draws from a Dirichlet distribution is preferred. C
 a `ChanceNode` with ModelVariableExpressions is permitted, but results
 in a warning being issued.
 
-# Documenting the model
+## Documenting the model
 Package `rdecision` includes tools for automated documentation of the model structure
 and inputs. 
 
-## Model inputs
+### Model inputs
 The model variables associated with a node and its descendants can be tabulated
 using the method `tabulateModelVariables`. The method
 returns a data frame describing each variable, its description, units and uncertainty
@@ -273,12 +275,12 @@ local({
 })
 ```
 
-# Running the model
+## Running the model
 The following code runs a single model scenario, using the `evaluate`
 method of a decision node to evaluate each pathway and decision option. In 
 the model there are eight possible root-to-leaf paths, each of which
 begins with the decision node and ends with a leaf node. For example,
-pathway `Dermatitis(Standard Dressing)` involves a traversal of nodes
+pathway `Dermatitis (Standard Dressing)` involves a traversal of nodes
 `d`, `chance.S`, and `leaf.S.Dermatitis`. This model did not consider 
 utility, and the columns associated with utility are removed.
 
@@ -288,33 +290,36 @@ RES$Utility <- NULL
 RES$ExpectedUtility <- NULL
 ```
 
-# Model results
+## Model results
 
-## Base case
+### Base case
 The results of the scenario model, using the code from the previous section,
 yields the following result:
 ```{r basecase-tabulate, echo=F}
 knitr::kable(RES)
 ```
 
-There are, as expected, eight root-to-leaf pathways, which `path.apply` has 
-worked out itself from the model structure. The total probability and expected
-cost for each choice can be calculated from the table as follows which gives 
-a result consistent with that reported by Jenks *et al* [-@jenks:2016a].
-
-```{r basecase-summary, echo=T}
+```{r basecase-summary, echo=F}
+PE.saving <- 0
 local({
   SUM <- aggregate(
     RES[,c('Probability', 'ExpectedCost')],
     by = list(RES$Choice),
     FUN = sum  
   )
-  names(SUM) <- c('Choice', 'Probability', 'Expected Cost')
-  knitr::kable(SUM)
+  names(SUM) <- c('Choice', 'Probability', 'Cost')
+  PE.saving <<- SUM$Cost[SUM$Choice=='Tegaderm CHG'] - 
+                SUM$Cost[SUM$Choice=='Standard Dressing']
 })
 ```
 
-## Probabilistic senstivity analysis
+There are, as expected, eight root-to-leaf pathways. The total probability and expected
+cost for each choice can be calculated from the table, giving a point estimate of
+the saving of `r -1*PE.saving` GBP. This is close to the sponsor's point 
+estimate of cost saving estimated from their probabilistic sensitivity analysis,
+77.26 GBP, reported in Jenks *et al* [-@jenks:2016a].
+
+### Probabilistic senstivity analysis
 When they are created, each `ModelVariable` returns its expected value when its
 method `value()` is called. Calling the method `sample()` of a model variable causes
 it to sample from its uncertainty distribution, and return the sampled value when
@@ -359,5 +364,85 @@ was cost saving. These results replicate those reported by the manufucturer.
 ```{r echo=F}
 rm(RES)
 ```
+
+# An alternative, tree-free approach
+It is possible to solve the decision problem without first constructing a tree, by
+combining model variables directly. This is, in essence, the approach taken in
+many decision tree models constructed in Excel. Each component of the cost of
+the technology and its comparator is as follows:
+
+```{r treefree, echo=T}
+# component costs, standard dressing
+CHG.S <- ExpressionModelVariable$new(
+  "Cost of standard dressing", "GBP", 
+  quote(n.dressings*c.Standard)
+)
+CRBSI.S <- ExpressionModelVariable$new(
+  "Cost of CRBSI, standard dressing", "GBP", 
+  quote(c.CRBSI*r.CRBSI*n.cathdays/1000)
+)
+LSI.S <- ExpressionModelVariable$new(
+  "Cost of LSI, standard dressing", "GBP", 
+  quote(c.LSI*r.LSI)
+)
+Dermatitis.S <- ExpressionModelVariable$new(
+  "Cost of dermatitis, standard dressing", "GBP",
+  quote(r.Dermatitis*c.Dermatitis*n.dressings)
+)
+
+# component costs, Tegaderm
+CHG.T <- ExpressionModelVariable$new(
+  "Cost of Tegaderm", "GBP", 
+  quote(n.dressings*c.Tegaderm)
+)
+CRBSI.T <- ExpressionModelVariable$new(
+  "Cost of CRBSI, Tegaderm", "GBP", 
+  quote(c.CRBSI*r.CRBSI*hr.CRBSI*n.cathdays/1000)
+)
+LSI.T <- ExpressionModelVariable$new(
+  "Cost of LSI, Tegaderm", "GBP", 
+  quote(c.LSI*r.LSI*hr.LSI)
+)
+Dermatitis.T <- ExpressionModelVariable$new(
+  "Cost of dermatitis, Tegaderm", "GBP",
+  quote(r.Dermatitis*c.Dermatitis*rr.Dermatitis*n.dressings)
+)
+
+# savings
+c.diff <- ExpressionModelVariable$new(
+  "Saving", "GBP",
+  quote((CHG.T+CRBSI.T+LSI.T+Dermatitis.T) - (CHG.S+CRBSI.S+LSI.S+Dermatitis.S))
+)
+```
+
+## Base case
+The components of cost can be extracted from the final ExpressionModelVariable,
+as follows:
+```{r treefree-base, echo=T}
+local({
+  BASE <- c.diff$tabulateModelVariables()
+  keep <- c('Description', 'Units', 'Mean')
+  knitr::kable(BASE[,keep], row.names=F, format.args=list(scientific=F), digits=2)
+})
+```
+
+The point estimate of the saving is `r round(c.diff$value(),2)`, identical to
+the point estimate saving calculated using the decision tree approach.
+
+## Probabilistic sensitivity analysis
+Each model variable provides a method, `r`, to make random draws from its
+uncertainty distribution. The PSA for the cost difference can therefore be 
+achieved by a single call to this method:
+```{r treefree-psa, echo=T}
+tf.psa <- c.diff$r(10000)
+```
+
+From this distribution, the mean cost saving was `r round(mean(tf.psa),2)`, the 
+95% confidence interval of the saving was `r round(quantile(tf.psa,0.025),2)` 
+to `r round(quantile(tf.psa,0.975),2)` 
+and `r round(100*sum(tf.psa<0)/length(tf.psa),2)`% of runs generated a cost saving.
+Within fluctuation error this is consistent with the manufacturer's reported
+saving of 77.26 with 98.5% of runs being cost saving.
+
 
 # References
