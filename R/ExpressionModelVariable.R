@@ -123,7 +123,7 @@ ExpressionModelVariable <- R6::R6Class(
     },
     
     #' @description 
-    #' Return a list of named ModelVariables associated with the expression.
+    #' Return a list of ModelVariables given in the expression.
     #' @return A named list of model variables. Each member of the list is
     #' named with a character string of the variable name used in constructing
     #' the model. This is not necessary for evaluation, but helps when tabulating
@@ -138,25 +138,25 @@ ExpressionModelVariable <- R6::R6Class(
         return(inherits(v, what='ModelVariable'))
       })
       return(mv[lv])
-    },
-    
-    #' @description
-    #' Tabulate all model variables in the expression.
-    #' @return Data frame with one row per model variable.
-    tabulateModelVariables = function() {
-      mvlist <- self$getModelVariables()
-      DF <- data.frame(
-        Variable = names(mvlist),
-        Description = sapply(mvlist, FUN=function(x){x$getDescription()}),
-        Units = sapply(mvlist, FUN=function(x){x$getUnits()}),
-        Distribution = sapply(mvlist, FUN=function(x){x$getDistribution()}),
-        Mean = sapply(mvlist, FUN=function(x){x$getMean()}),
-        SD = sapply(mvlist, FUN=function(x){x$getSD()}),
-        Q2.5 = sapply(mvlist, FUN=function(x){x$getQuantile(probs=c(0.025))}),
-        Q97.5 = sapply(mvlist, FUN=function(x){x$getQuantile(probs=c(0.975))})
-      )
-      return(DF)
     }
+    
+    # @description
+    #' Tabulate all model variables in the expression.
+    # @return Data frame with one row per model variable.
+    #tabulateModelVariables = function() {
+    #  mvlist <- self$getModelVariables()
+    #  DF <- data.frame(
+    #    Variable = names(mvlist),
+    #    Description = sapply(mvlist, FUN=function(x){x$getDescription()}),
+    #    Units = sapply(mvlist, FUN=function(x){x$getUnits()}),
+    #    Distribution = sapply(mvlist, FUN=function(x){x$getDistribution()}),
+    #    Mean = sapply(mvlist, FUN=function(x){x$getMean()}),
+    #    SD = sapply(mvlist, FUN=function(x){x$getSD()}),
+    #    Q2.5 = sapply(mvlist, FUN=function(x){x$getQuantile(probs=c(0.025))}),
+    #    Q97.5 = sapply(mvlist, FUN=function(x){x$getQuantile(probs=c(0.975))})
+    #  )
+    #  return(DF)
+    #}
 
   )
 )

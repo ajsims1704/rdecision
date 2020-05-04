@@ -151,48 +151,50 @@ decision tree nodes.
 
 ```{r expressions, echo=T}
 # probabilities
-p.Dermatitis.S <- ModelVariableExpression$new(
-  quote(n.dressings*r.Dermatitis),
-  'Probability of dermatitis with standard dressing'
+p.Dermatitis.S <- ExpressionModelVariable$new(
+  'Probability of dermatitis with standard dressing', 'P',
+  quote(n.dressings*r.Dermatitis)
 )
-p.Dermatitis.T <- ModelVariableExpression$new(
-  quote(n.dressings*r.Dermatitis*rr.Dermatitis),
-  'Probability of dermatitis with Tegaderm'
+p.Dermatitis.T <- ExpressionModelVariable$new(
+  'Probability of dermatitis with Tegaderm', 'P',
+  quote(n.dressings*r.Dermatitis*rr.Dermatitis)
 )
-p.LSI.S <- ModelVariableExpression$new(
- quote(r.LSI),
- 'Probability of LSI with standard dressing'
+p.LSI.S <- ExpressionModelVariable$new(
+ 'Probability of LSI with standard dressing', 'P',
+ quote(r.LSI)
 )
-p.LSI.T <- ModelVariableExpression$new(
- quote(r.LSI*hr.LSI),
- 'Probability of LSI with Tegaderm'
+p.LSI.T <- ExpressionModelVariable$new(
+ 'Probability of LSI with Tegaderm', 'P',
+ quote(r.LSI*hr.LSI)
 )
-p.CRBSI.S <- ModelVariableExpression$new(
-  quote(r.CRBSI*n.cathdays/1000),
-  'Probability of CRBSI with standard dressing'
+p.CRBSI.S <- ExpressionModelVariable$new(
+  'Probability of CRBSI with standard dressing', 'P',
+  quote(r.CRBSI*n.cathdays/1000)
 )
-p.CRBSI.T <- ModelVariableExpression$new(
-  quote(r.CRBSI*n.cathdays*hr.CRBSI/1000),
-  'Probability of CRBSI with standard dressing'
+p.CRBSI.T <- ExpressionModelVariable$new(
+  'Probability of CRBSI with standard dressing', 'P', 
+  quote(r.CRBSI*n.cathdays*hr.CRBSI/1000)
 )
 
 # costs
-c.Dermatitis.MVE <- ModelVariableExpression$new(
-  quote(c.Dermatitis),
-  'Cost of dermatitis'
+c.Dermatitis.MVE <- ExpressionModelVariable$new(
+  'Cost of dermatitis', 'GBP',
+  quote(c.Dermatitis)
 )
-c.LSI.MVE <- ModelVariableExpression$new(
-  quote(c.LSI),
-  'Cost of LSI'
+c.LSI.MVE <- ExpressionModelVariable$new(
+  'Cost of LSI', 'GBP',
+  quote(c.LSI)
 )
-c.CRBSI.MVE <- ModelVariableExpression$new(
-  quote(c.CRBSI),
-  'Cost of CRBSI'
+c.CRBSI.MVE <- ExpressionModelVariable$new(
+  'Cost of CRBSI', 'GBP',
+  quote(c.CRBSI)
 )
-c.S <- ModelVariableExpression$new(
+c.S <- ExpressionModelVariable$new(
+  'Cost of standard dressing', 'GBP',
   quote(n.dressings*c.Standard)
 )
-c.T <- ModelVariableExpression$new(
+c.T <- ExpressionModelVariable$new(
+  'Cost of Tegaderm', 'GBP',
   quote(n.dressings*c.Tegaderm)
 )
 ```
@@ -220,7 +222,7 @@ chance.S <- ChanceNode$new(
   edgelabels = c('Dermatitis', 'Local site infection', 'CRBSI', 'No complication'),
   costs = list(c.Dermatitis.MVE, c.LSI.MVE, c.CRBSI.MVE, 0),
   p = list(p.Dermatitis.S, p.LSI.S, p.CRBSI.S, as.numeric(NA)),
-  ptype = 'MVE'
+  ptype = 'MV'
 )
 
 # Tegaderm dressing branch
@@ -234,7 +236,7 @@ chance.T <- ChanceNode$new(
   edgelabels = c('Dermatitis', 'Local site infection', 'CRBSI', 'No complication'),
   costs = list(c.Dermatitis.MVE, c.LSI.MVE, c.CRBSI.MVE, 0),
   p = list(p.Dermatitis.T, p.LSI.T, p.CRBSI.T, as.numeric(NA)), 
-  ptype='MVE'
+  ptype='MV'
 )
 
 # decision node
@@ -420,9 +422,14 @@ The components of cost can be extracted from the final ExpressionModelVariable,
 as follows:
 ```{r treefree-base, echo=T}
 local({
-  BASE <- c.diff$tabulateModelVariables()
-  keep <- c('Description', 'Units', 'Mean')
-  knitr::kable(BASE[,keep], row.names=F, format.args=list(scientific=F), digits=2)
+  print(environment())
+  x <- ConstModelVariable$new('boo', 'GBP', 42)
+  y <- NormalModelVariable$new('foo', 'GBP', mu=0, sigma=1)
+  #junk <- ExpressionModelVariable$new("Saving", "GBP",  quote(x+y) )
+  #print(junk$getDistribution())
+#  BASE <- c.diff$tabulateModelVariables()
+#  keep <- c('Description', 'Units', 'Mean')
+#  knitr::kable(BASE[,keep], row.names=F, format.args=list(scientific=F), digits=2)
 })
 ```
 

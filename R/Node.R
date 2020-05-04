@@ -10,7 +10,7 @@
 #' Model (DOM) names are used for node methods as far as possibe.
 
 #' @docType class
-#' @author Andrew Sims \email{andrew.sims5@nhs.net}
+#' @author Andrew Sims \email{andrew.sims5@@nhs.net}
 #' @export
 #' 
 Node <- R6::R6Class(
@@ -189,18 +189,25 @@ Node <- R6::R6Class(
     #' descendants.
     #' @return Data frame with one row per model variable.
     tabulateModelVariables = function() {
-       mvlist <- node.apply(self, FUN=node.mvlist)
-       DF <- data.frame(
-         Variable = names(mvlist),
-         Description = sapply(mvlist, FUN=function(x){x$getDescription()}),
-         Units = sapply(mvlist, FUN=function(x){x$getUnits()}),
-         Distribution = sapply(mvlist, FUN=function(x){x$getDistribution()}),
-         Mean = sapply(mvlist, FUN=function(x){x$getMean()}),
-         SD = sapply(mvlist, FUN=function(x){x$getSD()}),
-         Q2.5 = sapply(mvlist, FUN=function(x){x$getQuantile(probs=c(0.025))}),
-         Q97.5 = sapply(mvlist, FUN=function(x){x$getQuantile(probs=c(0.975))})
-       )
-       return(DF)
+      # get list of descendant nodes
+      nodes <- self$descendantNodes()
+      # build list of model variables associated with each descendant node
+      mvlist <- list()
+      lapply(nodes, FUN=function(n) {
+        mvlist <<- c(mvlist, n$getModelVariables())        
+      })
+      # create a data frame of model variables
+      DF <- data.frame(
+      #  Variable = names(mvlist),
+        Description = sapply(mvlist, FUN=function(x){x$getDescription()}),
+        Units = sapply(mvlist, FUN=function(x){x$getUnits()}),
+        Distribution = sapply(mvlist, FUN=function(x){x$getDistribution()}),
+        Mean = sapply(mvlist, FUN=function(x){x$getMean()}),
+        SD = sapply(mvlist, FUN=function(x){x$getSD()}),
+        Q2.5 = sapply(mvlist, FUN=function(x){x$getQuantile(probs=c(0.025))}),
+        Q97.5 = sapply(mvlist, FUN=function(x){x$getQuantile(probs=c(0.975))})
+      )
+      return(DF)
     },
     
     #' @description 

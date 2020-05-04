@@ -11,7 +11,7 @@
 #' that branch given that the node has been reached) and a cost. 
 #' 
 #' @docType class
-#' @author Andrew Sims \email{andrew.sims5@nhs.net}
+#' @author Andrew Sims \email{andrew.sims5@@nhs.net}
 #' @export
 #' 
 ChanceNode <- R6::R6Class(
@@ -30,15 +30,15 @@ ChanceNode <- R6::R6Class(
       for (i in 1:length(private$edges)) {
         edge <- private$edges[[i]]
         cost <- private$costs[[i]]
-        if (inherits(cost, what='ModelVariableExpression')) {
-          c <- cost$eval()
+        if (inherits(cost, what='ModelVariable')) {
+          c <- cost$value()
           edge$setCost(c)
         }
         else if (is.numeric(cost)) {
           edge$setCost(cost)
         }
         else {
-          stop("Edge$setEdgeCosts: cost must be of type `ModelVariableExpression` or `numeric`")
+          stop("Edge$setEdgeCosts: cost must be of type `ModelVariable` or `numeric`")
         }
       }  
       return(invisible(self))
@@ -53,13 +53,13 @@ ChanceNode <- R6::R6Class(
           edge$setP(private$p[[i]])
         }
       }
-      else if (private$ptype == 'MVE') {
+      else if (private$ptype == 'MV') {
         pedge <- vector('numeric', length=length(private$edges))
         for (i in 1:length(private$edges)) {
           edge <- private$edges[[i]]
           p <- private$p[[i]]
-          if (inherits(p, what='ModelVariableExpression')) {
-             v <- p$eval()
+          if (inherits(p, what='ModelVariable')) {
+             v <- p$value()
              pedge[i] <- v
           }
           else {
@@ -86,8 +86,7 @@ ChanceNode <- R6::R6Class(
     #'        `children`.
     #' @param costs A list of \eqn{k} costs associated with each edge (branch) 
     #'        leaving the `ChanceNode`. Each element may be of type `numeric` or
-    #'        `ModelVariableExpression`; given in the same order as
-    #'        `children`.
+    #'        `ModelVariable`; given in the same order as `children`.
     #' @param ptype a character string taking one of four possible
     #'        values to define how the \code{p} argument is defined:
     #'        'numeric', 'MVE', 'Beta' or 'Dirichlet'. 
@@ -98,7 +97,7 @@ ChanceNode <- R6::R6Class(
     #' \item{'numeric'}{\eqn{k} numeric values; the simplest case in which the   
     #'           probabilities are certain. Supplied values should add
     #'           to unity and be given in the same order as `children`.}
-    #' \item{'MVE'}{\eqn{k-1} `ModelVariableExpressions` or `numeric` elements and
+    #' \item{'MV'}{\eqn{k-1} `ModelVariable`s or `numeric` elements and
     #'       a single `numeric(NA)`, give in the same order as `children`. The 
     #'       single NA will be replaced on evaluation of the model variable
     #'       expressions by a value to ensure the sum of probabilities
@@ -153,10 +152,10 @@ ChanceNode <- R6::R6Class(
       sapply(costs, function(x) {
         if (is.numeric(x)) {
         }
-        else if (inherits(x, what='ModelVariableExpression')) {
+        else if (inherits(x, what='ModelVariable')) {
         }
         else {
-          stop("ChanceNode$new: Each element in `costs` must be of class `numeric` or 'ModelVariableExpression`")
+          stop("ChanceNode$new: Each element in `costs` must be of class `numeric` or 'ModelVariable`")
         }
       })
       private$costs <- costs
@@ -184,7 +183,7 @@ ChanceNode <- R6::R6Class(
         })
         private$p <- p
       }
-      else if (ptype == 'MVE') {
+      else if (ptype == 'MV') {
         if (length(p) != length(children)) {
           stop('ChanceNode$new: `p`` must contain the same number of elements as children')
         }
@@ -195,10 +194,10 @@ ChanceNode <- R6::R6Class(
               nna <<- nna + 1
             }
           }
-          else if (inherits(x, what='ModelVariableExpression')) {
+          else if (inherits(x, what='ModelVariable')) {
           }
           else {
-            stop("ChanceNode$new: all elements of `p` must be of type `numeric`, `ModelVariableExpression` or `NA`")
+            stop("ChanceNode$new: all elements of `p` must be of type `numeric`, `ModelVariable` or `NA`")
           }
         })
         if (nna != 1) {
@@ -214,7 +213,7 @@ ChanceNode <- R6::R6Class(
       }
       # anything else is illegal
       else {
-        stop("ChanceNode$new: `ptype` must be one of 'numeric', 'MVE', 'Beta' or 'Dirichlet'")
+        stop("ChanceNode$new: `ptype` must be one of 'numeric', 'MV', 'Beta' or 'Dirichlet'")
       }
 
       # set p for each edge
@@ -231,11 +230,8 @@ ChanceNode <- R6::R6Class(
       # iterate objects and create list of model variables
       mvlist <- list()
       lapply(objects, FUN=function(o) {
-        if (inherits(o, what='ModelVariableExpression')==T) {
-          mvs <- o$getModelVariables()
-          if (length(mvs) > 0) {
-            mvlist <<- c(mvlist, unlist(mvs))
-          }
+        if (inherits(o, what='ModelVariable')==T) {
+          mvlist <<- c(mvlist, o)
         }
       })
       # return list of model variables

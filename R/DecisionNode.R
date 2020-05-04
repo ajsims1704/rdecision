@@ -26,15 +26,15 @@ DecisionNode <- R6::R6Class(
       for (i in 1:length(private$edges)) {
         edge <- private$edges[[i]]
         cost <- private$costs[[i]]
-        if (inherits(cost, what='ModelVariableExpression')) {
-          c <- cost$eval()
+        if (inherits(cost, what='ModelVariable')) {
+          c <- cost$value()
           edge$setCost(c)
         }
         else if (is.numeric(cost)) {
           edge$setCost(cost)
         }
         else {
-          stop("Edge$setEdgeCosts: cost must be of type `ModelVariableExpression` or `numeric`")
+          stop("Edge$setEdgeCosts: cost must be of type `ModelVariable` or `numeric`")
         }
       }  
       return(invisible(self))
@@ -51,7 +51,7 @@ DecisionNode <- R6::R6Class(
     #'        of each choice associated with the decision.
     #' @param costs A list of values containing the costs associated
     #'        with each choice. Each value can be a numeric variable,
-    #'        or a ModelVariableExpression.
+    #'        or a ModelVariable.
     #' @return A new DecisionNode object
     initialize = function(children, edgelabels, costs) {
 
@@ -91,10 +91,10 @@ DecisionNode <- R6::R6Class(
       sapply(costs, function(x) {
         if (is.numeric(x)) {
         }
-        else if (inherits(x, what='ModelVariableExpression')==T) {
+        else if (inherits(x, what='ModelVariable')==T) {
         }
         else {
-          stop("Each element in `costs` must be of class `numeric` or `ModelVariableExpression`")
+          stop("Each element in `costs` must be of class `numeric` or `ModelVariable`")
         }
       })
       private$costs <- costs
@@ -112,11 +112,8 @@ DecisionNode <- R6::R6Class(
       # iterate objects and create list of model variables
       mvlist <- list()
       lapply(objects, FUN=function(o) {
-        if (inherits(o, what='ModelVariableExpression')==T) {
-          mvs <- o$getModelVariables()
-          if (length(mvs) > 0) {
-            mvlist <<- c(mvlist, unlist(mvs))
-          }
+        if (inherits(o, what='ModelVariable')) {
+          mvlist <<- c(mvlist, o)
         }
       })
       # return list of model variables
