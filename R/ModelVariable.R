@@ -104,6 +104,31 @@ ModelVariable <- R6::R6Class(
     #' @return Vector of numeric values of the same length as `probs`.
     getQuantile = function(probs) {
       return(NA)
+    },
+    
+    #' @description 
+    #' Draw random samples from the model variable. After returning the
+    #' sample, the next call to `value()` will return the expected value.
+    #' @param n Number of samples to return
+    #' @return Numeric vector of samples drawn at random.
+    r = function(n) {
+      # check the input
+      if (!is.numeric(n)) {
+        stop('ModelVariable$r: argument n must be numeric')
+      }
+      if (n < 1) {
+        stop('ModelVariable$r: argument n must be at least 1')
+      }
+      # make random draws
+      rv <- vector(mode='numeric', length=n)
+      for (i in 1:n) {
+        self$sample(expected=F)
+        rv[i] <- self$value()
+      }
+      # reset the variable 
+      self$sample(expected=T)
+      # return the sample
+      return(rv)
     }
   )
 )
