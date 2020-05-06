@@ -36,6 +36,7 @@ ExpressionModelVariable <- R6::R6Class(
     expr = 'call',
     expr.value = 'call',
     expr.mean = 'call',
+    env = 'environment',
 
     # function to create an expression involving calling ModelVariable
     # methods. For example if method='value()', each model variable X
@@ -47,7 +48,7 @@ ExpressionModelVariable <- R6::R6Class(
       # substitute model variable names with call to value() method
       for (v in all.vars(expr)) {
         # v is a string containing a variable name
-        if (inherits(eval(str2lang(v)), what='ModelVariable')) {
+        if (inherits(eval(str2lang(v), envir=private$env), what='ModelVariable')) {
           rep <- gsub(v, paste(v, method, sep='$'), v)
         }
         else {
@@ -71,11 +72,24 @@ ExpressionModelVariable <- R6::R6Class(
     #' @param expr An R expression involving model variables which would be 
     #' syntactically correct were each model variable to be replaced by
     #' numerical variables.
+    #' @param env The environment in which the model variables live. Normally,
+    #' and by default, this is the global environment. But if an object is
+    #' created which refers to model variables created in a different 
+    #' environment it must be specified.
     #' @return An object of type ExpressionModelVariable
-    initialize = function(description, units, expr) {
+    initialize = function(description, units, expr, env=globalenv()) {
       super$initialize(description, units)
-      # parse the expression
+      # check and save arguments
+      if (!is.call(expr)) {
+        warning("ExpressionModelVariable$new: expr must be of type 'call'")
+      }
       private$expr <- expr
+      if (!is.environment(env)) {
+        stop("ExpressionModelVariable$new: env must be of type 'environment'")
+      }
+      private$env <- env
+      print(private$env)
+      # parse the expression
       private$expr.value <- private$subExpr(expr, 'value()')
       private$expr.mean <- private$subExpr(expr, 'getMean()')
       # set all model variables to their expected values

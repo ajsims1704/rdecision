@@ -421,16 +421,17 @@ c.diff <- ExpressionModelVariable$new(
 The components of cost can be extracted from the final ExpressionModelVariable,
 as follows:
 ```{r treefree-base, echo=T}
-local({
-  print(environment())
-  x <- ConstModelVariable$new('boo', 'GBP', 42)
-  y <- NormalModelVariable$new('foo', 'GBP', mu=0, sigma=1)
-  #junk <- ExpressionModelVariable$new("Saving", "GBP",  quote(x+y) )
+f <- function() {
+  E <- new.env()
+  E$x <- ConstModelVariable$new('boo', 'GBP', 42)
+  E$y <- NormalModelVariable$new('foo', 'GBP', mu=0, sigma=1)
+  junk <- ExpressionModelVariable$new("Saving", "GBP",  quote(x+y), env=E)
   #print(junk$getDistribution())
 #  BASE <- c.diff$tabulateModelVariables()
 #  keep <- c('Description', 'Units', 'Mean')
 #  knitr::kable(BASE[,keep], row.names=F, format.args=list(scientific=F), digits=2)
-})
+}
+f()
 ```
 
 The point estimate of the saving is `r round(c.diff$value(),2)`, identical to
