@@ -83,7 +83,7 @@ Node <- R6::R6Class(
 
     #' @description 
     #' Return list of descendent nodes.
-    #' @return List of descendent nodes.
+    #' @return List of descendent nodes, including self.
     descendantNodes = function() {
       nodes <- list()
       toLeaf <- function(node) {
@@ -177,28 +177,50 @@ Node <- R6::R6Class(
     },
     
     #' @description 
-    #' Function to return a list of model variables associated with the node
+    #' Function to return a list of model variables associated with this node.
     #' @return 
-    #' List of model variables associated with the node
+    #' List of model variables associated with this node.
     getModelVariables = function() {
       return(list())
     },
     
     #' @description
-    #' Tabulate all model variables associated with this node and its 
-    #' descendants.
+    #' Tabulate all model variables associated with this node.
+    #' @param descend If TRUE (the default), model variables associated
+    #' with this node and its descendants are tabulated.
+    #' @param explode If TRUE, recursively add model variables which are
+    #' included in expressions in ExpressionModelVariables. Default is
+    #' FALSE.
     #' @return Data frame with one row per model variable.
-    tabulateModelVariables = function() {
-      # get list of descendant nodes
-      nodes <- self$descendantNodes()
-      # build list of model variables associated with each descendant node
-      mvlist <- list()
-      lapply(nodes, FUN=function(n) {
-        mvlist <<- c(mvlist, n$getModelVariables())        
-      })
+    tabulateModelVariables = function(descend=T, explode=F) {
+      # create list of nodes
+      if (descend) {
+        nodes <- self$descendantNodes()
+      } 
+      else {
+        nodes <- list(self)
+      }
+      # list of model variables associated with this node
+      if (explode) {
+        mvlist <- list()
+        thislist <- self$getModelVariables() 
+        for (v in thislist) {
+          if (inherits(v, what='ExpressionModelVariable')) {
+            mvlist <- c(mvlist, v$explodeModelVariables())
+          }
+          else {
+            mvlist <- c(mvlist, v)
+          }
+        }
+      }
+      else {
+        mvlist <- self$getModelVariables()
+      }
+      # discard non unique members
+      #mvlist <- unique(mvlist)
       # create a data frame of model variables
       DF <- data.frame(
-      #  Variable = names(mvlist),
+        Label = sapply(mvlist, FUN=function(x){x$getLabel()}),
         Description = sapply(mvlist, FUN=function(x){x$getDescription()}),
         Units = sapply(mvlist, FUN=function(x){x$getUnits()}),
         Distribution = sapply(mvlist, FUN=function(x){x$getDistribution()}),

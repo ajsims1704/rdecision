@@ -24,6 +24,9 @@ ConstModelVariable <- R6::R6Class(
     
     #' @description 
     #' Create a new constant model variable
+    #' @param label A character string label for the variable. It is advised
+    #' to make this the same as the variable name which helps when tabulating
+    #' model variables involving ExpressionModelVariables.
     #' @param description A character string description of the variable
     #'        and its role in the
     #'        model. This description will be used in a tabulation of the
@@ -32,8 +35,8 @@ ConstModelVariable <- R6::R6Class(
     #'        'per year'.
     #' @param const The constant numerical value of the object.
     #' @return A new ModelVariable object.
-    initialize = function(description, units, const) {
-      super$initialize(description, units)
+    initialize = function(label, description, units, const) {
+      super$initialize(label, description, units)
       private$val <- const
     },
     

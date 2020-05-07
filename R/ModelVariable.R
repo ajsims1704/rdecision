@@ -19,6 +19,7 @@
 ModelVariable <- R6::R6Class(
   classname = "ModelVariable",
   private = list(
+    label = 'character',
     description = 'character',
     units = 'character',
     val = 'numeric'
@@ -27,6 +28,9 @@ ModelVariable <- R6::R6Class(
     
     #' @description 
     #' Create an object of type `ModelVariable`
+    #' @param label A character string label for the variable. It is advised
+    #' to make this the same as the variable name which helps when tabulating
+    #' model variables involving ExpressionModelVariables.
     #' @param description A character string description of the variable
     #'        and its role in the
     #'        model. This description will be used in a tabulation of the
@@ -34,7 +38,8 @@ ModelVariable <- R6::R6Class(
     #' @param units A character string description of the units, e.g. 'GBP',
     #'        'per year'.
     #' @return A new ModelVariable object.
-    initialize = function(description, units) {
+    initialize = function(label, description, units) {
+      private$label <- label
       private$description <- description
       private$units <- units
       private$val <- 0
@@ -64,7 +69,14 @@ ModelVariable <- R6::R6Class(
     },
     
     #' @description
-    #' Accessor functions for the description.
+    #' Accessor function for the label.
+    #' @return Label of model variable as character string.
+    getLabel = function() {
+      return(private$label)
+    },
+    
+    #' @description
+    #' Accessor function for the description.
     #' @return Description of model variable as character string.
     getDescription = function() {
       return(private$description)
@@ -83,7 +95,31 @@ ModelVariable <- R6::R6Class(
     getDistribution = function() {
       return(NA)
     },
+
+    #' @description 
+    #' Return a list of ModelVariables given in the expression.
+    #' Only relevant for objects of inherited type ExpressionModelVariable,
+    #' but defined for the base class for convenience to avoid type checking
+    #' inside iterators.
+    #' @return A list of model variables. An list containing self 
+    #' for non-expression model variables 
+    getExpressionModelVariables = function() {
+      return(list(self))
+    },
     
+    #' @description 
+    #' Recursively expand each model variable that is itself an 
+    #' ExpressionModelVariable into a full list of the model
+    #' variables that have been used to define it. 
+    #' Only relevant for objects of inherited type ExpressionModelVariable,
+    #' but defined for the base class for convenience to avoid type
+    #' checking inside iterators.
+    #' @return A list of model variables. An list containing self for 
+    #' non-expression model variables.
+    explodeExpressionModelVariables = function() {
+      return(list(self))
+    },
+
     #' @description 
     #' Return the expected value of the distribution. 
     #' @return Expected value as a numeric value.

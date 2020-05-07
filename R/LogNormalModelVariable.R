@@ -46,6 +46,9 @@ LogNormalModelVariable <- R6::R6Class(
     
     #' @description
     #' Create a model variable with log normal uncertainty. 
+    #' @param label A character string label for the variable. It is advised
+    #' to make this the same as the variable name which helps when tabulating
+    #' model variables involving ExpressionModelVariables.
     #' @param description A character string describing the variable.
     #' @param units Units of the quantity; character string.
     #' @param p1 First hyperparameter, a measure of location. 
@@ -55,8 +58,8 @@ LogNormalModelVariable <- R6::R6Class(
     #' @param parametrization A character string taking one of the values
     #'        'LN1' (default) through 'LN7' (see \link{Details}).
     #' @return A LogNormalModelVariable object.
-    initialize = function(description, units, p1, p2, parametrization='LN1') {
-      super$initialize(description, units)
+    initialize = function(label, description, units, p1, p2, parametrization='LN1') {
+      super$initialize(label, description, units)
       # transform parameters according to parametrization
       private$parametrization <- parametrization
       if (parametrization == 'LN1') {

@@ -21,9 +21,6 @@
 #' Method `getDistribution` returns the string representation of the
 #' expression used to create the model variable.
 #' 
-#' @note
-#' TO DO: does not work if expr is not in the global namespace.
-#' 
 #' @author Andrew J. Sims \email{andrew.sims5@@nhs.net}
 #' @docType class
 #' @export
@@ -65,30 +62,34 @@ ExpressionModelVariable <- R6::R6Class(
     #' @description 
     #' Create a Model Variable formed from an expression involving other
     #' model variables.
-    #' @param description Label for the model variable expresssion. In 
+    #' @param label A character string label for the variable. It is advised
+    #' to make this the same as the variable name which helps when tabulating
+    #' model variables involving ExpressionModelVariables.
+    #' @param description Name for the model variable expresssion. In 
     #' a complex model it may help to tabulate how model variables are
     #' combined into costs, probablities and rates.
     #' @param units Units in which the variable is expressed.
     #' @param expr An R expression involving model variables which would be 
     #' syntactically correct were each model variable to be replaced by
     #' numerical variables.
-    #' @param env The environment in which the model variables live. Normally,
+    #' @param envir The environment in which the model variables live. Normally,
     #' and by default, this is the global environment. But if an object is
     #' created which refers to model variables created in a different 
-    #' environment it must be specified.
+    #' environment it must be specified. If creating an object from
+    #' within a function, for example, set `envir=environment()` in the
+    #' parameter list.
     #' @return An object of type ExpressionModelVariable
-    initialize = function(description, units, expr, env=globalenv()) {
-      super$initialize(description, units)
+    initialize = function(label, description, units, expr, envir=globalenv()) {
+      super$initialize(label, description, units)
       # check and save arguments
       if (!is.call(expr)) {
         warning("ExpressionModelVariable$new: expr must be of type 'call'")
       }
       private$expr <- expr
-      if (!is.environment(env)) {
-        stop("ExpressionModelVariable$new: env must be of type 'environment'")
+      if (!is.environment(envir)) {
+        stop("ExpressionModelVariable$new: envir must be of type 'environment'")
       }
-      private$env <- env
-      print(private$env)
+      private$env <- envir
       # parse the expression
       private$expr.value <- private$subExpr(expr, 'value()')
       private$expr.mean <- private$subExpr(expr, 'getMean()')
@@ -105,7 +106,7 @@ ExpressionModelVariable <- R6::R6Class(
     #'        expectation of the variable. Default is FALSE.
     #' @return Updated ExpressionModelVariable object.
     sample = function(expected=F) {
-      mvlist <- self$getModelVariables()
+      mvlist <- self$getExpressionModelVariables()
       sapply(mvlist, FUN=function(mv) {
         mv$sample(expected)        
       })
@@ -116,7 +117,7 @@ ExpressionModelVariable <- R6::R6Class(
     #' Evaluate the expression.
     #' @return Numerical value of the evaluated expression.
     value = function() {
-      rv <- eval(private$expr.value)
+      rv <- eval(private$expr.value, envir=private$env)
       return(rv)  
     },
     
@@ -132,45 +133,46 @@ ExpressionModelVariable <- R6::R6Class(
     #' Return the expected value of the expression variable. 
     #' @return Expected value as a numeric value.
     getMean = function() {
-      rv <- eval(private$expr.mean)
+      rv <- eval(private$expr.mean, envir=private$env)
       return(rv)  
     },
     
     #' @description 
-    #' Return a list of ModelVariables given in the expression.
-    #' @return A named list of model variables. Each member of the list is
-    #' named with a character string of the variable name used in constructing
-    #' the model. This is not necessary for evaluation, but helps when tabulating
-    #' the variables used in a model.
-    getModelVariables = function() {
+    #' Return a named list of ModelVariables given in the expression.
+    #' @return A named list of model variables.
+    getExpressionModelVariables = function() {
       vars <- all.vars(private$expr)
-      names(vars) <- vars
-      mv <- lapply(vars, FUN=function(v) {
-        return(eval(str2lang(v)))
+      # filter the expression variables that are ModelVariables
+      mvlist <- list()
+      sapply(all.vars(private$expr), FUN=function(v) {
+        vv <- eval(str2lang(v), envir=private$env)
+        if (inherits(vv, what='ModelVariable')) {
+          mvlist <<- c(mvlist, vv)
+        }
       })
-      lv <- sapply(mv, FUN=function(v) {
-        return(inherits(v, what='ModelVariable'))
-      })
-      return(mv[lv])
+      return(mvlist)
+    },
+
+    #' @description 
+    #' Recursively expand each model variable that is itself an 
+    #' ExpressionModelVariable into a full list of the model
+    #' variables that have been used to define it. 
+    #' @return List of descendent model variables, including self.
+    explodeExpressionModelVariables = function() {
+      mvlist <- list()
+      toPlain <- function(mv) {
+        # push current mv to list
+        mvlist[[length(mvlist)+1]] <<- mv
+        # process descendant model variables if not a plain model variable
+        if (inherits(mv, what='ExpressionModelVariable')) {
+          for (v in mv$getExpressionModelVariables()) {
+            toPlain(v)
+          }
+        }
+      }
+      toPlain(self)
+      return(mvlist)
     }
-    
-    # @description
-    #' Tabulate all model variables in the expression.
-    # @return Data frame with one row per model variable.
-    #tabulateModelVariables = function() {
-    #  mvlist <- self$getModelVariables()
-    #  DF <- data.frame(
-    #    Variable = names(mvlist),
-    #    Description = sapply(mvlist, FUN=function(x){x$getDescription()}),
-    #    Units = sapply(mvlist, FUN=function(x){x$getUnits()}),
-    #    Distribution = sapply(mvlist, FUN=function(x){x$getDistribution()}),
-    #    Mean = sapply(mvlist, FUN=function(x){x$getMean()}),
-    #    SD = sapply(mvlist, FUN=function(x){x$getSD()}),
-    #    Q2.5 = sapply(mvlist, FUN=function(x){x$getQuantile(probs=c(0.025))}),
-    #    Q97.5 = sapply(mvlist, FUN=function(x){x$getQuantile(probs=c(0.975))})
-    #  )
-    #  return(DF)
-    #}
 
   )
 )

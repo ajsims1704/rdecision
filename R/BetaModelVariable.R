@@ -25,13 +25,16 @@ BetaModelVariable <- R6::R6Class(
     
     #' @description 
     #' Create an object of class BetaModelVariable.
+    #' @param label A character string label for the variable. It is advised
+    #' to make this the same as the variable name which helps when tabulating
+    #' model variables involving ExpressionModelVariables.
     #' @param description A character string describing the variable.
     #' @param units Units of the variable, as character string.
     #' @param alpha parameter of the Beta distribution.
     #' @param beta parameter of the Beta distribution.
     #' @return An object of class BetaModelVariable. 
-    initialize = function(description, units, alpha, beta) {
-      super$initialize(description, units)
+    initialize = function(label, description, units, alpha, beta) {
+      super$initialize(label, description, units)
       private$alpha <- alpha
       private$beta <- beta
       private$val <- self$getMean()
