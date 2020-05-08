@@ -15,7 +15,8 @@
 #' variables using the same operators as regular variables. 
 #' But such forms of expression may be desirable in constructing a
 #' model and this class provides a mechanism for doing so.
-#' Methods `getSD` and `getQuantile` return NA. For many expressions
+#' 
+#' @note Methods `getSD` and `getQuantile` return NA. For many expressions
 #' involving model variables there will be no closed form expression
 #' for these values, and they would normally be obtained by simulation.
 #' Method `getDistribution` returns the string representation of the
@@ -93,7 +94,7 @@ ExpressionModelVariable <- R6::R6Class(
       # parse the expression
       private$expr.value <- private$subExpr(expr, 'value()')
       private$expr.mean <- private$subExpr(expr, 'getMean()')
-      # set all model variables to their expected values
+      # set this model variable and its operands to their expected values
       self$sample(T)
     },
 
@@ -106,9 +107,8 @@ ExpressionModelVariable <- R6::R6Class(
     #'        expectation of the variable. Default is FALSE.
     #' @return Updated ExpressionModelVariable object.
     sample = function(expected=F) {
-      mvlist <- self$getExpressionModelVariables()
-      sapply(mvlist, FUN=function(mv) {
-        mv$sample(expected)        
+      sapply(self$getOperands(), FUN=function(o) {
+        o$sample(expected)        
       })
       return(invisible(self))
     },
@@ -138,39 +138,23 @@ ExpressionModelVariable <- R6::R6Class(
     },
     
     #' @description 
-    #' Return a named list of ModelVariables given in the expression.
-    #' @return A named list of model variables.
-    getExpressionModelVariables = function() {
-      vars <- all.vars(private$expr)
+    #' Return a list of operands that are themselves ModelVariables given
+    #' in the expression.
+    #' @return A list of model variables.
+    getOperands = function() {
       # filter the expression variables that are ModelVariables
       mvlist <- list()
       sapply(all.vars(private$expr), FUN=function(v) {
         vv <- eval(str2lang(v), envir=private$env)
         if (inherits(vv, what='ModelVariable')) {
+          # add the variable to the list
           mvlist <<- c(mvlist, vv)
+          # and add its operands, if any
+          sapply(vv$getOperands(), FUN=function(o) {
+            mvlist <<- c(mvlist, o)
+          })
         }
       })
-      return(mvlist)
-    },
-
-    #' @description 
-    #' Recursively expand each model variable that is itself an 
-    #' ExpressionModelVariable into a full list of the model
-    #' variables that have been used to define it. 
-    #' @return List of descendent model variables, including self.
-    explodeExpressionModelVariables = function() {
-      mvlist <- list()
-      toPlain <- function(mv) {
-        # push current mv to list
-        mvlist[[length(mvlist)+1]] <<- mv
-        # process descendant model variables if not a plain model variable
-        if (inherits(mv, what='ExpressionModelVariable')) {
-          for (v in mv$getExpressionModelVariables()) {
-            toPlain(v)
-          }
-        }
-      }
-      toPlain(self)
       return(mvlist)
     }
 

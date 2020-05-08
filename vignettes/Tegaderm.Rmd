@@ -92,44 +92,50 @@ of Jenks *et al* [-@jenks:2016a], with the following corrections:
 ```{r variables, echo=T}
 # clinical variables
 r.CRBSI <- NormalModelVariable$new(
+  'r.CRBSI',
   'Baseline CRBSI rate', 
   '/1000 catheter days',
   mu=1.48, sigma=0.074
 )
 hr.CRBSI <- LogNormalModelVariable$new(
+  'hr.CRBSI',
   'Tegaderm CRBSI HR',
   'ratio',
   p1=-0.911, p2=0.393
 )
 r.LSI <- NormalModelVariable$new(
+  'r.LSI',
   'Baseline LSI rate',
   '/patient',
   mu=0.1, sigma=0.01
 )
 hr.LSI <- LogNormalModelVariable$new(
+  'hr.LSI',
   'Tegaderm LSI HR',
   'ratio',
   p1=-0.911, p2=0.393
 )
 r.Dermatitis <- NormalModelVariable$new(
+  'r.Dermatitis',
   'Baseline dermatitis risk',
   '/catheter',
   mu=0.0026, sigma=0.00026
 )
 rr.Dermatitis <- LogNormalModelVariable$new(
+  'rr.Dermatitis',
   'Tegaderm Dermatitis RR',
   'ratio',
   p1=1.482, p2=0.490
 )
 
 # cost variables
-c.CRBSI <- GammaModelVariable$new('CRBSI cost', 'GBP', alpha=198.0, beta=50)
-c.Dermatitis <- GammaModelVariable$new('Dermatitis cost', 'GBP', alpha=30, beta=5)
-c.LSI <- GammaModelVariable$new('LSI cost', 'GBP', alpha=50, beta=5)
-c.Tegaderm <- ConstModelVariable$new('Tegaderm CHG cost', 'GBP', const=6.21)
-c.Standard <- ConstModelVariable$new('Standard dressing cost', 'GBP', const=1.34)
-n.cathdays <- NormalModelVariable$new('No. days with catheter', 'days', mu=10, sigma=2)
-n.dressings <- NormalModelVariable$new('No. dressings', 'dressings', mu=3, sigma=0.3)
+c.CRBSI <- GammaModelVariable$new('c.CRBSI', 'CRBSI cost', 'GBP', alpha=198.0, beta=50)
+c.Dermatitis <- GammaModelVariable$new('c.Dermatitis', 'Dermatitis cost', 'GBP', alpha=30, beta=5)
+c.LSI <- GammaModelVariable$new('c.LSI', 'LSI cost', 'GBP', alpha=50, beta=5)
+c.Tegaderm <- ConstModelVariable$new('c.Tegaderm', 'Tegaderm CHG cost', 'GBP', const=6.21)
+c.Standard <- ConstModelVariable$new('c.Standard', 'Standard dressing cost', 'GBP', const=1.34)
+n.cathdays <- NormalModelVariable$new('n.cathdays', 'No. days with catheter', 'days', mu=10, sigma=2)
+n.dressings <- NormalModelVariable$new('n.dressings', 'No. dressings', 'dressings', mu=3, sigma=0.3)
 ```
 
 
@@ -152,48 +158,59 @@ decision tree nodes.
 ```{r expressions, echo=T}
 # probabilities
 p.Dermatitis.S <- ExpressionModelVariable$new(
+  'p.Dermatitis.S',
   'Probability of dermatitis with standard dressing', 'P',
   quote(n.dressings*r.Dermatitis)
 )
 p.Dermatitis.T <- ExpressionModelVariable$new(
+  'p.Dermatitis.T',
   'Probability of dermatitis with Tegaderm', 'P',
   quote(n.dressings*r.Dermatitis*rr.Dermatitis)
 )
 p.LSI.S <- ExpressionModelVariable$new(
+  'p.LSI.S',
  'Probability of LSI with standard dressing', 'P',
  quote(r.LSI)
 )
 p.LSI.T <- ExpressionModelVariable$new(
+  'p.LSI.T',
  'Probability of LSI with Tegaderm', 'P',
  quote(r.LSI*hr.LSI)
 )
 p.CRBSI.S <- ExpressionModelVariable$new(
+  'p.CRBSI.S', 
   'Probability of CRBSI with standard dressing', 'P',
   quote(r.CRBSI*n.cathdays/1000)
 )
 p.CRBSI.T <- ExpressionModelVariable$new(
+  'p.CRBSI.T',
   'Probability of CRBSI with standard dressing', 'P', 
   quote(r.CRBSI*n.cathdays*hr.CRBSI/1000)
 )
 
 # costs
 c.Dermatitis.MVE <- ExpressionModelVariable$new(
+  'c.Dermatitis.MVE',
   'Cost of dermatitis', 'GBP',
   quote(c.Dermatitis)
 )
 c.LSI.MVE <- ExpressionModelVariable$new(
+  'c.LSI.MVE', 
   'Cost of LSI', 'GBP',
   quote(c.LSI)
 )
 c.CRBSI.MVE <- ExpressionModelVariable$new(
+  'c.CRBSI.MVE', 
   'Cost of CRBSI', 'GBP',
   quote(c.CRBSI)
 )
 c.S <- ExpressionModelVariable$new(
+  'c.S',
   'Cost of standard dressing', 'GBP',
   quote(n.dressings*c.Standard)
 )
 c.T <- ExpressionModelVariable$new(
+  'c.T',
   'Cost of Tegaderm', 'GBP',
   quote(n.dressings*c.Tegaderm)
 )
@@ -270,7 +287,7 @@ the method for different head nodes. Selected columns are omitted from the
 
 ```{r modelinputs, echo=T}
 local({
-  DF <- d$tabulateModelVariables(descend=F, explode=T)
+  DF <- d$tabulateModelVariables(include.descendants=T, include.operands=T)
   #DF$Variable <- NULL
   #DF$SD <- NULL
   knitr::kable(DF, row.names=F, format.args=list(scientific=F), digits=3)
@@ -376,42 +393,51 @@ the technology and its comparator is as follows:
 ```{r treefree, echo=T}
 # component costs, standard dressing
 CHG.S <- ExpressionModelVariable$new(
+  'CHG.S',
   "Cost of standard dressing", "GBP", 
   quote(n.dressings*c.Standard)
 )
 CRBSI.S <- ExpressionModelVariable$new(
+  'CRBSI.S',
   "Cost of CRBSI, standard dressing", "GBP", 
   quote(c.CRBSI*r.CRBSI*n.cathdays/1000)
 )
 LSI.S <- ExpressionModelVariable$new(
+  'LSI.S',
   "Cost of LSI, standard dressing", "GBP", 
   quote(c.LSI*r.LSI)
 )
 Dermatitis.S <- ExpressionModelVariable$new(
+  'Dermatitis.S',
   "Cost of dermatitis, standard dressing", "GBP",
   quote(r.Dermatitis*c.Dermatitis*n.dressings)
 )
 
 # component costs, Tegaderm
 CHG.T <- ExpressionModelVariable$new(
+  'CHG.T',
   "Cost of Tegaderm", "GBP", 
   quote(n.dressings*c.Tegaderm)
 )
 CRBSI.T <- ExpressionModelVariable$new(
+  'CRBSI.T',
   "Cost of CRBSI, Tegaderm", "GBP", 
   quote(c.CRBSI*r.CRBSI*hr.CRBSI*n.cathdays/1000)
 )
 LSI.T <- ExpressionModelVariable$new(
+  'LSI.T',
   "Cost of LSI, Tegaderm", "GBP", 
   quote(c.LSI*r.LSI*hr.LSI)
 )
 Dermatitis.T <- ExpressionModelVariable$new(
+  'Dermatitis.T',
   "Cost of dermatitis, Tegaderm", "GBP",
   quote(r.Dermatitis*c.Dermatitis*rr.Dermatitis*n.dressings)
 )
 
 # savings
 c.diff <- ExpressionModelVariable$new(
+  'c.diff',
   "Saving", "GBP",
   quote((CHG.T+CRBSI.T+LSI.T+Dermatitis.T) - (CHG.S+CRBSI.S+LSI.S+Dermatitis.S))
 )
@@ -436,7 +462,7 @@ Each model variable provides a method, `r`, to make random draws from its
 uncertainty distribution. The PSA for the cost difference can therefore be 
 achieved by a single call to this method:
 ```{r treefree-psa, echo=T}
-tf.psa <- c.diff$r(10000)
+tf.psa <- c.diff$r(1000)
 ```
 
 From this distribution, the mean cost saving was `r round(mean(tf.psa),2)`, the 

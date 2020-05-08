@@ -97,29 +97,16 @@ ModelVariable <- R6::R6Class(
     },
 
     #' @description 
-    #' Return a list of ModelVariables given in the expression.
-    #' Only relevant for objects of inherited type ExpressionModelVariable,
-    #' but defined for the base class for convenience to avoid type checking
-    #' inside iterators.
-    #' @return A list of model variables. An list containing self 
-    #' for non-expression model variables 
-    getExpressionModelVariables = function() {
-      return(list(self))
+    #' Return a list of operands given in the expression used to form the
+    #' expression. Only relevant for objects of inherited type 
+    #' ExpressionModelVariable, but defined for the base class for convenience to
+    #' avoid type checking inside iterators.
+    #' @return A list of operands that are themselves ModelVariables. An empty list 
+    #' for non-expression model variables.
+    getOperands = function() {
+      return(list())
     },
     
-    #' @description 
-    #' Recursively expand each model variable that is itself an 
-    #' ExpressionModelVariable into a full list of the model
-    #' variables that have been used to define it. 
-    #' Only relevant for objects of inherited type ExpressionModelVariable,
-    #' but defined for the base class for convenience to avoid type
-    #' checking inside iterators.
-    #' @return A list of model variables. An list containing self for 
-    #' non-expression model variables.
-    explodeExpressionModelVariables = function() {
-      return(list(self))
-    },
-
     #' @description 
     #' Return the expected value of the distribution. 
     #' @return Expected value as a numeric value.

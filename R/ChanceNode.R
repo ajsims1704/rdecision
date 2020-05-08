@@ -223,15 +223,23 @@ ChanceNode <- R6::R6Class(
     #' @description
     #' Return the list of model variables associated with the node. The
     #' model variables may be associated with costs or probabilities.
+    #' @param include.operands A logical. If TRUE the operands of the model variables
+    #' are included in the list; otherwise only the model model variables that 
+    #' were supplied when the node was created are returned.
     #' @return List of model variables. 
-    getModelVariables = function() {
+    getModelVariables = function(include.operands=F) {
       # make a list of all private objects that may be associated with model variables
-      objects <- c(private$p, private$costs)
+      mv <- c(private$p, private$costs)
       # iterate objects and create list of model variables
       mvlist <- list()
-      lapply(objects, FUN=function(o) {
-        if (inherits(o, what='ModelVariable')==T) {
-          mvlist <<- c(mvlist, o)
+      lapply(mv, FUN=function(v) {
+        if (inherits(v, what='ModelVariable')) {
+          mvlist <<- c(mvlist, v)
+          if (include.operands) {
+            sapply(v$getOperands(), FUN=function(o) {
+              mvlist <<- c(mvlist, o)
+            })
+          }
         }
       })
       # return list of model variables

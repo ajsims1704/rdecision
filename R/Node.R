@@ -178,46 +178,42 @@ Node <- R6::R6Class(
     
     #' @description 
     #' Function to return a list of model variables associated with this node.
+    #' @param include.operands A logical. If TRUE the operands of the model variables
+    #' are included in the list; otherwise only the model model variables that 
+    #' were supplied when the node was created are returned.
     #' @return 
     #' List of model variables associated with this node.
-    getModelVariables = function() {
+    getModelVariables = function(include.operands=F) {
       return(list())
     },
     
     #' @description
     #' Tabulate all model variables associated with this node.
-    #' @param descend If TRUE (the default), model variables associated
-    #' with this node and its descendants are tabulated.
-    #' @param explode If TRUE, recursively add model variables which are
+    #' @param include.descendants If TRUE, model variables associated
+    #' with this node and its descendants are tabulated; otherwise only
+    #' the ones that are associated with this node.
+    #' @param include.operands If TRUE, recursively add model variables which are
     #' included in expressions in ExpressionModelVariables. Default is
     #' FALSE.
     #' @return Data frame with one row per model variable.
-    tabulateModelVariables = function(descend=T, explode=F) {
+    tabulateModelVariables = function(include.descendants=F, include.operands=F) {
       # create list of nodes
-      if (descend) {
+      if (include.descendants) {
         nodes <- self$descendantNodes()
       } 
       else {
         nodes <- list(self)
       }
-      # list of model variables associated with this node
-      if (explode) {
-        mvlist <- list()
-        thislist <- self$getModelVariables() 
-        for (v in thislist) {
-          if (inherits(v, what='ExpressionModelVariable')) {
-            mvlist <- c(mvlist, v$explodeModelVariables())
-          }
-          else {
-            mvlist <- c(mvlist, v)
-          }
+      # list model variables associated with these nodes
+      mvlist <- list()
+      sapply(nodes, FUN=function(n) {
+        mv <- n$getModelVariables(include.operands=include.operands)
+        if (length(mv) > 0) {
+          mvlist <<- c(mvlist, unlist(mv))
         }
-      }
-      else {
-        mvlist <- self$getModelVariables()
-      }
+      })
       # discard non unique members
-      #mvlist <- unique(mvlist)
+      mvlist <- unique(mvlist)
       # create a data frame of model variables
       DF <- data.frame(
         Label = sapply(mvlist, FUN=function(x){x$getLabel()}),
