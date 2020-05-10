@@ -169,7 +169,7 @@ DecisionNode <- R6::R6Class(
     #' \item{Utility}{The utility associated with the outcome.}
     #' \item{ExpectedUtility}{Utility \eqn{*} probability of traversing the pathway.}
     #' }
-    evaluate = function(expected=T) {
+    evaluatePathways = function(expected=T) {
       # sample this node and all descendants
       descendants <- self$descendantNodes()
       lapply(descendants, FUN=function(n) {
@@ -188,6 +188,33 @@ DecisionNode <- R6::R6Class(
       RES$ExpectedCost <- round(RES$Probability*RES$Cost,2)
       RES$ExpectedUtility <- round(RES$Probability*RES$Utility,4)
       return(RES)
+    },
+    
+    #' @description 
+    #' Evaluate each choice. Starting with this decision node, the function
+    #' works though all possible paths and computes the probability,
+    #' cost and utility of each, then aggregates by choice. 
+    #' @param expected If TRUE, evaluate each model variable as its mean value,
+    #'        otherwise sample each one from their uncertainty distrbution.
+    #' @return A data frame with one row per path and columns organized as
+    #' follows:
+    #' \describe{
+    #' \item{Choice}{The choice.}
+    #' \item{Cost}{Aggregate cost of the choice.}
+    #' \item{Utility}{Aggregate utility of the choice.}
+    #' }
+    evaluateChoices = function(expected=T) {
+      # evaluate pathways
+      RES <- self$evaluatePathways(expected)
+      # aggregate them by choice
+      SUM <- aggregate(
+        RES[,c('ExpectedCost', 'ExpectedUtility')],
+        by = list(RES$Choice),
+        FUN = sum
+      )
+      names(SUM) <- c('Choice', 'Cost', 'Utility')
+      # return the aggregates
+      return(SUM)
     }
   )
 )

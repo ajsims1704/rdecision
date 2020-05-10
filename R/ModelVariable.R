@@ -44,6 +44,13 @@ ModelVariable <- R6::R6Class(
       private$units <- units
       private$val <- 0
     },
+ 
+    #' @description 
+    #' Is this ModelVariable an expression?
+    #' @return TRUE if it inherits from ExpressionModelVariable, FALSE otherwise.
+    isExpression = function() {
+      return(inherits(self, what='ExpressionModelVariable'))
+    },
     
     #' @description
     #' Set the value of the model variable from its uncertainty distribution.

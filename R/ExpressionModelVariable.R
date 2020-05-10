@@ -35,6 +35,7 @@ ExpressionModelVariable <- R6::R6Class(
     expr.value = 'call',
     expr.mean = 'call',
     env = 'environment',
+    Nsim = 1000,
 
     # function to create an expression involving calling ModelVariable
     # methods. For example if method='value()', each model variable X
@@ -137,6 +138,33 @@ ExpressionModelVariable <- R6::R6Class(
       return(rv)  
     },
     
+    #' @description 
+    #' Return the standard deviation of the distribution. 
+    #' @return Standard deviation as a numeric value
+    getSD = function() {
+      # sample values from the variable
+      S <- self$r(private$Nsim)
+      return(sd(S))
+    },
+
+    #' @description
+    #' Return the quantiles by sampling the variable.
+    #' @param probs Vector of probabilities, in range [0,1].    
+    #' @return Vector of quantiles.
+    getQuantile = function(probs) {
+      # check inputs
+      sapply(probs, FUN=function(x) {
+        if (!is.numeric(probs)) {
+          stop("ExpressionModelVariable$getQuantile: argument must be a numeric vector")
+        }
+      })
+      # sample the distribution
+      S <- self$r(private$Nsim)
+      # return the quantiles of the sample
+      q <- quantile(S, probs)
+      return(q)
+    },
+
     #' @description 
     #' Return a list of operands that are themselves ModelVariables given
     #' in the expression.

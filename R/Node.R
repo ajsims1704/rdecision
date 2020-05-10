@@ -195,7 +195,21 @@ Node <- R6::R6Class(
     #' @param include.operands If TRUE, recursively add model variables which are
     #' included in expressions in ExpressionModelVariables. Default is
     #' FALSE.
-    #' @return Data frame with one row per model variable.
+    #' @return Data frame with one row per model variable, as follows:
+    #' \describe{
+    #' \item{Label}{The label given to the variable on creation.}
+    #' \item{Description}{As given at initiialization.}
+    #' \item{Units}{Units of the variable.}
+    #' \item{Distribution}{Either the uncertainty distribution, if
+    #' it is a regular model variable, or the expression used to create it,
+    #' if it is an ExpressionModelVariable.}
+    #' \item{Mean}{Expected value.}
+    #' \item{SD}{Standard deviation.}
+    #' \item{Q2.5}{2.5% quantile.}
+    #' \item{Q97.5}{97.5% quantile.}
+    #' \item{Qhat}{Asterisk (*) if the quantiles and SD have been estimated
+    #' by random sampling.}
+    #' }
     tabulateModelVariables = function(include.descendants=F, include.operands=F) {
       # create list of nodes
       if (include.descendants) {
@@ -223,8 +237,14 @@ Node <- R6::R6Class(
         Mean = sapply(mvlist, FUN=function(x){x$getMean()}),
         SD = sapply(mvlist, FUN=function(x){x$getSD()}),
         Q2.5 = sapply(mvlist, FUN=function(x){x$getQuantile(probs=c(0.025))}),
-        Q97.5 = sapply(mvlist, FUN=function(x){x$getQuantile(probs=c(0.975))})
+        Q97.5 = sapply(mvlist, FUN=function(x){x$getQuantile(probs=c(0.975))}),
+        Qhat = sapply(mvlist, FUN=function(exp){return(ifelse(exp$isExpression(),'*',''))})
       )
+      # order the table
+      if (nrow(DF) > 0) {
+        DF <- DF[order(DF$Label),]
+      }
+      # return the tabulated variables
       return(DF)
     },
     
