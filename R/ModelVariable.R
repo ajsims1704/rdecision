@@ -113,7 +113,49 @@ ModelVariable <- R6::R6Class(
     getOperands = function() {
       return(list())
     },
-    
+
+    #' @description 
+    #' Tabulate the model variable and optionally include its operands.
+    #' @param include.operands If TRUE include the operands of this model
+    #' variable in the table. Otherwise return a table with one row, 
+    #' describing this variable.
+    #' @return Data frame with one row per model variable, as follows:
+    #' \describe{
+    #' \item{Label}{The label given to the variable on creation.}
+    #' \item{Description}{As given at initiialization.}
+    #' \item{Units}{Units of the variable.}
+    #' \item{Distribution}{Either the uncertainty distribution, if
+    #' it is a regular model variable, or the expression used to create it,
+    #' if it is an ExpressionModelVariable.}
+    #' \item{Mean}{Expected value.}
+    #' \item{SD}{Standard deviation.}
+    #' \item{Q2.5}{2.5% quantile.}
+    #' \item{Q97.5}{97.5% quantile.}
+    #' \item{Qhat}{Asterisk (*) if the quantiles and SD have been estimated
+    #' by random sampling.}
+    #' }
+    tabulate = function(include.operands=FALSE) {
+      # create list of model variables
+      mvlist <- list(self)
+      if (include.operands) {
+        mvlist <- c(mvlist, self$getOperands())
+      }
+      # create a data frame of model variables
+      DF <- data.frame(
+        Label = sapply(mvlist, FUN=function(x){x$getLabel()}),
+        Description = sapply(mvlist, FUN=function(x){x$getDescription()}),
+        Units = sapply(mvlist, FUN=function(x){x$getUnits()}),
+        Distribution = sapply(mvlist, FUN=function(x){x$getDistribution()}),
+        Mean = sapply(mvlist, FUN=function(x){x$getMean()}),
+        SD = sapply(mvlist, FUN=function(x){x$getSD()}),
+        Q2.5 = sapply(mvlist, FUN=function(x){x$getQuantile(probs=c(0.025))}),
+        Q97.5 = sapply(mvlist, FUN=function(x){x$getQuantile(probs=c(0.975))}),
+        Qhat = sapply(mvlist, FUN=function(exp){return(ifelse(exp$isExpression(),'*',''))})
+      )
+      # Return the table
+      return(DF)
+    },
+
     #' @description 
     #' Return the expected value of the distribution. 
     #' @return Expected value as a numeric value.

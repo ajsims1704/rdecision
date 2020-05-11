@@ -67,6 +67,12 @@ package, with probabilistic sensitivity analysis. It is based on the model repor
 by Jenks *et al* [-@jenks:2016a] in which a transparent dressing used to secure
 vascular catheters (Tegaderm CHG) was compared with a standard dressing.
 
+Two methods of evaluating the decision are presented. The first method constructs
+a decision tree and evaluates the costs associated with traversing each pathway
+through it. The second method is a direct calculation and summation of costs,
+without the need to construct a tree. Point estimates calculations and probabilistic 
+sensitivity analysis are conducted for both methods.
+
 # Model variables
 The following code creates the 13 variables used in the model. The choice of
 variables, their distributions and their parameters are taken from table 3 
@@ -180,11 +186,6 @@ p.Dermatitis.T <- ExpressionModelVariable$new(
   'P(dermatitis|Tegaderm)', 'P',
   quote(n.dressings*r.Dermatitis*rr.Dermatitis)
 )
-#p.LSI.S <- ExpressionModelVariable$new(
-#  'p.LSI.S',
-# 'P(LSI|standard dressing)', 'P',
-# quote(r.LSI)
-#)
 r.LSI.T <- ExpressionModelVariable$new(
   'r.LSI.T',
  'P(LSI|Tegaderm)', 'P',
@@ -317,25 +318,24 @@ the model there are eight possible root-to-leaf paths, each of which
 begins with the decision node and ends with a leaf node. For example,
 pathway `Dermatitis (Standard Dressing)` involves a traversal of nodes
 `d`, `chance.S`, and `leaf.S.Dermatitis`. The method `evaluateChoices`
-is similar, but aggregates the results by choice.
+is similar, but aggregates the results by choice. The results of the scenario
+model, using the code from the previous section,
+yields the table above. There are, as expected, eight root-to-leaf pathways, and 
+the table below shows the probability and cost associated with each pathway. 
+This model did not consider utility, and the columns associated with utility
+are removed.
 
 ```{r basecase, echo=T}
-RES <- d$evaluatePathways(expected=T)
+local({
+  RES <- d$evaluatePathways(expected=T)
+  keep <- c('Choice', 'Pathway', 'Probability', 'Cost', 'ExpectedCost')
+  knitr::kable(RES[,keep])
+})
 ```
 
 ## Model results
 
 ### Base case
-The results of the scenario model, using the code from the previous section,
-yields the following result. There are, as expected, eight root-to-leaf pathways, and 
-the table below shows the probability and cost associated with each pathway. 
-This model did not consider utility, and the columns associated with utility
-are removed.
-```{r basecase-tabulate, echo=F}
-keep <- c('Choice', 'Pathway', 'Probability', 'Cost', 'ExpectedCost')
-knitr::kable(RES[,keep])
-```
-
 ```{r basecase-summary, echo=FALSE}
 PE.saving <- 0
 local({
@@ -372,15 +372,17 @@ local({
   N <- 1000
   RES <<- data.frame(
     Run = 1:N,
-    Tegaderm = numeric(length=N),
-    Standard = numeric(length=N)
+    Tegaderm = vector('numeric', length=N),
+    Standard = vector('numeric', length=N),
+    Difference = vector('numeric', length=N)
   )
   for (i in 1:N) {
     RUN <- d$evaluateChoices(expected=F)
     RES$Tegaderm[i] <<- RUN$Cost[RUN$Choice=='Tegaderm CHG']
     RES$Standard[i] <<- RUN$Cost[RUN$Choice=='Standard Dressing']
+    RES$Difference[i] <<- RUN$Cost[RUN$Choice=='Tegaderm CHG'] - 
+                          RUN$Cost[RUN$Choice=='Standard Dressing']
   }
-  RES$Difference <<- RES$Tegaderm - RES$Standard
   knitr::kable(head(RES, n=10))
 })
 ```
@@ -389,7 +391,8 @@ From PSA, the mean cost of treatment with Tegaderm was `r round(mean(RES$Tegader
 the mean cost of treatment with standard dressings was `r round(mean(RES$Standard),2)`
 and the mean cost saving was `r round(mean(RES$Difference),2)`. The 95% confidence 
 interval for cost saving was `r round(quantile(RES$Difference, probs=c(0.025)),2)` to 
-`r round(quantile(RES$Difference, probs=c(0.975)),2)`. 
+`r round(quantile(RES$Difference, probs=c(0.975)),2)`; the standard deviation of the
+cost saving was `r round(sd(RES$Difference),2)`.
 Overall, `r round(100*sum(RES$Difference<0)/nrow(RES),2)`% of runs found that Tegaderm
 was cost saving. These results replicate those reported by the manufucturer.
 
@@ -403,7 +406,10 @@ combining model variables directly. This is, in essence, the approach taken in
 many decision tree models constructed in Excel. 
 
 ## Components of cost
-Each component of the cost of the technology and its comparator is as follows:
+Each cost component is defined as an expression involving two or more
+of the 13 model inputs. In contrast to the tree approach, which computed
+the cost of traversing each pathway, this apprach allows the costs of the
+technology and its comparator to be constructed as sub-totals.
 ```{r treefree, echo=T}
 # component costs, standard dressing
 CHG.S <- ExpressionModelVariable$new(
@@ -451,101 +457,51 @@ Dermatitis.T <- ExpressionModelVariable$new(
 
 # per-patient costs
 total.T <- ExpressionModelVariable$new(
-  'c.Tegaderm',
+  'total.T',
   'Treatment cost (Tegaderm)', 'GBP',
   quote(CHG.T+CRBSI.T+LSI.T+Dermatitis.T)
 )
 
 total.S <- ExpressionModelVariable$new(
-  'c.Standard',
+  'total.S',
   'Treatment cost (Standard)', 'GBP',
   quote(CHG.S+CRBSI.S+LSI.S+Dermatitis.S)
 )
 
-junk <- ExpressionModelVariable$new(
-  'junk',
-  'S-T', 'GBP',
-  quote((CHG.S+CRBSI.S+LSI.S+Dermatitis.S)-(CHG.T+CRBSI.T+LSI.T+Dermatitis.T))
-)
-
-```
-
-## Evaluating the decision
-Although the costs can be analyzed without incorporating them into a tree, 
-a `DecisionNode` object provides easy methods for describing the model
-and evaluating decisions. A rudimentary tree can be constructed as follows:
-```{r treefree-decision, echo=TRUE}
-leaf.S <- LeafNode$new('Standard dressing')
-leaf.T <- LeafNode$new('Tegaderm')
-dd <- DecisionNode$new(
-  children <- c(leaf.S, leaf.T),
-  edgelabels = c('Standard-Tegaderm Dressing', 'Zero'),
-  costs = list(junk, 0) #list(total.S, total.T) 
+c.diff <- ExpressionModelVariable$new(
+  'c.diff',
+  'Cost difference', 'GBP',
+  quote(total.T-total.S)
 )
 ```
 
 ## Base case
-The components of cost can be extracted from the ExpressionModelVariable `dd` by 
-tabulating the model variables in the decision node. In this case, only the
+The components of cost can be extracted by tabulating the model variables
+in the cost difference model variable, `c.diff`. In this case, only the
 rows containing component costs are displayed.
 ```{r treefree-base, echo=FALSE}
 local({
-  MV <- dd$tabulateModelVariables(include.operands=TRUE)
+  MV <- c.diff$tabulate(include.operands=TRUE)
   vars <- c('CHG.S', 'CRBSI.S', 'LSI.S', 'Dermatitis.S',
             'CHG.T', 'CRBSI.T', 'LSI.T', 'Dermatitis.T',
-            'junk')
-  keep <- c('Description', 'Units', 'Mean', 'Q2.5', 'Q97.5', 'Qhat')
-  knitr::kable(MV[MV$Label %in% vars,keep], row.names=F, 
-               format.args=list(scientific=F), digits=3
+            'total.S', 'total.T', 'c.diff')
+  keep <- c('Description', 'Units', 'Mean', 'SD', 'Q2.5', 'Q97.5', 'Qhat')
+  knitr::kable(MV[MV$Label %in% vars, keep], row.names=F, 
+               format.args=list(scientific=F), digits=2
                )
 })
 ```
 
-```{r treefree-base-result, echo=FALSE}
-SUM <- dd$evaluateChoices(expected=T)
-PE.saving <<- SUM$Cost[SUM$Choice=='Standard-Tegaderm Dressing'] - 
-              SUM$Cost[SUM$Choice=='Zero']
-rm(SUM)
-```
-
-As with the full tree, the decision can be evaluated by calling
-the `evaluateChoices` method. The point estimate of the saving is 
-`r round(-1*PE.saving,2)`, which is identical to
-the point estimate saving calculated using the decision tree approach.
+The point estimate of saving is obtained directly from the expectation
+of the cost difference variable, `r round(-1*c.diff$getMean(),2)`. This
+is identical to the value obtained from the full tree.
 
 ## Probabilistic sensitivity analysis
-```{r treefree-PSA, echo=FALSE}
-local({
-  N <- 1000
-  RES <<- data.frame(
-    Run = 1:N,
-    Tegaderm = numeric(length=N),
-    Standard = numeric(length=N)
-  )
-  for (i in 1:N) {
-    RUN <- d$evaluateChoices(expected=F)
-    RES$Tegaderm[i] <<- RUN$Cost[RUN$Choice=='Tegaderm CHG']
-    RES$Standard[i] <<- RUN$Cost[RUN$Choice=='Standard Dressing']
-  }
-  RES$Difference <<- RES$Tegaderm - RES$Standard
-})
-```
-
-This proceeds exactly as with the full tree analysis. From PSA, the mean cost of
-treatment with Tegaderm was `r round(mean(RES$Tegaderm),2)`,
-the mean cost of treatment with standard dressings was `r round(mean(RES$Standard),2)`
-and the mean cost saving was `r round(mean(RES$Difference),2)`. The 95% confidence 
-interval for cost saving was `r round(quantile(RES$Difference, probs=c(0.025)),2)` to 
-`r round(quantile(RES$Difference, probs=c(0.975)),2)`. 
-Overall, `r round(100*sum(RES$Difference<0)/nrow(RES),2)`% of runs found that Tegaderm
-was cost saving. These results replicate those reported by the manufucturer.
-
 Each model variable provides a method, `r`, to make random draws from its
 uncertainty distribution. The PSA for the cost difference can therefore be 
 achieved by a single call to this method:
 ```{r echo=T}
-#tf.psa <- c.diff$r(1000)
-tf.psa <- rnorm(1000)
+tf.psa <- c.diff$r(1000)
 ```
 
 From this distribution, the mean cost saving was `r round(mean(tf.psa),2)`, the 
@@ -554,6 +510,61 @@ to `r round(quantile(tf.psa,0.975),2)`
 and `r round(100*sum(tf.psa<0)/length(tf.psa),2)`% of runs generated a cost saving.
 Within fluctuation error this is consistent with the manufacturer's reported
 saving of 77.26 with 98.5% of runs being cost saving.
+
+# Comparison of approaches
+
+```{r echo=T}
+local({
+  TS <- ExpressionModelVariable$new(
+    'TS',
+    'total.S * total.T',
+    'GBP',
+    quote(total.S * total.T)
+  )
+
+  N <- 10000
+  TC <- vector(mode='numeric', length=N)
+  TU <- vector(mode='numeric', length=N)
+  S <- vector(mode='numeric', length=N)
+  for (i in 1:10000) {  
+    total.T$sample(expected=F)
+    TU[i] <- total.T$value()
+    total.T$sample(expected=F)
+    total.S$sample(expected=F)
+    TC[i] <- total.T$value()
+    S[i] <- total.S$value() 
+  }
+  print(paste('mean TC = ', mean(TC)))
+  print(paste('sd TC = ', sd(TC)))
+  print(paste('mean TU = ', mean(TU)))
+  print(paste('sd TU = ', sd(TU)))
+  print(paste('mean S = ', mean(S)))
+  print(paste('sd S = ', sd(S)))
+  print(paste('cov TC,S = ', cov(S,TC)))
+  print(paste('cor TC,S = ', cor(S,TC)))
+  print(paste('cov TU,S = ', cov(S,TU)))
+  print(paste('cor TU,S = ', cor(S,TU)))
+
+  DC <- TC-S
+  print(paste('mean DC = ', mean(DC)))
+  print(paste('sd DC = ', sd(DC)))
+  print(paste('%DC < 0 =', 100*sum(DC<0)/length(DC)))
+  print(paste('DC CI =', quantile(DC, probs=c(0.025,0.975))))
+  DU <- TU-S
+  print(paste('mean DU = ', mean(DU)))
+  print(paste('sd DU = ', sd(DU)))
+  print(paste('%DU < 0 =', 100*sum(DU<0)/length(DU)))
+  print(paste('DU CI =', quantile(DU, probs=c(0.025,0.975))))
+  
+
+  knitr::kable(TS$tabulate(), row.names=F,
+               format.args=list(scientific=F), digits=2
+)
+  
+})
+```
+
+
 
 
 # References

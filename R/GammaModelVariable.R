@@ -50,7 +50,7 @@ GammaModelVariable <- R6::R6Class(
     #'        returned at subsequent calls to `value()` to be equal to the 
     #'        expectation of the variable. Default is FALSE.
     #' @return Updated GammaModelVariable object.
-    sample = function(expected=F) {
+    sample = function(expected=FALSE) {
       private$val <- NA
       if (expected) {
         private$val <- self$getMean()

@@ -21,7 +21,7 @@ pathway.name <- function(nodes) {
     node <- nodes[[length(nodes)]]
     # if leaf node, return its pathway
     if (node$nodeType()=='LeafNode') {
-      rc <- node$getPathway()
+      rc <- node$getName()
     }
   }
   return(rc)

@@ -18,28 +18,8 @@ DecisionNode <- R6::R6Class(
   private = list(
     
     # fields
-    costs = 'list',
+    costs = 'list'
     
-    # description Set numerical cost values in edges.
-    # return An updated object.
-    setEdgeCosts = function() {
-      for (i in 1:length(private$edges)) {
-        edge <- private$edges[[i]]
-        cost <- private$costs[[i]]
-        if (inherits(cost, what='ModelVariable')) {
-          c <- cost$value()
-          edge$setCost(c)
-        }
-        else if (is.numeric(cost)) {
-          edge$setCost(cost)
-        }
-        else {
-          stop("Edge$setEdgeCosts: cost must be of type `ModelVariable` or `numeric`")
-        }
-      }  
-      return(invisible(self))
-    }
-
   ),
   public = list(
 
@@ -99,18 +79,15 @@ DecisionNode <- R6::R6Class(
       })
       private$costs <- costs
       
-      # set the costs for each edge
-      private$setEdgeCosts()
+      # update the numerical values on the edges
+      self$updateEdges()
     },
 
     #' @description
     #' Return the list of model variables associated with the node. The
     #' model variables may be associated with costs or probabilities.
-    #' @param include.operands A logical. If TRUE the operands of the model variables
-    #' are included in the list; otherwise only the model model variables that 
-    #' were supplied when the node was created are returned.
     #' @return List of model variables. 
-    getModelVariables = function(include.operands=F) {
+    getModelVariables = function() {
       # make a list of all private objects that may be associated with model variables
       mv <- c(private$p, private$costs)
       # iterate objects and create list of model variables
@@ -118,11 +95,6 @@ DecisionNode <- R6::R6Class(
       lapply(mv, FUN=function(v) {
         if (inherits(v, what='ModelVariable')) {
           mvlist <<- c(mvlist, v)
-          if (include.operands) {
-            sapply(v$getOperands(), FUN=function(o) {
-              mvlist <<- c(mvlist, o)
-            })
-          }
         }
       })
       # return list of model variables
@@ -135,19 +107,38 @@ DecisionNode <- R6::R6Class(
     #'        value at the next call to `value()`. If FALSE each model variable
     #'        will return the sampled value. Default is FALSE.
     #' @return An updated DecisionNode object.
-    sample = function(expected=F) {
+    sampleModelVariables = function(expected=FALSE) {
       # get the model variables associated with this node
       mvlist <- self$getModelVariables()
       # sample them
       sapply(mvlist, FUN=function(mv) {
         mv$sample(expected)
       })
-      # update edges
-      private$setEdgeCosts()
       # return reference to updated node
       return(invisible(self))  
     },
     
+    #' @description Update numerical values in edges.
+    #' @return An updated Node object.
+    updateEdges = function() {
+      # update costs
+      for (i in 1:length(private$edges)) {
+        edge <- private$edges[[i]]
+        cost <- private$costs[[i]]
+        if (inherits(cost, what='ModelVariable')) {
+          c <- cost$value()
+          edge$setCost(c)
+        }
+        else if (is.numeric(cost)) {
+          edge$setCost(cost)
+        }
+        else {
+          stop("Edge$setEdgeCosts: cost must be of type `ModelVariable` or `numeric`")
+        }
+      }  
+      return(invisible(self))
+    },
+
     #' @description 
     #' Evaluate a decision. Starting with this decision node, the function
     #' works though all possible paths and computes the probability,
@@ -170,23 +161,24 @@ DecisionNode <- R6::R6Class(
     #' \item{ExpectedUtility}{Utility \eqn{*} probability of traversing the pathway.}
     #' }
     evaluatePathways = function(expected=T) {
-      # sample this node and all descendants
+      # sample model variables of this node and all descendants
       descendants <- self$descendantNodes()
       lapply(descendants, FUN=function(n) {
-        n$sample(expected)
+        n$sampleModelVariables(expected)
+      })
+      # update numerical edge values
+      lapply(descendants, FUN=function(n) {
+        n$updateEdges()
       })
       # evaluate cost and utility of each path
-      RES <- data.frame(
-        'Choice' = unlist(path.apply(self, FUN=pathway.choice)),
-        'Pathway' = unlist(path.apply(self, FUN=pathway.name)),
-        'Probability' = unlist(path.apply(self, FUN=pathway.probability)),
-        'Cost' = unlist(path.apply(self, FUN=pathway.cost)),
-        'ExpectedCost' = NA,
-        'Utility' = unlist(path.apply(self, FUN=pathway.utility)),
-        'ExpectedUtility' = NA
+      paths <- self$getPathways()
+      # 
+      RES <- do.call(
+        'rbind', 
+        lapply(paths, FUN=function(x){x$tabulate()})
       )
-      RES$ExpectedCost <- round(RES$Probability*RES$Cost,2)
-      RES$ExpectedUtility <- round(RES$Probability*RES$Utility,4)
+      RES$ExpectedCost <- RES$Probability*RES$Cost
+      RES$ExpectedUtility <- RES$Probability*RES$Utility
       return(RES)
     },
     
@@ -208,11 +200,11 @@ DecisionNode <- R6::R6Class(
       RES <- self$evaluatePathways(expected)
       # aggregate them by choice
       SUM <- aggregate(
-        RES[,c('ExpectedCost', 'ExpectedUtility')],
+        RES[,c('Probability', 'ExpectedCost', 'ExpectedUtility')],
         by = list(RES$Choice),
         FUN = sum
       )
-      names(SUM) <- c('Choice', 'Cost', 'Utility')
+      names(SUM) <- c('Choice', 'Probability', 'Cost', 'Utility')
       # return the aggregates
       return(SUM)
     }

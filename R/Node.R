@@ -51,6 +51,7 @@ Node <- R6::R6Class(
       return(re)
     }
   ),
+  
   public = list(
     
     #' @description
@@ -147,13 +148,34 @@ Node <- R6::R6Class(
     },
     
     #' @description
-    #' Function to return the pathway name, if defined
-    #' @return 
-    #' Name of pathway (final leaf node), character string
-    getPathway = function() {
-      return(NA)  
+    #' Trace and list all pathways ending on leaf nodes which start
+    #' with this node.
+    #' @return A list of Path objects. Each member of the list is a
+    #' path from this node to a leaf.
+    getPathways = function() {
+      path <- list()
+      rc <- list()
+      toLeaf <- function(node) {
+        # push current node to path
+        path[[length(path)+1]] <<- node
+        # leaf reached; store the path
+        if (node$hasChildNodes()) {
+          # process child nodes
+          for (child in node$childNodes()) {
+            toLeaf(child)
+          }
+        }
+        else {
+          p <- Path$new(path)
+          rc[[length(rc)+1]] <<- p
+        }
+        # pop current node from path
+        path <<- path[1:(length(path)-1)]
+      }
+      toLeaf(self)
+      return(rc)
     },
-    
+
     #' @description
     #' function to return the utility associated with the node
     #' @return 
@@ -178,12 +200,9 @@ Node <- R6::R6Class(
     
     #' @description 
     #' Function to return a list of model variables associated with this node.
-    #' @param include.operands A logical. If TRUE the operands of the model variables
-    #' are included in the list; otherwise only the model model variables that 
-    #' were supplied when the node was created are returned.
     #' @return 
     #' List of model variables associated with this node.
-    getModelVariables = function(include.operands=F) {
+    getModelVariables = function() {
       return(list())
     },
     
@@ -210,7 +229,8 @@ Node <- R6::R6Class(
     #' \item{Qhat}{Asterisk (*) if the quantiles and SD have been estimated
     #' by random sampling.}
     #' }
-    tabulateModelVariables = function(include.descendants=F, include.operands=F) {
+    tabulateModelVariables = function(include.descendants=FALSE, 
+                                      include.operands=FALSE) {
       # create list of nodes
       if (include.descendants) {
         nodes <- self$descendantNodes()
@@ -221,25 +241,17 @@ Node <- R6::R6Class(
       # list model variables associated with these nodes
       mvlist <- list()
       sapply(nodes, FUN=function(n) {
-        mv <- n$getModelVariables(include.operands=include.operands)
+        mv <- n$getModelVariables()
         if (length(mv) > 0) {
           mvlist <<- c(mvlist, unlist(mv))
         }
       })
-      # discard non unique members
-      mvlist <- unique(mvlist)
-      # create a data frame of model variables
-      DF <- data.frame(
-        Label = sapply(mvlist, FUN=function(x){x$getLabel()}),
-        Description = sapply(mvlist, FUN=function(x){x$getDescription()}),
-        Units = sapply(mvlist, FUN=function(x){x$getUnits()}),
-        Distribution = sapply(mvlist, FUN=function(x){x$getDistribution()}),
-        Mean = sapply(mvlist, FUN=function(x){x$getMean()}),
-        SD = sapply(mvlist, FUN=function(x){x$getSD()}),
-        Q2.5 = sapply(mvlist, FUN=function(x){x$getQuantile(probs=c(0.025))}),
-        Q97.5 = sapply(mvlist, FUN=function(x){x$getQuantile(probs=c(0.975))}),
-        Qhat = sapply(mvlist, FUN=function(exp){return(ifelse(exp$isExpression(),'*',''))})
+      # tabulate the model variables
+      DF <- do.call(
+        'rbind', 
+        lapply(mvlist, FUN=function(x){x$tabulate(include.operands)})
       )
+      DF <- DF[!duplicated(DF),]
       # order the table
       if (nrow(DF) > 0) {
         DF <- DF[order(DF$Label),]
@@ -249,12 +261,18 @@ Node <- R6::R6Class(
     },
     
     #' @description 
-    #' Sample the model variables associated with the node and update edges
-    #' as necessary
-    #' @param expected if TRUE, use the expected value of the moel variables in
+    #' Sample the model variables associated with the node.
+    #' @param expected if TRUE, use the expected value of the model variables in
     #'        the node; otherwise sample from their uncertainty distributions.
     #' @return Updated Node object
-    sample = function(expected=F) {
+    sampleModelVariables = function(expected=FALSE) {
+      return(invisible(self))
+    },
+    
+    #' @description 
+    #' Update the values on the edges associated with the node.
+    #' @return Updated Node object
+    updateEdges = function() {
       return(invisible(self))
     }
   )

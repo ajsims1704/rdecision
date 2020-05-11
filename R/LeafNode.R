@@ -17,7 +17,7 @@ LeafNode <- R6::R6Class(
   classname = "LeafNode",
   inherit = Node,
   private = list(
-    pathway = "character",
+    name = "character",
     utility = "numeric"
   ),
   public = list(
@@ -31,7 +31,7 @@ LeafNode <- R6::R6Class(
     #' @return A new `LeafNode` object
     initialize = function(name, utility=1) {
       super$initialize()
-      private$pathway <- name
+      private$name <- name
       if (!is.numeric(utility)) {
         stop("LeafNode$new: utility must be a numeric value")
       }
@@ -44,8 +44,8 @@ LeafNode <- R6::R6Class(
     #' @description 
     #' Return the label of the leaf node; the name of the clinical outcome.
     #' @return Name of the clinical outcome; character string.
-    getPathway = function() {
-      return(private$pathway)
+    getName = function() {
+      return(private$name)
     },
     
     #' @description 

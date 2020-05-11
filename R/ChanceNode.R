@@ -22,58 +22,8 @@ ChanceNode <- R6::R6Class(
     # private fields
     costs = 'list',
     p = "list",
-    ptype = 'character',
+    ptype = 'character'
     
-    # description Set numerical cost values in edges.
-    # return An updated object.
-    setEdgeCosts = function() {
-      for (i in 1:length(private$edges)) {
-        edge <- private$edges[[i]]
-        cost <- private$costs[[i]]
-        if (inherits(cost, what='ModelVariable')) {
-          c <- cost$value()
-          edge$setCost(c)
-        }
-        else if (is.numeric(cost)) {
-          edge$setCost(cost)
-        }
-        else {
-          stop("Edge$setEdgeCosts: cost must be of type `ModelVariable` or `numeric`")
-        }
-      }  
-      return(invisible(self))
-    },
-    
-    # description Set numerical p values in edges
-    # return An updated ChanceNode object
-    setEdgeP = function() {
-      if (private$ptype == 'numeric') {
-        for (i in 1:length(private$edges)) {
-          edge <- private$edges[[i]]
-          edge$setP(private$p[[i]])
-        }
-      }
-      else if (private$ptype == 'MV') {
-        pedge <- vector('numeric', length=length(private$edges))
-        for (i in 1:length(private$edges)) {
-          edge <- private$edges[[i]]
-          p <- private$p[[i]]
-          if (inherits(p, what='ModelVariable')) {
-             v <- p$value()
-             pedge[i] <- v
-          }
-          else {
-            pedge[i] <- p
-          }
-        }
-        pedge[is.na(pedge)] <- 1 - sum(pedge, na.rm=T)
-        for (i in 1:length(private$edges)) {
-          edge <- private$edges[[i]]
-          edge$setP(pedge[i])
-        }
-      }
-      return(invisible(self))
-    }
   ),
   public = list(
     
@@ -160,9 +110,6 @@ ChanceNode <- R6::R6Class(
       })
       private$costs <- costs
 
-      # set costs for each edge
-      private$setEdgeCosts()
-      
       # set ptype
       if (!is.character(ptype)) {
         stop("ChanceNode$new: `ptype`` must be of class `character`")
@@ -216,18 +163,15 @@ ChanceNode <- R6::R6Class(
         stop("ChanceNode$new: `ptype` must be one of 'numeric', 'MV', 'Beta' or 'Dirichlet'")
       }
 
-      # set p for each edge
-      private$setEdgeP()
+      # update numeric edge values
+      self$updateEdges()
     },
 
     #' @description
     #' Return the list of model variables associated with the node. The
     #' model variables may be associated with costs or probabilities.
-    #' @param include.operands A logical. If TRUE the operands of the model variables
-    #' are included in the list; otherwise only the model model variables that 
-    #' were supplied when the node was created are returned.
     #' @return List of model variables. 
-    getModelVariables = function(include.operands=F) {
+    getModelVariables = function() {
       # make a list of all private objects that may be associated with model variables
       mv <- c(private$p, private$costs)
       # iterate objects and create list of model variables
@@ -235,11 +179,6 @@ ChanceNode <- R6::R6Class(
       lapply(mv, FUN=function(v) {
         if (inherits(v, what='ModelVariable')) {
           mvlist <<- c(mvlist, v)
-          if (include.operands) {
-            sapply(v$getOperands(), FUN=function(o) {
-              mvlist <<- c(mvlist, o)
-            })
-          }
         }
       })
       # return list of model variables
@@ -252,18 +191,63 @@ ChanceNode <- R6::R6Class(
     #'        value at the next call to `value()`. If FALSE each model variable
     #'        will return the sampled value. Default is FALSE.
     #' @return An updated ChanceNode object.
-    sample = function(expected=F) {
+    sampleModelVariables = function(expected=F) {
       # get the model variables associated with this node
       mvlist <- self$getModelVariables()
       # sample them
       sapply(mvlist, FUN=function(mv) {
         mv$sample(expected)
       })
-      # update edges
-      private$setEdgeCosts()
-      private$setEdgeP()
       # return reference to updated node
       return(invisible(self))  
+    },
+    
+    #' @description Update numerical values in edges.
+    #' @return An updated object.
+    updateEdges = function() {
+      # update costs
+      for (i in 1:length(private$edges)) {
+        edge <- private$edges[[i]]
+        cost <- private$costs[[i]]
+        if (inherits(cost, what='ModelVariable')) {
+          c <- cost$value()
+          edge$setCost(c)
+        }
+        else if (is.numeric(cost)) {
+          edge$setCost(cost)
+        }
+        else {
+          stop("Edge$setEdgeCosts: cost must be of type `ModelVariable` or `numeric`")
+        }
+      }  
+      # update probabilities
+      if (private$ptype == 'numeric') {
+        for (i in 1:length(private$edges)) {
+          edge <- private$edges[[i]]
+          edge$setP(private$p[[i]])
+        }
+      }
+      else if (private$ptype == 'MV') {
+        pedge <- vector('numeric', length=length(private$edges))
+        for (i in 1:length(private$edges)) {
+          edge <- private$edges[[i]]
+          p <- private$p[[i]]
+          if (inherits(p, what='ModelVariable')) {
+             v <- p$value()
+             pedge[i] <- v
+          }
+          else {
+            pedge[i] <- p
+          }
+        }
+        pedge[is.na(pedge)] <- 1 - sum(pedge, na.rm=T)
+        for (i in 1:length(private$edges)) {
+          edge <- private$edges[[i]]
+          edge$setP(pedge[i])
+        }
+      }
+      # return updated Node object
+      return(invisible(self))
     }
 
   )
