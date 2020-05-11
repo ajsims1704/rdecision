@@ -377,7 +377,7 @@ local({
     Difference = vector('numeric', length=N)
   )
   for (i in 1:N) {
-    RUN <- d$evaluateChoices(expected=F)
+    RUN <- d$evaluateChoices(expected=F, uncorrelate=T)
     RES$Tegaderm[i] <<- RUN$Cost[RUN$Choice=='Tegaderm CHG']
     RES$Standard[i] <<- RUN$Cost[RUN$Choice=='Standard Dressing']
     RES$Difference[i] <<- RUN$Cost[RUN$Choice=='Tegaderm CHG'] - 

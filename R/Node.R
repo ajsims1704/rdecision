@@ -118,6 +118,44 @@ Node <- R6::R6Class(
       return(c)
     },
     
+    #' @description
+    #' Trace and list all pathways ending on leaf nodes which start
+    #' with this node.
+    #' @param choice Name of choice. All pathways are returned if NA.
+    #' @return A list of Path objects. Each member of the list is a
+    #' path from this node to a leaf, limited to those associated
+    #' with choice, if defined.
+    getPathways = function(choice=NA) {
+      path <- list()
+      rc <- list()
+      toLeaf <- function(node) {
+        # push current node to path
+        path[[length(path)+1]] <<- node
+        # leaf reached; store the path
+        if (node$hasChildNodes()) {
+          # process child nodes
+          for (child in node$childNodes()) {
+            toLeaf(child)
+          }
+        }
+        else {
+          p <- Path$new(path)
+          if (!is.na(choice)) {
+            if (p$getChoice()==choice) {
+              rc[[length(rc)+1]] <<- p
+            }
+          }
+          else {
+            rc[[length(rc)+1]] <<- p
+          }
+        }
+        # pop current node from path
+        path <<- path[1:(length(path)-1)]
+      }
+      toLeaf(self)
+      return(rc)
+    },
+    
     #' @description 
     #' Return label of edge which links to specified child node
     #' @param childNode child node to which find label of linking edge
@@ -147,35 +185,6 @@ Node <- R6::R6Class(
       return(rv)
     },
     
-    #' @description
-    #' Trace and list all pathways ending on leaf nodes which start
-    #' with this node.
-    #' @return A list of Path objects. Each member of the list is a
-    #' path from this node to a leaf.
-    getPathways = function() {
-      path <- list()
-      rc <- list()
-      toLeaf <- function(node) {
-        # push current node to path
-        path[[length(path)+1]] <<- node
-        # leaf reached; store the path
-        if (node$hasChildNodes()) {
-          # process child nodes
-          for (child in node$childNodes()) {
-            toLeaf(child)
-          }
-        }
-        else {
-          p <- Path$new(path)
-          rc[[length(rc)+1]] <<- p
-        }
-        # pop current node from path
-        path <<- path[1:(length(path)-1)]
-      }
-      toLeaf(self)
-      return(rc)
-    },
-
     #' @description
     #' function to return the utility associated with the node
     #' @return 

@@ -140,11 +140,36 @@ DecisionNode <- R6::R6Class(
     },
 
     #' @description 
+    #' Update the tree by sampling model variables and then updating numerical
+    #' edge values.
+    #' @param expected if TRUE set model variables to their expectation; 
+    #' otherwise sample from their uncertainty distributions.
+    #' @returns Updated DecisionNode object.
+    updateTree = function(expected=TRUE) {
+      # sample model variables of this node and all descendants
+      descendants <- self$descendantNodes()
+      lapply(descendants, FUN=function(n) {
+        n$sampleModelVariables(expected)
+      })
+      # update numerical edge values
+      lapply(descendants, FUN=function(n) {
+        n$updateEdges()
+      })
+      # return updated DecisionNode
+      return(invisible(self))
+    }, 
+    
+    #' @description 
     #' Evaluate a decision. Starting with this decision node, the function
     #' works though all possible paths and computes the probability,
     #' cost and utility of each. 
     #' @param expected If TRUE, evaluate each model variable as its mean value,
     #'        otherwise sample each one from their uncertainty distrbution.
+    #' @param uncorrelate If TRUE, resample and update the tree between
+    #' the evaluation of each choice. This causes any model variables that
+    #' are common to more than one choice to be resampled between choices,
+    #' and removes correlation due to shared model variables. Other forms
+    #' of correlation may not be removed.
     #' @return A data frame with one row per path and columns organized as
     #' follows:
     #' \describe{
@@ -160,23 +185,23 @@ DecisionNode <- R6::R6Class(
     #' \item{Utility}{The utility associated with the outcome.}
     #' \item{ExpectedUtility}{Utility \eqn{*} probability of traversing the pathway.}
     #' }
-    evaluatePathways = function(expected=T) {
-      # sample model variables of this node and all descendants
-      descendants <- self$descendantNodes()
-      lapply(descendants, FUN=function(n) {
-        n$sampleModelVariables(expected)
+    evaluatePathways = function(expected=TRUE, uncorrelate=FALSE) {
+      # if no requireement to uncorrelate, reample the tree once
+      if (!uncorrelate) {
+        self$updateTree(expected)
+      }
+      # choice by choice
+      choices <- sapply(private$edges, FUN=function(e){e$getLabel()})
+      choicerows <- lapply(choices, FUN=function(choice) {
+        if (uncorrelate) {
+          self$updateTree(expected)
+        }
+        paths <- self$getPathways(choice)
+        RCH <- do.call('rbind', lapply(paths, FUN=function(x){x$tabulate()}))
+        return(RCH)
       })
-      # update numerical edge values
-      lapply(descendants, FUN=function(n) {
-        n$updateEdges()
-      })
-      # evaluate cost and utility of each path
-      paths <- self$getPathways()
-      # 
-      RES <- do.call(
-        'rbind', 
-        lapply(paths, FUN=function(x){x$tabulate()})
-      )
+      RES <- do.call('rbind', choicerows)
+      # add expected cost and utility     
       RES$ExpectedCost <- RES$Probability*RES$Cost
       RES$ExpectedUtility <- RES$Probability*RES$Utility
       return(RES)
@@ -188,25 +213,31 @@ DecisionNode <- R6::R6Class(
     #' cost and utility of each, then aggregates by choice. 
     #' @param expected If TRUE, evaluate each model variable as its mean value,
     #'        otherwise sample each one from their uncertainty distrbution.
-    #' @return A data frame with one row per path and columns organized as
+    #' @param uncorrelate If TRUE, resample and update the tree between
+    #' the evaluation of each choice. This causes any model variables that
+    #' are common to more than one choice to be resampled between choices,
+    #' and removes correlation due to shared model variables. Other forms
+    #' of correlation may not be removed.
+    #' @return A data frame with one row per choice and columns organized as
     #' follows:
     #' \describe{
     #' \item{Choice}{The choice.}
     #' \item{Cost}{Aggregate cost of the choice.}
     #' \item{Utility}{Aggregate utility of the choice.}
     #' }
-    evaluateChoices = function(expected=T) {
+    evaluateChoices = function(expected=TRUE, uncorrelate=FALSE) {
       # evaluate pathways
-      RES <- self$evaluatePathways(expected)
+      RES <- self$evaluatePathways(expected, uncorrelate)
       # aggregate them by choice
       SUM <- aggregate(
-        RES[,c('Probability', 'ExpectedCost', 'ExpectedUtility')],
+        RES[,c('ExpectedCost', 'ExpectedUtility')],
         by = list(RES$Choice),
         FUN = sum
       )
-      names(SUM) <- c('Choice', 'Probability', 'Cost', 'Utility')
+      names(SUM) <- c('Choice', 'Cost', 'Utility')
       # return the aggregates
       return(SUM)
     }
+    
   )
 )
