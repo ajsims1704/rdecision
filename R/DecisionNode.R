@@ -9,7 +9,7 @@
 #' is associated with one or more branches to child nodes.  
 #' 
 #' @docType class
-#' @author Andrew J. Sims \email{andrew.sims5@@nhs.net}
+#' @author Andrew J. Sims \email{andrew.sims@@newcastle.ac.uk}
 #' @export
 #' 
 DecisionNode <- R6::R6Class(
@@ -216,27 +216,34 @@ DecisionNode <- R6::R6Class(
     #' @param uncorrelate If TRUE, resample and update the tree between
     #' the evaluation of each choice. This causes any model variables that
     #' are common to more than one choice to be resampled between choices,
-    #' and removes correlation due to shared model variables. Other forms
-    #' of correlation may not be removed.
-    #' @return A data frame with one row per choice and columns organized as
-    #' follows:
+    #' and removes correlation due to shared model variables.
+    #' @param N Number of replicates. Intended for use with PSA (expected=F);
+    #' use with expected=T will be repetitive and uninformative. 
+    #' @return A data frame with one row per choice per run and columns
+    #' organized as follows:
     #' \describe{
+    #' \item{Run}{The run number}
     #' \item{Choice}{The choice.}
     #' \item{Cost}{Aggregate cost of the choice.}
     #' \item{Utility}{Aggregate utility of the choice.}
     #' }
-    evaluateChoices = function(expected=TRUE, uncorrelate=FALSE) {
-      # evaluate pathways
-      RES <- self$evaluatePathways(expected, uncorrelate)
-      # aggregate them by choice
-      SUM <- aggregate(
-        RES[,c('ExpectedCost', 'ExpectedUtility')],
-        by = list(RES$Choice),
-        FUN = sum
-      )
-      names(SUM) <- c('Choice', 'Cost', 'Utility')
-      # return the aggregates
-      return(SUM)
+    evaluateChoices = function(expected=TRUE, uncorrelate=FALSE, N=1) {
+      DF <- do.call('rbind', lapply(1:N, FUN=function(n){
+        # evaluate pathways
+        RES <- self$evaluatePathways(expected, uncorrelate)
+        RES$Choice <- as.character(RES$Choice)
+        # aggregate them by choice
+        SUM <- aggregate(
+          RES[,c('ExpectedCost', 'ExpectedUtility')],
+          by = list(RES$Choice),
+          FUN = sum
+        )
+        names(SUM) <- c('Choice', 'Cost', 'Utility')
+        SUM <- cbind(Run=rep(n, times=nrow(SUM)), SUM)
+        # return the aggregates
+        return(SUM)
+      }))
+      return(DF)
     }
     
   )

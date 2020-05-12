@@ -50,10 +50,10 @@ Create an object of type `Edge`.
 
 \item{\code{label}}{Character string containing the edge label.}
 
-\item{\code{cost}}{Cost associated with traversing the edge; numeric.}
+\item{\code{cost}}{Cost associated with traversing the edge; ModelVariable.}
 
 \item{\code{p}}{Probability of traversing the edge conditional on
-having reached `fromNode`; numeric.}
+having reached `fromNode`; ModelVariable.}
 }
 \if{html}{\out{</div>}}
 }

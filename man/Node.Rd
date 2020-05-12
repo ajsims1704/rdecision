@@ -24,14 +24,15 @@ Andrew Sims \email{andrew.sims5@nhs.net}
 \item \href{#method-descendantNodes}{\code{Node$descendantNodes()}}
 \item \href{#method-isSameNode}{\code{Node$isSameNode()}}
 \item \href{#method-nodeType}{\code{Node$nodeType()}}
+\item \href{#method-getPathways}{\code{Node$getPathways()}}
 \item \href{#method-getLabel}{\code{Node$getLabel()}}
 \item \href{#method-getP}{\code{Node$getP()}}
-\item \href{#method-getPathway}{\code{Node$getPathway()}}
 \item \href{#method-getUtility}{\code{Node$getUtility()}}
 \item \href{#method-getCost}{\code{Node$getCost()}}
 \item \href{#method-getModelVariables}{\code{Node$getModelVariables()}}
 \item \href{#method-tabulateModelVariables}{\code{Node$tabulateModelVariables()}}
-\item \href{#method-sample}{\code{Node$sample()}}
+\item \href{#method-sampleModelVariables}{\code{Node$sampleModelVariables()}}
+\item \href{#method-updateEdges}{\code{Node$updateEdges()}}
 \item \href{#method-clone}{\code{Node$clone()}}
 }
 }
@@ -84,7 +85,7 @@ Return list of descendent nodes.
 }
 
 \subsection{Returns}{
-List of descendent nodes.
+List of descendent nodes, including self.
 }
 }
 \if{html}{\out{<hr>}}
@@ -118,6 +119,29 @@ node type (DOM-style)
 
 \subsection{Returns}{
 Node class, as character string
+}
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-getPathways"></a>}}
+\if{latex}{\out{\hypertarget{method-getPathways}{}}}
+\subsection{Method \code{getPathways()}}{
+Trace and list all pathways ending on leaf nodes which start
+with this node.
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{Node$getPathways(choice = NA)}\if{html}{\out{</div>}}
+}
+
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{choice}}{Name of choice. All pathways are returned if NA.}
+}
+\if{html}{\out{</div>}}
+}
+\subsection{Returns}{
+A list of Path objects. Each member of the list is a
+path from this node to a leaf, limited to those associated
+with choice, if defined.
 }
 }
 \if{html}{\out{<hr>}}
@@ -162,19 +186,6 @@ numerical value of probability
 }
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-getPathway"></a>}}
-\if{latex}{\out{\hypertarget{method-getPathway}{}}}
-\subsection{Method \code{getPathway()}}{
-Function to return the pathway name, if defined
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{Node$getPathway()}\if{html}{\out{</div>}}
-}
-
-\subsection{Returns}{
-Name of pathway (final leaf node), character string
-}
-}
-\if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-getUtility"></a>}}
 \if{latex}{\out{\hypertarget{method-getUtility}{}}}
 \subsection{Method \code{getUtility()}}{
@@ -211,47 +222,85 @@ Cost, numerical value
 \if{html}{\out{<a id="method-getModelVariables"></a>}}
 \if{latex}{\out{\hypertarget{method-getModelVariables}{}}}
 \subsection{Method \code{getModelVariables()}}{
-Function to return a list of model variables associated with the node
+Function to return a list of model variables associated with this node.
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{Node$getModelVariables()}\if{html}{\out{</div>}}
 }
 
 \subsection{Returns}{
-List of model variables associated with the node
+List of model variables associated with this node.
 }
 }
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-tabulateModelVariables"></a>}}
 \if{latex}{\out{\hypertarget{method-tabulateModelVariables}{}}}
 \subsection{Method \code{tabulateModelVariables()}}{
-Tabulate all model variables associated with this node and its 
-descendants.
+Tabulate all model variables associated with this node.
 \subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{Node$tabulateModelVariables()}\if{html}{\out{</div>}}
-}
-
-\subsection{Returns}{
-Data frame with one row per model variable.
-}
-}
-\if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-sample"></a>}}
-\if{latex}{\out{\hypertarget{method-sample}{}}}
-\subsection{Method \code{sample()}}{
-Sample the model variables associated with the node and update edges
-as necessary
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{Node$sample(expected = F)}\if{html}{\out{</div>}}
+\if{html}{\out{<div class="r">}}\preformatted{Node$tabulateModelVariables(
+  include.descendants = FALSE,
+  include.operands = FALSE
+)}\if{html}{\out{</div>}}
 }
 
 \subsection{Arguments}{
 \if{html}{\out{<div class="arguments">}}
 \describe{
-\item{\code{expected}}{if TRUE, use the expected value of the moel variables in
+\item{\code{include.descendants}}{If TRUE, model variables associated
+with this node and its descendants are tabulated; otherwise only
+the ones that are associated with this node.}
+
+\item{\code{include.operands}}{If TRUE, recursively add model variables which are
+included in expressions in ExpressionModelVariables. Default is
+FALSE.}
+}
+\if{html}{\out{</div>}}
+}
+\subsection{Returns}{
+Data frame with one row per model variable, as follows:
+\describe{
+\item{Label}{The label given to the variable on creation.}
+\item{Description}{As given at initialization.}
+\item{Units}{Units of the variable.}
+\item{Distribution}{The uncertainty distribution or an expression.} 
+\item{Mean}{Expected value.}
+\item{SD}{Standard deviation.}
+\item{Q2.5}{p=0.025 quantile.}
+\item{Q97.5}{p=0.975 quantile.}
+\item{Qhat}{Asterisk if the quantiles and SD were estimated by random sampling.}
+}
+}
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-sampleModelVariables"></a>}}
+\if{latex}{\out{\hypertarget{method-sampleModelVariables}{}}}
+\subsection{Method \code{sampleModelVariables()}}{
+Sample the model variables associated with the node.
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{Node$sampleModelVariables(expected = FALSE)}\if{html}{\out{</div>}}
+}
+
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{expected}}{if TRUE, use the expected value of the model variables in
 the node; otherwise sample from their uncertainty distributions.}
 }
 \if{html}{\out{</div>}}
 }
+\subsection{Returns}{
+Updated Node object
+}
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-updateEdges"></a>}}
+\if{latex}{\out{\hypertarget{method-updateEdges}{}}}
+\subsection{Method \code{updateEdges()}}{
+Update the values on the edges associated with the node.
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{Node$updateEdges()}\if{html}{\out{</div>}}
+}
+
 \subsection{Returns}{
 Updated Node object
 }

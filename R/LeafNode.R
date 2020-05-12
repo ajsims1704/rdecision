@@ -4,12 +4,12 @@
 #' @description 
 #' An R6 class for a leaf node in a decision tree
 #'
-#' @details A LefNode is synomymous with a clinical outcome, or end
+#' @details A LeafNode is synomymous with a clinical outcome, or end
 #' point of a decision tree. Paths through the tree must end on leaf
 #' nodes.
 #' 
 #' @docType class
-#' @author Andrew J. Sims \email{andrew.sims5@nhs.net}
+#' @author Andrew J. Sims \email{andrew.sims5@@newcastle.ac.uk}
 #' 
 #' @export
 #' 
@@ -35,8 +35,8 @@ LeafNode <- R6::R6Class(
       if (!is.numeric(utility)) {
         stop("LeafNode$new: utility must be a numeric value")
       }
-      if ((utility < 0) | (utility < 1)) {
-        stop("LeafNode$new: utility must be in the range [0,1]")
+      if (utility > 1) {
+        stop("LeafNode$new: utility must be in the range [-Inf,1]")
       }
       private$utility <- utility
     },

@@ -23,7 +23,7 @@ Path <- R6::R6Class(
     
     #' @description 
     #' Create a path from a list of nodes. Must end on a leaf node.
-    #' @param A list of Nodes.
+    #' @param nodes A list of Nodes.
     initialize = function(nodes) {
       # check the supplied node list
       if (length(nodes) < 1) {

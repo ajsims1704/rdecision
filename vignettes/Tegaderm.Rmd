@@ -161,20 +161,18 @@ n.dressings <- NormalModelVariable$new(
 # The decision tree approach
 Using `rdecision` the decision problem may be solved by constructing a decision tree
 comprising decision nodes, chance nodes and leaf nodes. The general approach is to
-create model variable expressions, which link model variables, construct a tree,
-and then evaluate the decision for the base case and proabilistically.
+create expressions involving model variables, construct a tree,
+and then evaluate the decision for the base case and its uncertainty.
 
 ## Model variable expressions
-Variables in the model may be included in the decision tree via model variable expressions,
-which are mathematical expressions which involve model variables. The most simple
-form of model variable expression involving a model variable `X` is `quote(X)`. More
-complex forms of expression involving R's numerical functions and
+Variables in the model may be included in the decision tree via expressions,
+which are mathematical expressions which involve model variables and are themselves
+model variables. Forms of expression involving R's numerical functions and
 multiple model variables are supported, provided the expressions conform to R syntax.
-
 The following code creates the model variable expressions to be used as values in the
 decision tree nodes.
 
-```{r expressions, echo=T}
+```{r expressions, echo=TRUE}
 # probabilities
 p.Dermatitis.S <- ExpressionModelVariable$new(
   'p.Dermatitis.S',
@@ -215,7 +213,7 @@ c.T <- ExpressionModelVariable$new(
 )
 ```
 
-## Constructing the decision tree
+## The decision tree
 The following code constructs the decision tree, node by node, based on figure 2
 of Jenks *et al* [-@jenks:2016a]. In the
 formulation used by `rdecision`, each node is a potentially recursive
@@ -258,7 +256,7 @@ chance.T <- ChanceNode$new(
 # decision node
 d <- DecisionNode$new(
   children = list(chance.S, chance.T),
-  edgelabels = c('Standard Dressing', 'Tegaderm CHG'),
+  edgelabels = c('Standard', 'Tegaderm'),
   costs = list(c.S, c.T)
 )
 ```
@@ -270,11 +268,7 @@ uncertain probabilities with draws from a Dirichlet distribution is preferred. C
 a `ChanceNode` with ModelVariableExpressions is permitted, but results
 in a warning being issued.
 
-## Documenting the model
-Package `rdecision` includes tools for automated documentation of the model structure
-and inputs. 
-
-### Model inputs
+## Summary of the model
 The model variables and their operands associated with a node and (optionally)
 its descendants
 can be tabulated using the method `tabulateModelVariables`. This returns a data
@@ -290,7 +284,7 @@ expressions of other model variables can be included in the tabulation via the
 of a model, *i.e.* its model variables and the way in which they are combined, 
 to be tabulated. In the Tegaderm model, the structure is as follows:
 
-```{r modelinputs-structure, echo=T}
+```{r modelinputs-structure, echo=FALSE}
 local({
   DF <- d$tabulateModelVariables(include.descendants=T, include.operands=T)
   keep <- c('Description', 'Label', 'Distribution')
@@ -303,7 +297,7 @@ The point estimates, units and distributional properties are obtained from the
 same call, in the remaining columns. Rows with `Qhat` indicate that the 
 quantiles have been estimated from simulation.
 
-```{r modelinputs-pe, echo=T}
+```{r modelinputs-pe, echo=FALSE}
 local({
   DF <- d$tabulateModelVariables(include.descendants=T, include.operands=T)
   keep <- c('Description', 'Units', 'Mean', 'Q2.5', 'Q97.5', 'Qhat')
@@ -320,12 +314,11 @@ pathway `Dermatitis (Standard Dressing)` involves a traversal of nodes
 `d`, `chance.S`, and `leaf.S.Dermatitis`. The method `evaluateChoices`
 is similar, but aggregates the results by choice. The results of the scenario
 model, using the code from the previous section,
-yields the table above. There are, as expected, eight root-to-leaf pathways, and 
-the table below shows the probability and cost associated with each pathway. 
+yields the following table.  
 This model did not consider utility, and the columns associated with utility
 are removed.
 
-```{r basecase, echo=T}
+```{r basecase, echo=FALSE}
 local({
   RES <- d$evaluatePathways(expected=T)
   keep <- c('Choice', 'Pathway', 'Probability', 'Cost', 'ExpectedCost')
@@ -340,13 +333,12 @@ local({
 PE.saving <- 0
 local({
   SUM <- d$evaluateChoices(expected=T)
-  PE.saving <<- SUM$Cost[SUM$Choice=='Tegaderm CHG'] - 
-                SUM$Cost[SUM$Choice=='Standard Dressing']
+  PE.saving <<- SUM$Cost[SUM$Choice=='Tegaderm'] - 
+                SUM$Cost[SUM$Choice=='Standard']
 })
 ```
-
-The total cost for each choice can be calculated from the table, or by calling
-`evaluateChoices`, giving a point estimate of the saving of `r -1*PE.saving`
+The total cost for each choice can be calculated from the table above, or by calling
+`evaluateChoices`, giving a point estimate of the saving of `r round(-1*PE.saving,2)`
 GBP. This is close to the sponsor's point 
 estimate of cost saving estimated from their probabilistic sensitivity analysis,
 77.26 GBP, reported in Jenks *et al* [-@jenks:2016a].
@@ -361,34 +353,27 @@ return the expected value of the variable.
 
 Probabilistic sensitivity analysis
 is supported through the use of sampling model variables. In practice, because the
-model variables are contained within model variable expressions embedded in the
-model, decision nodes expose a method called `sample()`. This causes each model
-variable associated with the decision node and its descendants to be sampled. The code
-needed to run $N$ samples of the model, and the results of the first 10 samples are 
-as follows:
+model variables enter the model via nodes, the methods `evaluatePathways` and
+`evaluateChoices` provided by decision nodes provide a convenient interface for
+sampling from model variables. These methods, called with `expected=FALSE` cause
+each model variable associated with the decision node and its descendants to be
+sampled. For further convenience the method `evaluateChoices` permits replicates
+to be run (parameter `N`), making PSA straightforward. The first few runs of
+PSA are as follows:
 
-```{r PSA, echo=T}
+```{r PSA, echo=FALSE}
 local({
-  N <- 1000
-  RES <<- data.frame(
-    Run = 1:N,
-    Tegaderm = vector('numeric', length=N),
-    Standard = vector('numeric', length=N),
-    Difference = vector('numeric', length=N)
-  )
-  for (i in 1:N) {
-    RUN <- d$evaluateChoices(expected=F, uncorrelate=T)
-    RES$Tegaderm[i] <<- RUN$Cost[RUN$Choice=='Tegaderm CHG']
-    RES$Standard[i] <<- RUN$Cost[RUN$Choice=='Standard Dressing']
-    RES$Difference[i] <<- RUN$Cost[RUN$Choice=='Tegaderm CHG'] - 
-                          RUN$Cost[RUN$Choice=='Standard Dressing']
-  }
-  knitr::kable(head(RES, n=10))
+  PSA <- d$evaluateChoices(expected=F, uncorrelate=F, N=1000)
+  RES <<- reshape(PSA, idvar='Run', timevar='Choice', direction='wide')
+  RES$Difference <<- RES$Cost.Tegaderm - RES$Cost.Standard
+  keep<- c('Run', 'Cost.Tegaderm', 'Cost.Standard', 'Difference')
+  knitr::kable(head(RES[,keep], n=10), digits=2, row.names=F)
 })
 ```
 
-From PSA, the mean cost of treatment with Tegaderm was `r round(mean(RES$Tegaderm),2)`,
-the mean cost of treatment with standard dressings was `r round(mean(RES$Standard),2)`
+From PSA (1000 runs), the mean cost of treatment with Tegaderm 
+was `r round(mean(RES$Cost.Tegaderm),2)`,
+the mean cost of treatment with standard dressings was `r round(mean(RES$Cost.Standard),2)`
 and the mean cost saving was `r round(mean(RES$Difference),2)`. The 95% confidence 
 interval for cost saving was `r round(quantile(RES$Difference, probs=c(0.025)),2)` to 
 `r round(quantile(RES$Difference, probs=c(0.975)),2)`; the standard deviation of the
@@ -408,7 +393,7 @@ many decision tree models constructed in Excel.
 ## Components of cost
 Each cost component is defined as an expression involving two or more
 of the 13 model inputs. In contrast to the tree approach, which computed
-the cost of traversing each pathway, this apprach allows the costs of the
+the cost of traversing each pathway, this approach allows the costs of the
 technology and its comparator to be constructed as sub-totals.
 ```{r treefree, echo=T}
 # component costs, standard dressing
@@ -500,7 +485,7 @@ is identical to the value obtained from the full tree.
 Each model variable provides a method, `r`, to make random draws from its
 uncertainty distribution. The PSA for the cost difference can therefore be 
 achieved by a single call to this method:
-```{r echo=T}
+```{r echo=TRUE}
 tf.psa <- c.diff$r(1000)
 ```
 
@@ -511,60 +496,66 @@ and `r round(100*sum(tf.psa<0)/length(tf.psa),2)`% of runs generated a cost savi
 Within fluctuation error this is consistent with the manufacturer's reported
 saving of 77.26 with 98.5% of runs being cost saving.
 
-# Comparison of approaches
+# A note on correlation
+Of the 13 input variables defined in the tree model, eight appear in both the
+main branches of the decision tree. If, in PSA, common variables are sampled
+from their uncertainty distributions once per run, rather being sampled for 
+each choice within a run, the costs of each arm will be correlated.
 
-```{r echo=T}
+```{r CORR, echo=FALSE}
 local({
-  TS <- ExpressionModelVariable$new(
-    'TS',
-    'total.S * total.T',
-    'GBP',
-    quote(total.S * total.T)
-  )
+  PSA <- d$evaluateChoices(expected=F, uncorrelate=F, N=1000)
+  RES.C <<- reshape(PSA, idvar='Run', timevar='Choice', direction='wide')
+  RES.C$Difference <<- RES.C$Cost.Tegaderm - RES.C$Cost.Standard
+  R.C <<- cor(RES.C$Cost.Tegaderm, RES.C$Cost.Standard)
 
-  N <- 10000
-  TC <- vector(mode='numeric', length=N)
-  TU <- vector(mode='numeric', length=N)
-  S <- vector(mode='numeric', length=N)
-  for (i in 1:10000) {  
-    total.T$sample(expected=F)
-    TU[i] <- total.T$value()
-    total.T$sample(expected=F)
-    total.S$sample(expected=F)
-    TC[i] <- total.T$value()
-    S[i] <- total.S$value() 
-  }
-  print(paste('mean TC = ', mean(TC)))
-  print(paste('sd TC = ', sd(TC)))
-  print(paste('mean TU = ', mean(TU)))
-  print(paste('sd TU = ', sd(TU)))
-  print(paste('mean S = ', mean(S)))
-  print(paste('sd S = ', sd(S)))
-  print(paste('cov TC,S = ', cov(S,TC)))
-  print(paste('cor TC,S = ', cor(S,TC)))
-  print(paste('cov TU,S = ', cov(S,TU)))
-  print(paste('cor TU,S = ', cor(S,TU)))
-
-  DC <- TC-S
-  print(paste('mean DC = ', mean(DC)))
-  print(paste('sd DC = ', sd(DC)))
-  print(paste('%DC < 0 =', 100*sum(DC<0)/length(DC)))
-  print(paste('DC CI =', quantile(DC, probs=c(0.025,0.975))))
-  DU <- TU-S
-  print(paste('mean DU = ', mean(DU)))
-  print(paste('sd DU = ', sd(DU)))
-  print(paste('%DU < 0 =', 100*sum(DU<0)/length(DU)))
-  print(paste('DU CI =', quantile(DU, probs=c(0.025,0.975))))
+  PSA <- d$evaluateChoices(expected=F, uncorrelate=T, N=1000)
+  RES.U <<- reshape(PSA, idvar='Run', timevar='Choice', direction='wide')
+  RES.U$Difference <<- RES.U$Cost.Tegaderm - RES.U$Cost.Standard
+  R.U <<- cor(RES.U$Cost.Tegaderm, RES.U$Cost.Standard)
   
-
-  knitr::kable(TS$tabulate(), row.names=F,
-               format.args=list(scientific=F), digits=2
-)
-  
+  sd.T <<- sd(RES.C$Cost.Tegaderm)
+  sd.S <<- sd(RES.C$Cost.Standard)
+  cov.TS <<- cov(RES.C$Cost.Tegaderm, RES.C$Cost.Standard)  
 })
 ```
 
+In the original Excel model submitted by the manufacturer, the model variables
+were sampled once per run. The tree model constructed using `rdecision` described
+in this vignette made the same assumption, and replicated the manufacturer's
+results. The correlation coefficient between 1000 samples from the cost of 
+treatment with Tegaderm and the cost with standard care was `r round(R.C, 3)`. This
+reflects the relatively high degree of correlation between the two choice
+arms of the model, because of the eight shared model variables.
 
+However, `rdecision` includes the facility to resample the model
+variables for each choice, within each run, by setting parameter
+`uncorrelate=TRUE` in method `evaluateChoices` of the decision node.
+With this option, the equivalent correlation coefficient is `r round(R.U, 3)`;
+*i.e.* they are uncorrelated within statistical fluctuation. This does not
+affect the point estimate, but does alter the distribution of the
+cost difference, which has standard deviation `r round(sd(RES.U$Difference),2)`
+and 95% confidence interval `r round(quantile(RES.U$Difference, probs=c(0.025)),2)` 
+to `r round(quantile(RES.U$Difference, probs=c(0.975)),2)`, 
+with `r round(100*sum(RES.U<0)/nrow(RES.U),1)`% of simulations being
+cost saving.
+The confidence interval includes zero, but the percentage of
+cost saving cases exceeds 95%; with correlation removed, the evidence
+for a cost saving is therefore marginal, given the input parameters.
+
+Finally, the variance of the cost of treatment with Tegaderm 
+is `r round(sd.T,2)`$^2$, the variance of the cost of treatment with
+standard care is `r round(sd.S,2)`$^2$ and the covariance with
+correlated model variables is `r round(cov.TS,2)`. Via the relation
+$Var(X-Y) = Var(X) + Var(Y) - 2Cov(X,Y)$, the variance of the
+cost difference with correlated model variables 
+is `r round(sqrt(sd.T^2 + sd.S^2 - 2*cov.TS),2)`$^2$ and of the
+uncorrelated model variables 
+is `r round(sqrt(sd.T^2 + sd.S^2),2)`$^2$, close to the that observed.
+
+```{r CORREND, echo=FALSE}
+rm(RES.C, RES.U, R.C, R.U, sd.T, sd.S, cov.TS)
+```
 
 
 # References

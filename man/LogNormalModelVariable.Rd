@@ -32,10 +32,6 @@ natural scale.}
 the natural scale and \eqn{\sigma_N} is the standard deviation on the
 natural scale.}
 }
-
-The hyperparameters of the
-distribution are the mean (`mu`) and the standard deviation (`sd`) of
-the uncertainty distribution.
 }
 \author{
 Andrew J. Sims \email{andrew.sims5@nhs.net}
@@ -56,10 +52,15 @@ Andrew J. Sims \email{andrew.sims5@nhs.net}
 }
 }
 \if{html}{
-\out{<details open ><summary>Inherited methods</summary>}
+\out{<details ><summary>Inherited methods</summary>}
 \itemize{
 \item \out{<span class="pkg-link" data-pkg="rdecision" data-topic="ModelVariable" data-id="getDescription">}\href{../../rdecision/html/ModelVariable.html#method-getDescription}{\code{rdecision::ModelVariable$getDescription()}}\out{</span>}
+\item \out{<span class="pkg-link" data-pkg="rdecision" data-topic="ModelVariable" data-id="getLabel">}\href{../../rdecision/html/ModelVariable.html#method-getLabel}{\code{rdecision::ModelVariable$getLabel()}}\out{</span>}
+\item \out{<span class="pkg-link" data-pkg="rdecision" data-topic="ModelVariable" data-id="getOperands">}\href{../../rdecision/html/ModelVariable.html#method-getOperands}{\code{rdecision::ModelVariable$getOperands()}}\out{</span>}
 \item \out{<span class="pkg-link" data-pkg="rdecision" data-topic="ModelVariable" data-id="getUnits">}\href{../../rdecision/html/ModelVariable.html#method-getUnits}{\code{rdecision::ModelVariable$getUnits()}}\out{</span>}
+\item \out{<span class="pkg-link" data-pkg="rdecision" data-topic="ModelVariable" data-id="isExpression">}\href{../../rdecision/html/ModelVariable.html#method-isExpression}{\code{rdecision::ModelVariable$isExpression()}}\out{</span>}
+\item \out{<span class="pkg-link" data-pkg="rdecision" data-topic="ModelVariable" data-id="r">}\href{../../rdecision/html/ModelVariable.html#method-r}{\code{rdecision::ModelVariable$r()}}\out{</span>}
+\item \out{<span class="pkg-link" data-pkg="rdecision" data-topic="ModelVariable" data-id="tabulate">}\href{../../rdecision/html/ModelVariable.html#method-tabulate}{\code{rdecision::ModelVariable$tabulate()}}\out{</span>}
 \item \out{<span class="pkg-link" data-pkg="rdecision" data-topic="ModelVariable" data-id="value">}\href{../../rdecision/html/ModelVariable.html#method-value}{\code{rdecision::ModelVariable$value()}}\out{</span>}
 }
 \out{</details>}
@@ -70,12 +71,23 @@ Andrew J. Sims \email{andrew.sims5@nhs.net}
 \subsection{Method \code{new()}}{
 Create a model variable with log normal uncertainty.
 \subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{LogNormalModelVariable$new(description, units, p1, p2, parametrization = "LN1")}\if{html}{\out{</div>}}
+\if{html}{\out{<div class="r">}}\preformatted{LogNormalModelVariable$new(
+  label,
+  description,
+  units,
+  p1,
+  p2,
+  parametrization = "LN1"
+)}\if{html}{\out{</div>}}
 }
 
 \subsection{Arguments}{
 \if{html}{\out{<div class="arguments">}}
 \describe{
+\item{\code{label}}{A character string label for the variable. It is advised
+to make this the same as the variable name which helps when tabulating
+model variables involving ExpressionModelVariables.}
+
 \item{\code{description}}{A character string describing the variable.}
 
 \item{\code{units}}{Units of the quantity; character string.}
@@ -129,7 +141,7 @@ Accessor function for the name of the uncertainty distribution.
 }
 
 \subsection{Returns}{
-Distribution name as character string.
+Distribution name as character string (LN1, LN2 etc).
 }
 }
 \if{html}{\out{<hr>}}

@@ -24,7 +24,8 @@ Andrew Sims \email{andrew.sims5@nhs.net}
 \itemize{
 \item \href{#method-new}{\code{ChanceNode$new()}}
 \item \href{#method-getModelVariables}{\code{ChanceNode$getModelVariables()}}
-\item \href{#method-sample}{\code{ChanceNode$sample()}}
+\item \href{#method-sampleModelVariables}{\code{ChanceNode$sampleModelVariables()}}
+\item \href{#method-updateEdges}{\code{ChanceNode$updateEdges()}}
 \item \href{#method-clone}{\code{ChanceNode$clone()}}
 }
 }
@@ -36,7 +37,7 @@ Andrew Sims \email{andrew.sims5@nhs.net}
 \item \out{<span class="pkg-link" data-pkg="rdecision" data-topic="Node" data-id="getCost">}\href{../../rdecision/html/Node.html#method-getCost}{\code{rdecision::Node$getCost()}}\out{</span>}
 \item \out{<span class="pkg-link" data-pkg="rdecision" data-topic="Node" data-id="getLabel">}\href{../../rdecision/html/Node.html#method-getLabel}{\code{rdecision::Node$getLabel()}}\out{</span>}
 \item \out{<span class="pkg-link" data-pkg="rdecision" data-topic="Node" data-id="getP">}\href{../../rdecision/html/Node.html#method-getP}{\code{rdecision::Node$getP()}}\out{</span>}
-\item \out{<span class="pkg-link" data-pkg="rdecision" data-topic="Node" data-id="getPathway">}\href{../../rdecision/html/Node.html#method-getPathway}{\code{rdecision::Node$getPathway()}}\out{</span>}
+\item \out{<span class="pkg-link" data-pkg="rdecision" data-topic="Node" data-id="getPathways">}\href{../../rdecision/html/Node.html#method-getPathways}{\code{rdecision::Node$getPathways()}}\out{</span>}
 \item \out{<span class="pkg-link" data-pkg="rdecision" data-topic="Node" data-id="getUtility">}\href{../../rdecision/html/Node.html#method-getUtility}{\code{rdecision::Node$getUtility()}}\out{</span>}
 \item \out{<span class="pkg-link" data-pkg="rdecision" data-topic="Node" data-id="hasChildNodes">}\href{../../rdecision/html/Node.html#method-hasChildNodes}{\code{rdecision::Node$hasChildNodes()}}\out{</span>}
 \item \out{<span class="pkg-link" data-pkg="rdecision" data-topic="Node" data-id="isSameNode">}\href{../../rdecision/html/Node.html#method-isSameNode}{\code{rdecision::Node$isSameNode()}}\out{</span>}
@@ -66,8 +67,7 @@ of this node.}
 
 \item{\code{costs}}{A list of \eqn{k} costs associated with each edge (branch) 
 leaving the `ChanceNode`. Each element may be of type `numeric` or
-`ModelVariableExpression`; given in the same order as
-`children`.}
+`ModelVariable`; given in the same order as `children`.}
 
 \item{\code{p}}{a list of probabilities associated with \eqn{k} branches.
        There are four possible configurations of the list 
@@ -76,7 +76,7 @@ leaving the `ChanceNode`. Each element may be of type `numeric` or
 \item{'numeric'}{\eqn{k} numeric values; the simplest case in which the   
           probabilities are certain. Supplied values should add
           to unity and be given in the same order as `children`.}
-\item{'MVE'}{\eqn{k-1} `ModelVariableExpressions` or `numeric` elements and
+\item{'MV'}{\eqn{k-1} `ModelVariable`s or `numeric` elements and
       a single `numeric(NA)`, give in the same order as `children`. The 
       single NA will be replaced on evaluation of the model variable
       expressions by a value to ensure the sum of probabilities
@@ -116,12 +116,12 @@ List of model variables.
 }
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-sample"></a>}}
-\if{latex}{\out{\hypertarget{method-sample}{}}}
-\subsection{Method \code{sample()}}{
+\if{html}{\out{<a id="method-sampleModelVariables"></a>}}
+\if{latex}{\out{\hypertarget{method-sampleModelVariables}{}}}
+\subsection{Method \code{sampleModelVariables()}}{
 Sample all model variables in this node and update edges.
 \subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{ChanceNode$sample(expected = F)}\if{html}{\out{</div>}}
+\if{html}{\out{<div class="r">}}\preformatted{ChanceNode$sampleModelVariables(expected = F)}\if{html}{\out{</div>}}
 }
 
 \subsection{Arguments}{
@@ -135,6 +135,19 @@ will return the sampled value. Default is FALSE.}
 }
 \subsection{Returns}{
 An updated ChanceNode object.
+}
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-updateEdges"></a>}}
+\if{latex}{\out{\hypertarget{method-updateEdges}{}}}
+\subsection{Method \code{updateEdges()}}{
+Update numerical values in edges.
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{ChanceNode$updateEdges()}\if{html}{\out{</div>}}
+}
+
+\subsection{Returns}{
+An updated object.
 }
 }
 \if{html}{\out{<hr>}}

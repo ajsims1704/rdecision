@@ -8,12 +8,12 @@
 An R6 class for a leaf node in a decision tree
 }
 \details{
-A LefNode is synomymous with a clinical outcome, or end
+A LeafNode is synomymous with a clinical outcome, or end
 point of a decision tree. Paths through the tree must end on leaf
 nodes.
 }
 \author{
-Andrew J. Sims \email{andrew.sims5@nhs.net}
+Andrew J. Sims \email{andrew.sims5@newcastle.ac.uk}
 }
 \section{Super class}{
 \code{\link[rdecision:Node]{rdecision::Node}} -> \code{LeafNode}
@@ -22,7 +22,7 @@ Andrew J. Sims \email{andrew.sims5@nhs.net}
 \subsection{Public methods}{
 \itemize{
 \item \href{#method-new}{\code{LeafNode$new()}}
-\item \href{#method-getPathway}{\code{LeafNode$getPathway()}}
+\item \href{#method-getName}{\code{LeafNode$getName()}}
 \item \href{#method-getUtility}{\code{LeafNode$getUtility()}}
 \item \href{#method-clone}{\code{LeafNode$clone()}}
 }
@@ -36,11 +36,13 @@ Andrew J. Sims \email{andrew.sims5@nhs.net}
 \item \out{<span class="pkg-link" data-pkg="rdecision" data-topic="Node" data-id="getLabel">}\href{../../rdecision/html/Node.html#method-getLabel}{\code{rdecision::Node$getLabel()}}\out{</span>}
 \item \out{<span class="pkg-link" data-pkg="rdecision" data-topic="Node" data-id="getModelVariables">}\href{../../rdecision/html/Node.html#method-getModelVariables}{\code{rdecision::Node$getModelVariables()}}\out{</span>}
 \item \out{<span class="pkg-link" data-pkg="rdecision" data-topic="Node" data-id="getP">}\href{../../rdecision/html/Node.html#method-getP}{\code{rdecision::Node$getP()}}\out{</span>}
+\item \out{<span class="pkg-link" data-pkg="rdecision" data-topic="Node" data-id="getPathways">}\href{../../rdecision/html/Node.html#method-getPathways}{\code{rdecision::Node$getPathways()}}\out{</span>}
 \item \out{<span class="pkg-link" data-pkg="rdecision" data-topic="Node" data-id="hasChildNodes">}\href{../../rdecision/html/Node.html#method-hasChildNodes}{\code{rdecision::Node$hasChildNodes()}}\out{</span>}
 \item \out{<span class="pkg-link" data-pkg="rdecision" data-topic="Node" data-id="isSameNode">}\href{../../rdecision/html/Node.html#method-isSameNode}{\code{rdecision::Node$isSameNode()}}\out{</span>}
 \item \out{<span class="pkg-link" data-pkg="rdecision" data-topic="Node" data-id="nodeType">}\href{../../rdecision/html/Node.html#method-nodeType}{\code{rdecision::Node$nodeType()}}\out{</span>}
-\item \out{<span class="pkg-link" data-pkg="rdecision" data-topic="Node" data-id="sample">}\href{../../rdecision/html/Node.html#method-sample}{\code{rdecision::Node$sample()}}\out{</span>}
+\item \out{<span class="pkg-link" data-pkg="rdecision" data-topic="Node" data-id="sampleModelVariables">}\href{../../rdecision/html/Node.html#method-sampleModelVariables}{\code{rdecision::Node$sampleModelVariables()}}\out{</span>}
 \item \out{<span class="pkg-link" data-pkg="rdecision" data-topic="Node" data-id="tabulateModelVariables">}\href{../../rdecision/html/Node.html#method-tabulateModelVariables}{\code{rdecision::Node$tabulateModelVariables()}}\out{</span>}
+\item \out{<span class="pkg-link" data-pkg="rdecision" data-topic="Node" data-id="updateEdges">}\href{../../rdecision/html/Node.html#method-updateEdges}{\code{rdecision::Node$updateEdges()}}\out{</span>}
 }
 \out{</details>}
 }
@@ -69,12 +71,12 @@ A new `LeafNode` object
 }
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-getPathway"></a>}}
-\if{latex}{\out{\hypertarget{method-getPathway}{}}}
-\subsection{Method \code{getPathway()}}{
+\if{html}{\out{<a id="method-getName"></a>}}
+\if{latex}{\out{\hypertarget{method-getName}{}}}
+\subsection{Method \code{getName()}}{
 Return the label of the leaf node; the name of the clinical outcome.
 \subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{LeafNode$getPathway()}\if{html}{\out{</div>}}
+\if{html}{\out{<div class="r">}}\preformatted{LeafNode$getName()}\if{html}{\out{</div>}}
 }
 
 \subsection{Returns}{

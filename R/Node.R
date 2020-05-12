@@ -226,17 +226,14 @@ Node <- R6::R6Class(
     #' @return Data frame with one row per model variable, as follows:
     #' \describe{
     #' \item{Label}{The label given to the variable on creation.}
-    #' \item{Description}{As given at initiialization.}
+    #' \item{Description}{As given at initialization.}
     #' \item{Units}{Units of the variable.}
-    #' \item{Distribution}{Either the uncertainty distribution, if
-    #' it is a regular model variable, or the expression used to create it,
-    #' if it is an ExpressionModelVariable.}
+    #' \item{Distribution}{The uncertainty distribution or an expression.} 
     #' \item{Mean}{Expected value.}
     #' \item{SD}{Standard deviation.}
-    #' \item{Q2.5}{2.5% quantile.}
-    #' \item{Q97.5}{97.5% quantile.}
-    #' \item{Qhat}{Asterisk (*) if the quantiles and SD have been estimated
-    #' by random sampling.}
+    #' \item{Q2.5}{p=0.025 quantile.}
+    #' \item{Q97.5}{p=0.975 quantile.}
+    #' \item{Qhat}{Asterisk if the quantiles and SD were estimated by random sampling.}
     #' }
     tabulateModelVariables = function(include.descendants=FALSE, 
                                       include.operands=FALSE) {

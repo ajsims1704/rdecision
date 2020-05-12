@@ -16,20 +16,25 @@ variables whose uncertainties are described by statistical distributions
 parametrized with hyperparameters.
 }
 \author{
-Andrew Sims \email{andrew.sims5@nhs.net}
+Andrew Sims \email{andrew.sims@newcastle.ac.uk}
 }
 \section{Methods}{
 \subsection{Public methods}{
 \itemize{
 \item \href{#method-new}{\code{ModelVariable$new()}}
+\item \href{#method-isExpression}{\code{ModelVariable$isExpression()}}
 \item \href{#method-sample}{\code{ModelVariable$sample()}}
 \item \href{#method-value}{\code{ModelVariable$value()}}
+\item \href{#method-getLabel}{\code{ModelVariable$getLabel()}}
 \item \href{#method-getDescription}{\code{ModelVariable$getDescription()}}
 \item \href{#method-getUnits}{\code{ModelVariable$getUnits()}}
 \item \href{#method-getDistribution}{\code{ModelVariable$getDistribution()}}
+\item \href{#method-getOperands}{\code{ModelVariable$getOperands()}}
+\item \href{#method-tabulate}{\code{ModelVariable$tabulate()}}
 \item \href{#method-getMean}{\code{ModelVariable$getMean()}}
 \item \href{#method-getSD}{\code{ModelVariable$getSD()}}
 \item \href{#method-getQuantile}{\code{ModelVariable$getQuantile()}}
+\item \href{#method-r}{\code{ModelVariable$r()}}
 \item \href{#method-clone}{\code{ModelVariable$clone()}}
 }
 }
@@ -39,12 +44,16 @@ Andrew Sims \email{andrew.sims5@nhs.net}
 \subsection{Method \code{new()}}{
 Create an object of type `ModelVariable`
 \subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{ModelVariable$new(description, units)}\if{html}{\out{</div>}}
+\if{html}{\out{<div class="r">}}\preformatted{ModelVariable$new(label, description, units)}\if{html}{\out{</div>}}
 }
 
 \subsection{Arguments}{
 \if{html}{\out{<div class="arguments">}}
 \describe{
+\item{\code{label}}{A character string label for the variable. It is advised
+to make this the same as the variable name which helps when tabulating
+model variables involving ExpressionModelVariables.}
+
 \item{\code{description}}{A character string description of the variable
 and its role in the
 model. This description will be used in a tabulation of the
@@ -57,6 +66,19 @@ variables linked to a model.}
 }
 \subsection{Returns}{
 A new ModelVariable object.
+}
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-isExpression"></a>}}
+\if{latex}{\out{\hypertarget{method-isExpression}{}}}
+\subsection{Method \code{isExpression()}}{
+Is this ModelVariable an expression?
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{ModelVariable$isExpression()}\if{html}{\out{</div>}}
+}
+
+\subsection{Returns}{
+TRUE if it inherits from ExpressionModelVariable, FALSE otherwise.
 }
 }
 \if{html}{\out{<hr>}}
@@ -100,10 +122,23 @@ Numeric value of the model variable.
 }
 }
 \if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-getLabel"></a>}}
+\if{latex}{\out{\hypertarget{method-getLabel}{}}}
+\subsection{Method \code{getLabel()}}{
+Accessor function for the label.
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{ModelVariable$getLabel()}\if{html}{\out{</div>}}
+}
+
+\subsection{Returns}{
+Label of model variable as character string.
+}
+}
+\if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-getDescription"></a>}}
 \if{latex}{\out{\hypertarget{method-getDescription}{}}}
 \subsection{Method \code{getDescription()}}{
-Accessor functions for the description.
+Accessor function for the description.
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{ModelVariable$getDescription()}\if{html}{\out{</div>}}
 }
@@ -136,6 +171,59 @@ Accessor function for the name of the uncertainty distribution.
 
 \subsection{Returns}{
 Distribution name as character string.
+}
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-getOperands"></a>}}
+\if{latex}{\out{\hypertarget{method-getOperands}{}}}
+\subsection{Method \code{getOperands()}}{
+Return a list of operands given in the expression used to form the
+expression. Only relevant for objects of inherited type 
+ExpressionModelVariable, but defined for the base class for convenience to
+avoid type checking inside iterators.
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{ModelVariable$getOperands()}\if{html}{\out{</div>}}
+}
+
+\subsection{Returns}{
+A list of operands that are themselves ModelVariables. An empty list 
+for non-expression model variables.
+}
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-tabulate"></a>}}
+\if{latex}{\out{\hypertarget{method-tabulate}{}}}
+\subsection{Method \code{tabulate()}}{
+Tabulate the model variable and optionally include its operands.
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{ModelVariable$tabulate(include.operands = FALSE)}\if{html}{\out{</div>}}
+}
+
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{include.operands}}{If TRUE include the operands of this model
+variable in the table. Otherwise return a table with one row, 
+describing this variable.}
+}
+\if{html}{\out{</div>}}
+}
+\subsection{Returns}{
+Data frame with one row per model variable, as follows:
+\describe{
+\item{Label}{The label given to the variable on creation.}
+\item{Description}{As given at initialization.}
+\item{Units}{Units of the variable.}
+\item{Distribution}{Either the uncertainty distribution, if
+it is a regular model variable, or the expression used to create it,
+if it is an ExpressionModelVariable.}
+\item{Mean}{Expected value.}
+\item{SD}{Standard deviation.}
+\item{Q2.5}{p=0.025 quantile.}
+\item{Q97.5}{p=0.975 quantile.}
+\item{Qhat}{Asterisk (*) if the quantiles and SD have been estimated
+by random sampling.}
+}
 }
 }
 \if{html}{\out{<hr>}}
@@ -182,6 +270,27 @@ Find quantiles of the uncertainty distribution.
 }
 \subsection{Returns}{
 Vector of numeric values of the same length as `probs`.
+}
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-r"></a>}}
+\if{latex}{\out{\hypertarget{method-r}{}}}
+\subsection{Method \code{r()}}{
+Draw random samples from the model variable. After returning the
+sample, the next call to `value()` will return the expected value.
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{ModelVariable$r(n)}\if{html}{\out{</div>}}
+}
+
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{n}}{Number of samples to return}
+}
+\if{html}{\out{</div>}}
+}
+\subsection{Returns}{
+Numeric vector of samples drawn at random.
 }
 }
 \if{html}{\out{<hr>}}
