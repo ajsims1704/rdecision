@@ -39,35 +39,37 @@ ChanceNode <- R6::R6Class(
     #'        `ModelVariable`; given in the same order as `children`.
     #' @param ptype a character string taking one of four possible
     #'        values to define how the \code{p} argument is defined:
-    #'        'numeric', 'MVE', 'Beta' or 'Dirichlet'. 
+    #'        'numeric', 'MV', 'Beta' or 'Dirichlet'. 
     #' @param p a list of probabilities associated with \eqn{k} branches.
     #'        There are four possible configurations of the list 
     #'        based on the \code{ptype} argument.
     #' \describe{
     #' \item{'numeric'}{\eqn{k} numeric values; the simplest case in which the   
-    #'           probabilities are certain. Supplied values should add
-    #'           to unity and be given in the same order as `children`.}
-    #' \item{'MV'}{\eqn{k-1} `ModelVariable`s or `numeric` elements and
-    #'       a single `numeric(NA)`, give in the same order as `children`. The 
-    #'       single NA will be replaced on evaluation of the model variable
-    #'       expressions by a value to ensure the sum of probabilities
-    #'       is unity. This option is not recommended, because there is
-    #'       a chance that during sampling, individual branch probabilities
-    #'       may be less than zero, or that the sum of the sampled model variable
-    #'       expressions may exceed 1.}
+    #' probabilities are certain. Supplied values should add
+    #' to unity and be given in the same order as `children`.}
+    #' \item{'MV'}{At least one `ModelVariable` and exactly one
+    #' `NA``, and the remainder either `numeric` or `ModelVariable`, given in the
+    #' same order as `children`. The single NA will be replaced on evaluation of
+    #' the model variables by a value to ensure the sum of probabilities
+    #' is unity. This option is not recommended, because there is
+    #' a chance that during sampling, individual branch probabilities
+    #' may be less than zero, or that the sum of the sampled model variable
+    #' expressions may exceed 1.}
     #' \item{'Beta'}{One `BetaModelVariable` and one NA. Used for \eqn{k=2}. The 
-    #'       element defined as NA will be replaced by one minus the sampled 
-    #'       value of the supplied beta distribution.}
+    #' element defined as NA will be replaced by one minus the sampled 
+    #' value of the supplied beta distribution.}
     #' \item{'Dirichlet'}{One DirichletModelVariable, with \eqn{k} parameters,
-    #'       given in the same order as `children`.}
+    #' given in the same order as `children`.}
+    #' \item{'auto'}{Infer which of the previous options applies based on
+    #' the types of elements of p}
     #' }
     #' @return A new `ChanceNode` object
-    initialize = function(children, edgelabels, costs, p, ptype='numeric') {
+    initialize = function(children, edgelabels, costs, p, ptype='auto') {
 
-      # ensure base class fields are initialized
+      ## ensure base class fields are initialized
       super$initialize()
       
-      # check child nodes
+      ## check child nodes
       if (length(children) < 2) {
         stop("ChanceNode$new: `children` must contain at least two objects of class `Node`.")
       }
@@ -77,7 +79,7 @@ ChanceNode <- R6::R6Class(
         }
       })
 
-      # check edge labels
+      ## check edge labels
       if (length(edgelabels) != length(children)) {
         stop("ChanceNode$new: `edgelabels` must contain the same number of objects as `children`.")
       }
@@ -87,15 +89,15 @@ ChanceNode <- R6::R6Class(
         }
       })
 
-      # add edges to this node, using equal probability and zero cost per
-      # branch to ensure initialization of edge
+      ## add edges to this node, using equal probability and zero cost per
+      ## branch to ensure initialization of edge
       for (i in 1:length(children)) {
         pFlat <- 1/length(children)
         edge <- Edge$new(self, children[[i]], edgelabels[[i]], cost=0, p=pFlat)
         private$addEdge(edge)
       }
 
-      # check and store costs
+      ## check and store costs
       if (length(costs) != length(children)) {
         stop("ChanceNode$new: `costs` must contain the same number of objects as `children`.")
       }
@@ -110,7 +112,7 @@ ChanceNode <- R6::R6Class(
       })
       private$costs <- costs
 
-      # set ptype
+      ## set ptype
       if (!is.character(ptype)) {
         stop("ChanceNode$new: `ptype`` must be of class `character`")
       }
@@ -118,38 +120,38 @@ ChanceNode <- R6::R6Class(
         private$ptype <- ptype  
       }
 
-      # check and store p
+      ## check and store p values
+      
+      # count each type of member of p
+      k <- length(p)
+      nna <- sum(is.na(p))
+      nnu <- sum(sapply(p, is.numeric))
+      nmv <- sum(sapply(p, FUN=function(e){return(inherits(e, what='ModelVariable'))}))
+      
+      # switch on ptype 
       if (ptype == 'numeric') {
-        if (length(p) != length(children)) {
-          stop('ChanceNode$new: `p`` must contain the same number of elements as children')
+        if (k != length(children)) {
+          stop('ChanceNode$new: `p` must contain the same number of elements as children')
         }
-        sapply(p, FUN=function(x){
-          if (!is.numeric(x)) {
-            stop('ChanceNode$new: all elements of `p` must be of type `numeric`')
-          }
-        })
+        if (nnu != k) {
+          stop('ChanceNode$new: all elements of `p` must be of type `numeric` for ptype=numeric')
+        }
         private$p <- p
       }
       else if (ptype == 'MV') {
-        if (length(p) != length(children)) {
-          stop('ChanceNode$new: `p`` must contain the same number of elements as children')
+        if (k != length(children)) {
+          stop('ChanceNode$new: `p` must contain the same number of elements as children')
         }
-        nna <- 0
-        sapply(p, FUN=function(x){
-          if (is.numeric(x)) {
-            if (is.na(x)) {
-              nna <<- nna + 1
-            }
-          }
-          else if (inherits(x, what='ModelVariable')) {
-          }
-          else {
-            stop("ChanceNode$new: all elements of `p` must be of type `numeric`, `ModelVariable` or `NA`")
-          }
-        })
         if (nna != 1) {
-          stop("ChanceNode$new: one element of p must be numeric(NA) for `ptype='MVE`")
+          stop("ChanceNode$new: one element of p must be NA for `ptype='MVE`.")
         }
+        if (nmv < 1) {
+          stop("ChanceNode$new: at least one element of p must be a ModelVariable for `ptype=MVE`.")
+        }
+        if ((nna+nmv+nnu) != k) {
+          stop("ChanceNode$new: all elements of `p` must be of type `numeric`, `ModelVariable` or `NA` for `ptype=MVE`")
+        }
+        warning("ChanceNode$new: `ptype='MV'` may lead to p values out of range [0,1].")
         private$p <- p
       }
       else if (ptype == 'Beta') {
@@ -157,6 +159,20 @@ ChanceNode <- R6::R6Class(
       }
       else if (ptype == 'Dirichlet') {
         stop("ChanceNode$new: `ptype=Dirichlet` not yet implemented")
+      }
+      else if (ptype == "auto") {
+        if (nnu == k) {
+          private$ptype <- 'numeric'
+          private$p <- p
+        }
+        else if ( (nna==1) && (nmv>=1) & ((nna+nmv+nnu)==k) ) {
+          private$ptype <- 'MV'
+          private$p <- p
+          warning("ChanceNode$new: `ptype='MV'` may lead to p values out of range [0,1].")
+        }
+        else {
+          stop("ChanceNode$new: cannot guess `ptype` from supplied p for `ptype=auto`.")
+        }
       }
       # anything else is illegal
       else {
