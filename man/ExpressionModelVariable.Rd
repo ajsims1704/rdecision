@@ -21,14 +21,14 @@ But such forms of expression may be desirable in constructing a
 model and this class provides a mechanism for doing so.
 }
 \note{
-Methods `getSD` and `getQuantile` return NA. For many expressions
-involving model variables there will be no closed form expression
-for these values, and they would normally be obtained by simulation.
+For many expressions involving model variables there will 
+be no closed form expressions for the standard deviation an
+the quantiles. Therefore they are obtained by simulation.
 Method `getDistribution` returns the string representation of the
 expression used to create the model variable.
 }
 \author{
-Andrew J. Sims \email{andrew.sims5@nhs.net}
+Andrew J. Sims \email{andrew.sims5@newcastle.ac.uk}
 }
 \section{Super class}{
 \code{\link[rdecision:ModelVariable]{rdecision::ModelVariable}} -> \code{ExpressionModelVariable}
@@ -90,7 +90,7 @@ combined into costs, probablities and rates.}
 
 \item{\code{expr}}{An R expression involving model variables which would be 
 syntactically correct were each model variable to be replaced by
-numerical variables.}
+numerical variables. Create either by `quote(x+y)` or `rlang::expr(x+y)`.}
 
 \item{\code{envir}}{The environment in which the model variables live. Normally,
 and by default, this is the global environment. But if an object is
@@ -152,7 +152,8 @@ Accessor function for the name of the expression model variable.
 }
 
 \subsection{Returns}{
-Expression as a character string.
+Expression as a character string with all control characters
+having been removed.
 }
 }
 \if{html}{\out{<hr>}}

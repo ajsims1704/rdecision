@@ -3,7 +3,7 @@ Title: Decision Analytic Modelling In Health Economics
 Version: 0.1.6
 Authors@R: c(
   person("Andrew", "Sims", email = "andrew.sims@newcastle.ac.uk", role = c("aut", "cre")),
-  person("Kim", "Fairbairn", email="kim.fairbairn@nuth.nhs.uk", role=c("aut")) )
+  person("Kim", "Fairbairn", email="kim.fairbairn@nhs.net", role=c("aut")) )
 Description: A package for decision analytic modelling in health economics.
   It includes functions for modelling healthcare interventions using
   cohort models (decision trees, Markov models and extended Markov models).
@@ -11,7 +11,8 @@ Description: A package for decision analytic modelling in health economics.
   Modelling for Health Economic Evaluation", Oxford University Press, 2006.
 Depends: R (>= 3.1.0)
 Imports:
-  R6
+  R6,
+  rlang
 Suggests:
     rmarkdown,
     knitr

@@ -17,7 +17,7 @@ A package for decision analytic modelling in health economics.
 
 Authors:
 \itemize{
-  \item Kim Fairbairn \email{kim.fairbairn@nuth.nhs.uk}
+  \item Kim Fairbairn \email{kim.fairbairn@nhs.net}
 }
 
 }

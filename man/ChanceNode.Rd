@@ -52,7 +52,7 @@ Andrew Sims \email{andrew.sims5@nhs.net}
 \subsection{Method \code{new()}}{
 Create a new ChanceNode object
 \subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{ChanceNode$new(children, edgelabels, costs, p, ptype = "numeric")}\if{html}{\out{</div>}}
+\if{html}{\out{<div class="r">}}\preformatted{ChanceNode$new(children, edgelabels, costs, p, ptype = "auto")}\if{html}{\out{</div>}}
 }
 
 \subsection{Arguments}{
@@ -74,26 +74,28 @@ leaving the `ChanceNode`. Each element may be of type `numeric` or
        based on the \code{ptype} argument.
 \describe{
 \item{'numeric'}{\eqn{k} numeric values; the simplest case in which the   
-          probabilities are certain. Supplied values should add
-          to unity and be given in the same order as `children`.}
-\item{'MV'}{\eqn{k-1} `ModelVariable`s or `numeric` elements and
-      a single `numeric(NA)`, give in the same order as `children`. The 
-      single NA will be replaced on evaluation of the model variable
-      expressions by a value to ensure the sum of probabilities
-      is unity. This option is not recommended, because there is
-      a chance that during sampling, individual branch probabilities
-      may be less than zero, or that the sum of the sampled model variable
-      expressions may exceed 1.}
+probabilities are certain. Supplied values should add
+to unity and be given in the same order as `children`.}
+\item{'MV'}{At least one `ModelVariable` and exactly one
+`NA``, and the remainder either `numeric` or `ModelVariable`, given in the
+same order as `children`. The single NA will be replaced on evaluation of
+the model variables by a value to ensure the sum of probabilities
+is unity. This option is not recommended, because there is
+a chance that during sampling, individual branch probabilities
+may be less than zero, or that the sum of the sampled model variable
+expressions may exceed 1.}
 \item{'Beta'}{One `BetaModelVariable` and one NA. Used for \eqn{k=2}. The 
-      element defined as NA will be replaced by one minus the sampled 
-      value of the supplied beta distribution.}
+element defined as NA will be replaced by one minus the sampled 
+value of the supplied beta distribution.}
 \item{'Dirichlet'}{One DirichletModelVariable, with \eqn{k} parameters,
-      given in the same order as `children`.}
+given in the same order as `children`.}
+\item{'auto'}{Infer which of the previous options applies based on
+the types of elements of p}
 }}
 
 \item{\code{ptype}}{a character string taking one of four possible
 values to define how the \code{p} argument is defined:
-'numeric', 'MVE', 'Beta' or 'Dirichlet'.}
+'numeric', 'MV', 'Beta' or 'Dirichlet'.}
 }
 \if{html}{\out{</div>}}
 }

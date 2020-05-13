@@ -70,7 +70,6 @@ with leaf nodes which have no children (leaf nodes are synonymous with
 pathways in Briggs' terminology). The final node to be constructed 
 is the left-most decision node in the model.
 
-
 ```{r echo=T}
 # Sumatriptan branch
 leaf.a <- LeafNode$new("A", utility=1.0)
@@ -148,85 +147,44 @@ d.1 <- DecisionNode$new(
   edgelabels = list("Sumatriptan", "Caffeine/Ergotamine"),
   costs = list(16.10, 1.32)
 )
-
 ```
 
 # Running the model
-The following code runs a single model scenario, using low-level
-functions to evaluate each pathway and decision option. The
-`path.apply` function applies a user-provided function to each
-node of every root-to-leaf path in the model. In the Sumatriptan
-model there are eight possible root-to-leaf paths, each of which
-begins with the decision node and ends with a leaf node. For example,
+The method `evaluatePathways` of decision nodes computes
+the probability, cost and utility of traversing each root-to-leaf path
+in the model. In the Sumatriptan model there are eight such paths, each 
+of which begins with the decision node and ends with a leaf node. For example,
 pathway A involves a traversal of nodes `d.1`, `c.2`, `c.4` and
 `leaf.a`. 
 
-The argument to the function required by `path.apply` is simply an 
-ordered list of nodes. The main challenge in computing, for example,
-the probability of following the path is to work out which branch of
-each chance node is linked to the next child node. For example when
-traversing the list of nodes for pathway A, at chance node `c.4` some
-effort is needed to establish which branch and p-value (0.594) leads
-to leaf A. For this reason several functions suitable for use with
-`path.apply` are provided by `rdecision`. The functions provided include
-
-* `pathway.name` which returns the pathway name defined by its final
-   leaf node;
-* `pathway.choice` which returns the choice associated with the first
-   decision node in the pathway;
-* `pathway.probability` which returns the product of probabilities
-   associated with the pathway;
-* `pathway.cost` which returns the summed cost of traversing each 
-   node in the pathway.
-* `pathway.utility` which returns the utility associated with the final
-   leaf node of each pathway.
-
-The following code extracts and calculates various features associated
-with each root-to-leaf node traversal, and puts them into a table.
-
-```{r echo=T}
-RES <- data.frame(
-  'Choice' = unlist(path.apply(d.1, FUN=pathway.choice)),
-  'Pathway' = unlist(path.apply(d.1, FUN=pathway.name)),
-  'Probability' = unlist(path.apply(d.1, FUN=pathway.probability)),
-  'Cost' = unlist(path.apply(d.1, FUN=pathway.cost)),
-  'ExpectedCost' = NA,
-  'Utility' = unlist(path.apply(d.1, FUN=pathway.utility)),
-  'ExpectedUtility' = NA
-)
-RES$ExpectedCost <- round(RES$Probability*RES$Cost,2)
-RES$ExpectedUtility <- round(RES$Probability*RES$Utility,4)
-```
-
 # Model results
-The results of the scenario model, using the code from the previous section,
+The results of the scenario model, using the code from the previous sections,
 yields the following result:
-```{r echo=F}
-knitr::kable(RES)
+```{r echo=FALSE}
+local({
+  RES <- d.1$evaluatePathways()
+  names(RES) <- c('Choice', 'Pathway', 'Probability', 'Cost', 'Utility',
+                  'Expected Cost', 'Expected Utility')
+  keep <- c('Choice', 'Pathway', 'Probability', 'Cost', 'Expected Cost',
+            'Utility', 'Expected Utility')
+  knitr::kable(RES[,keep], row.names=F, digits=c(NA,NA,3,2,2,2,5))
+})
 ```
 
-There are, as expected, eight root-to-leaf pathways, which `path.apply` has 
-worked out itself from the model structure. The total probability, expected
-cost and expected utility for each choice can be calculated from the table
-as follows:
-
-```{r echo=T}
-SUM <- aggregate(
-  RES[,c('Probability', 'ExpectedCost', 'ExpectedUtility')],
-  by = list(RES$Choice),
-  FUN = sum
-)
-names(SUM) <- c('Choice', 'Probability', 'Expected Cost', 'Expected Utility')
-```
-which gives the following result, which is consistent with the result reported by
+There are, as expected, eight root-to-leaf pathways. The total probability, expected
+cost and expected utility for each choice can be calculated from the table above, or
+by invoking the `evaluateChoices` method of a decision node. This 
+gives the following result, consistent with that reported by
 Evans *et al* [-@evans:1997a].
 
 ```{r echo=F}
-knitr::kable(SUM)
+local({
+  SUM <- d.1$evaluateChoices()
+  names(SUM) <- c('Run', 'Choice', 'Expected Cost', 'Expected Utility')
+  keep <- c('Choice', 'Expected Cost', 'Expected Utility')
+  knitr::kable(SUM[,keep], row.names=F, digits=c(NA,2,5))
+})
 ```
 
-```{r echo=F}
-rm(RES, SUM)
-```
 
 # References

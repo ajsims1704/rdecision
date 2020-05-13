@@ -51,8 +51,7 @@ knitr::opts_chunk$set(
 ```
 
 ```{r setup, echo=F}
-#library(rdecision)
-source('rdecision-dev.R')
+library(rdecision)
 ```
 
 # Introduction

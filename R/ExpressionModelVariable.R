@@ -16,13 +16,13 @@
 #' But such forms of expression may be desirable in constructing a
 #' model and this class provides a mechanism for doing so.
 #' 
-#' @note Methods `getSD` and `getQuantile` return NA. For many expressions
-#' involving model variables there will be no closed form expression
-#' for these values, and they would normally be obtained by simulation.
+#' @note For many expressions involving model variables there will 
+#' be no closed form expressions for the standard deviation an
+#' the quantiles. Therefore they are obtained by simulation.
 #' Method `getDistribution` returns the string representation of the
 #' expression used to create the model variable.
 #' 
-#' @author Andrew J. Sims \email{andrew.sims5@@nhs.net}
+#' @author Andrew J. Sims \email{andrew.sims5@@newcastle.ac.uk}
 #' @docType class
 #' @export
 #' 
@@ -32,6 +32,7 @@ ExpressionModelVariable <- R6::R6Class(
   private = list(
     # fields
     expr = 'call',
+    #expr.str = 'character',
     expr.value = 'call',
     expr.mean = 'call',
     env = 'environment',
@@ -73,7 +74,7 @@ ExpressionModelVariable <- R6::R6Class(
     #' @param units Units in which the variable is expressed.
     #' @param expr An R expression involving model variables which would be 
     #' syntactically correct were each model variable to be replaced by
-    #' numerical variables.
+    #' numerical variables. Create either by `quote(x+y)` or `rlang::expr(x+y)`.
     #' @param envir The environment in which the model variables live. Normally,
     #' and by default, this is the global environment. But if an object is
     #' created which refers to model variables created in a different 
@@ -83,11 +84,12 @@ ExpressionModelVariable <- R6::R6Class(
     #' @return An object of type ExpressionModelVariable
     initialize = function(label, description, units, expr, envir=globalenv()) {
       super$initialize(label, description, units)
-      # check and save arguments
-      if (!is.call(expr)) {
-        warning("ExpressionModelVariable$new: expr must be of type 'call'")
+      # check and process the expression
+      if (!rlang::is_expression(expr)) {
+        warning("ExpressionModelVariable$new: expr must be an expression")
       }
       private$expr <- expr
+      # check the environment
       if (!is.environment(envir)) {
         stop("ExpressionModelVariable$new: envir must be of type 'environment'")
       }
@@ -124,10 +126,12 @@ ExpressionModelVariable <- R6::R6Class(
     
     #' @description 
     #' Accessor function for the name of the expression model variable.
-    #' @return Expression as a character string.
+    #' @return Expression as a character string with all control characters
+    #' having been removed.
     getDistribution = function() {
-      ex <- deparse(private$expr)
-      return(ex)
+      estr <- rlang::expr_text(private$expr)
+      estr <- gsub("[[:cntrl:]]", "", estr)
+      return(estr)
     },
     
     #' @description 

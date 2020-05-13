@@ -4,3 +4,6 @@ knitr::opts_chunk$set(
   comment = "#>"
 )
 
+## ----setup, echo=F-------------------------------------------------------
+library('rdecision')
+

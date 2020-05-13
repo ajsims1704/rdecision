@@ -85,34 +85,21 @@ d.1 <- DecisionNode$new(
   costs = list(16.10, 1.32)
 )
 
-
-## ----echo=T--------------------------------------------------------------
-RES <- data.frame(
-  'Choice' = unlist(path.apply(d.1, FUN=pathway.choice)),
-  'Pathway' = unlist(path.apply(d.1, FUN=pathway.name)),
-  'Probability' = unlist(path.apply(d.1, FUN=pathway.probability)),
-  'Cost' = unlist(path.apply(d.1, FUN=pathway.cost)),
-  'ExpectedCost' = NA,
-  'Utility' = unlist(path.apply(d.1, FUN=pathway.utility)),
-  'ExpectedUtility' = NA
-)
-RES$ExpectedCost <- round(RES$Probability*RES$Cost,2)
-RES$ExpectedUtility <- round(RES$Probability*RES$Utility,4)
+## ----echo=FALSE----------------------------------------------------------
+local({
+  RES <- d.1$evaluatePathways()
+  names(RES) <- c('Choice', 'Pathway', 'Probability', 'Cost', 'Utility',
+                  'Expected Cost', 'Expected Utility')
+  keep <- c('Choice', 'Pathway', 'Probability', 'Cost', 'Expected Cost',
+            'Utility', 'Expected Utility')
+  knitr::kable(RES[,keep], row.names=F, digits=c(NA,NA,3,2,2,2,5))
+})
 
 ## ----echo=F--------------------------------------------------------------
-knitr::kable(RES)
-
-## ----echo=T--------------------------------------------------------------
-SUM <- aggregate(
-  RES[,c('Probability', 'ExpectedCost', 'ExpectedUtility')],
-  by = list(RES$Choice),
-  FUN = sum
-)
-names(SUM) <- c('Choice', 'Probability', 'Expected Cost', 'Expected Utility')
-
-## ----echo=F--------------------------------------------------------------
-knitr::kable(SUM)
-
-## ----echo=F--------------------------------------------------------------
-rm(RES, SUM)
+local({
+  SUM <- d.1$evaluateChoices()
+  names(SUM) <- c('Run', 'Choice', 'Expected Cost', 'Expected Utility')
+  keep <- c('Choice', 'Expected Cost', 'Expected Utility')
+  knitr::kable(SUM[,keep], row.names=F, digits=c(NA,2,5))
+})
 

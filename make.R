@@ -15,7 +15,7 @@ rm(list=ls())
 local({
   
   # set working directory to package source and define repository
-  setwd("h:/Sources/rdecision")
+  setwd("h:/GitHub/rdecision")
   repo <- "h:/Sources/repository/rdecision"
 
   # get version

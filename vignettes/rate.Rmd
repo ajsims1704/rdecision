@@ -32,6 +32,12 @@ knitr::opts_chunk$set(
   comment = "#>"
 )
 ```
+
+```{r setup, echo=F}
+library('rdecision')
+```
+
+
 # Relationship between rates and probabilities
 Briggs *et al* [-@briggs:2002a] use the expression $p = 1-\exp(-rt)$, 
 where $r$ is described as

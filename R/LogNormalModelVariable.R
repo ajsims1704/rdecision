@@ -52,11 +52,11 @@ LogNormalModelVariable <- R6::R6Class(
     #' @param description A character string describing the variable.
     #' @param units Units of the quantity; character string.
     #' @param p1 First hyperparameter, a measure of location. 
-    #'        See \link{Details}.
+    #'        See 'Details'.
     #' @param p2 Second hyperparameter, a measure of spread.
-    #'        See \link{Details}.
+    #'        See 'Details'.
     #' @param parametrization A character string taking one of the values
-    #'        'LN1' (default) through 'LN7' (see \link{Details}).
+    #'        'LN1' (default) through 'LN7' (see 'Details').
     #' @return A LogNormalModelVariable object.
     initialize = function(label, description, units, p1, p2, parametrization='LN1') {
       super$initialize(label, description, units)
