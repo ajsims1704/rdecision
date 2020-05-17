@@ -1,6 +1,6 @@
 Package: rdecision
 Title: Decision Analytic Modelling In Health Economics
-Version: 0.1.6
+Version: 0.1.7
 Authors@R: c(
   person("Andrew", "Sims", email = "andrew.sims@newcastle.ac.uk", role = c("aut", "cre")),
   person("Kim", "Fairbairn", email="kim.fairbairn@nhs.net", role=c("aut")) )
@@ -15,9 +15,10 @@ Imports:
   rlang
 Suggests:
     rmarkdown,
-    knitr
+    knitr,
+    testthat
 License: GPL-3
 LazyData: true
 Encoding: UTF-8
 RoxygenNote: 7.1.0
-VignetteBuilder: knitr
+VignetteBuilder: knitr, rmarkdown

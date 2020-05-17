@@ -39,12 +39,35 @@ ModelVariable <- R6::R6Class(
     #'        'per year'.
     #' @return A new ModelVariable object.
     initialize = function(label, description, units) {
-      private$label <- label
+      private$label <- ""
       private$description <- description
       private$units <- units
       private$val <- 0
     },
  
+    #' @description Find the environment in which this model variable lives.
+    #' Uses a recursive environment walk function adapted from Hadley
+    #' Whickham's 'Advanced R'.
+    #' @return An environment. If not found, returns the empty environment.
+    get_environment = function(env=rlang::caller_env()) {
+      # stop recurring if we have reached the base case
+      if (identical(env, rlang::empty_env())) {
+        return(rlang::empty_env())
+      } 
+      # if not base case, compare the objects in the argument environment
+      # with self
+      iamhere <- FALSE
+      sapply(rlang::env_names(env), FUN=function(objname) {
+        obj <- rlang::env_get(env, objname)
+        if (identical(obj, self)) iamhere <<- TRUE  
+      })
+      if (iamhere) {
+        return(env)
+      } else {
+        self$get_environment(rlang::env_parent(env))
+      }
+    },    
+    
     #' @description 
     #' Is this ModelVariable an expression?
     #' @return TRUE if it inherits from ExpressionModelVariable, FALSE otherwise.
@@ -75,11 +98,42 @@ ModelVariable <- R6::R6Class(
       return(private$val)  
     },
     
+    junk = function() {
+      ej <- self$get_environment()
+      return(ej)
+    },
+    
+    
     #' @description
-    #' Accessor function for the label.
+    #' Accessor function for the label. Unless `set_label` has been called, this
+    #' function will search the MV's environment for the variable name given
+    #' the class object. 
     #' @return Label of model variable as character string.
-    getLabel = function() {
+    get_label = function() {
+      if (nchar(private$label)==0) {
+        # find the environment, starting with parent
+        my.env <- self$get_environment()
+        if (!identical(my.env, rlang::empty_env())) {
+          sapply(rlang::env_names(my.env), FUN=function(on){
+            v <- eval(rlang::parse_expr(on), envir=my.env)
+            if (identical(v,self)) private$label <- on
+          })      
+        }
+      }
       return(private$label)
+    },
+    
+    #' @description 
+    #' Function to set the label. Normally this is not required because the label
+    #' is set to the name given to the variable by the user. This function allows
+    #' the default behaviour to be overridden.
+    #' @param label The label to use.
+    #' @return Updated ModelVariable object
+    set_label = function(label) {
+      if (!is.character(label)) {
+        stop("ModelVariable$set_label: argument 'label' must be a character string")
+      }
+      private$label <- label
     },
     
     #' @description
@@ -142,7 +196,7 @@ ModelVariable <- R6::R6Class(
       }
       # create a data frame of model variables
       DF <- data.frame(
-        Label = sapply(mvlist, FUN=function(x){x$getLabel()}),
+        Label = sapply(mvlist, FUN=function(x){x$get_label()}),
         Description = sapply(mvlist, FUN=function(x){x$getDescription()}),
         Units = sapply(mvlist, FUN=function(x){x$getUnits()}),
         Distribution = sapply(mvlist, FUN=function(x){x$getDistribution()}),
