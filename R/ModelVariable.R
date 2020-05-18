@@ -57,8 +57,17 @@ ModelVariable <- R6::R6Class(
     #' @param units A character string description of the units, e.g. 'GBP',
     #'        'per year'.
     #' @return A new ModelVariable object.
-    initialize = function(description, units, env=rlang::current_env()) {
-      rlang::env_print(env)
+    initialize = function(description, units) {
+      p.env <- parent.env(rlang::current_env())
+      rlang::env_print(p.env)
+      caller.env <- rlang::caller_env()
+      #rlang::env_print(caller.env)
+      #caller.parent.env <- rlang::env_parent(caller.env, 3)
+      #rlang::env_print(caller.parent.env)
+      #print(caller.env$name)
+      #enclos.env <- rlang::env_get(caller.env, "enclos_env")
+      #rlang::env_print(enclos.env)
+
       private$description <- description
       private$units <- units
       private$val <- 0
@@ -71,7 +80,7 @@ ModelVariable <- R6::R6Class(
     get_environment = function() {
       #print(names(self))
       #print(class(self$.__enclos_env__))
-      rlang::env_print(self$.__enclos_env__)
+      #rlang::env_print(self$.__enclos_env__)
       #print(rlang::env_parents(self$.__enclos_env__))
       #myenv <- rlang::env_parent(self$.__enclos_env__)
       #print(myenv)
