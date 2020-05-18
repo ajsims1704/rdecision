@@ -32,7 +32,6 @@ ExpressionModelVariable <- R6::R6Class(
   private = list(
     # fields
     expr = 'call',
-    #expr.str = 'character',
     expr.value = 'call',
     expr.mean = 'call',
     env = 'environment',
@@ -65,9 +64,6 @@ ExpressionModelVariable <- R6::R6Class(
     #' @description 
     #' Create a Model Variable formed from an expression involving other
     #' model variables.
-    #' @param label A character string label for the variable. It is advised
-    #' to make this the same as the variable name which helps when tabulating
-    #' model variables involving ExpressionModelVariables.
     #' @param description Name for the model variable expresssion. In 
     #' a complex model it may help to tabulate how model variables are
     #' combined into costs, probablities and rates.
@@ -82,8 +78,8 @@ ExpressionModelVariable <- R6::R6Class(
     #' within a function, for example, set `envir=environment()` in the
     #' parameter list.
     #' @return An object of type ExpressionModelVariable
-    initialize = function(label, description, units, expr, envir=globalenv()) {
-      super$initialize(label, description, units)
+    initialize = function(description, units, expr, envir=globalenv()) {
+      super$initialize(description, units)
       # check and process the expression
       if (!rlang::is_expression(expr)) {
         warning("ExpressionModelVariable$new: expr must be an expression")

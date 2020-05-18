@@ -33,8 +33,8 @@ BetaModelVariable <- R6::R6Class(
     #' @param alpha parameter of the Beta distribution.
     #' @param beta parameter of the Beta distribution.
     #' @return An object of class BetaModelVariable. 
-    initialize = function(label, description, units, alpha, beta) {
-      super$initialize(label, description, units)
+    initialize = function(description, units, alpha, beta) {
+      super$initialize(description, units)
       private$alpha <- alpha
       private$beta <- beta
       private$val <- self$getMean()

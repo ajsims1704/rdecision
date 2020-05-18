@@ -26,9 +26,6 @@ NormalModelVariable <- R6::R6Class(
 
     #' @description
     #' Create a model variable with normal uncertainty. 
-    #' @param label A character string label for the variable. It is advised
-    #' to make this the same as the variable name which helps when tabulating
-    #' model variables involving ExpressionModelVariables.
     #' @param description A character string describing the variable.
     #' @param units Units of the quantity; character string.
     #' @param mu Hyperparameter with mean of the Normal distribution for 
@@ -36,8 +33,8 @@ NormalModelVariable <- R6::R6Class(
     #' @param sigma Hyperparameter equal to the standard deviation of the
     #'        normal distribution for the uncertainty of the variable.
     #' @return A NormalModelVariable object.
-    initialize = function(label, description, units, mu, sigma) {
-      super$initialize(label, description, units)
+    initialize = function(description, units, mu, sigma) {
+      super$initialize(description, units)
       private$mu <- mu
       private$sigma <- sigma
       private$val <- mu

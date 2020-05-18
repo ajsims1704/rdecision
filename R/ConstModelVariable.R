@@ -13,7 +13,7 @@
 #' as a model input.
 #' 
 #' @docType class
-#' @author Andrew Sims \email{andrew.sims5@nhs.net}
+#' @author Andrew Sims \email{andrew.sims@@newcastle.ac.uk}
 #' @export
 #' 
 ConstModelVariable <- R6::R6Class(
@@ -24,9 +24,6 @@ ConstModelVariable <- R6::R6Class(
     
     #' @description 
     #' Create a new constant model variable
-    #' @param label A character string label for the variable. It is advised
-    #' to make this the same as the variable name which helps when tabulating
-    #' model variables involving ExpressionModelVariables.
     #' @param description A character string description of the variable
     #'        and its role in the
     #'        model. This description will be used in a tabulation of the
@@ -35,8 +32,8 @@ ConstModelVariable <- R6::R6Class(
     #'        'per year'.
     #' @param const The constant numerical value of the object.
     #' @return A new ModelVariable object.
-    initialize = function(label, description, units, const) {
-      super$initialize(label, description, units)
+    initialize = function(description, units, const) {
+      super$initialize(description, units)
       private$val <- const
     },
     

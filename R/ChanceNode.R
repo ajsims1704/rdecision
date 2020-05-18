@@ -168,7 +168,8 @@ ChanceNode <- R6::R6Class(
         else if ( (nna==1) && (nmv>=1) & ((nna+nmv+nnu)==k) ) {
           private$ptype <- 'MV'
           private$p <- p
-          warning("ChanceNode$new: `ptype='MV'` may lead to p values out of range [0,1].")
+          warning("ChanceNode$new: 'ptype=\"MV\"' may cause p values outside [0,1].",
+                  call.=FALSE)
         }
         else {
           stop("ChanceNode$new: cannot guess `ptype` from supplied p for `ptype=auto`.")
