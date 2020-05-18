@@ -57,7 +57,8 @@ ModelVariable <- R6::R6Class(
     #' @param units A character string description of the units, e.g. 'GBP',
     #'        'per year'.
     #' @return A new ModelVariable object.
-    initialize = function(description, units) {
+    initialize = function(description, units, env=rlang::current_env()) {
+      rlang::env_print(env)
       private$description <- description
       private$units <- units
       private$val <- 0
@@ -68,8 +69,14 @@ ModelVariable <- R6::R6Class(
     #' @return An environment. If not found, returns the empty environment.
     # * Don't call from class methods; use private$whereami instead. *
     get_environment = function() {
-      myenv <- private$whereami(rlang::caller_env())
-      return(myenv)
+      #print(names(self))
+      #print(class(self$.__enclos_env__))
+      rlang::env_print(self$.__enclos_env__)
+      #print(rlang::env_parents(self$.__enclos_env__))
+      #myenv <- rlang::env_parent(self$.__enclos_env__)
+      #print(myenv)
+#      myenv <- private$whereami(rlang::caller_env())
+      return(self$.__enclos_env__)
     },   
     
     #' @description 
@@ -110,13 +117,15 @@ ModelVariable <- R6::R6Class(
     get_label = function() {
       if (is.na(private$label)) {
         # find the environment, starting with parent
-        my.env <- private$whereami(rlang::caller_env()) 
+#        my.env <- private$whereami(rlang::caller_env()) 
+        my.env <- rlang::env_parent(self$.__enclos_env__) 
         if (!identical(my.env, rlang::empty_env())) {
           sapply(rlang::env_names(my.env), FUN=function(on){
             v <- eval(rlang::parse_expr(on), envir=my.env)
             if (identical(v,self)) private$label <- on
           })      
         }
+        
       }
       return(private$label)
     },

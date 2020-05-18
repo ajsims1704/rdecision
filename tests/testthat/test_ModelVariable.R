@@ -9,6 +9,8 @@ test_that("the MV returns the correct environment, case 1", {
   v.env <- mv$get_environment()
   expect_type(v.env, 'environment')
   c.env <- rlang::current_env()
+  rlang::env_print(c.env)
+  print(rlang::env_parents(c.env))
   expect_identical(c.env, v.env)
 })
 
