@@ -20,17 +20,17 @@ ModelVariable <- R6::R6Class(
   classname = "ModelVariable",
   private = list(
     label = as.character(NA),
-    description = 'character',
-    units = 'character',
-    val = 'numeric',
+    description = as.character(NA),
+    units = as.character(NA),
+    val = 0,
     
     # Function to find self in an environment
     # Uses a looping environment walk function adapted from Hadley Whickham's
-    # 'Advanced R'. Starts at leaf and walks towards the super-level
+    # 'Advanced R'. Starts at leaf and walks towards the ancestor
     # empty environment and updates myenv if it finds a match. Successful
     # matches are overwritten by matches nearer the root of the tree, so
     # that if a reference copy of a variable exists it will cede priority
-    # to its reference nearer the root. 
+    # to its origin nearer the root. 
     whereami = function(env = rlang::caller_env()) {
       myenv <- rlang::empty_env()
       while (!identical(env, rlang::empty_env())) {
@@ -58,19 +58,8 @@ ModelVariable <- R6::R6Class(
     #'        'per year'.
     #' @return A new ModelVariable object.
     initialize = function(description, units) {
-      p.env <- parent.env(rlang::current_env())
-      rlang::env_print(p.env)
-      caller.env <- rlang::caller_env()
-      #rlang::env_print(caller.env)
-      #caller.parent.env <- rlang::env_parent(caller.env, 3)
-      #rlang::env_print(caller.parent.env)
-      #print(caller.env$name)
-      #enclos.env <- rlang::env_get(caller.env, "enclos_env")
-      #rlang::env_print(enclos.env)
-
       private$description <- description
       private$units <- units
-      private$val <- 0
     },
 
     #' @description Find the environment nearest the global environment in which
@@ -78,14 +67,8 @@ ModelVariable <- R6::R6Class(
     #' @return An environment. If not found, returns the empty environment.
     # * Don't call from class methods; use private$whereami instead. *
     get_environment = function() {
-      #print(names(self))
-      #print(class(self$.__enclos_env__))
-      #rlang::env_print(self$.__enclos_env__)
-      #print(rlang::env_parents(self$.__enclos_env__))
-      #myenv <- rlang::env_parent(self$.__enclos_env__)
-      #print(myenv)
-#      myenv <- private$whereami(rlang::caller_env())
-      return(self$.__enclos_env__)
+      myenv <- private$whereami(rlang::caller_env())
+      return(myenv)
     },   
     
     #' @description 
@@ -120,21 +103,28 @@ ModelVariable <- R6::R6Class(
     
     #' @description
     #' Accessor function for the label. Unless `set_label` has been called, this
-    #' function will search the MV's environment for the variable name given
-    #' the class object. 
+    #' function will return the variable's own name. As far as possible, this will 
+    #' be the variable name used when the object was first created in the model,
+    #' so that it aligns with the variable name used in ExpressionModelVariables
+    #' and tabulations of variables used in models. But due to the nature of R's
+    #' non-standard evaluation, this is not ensured. It will sometimes return
+    #' the name of a reference to the original variable, if
+    #' the original environment is not an ancestor of the calling environment of
+    #' this function. In cases where references to model variables are routinely
+    #' created, destroyed and passed around, it is advised to call this method
+    #' from the environment of the original object as soon as possible after
+    #' it is created. Subsequent calls will return the original name.
     #' @return Label of model variable as character string.
     get_label = function() {
       if (is.na(private$label)) {
         # find the environment, starting with parent
-#        my.env <- private$whereami(rlang::caller_env()) 
-        my.env <- rlang::env_parent(self$.__enclos_env__) 
+        my.env <- private$whereami(rlang::caller_env()) 
         if (!identical(my.env, rlang::empty_env())) {
           sapply(rlang::env_names(my.env), FUN=function(on){
             v <- eval(rlang::parse_expr(on), envir=my.env)
             if (identical(v,self)) private$label <- on
           })      
         }
-        
       }
       return(private$label)
     },
@@ -147,7 +137,8 @@ ModelVariable <- R6::R6Class(
     #' @return Updated ModelVariable object
     set_label = function(label) {
       if (!is.character(label)) {
-        stop("ModelVariable$set_label: argument 'label' must be a character string")
+        stop("ModelVariable$set_label: argument 'label' must be a character string",
+             call.=FALSE)
       }
       private$label <- label
       return(invisible(self))
