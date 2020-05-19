@@ -16,7 +16,7 @@ associated with a model and therefore be explicitly documented
 as a model input.
 }
 \author{
-Andrew Sims \email{andrew.sims5@nhs.net}
+Andrew Sims \email{andrew.sims@newcastle.ac.uk}
 }
 \section{Super class}{
 \code{\link[rdecision:ModelVariable]{rdecision::ModelVariable}} -> \code{ConstModelVariable}
@@ -36,13 +36,16 @@ Andrew Sims \email{andrew.sims5@nhs.net}
 \if{html}{
 \out{<details ><summary>Inherited methods</summary>}
 \itemize{
+\item \out{<span class="pkg-link" data-pkg="rdecision" data-topic="ModelVariable" data-id="get_environment">}\href{../../rdecision/html/ModelVariable.html#method-get_environment}{\code{rdecision::ModelVariable$get_environment()}}\out{</span>}
+\item \out{<span class="pkg-link" data-pkg="rdecision" data-topic="ModelVariable" data-id="get_label">}\href{../../rdecision/html/ModelVariable.html#method-get_label}{\code{rdecision::ModelVariable$get_label()}}\out{</span>}
 \item \out{<span class="pkg-link" data-pkg="rdecision" data-topic="ModelVariable" data-id="getDescription">}\href{../../rdecision/html/ModelVariable.html#method-getDescription}{\code{rdecision::ModelVariable$getDescription()}}\out{</span>}
-\item \out{<span class="pkg-link" data-pkg="rdecision" data-topic="ModelVariable" data-id="getLabel">}\href{../../rdecision/html/ModelVariable.html#method-getLabel}{\code{rdecision::ModelVariable$getLabel()}}\out{</span>}
 \item \out{<span class="pkg-link" data-pkg="rdecision" data-topic="ModelVariable" data-id="getOperands">}\href{../../rdecision/html/ModelVariable.html#method-getOperands}{\code{rdecision::ModelVariable$getOperands()}}\out{</span>}
 \item \out{<span class="pkg-link" data-pkg="rdecision" data-topic="ModelVariable" data-id="getUnits">}\href{../../rdecision/html/ModelVariable.html#method-getUnits}{\code{rdecision::ModelVariable$getUnits()}}\out{</span>}
 \item \out{<span class="pkg-link" data-pkg="rdecision" data-topic="ModelVariable" data-id="isExpression">}\href{../../rdecision/html/ModelVariable.html#method-isExpression}{\code{rdecision::ModelVariable$isExpression()}}\out{</span>}
 \item \out{<span class="pkg-link" data-pkg="rdecision" data-topic="ModelVariable" data-id="r">}\href{../../rdecision/html/ModelVariable.html#method-r}{\code{rdecision::ModelVariable$r()}}\out{</span>}
+\item \out{<span class="pkg-link" data-pkg="rdecision" data-topic="ModelVariable" data-id="set_label">}\href{../../rdecision/html/ModelVariable.html#method-set_label}{\code{rdecision::ModelVariable$set_label()}}\out{</span>}
 \item \out{<span class="pkg-link" data-pkg="rdecision" data-topic="ModelVariable" data-id="tabulate">}\href{../../rdecision/html/ModelVariable.html#method-tabulate}{\code{rdecision::ModelVariable$tabulate()}}\out{</span>}
+\item \out{<span class="pkg-link" data-pkg="rdecision" data-topic="ModelVariable" data-id="unset_label">}\href{../../rdecision/html/ModelVariable.html#method-unset_label}{\code{rdecision::ModelVariable$unset_label()}}\out{</span>}
 \item \out{<span class="pkg-link" data-pkg="rdecision" data-topic="ModelVariable" data-id="value">}\href{../../rdecision/html/ModelVariable.html#method-value}{\code{rdecision::ModelVariable$value()}}\out{</span>}
 }
 \out{</details>}
@@ -53,16 +56,12 @@ Andrew Sims \email{andrew.sims5@nhs.net}
 \subsection{Method \code{new()}}{
 Create a new constant model variable
 \subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{ConstModelVariable$new(label, description, units, const)}\if{html}{\out{</div>}}
+\if{html}{\out{<div class="r">}}\preformatted{ConstModelVariable$new(description, units, const)}\if{html}{\out{</div>}}
 }
 
 \subsection{Arguments}{
 \if{html}{\out{<div class="arguments">}}
 \describe{
-\item{\code{label}}{A character string label for the variable. It is advised
-to make this the same as the variable name which helps when tabulating
-model variables involving ExpressionModelVariables.}
-
 \item{\code{description}}{A character string description of the variable
 and its role in the
 model. This description will be used in a tabulation of the

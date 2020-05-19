@@ -489,14 +489,14 @@ des <- function(nStates, nGroups=0, nPatients, nCyclesPerYear, nCycles,
     prevCycles <- 0
   }
   else {
-    popm <- as.matrix(read.csv(file=paste(stub, '-pop.csv', sep="")))
+    popm <- as.matrix(utils::read.csv(file=paste(stub, '-pop.csv', sep="")))
     prevCycles <- max(popm[,'Cycle'])
     popm <- rbind(popm, matrix(data=NA, nrow=nCycles, ncol=nStates+2))
-    pspm <- as.matrix(read.csv(file=paste(stub, '-psp.csv', sep="")))
+    pspm <- as.matrix(utils::read.csv(file=paste(stub, '-psp.csv', sep="")))
     pspm <- rbind(pspm, matrix(data=NA, nrow=nCycles, ncol=nStates+2))
-    entm <- as.matrix(read.csv(file=paste(stub, '-ent.csv', sep="")))
+    entm <- as.matrix(utils::read.csv(file=paste(stub, '-ent.csv', sep="")))
     entm <- rbind(entm, matrix(data=NA, nrow=nCycles, ncol=nStates+2))
-    utlm <- as.matrix(read.csv(file=paste(stub, '-utl.csv', sep="")))
+    utlm <- as.matrix(utils::read.csv(file=paste(stub, '-utl.csv', sep="")))
     utlm <- rbind(entm, matrix(data=NA, nrow=nCycles, ncol=nStates+2))
   }
 
@@ -544,7 +544,7 @@ des <- function(nStates, nGroups=0, nPatients, nCyclesPerYear, nCycles,
     if (c==0) {
       prevalenceCDF <- cumsum(prevalence)
       for (p in 1:nPatients) {
-        r <- runif(1, 0, 1)
+        r <- stats::runif(1, 0, 1)
         for (s in 1:nStates) {
           if (r < prevalenceCDF[s]) {
             patient[p,'state'] <- s
@@ -563,7 +563,7 @@ des <- function(nStates, nGroups=0, nPatients, nCyclesPerYear, nCycles,
       for (p in 1:nPatients) {
         sCurrent <- patient[p,'state']
         sNew <- sCurrent
-        r <- runif(1, min=0, max=1)
+        r <- stats::runif(1, min=0, max=1)
         for (s in 1:nStates) {
           if (r < Pcdf[sCurrent,s]) {
             sNew <- s
@@ -609,7 +609,7 @@ des <- function(nStates, nGroups=0, nPatients, nCyclesPerYear, nCycles,
         # test for reaching state cycle limit
         if (state$hasCycleLimit[sCurrent]) {
           if (patient[p,'timeInState'] >= state$cycleLimit[sCurrent]) {
-            r <- runif(1, min=0, max=1)
+            r <- stats::runif(1, min=0, max=1)
             for (s in 1:nStates) {
               if (r < Tcdf[sCurrent,s]) {
                 sNew <- s
@@ -622,7 +622,7 @@ des <- function(nStates, nGroups=0, nPatients, nCyclesPerYear, nCycles,
         # test for reaching group cycle limit
         if (gCurrent > 0 && group$hasCycleLimit[gCurrent]) {
           if (patient[p,'timeInGroup'] >= group$cycleLimit[gCurrent]) {
-            r <- runif(1, min=0, max=1)
+            r <- stats::runif(1, min=0, max=1)
             for (s in 1:nStates) {
               if (r < Gcdf[gCurrent,s]) {
                 sNew <- s
@@ -829,10 +829,10 @@ des <- function(nStates, nGroups=0, nPatients, nCyclesPerYear, nCycles,
   # write state information files
   # --------------------------------------------------------------------
   if (!is.na(stub)) {
-    write.csv(popm, file=paste(stub, '-pop.csv', sep=""), row.names=F)
-    write.csv(pspm, file=paste(stub, '-psp.csv', sep=""), row.names=F)
-    write.csv(entm, file=paste(stub, '-ent.csv', sep=""), row.names=F)
-    write.csv(utlm, file=paste(stub, '-utl.csv', sep=""), row.names=F)
+    utils::write.csv(popm, file=paste(stub, '-pop.csv', sep=""), row.names=F)
+    utils::write.csv(pspm, file=paste(stub, '-psp.csv', sep=""), row.names=F)
+    utils::write.csv(entm, file=paste(stub, '-ent.csv', sep=""), row.names=F)
+    utils::write.csv(utlm, file=paste(stub, '-utl.csv', sep=""), row.names=F)
   }
 
   # --------------------------------------------------------------------

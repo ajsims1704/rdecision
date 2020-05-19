@@ -22,10 +22,13 @@ Andrew Sims \email{andrew.sims@newcastle.ac.uk}
 \subsection{Public methods}{
 \itemize{
 \item \href{#method-new}{\code{ModelVariable$new()}}
+\item \href{#method-get_environment}{\code{ModelVariable$get_environment()}}
 \item \href{#method-isExpression}{\code{ModelVariable$isExpression()}}
 \item \href{#method-sample}{\code{ModelVariable$sample()}}
 \item \href{#method-value}{\code{ModelVariable$value()}}
-\item \href{#method-getLabel}{\code{ModelVariable$getLabel()}}
+\item \href{#method-get_label}{\code{ModelVariable$get_label()}}
+\item \href{#method-set_label}{\code{ModelVariable$set_label()}}
+\item \href{#method-unset_label}{\code{ModelVariable$unset_label()}}
 \item \href{#method-getDescription}{\code{ModelVariable$getDescription()}}
 \item \href{#method-getUnits}{\code{ModelVariable$getUnits()}}
 \item \href{#method-getDistribution}{\code{ModelVariable$getDistribution()}}
@@ -44,16 +47,12 @@ Andrew Sims \email{andrew.sims@newcastle.ac.uk}
 \subsection{Method \code{new()}}{
 Create an object of type `ModelVariable`
 \subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{ModelVariable$new(label, description, units)}\if{html}{\out{</div>}}
+\if{html}{\out{<div class="r">}}\preformatted{ModelVariable$new(description, units)}\if{html}{\out{</div>}}
 }
 
 \subsection{Arguments}{
 \if{html}{\out{<div class="arguments">}}
 \describe{
-\item{\code{label}}{A character string label for the variable. It is advised
-to make this the same as the variable name which helps when tabulating
-model variables involving ExpressionModelVariables.}
-
 \item{\code{description}}{A character string description of the variable
 and its role in the
 model. This description will be used in a tabulation of the
@@ -66,6 +65,20 @@ variables linked to a model.}
 }
 \subsection{Returns}{
 A new ModelVariable object.
+}
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-get_environment"></a>}}
+\if{latex}{\out{\hypertarget{method-get_environment}{}}}
+\subsection{Method \code{get_environment()}}{
+Find the environment nearest the global environment in which
+this model variable or a reference to it, lives.
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{ModelVariable$get_environment()}\if{html}{\out{</div>}}
+}
+
+\subsection{Returns}{
+An environment. If not found, returns the empty environment.
 }
 }
 \if{html}{\out{<hr>}}
@@ -122,16 +135,63 @@ Numeric value of the model variable.
 }
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-getLabel"></a>}}
-\if{latex}{\out{\hypertarget{method-getLabel}{}}}
-\subsection{Method \code{getLabel()}}{
-Accessor function for the label.
+\if{html}{\out{<a id="method-get_label"></a>}}
+\if{latex}{\out{\hypertarget{method-get_label}{}}}
+\subsection{Method \code{get_label()}}{
+Accessor function for the label. Unless `set_label` has been called, this
+function will return the variable's own name. As far as possible, this will 
+be the variable name used when the object was first created in the model,
+so that it aligns with the variable name used in ExpressionModelVariables
+and tabulations of variables used in models. But due to the nature of R's
+non-standard evaluation, this is not ensured. It will sometimes return
+the name of a reference to the original variable, if
+the original environment is not an ancestor of the calling environment of
+this function. In cases where references to model variables are routinely
+created, destroyed and passed around, it is advised to call this method
+from the environment of the original object as soon as possible after
+it is created. Subsequent calls will return the original name.
 \subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{ModelVariable$getLabel()}\if{html}{\out{</div>}}
+\if{html}{\out{<div class="r">}}\preformatted{ModelVariable$get_label()}\if{html}{\out{</div>}}
 }
 
 \subsection{Returns}{
 Label of model variable as character string.
+}
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-set_label"></a>}}
+\if{latex}{\out{\hypertarget{method-set_label}{}}}
+\subsection{Method \code{set_label()}}{
+Function to set the label. Normally this is not required because the label
+is set to the name given to the variable by the user. This function allows
+the default behaviour to be overridden.
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{ModelVariable$set_label(label)}\if{html}{\out{</div>}}
+}
+
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{label}}{The label to use.}
+}
+\if{html}{\out{</div>}}
+}
+\subsection{Returns}{
+Updated ModelVariable object
+}
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-unset_label"></a>}}
+\if{latex}{\out{\hypertarget{method-unset_label}{}}}
+\subsection{Method \code{unset_label()}}{
+Function to unset the label. Causes the label to revert to its default, i.e.
+its variable name at the next call to `get_label`.
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{ModelVariable$unset_label()}\if{html}{\out{</div>}}
+}
+
+\subsection{Returns}{
+Updated ModelVariable object
 }
 }
 \if{html}{\out{<hr>}}
