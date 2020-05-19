@@ -15,23 +15,27 @@ rm(list=ls())
 
 local({
   
-  # set working directory to package source 
-  #setwd("h:/GitHub/rdecision")
-
-  # add pandoc to PATH
+  # add pandoc and qpdf to PATH
+  OPATH <- Sys.getenv("PATH")
   PATH <- Sys.getenv("PATH")
+  sep <- ifelse(grepl(":", PATH), ":", ";")
   PANDOC <- Sys.getenv("RSTUDIO_PANDOC")
-  PATH <- paste(PATH, PANDOC, sep=";")
+  PATH <- paste(PATH, PANDOC, sep=sep)
   Sys.setenv(PATH=PATH)
-  print(Sys.getenv())
+  QPDF <- Sys.getenv("R_QPDF")
+  PATH <- paste(PATH, QPDF, sep=sep)
+  Sys.setenv(PATH=PATH)
   
   # run the check
   devtools::check(
-    pkg="h:/GitHub/rdecision",
+    pkg = paste(Sys.getenv("HOME"), "GitHub/rdecision", sep="/"),
     document=TRUE,
     manual=TRUE,
     cran=TRUE,
     incoming=T
   )
-  
+
+  # clear up
+  Sys.setenv(PATH=OPATH)
+    
 })
