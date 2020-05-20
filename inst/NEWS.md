@@ -1,14 +1,10 @@
 # rdecision 0.1.7
 
-## Refactoring
-
 * Removed the label argument from ModelVariable. 
-
-## New features
-
+* Improved auto-detection of variable label in ModelVariable.
 * Added NEWS.md and CITATION file to inst folder in CRAN preparation.
-* Added tests/testthat folder, with some automated testing.
-
+* Added tests/testthat folder with tests for ModelVariable.
+* Fixed notes issued by R CMD check.
 
 # rdecision 0.1.6
 
@@ -54,9 +50,19 @@
 # rdecision 0.1.2
 
 * For the Markov solver:
-    * Function is now called ‘des’
+    * Function is now called 'des'
     * It returns a list of summary matrices (the same ones written to csv files) 
       instead of a single number.
     * Output can be suppressed by setting stub=NA.
     * Some minor bugs fixed.
     
+# rdecision 0.1.1
+
+* First release of rdecision as a package.
+* Added classes for solving decision trees (Node, LeafNode, ChanceNode,
+  DecisionNode) and pathway detection and traversal functions.
+* Incorporated our discrete event solver, originally written in Matlab
+  for the WatchBP model, then translated as a stand-alone R script, into
+  the package.
+* Added vignettes for Sumatriptan model from Briggs (Box 2.3) and
+  from Sonnenberg and Beck's original 3-state example.
