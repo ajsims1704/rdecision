@@ -27,9 +27,11 @@ local({
     RTOOLS <- paste("C:", "Rtools", "bin", sep="/")
     PATH <- paste(PATH, RTOOLS, sep=PATHSEP)
     Sys.setenv(PATH=PATH)
-    # don't use GhostScript
-    Sys.setenv(R_GSCMD="")
-    Sys.setenv(GS_QUALITY="none")
+    # add Ghostscript to the path
+    PATH <- Sys.getenv("PATH")
+    RTOOLS <- paste("C:", "Program Files", "gs", "gs9.52", "bin", sep="/")
+    PATH <- paste(PATH, RTOOLS, sep=PATHSEP)
+    Sys.setenv(PATH=PATH)
   } else {
     HOME <- Sys.getenv("HOME")
     PATHSEP <- ":"

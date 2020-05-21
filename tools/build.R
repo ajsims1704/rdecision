@@ -8,50 +8,72 @@
 #
 # History:
 # ========
-# 14.05.2019. A.J. Sims.
+# 14.05.2019. A.J. Sims. Created.
+# 21.05.2010. A.J. Sims. Updated for cross-platform use.
 # ----------------------------------------------------------------------------
 
 rm(list=ls())
 
 local({
   
-  # set working directory to package source and define repository
-  #setwd("h:/GitHub/rdecision")
-  #repo <- "h:/Sources/repository/rdecision"
+  # save original path
+  OPATH <- Sys.getenv("PATH")
+  owd <- getwd()
+  
+  # System dependencies
+  if (grepl("Windows", Sys.getenv("OS"))) {
+    HOME <- "H:"
+    PATHSEP <- ";"
+    # add Rtools to path to help find qpdf
+    PATH <- Sys.getenv("PATH")
+    RTOOLS <- paste("C:", "Rtools", "bin", sep="/")
+    PATH <- paste(PATH, RTOOLS, sep=PATHSEP)
+    Sys.setenv(PATH=PATH)
+    # add Ghostscript to the path
+    PATH <- Sys.getenv("PATH")
+    RTOOLS <- paste("C:", "Program Files", "gs", "gs9.52", "bin", sep="/")
+    PATH <- paste(PATH, RTOOLS, sep=PATHSEP)
+    Sys.setenv(PATH=PATH)
+  } else {
+    HOME <- Sys.getenv("HOME")
+    PATHSEP <- ":"
+  }
+  REPOSITORY <- paste(HOME, "GitHub", sep="/")
+  setwd(REPOSITORY)
 
-  # get version
-  #DESC <- read.dcf('DESCRIPTION')
-  #VERSION <- DESC[1,'Version']
-  
-  # build manual
-  #devtools::build_manual(pkg='.', path=repo)
-  
-  # build vignettes
-  #devtools::build_vignettes(pkg='.')
-  
-  # build documentation (identifies errors in documentation which can
-  # upset the build process)
-  #devtools::document()
+  # add pandoc to PATH, if it is installed
+  PATH <- Sys.getenv("PATH")
+  PANDOC <- Sys.getenv("RSTUDIO_PANDOC")
+  if (nchar(PANDOC)>0) {
+    PATH <- paste(PATH, PANDOC, sep=PATHSEP)
+    Sys.setenv(PATH=PATH)
+  }
 
-  pkg = paste(Sys.getenv("HOME"), "GitHub/rdecision", sep="/")
-  print(pkg)
-
+  # build the package
+  srcpkg <- devtools::build(
+    pkg = paste(REPOSITORY, "rdecision", sep="/"),
+    path = paste(REPOSITORY, "rdecision", "archive", sep="/"),
+    manual = TRUE
+  )
   
-    # build source package
-  #devtools::build(
-  #  pkg = paste(Sys.getenv("HOME"), "GitHub/rdecision", sep="/"),
-  #  path = paste(Sys.getenv("HOME"), "GitHub/rdecision/archive", sep="/"),
-  #  binary = FALSE,
-  #  vignettes = TRUE,
-  #  manual = TRUE
-  #)
+  # build a binary package from the source package
+  devtools::build(
+    pkg = srcpkg,
+    path = paste(REPOSITORY, "rdecision", "archive", sep="/"),
+    binary = TRUE,
+    vignettes = TRUE,
+    manual = TRUE
+  )
   
-  # build source package with vignettes
-#  devtools::build(path=repo, binary=F, vignettes=T, manual=F)
+  # build package manual
+  devtools::build_manual(
+    pkg = paste(REPOSITORY, "rdecision", sep="/"),
+    path = paste(REPOSITORY, "rdecision", "archive", sep="/")
+  )
   
-  # build windows binary from the source package
-#  pkg <- paste(repo, '/rdecision_', VERSION, '.tar.gz', sep='')
-#  devtools::build(pkg=pkg, path=repo, binary=T)
+  # clear up
+  Sys.setenv(PATH=OPATH)
+  setwd(owd)
 
 })
 

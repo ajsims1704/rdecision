@@ -4,6 +4,7 @@
 * Improved auto-detection of variable label in ModelVariable.
 * Added NEWS.md and CITATION file to inst folder in CRAN preparation.
 * Added tests/testthat folder with tests for ModelVariable.
+* Added scripts to call devtools::check/build on Windows/Mac.
 * Fixed notes issued by R CMD check.
 
 # rdecision 0.1.6
