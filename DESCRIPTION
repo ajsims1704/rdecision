@@ -1,9 +1,18 @@
 Package: rdecision
 Title: Decision Analytic Modelling in Health Economics
-Version: 0.1.7
+Version: 0.1.8
 Authors@R: c(
-  person("Andrew", "Sims", email = "andrew.sims@newcastle.ac.uk", role = c("aut", "cre")),
-  person("Kim", "Fairbairn", email="kim.fairbairn@nhs.net", role=c("aut")) )
+  person(given="Andrew", family="Sims", 
+         email = "andrew.sims@newcastle.ac.uk", 
+         role = c("aut", "cre"),
+         comment = c(ORCID="0000-0002-9553-7278")
+         ),
+  person(given="Kim", family="Fairbairn", 
+         email="kim.fairbairn@nhs.net", 
+         role=c("aut"),
+         comment = c(ORCID="0000-0001-5108-6279")
+         )
+)
 Description: Classes and functions for modelling healthcare interventions using
   cohort models (decision trees, Markov models and extended Markov models).
   It draws on terminology and examples from Briggs, Claxton and Sculpher, "Decision
