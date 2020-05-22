@@ -1,11 +1,11 @@
 #' @title
-#' ConstModelVariable
+#' ConstModVar
 #' 
 #' @description 
 #' An R6 class for a constant in a model
 #' 
 #' @details
-#' A ModelVariable with no uncertainty in its value. It has no
+#' A ModVar with no uncertainty in its value. It has no
 #' distribution and there are no hyperparameters. Its 
 #' benefit over using a regular 'numeric' variable in a model is that
 #' it will appear in automatic tabulations of the model variables
@@ -16,9 +16,9 @@
 #' @author Andrew Sims \email{andrew.sims@@newcastle.ac.uk}
 #' @export
 #' 
-ConstModelVariable <- R6::R6Class(
-  classname = "ConstModelVariable",
-  inherit = ModelVariable,
+ConstModVar <- R6::R6Class(
+  classname = "ConstModVar",
+  inherit = ModVar,
   
   public = list(
     
@@ -31,7 +31,7 @@ ConstModelVariable <- R6::R6Class(
     #' @param units A character string description of the units, e.g. 'GBP',
     #'        'per year'.
     #' @param const The constant numerical value of the object.
-    #' @return A new ModelVariable object.
+    #' @return A new ConstModVar object.
     initialize = function(description, units, const) {
       super$initialize(description, units)
       private$val <- const
@@ -40,7 +40,7 @@ ConstModelVariable <- R6::R6Class(
     #' @description
     #' Not applicable for a constant variable, no action is taken on sampling.
     #' @param expected Logical; ignored.
-    #' @return Updated ModelVariable object.
+    #' @return Updated ConstModVar object.
     sample = function(expected=F) {
       return(invisible(self))
     },
@@ -74,7 +74,8 @@ ConstModelVariable <- R6::R6Class(
     getQuantile = function(probs) {
       sapply(probs, FUN=function(x) {
         if (!is.numeric(probs)) {
-          stop("ConstModelVariable$getQuantile: argument must be a numeric vector")
+          stop("ConstModVar$getQuantile: argument must be a numeric vector",
+               call. = FALSE)
         }
       })
       q <- rep(private$val, times=length(probs))

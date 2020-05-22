@@ -1,0 +1,309 @@
+---
+title: "Combination versus monotherapy for HIV"
+subtitle: "Chancellor et al, 1997"
+author: "Andrew J. Sims"
+date: "`r Sys.Date()`"
+output: rmarkdown::pdf_document
+vignette: >
+  %\VignetteIndexEntry{Monotherapy versus combination therapy for HIV}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+references:
+- id: briggs:2002a
+  type: book
+  author:
+    - family: Briggs
+      given: Andrew
+    - family: Claxton
+      given: Karl
+    - family: Sculpher
+      given: Mark
+  title: "Decision modelling for health economic evaluation"
+  publisher: "Oxford University Press"
+  publisher-place: "Oxford, UK"
+  isbn: 978-0-19-852662-9
+  issued:
+    - year: 2006
+- id: chancellor:1997a
+  type: article
+  author:
+    - given: Jeremy V.
+      family: Chancellor
+    - given: Andrew M.
+      family: Hill
+    - given: Caroline A.
+      family: Sabin
+    - given: Kit N.
+      family: Simpson
+    - given: Mike
+      family: Youle
+  title: "Modelling the cost effectiveness of Lamivudine/Zidovudine Combination Therapy in HIV Infection"
+  container-title: "Pharmacoeconomics"
+  issued:
+    - year: 1997
+  volume: "12"
+  issue: 1
+  page: 54--66
+---
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+```{r setup, echo=F}
+library(rdecision)
+```
+
+# Introduction
+This vignette is an example of a simple Markov model using the `rdecision`
+package. It is based on the example given by Briggs [-@briggs:2002a, Exercise 2.5] 
+which itself is based on a Markov model which compared a combination therapy of
+Lamivudine/Zidovudine versus Zidovudine monotherapy in people with HIV infection
+[@chancellor:1997a].
+
+# Creating the model
+The variables used in the model are defined as follows:
+```{r model-variables, echo=TRUE}
+# transition probabilities
+tpA2A <- 0.721
+tpA2B <- 0.202
+tpA2C <- 0.067
+tpA2D <- 0.010
+tpB2A <- 0
+tpB2B <- 0.581
+tpB2C <- 0.407
+tpB2D <- 0.012
+tpC2A <- 0
+tpC2B <- 0
+tpC2C <- 0.750
+tpC2D <- 0.250
+tpD2A <- 0
+tpD2B <- 0
+tpD2C <- 0
+tpD2D <- 1
+
+# Costs
+dmca <- 1701 # direct medical costs associated with state A
+dmcb <- 1774 # direct medical costs associated with state B
+dmcc <- 6948 # direct medical costs associated with state C
+ccca <- 1055 # Community care costs associated with state A
+cccb <- 1278 # Community care costs associated with state B
+cccc <- 2059 # Community care costs associated with state C
+
+# Drug costs
+cAZT <- 2278 # zidovudine drug cost
+cLam <- 2086 # lamivudine drug cost
+
+# Other parameters
+RR <- 0.509 # treatment effect
+cDR <- 6 # annual discount rate, costs (%)
+oDR <- 6 # annual discount rate, benefits (%)
+```
+
+The monotherapy model is created as follows:
+```{r echo=T}
+# create Markov states for monotherapy (zidovudine only)
+state.mono.A <- MarkovState$new("A", dmca+ccca+cAZT)
+state.mono.B <- MarkovState$new("B", dmcb+cccb+cAZT)
+state.mono.C <- MarkovState$new("C", dmcc+cccc+cAZT)
+state.mono.D <- MarkovState$new("D", 0)
+# transition matrix for monotherapy
+I.mono <- matrix(
+  data = c(tpA2A, tpA2B, tpA2C, tpA2D,
+           tpB2A, tpB2B, tpB2C, tpB2D,
+           tpC2A, tpC2B, tpC2C, tpC2D,
+           tpD2A, tpD2B, tpD2C, tpD2D),
+  nrow = 4,
+  ncol = 4, 
+  byrow = T,
+  dimnames = list(c('A', 'B', 'C', 'D'), c('A', 'B', 'C', 'D'))
+)
+# construct the model
+m.mono <- MarkovModel$new(
+  states=list(state.mono.A, state.mono.B, state.mono.C, state.mono.D),
+  Ip=I.mono,
+  discount=6.0
+)
+```
+
+# Checking the model
+Although several checks are made on the model when it is created, such
+as transition probabilities from a state being less than unity, not all
+errors can be detected automatically. A summary of the model, suitable for
+printing with markdown or similar, may be created using the helper
+functions in class 'MarkovModel`. 
+
+## Summary of model states
+```{r echo=T}
+model.states <- m.mono$stateSummary()
+```
+
+```{r echo=F}
+knitr::kable(model.states)
+rm(model.states)
+```
+
+## Summary of annual transition probabilities
+```{r echo=T}
+transition.matrix <- m.mono$transitionSummary()
+```
+
+```{r echo=F}
+knitr::kable(transition.matrix)
+rm(transition.matrix)
+```
+
+
+# Running the model
+
+## Single cycle
+Model function `cycle` applies one cycle of a Markov model to a defined 
+starting population in each state. It returns a table with one row per state, 
+and each row containing several columns, including the population at the end of
+the state, and the cost of occupancy of states, normalized by the number of 
+patients in the cohort, with discounting applied. For example, the first cycle 
+of the model is as follows:
+
+```{r echo=T}
+# create starting populations
+populations <- c('A'=1000, 'B'=0, 'C'=0, 'D'=0)
+m.mono$setPopulations(populations)
+# run the model
+DF <- m.mono$cycle()
+```
+which returns the following result:
+```{r echo=F}
+knitr::kable(DF)
+rm(DF)
+```
+
+## Multiple cycles
+Multiple cycles are run by feeding the state populations at the end of
+one cycle into the next. Function `cycles` returns a data frame with one 
+row per cycle, and each row containing the state populations and the
+aggregated cost of
+occupancy for all states, with discounting applied. If costs per
+state, per cycle, are needed, use the lower level function `cycle` to extract
+state values. Below, this is done for
+the first 20 cycles of the model. In addition, the proportion
+of patients alive at each cycle is added to the table.  
+```{r echo=T}
+# create starting populations
+N <- 1000
+populations <- c('A'=N, 'B'=0, 'C'=0, 'D'=0)
+m.mono$setPopulations(populations)
+# run 20 cycles
+DF.mono <- m.mono$cycles(nCycles=20+1)
+# calculate the proportion alive at each cycle
+DF.mono$Alive <- (DF.mono$A + DF.mono$B + DF.mono$C)/N
+```
+
+This yields the following summary table for monotherapy:
+```{r echo=F}
+knitr::kable(DF.mono)
+```
+
+
+# Model results
+
+## Expected survival
+The estimated life years is given by summing the proportions of
+patients left alive at each cycle [@briggs:2002a, Exercise 2.5]. This is
+proved as follows. If patients are
+assumed to die at the start of the cycle, then the expected life years
+is equal to the probability of death in one cycle multiplied by the
+survival time. 
+If $p_i$ is the proportion of patients alive at the start of cycle $i$, 
+then the expected life years is given by
+$$
+\begin{aligned}
+E[LY] &= (p_0 - p_1) \times 0 + (p_2 - p_1) \times 1 + \quad ... \quad + (p_{n-1}-p_n)\times (n-1)\\
+&= \sum_1^N (p_{i-1} -p_i)\times (i-1)\\
+&= \sum_1^N (ip_{i-1}-ip_i -p_{i-1} + p_i)\\
+&= \sum_1^N (i-1)p_{i-1} - \sum_1^N i p_i + \sum_1^N p_i\\
+&= -Np_n + \sum_1^N p_i\\
+\end{aligned}
+$$
+If $p_N = 0$ (i.e. all patients have died by cycle $N$), then $E[LY] = \sum_1^N p_i$. 
+
+## Combination therapy
+For combination therapy, the model is constructed as follows:
+```{r echo=T}
+# create Markov states for combination therapy (zidovudine and lamivudine)
+state.comb.A <- MarkovState$new("A", dmca+ccca+cAZT+cLam)
+state.comb.B <- MarkovState$new("B", dmcb+cccb+cAZT+cLam)
+state.comb.C <- MarkovState$new("C", dmcc+cccc+cAZT+cLam)
+state.comb.D <- MarkovState$new("D", 0)
+# transition matrix for combination therapy
+I.comb <- matrix(
+  data = c(0.858, 0.103, 0.034, 0.005,
+           0.000, 0.787, 0.207, 0.006,
+           0.000, 0.000, 0.873, 0.127,
+           0.000, 0.000, 0.000, 1.000),
+  nrow = 4,
+  ncol = 4, 
+  byrow = T,
+  dimnames = list(c('A', 'B', 'C', 'D'), c('A', 'B', 'C', 'D'))
+)
+# construct the model
+m.comb <- MarkovModel$new(
+  states = list(state.comb.A, state.comb.B, state.comb.C, state.comb.D),
+  Ip = I.comb,
+  discount = 6.0
+)
+```
+
+In this model, lamivudine is given for the first 2 years, with 
+the treatment effect assumed to persist for the same period. The
+state populations and cycle numbers are retained by the model between 
+calls to `cycle` or `cycles` making it easy to change probabilities or
+costs during a simulation. Helper functions `setAnnualCost`, `setEntryCost`
+(for a `MarkovState` object) and `setTransitions` (for a `MarkovModel`
+object) are provided for that purpose.
+```{r echo=T}
+# run combination therapy model for 2 years
+N <- 1000
+populations <- c('A'=N, 'B'=0, 'C'=0, 'D'=0)
+m.comb$setPopulations(populations)
+DF.comb <- m.comb$cycles(nCycles=2+1)
+# revise costs and transitions, and run model for next 18 years
+state.comb.A$setAnnualCost(1701+1055+2278)
+state.comb.B$setAnnualCost(1774+1278+2278)
+state.comb.C$setAnnualCost(6948+2059+2278)
+m.comb$setTransitions(I.mono)
+DF.comb <- rbind(DF.comb, m.comb$cycles(nCycles=18))
+# calculate the proportion alive at end of each cycle
+DF.comb$Alive <- (DF.comb$A + DF.comb$B + DF.comb$C)/N
+```
+
+The cycle history for combination therapy is as follows:
+```{r echo=F}
+knitr::kable(DF.comb)
+```
+
+## Comparison of treatments
+```{r echo=F}
+el.mono <- sum(DF.mono$Alive)
+el.comb <- sum(DF.comb$Alive)
+cost.mono <- sum(DF.mono$Cost)
+cost.comb <- sum(DF.comb$Cost)
+icer <- (cost.comb-cost.mono)/(el.comb-el.mono)
+```
+The ICER is calculated by running both models and calculating the incremental
+cost per life year gained. 
+
+Over the 20 year time horizon, the expected life years for monotherapy was
+`r round(el.mono,3)` years at a total cost per patient of 
+`r format(cost.mono,digits=2,scientific=F,big.mark=',')` GBP. The expected life years
+with combination therapy
+was `r round(el.comb,3)` at a total cost per patient of 
+`r format(cost.comb,digits=2,scientific=F,big.mark=',')` GBP. 
+The incremental change in life years was `r round(el.comb-el.mono,3)` years
+at an incremental cost of 
+`r format(cost.comb-cost.mono,digits=2,scientific=F,big.mark=',')` GBP,
+giving an ICER of `r round(icer,2)` GBP.
+
+
+# References

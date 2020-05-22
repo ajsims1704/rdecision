@@ -1,5 +1,5 @@
 #' @title
-#' ModelVariable
+#' ModVar
 #' 
 #' @description
 #' An R6 class for a variable in an health economic model
@@ -16,8 +16,8 @@
 #' @author Andrew Sims \email{andrew.sims@@newcastle.ac.uk}
 #' @export 
 #' 
-ModelVariable <- R6::R6Class(
-  classname = "ModelVariable",
+ModVar <- R6::R6Class(
+  classname = "ModVar",
   private = list(
     label = as.character(NA),
     description = as.character(NA),
@@ -49,14 +49,14 @@ ModelVariable <- R6::R6Class(
   public = list(
     
     #' @description 
-    #' Create an object of type `ModelVariable`
+    #' Create an object of type `ModVar`
     #' @param description A character string description of the variable
     #'        and its role in the
     #'        model. This description will be used in a tabulation of the
     #'        variables linked to a model.
     #' @param units A character string description of the units, e.g. 'GBP',
     #'        'per year'.
-    #' @return A new ModelVariable object.
+    #' @return A new ModVar object.
     initialize = function(description, units) {
       private$description <- description
       private$units <- units
@@ -72,10 +72,10 @@ ModelVariable <- R6::R6Class(
     },   
     
     #' @description 
-    #' Is this ModelVariable an expression?
-    #' @return TRUE if it inherits from ExpressionModelVariable, FALSE otherwise.
+    #' Is this ModVar an expression?
+    #' @return TRUE if it inherits from ExprModVar, FALSE otherwise.
     isExpression = function() {
-      return(inherits(self, what='ExpressionModelVariable'))
+      return(inherits(self, what='ExprModVar'))
     },
     
     #' @description
@@ -85,7 +85,7 @@ ModelVariable <- R6::R6Class(
     #' @param expected Logical; if TRUE sets the value of the model variable
     #'        returned at subsequent calls to `value()` to be equal to the 
     #'        expectation of the variable. Default is FALSE.
-    #' @return Updated ModelVariable object.
+    #' @return Updated ModVar object.
     sample = function(expected=F) {
       private$val <- 0
       return(invisible(self))
@@ -105,7 +105,7 @@ ModelVariable <- R6::R6Class(
     #' Accessor function for the label. Unless `set_label` has been called, this
     #' function will return the variable's own name. As far as possible, this will 
     #' be the variable name used when the object was first created in the model,
-    #' so that it aligns with the variable name used in ExpressionModelVariables
+    #' so that it aligns with the variable name used in ExprModVar
     #' and tabulations of variables used in models. But due to the nature of R's
     #' non-standard evaluation, this is not ensured. It will sometimes return
     #' the name of a reference to the original variable, if
@@ -134,10 +134,10 @@ ModelVariable <- R6::R6Class(
     #' is set to the name given to the variable by the user. This function allows
     #' the default behaviour to be overridden.
     #' @param label The label to use.
-    #' @return Updated ModelVariable object
+    #' @return Updated ModVar object
     set_label = function(label) {
       if (!is.character(label)) {
-        stop("ModelVariable$set_label: argument 'label' must be a character string",
+        stop("ModVar$set_label: argument 'label' must be a character string",
              call.=FALSE)
       }
       private$label <- label
@@ -147,7 +147,7 @@ ModelVariable <- R6::R6Class(
     #' @description 
     #' Function to unset the label. Causes the label to revert to its default, i.e.
     #' its variable name at the next call to `get_label`.
-    #' @return Updated ModelVariable object
+    #' @return Updated ModVar object
     unset_label = function() {
       private$label <- as.character(NA)
       return(invisible(self))
@@ -177,9 +177,9 @@ ModelVariable <- R6::R6Class(
     #' @description 
     #' Return a list of operands given in the expression used to form the
     #' expression. Only relevant for objects of inherited type 
-    #' ExpressionModelVariable, but defined for the base class for convenience to
+    #' ExprModVar, but defined for the base class for convenience to
     #' avoid type checking inside iterators.
-    #' @return A list of operands that are themselves ModelVariables. An empty list 
+    #' @return A list of operands that are themselves ModVars. An empty list 
     #' for non-expression model variables.
     getOperands = function() {
       return(list())
@@ -197,7 +197,7 @@ ModelVariable <- R6::R6Class(
     #' \item{Units}{Units of the variable.}
     #' \item{Distribution}{Either the uncertainty distribution, if
     #' it is a regular model variable, or the expression used to create it,
-    #' if it is an ExpressionModelVariable.}
+    #' if it is an ExprModVar.}
     #' \item{Mean}{Expected value.}
     #' \item{SD}{Standard deviation.}
     #' \item{Q2.5}{p=0.025 quantile.}
@@ -257,10 +257,10 @@ ModelVariable <- R6::R6Class(
     r = function(n) {
       # check the input
       if (!is.numeric(n)) {
-        stop('ModelVariable$r: argument n must be numeric')
+        stop('ModVar$r: argument n must be numeric', call.=FALSE)
       }
       if (n < 1) {
-        stop('ModelVariable$r: argument n must be at least 1')
+        stop('ModVar$r: argument n must be at least 1', call.=FALSE)
       }
       # make random draws
       rv <- vector(mode='numeric', length=n)

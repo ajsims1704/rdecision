@@ -56,8 +56,7 @@ knitr::opts_chunk$set(
 ```
 
 ```{r setup, echo=F}
-#library('rdecision')
-source("../tools/rdecision-dev.R")
+library('rdecision')
 ```
 
 # Introduction
@@ -98,46 +97,45 @@ The 13 model variables were constructed as follows:
 
 ```{r variables, echo=T}
 # clinical variables
-r.CRBSI <- NormalModelVariable$new(
+r.CRBSI <- NormModVar$new(
   'Baseline CRBSI rate', '/1000 catheter days', mu=1.48, sigma=0.074
 )
-hr.CRBSI <- LogNormalModelVariable$new(
+hr.CRBSI <- LogNormModVar$new(
   'Tegaderm CRBSI HR', 'ratio', p1=-0.911, p2=0.393
 )
-r.LSI <- NormalModelVariable$new(
+r.LSI <- NormModVar$new(
   'Baseline LSI rate', '/patient', mu=0.1, sigma=0.01
 )
-hr.LSI <- LogNormalModelVariable$new(
+hr.LSI <- LogNormModVar$new(
   'Tegaderm LSI HR', 'ratio', p1=-0.911, p2=0.393
 )
-r.Dermatitis <- NormalModelVariable$new(
-  'Baseline dermatitis risk', '/catheter', 
-  mu=0.0026, sigma=0.00026
+r.Dermatitis <- NormModVar$new(
+  'Baseline dermatitis risk', '/catheter', mu=0.0026, sigma=0.00026
 )
-rr.Dermatitis <- LogNormalModelVariable$new(
+rr.Dermatitis <- LogNormModVar$new(
   'Tegaderm Dermatitis RR', 'ratio',  p1=1.482, p2=0.490
 )
 
 # cost variables
-c.CRBSI <- GammaModelVariable$new(
+c.CRBSI <- GammaModVar$new(
   'CRBSI cost', 'GBP', alpha=198.0, beta=50
 )
-c.Dermatitis <- GammaModelVariable$new(
+c.Dermatitis <- GammaModVar$new(
   'Dermatitis cost', 'GBP', alpha=30, beta=5
 )
-c.LSI <- GammaModelVariable$new(
+c.LSI <- GammaModVar$new(
   'LSI cost', 'GBP', alpha=50, beta=5
 )
-c.Tegaderm <- ConstModelVariable$new(
+c.Tegaderm <- ConstModVar$new(
   'Tegaderm CHG cost', 'GBP', const=6.21
 )
-c.Standard <- ConstModelVariable$new(
+c.Standard <- ConstModVar$new(
   'Standard dressing cost', 'GBP', const=1.34
 )
-n.cathdays <- NormalModelVariable$new(
+n.cathdays <- NormModVar$new(
   'No. days with catheter', 'days', mu=10, sigma=2
 )
-n.dressings <- NormalModelVariable$new(
+n.dressings <- NormModVar$new(
   'No. dressings', 'dressings', mu=3, sigma=0.3
 )
 ```
@@ -158,35 +156,28 @@ decision tree nodes.
 
 ```{r expressions, echo=TRUE}
 # probabilities
-p.Dermatitis.S <- ExpressionModelVariable$new(
-  'P(dermatitis|standard dressing)', 'P', 
-  quote(n.dressings*r.Dermatitis)
+p.Dermatitis.S <- ExprModVar$new(
+  'P(dermatitis|standard dressing)', 'P', quote(n.dressings*r.Dermatitis)
 )
-p.Dermatitis.T <- ExpressionModelVariable$new(
-  'P(dermatitis|Tegaderm)', 'P',
-  quote(n.dressings*r.Dermatitis*rr.Dermatitis)
+p.Dermatitis.T <- ExprModVar$new(
+  'P(dermatitis|Tegaderm)', 'P', quote(n.dressings*r.Dermatitis*rr.Dermatitis)
 )
-r.LSI.T <- ExpressionModelVariable$new(
-  'P(LSI|Tegaderm)', 'P',
- quote(r.LSI*hr.LSI)
+r.LSI.T <- ExprModVar$new(
+  'P(LSI|Tegaderm)', 'P', quote(r.LSI*hr.LSI)
 )
-p.CRBSI.S <- ExpressionModelVariable$new(
-  'P(CRBSI|standard dressing)', 'P',
-  quote(r.CRBSI*n.cathdays/1000)
+p.CRBSI.S <- ExprModVar$new(
+  'P(CRBSI|standard dressing)', 'P',  quote(r.CRBSI*n.cathdays/1000)
 )
-p.CRBSI.T <- ExpressionModelVariable$new(
-  'P(CRBSI|Tegaderm)', 'P', 
-  quote(r.CRBSI*n.cathdays*hr.CRBSI/1000)
+p.CRBSI.T <- ExprModVar$new(
+  'P(CRBSI|Tegaderm)', 'P', quote(r.CRBSI*n.cathdays*hr.CRBSI/1000)
 )
 
 # costs
-c.S <- ExpressionModelVariable$new(
-  'Cost of standard dressing', 'GBP',
-  quote(n.dressings*c.Standard)
+c.S <- ExprModVar$new(
+  'Cost of standard dressing', 'GBP', quote(n.dressings*c.Standard)
 )
-c.T <- ExpressionModelVariable$new(
-  'Cost of Tegaderm', 'GBP',
-  quote(n.dressings*c.Tegaderm)
+c.T <- ExprModVar$new(
+  'Cost of Tegaderm', 'GBP', quote(n.dressings*c.Tegaderm)
 )
 ```
 
@@ -240,15 +231,15 @@ with the polytomous chance nodes were modelled as independent variables. This is
 not recommended because there is a chance that a particular run of the PSA will
 yield probabilities that are outside the range [0,1]. Representing the 
 uncertain probabilities with draws from a Dirichlet distribution is preferred. Creating
-a `ChanceNode` with ModelVariables is permitted, but results
+a `ChanceNode` with ModVars is permitted, but results
 in a warning being issued.
 
 ## Summary of the model
 The model variables and their operands associated with a node and (optionally)
 its descendants
-can be tabulated using the method `tabulateModelVariables`. This returns a data
+can be tabulated using the method `tabulate_modvars`. This returns a data
 frame describing each variable, its description, units and uncertainty
-distribution. Variables inheriting from type `ModelVariable` will be included in the
+distribution. Variables inheriting from type `ModVar` will be included in the
 tabulation; regular numeric values will not be listed. For extensive models, variables
 associated with separate branches of a tree can be tabulated separately by calling
 the method for different head nodes. 
@@ -261,7 +252,7 @@ to be tabulated. In the Tegaderm model, the complete structure is as follows:
 
 ```{r modelinputs-structure, echo=FALSE}
 local({
-  DF <- d$tabulateModelVariables(include.descendants=T, include.operands=T)
+  DF <- d$tabulate_modvars(include.descendants=T, include.operands=T)
   keep <- c('Description', 'Label', 'Distribution')
   knitr::kable(DF[,keep], row.names=F, format.args=list(scientific=F), digits=3)
 })
@@ -274,7 +265,7 @@ quantiles have been estimated from simulation.
 
 ```{r modelinputs-pe, echo=FALSE}
 local({
-  DF <- d$tabulateModelVariables(include.descendants=T, include.operands=T)
+  DF <- d$tabulate_modvars(include.descendants=T, include.operands=T)
   keep <- c('Description', 'Units', 'Mean', 'Q2.5', 'Q97.5', 'Qhat')
   knitr::kable(DF[,keep], row.names=F, format.args=list(scientific=F), digits=3)
 })
@@ -318,7 +309,7 @@ estimate of cost saving estimated from their probabilistic sensitivity analysis,
 77.26 GBP, reported in Jenks *et al* [-@jenks:2016a].
 
 ### Probabilistic senstivity analysis
-When they are created, each `ModelVariable` returns its expected value when its
+When they are created, each `ModVar` returns its expected value when its
 method `value()` is called. Calling the method `sample()` of a model variable causes
 it to sample from its uncertainty distribution, and return the sampled value when
 method `value()` is next called. The same sampled value will be returned until
@@ -372,53 +363,43 @@ the cost of traversing each pathway, this approach allows the costs of the
 technology and its comparator to be constructed as sub-totals.
 ```{r treefree, echo=TRUE}
 # component costs, standard dressing
-CHG.S <- ExpressionModelVariable$new(
-  "Cost of standard dressing", "GBP", 
-  quote(n.dressings*c.Standard)
+CHG.S <- ExprModVar$new(
+  "Cost std dressing", "GBP", quote(n.dressings*c.Standard)
 )
-CRBSI.S <- ExpressionModelVariable$new(
-  "Cost of CRBSI, standard dressing", "GBP", 
-  quote(c.CRBSI*r.CRBSI*n.cathdays/1000)
+CRBSI.S <- ExprModVar$new(
+  "Cost CRBSI, std dressing", "GBP", quote(c.CRBSI*r.CRBSI*n.cathdays/1000)
 )
-LSI.S <- ExpressionModelVariable$new(
-  "Cost of LSI, standard dressing", "GBP", 
-  quote(c.LSI*r.LSI)
+LSI.S <- ExprModVar$new(
+  "Cost LSI, std dressing", "GBP", quote(c.LSI*r.LSI)
 )
-Dermatitis.S <- ExpressionModelVariable$new(
-  "Cost of dermatitis, standard dressing", "GBP",
-  quote(r.Dermatitis*c.Dermatitis*n.dressings)
+Dermatitis.S <- ExprModVar$new(
+  "Cost dermatitis, std dressing", "GBP", quote(r.Dermatitis*c.Dermatitis*n.dressings)
 )
 
 # component costs, Tegaderm
-CHG.T <- ExpressionModelVariable$new(
-  "Cost of Tegaderm", "GBP", 
-  quote(n.dressings*c.Tegaderm)
+CHG.T <- ExprModVar$new(
+  "Cost Tegaderm", "GBP", quote(n.dressings*c.Tegaderm)
 )
-CRBSI.T <- ExpressionModelVariable$new(
-  "Cost of CRBSI, Tegaderm", "GBP", 
-  quote(c.CRBSI*r.CRBSI*hr.CRBSI*n.cathdays/1000)
+CRBSI.T <- ExprModVar$new(
+  "Cost CRBSI, Tegaderm", "GBP", quote(c.CRBSI*r.CRBSI*hr.CRBSI*n.cathdays/1000)
 )
-LSI.T <- ExpressionModelVariable$new(
-  "Cost of LSI, Tegaderm", "GBP", 
-  quote(c.LSI*r.LSI*hr.LSI)
+LSI.T <- ExprModVar$new(
+  "Cost LSI, Tegaderm", "GBP", quote(c.LSI*r.LSI*hr.LSI)
 )
-Dermatitis.T <- ExpressionModelVariable$new(
-  "Cost of dermatitis, Tegaderm", "GBP",
-  quote(r.Dermatitis*c.Dermatitis*rr.Dermatitis*n.dressings)
+Dermatitis.T <- ExprModVar$new(
+  "Cost dermatitis, Tegaderm", "GBP", 
+   quote(r.Dermatitis*c.Dermatitis*rr.Dermatitis*n.dressings)
 )
 
 # per-patient costs
-total.T <- ExpressionModelVariable$new(
-  'Treatment cost (Tegaderm)', 'GBP',
-  quote(CHG.T+CRBSI.T+LSI.T+Dermatitis.T)
+total.T <- ExprModVar$new(
+  'Treatment cost, Tegaderm', 'GBP', quote(CHG.T+CRBSI.T+LSI.T+Dermatitis.T)
 )
-total.S <- ExpressionModelVariable$new(
-  'Treatment cost (Standard)', 'GBP',
-  quote(CHG.S+CRBSI.S+LSI.S+Dermatitis.S)
+total.S <- ExprModVar$new(
+  'Treatment cost, Standard', 'GBP', quote(CHG.S+CRBSI.S+LSI.S+Dermatitis.S)
 )
-c.diff <- ExpressionModelVariable$new(
-  'Cost difference', 'GBP',
-  quote(total.T-total.S)
+c.diff <- ExprModVar$new(
+  'Cost difference', 'GBP', quote(total.T-total.S)
 )
 ```
 

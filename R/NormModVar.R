@@ -1,5 +1,5 @@
 #' @title 
-#' NormalModelVariable
+#' NormModVar
 #' 
 #' @description 
 #' An R6 class for a model variable with Normal uncertainty
@@ -15,9 +15,9 @@
 #' @author Andrew J. Sims \email{andrew.sims5@nhs.net}
 #' @export
 #' 
-NormalModelVariable <- R6::R6Class(
-  classname = "NormalModelVariable",
-  inherit = ModelVariable,
+NormModVar <- R6::R6Class(
+  classname = "NormModVar",
+  inherit = ModVar,
   private = list(
     mu = 'numeric',
     sigma = 'numeric'
@@ -32,7 +32,7 @@ NormalModelVariable <- R6::R6Class(
     #'        the uncertainty of the variable.
     #' @param sigma Hyperparameter equal to the standard deviation of the
     #'        normal distribution for the uncertainty of the variable.
-    #' @return A NormalModelVariable object.
+    #' @return A NormModVar object.
     initialize = function(description, units, mu, sigma) {
       super$initialize(description, units)
       private$mu <- mu
@@ -47,7 +47,7 @@ NormalModelVariable <- R6::R6Class(
     #' @param expected Logical; if TRUE sets the value of the model variable
     #'        returned at subsequent calls to `value()` to be equal to the 
     #'        expectation of the variable. Default is FALSE.
-    #' @return Updated NormalModelVariable object.
+    #' @return Updated NormModVar object.
     sample = function(expected=F) {
       if (expected) {
         private$val <- self$getMean()
@@ -91,7 +91,7 @@ NormalModelVariable <- R6::R6Class(
     getQuantile = function(probs) {
       sapply(probs, FUN=function(x) {
         if (!is.numeric(probs)) {
-          stop("NormalModelVariable$getQuantile: argument must be a numeric vector")
+          stop("NormalModVar$getQuantile: argument must be a numeric vector")
         }
       })
       q <- qnorm(probs, mean=private$mu, sd=private$sigma)

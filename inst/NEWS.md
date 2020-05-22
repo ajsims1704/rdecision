@@ -1,3 +1,9 @@
+# rdecision 1.0.0
+
+* First full release of the package.
+* Renamed ModelVariable as ModVar for compactness, and renamed its derived
+  classes similarly.
+
 # rdecision 0.1.7
 
 * Removed the label argument from ModelVariable. 

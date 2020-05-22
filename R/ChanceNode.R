@@ -36,7 +36,7 @@ ChanceNode <- R6::R6Class(
     #'        `children`.
     #' @param costs A list of \eqn{k} costs associated with each edge (branch) 
     #'        leaving the `ChanceNode`. Each element may be of type `numeric` or
-    #'        `ModelVariable`; given in the same order as `children`.
+    #'        `ModVar`; given in the same order as `children`.
     #' @param ptype a character string taking one of four possible
     #'        values to define how the \code{p} argument is defined:
     #'        'numeric', 'MV', 'Beta' or 'Dirichlet'. 
@@ -47,18 +47,18 @@ ChanceNode <- R6::R6Class(
     #' \item{'numeric'}{\eqn{k} numeric values; the simplest case in which the   
     #' probabilities are certain. Supplied values should add
     #' to unity and be given in the same order as `children`.}
-    #' \item{'MV'}{At least one `ModelVariable` and exactly one
-    #' `NA``, and the remainder either `numeric` or `ModelVariable`, given in the
+    #' \item{'MV'}{At least one `ModVar` and exactly one
+    #' `NA``, and the remainder either `numeric` or `ModVar`, given in the
     #' same order as `children`. The single NA will be replaced on evaluation of
     #' the model variables by a value to ensure the sum of probabilities
     #' is unity. This option is not recommended, because there is
     #' a chance that during sampling, individual branch probabilities
     #' may be less than zero, or that the sum of the sampled model variable
     #' expressions may exceed 1.}
-    #' \item{'Beta'}{One `BetaModelVariable` and one NA. Used for \eqn{k=2}. The 
+    #' \item{'Beta'}{One `BetaModVar` and one NA. Used for \eqn{k=2}. The 
     #' element defined as NA will be replaced by one minus the sampled 
     #' value of the supplied beta distribution.}
-    #' \item{'Dirichlet'}{One DirichletModelVariable, with \eqn{k} parameters,
+    #' \item{'Dirichlet'}{One DirichletModVar, with \eqn{k} parameters,
     #' given in the same order as `children`.}
     #' \item{'auto'}{Infer which of the previous options applies based on
     #' the types of elements of p}
@@ -104,10 +104,10 @@ ChanceNode <- R6::R6Class(
       sapply(costs, function(x) {
         if (is.numeric(x)) {
         }
-        else if (inherits(x, what='ModelVariable')) {
+        else if (inherits(x, what='ModVar')) {
         }
         else {
-          stop("ChanceNode$new: Each element in `costs` must be of class `numeric` or 'ModelVariable`")
+          stop("ChanceNode$new: Each element in `costs` must be of class `numeric` or 'ModVar`")
         }
       })
       private$costs <- costs
@@ -126,7 +126,7 @@ ChanceNode <- R6::R6Class(
       k <- length(p)
       nna <- sum(is.na(p))
       nnu <- sum(sapply(p, is.numeric))
-      nmv <- sum(sapply(p, FUN=function(e){return(inherits(e, what='ModelVariable'))}))
+      nmv <- sum(sapply(p, FUN=function(e){return(inherits(e, what='ModVar'))}))
       
       # switch on ptype 
       if (ptype == 'numeric') {
@@ -146,10 +146,10 @@ ChanceNode <- R6::R6Class(
           stop("ChanceNode$new: one element of p must be NA for `ptype='MVE`.")
         }
         if (nmv < 1) {
-          stop("ChanceNode$new: at least one element of p must be a ModelVariable for `ptype=MVE`.")
+          stop("ChanceNode$new: at least one element of p must be a ModVar for `ptype=MVE`.")
         }
         if ((nna+nmv+nnu) != k) {
-          stop("ChanceNode$new: all elements of `p` must be of type `numeric`, `ModelVariable` or `NA` for `ptype=MVE`")
+          stop("ChanceNode$new: all elements of `p` must be of type `numeric`, `ModVar` or `NA` for `ptype=MVE`")
         }
         warning("ChanceNode$new: `ptype='MV'` may lead to p values out of range [0,1].")
         private$p <- p
@@ -188,13 +188,13 @@ ChanceNode <- R6::R6Class(
     #' Return the list of model variables associated with the node. The
     #' model variables may be associated with costs or probabilities.
     #' @return List of model variables. 
-    getModelVariables = function() {
+    get_modvars = function() {
       # make a list of all private objects that may be associated with model variables
       mv <- c(private$p, private$costs)
       # iterate objects and create list of model variables
       mvlist <- list()
       lapply(mv, FUN=function(v) {
-        if (inherits(v, what='ModelVariable')) {
+        if (inherits(v, what='ModVar')) {
           mvlist <<- c(mvlist, v)
         }
       })
@@ -208,9 +208,9 @@ ChanceNode <- R6::R6Class(
     #'        value at the next call to `value()`. If FALSE each model variable
     #'        will return the sampled value. Default is FALSE.
     #' @return An updated ChanceNode object.
-    sampleModelVariables = function(expected=F) {
+    sample_modvars = function(expected=F) {
       # get the model variables associated with this node
-      mvlist <- self$getModelVariables()
+      mvlist <- self$get_modvars()
       # sample them
       sapply(mvlist, FUN=function(mv) {
         mv$sample(expected)
@@ -226,7 +226,7 @@ ChanceNode <- R6::R6Class(
       for (i in 1:length(private$edges)) {
         edge <- private$edges[[i]]
         cost <- private$costs[[i]]
-        if (inherits(cost, what='ModelVariable')) {
+        if (inherits(cost, what='ModVar')) {
           c <- cost$value()
           edge$setCost(c)
         }
@@ -234,7 +234,7 @@ ChanceNode <- R6::R6Class(
           edge$setCost(cost)
         }
         else {
-          stop("Edge$setEdgeCosts: cost must be of type `ModelVariable` or `numeric`")
+          stop("Edge$setEdgeCosts: cost must be of type `ModVar` or `numeric`")
         }
       }  
       # update probabilities
@@ -249,7 +249,7 @@ ChanceNode <- R6::R6Class(
         for (i in 1:length(private$edges)) {
           edge <- private$edges[[i]]
           p <- private$p[[i]]
-          if (inherits(p, what='ModelVariable')) {
+          if (inherits(p, what='ModVar')) {
              v <- p$value()
              pedge[i] <- v
           }

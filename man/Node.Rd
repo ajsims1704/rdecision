@@ -29,9 +29,9 @@ Andrew Sims \email{andrew.sims5@nhs.net}
 \item \href{#method-getP}{\code{Node$getP()}}
 \item \href{#method-getUtility}{\code{Node$getUtility()}}
 \item \href{#method-getCost}{\code{Node$getCost()}}
-\item \href{#method-getModelVariables}{\code{Node$getModelVariables()}}
-\item \href{#method-tabulateModelVariables}{\code{Node$tabulateModelVariables()}}
-\item \href{#method-sampleModelVariables}{\code{Node$sampleModelVariables()}}
+\item \href{#method-get_modvars}{\code{Node$get_modvars()}}
+\item \href{#method-tabulate_modvars}{\code{Node$tabulate_modvars()}}
+\item \href{#method-sample_modvars}{\code{Node$sample_modvars()}}
 \item \href{#method-updateEdges}{\code{Node$updateEdges()}}
 \item \href{#method-clone}{\code{Node$clone()}}
 }
@@ -219,12 +219,12 @@ Cost, numerical value
 }
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-getModelVariables"></a>}}
-\if{latex}{\out{\hypertarget{method-getModelVariables}{}}}
-\subsection{Method \code{getModelVariables()}}{
+\if{html}{\out{<a id="method-get_modvars"></a>}}
+\if{latex}{\out{\hypertarget{method-get_modvars}{}}}
+\subsection{Method \code{get_modvars()}}{
 Function to return a list of model variables associated with this node.
 \subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{Node$getModelVariables()}\if{html}{\out{</div>}}
+\if{html}{\out{<div class="r">}}\preformatted{Node$get_modvars()}\if{html}{\out{</div>}}
 }
 
 \subsection{Returns}{
@@ -232,15 +232,12 @@ List of model variables associated with this node.
 }
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-tabulateModelVariables"></a>}}
-\if{latex}{\out{\hypertarget{method-tabulateModelVariables}{}}}
-\subsection{Method \code{tabulateModelVariables()}}{
+\if{html}{\out{<a id="method-tabulate_modvars"></a>}}
+\if{latex}{\out{\hypertarget{method-tabulate_modvars}{}}}
+\subsection{Method \code{tabulate_modvars()}}{
 Tabulate all model variables associated with this node.
 \subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{Node$tabulateModelVariables(
-  include.descendants = FALSE,
-  include.operands = FALSE
-)}\if{html}{\out{</div>}}
+\if{html}{\out{<div class="r">}}\preformatted{Node$tabulate_modvars(include.descendants = FALSE, include.operands = FALSE)}\if{html}{\out{</div>}}
 }
 
 \subsection{Arguments}{
@@ -251,7 +248,7 @@ with this node and its descendants are tabulated; otherwise only
 the ones that are associated with this node.}
 
 \item{\code{include.operands}}{If TRUE, recursively add model variables which are
-included in expressions in ExpressionModelVariables. Default is
+included in expressions in ExprModVars. Default is
 FALSE.}
 }
 \if{html}{\out{</div>}}
@@ -272,12 +269,12 @@ Data frame with one row per model variable, as follows:
 }
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-sampleModelVariables"></a>}}
-\if{latex}{\out{\hypertarget{method-sampleModelVariables}{}}}
-\subsection{Method \code{sampleModelVariables()}}{
+\if{html}{\out{<a id="method-sample_modvars"></a>}}
+\if{latex}{\out{\hypertarget{method-sample_modvars}{}}}
+\subsection{Method \code{sample_modvars()}}{
 Sample the model variables associated with the node.
 \subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{Node$sampleModelVariables(expected = FALSE)}\if{html}{\out{</div>}}
+\if{html}{\out{<div class="r">}}\preformatted{Node$sample_modvars(expected = FALSE)}\if{html}{\out{</div>}}
 }
 
 \subsection{Arguments}{

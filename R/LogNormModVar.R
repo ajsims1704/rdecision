@@ -1,12 +1,12 @@
 #' @title 
-#' LogNormalModelVariable
+#' LogNormModVar
 #' 
 #' @description 
-#' An R6 class for a model variable with logNormal uncertainty
+#' An R6 class for a model variable with Log Normal uncertainty
 #' 
 #' @details 
 #' A model variable for which the uncertainty in the point estimate can
-#' be modelled with a logNormal distribution. 
+#' be modelled with a Log Normal distribution. 
 #' \href{https://sites.google.com/site/probonto/}{ProbOnto}
 #' defines seven parametrizations of the log normal distribution. These are linked,
 #' allowing the parameters of any one to be derived from any other. All
@@ -34,9 +34,9 @@
 #' @author Andrew J. Sims \email{andrew.sims@@newcastle.ac.uk}
 #' @export
 #' 
-LogNormalModelVariable <- R6::R6Class(
-  classname = "LogNormalModelVariable",
-  inherit = ModelVariable,
+LogNormModVar <- R6::R6Class(
+  classname = "LogNormModVar",
+  inherit = ModVar,
   private = list(
     meanlog = 'numeric',
     sdlog = 'numeric',
@@ -54,7 +54,7 @@ LogNormalModelVariable <- R6::R6Class(
     #'        See 'Details'.
     #' @param parametrization A character string taking one of the values
     #'        'LN1' (default) through 'LN7' (see 'Details').
-    #' @return A LogNormalModelVariable object.
+    #' @return A LogNormModVar object.
     initialize = function(description, units, p1, p2, parametrization='LN1') {
       super$initialize(description, units)
       # transform parameters according to parametrization
@@ -88,7 +88,7 @@ LogNormalModelVariable <- R6::R6Class(
         private$sdlog <- sqrt(log(1+(p2^2)/(p1^2)))
       }
       else {
-        stop("LogNormalModelVariable::new: parameter 'parametrize must be one of 'LN1' through 'LN7'.")
+        stop("LogNormModVar::new: parameter 'parametrize must be one of 'LN1' through 'LN7'.")
       }
 
       # set the next value returned to be the mean
@@ -102,7 +102,7 @@ LogNormalModelVariable <- R6::R6Class(
     #' @param expected Logical; if TRUE sets the value of the model variable
     #'        returned at subsequent calls to `value()` to be equal to the 
     #'        expectation of the variable. Default is FALSE.
-    #' @return Updated NormalModelVariable object.
+    #' @return Updated NormalModVar object.
     sample = function(expected=F) {
       if (expected) {
         private$val <- self$getMean()
@@ -146,7 +146,7 @@ LogNormalModelVariable <- R6::R6Class(
     getQuantile = function(probs) {
       sapply(probs, FUN=function(x) {
         if (!is.numeric(probs)) {
-          stop("LogNormalModelVariable$getQuantile: argument must be a numeric vector")
+          stop("LogNormModVar$getQuantile: argument must be a numeric vector")
         }
       })
       q <- qlnorm(probs, mean=private$meanlog, sd=private$sdlog)

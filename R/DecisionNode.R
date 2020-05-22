@@ -31,7 +31,7 @@ DecisionNode <- R6::R6Class(
     #'        of each choice associated with the decision.
     #' @param costs A list of values containing the costs associated
     #'        with each choice. Each value can be a numeric variable,
-    #'        or a ModelVariable.
+    #'        or a ModVar.
     #' @return A new DecisionNode object
     initialize = function(children, edgelabels, costs) {
 
@@ -71,10 +71,10 @@ DecisionNode <- R6::R6Class(
       sapply(costs, function(x) {
         if (is.numeric(x)) {
         }
-        else if (inherits(x, what='ModelVariable')==T) {
+        else if (inherits(x, what='ModVar')==T) {
         }
         else {
-          stop("Each element in `costs` must be of class `numeric` or `ModelVariable`")
+          stop("Each element in `costs` must be of class `numeric` or `ModVar`")
         }
       })
       private$costs <- costs
@@ -87,13 +87,13 @@ DecisionNode <- R6::R6Class(
     #' Return the list of model variables associated with the node. The
     #' model variables may be associated with costs or probabilities.
     #' @return List of model variables. 
-    getModelVariables = function() {
+    get_modvars = function() {
       # make a list of all private objects that may be associated with model variables
       mv <- c(private$p, private$costs)
       # iterate objects and create list of model variables
       mvlist <- list()
       lapply(mv, FUN=function(v) {
-        if (inherits(v, what='ModelVariable')) {
+        if (inherits(v, what='ModVar')) {
           mvlist <<- c(mvlist, v)
         }
       })
@@ -107,9 +107,9 @@ DecisionNode <- R6::R6Class(
     #'        value at the next call to `value()`. If FALSE each model variable
     #'        will return the sampled value. Default is FALSE.
     #' @return An updated DecisionNode object.
-    sampleModelVariables = function(expected=FALSE) {
+    sample_modvars = function(expected=FALSE) {
       # get the model variables associated with this node
-      mvlist <- self$getModelVariables()
+      mvlist <- self$get_modvars()
       # sample them
       sapply(mvlist, FUN=function(mv) {
         mv$sample(expected)
@@ -125,7 +125,7 @@ DecisionNode <- R6::R6Class(
       for (i in 1:length(private$edges)) {
         edge <- private$edges[[i]]
         cost <- private$costs[[i]]
-        if (inherits(cost, what='ModelVariable')) {
+        if (inherits(cost, what='ModVar')) {
           c <- cost$value()
           edge$setCost(c)
         }
@@ -133,7 +133,7 @@ DecisionNode <- R6::R6Class(
           edge$setCost(cost)
         }
         else {
-          stop("Edge$setEdgeCosts: cost must be of type `ModelVariable` or `numeric`")
+          stop("Edge$setEdgeCosts: cost must be of type `ModVar` or `numeric`")
         }
       }  
       return(invisible(self))
@@ -149,7 +149,7 @@ DecisionNode <- R6::R6Class(
       # sample model variables of this node and all descendants
       descendants <- self$descendantNodes()
       lapply(descendants, FUN=function(n) {
-        n$sampleModelVariables(expected)
+        n$sample_modvars(expected)
       })
       # update numerical edge values
       lapply(descendants, FUN=function(n) {

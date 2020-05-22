@@ -5,7 +5,7 @@
 # --------------------------------------------
 
 test_that("the MV returns the correct environment, case 1", {
-  mv <- ModelVariable$new('Variable description', 'GBP')
+  mv <- ModVar$new('Variable description', 'GBP')
   v.env <- mv$get_environment()
   expect_type(v.env, 'environment')
   c.env <- rlang::current_env()
@@ -13,7 +13,7 @@ test_that("the MV returns the correct environment, case 1", {
 })
 
 test_that("the MV returns the correct environment, case 2", {
-  mv <- ModelVariable$new('Variable description', 'GBP')
+  mv <- ModVar$new('Variable description', 'GBP')
   c.env <- rlang::current_env()
   f <- function() {
     v.env <- mv$get_environment()
@@ -23,18 +23,18 @@ test_that("the MV returns the correct environment, case 2", {
 })
 
 test_that("an MV's label is auto-detected, case 1", {
-  mv <- ModelVariable$new('Variable description', 'GBP')
+  mv <- ModVar$new('Variable description', 'GBP')
   expect_equal(mv$get_label(), "mv")
 })
 
 test_that("an MV's label is auto-detected, case 2", {
-  mv <- ModelVariable$new('Variable description', 'GBP')
+  mv <- ModVar$new('Variable description', 'GBP')
   cmv <- mv
   expect_equal(cmv$get_label(), 'mv')
 })
 
 test_that("an MV's label is auto-detected, case 3", {
-  mv <- ModelVariable$new('Variable description', 'GBP')
+  mv <- ModVar$new('Variable description', 'GBP')
   f <- function() {
     fmv <- mv
     expect_equal(fmv$get_label(), 'mv')
@@ -43,8 +43,8 @@ test_that("an MV's label is auto-detected, case 3", {
 })
 
 test_that("an MV's label is auto-detected, case 4", {
-  mv1 <- ModelVariable$new('First variable', 'GBP')
-  mv2 <- ModelVariable$new('Second variable', 'GBP')
+  mv1 <- ModVar$new('First variable', 'GBP')
+  mv2 <- ModVar$new('Second variable', 'GBP')
   mvlist <- list(mv1, mv2)
   labels <- sapply(mvlist, FUN=function(x) {
     return(x$get_label())
@@ -54,7 +54,7 @@ test_that("an MV's label is auto-detected, case 4", {
 
 test_that("an MV's label is auto-detected, case 5", {
   f <- function() {
-    mv <- ModelVariable$new('MV in f', 'GBP')
+    mv <- ModVar$new('MV in f', 'GBP')
     mv$get_label()  # work-around
     return(mv)
   }
@@ -66,7 +66,7 @@ test_that("an MV's label is auto-detected, case 5", {
 })
 
 test_that("an MV's label can be set and unset", {
-  mv <- ModelVariable$new('Variable description', 'GBP')
+  mv <- ModVar$new('Variable description', 'GBP')
   mv$set_label("mylabel")
   expect_equal(mv$get_label(), "mylabel")
   mv$unset_label()

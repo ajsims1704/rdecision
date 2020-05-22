@@ -23,8 +23,8 @@ Andrew Sims \email{andrew.sims5@nhs.net}
 \subsection{Public methods}{
 \itemize{
 \item \href{#method-new}{\code{ChanceNode$new()}}
-\item \href{#method-getModelVariables}{\code{ChanceNode$getModelVariables()}}
-\item \href{#method-sampleModelVariables}{\code{ChanceNode$sampleModelVariables()}}
+\item \href{#method-get_modvars}{\code{ChanceNode$get_modvars()}}
+\item \href{#method-sample_modvars}{\code{ChanceNode$sample_modvars()}}
 \item \href{#method-updateEdges}{\code{ChanceNode$updateEdges()}}
 \item \href{#method-clone}{\code{ChanceNode$clone()}}
 }
@@ -42,7 +42,7 @@ Andrew Sims \email{andrew.sims5@nhs.net}
 \item \out{<span class="pkg-link" data-pkg="rdecision" data-topic="Node" data-id="hasChildNodes">}\href{../../rdecision/html/Node.html#method-hasChildNodes}{\code{rdecision::Node$hasChildNodes()}}\out{</span>}
 \item \out{<span class="pkg-link" data-pkg="rdecision" data-topic="Node" data-id="isSameNode">}\href{../../rdecision/html/Node.html#method-isSameNode}{\code{rdecision::Node$isSameNode()}}\out{</span>}
 \item \out{<span class="pkg-link" data-pkg="rdecision" data-topic="Node" data-id="nodeType">}\href{../../rdecision/html/Node.html#method-nodeType}{\code{rdecision::Node$nodeType()}}\out{</span>}
-\item \out{<span class="pkg-link" data-pkg="rdecision" data-topic="Node" data-id="tabulateModelVariables">}\href{../../rdecision/html/Node.html#method-tabulateModelVariables}{\code{rdecision::Node$tabulateModelVariables()}}\out{</span>}
+\item \out{<span class="pkg-link" data-pkg="rdecision" data-topic="Node" data-id="tabulate_modvars">}\href{../../rdecision/html/Node.html#method-tabulate_modvars}{\code{rdecision::Node$tabulate_modvars()}}\out{</span>}
 }
 \out{</details>}
 }
@@ -67,7 +67,7 @@ of this node.}
 
 \item{\code{costs}}{A list of \eqn{k} costs associated with each edge (branch) 
 leaving the `ChanceNode`. Each element may be of type `numeric` or
-`ModelVariable`; given in the same order as `children`.}
+`ModVar`; given in the same order as `children`.}
 
 \item{\code{p}}{a list of probabilities associated with \eqn{k} branches.
        There are four possible configurations of the list 
@@ -76,18 +76,18 @@ leaving the `ChanceNode`. Each element may be of type `numeric` or
 \item{'numeric'}{\eqn{k} numeric values; the simplest case in which the   
 probabilities are certain. Supplied values should add
 to unity and be given in the same order as `children`.}
-\item{'MV'}{At least one `ModelVariable` and exactly one
-`NA``, and the remainder either `numeric` or `ModelVariable`, given in the
+\item{'MV'}{At least one `ModVar` and exactly one
+`NA``, and the remainder either `numeric` or `ModVar`, given in the
 same order as `children`. The single NA will be replaced on evaluation of
 the model variables by a value to ensure the sum of probabilities
 is unity. This option is not recommended, because there is
 a chance that during sampling, individual branch probabilities
 may be less than zero, or that the sum of the sampled model variable
 expressions may exceed 1.}
-\item{'Beta'}{One `BetaModelVariable` and one NA. Used for \eqn{k=2}. The 
+\item{'Beta'}{One `BetaModVar` and one NA. Used for \eqn{k=2}. The 
 element defined as NA will be replaced by one minus the sampled 
 value of the supplied beta distribution.}
-\item{'Dirichlet'}{One DirichletModelVariable, with \eqn{k} parameters,
+\item{'Dirichlet'}{One DirichletModVar, with \eqn{k} parameters,
 given in the same order as `children`.}
 \item{'auto'}{Infer which of the previous options applies based on
 the types of elements of p}
@@ -104,13 +104,13 @@ A new `ChanceNode` object
 }
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-getModelVariables"></a>}}
-\if{latex}{\out{\hypertarget{method-getModelVariables}{}}}
-\subsection{Method \code{getModelVariables()}}{
+\if{html}{\out{<a id="method-get_modvars"></a>}}
+\if{latex}{\out{\hypertarget{method-get_modvars}{}}}
+\subsection{Method \code{get_modvars()}}{
 Return the list of model variables associated with the node. The
 model variables may be associated with costs or probabilities.
 \subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{ChanceNode$getModelVariables()}\if{html}{\out{</div>}}
+\if{html}{\out{<div class="r">}}\preformatted{ChanceNode$get_modvars()}\if{html}{\out{</div>}}
 }
 
 \subsection{Returns}{
@@ -118,12 +118,12 @@ List of model variables.
 }
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-sampleModelVariables"></a>}}
-\if{latex}{\out{\hypertarget{method-sampleModelVariables}{}}}
-\subsection{Method \code{sampleModelVariables()}}{
+\if{html}{\out{<a id="method-sample_modvars"></a>}}
+\if{latex}{\out{\hypertarget{method-sample_modvars}{}}}
+\subsection{Method \code{sample_modvars()}}{
 Sample all model variables in this node and update edges.
 \subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{ChanceNode$sampleModelVariables(expected = F)}\if{html}{\out{</div>}}
+\if{html}{\out{<div class="r">}}\preformatted{ChanceNode$sample_modvars(expected = F)}\if{html}{\out{</div>}}
 }
 
 \subsection{Arguments}{

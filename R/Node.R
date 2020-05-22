@@ -211,7 +211,7 @@ Node <- R6::R6Class(
     #' Function to return a list of model variables associated with this node.
     #' @return 
     #' List of model variables associated with this node.
-    getModelVariables = function() {
+    get_modvars = function() {
       return(list())
     },
     
@@ -221,7 +221,7 @@ Node <- R6::R6Class(
     #' with this node and its descendants are tabulated; otherwise only
     #' the ones that are associated with this node.
     #' @param include.operands If TRUE, recursively add model variables which are
-    #' included in expressions in ExpressionModelVariables. Default is
+    #' included in expressions in ExprModVars. Default is
     #' FALSE.
     #' @return Data frame with one row per model variable, as follows:
     #' \describe{
@@ -235,8 +235,8 @@ Node <- R6::R6Class(
     #' \item{Q97.5}{p=0.975 quantile.}
     #' \item{Qhat}{Asterisk if the quantiles and SD were estimated by random sampling.}
     #' }
-    tabulateModelVariables = function(include.descendants=FALSE, 
-                                      include.operands=FALSE) {
+    tabulate_modvars = function(include.descendants=FALSE, 
+                                include.operands=FALSE) {
       # create list of nodes
       if (include.descendants) {
         nodes <- self$descendantNodes()
@@ -247,7 +247,7 @@ Node <- R6::R6Class(
       # list model variables associated with these nodes
       mvlist <- list()
       sapply(nodes, FUN=function(n) {
-        mv <- n$getModelVariables()
+        mv <- n$get_modvars()
         if (length(mv) > 0) {
           mvlist <<- c(mvlist, unlist(mv))
         }
@@ -271,7 +271,7 @@ Node <- R6::R6Class(
     #' @param expected if TRUE, use the expected value of the model variables in
     #'        the node; otherwise sample from their uncertainty distributions.
     #' @return Updated Node object
-    sampleModelVariables = function(expected=FALSE) {
+    sample_modvars = function(expected=FALSE) {
       return(invisible(self))
     },
     

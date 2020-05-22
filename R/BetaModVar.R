@@ -1,5 +1,5 @@
 #' @title 
-#' BetaModelVariable
+#' BetaModVar
 #' 
 #' @description
 #' An R6 class for a model variable with Beta function uncertainty
@@ -11,12 +11,12 @@
 #' the uncertainty distribution. 
 #'
 #' @docType class
-#' @author Andrew J. Sims \email{andrew.sims5@nhs.net}
+#' @author Andrew J. Sims \email{andrew.sims@@newcastle.ac.uk}
 #' @export
 #' 
-BetaModelVariable <- R6::R6Class(
-  classname = "BetaModelVariable",
-  inherit = ModelVariable,
+BetaModVar <- R6::R6Class(
+  classname = "BetaModVar",
+  inherit = ModVar,
   private = list(
     alpha = 'numeric',
     beta = 'numeric'
@@ -24,15 +24,15 @@ BetaModelVariable <- R6::R6Class(
   public = list(
     
     #' @description 
-    #' Create an object of class BetaModelVariable.
+    #' Create an object of class BetaModVar.
     #' @param label A character string label for the variable. It is advised
     #' to make this the same as the variable name which helps when tabulating
-    #' model variables involving ExpressionModelVariables.
+    #' model variables involving ExprModVars.
     #' @param description A character string describing the variable.
     #' @param units Units of the variable, as character string.
     #' @param alpha parameter of the Beta distribution.
     #' @param beta parameter of the Beta distribution.
-    #' @return An object of class BetaModelVariable. 
+    #' @return An object of class BetaModVar. 
     initialize = function(description, units, alpha, beta) {
       super$initialize(description, units)
       private$alpha <- alpha
@@ -47,7 +47,7 @@ BetaModelVariable <- R6::R6Class(
     #' @param expected Logical; if TRUE sets the value of the model variable
     #'        returned at subsequent calls to `value()` to be equal to the 
     #'        expectation of the variable. Default is FALSE.
-    #' @return Updated BetaModelVariable object.
+    #' @return Updated BetaModVar object.
     sample = function(expected=F) {
       private$val <- NA
       if (expected) {
@@ -91,7 +91,8 @@ BetaModelVariable <- R6::R6Class(
     getQuantile = function(probs) {
       sapply(probs, FUN=function(x) {
         if (!is.numeric(probs)) {
-          stop("BetaModelVariable$getQuantile: argument must be a numeric vector")
+          stop("BetaModVar$getQuantile: argument must be a numeric vector",
+               call.=FALSE)
         }
       })
       q <- qbeta(probs, shape1=private$alpha, shape2=private$beta)

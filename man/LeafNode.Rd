@@ -32,16 +32,16 @@ Andrew J. Sims \email{andrew.sims5@newcastle.ac.uk}
 \itemize{
 \item \out{<span class="pkg-link" data-pkg="rdecision" data-topic="Node" data-id="childNodes">}\href{../../rdecision/html/Node.html#method-childNodes}{\code{rdecision::Node$childNodes()}}\out{</span>}
 \item \out{<span class="pkg-link" data-pkg="rdecision" data-topic="Node" data-id="descendantNodes">}\href{../../rdecision/html/Node.html#method-descendantNodes}{\code{rdecision::Node$descendantNodes()}}\out{</span>}
+\item \out{<span class="pkg-link" data-pkg="rdecision" data-topic="Node" data-id="get_modvars">}\href{../../rdecision/html/Node.html#method-get_modvars}{\code{rdecision::Node$get_modvars()}}\out{</span>}
 \item \out{<span class="pkg-link" data-pkg="rdecision" data-topic="Node" data-id="getCost">}\href{../../rdecision/html/Node.html#method-getCost}{\code{rdecision::Node$getCost()}}\out{</span>}
 \item \out{<span class="pkg-link" data-pkg="rdecision" data-topic="Node" data-id="getLabel">}\href{../../rdecision/html/Node.html#method-getLabel}{\code{rdecision::Node$getLabel()}}\out{</span>}
-\item \out{<span class="pkg-link" data-pkg="rdecision" data-topic="Node" data-id="getModelVariables">}\href{../../rdecision/html/Node.html#method-getModelVariables}{\code{rdecision::Node$getModelVariables()}}\out{</span>}
 \item \out{<span class="pkg-link" data-pkg="rdecision" data-topic="Node" data-id="getP">}\href{../../rdecision/html/Node.html#method-getP}{\code{rdecision::Node$getP()}}\out{</span>}
 \item \out{<span class="pkg-link" data-pkg="rdecision" data-topic="Node" data-id="getPathways">}\href{../../rdecision/html/Node.html#method-getPathways}{\code{rdecision::Node$getPathways()}}\out{</span>}
 \item \out{<span class="pkg-link" data-pkg="rdecision" data-topic="Node" data-id="hasChildNodes">}\href{../../rdecision/html/Node.html#method-hasChildNodes}{\code{rdecision::Node$hasChildNodes()}}\out{</span>}
 \item \out{<span class="pkg-link" data-pkg="rdecision" data-topic="Node" data-id="isSameNode">}\href{../../rdecision/html/Node.html#method-isSameNode}{\code{rdecision::Node$isSameNode()}}\out{</span>}
 \item \out{<span class="pkg-link" data-pkg="rdecision" data-topic="Node" data-id="nodeType">}\href{../../rdecision/html/Node.html#method-nodeType}{\code{rdecision::Node$nodeType()}}\out{</span>}
-\item \out{<span class="pkg-link" data-pkg="rdecision" data-topic="Node" data-id="sampleModelVariables">}\href{../../rdecision/html/Node.html#method-sampleModelVariables}{\code{rdecision::Node$sampleModelVariables()}}\out{</span>}
-\item \out{<span class="pkg-link" data-pkg="rdecision" data-topic="Node" data-id="tabulateModelVariables">}\href{../../rdecision/html/Node.html#method-tabulateModelVariables}{\code{rdecision::Node$tabulateModelVariables()}}\out{</span>}
+\item \out{<span class="pkg-link" data-pkg="rdecision" data-topic="Node" data-id="sample_modvars">}\href{../../rdecision/html/Node.html#method-sample_modvars}{\code{rdecision::Node$sample_modvars()}}\out{</span>}
+\item \out{<span class="pkg-link" data-pkg="rdecision" data-topic="Node" data-id="tabulate_modvars">}\href{../../rdecision/html/Node.html#method-tabulate_modvars}{\code{rdecision::Node$tabulate_modvars()}}\out{</span>}
 \item \out{<span class="pkg-link" data-pkg="rdecision" data-topic="Node" data-id="updateEdges">}\href{../../rdecision/html/Node.html#method-updateEdges}{\code{rdecision::Node$updateEdges()}}\out{</span>}
 }
 \out{</details>}

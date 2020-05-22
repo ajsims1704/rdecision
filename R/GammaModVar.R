@@ -1,5 +1,5 @@
 #' @title 
-#' GammaModelVariable
+#' GammaModVar
 #' 
 #' @description
 #' An R6 class for a model variable with Gamma function uncertainty
@@ -16,9 +16,9 @@
 #' @author Andrew J. Sims \email{andrew.sims5@nhs.net}
 #' @export
 #' 
-GammaModelVariable <- R6::R6Class(
-  classname = "GammaModelVariable",
-  inherit = ModelVariable,
+GammaModVar <- R6::R6Class(
+  classname = "GammaModVar",
+  inherit = ModVar,
   private = list(
     alpha = 'numeric',
     beta = 'numeric'
@@ -26,12 +26,12 @@ GammaModelVariable <- R6::R6Class(
   public = list(
     
     #' @description 
-    #' Create an object of class GammaModelVariable.
+    #' Create an object of class GammaModVar.
     #' @param description A character string describing the variable.
     #' @param units Units of the variable, as character string.
     #' @param alpha shape parameter of the Gamma distribution.
     #' @param beta scale parameter of the Gamma distribution.
-    #' @return An object of class GammaModelVariable. 
+    #' @return An object of class GammaModVar. 
     initialize = function(description, units, alpha, beta) {
       super$initialize(description, units)
       private$alpha <- alpha
@@ -46,7 +46,7 @@ GammaModelVariable <- R6::R6Class(
     #' @param expected Logical; if TRUE sets the value of the model variable
     #'        returned at subsequent calls to `value()` to be equal to the 
     #'        expectation of the variable. Default is FALSE.
-    #' @return Updated GammaModelVariable object.
+    #' @return Updated GammaModVar object.
     sample = function(expected=FALSE) {
       private$val <- NA
       if (expected) {
@@ -87,7 +87,8 @@ GammaModelVariable <- R6::R6Class(
     getQuantile = function(probs) {
       sapply(probs, FUN=function(x) {
         if (!is.numeric(probs)) {
-          stop("GammaModelVariable$getQuantile: argument must be a numeric vector")
+          stop("GammaModVar$getQuantile: argument must be a numeric vector",
+               call. = FALSE)
         }
       })
       q <- qgamma(probs, shape=private$alpha, scale=private$beta)

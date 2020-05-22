@@ -24,8 +24,8 @@ Andrew J. Sims \email{andrew.sims@newcastle.ac.uk}
 \subsection{Public methods}{
 \itemize{
 \item \href{#method-new}{\code{DecisionNode$new()}}
-\item \href{#method-getModelVariables}{\code{DecisionNode$getModelVariables()}}
-\item \href{#method-sampleModelVariables}{\code{DecisionNode$sampleModelVariables()}}
+\item \href{#method-get_modvars}{\code{DecisionNode$get_modvars()}}
+\item \href{#method-sample_modvars}{\code{DecisionNode$sample_modvars()}}
 \item \href{#method-updateEdges}{\code{DecisionNode$updateEdges()}}
 \item \href{#method-updateTree}{\code{DecisionNode$updateTree()}}
 \item \href{#method-evaluatePathways}{\code{DecisionNode$evaluatePathways()}}
@@ -46,7 +46,7 @@ Andrew J. Sims \email{andrew.sims@newcastle.ac.uk}
 \item \out{<span class="pkg-link" data-pkg="rdecision" data-topic="Node" data-id="hasChildNodes">}\href{../../rdecision/html/Node.html#method-hasChildNodes}{\code{rdecision::Node$hasChildNodes()}}\out{</span>}
 \item \out{<span class="pkg-link" data-pkg="rdecision" data-topic="Node" data-id="isSameNode">}\href{../../rdecision/html/Node.html#method-isSameNode}{\code{rdecision::Node$isSameNode()}}\out{</span>}
 \item \out{<span class="pkg-link" data-pkg="rdecision" data-topic="Node" data-id="nodeType">}\href{../../rdecision/html/Node.html#method-nodeType}{\code{rdecision::Node$nodeType()}}\out{</span>}
-\item \out{<span class="pkg-link" data-pkg="rdecision" data-topic="Node" data-id="tabulateModelVariables">}\href{../../rdecision/html/Node.html#method-tabulateModelVariables}{\code{rdecision::Node$tabulateModelVariables()}}\out{</span>}
+\item \out{<span class="pkg-link" data-pkg="rdecision" data-topic="Node" data-id="tabulate_modvars">}\href{../../rdecision/html/Node.html#method-tabulate_modvars}{\code{rdecision::Node$tabulate_modvars()}}\out{</span>}
 }
 \out{</details>}
 }
@@ -70,7 +70,7 @@ of each choice associated with the decision.}
 
 \item{\code{costs}}{A list of values containing the costs associated
 with each choice. Each value can be a numeric variable,
-or a ModelVariable.}
+or a ModVar.}
 }
 \if{html}{\out{</div>}}
 }
@@ -79,13 +79,13 @@ A new DecisionNode object
 }
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-getModelVariables"></a>}}
-\if{latex}{\out{\hypertarget{method-getModelVariables}{}}}
-\subsection{Method \code{getModelVariables()}}{
+\if{html}{\out{<a id="method-get_modvars"></a>}}
+\if{latex}{\out{\hypertarget{method-get_modvars}{}}}
+\subsection{Method \code{get_modvars()}}{
 Return the list of model variables associated with the node. The
 model variables may be associated with costs or probabilities.
 \subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{DecisionNode$getModelVariables()}\if{html}{\out{</div>}}
+\if{html}{\out{<div class="r">}}\preformatted{DecisionNode$get_modvars()}\if{html}{\out{</div>}}
 }
 
 \subsection{Returns}{
@@ -93,12 +93,12 @@ List of model variables.
 }
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-sampleModelVariables"></a>}}
-\if{latex}{\out{\hypertarget{method-sampleModelVariables}{}}}
-\subsection{Method \code{sampleModelVariables()}}{
+\if{html}{\out{<a id="method-sample_modvars"></a>}}
+\if{latex}{\out{\hypertarget{method-sample_modvars}{}}}
+\subsection{Method \code{sample_modvars()}}{
 Sample all model variables in this node and update edges.
 \subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{DecisionNode$sampleModelVariables(expected = FALSE)}\if{html}{\out{</div>}}
+\if{html}{\out{<div class="r">}}\preformatted{DecisionNode$sample_modvars(expected = FALSE)}\if{html}{\out{</div>}}
 }
 
 \subsection{Arguments}{

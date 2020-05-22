@@ -32,9 +32,9 @@ Edge <- R6::R6Class(
     #' @param fromNode Node nearest the root to which the edge connects.
     #' @param toNode Node nearest the leaf to which the edge connects.
     #' @param label Character string containing the edge label.
-    #' @param cost Cost associated with traversing the edge; ModelVariable.
+    #' @param cost Cost associated with traversing the edge; ModVar.
     #' @param p Probability of traversing the edge conditional on
-    #'          having reached `fromNode`; ModelVariable.
+    #'          having reached `fromNode`.
     #' @return A new `Edge` object.
     initialize = function(fromNode, toNode, label, cost=0, p=1) {
       
