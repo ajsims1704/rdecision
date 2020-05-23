@@ -8,42 +8,8 @@ vignette: >
   %\VignetteIndexEntry{Monotherapy versus combination therapy for HIV}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
-references:
-- id: briggs:2002a
-  type: book
-  author:
-    - family: Briggs
-      given: Andrew
-    - family: Claxton
-      given: Karl
-    - family: Sculpher
-      given: Mark
-  title: "Decision modelling for health economic evaluation"
-  publisher: "Oxford University Press"
-  publisher-place: "Oxford, UK"
-  isbn: 978-0-19-852662-9
-  issued:
-    - year: 2006
-- id: chancellor:1997a
-  type: article
-  author:
-    - given: Jeremy V.
-      family: Chancellor
-    - given: Andrew M.
-      family: Hill
-    - given: Caroline A.
-      family: Sabin
-    - given: Kit N.
-      family: Simpson
-    - given: Mike
-      family: Youle
-  title: "Modelling the cost effectiveness of Lamivudine/Zidovudine Combination Therapy in HIV Infection"
-  container-title: "Pharmacoeconomics"
-  issued:
-    - year: 1997
-  volume: "12"
-  issue: 1
-  page: 54--66
+bibliography: "references.bib"
+csl: "scientific-reports.csl"
 ---
 ```{r, include = FALSE}
 knitr::opts_chunk$set(
@@ -64,25 +30,21 @@ Lamivudine/Zidovudine versus Zidovudine monotherapy in people with HIV infection
 [@chancellor:1997a].
 
 # Creating the model
-The variables used in the model are defined as follows:
+The variables used in the model are all numerical constants, and are defined as follows:
 ```{r model-variables, echo=TRUE}
 # transition probabilities
-tpA2A <- 0.721
 tpA2B <- 0.202
 tpA2C <- 0.067
 tpA2D <- 0.010
 tpB2A <- 0
-tpB2B <- 0.581
 tpB2C <- 0.407
 tpB2D <- 0.012
 tpC2A <- 0
 tpC2B <- 0
-tpC2C <- 0.750
 tpC2D <- 0.250
 tpD2A <- 0
 tpD2B <- 0
 tpD2C <- 0
-tpD2D <- 1
 
 # Costs
 dmca <- 1701 # direct medical costs associated with state A
@@ -102,7 +64,9 @@ cDR <- 6 # annual discount rate, costs (%)
 oDR <- 6 # annual discount rate, benefits (%)
 ```
 
-The monotherapy model is created as follows:
+The monotherapy model is created as follows. Note that in the transition matrix, the
+entries of the leading diagonal are set to missing (NA); they will be calculated
+by the package to enure that the sum of probabilities from each state is unity.
 ```{r echo=T}
 # create Markov states for monotherapy (zidovudine only)
 state.mono.A <- MarkovState$new("A", dmca+ccca+cAZT)
@@ -111,10 +75,10 @@ state.mono.C <- MarkovState$new("C", dmcc+cccc+cAZT)
 state.mono.D <- MarkovState$new("D", 0)
 # transition matrix for monotherapy
 I.mono <- matrix(
-  data = c(tpA2A, tpA2B, tpA2C, tpA2D,
-           tpB2A, tpB2B, tpB2C, tpB2D,
-           tpC2A, tpC2B, tpC2C, tpC2D,
-           tpD2A, tpD2B, tpD2C, tpD2D),
+  data = c(   NA, tpA2B, tpA2C, tpA2D,
+           tpB2A,    NA, tpB2C, tpB2D,
+           tpC2A, tpC2B,    NA, tpC2D,
+           tpD2A, tpD2B, tpD2C,    NA),
   nrow = 4,
   ncol = 4, 
   byrow = T,
@@ -226,7 +190,7 @@ E[LY] &= (p_0 - p_1) \times 0 + (p_2 - p_1) \times 1 + \quad ... \quad + (p_{n-1
 &= -Np_n + \sum_1^N p_i\\
 \end{aligned}
 $$
-If $p_N = 0$ (i.e. all patients have died by cycle $N$), then $E[LY] = \sum_1^N p_i$. 
+If $p_N = 0$ (*i.e.* all patients have died by cycle $N$), then $E[LY] = \sum_1^N p_i$. 
 
 ## Combination therapy
 For combination therapy, the model is constructed as follows:

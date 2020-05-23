@@ -8,44 +8,8 @@ vignette: >
   %\VignetteIndexEntry{Tegaderm CHG IV Securement Dressing}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
-references:
-- id: briggs:2002a
-  type: book
-  author:
-    - family: Briggs
-      given: Andrew
-    - family: Claxton
-      given: Karl
-    - family: Sculpher
-      given: Mark
-  title: "Decision modelling for health economic evaluation"
-  publisher: "Oxford University Press"
-  publisher-place: "Oxford, UK"
-  isbn: 978-0-19-852662-9
-  issued:
-    - year: 2006
-- id: jenks:2016a
-  type: article
-  author:
-    - given: Michelle
-      family: Jenks
-    - given: Joyce
-      family: Craig
-    - given: William
-      family: Green
-    - given: Neil
-      family: Hewitt
-    - given: Mick
-      family: Arber
-    - given: Andrew J.
-      family: Sims
-  title: "Tegaderm CHG IV Securement Dressing for Central Venous and Arterial
-          Catheter Insertion Sites: A NICE Medical Technology Guidance"
-  container-title: "Applied Health Economics and Health Policy"
-  issued:
-    - year: 2016
-  volume: "14"
-  page: 135-149
+bibliography: "references.bib"
+csl: "scientific-reports.csl"
 ---
 ```{r, include = FALSE}
 rm(list=ls())

@@ -8,40 +8,8 @@ vignette: >
   %\VignetteIndexEntry{Sumatriptan versus caffeine for migraine}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
-references:
-- id: briggs:2002a
-  type: book
-  author:
-    - family: Briggs
-      given: Andrew
-    - family: Claxton
-      given: Karl
-    - family: Sculpher
-      given: Mark
-  title: "Decision modelling for health economic evaluation"
-  publisher: "Oxford University Press"
-  publisher-place: "Oxford, UK"
-  isbn: 978-0-19-852662-9
-  issued:
-    - year: 2006
-- id: evans:1997a
-  type: article
-  author:
-    - given: Kenneth W.
-      family: Evans
-    - given: John A.
-      family: Boan
-    - given: John L.
-      family: Evans
-    - given: Ashfaq
-      family: Shuaib
-  title: "Economic evaluation of oral Sumatriptan compared with oral Caffeine/Ergotamine for migraine"
-  container-title: "Pharmacoeconomics"
-  issued:
-    - year: 1997
-  volume: "12"
-  issue: 5
-  page: 565-577
+bibliography: "references.bib"
+csl: "scientific-reports.csl"
 ---
 ```{r, include = FALSE}
 knitr::opts_chunk$set(

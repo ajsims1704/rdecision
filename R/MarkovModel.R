@@ -8,7 +8,7 @@
 #' A class to represent a complete Markov model.
 #' 
 #' @docType class
-#' @author Andrew J. Sims \email{andrew.sims5@nhs.net}
+#' @author Andrew J. Sims \email{andrew.sims@@newcastle.ac.uk}
 #' @export 
 #' 
 MarkovModel <- R6::R6Class(
@@ -29,10 +29,10 @@ MarkovModel <- R6::R6Class(
     #' @param Ip Matrix of \emph{annual} rates of transition between states. The
     #'        dimensions are (nStates,nStates) with each entry being the
     #'        annual rate of transitions from the row state to the
-    #'        column state. Values are in the range [0,1]. Transitions
-    #'        to self (i.e. leading diagonal) should be set to zero, and will
+    #'        column state. Values are in the range [0,1]. One transition
+    #'        probability per row should be set to NA, and will
     #'        be adjusted so that the sum of transitions from each row are
-    #'        zero. The matrix should have row names and column names which are the
+    #'        unity. The matrix should have row names and column names which are the
     #'        state names.
     #' @param discount The annual discount rate (percentage).
     #' @param nCyclesPerYear The number of cycles per year.
@@ -43,7 +43,7 @@ MarkovModel <- R6::R6Class(
       # check that all states are of type MarkovState
       sapply(states, function(x) {
         if (inherits(x, what="MarkovState")==F){
-          stop("Each element in `states` must be of class `MarkovState`")
+          rlang::abort("Each element in 'states' must be of class 'MarkovState'")
         }
       })
       # set the states
@@ -51,7 +51,7 @@ MarkovModel <- R6::R6Class(
       # set the number of cycles per year
       private$nCyclesPerYear <- nCyclesPerYear
       # set the transition probabilities
-      self$setTransitions(Ip)
+      self$set_transitions(Ip)
       # set the discount rate
       self$setDiscount(discount)
     },
@@ -200,23 +200,32 @@ MarkovModel <- R6::R6Class(
     #' Sets the annual state transition rates. 
     #' @param Ip A numeric square matrix of dimension equal to the number of
     #' states, with row and column names equal to Markov state names. Transition 
-    #' rates are from row state to column state.
+    #' rates are from row state to column state. Exactly one element of each
+    #' row should be NA; this element is computed from the others to ensure that
+    #' the sum of 'from' probabilities is unity/ 
     #' @return Updated MarkovModel object
-    setTransitions = function(Ip) {
+    set_transitions = function(Ip) {
       # check that the transition matrix is of the correct dimension
       if (nrow(Ip) != length(private$states)) {
-        stop("Ip must have ", length(private$states), " rows")
+        stop("Ip must have ", length(private$states), " rows", call.=FALSE)
       }
       if (ncol(Ip) != length(private$states)) {
-        stop("Ip must have ", length(private$states), " columns")
+        stop("Ip must have ", length(private$states), " columns", call.=FALSE)
       }
       # check that the transition matrix is labelled with state names
       statenames <- self$getStatenames()
       if (!setequal(statenames, rownames(Ip))) {
-        stop("Ip must have state names as row names")
+        stop("Ip must have state names as row names", call.=FALSE)
       }
       if (!setequal(statenames, colnames(Ip))) {
-        stop("Ip must have state names as column names")
+        stop("Ip must have state names as column names", call.=FALSE)
+      }
+      # check that there is one NA element per row
+      nna <- apply(Ip, MARGIN=1, FUN=function(row){
+        return(sum(is.na(row)))
+      })
+      if (!all.equal(nna, rep(1,times=ncol(Ip)))) {
+        stop("Each row of Ip must have exactly one NA", call.=FALSE)
       }
       # set Ip
       private$Ip <- Ip
@@ -224,27 +233,35 @@ MarkovModel <- R6::R6Class(
       private$Ip <- private$Ip[order(match(rownames(private$Ip), statenames)), 
                                order(match(colnames(private$Ip), statenames))]
       # calculate per-cycle transitions and correct leading diagonals
-      for (s in private$states) {
-        if (!s$hasCycleLimit()) {
-          # calculate per-cycle transition rates
-          private$Ip[s$getName(),] <- 1-exp(log(1-private$Ip[s$getName(),])/private$nCyclesPerYear) 
-          # adjust leading diagonals to ensure unity transition rates
-          offdiag <- colnames(private$Ip)[colnames(private$Ip) != s$getName()]
-          sigma <- sum(private$Ip[s$getName(), offdiag])
-          if (sigma > 1) {
-            stop('Rows of Ip for normal states must sum to <= 1')
-          }
-          private$Ip[s$getName(),s$getName()] <- 1-sigma
+      for (row in length(private$states)) {
+        sigma <- sum(private$Ip[row,], na.rm=TRUE)
+        if (sigma > 1) {
+          stop("Non-missing elements of rows of Ip must sum to <= 1", call.=FALSE)
         }
-        else {
-          # leave transitions in tunnel states alone, but check them
-          sigma <- sum(private$Ip[s$getName(),])
-          if (isFALSE(all.equal(sigma,1))) {
-            stop('Rows of Ip for tunnel state ', s$getName(), 
-                 ' must sum to 1 (specified as ', sigma, ')')
-          }
-        }
+        col <- which(row, arr.ind=TRUE)
+        private$Ip[row,col] <- 1-sigma
       }
+      #for (s in private$states) {
+      #  if (!s$hasCycleLimit()) {
+      #    # calculate per-cycle transition rates
+      #    private$Ip[s$getName(),] <- 1-exp(log(1-private$Ip[s$getName(),])/private$nCyclesPerYear) 
+      #    # adjust leading diagonals to ensure unity transition rates
+      #    #offdiag <- colnames(private$Ip)[colnames(private$Ip) != s$getName()]
+      #    sigma <- sum(private$Ip[s$getName(), offdiag], na.rm=TRUE)
+      #    if (sigma > 1) {
+      #      stop("Rows of Ip for normal states must sum to <= 1", call.=FALSE)
+      #    }
+      #    private$Ip[s$getName(),s$getName()] <- 1-sigma
+      #  }
+      #  else {
+      #    # leave transitions in tunnel states alone, but check them
+      #    sigma <- sum(private$Ip[s$getName(),])
+      #    if (isFALSE(all.equal(sigma,1))) {
+      #      stop('Rows of Ip for tunnel state ', s$getName(), 
+      #           ' must sum to 1 (specified as ', sigma, ')')
+      #    }
+      #  }
+      #}
       return(invisible(self))
     },
     

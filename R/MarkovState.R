@@ -8,7 +8,7 @@
 #' A class to represent a single state in a Markov model. 
 #' 
 #' @docType class
-#' @author Andrew J. Sims \email{andrew.sims5@nhs.net}
+#' @author Andrew J. Sims \email{andrew.sims@@newcastle.ac.uk}
 #' @export
 #'  
 MarkovState <- R6::R6Class(

@@ -3,6 +3,8 @@
 * First full release of the package.
 * Renamed ModelVariable as ModVar for compactness, and renamed its derived
   classes similarly.
+* Collected vignette citations to file references.bib and changed 
+  to *Scientific Reports* csl style guide.
 
 # rdecision 0.1.7
 

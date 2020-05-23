@@ -8,21 +8,8 @@ vignette: >
   %\VignetteIndexEntry{Example Markov Model By Sonnenberg and Beck}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
-references:
-- id: sonnenberg:1993a
-  type: article
-  title: "Markov Models in Medical Decision Making: A Practical Guide"
-  author:
-    - family: Sonnenberg
-      given: Frank A.
-    - family: Beck
-      given: J. Robert
-  container-title: Medical Decision Making
-  issued:
-    - year: 1993
-  volume: '13'
-  page: 322-339
-  DOI: 10.1177/0272989X9301300409
+bibliography: "references.bib"
+csl: "scientific-reports.csl"
 ---
 ```{r, include = FALSE}
 knitr::opts_chunk$set(
@@ -69,7 +56,7 @@ discount <- 0.0
 ```
 
 The parameters of the simulation are defined as follows, to replicate the
-results of Sonneberg and Beck [-@sonnenberg:1993a, Table 2].
+results of Sonnenberg and Beck [-@sonnenberg:1993a, Table 2].
 ```{r echo=T}
 # simulation parameters
 nPatients <- 10000

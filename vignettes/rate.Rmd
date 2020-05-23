@@ -9,22 +9,8 @@ vignette: >
   %\VignetteIndexEntry{Markov cycle transition probabilities}
   %\VignetteEncoding{UTF-8}
   %\VignetteEngine{knitr::rmarkdown}
-references:
-- id: briggs:2002a
-  type: book
-  author:
-    - family: Briggs
-      given: Andrew
-    - family: Claxton
-      given: Karl
-    - family: Sculpher
-      given: Mark
-  title: "Decision modelling for health economic evaluation"
-  publisher: "Oxford University Press"
-  publisher-place: "Oxford, UK"
-  isbn: 978-0-19-852662-9
-  issued:
-    - year: 2006
+bibliography: "references.bib"
+csl: "scientific-reports.csl"
 ---
 ```{r,include=FALSE}
 knitr::opts_chunk$set(
