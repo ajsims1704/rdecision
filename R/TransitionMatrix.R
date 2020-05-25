@@ -18,8 +18,17 @@ TransitionMatrix <- R6::R6Class(
   classname = "TransitionMatrix",
   
   private = list(
+    # vector of state names
     statenames = vector(mode="character", length=0),
-    i = NULL # effective annual transition rates
+    # effective annual transition rates, stored as list to accept ModVars
+    i = list(),  
+    # find row major index in list for an unchecked pair of state names
+    index = function(from, to) {
+      r <- match(from, private$statenames)
+      c <- match(to, private$statenames)
+      N <- length(private$statenames)
+      return((r-1)*N + c)
+    }
   ),
   
   public = list(
@@ -29,8 +38,9 @@ TransitionMatrix <- R6::R6Class(
     #' @param statenames A character vector of state names.
     #' @return A new TransitionMatrix object.     
     initialize = function(statenames) {
-      # check that state names are non-missing and characters  
-      sapply(statenames, function(n) {
+      # check that state names are non-missing and of type character  
+      snames <- sapply(statenames, USE.NAMES=FALSE, function(n) {
+        # run checks
         if (is.na(n)) {
           rlang::abort("State names must not be missing.", 
                        class="missing_state_name")
@@ -40,20 +50,19 @@ TransitionMatrix <- R6::R6Class(
                        class="non-string_state_name")
         }
       })
+      # check that state names are not repeated
+      if (length(unique(statenames)) != length(statenames)) {
+        rlang::abort("State names must be unique", class="non-unique_state_names")
+      }
+      # save the state names
       private$statenames <- statenames
-      # create matrix (list with attributes) of effective annual transition rates
+      # create matrix (list of cells in row major order) of effective annual transition rates
       nstates <- length(private$statenames)
-      private$i <- matrix(
-        data = vector(mode="list", length=nstates*nstates),
-        nrow = nstates,
-        ncol = nstates,
-        byrow = TRUE,
-        dimnames = list(from=private$statenames, to=private$statenames)
-      )
+      private$i <- vector(mode="list", length=nstates*nstates)
       # set initial matrix with leading diagonals as NA, others as zero
-      for (i in statenames) {
-        for (j in statenames) {
-          private$i[i,j] <- ifelse(i==j, NA, 0)
+      for (from in private$statenames) {
+        for (to in private$statenames) {
+          private$i[[private$index(from,to)]] <- ifelse(from==to, NA, 0)
         }
       }
       # return object 
@@ -64,21 +73,22 @@ TransitionMatrix <- R6::R6Class(
     #' Return the number of rows in the matrix
     #' @return Row count.
     nrow = function() {
-      return(nrow(private$i))      
+      return(length(private$statenames))      
     },
     
     #' @description 
     #' Return the number of columns in the matrix.
     #' @return Row count.
     ncol = function() {
-      return(ncol(private$i))      
+      return(length(private$statenames))      
     },
     
     #' @description 
     #' Return list of state names (as per matrix dimnames).
     #' @return Named list of length 2 ('from' and 'to').
     dimnames = function() {
-      return(dimnames(private$i))
+      dn <- list(from=private$statenames, to=private$statenames)
+      return(dn)
     },
     
     #' @description 
@@ -86,26 +96,32 @@ TransitionMatrix <- R6::R6Class(
     #' @param from Name of the 'from' state.
     #' @param to Name of the 'to' state.
     #' @param rate Annual transition rate between the states. Must be a numeric
-    #' value or a ModVar.
+    #' value, ModVar or NA. The latter is used to set the cell in the row which
+    #' will be computed when value() is called, to ensure that the sum of 
+    #' probabilities leaving a row is one.
     #' @return Updated TransitionMatrix object.
     set_rate = function(from, to, rate) {
       # check that 'from' and 'to' are state names
       if (is.na(from) || !is.character(from) || !(from %in% private$statenames)) {
-        rlang::abort("Argument 'from' must be a state name.", class="undefined_state_name")
+        rlang::abort("Argument 'from' must be a state name.", 
+                     class="undefined_state_name")
       }
       if (is.na(to) || !is.character(to) || !(to %in% private$statenames)) {
-        rlang::abort("Argument 'to' must be a state name.", class="undefined_state_name")
+        rlang::abort("Argument 'to' must be a state name.", 
+                     class="undefined_state_name")
       }
       # check that rate is numeric or ModVar
-      if (!is.numeric(rate) && !inherits(rate, what='ModVar')) {
-        rlang::abort("Argument 'rate' must be numeric or ModVar.", class="non-numeric_rate")
+      if (!is.numeric(rate) && !inherits(rate, what='ModVar') && !is.na(rate)) {
+        rlang::abort("Argument 'rate' must be numeric, ModVar or NA.", 
+                     class="non-numeric_rate")
       }
       # if rate is numeric, check if in range
       if (is.numeric(rate) && ((rate<0) || (rate>1))) {
-        rlang::abort("Numeric 'rate' must be [0,1].", class="numeric_rate_out_of_range")
+        rlang::abort("Numeric 'rate' must be [0,1].", 
+                     class="numeric_rate_out_of_range")
       } 
       # set the rate
-      private$i[from,to] <- rate
+      private$i[[private$index(from,to)]] <- rate
       # return updated object
       return(invisible(self))
     },
@@ -117,7 +133,7 @@ TransitionMatrix <- R6::R6Class(
     #' is retrieved using 'value()'. The single NA in each row is replaced
     #' with 1-p where P is the sum of the other values in the row.
     #' @return A numeric matrix with rows and columns labelled with 
-    #' state names.
+    #' state names. Satisfies 'is.matrix()' test in R.
     value = function() {
       # fetch numeric representation of the transition matrix
       ML <- sapply(private$i, FUN=function(cell) {
@@ -129,12 +145,20 @@ TransitionMatrix <- R6::R6Class(
         }
         return(rv)
       })
-      str(ML)
       # convert to matrix
       MM <- matrix(ML, nrow=self$nrow(), ncol=self$ncol(), byrow=TRUE, 
                    dimnames=self$dimnames()) 
-      print(MM)
+      # check one NA per row
+      nna <- rowSums(is.na(MM))
+      if (!all(nna==1)) {
+        rlang::abort("Each row of the matrix must have one NA", 
+                     class="incorrect_NA_count")
+      }
       # replace each NA to ensure sum of probabilities is one
+      for (i in 1:nrow(MM)) {
+        p <- sum(MM[i,], na.rm=TRUE)
+        MM[i,which(is.na(MM[i,]), arr.ind=TRUE)] <- 1-p
+      }
       # return numeric matrix
       return(MM)
     }

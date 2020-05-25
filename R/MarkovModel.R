@@ -14,10 +14,10 @@
 MarkovModel <- R6::R6Class(
   classname = "MarkovModel",
   private = list(
-    states = "list",
-    Ip = "matrix",
-    nCyclesPerYear = "numeric",
-    populations = "vector",
+    states = list(),
+    Ip = NULL,
+    nCyclesPerYear = as.numeric(NA),
+    populations = vector(mode="numeric", length=0),
     icycle = "integer",
     discount = 0
   ),
@@ -26,32 +26,35 @@ MarkovModel <- R6::R6Class(
     #' @description
     #' Creates a Markov model.
     #' @param states a list of objects of type MarkovState 
-    #' @param Ip Matrix of \emph{annual} rates of transition between states. The
-    #'        dimensions are (nStates,nStates) with each entry being the
-    #'        annual rate of transitions from the row state to the
-    #'        column state. Values are in the range [0,1]. One transition
-    #'        probability per row should be set to NA, and will
-    #'        be adjusted so that the sum of transitions from each row are
-    #'        unity. The matrix should have row names and column names which are the
-    #'        state names.
+    #' @param Ip Matrix of \emph{annual} rates of transition between states,
+    #' represented by a TransitionMatrix object.
     #' @param discount The annual discount rate (percentage).
     #' @param nCyclesPerYear The number of cycles per year.
     #' @return A MarkovModel object.
     initialize = function(states, Ip, discount=0, nCyclesPerYear=1) {
       # set the cycle number to be zero
       private$icycle <- 0
-      # check that all states are of type MarkovState
+      # check and set the states are of type MarkovState
       sapply(states, function(x) {
-        if (inherits(x, what="MarkovState")==F){
-          rlang::abort("Each element in 'states' must be of class 'MarkovState'")
+        if (!inherits(x, what="MarkovState")){
+          rlang::abort("Each element in 'states' must be of class 'MarkovState'",
+                       class="not_markov_state")
         }
       })
-      # set the states
       private$states <- states 
+      # check that the transition matrix is a TransitionMatrix object, with the
+      # same number and names of states as the state list.
+      if (!inherits(Ip, what='TransitionMatrix')) {
+        rlang::abort("Argument Ip must be of type TransitionMatrix",
+                     class="not_transition_matrix")
+      }
+      if (!setequal(self$get_statenames(), Ip$dimnames()[["from"]])) {
+        rlang::abort("Transition matrix 'Ip' must have the same state names as 'states'",
+                     class="unmatched_states")
+      }
+      private$Ip <- Ip
       # set the number of cycles per year
       private$nCyclesPerYear <- nCyclesPerYear
-      # set the transition probabilities
-      self$set_transitions(Ip)
       # set the discount rate
       self$setDiscount(discount)
     },
@@ -68,7 +71,7 @@ MarkovModel <- R6::R6Class(
       for (s in private$states) {
         if (s$hasCycleLimit() & s$getCycleLimit() != 1) {
           stop("All temporary states in cohort solver must have cycleLimit of 1",
-               " (", s$getName(), " has ", s$getCycleLimit(), ')')
+               " (", s$get_name(), " has ", s$getCycleLimit(), ')')
         }
       }
       # Apply the transition probabilities to the population
@@ -129,7 +132,7 @@ MarkovModel <- R6::R6Class(
         Cycle = integer(length=nCycles),
         'Cost' = numeric(length=nCycles)
       )
-      statenames <- self$getStatenames()
+      statenames <- self$get_statenames()
       POP <- matrix(data=NA, nrow=nCycles, ncol=length(statenames))
       colnames(POP) <- statenames
       DF <- cbind(DF, POP)
@@ -151,8 +154,8 @@ MarkovModel <- R6::R6Class(
     #' @description
     #' Returns a character list of state names.
     #' @return List of the names of each state.
-    getStatenames = function() {
-      statenames <- sapply(private$states, function(x) {return(x$getName())})
+    get_statenames = function() {
+      statenames <- sapply(private$states, function(x) {return(x$get_name())})
       return(statenames)
     },
 
@@ -168,33 +171,37 @@ MarkovModel <- R6::R6Class(
     },
 
     #' @description
-    #' Sets the occupancy of each state. Takes argument
+    #' Sets the occupancy of each state. 
     #' Calling this resets the cycle count for the model to zero.
     #' @param populations A named vector of populations for
     #' the start of the state. The names should be the state names. 
     #' Due to R's implementation of matrix algebra, \code{populations} 
     #' must be a numeric type and is not restricted to being an integer.
     #' @return Updated MarkovModel object.
-    setPopulations = function(populations) {
+    set_populations = function(populations) {
       # check that prevalence is valid
       if (length(populations) != length(private$states)) {
-        stop("`populations` must have length ", length(private$states))
+        rlang::abort("Argument 'populations' must have one element per state", 
+                     class="incorrect_state_count")
       }
       # check the state names are correct
-      statenames <- self$getStatenames()
-      if (!setequal(statenames, names(populations))) {
-        stop("`populations` must be vector named with state names")
+      if (!setequal(self$get_statenames(), names(populations))) {
+        rlang::abort("Each element of 'populations' must have a state name",
+                     class="unmatched_states")
       }  
       # check that all populations are of type numeric
       sapply(populations, function(x) {
         if (is.numeric(x)==F){
-          stop("Each element in `populations` must be of type numeric")
+          rlang::abort("Each element of 'populations' must be of type numeric",
+                       class="non-numeric_state_population")
         }
       })
       # re-order the population to match the transition matrix
-      private$populations <- populations[order(match(names(populations), statenames))]
+      private$populations <- populations[order(match(names(populations), self$get_statenames()))]
       # reset the cycle number (assumed restart if new population)
       private$icycle <- 0
+      # return updated object
+      return(invisible(self))
     },
     
     #' Sets the annual state transition rates. 
@@ -204,43 +211,43 @@ MarkovModel <- R6::R6Class(
     #' row should be NA; this element is computed from the others to ensure that
     #' the sum of 'from' probabilities is unity/ 
     #' @return Updated MarkovModel object
-    set_transitions = function(Ip) {
-      # check that the transition matrix is of the correct dimension
-      if (nrow(Ip) != length(private$states)) {
-        stop("Ip must have ", length(private$states), " rows", call.=FALSE)
-      }
-      if (ncol(Ip) != length(private$states)) {
-        stop("Ip must have ", length(private$states), " columns", call.=FALSE)
-      }
-      # check that the transition matrix is labelled with state names
-      statenames <- self$getStatenames()
-      if (!setequal(statenames, rownames(Ip))) {
-        stop("Ip must have state names as row names", call.=FALSE)
-      }
-      if (!setequal(statenames, colnames(Ip))) {
-        stop("Ip must have state names as column names", call.=FALSE)
-      }
-      # check that there is one NA element per row
-      nna <- apply(Ip, MARGIN=1, FUN=function(row){
-        return(sum(is.na(row)))
-      })
-      if (!all.equal(nna, rep(1,times=ncol(Ip)))) {
-        stop("Each row of Ip must have exactly one NA", call.=FALSE)
-      }
-      # set Ip
-      private$Ip <- Ip
-      # reorder Ip to match state names
-      private$Ip <- private$Ip[order(match(rownames(private$Ip), statenames)), 
-                               order(match(colnames(private$Ip), statenames))]
-      # calculate per-cycle transitions and correct leading diagonals
-      for (row in length(private$states)) {
-        sigma <- sum(private$Ip[row,], na.rm=TRUE)
-        if (sigma > 1) {
-          stop("Non-missing elements of rows of Ip must sum to <= 1", call.=FALSE)
-        }
-        col <- which(row, arr.ind=TRUE)
-        private$Ip[row,col] <- 1-sigma
-      }
+    # set_transitions = function(Ip) {
+    #   # check that the transition matrix is of the correct dimension
+    #   if (nrow(Ip) != length(private$states)) {
+    #     stop("Ip must have ", length(private$states), " rows", call.=FALSE)
+    #   }
+    #   if (ncol(Ip) != length(private$states)) {
+    #     stop("Ip must have ", length(private$states), " columns", call.=FALSE)
+    #   }
+    #   # check that the transition matrix is labelled with state names
+    #   statenames <- self$get_statenames()
+    #   if (!setequal(statenames, rownames(Ip))) {
+    #     stop("Ip must have state names as row names", call.=FALSE)
+    #   }
+    #   if (!setequal(statenames, colnames(Ip))) {
+    #     stop("Ip must have state names as column names", call.=FALSE)
+    #   }
+    #   # check that there is one NA element per row
+    #   nna <- apply(Ip, MARGIN=1, FUN=function(row){
+    #     return(sum(is.na(row)))
+    #   })
+    #   if (!all.equal(nna, rep(1,times=ncol(Ip)))) {
+    #     stop("Each row of Ip must have exactly one NA", call.=FALSE)
+    #   }
+    #   # set Ip
+    #   private$Ip <- Ip
+    #   # reorder Ip to match state names
+    #   private$Ip <- private$Ip[order(match(rownames(private$Ip), statenames)), 
+    #                            order(match(colnames(private$Ip), statenames))]
+    #   # calculate per-cycle transitions and correct leading diagonals
+    #   for (row in length(private$states)) {
+    #     sigma <- sum(private$Ip[row,], na.rm=TRUE)
+    #     if (sigma > 1) {
+    #       stop("Non-missing elements of rows of Ip must sum to <= 1", call.=FALSE)
+    #     }
+    #     col <- which(row, arr.ind=TRUE)
+    #     private$Ip[row,col] <- 1-sigma
+    #   }
       #for (s in private$states) {
       #  if (!s$hasCycleLimit()) {
       #    # calculate per-cycle transition rates
@@ -262,28 +269,28 @@ MarkovModel <- R6::R6Class(
       #    }
       #  }
       #}
-      return(invisible(self))
-    },
+#      return(invisible(self))
+#    },
     
     #' @description
     #' Creates a state summary data frame suitable for printing with kable etc.
     #' @return A dataframe with details of all states.
-    stateSummary = function() {
+    tabulate_states = function() {
       DF <- data.frame(
-        Name = self$getStatenames(),
+        Name = sapply(private$states, function(x) {return(x$get_name())}),
         hasCycleLimit = sapply(private$states, function(x) {return(x$hasCycleLimit())}),
         cycleLimit = sapply(private$states, function(x) {return(x$getCycleLimit())}),
         'Entry Cost' = sapply(private$states, function(x) {return(x$getEntryCost())}),
         'Annual Cost' = sapply(private$states, function(x) {return(x$getAnnualCost())})
       )
       return(DF)
-    },
-    
-    #' @description
-    #' Creates a table of the annual transition probabilities.
-    #' @return A data frame of annual transition probabilities
-    transitionSummary = function() {
-      return(as.data.frame(private$Ip))
     }
+    
+#    #' @description
+#    #' Creates a table of the annual transition probabilities.
+#    #' @return A data frame of annual transition probabilities.
+#    transitionSummary = function() {
+#      return(as.data.frame(private$Ip))
+#    }
   )
 )

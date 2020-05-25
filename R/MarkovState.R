@@ -14,7 +14,7 @@
 MarkovState <- R6::R6Class(
   classname = "MarkovState", 
   private = list(
-    name = "character",
+    name = "",
     isTemporaryState = "logical",
     cycleLimit = "numeric",
     annualCost = "numeric",
@@ -33,6 +33,12 @@ MarkovState <- R6::R6Class(
     #' @return An object of type MarkovState.
     initialize = function(name, annualCost=0, entryCost=0, hasCycleLimit=F, cycleLimit=NA) {
       # set the name
+      if (is.na(name)) {
+        rlang::abort("State name must not be missing", class="missing_state_name")
+      }
+      if (!is.character(name)) {
+        rlang::abort("State name must be a string", class="non-string_state_name")
+      }
       private$name <- name 
       # set the cycle limit state and value (for tunnel states)
       private$isTemporaryState <- hasCycleLimit
@@ -55,7 +61,7 @@ MarkovState <- R6::R6Class(
     #' @description 
     #' Accessor function to retrieve the state name.
     #' @return State name.
-    getName = function() {
+    get_name = function() {
       return(private$name)
     },
     
