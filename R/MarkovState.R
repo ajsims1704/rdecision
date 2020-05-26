@@ -19,7 +19,8 @@ MarkovState <- R6::R6Class(
     isAbsorbing = FALSE,
     cycleLimit = NA,
     annualCost = 0,
-    entryCost = 0
+    entryCost = 0,
+    utility = 1
   ),
   public = list(
     
@@ -28,13 +29,14 @@ MarkovState <- R6::R6Class(
     #' @param name The name of the state (character string).
     #' @param entryCost The cost to enter the state.
     #' @param annualCost The annual cost of state occupancy.
+    #' @param utility The utility associated with being in the state.
     #' @param cycleLimit The maximum length of stay;
     #' numeric. Leave unset for no cycle limit (normal behaviour).
     #' @param absorbing Logical; TRUE if the state is an absorbing state,
     #' FALSE otherwise. Must be FALSE (default) if cycleLimit is set.
     #' @return An object of type MarkovState.
-    initialize = function(name, annualCost=0, entryCost=0, cycleLimit=NA,
-                          absorbing=FALSE) {
+    initialize = function(name, annualCost=0, entryCost=0, utility=1,
+                          cycleLimit=NA, absorbing=FALSE) {
       # set the name
       if (is.na(name)) {
         rlang::abort("State name must not be missing", class="missing_state_name")
@@ -43,6 +45,28 @@ MarkovState <- R6::R6Class(
         rlang::abort("State name must be a string", class="non-string_state_name")
       }
       private$name <- name 
+      # check that annual cost is numeric, then set it
+      if (!is.numeric(annualCost)){
+        rlang::abort("'annualCost' must be of type 'numeric'",
+                     class="non-numeric_annual_cost")
+      }
+      private$annualCost <- annualCost
+      # check that entry cost is numeric, then set it
+      if (!is.numeric(entryCost)){
+        rlang::abort("'entryCost' must be of type 'numeric'",
+                     class="non-numeric_entry_cost")
+      }
+      private$entryCost <- entryCost
+      # check the utility is numeric, and in range[-Inf,1], and set it
+      if (!is.numeric(utility)) {
+        rlang::abort("Argument 'utility; must be numeric", 
+                     class="non-numeric_utility")
+      }
+      if (utility > 1) {
+        rlang::abort("Utility must be in the range [-Inf,1]",
+                     class="utility_out_of_range")
+      }
+      private$utility <- utility
       # set the cycle limit status and value (for temporary states)
       if (!is.na(cycleLimit)) {
         if (!is.numeric(cycleLimit)) {
@@ -66,16 +90,6 @@ MarkovState <- R6::R6Class(
                      class="temporary_absorbing_conflict")
       }
       private$isAbsorbing <- absorbing
-      # check that annual cost is numeric, then set it
-      if (!is.numeric(annualCost)){
-        stop("`annualCost` must be of type `numeric`")
-      }
-      private$annualCost<- annualCost
-      # check that entry cost is numeric, then set it
-      if (!is.numeric(entryCost)){
-        stop("`entryCost` must be of type `numeric`")
-      }
-      private$entryCost <- entryCost
     },
     
     #' @description 

@@ -157,7 +157,7 @@ CohortMarkovModel <- R6::R6Class(
     #' states, which will include calculation of state entry costs.
     #' @param nCycles Number of cycles to run; default is 2.
     #' @return Data frame with cycle results.
-    cycles = function(nCycles=2) {
+    cycles = function(nCycles=2, roundpop=FALSE) {
       # check that populations have been set
       if (length(private$populations)==0) {
         stop("State populations must be initialized")
