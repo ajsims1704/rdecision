@@ -17,7 +17,7 @@ Description: Classes and functions for modelling healthcare interventions using
 Depends: R (>= 3.1.0)
 Imports:
   R6,
-  rlang,
+  rlang (>= 0.4.2),
   stats,
   utils
 Suggests:

@@ -1,8 +1,8 @@
 #' @title 
-#' MarkovModel
+#' CohortMarkovModel
 #' 
 #' @description
-#' An R6 class for a Markov model
+#' An R6 class for a Markov model with cohort simulation.
 #' 
 #' @details 
 #' A class to represent a complete Markov model.
@@ -11,8 +11,8 @@
 #' @author Andrew J. Sims \email{andrew.sims@@newcastle.ac.uk}
 #' @export 
 #' 
-MarkovModel <- R6::R6Class(
-  classname = "MarkovModel",
+CohortMarkovModel <- R6::R6Class(
+  classname = "CohortMarkovModel",
   private = list(
     states = list(),
     Ip = NULL,
@@ -34,11 +34,17 @@ MarkovModel <- R6::R6Class(
     initialize = function(states, Ip, discount=0, nCyclesPerYear=1) {
       # set the cycle number to be zero
       private$icycle <- 0
-      # check and set the states are of type MarkovState
-      sapply(states, function(x) {
-        if (!inherits(x, what="MarkovState")){
+      # check and set the states
+      sapply(states, function(s) {
+        # check that the states are of type MarkovState
+        if (!inherits(s, what="MarkovState")){
           rlang::abort("Each element in 'states' must be of class 'MarkovState'",
                        class="not_markov_state")
+        }
+        # check that temporary states have cycleLimit=1
+        if (s$has_cycle_limit() & s$get_cycle_limit() != 1) {
+          rlang::abort("Temporary states in a cohort model must have cycle limit of 1",
+                       class="unsupported_cycle_limit")
         }
       })
       private$states <- states 
@@ -60,24 +66,53 @@ MarkovModel <- R6::R6Class(
     },
 
     #' @description
+    #' Sets the occupancy of each state. 
+    #' Calling this resets the cycle count for the model to zero.
+    #' @param populations A named vector of populations for
+    #' the start of the state. The names should be the state names. 
+    #' Due to R's implementation of matrix algebra, \code{populations} 
+    #' must be a numeric type and is not restricted to being an integer.
+    #' @return Updated MarkovModel object.
+    set_populations = function(populations) {
+      # check that prevalence is valid
+      if (length(populations) != length(private$states)) {
+        rlang::abort("Argument 'populations' must have one element per state", 
+                     class="incorrect_state_count")
+      }
+      # check the state names are correct
+      if (!setequal(self$get_statenames(), names(populations))) {
+        rlang::abort("Each element of 'populations' must have a state name",
+                     class="unmatched_states")
+      }  
+      # check that all populations are of type numeric
+      sapply(populations, function(x) {
+        if (is.numeric(x)==F){
+          rlang::abort("Each element of 'populations' must be of type numeric",
+                       class="non-numeric_state_population")
+        }
+      })
+      # re-order the population vector to match the transition matrix
+      colnames <- private$Ip$dimnames()[["from"]]
+      private$populations <- populations[order(match(names(populations), colnames))]
+      # reset the cycle number (assumed restart if new population)
+      private$icycle <- 0
+      # return updated object
+      return(invisible(self))
+    },
+
+    #' @description
     #' Applies one cycle of the model, starting at zero.
     #' @return Calculated values, per state.
     cycle = function() {
       # check that populations have been set
       if (length(private$populations)==0) {
-        stop("State populations must be initialized")
-      }
-      # check that temporary states only have cycleLimit=1
-      for (s in private$states) {
-        if (s$hasCycleLimit() & s$getCycleLimit() != 1) {
-          stop("All temporary states in cohort solver must have cycleLimit of 1",
-               " (", s$get_name(), " has ", s$getCycleLimit(), ')')
-        }
+        rlang::abort("State populations must be initialized",
+                     "missing_state_populations")
       }
       # Apply the transition probabilities to the population
       if (private$icycle > 0) {
-        pop.end <- private$populations %*% private$Ip
-        private$populations <- pop.end[1,]
+        pop.end <- private$populations %*% private$Ip$value()
+        private$populations <- drop(pop.end)
       }
       # calculate entry costs
       state.costs <- sapply(private$states, function(x) {return(x$getEntryCost())})
@@ -169,41 +204,7 @@ MarkovModel <- R6::R6Class(
       }
       private$discount <- r/100
     },
-
-    #' @description
-    #' Sets the occupancy of each state. 
-    #' Calling this resets the cycle count for the model to zero.
-    #' @param populations A named vector of populations for
-    #' the start of the state. The names should be the state names. 
-    #' Due to R's implementation of matrix algebra, \code{populations} 
-    #' must be a numeric type and is not restricted to being an integer.
-    #' @return Updated MarkovModel object.
-    set_populations = function(populations) {
-      # check that prevalence is valid
-      if (length(populations) != length(private$states)) {
-        rlang::abort("Argument 'populations' must have one element per state", 
-                     class="incorrect_state_count")
-      }
-      # check the state names are correct
-      if (!setequal(self$get_statenames(), names(populations))) {
-        rlang::abort("Each element of 'populations' must have a state name",
-                     class="unmatched_states")
-      }  
-      # check that all populations are of type numeric
-      sapply(populations, function(x) {
-        if (is.numeric(x)==F){
-          rlang::abort("Each element of 'populations' must be of type numeric",
-                       class="non-numeric_state_population")
-        }
-      })
-      # re-order the population to match the transition matrix
-      private$populations <- populations[order(match(names(populations), self$get_statenames()))]
-      # reset the cycle number (assumed restart if new population)
-      private$icycle <- 0
-      # return updated object
-      return(invisible(self))
-    },
-    
+  
     #' Sets the annual state transition rates. 
     #' @param Ip A numeric square matrix of dimension equal to the number of
     #' states, with row and column names equal to Markov state names. Transition 

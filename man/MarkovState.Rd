@@ -11,13 +11,13 @@ An R6 class for a state in a Markov model
 A class to represent a single state in a Markov model.
 }
 \author{
-Andrew J. Sims \email{andrew.sims5@nhs.net}
+Andrew J. Sims \email{andrew.sims@newcastle.ac.uk}
 }
 \section{Methods}{
 \subsection{Public methods}{
 \itemize{
 \item \href{#method-new}{\code{MarkovState$new()}}
-\item \href{#method-getName}{\code{MarkovState$getName()}}
+\item \href{#method-get_name}{\code{MarkovState$get_name()}}
 \item \href{#method-hasCycleLimit}{\code{MarkovState$hasCycleLimit()}}
 \item \href{#method-getCycleLimit}{\code{MarkovState$getCycleLimit()}}
 \item \href{#method-setAnnualCost}{\code{MarkovState$setAnnualCost()}}
@@ -64,12 +64,12 @@ An object of type MarkovState.
 }
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-getName"></a>}}
-\if{latex}{\out{\hypertarget{method-getName}{}}}
-\subsection{Method \code{getName()}}{
+\if{html}{\out{<a id="method-get_name"></a>}}
+\if{latex}{\out{\hypertarget{method-get_name}{}}}
+\subsection{Method \code{get_name()}}{
 Accessor function to retrieve the state name.
 \subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{MarkovState$getName()}\if{html}{\out{</div>}}
+\if{html}{\out{<div class="r">}}\preformatted{MarkovState$get_name()}\if{html}{\out{</div>}}
 }
 
 \subsection{Returns}{

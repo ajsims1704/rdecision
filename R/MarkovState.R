@@ -5,7 +5,7 @@
 #' An R6 class for a state in a Markov model
 #' 
 #' @details 
-#' A class to represent a single state in a Markov model. 
+#' Class to represent a single state in a Markov model. 
 #' 
 #' @docType class
 #' @author Andrew J. Sims \email{andrew.sims@@newcastle.ac.uk}
@@ -15,23 +15,26 @@ MarkovState <- R6::R6Class(
   classname = "MarkovState", 
   private = list(
     name = "",
-    isTemporaryState = "logical",
-    cycleLimit = "numeric",
-    annualCost = "numeric",
-    entryCost = "numeric"
+    isTemporary = FALSE,
+    isAbsorbing = FALSE,
+    cycleLimit = NA,
+    annualCost = 0,
+    entryCost = 0
   ),
   public = list(
     
     #' @description 
     #' Create a Markov state object.
     #' @param name The name of the state (character string).
-    #' @param isTemporaryState Logical; TRUE if the state is a tunnel state.
-    #' @param cycleLimit The maximum length of stay (1 for cohort tunnel states); numeric.
     #' @param entryCost The cost to enter the state.
-    #' @param hasCycleLimit Whether the state has a cycle limit; logical.
     #' @param annualCost The annual cost of state occupancy.
+    #' @param cycleLimit The maximum length of stay;
+    #' numeric. Leave unset for no cycle limit (normal behaviour).
+    #' @param absorbing Logical; TRUE if the state is an absorbing state,
+    #' FALSE otherwise. Must be FALSE (default) if cycleLimit is set.
     #' @return An object of type MarkovState.
-    initialize = function(name, annualCost=0, entryCost=0, hasCycleLimit=F, cycleLimit=NA) {
+    initialize = function(name, annualCost=0, entryCost=0, cycleLimit=NA,
+                          absorbing=FALSE) {
       # set the name
       if (is.na(name)) {
         rlang::abort("State name must not be missing", class="missing_state_name")
@@ -40,12 +43,29 @@ MarkovState <- R6::R6Class(
         rlang::abort("State name must be a string", class="non-string_state_name")
       }
       private$name <- name 
-      # set the cycle limit state and value (for tunnel states)
-      private$isTemporaryState <- hasCycleLimit
-      private$cycleLimit <- cycleLimit
-      if (private$isTemporaryState & is.na(cycleLimit)) {
-        private$cycleLimit <- 1
+      # set the cycle limit status and value (for temporary states)
+      if (!is.na(cycleLimit)) {
+        if (!is.numeric(cycleLimit)) {
+          rlang::abort("Argument 'cycleLimit' must be numeric", 
+                       class="non-numeric_cycle_limit")
+        }
+        if (abs(cycleLimit-round(cycleLimit)) > .Machine$double.eps^0.5) {
+          rlang::abort("Argument 'cycleLimit' must be a whole number",
+                       class="non-integer_cycle_limit")
+        }
+        private$cycleLimit <- cycleLimit
+        private$isTemporary <- TRUE
       }
+      # check and set absorbing status
+      if (!is.logical(absorbing)) {
+        rlang::abort("Argument 'absorbing' must be logical",
+                     class="non-logical_absorbing_status")  
+      }
+      if (absorbing && private$isTemporary) {
+        rlang::abort("Must not define a state as temporary *and* absorbing",
+                     class="temporary_absorbing_conflict")
+      }
+      private$isAbsorbing <- absorbing
       # check that annual cost is numeric, then set it
       if (!is.numeric(annualCost)){
         stop("`annualCost` must be of type `numeric`")
@@ -68,14 +88,14 @@ MarkovState <- R6::R6Class(
     #' @description
     #' Accessor function to identify if the state has a cycle limit.
     #' @return TRUE if temporary state; false otherwise.
-    hasCycleLimit = function() {
-      return(private$isTemporaryState)
+    has_cycle_limit = function() {
+      return(private$isTemporary)
     },
     
     #' @description 
     #' Accessor function to find the cycle limit.
     #' @return The cycle limit; integer.
-    getCycleLimit = function() {
+    get_cycle_limit = function() {
       return(private$cycleLimit)
     },
     
