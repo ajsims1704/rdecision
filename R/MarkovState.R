@@ -113,6 +113,13 @@ MarkovState <- R6::R6Class(
       return(private$cycleLimit)
     },
     
+    #' @description
+    #' Test whether this is an absorbing state.
+    #' @return TRUE if state was defined as absorbing.
+    is_absorbing = function() {
+      return(private$isAbsorbing)
+    },
+    
     #' @description 
     #' Sets the annual cost of state occupancy.
     #' @param annualCost Annual cost of occupying the state; numeric.
@@ -151,6 +158,13 @@ MarkovState <- R6::R6Class(
     #' @return Entry cost; numeric.
     getEntryCost = function() {
       return(private$entryCost)
+    },
+    
+    #' @description 
+    #' Gets the utility associated with the state.
+    #' @return Utility; numeric.
+    get_utility = function() {
+      return(private$utility)
     }
   )
 )

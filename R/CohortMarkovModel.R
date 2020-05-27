@@ -101,7 +101,9 @@ CohortMarkovModel <- R6::R6Class(
     },
 
     #' @description
-    #' Applies one cycle of the model, starting at zero.
+    #' Applies one cycle of the model, starting at zero. Cycle zero is assumed
+    #' to have a duration of zero, i.e. no transitions take place and no
+    #' occupancy costs are incurred, but entry costs are accumulated.
     #' @return Calculated values, per state.
     cycle = function() {
       # check that populations have been set
@@ -157,7 +159,7 @@ CohortMarkovModel <- R6::R6Class(
     #' states, which will include calculation of state entry costs.
     #' @param nCycles Number of cycles to run; default is 2.
     #' @return Data frame with cycle results.
-    cycles = function(nCycles=2, roundpop=FALSE) {
+    cycles = function(nCycles=2) {
       # check that populations have been set
       if (length(private$populations)==0) {
         stop("State populations must be initialized")
