@@ -136,13 +136,19 @@ p.CRBSI.T <- ExprModVar$new(
   'P(CRBSI|Tegaderm)', 'P', quote(r.CRBSI*n.cathdays*hr.CRBSI/1000)
 )
 
-# costs
+# costs to each branch
 c.S <- ExprModVar$new(
   'Cost of standard dressing', 'GBP', quote(n.dressings*c.Standard)
 )
 c.T <- ExprModVar$new(
   'Cost of Tegaderm', 'GBP', quote(n.dressings*c.Tegaderm)
 )
+c.Dermatitis.S <- ExprModVar$new("c(Dermatitis,Std)", "GBP", quote(c.Dermatitis+c.S))
+c.Dermatitis.T <- ExprModVar$new("c(Dermatitis,Teg)", "GBP", quote(c.Dermatitis+c.T))
+c.LSI.S <- ExprModVar$new("c(LSI,Std)", "GBP", quote(c.LSI+c.S))
+c.LSI.T <- ExprModVar$new("c(LSI,Teg)", "GBP", quote(c.LSI+c.T))
+c.CRBSI.S <- ExprModVar$new("c(CRBSI),Std)", "GBP", quote(c.CRBSI+c.S))
+c.CRBSI.T <- ExprModVar$new("c(CRBSI),Teg)", "GBP", quote(c.CRBSI+c.T))
 ```
 
 ## The decision tree
@@ -154,32 +160,55 @@ nodes must have already been declared before their parent node is declared.
 This implies that a tree should be constructed from right to left, starting
 with leaf nodes which have no children (leaf nodes are synonymous with
 pathways in Briggs' terminology [-@briggs:2002a]). The final node to be constructed 
-is the node representing the decision problem.
+is the node representing the decision problem. The time horizon is not stated
+explicitly in the model, and is assumed to be 7 days here. It was implied
+that the time horizon was ICU stay plus some follow-up, and the costs reflect
+those incurred in that period, so the assumption of 7 days does not affect
+the `rdecision` implementation of the model.
 
 ```{r tree, echo=T}
+# Time horizon
+th <- as.difftime(7, units="days")
+
 # standard dressing branch
-leaf.S.Dermatitis <- LeafNode$new('Dermatitis (Standard Dressing)')
-leaf.S.LSI <- LeafNode$new('Local site infection (Standard Dressing)')
-leaf.S.CRBSI <- LeafNode$new('CRBSI (Standard Dressing)')
-leaf.S.NoComp <- LeafNode$new('No complication (Standard Dressing)')
+state.S.Dermatitis <- State$new(
+  "Dermatitis (Standard Dressing)", cost=c.Dermatitis.S, interval=th
+)
+state.S.LSI <- State$new(
+  "Local site infection (Standard Dressing)", cost=c.LSI.S, interval=th
+)
+state.S.CRBSI <- State$new(
+  "CRBSI (Standard Dressing)", cost=c.CRBSI.S, interval=th
+)
+state.S.NoComp <- State$new(
+  "No complication (Standard Dressing)", cost=c.S, interval=th
+)
 
 chance.S <- ChanceNode$new(
-  children = list(leaf.S.Dermatitis, leaf.S.LSI, leaf.S.CRBSI, leaf.S.NoComp),
+  children = list(state.S.Dermatitis, state.S.LSI, state.S.CRBSI, state.S.NoComp),
   edgelabels = c('Dermatitis', 'Local site infection', 'CRBSI', 'No complication'),
-  costs = list(c.Dermatitis, c.LSI, c.CRBSI, 0),
+  costs = list(0, 0, 0, 0),
   p = list(p.Dermatitis.S, r.LSI, p.CRBSI.S, NA)
 )
 
 # Tegaderm dressing branch
-leaf.T.Dermatitis <- LeafNode$new('Dermatitis (Tegaderm CHG)')
-leaf.T.LSI <- LeafNode$new('Local site infection (Tegaderm CHG)')
-leaf.T.CRBSI <- LeafNode$new('CRBSI (Tegaderm CHG)')
-leaf.T.NoComp <- LeafNode$new('No complication (Tegaderm CHG)')
+state.T.Dermatitis <- State$new(
+  "Dermatitis (Tegaderm CHG)", cost=c.Dermatitis.T, interval=th
+)
+state.T.LSI <- State$new(
+  "Local site infection (Tegaderm CHG)", cost=c.LSI.T, interval=th
+)
+state.T.CRBSI <- State$new(
+  "CRBSI (Tegaderm CHG)", cost=c.CRBSI.T, interval=th
+)
+state.T.NoComp <- State$new(
+  "No complication (Tegaderm CHG)", cost=c.T, interval=th
+)
 
 chance.T <- ChanceNode$new(
-  children = list(leaf.T.Dermatitis, leaf.T.LSI, leaf.T.CRBSI, leaf.T.NoComp),
+  children = list(state.T.Dermatitis, state.T.LSI, state.T.CRBSI, state.T.NoComp),
   edgelabels = c('Dermatitis', 'Local site infection', 'CRBSI', 'No complication'),
-  costs = list(c.Dermatitis, c.LSI, c.CRBSI, 0),
+  costs = list(0, 0, 0, 0),
   p = list(p.Dermatitis.T, r.LSI.T, p.CRBSI.T, NA)
 )
 
@@ -187,7 +216,7 @@ chance.T <- ChanceNode$new(
 d <- DecisionNode$new(
   children = list(chance.S, chance.T),
   edgelabels = c('Standard', 'Tegaderm'),
-  costs = list(c.S, c.T)
+  costs = list(0, 0)
 )
 ```
 In the manufacturer's model, the uncertainties in the probabilities associated

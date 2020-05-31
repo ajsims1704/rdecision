@@ -81,7 +81,9 @@ Updated MarkovModel object.
 \if{html}{\out{<a id="method-cycle"></a>}}
 \if{latex}{\out{\hypertarget{method-cycle}{}}}
 \subsection{Method \code{cycle()}}{
-Applies one cycle of the model, starting at zero.
+Applies one cycle of the model, starting at zero. Cycle zero is assumed
+to have a duration of zero, i.e. no transitions take place and no
+occupancy costs are incurred, but entry costs are accumulated.
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{CohortMarkovModel$cycle()}\if{html}{\out{</div>}}
 }
