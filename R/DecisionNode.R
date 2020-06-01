@@ -16,10 +16,6 @@ DecisionNode <- R6::R6Class(
   classname = "DecisionNode",
   inherit = Node,
   private = list(
-    
-    # fields
-    costs = 'list'
-    
   ),
   public = list(
 
@@ -29,11 +25,8 @@ DecisionNode <- R6::R6Class(
     #'        decision node.
     #' @param edgelabels A vector of character stings containing the labels
     #'        of each choice associated with the decision.
-    #' @param costs A list of values containing the costs associated
-    #'        with each choice. Each value can be a numeric variable,
-    #'        or a ModVar.
     #' @return A new DecisionNode object
-    initialize = function(children, edgelabels, costs) {
+    initialize = function(children, edgelabels) {
 
       # ensure base class fields are initialized
       super$initialize()
@@ -43,7 +36,7 @@ DecisionNode <- R6::R6Class(
         stop("`children` must contain at least one object of class `Node`.")
       }
       sapply(children, function(x) {
-        if (inherits(x, what="Node")==F){
+        if (inherits(x, what="Node")==FALSE){
           stop("Each element in `children` must be of class `Node`")
         }
       })
@@ -58,87 +51,15 @@ DecisionNode <- R6::R6Class(
         }
       })
 
-      # add edges to this node with zero costs, to ensure initialization
+      # add edges to this node
       for (i in 1:length(children)) {
-        edge <- Edge$new(self, children[[i]], edgelabels[[i]], cost=0)
+        edge <- Edge$new(self, children[[i]], edgelabels[[i]])
         private$addEdge(edge)
       }
-
-      # check and store costs
-      if (length(costs) != length(children)) {
-        stop("`costs` must contain the same number of objects as `children`.")
-      }
-      sapply(costs, function(x) {
-        if (is.numeric(x)) {
-        }
-        else if (inherits(x, what='ModVar')==T) {
-        }
-        else {
-          stop("Each element in `costs` must be of class `numeric` or `ModVar`")
-        }
-      })
-      private$costs <- costs
       
-      # update the numerical values on the edges
-      self$updateEdges()
-    },
-
-    #' @description
-    #' Return the list of model variables associated with the node. The
-    #' model variables may be associated with costs or probabilities.
-    #' @return List of model variables. 
-    get_modvars = function() {
-      # make a list of all private objects that may be associated with model variables
-      mv <- c(private$p, private$costs)
-      # iterate objects and create list of model variables
-      mvlist <- list()
-      lapply(mv, FUN=function(v) {
-        if (inherits(v, what='ModVar')) {
-          mvlist <<- c(mvlist, v)
-        }
-      })
-      # return list of model variables
-      return(mvlist)
-    },
-    
-    #' @description 
-    #' Sample all model variables in this node and update edges.
-    #' @param expected If TRUE cause each model variable to return its expected
-    #'        value at the next call to `value()`. If FALSE each model variable
-    #'        will return the sampled value. Default is FALSE.
-    #' @return An updated DecisionNode object.
-    sample_modvars = function(expected=FALSE) {
-      # get the model variables associated with this node
-      mvlist <- self$get_modvars()
-      # sample them
-      sapply(mvlist, FUN=function(mv) {
-        mv$sample(expected)
-      })
-      # return reference to updated node
-      return(invisible(self))  
-    },
-    
-    #' @description Update numerical values in edges.
-    #' @return An updated Node object.
-    updateEdges = function() {
-      # update costs
-      for (i in 1:length(private$edges)) {
-        edge <- private$edges[[i]]
-        cost <- private$costs[[i]]
-        if (inherits(cost, what='ModVar')) {
-          c <- cost$value()
-          edge$setCost(c)
-        }
-        else if (is.numeric(cost)) {
-          edge$setCost(cost)
-        }
-        else {
-          stop("Edge$setEdgeCosts: cost must be of type `ModVar` or `numeric`")
-        }
-      }  
       return(invisible(self))
     },
-
+    
     #' @description 
     #' Update the tree by sampling model variables and then updating numerical
     #' edge values.
@@ -150,10 +71,6 @@ DecisionNode <- R6::R6Class(
       descendants <- self$descendantNodes()
       lapply(descendants, FUN=function(n) {
         n$sample_modvars(expected)
-      })
-      # update numerical edge values
-      lapply(descendants, FUN=function(n) {
-        n$updateEdges()
       })
       # return updated DecisionNode
       return(invisible(self))
@@ -186,7 +103,7 @@ DecisionNode <- R6::R6Class(
     #' \item{ExpectedUtility}{Utility \eqn{*} probability of traversing the pathway.}
     #' }
     evaluatePathways = function(expected=TRUE, uncorrelate=FALSE) {
-      # if no requireement to uncorrelate, reample the tree once
+      # if no requireement to uncorrelate, resample the tree once
       if (!uncorrelate) {
         self$updateTree(expected)
       }

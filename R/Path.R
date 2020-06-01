@@ -96,7 +96,7 @@ Path <- R6::R6Class(
         # if chance node, get p for the path to the next node
         if (thisNode$node_type()=='ChanceNode') {
           nextNode <- private$nodes[[i+1]]
-          nodeP <- thisNode$getP(nextNode)
+          nodeP <- thisNode$get_p(nextNode)
           p <- p * nodeP
         }
       }

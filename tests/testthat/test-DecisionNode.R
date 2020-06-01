@@ -33,26 +33,22 @@ test_that("rdecision replicates Evans et al, Sumatriptan base case", {
   c.8 <- ChanceNode$new(
     p = list(0.998, 0.002),
     children = list(state.d, state.e),
-    edgelabels = list("Relief", "Hospitalization"),
-    costs = list(0, 0)
+    edgelabels = list("Relief", "Hospitalization")
   )
   c.4 <- ChanceNode$new(
     p = list(0.594, 0.406),
     children = list(state.a, state.b),
-    edgelabels = list("No recurrence", "Recurrence relieved with 2nd dose"),
-    costs = list(0, 0)
+    edgelabels = list("No recurrence", "Recurrence relieved with 2nd dose")
   )
   c.5 <- ChanceNode$new(
     p = list(0.920, 0.080),
     children = list(state.c, c.8),
-    edgelabels = list("Endures attack", "ER"),
-    costs = list(0, 0)
+    edgelabels = list("Endures attack", "ER")
   )
   c.2 <- ChanceNode$new(
     p = list(0.558, 0.442),
     children = list(c.4, c.5),
-    edgelabels = list("Relief", "No relief"),
-    costs = list(0, 0)
+    edgelabels = list("Relief", "No relief")
   )
   # Caffeine/Ergotamine branch
   state.f <- State$new("F", cost=c.F, utility=1.0, interval=th)
@@ -63,32 +59,27 @@ test_that("rdecision replicates Evans et al, Sumatriptan base case", {
   c.9 <- ChanceNode$new(
     p = list(0.998, 0.002),
     children = list(state.i, state.j),
-    edgelabels = list("Relief", "Hospitalization"),
-    costs = list(0, 0)
+    edgelabels = list("Relief", "Hospitalization")
   )
   c.6 <- ChanceNode$new(
     p = list(0.703, 0.297),
     children = list(state.f, state.g),
-    edgelabels = list("No recurrence", "Recurrence relieved with 2nd dose"),
-    costs = list(0, 0)
+    edgelabels = list("No recurrence", "Recurrence relieved with 2nd dose")
   )
   c.7 <- ChanceNode$new(
     p = list(0.920, 0.080),
     children = list(state.h, c.9),
-    edgelabels = list("Endures attack", "ER"),
-    costs = list(0, 0)
+    edgelabels = list("Endures attack", "ER")
   )
   c.3 <- ChanceNode$new(
     p = list(0.379, 0.621),
     children = list(c.6, c.7),
-    edgelabels = list("Relief", "No relief"),
-    costs = list(0, 0)
+    edgelabels = list("Relief", "No relief")
   )
   # decision node
   d <- DecisionNode$new(
     children = list(c.2, c.3),
-    edgelabels = list("Sumatriptan", "Caffeine/Ergotamine"),
-    costs = list(0, 0)
+    edgelabels = list("Sumatriptan", "Caffeine/Ergotamine")
   )
   # evaluate
   RES <- d$evaluateChoices()

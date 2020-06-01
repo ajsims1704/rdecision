@@ -10,6 +10,8 @@
   variables are needed for the cost associated with each state, it improves
   consistency in the usage and meaning of state variables between decision
   trees and Markov models.
+* Added test scripts for ChanceNode, DecisionNode, MarkovState, 
+  TransitionMatrix, CohortMarkovModel.
 * Collected vignette citations to file references.bib and changed 
   to *Scientific Reports* csl style.
 

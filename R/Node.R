@@ -170,43 +170,6 @@ Node <- R6::R6Class(
       return(rv)
     },
     
-    #' @description
-    #' Function to return the conditional probability of the edge which links to
-    #' the specified child node
-    #' @param childNode child node to which to find probability of linking edge 
-    #' @return numerical value of probability
-    getP = function(childNode) {
-      rv <- 0
-      ie <- private$whichEdge(childNode)
-      if (!is.na(ie)){
-        edge <- private$edges[[ie]]
-        rv <- edge$getP()
-      }
-      return(rv)
-    },
-    
-#    #' @description
-#    #' function to return the utility associated with the node
-#    #' @return 
-#    #' Utility, numeric
-#   getUtility = function() {
-#      return(NA)
-#    },
-    
-#    #' @description
-#    #' Function to return the cost of the edge which links to the specified child node
-#    #' @param childNode child node to identify edge with associated cost of traversal
-#    #' @return Cost, numerical value
-#    getCost = function(childNode) {
-#      rv <- 0
-#      ie <- private$whichEdge(childNode)
-#      if (!is.na(ie)){
-#        edge <- private$edges[[ie]]
-#        rv <- edge$getCost()
-#      }
-#      return(rv)
-#    },
-    
     #' @description 
     #' Function to return a list of model variables associated with this node.
     #' @return 
@@ -272,14 +235,14 @@ Node <- R6::R6Class(
     #'        the node; otherwise sample from their uncertainty distributions.
     #' @return Updated Node object
     sample_modvars = function(expected=FALSE) {
-      return(invisible(self))
-    },
-    
-    #' @description 
-    #' Update the values on the edges associated with the node.
-    #' @return Updated Node object
-    updateEdges = function() {
+      # get the model variables associated with this node
+      mvlist <- self$get_modvars()
+      # sample them
+      sapply(mvlist, FUN=function(mv) {
+        mv$sample(expected)
+      })
       return(invisible(self))
     }
+    
   )
 )

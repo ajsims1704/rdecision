@@ -18,12 +18,9 @@ ChanceNode <- R6::R6Class(
   classname = "ChanceNode",
   inherit = Node,
   private = list(
-
     # private fields
-    costs = 'list',
-    p = "list",
-    ptype = 'character'
-    
+    p = NULL,
+    ptype = "numeric"
   ),
   public = list(
     
@@ -34,9 +31,6 @@ ChanceNode <- R6::R6Class(
     #' @param edgelabels a list of \eqn{k} character strings to label each edge 
     #'        (branch) leaving the `ChanceNode`, given in the same order as
     #'        `children`.
-    #' @param costs A list of \eqn{k} costs associated with each edge (branch) 
-    #'        leaving the `ChanceNode`. Each element may be of type `numeric` or
-    #'        `ModVar`; given in the same order as `children`.
     #' @param ptype a character string taking one of four possible
     #'        values to define how the \code{p} argument is defined:
     #'        'numeric', 'MV', 'Beta' or 'Dirichlet'. 
@@ -64,7 +58,7 @@ ChanceNode <- R6::R6Class(
     #' the types of elements of p}
     #' }
     #' @return A new `ChanceNode` object
-    initialize = function(children, edgelabels, costs, p, ptype='auto') {
+    initialize = function(children, edgelabels, p, ptype='auto') {
 
       ## ensure base class fields are initialized
       super$initialize()
@@ -93,28 +87,11 @@ ChanceNode <- R6::R6Class(
         }
       })
 
-      ## add edges to this node, using equal probability and zero cost per
-      ## branch to ensure initialization of edge
+      ## add edges to this node
       for (i in 1:length(children)) {
-        pFlat <- 1/length(children)
-        edge <- Edge$new(self, children[[i]], edgelabels[[i]], cost=0, p=pFlat)
+        edge <- Edge$new(self, children[[i]], edgelabels[[i]])
         private$addEdge(edge)
       }
-
-      ## check and store costs
-      if (length(costs) != length(children)) {
-        stop("ChanceNode$new: `costs` must contain the same number of objects as `children`.")
-      }
-      sapply(costs, function(x) {
-        if (is.numeric(x)) {
-        }
-        else if (inherits(x, what='ModVar')) {
-        }
-        else {
-          stop("ChanceNode$new: Each element in `costs` must be of class `numeric` or 'ModVar`")
-        }
-      })
-      private$costs <- costs
 
       ## set ptype
       if (!is.character(ptype)) {
@@ -184,9 +161,46 @@ ChanceNode <- R6::R6Class(
       else {
         stop("ChanceNode$new: `ptype` must be one of 'numeric', 'MV', 'Beta' or 'Dirichlet'")
       }
+    },
 
-      # update numeric edge values
-      self$updateEdges()
+    #' @description
+    #' Function to return the conditional probability of the edge which links to
+    #' the specified child node.
+    #' @param childNode child node to which to find probability of linking edge 
+    #' @return Numerical value of probability.
+    get_p = function(childNode) {
+      # create vector of p values, with one element per edge
+      pedge <- vector('numeric', length=length(private$edges))
+      # compute the probability associated with each edge
+      if (private$ptype == 'numeric') {
+        for (i in 1:length(private$edges)) {
+          pedge[i] <- private$p[[i]]
+        }
+      }
+      else if (private$ptype == 'MV') {
+        for (i in 1:length(private$edges)) {
+          p <- private$p[[i]]
+          if (inherits(p, what='ModVar')) {
+            v <- p$value()
+            pedge[i] <- v
+          }
+          else {
+            pedge[i] <- p
+          }
+        }
+        pedge[is.na(pedge)] <- 1 - sum(pedge, na.rm=T)
+      }
+      else {
+        rlang::abort("Only ptype='numeric' and ptype='MV' are currently supported",
+                     class="unsupported_ptype")
+      }
+      # return the single p value associated with the edge to the given child node
+      rv <- 0
+      ie <- private$whichEdge(childNode)
+      if (!is.na(ie)){
+        rv <- pedge[ie]
+      }
+      return(rv)
     },
 
     #' @description
@@ -195,7 +209,7 @@ ChanceNode <- R6::R6Class(
     #' @return List of model variables. 
     get_modvars = function() {
       # make a list of all private objects that may be associated with model variables
-      mv <- c(private$p, private$costs)
+      mv <- c(private$p)
       # iterate objects and create list of model variables
       mvlist <- list()
       lapply(mv, FUN=function(v) {
@@ -205,72 +219,7 @@ ChanceNode <- R6::R6Class(
       })
       # return list of model variables
       return(mvlist)
-    },
-    
-    #' @description 
-    #' Sample all model variables in this node and update edges.
-    #' @param expected If TRUE cause each model variable to return its expected
-    #'        value at the next call to `value()`. If FALSE each model variable
-    #'        will return the sampled value. Default is FALSE.
-    #' @return An updated ChanceNode object.
-    sample_modvars = function(expected=F) {
-      # get the model variables associated with this node
-      mvlist <- self$get_modvars()
-      # sample them
-      sapply(mvlist, FUN=function(mv) {
-        mv$sample(expected)
-      })
-      # return reference to updated node
-      return(invisible(self))  
-    },
-    
-    #' @description Update numerical values in edges.
-    #' @return An updated object.
-    updateEdges = function() {
-      # update costs
-      for (i in 1:length(private$edges)) {
-        edge <- private$edges[[i]]
-        cost <- private$costs[[i]]
-        if (inherits(cost, what='ModVar')) {
-          c <- cost$value()
-          edge$setCost(c)
-        }
-        else if (is.numeric(cost)) {
-          edge$setCost(cost)
-        }
-        else {
-          stop("Edge$setEdgeCosts: cost must be of type `ModVar` or `numeric`")
-        }
-      }  
-      # update probabilities
-      if (private$ptype == 'numeric') {
-        for (i in 1:length(private$edges)) {
-          edge <- private$edges[[i]]
-          edge$setP(private$p[[i]])
-        }
-      }
-      else if (private$ptype == 'MV') {
-        pedge <- vector('numeric', length=length(private$edges))
-        for (i in 1:length(private$edges)) {
-          edge <- private$edges[[i]]
-          p <- private$p[[i]]
-          if (inherits(p, what='ModVar')) {
-             v <- p$value()
-             pedge[i] <- v
-          }
-          else {
-            pedge[i] <- p
-          }
-        }
-        pedge[is.na(pedge)] <- 1 - sum(pedge, na.rm=T)
-        for (i in 1:length(private$edges)) {
-          edge <- private$edges[[i]]
-          edge$setP(pedge[i])
-        }
-      }
-      # return updated Node object
-      return(invisible(self))
     }
-
+    
   )
 )
