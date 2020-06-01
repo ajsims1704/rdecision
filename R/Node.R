@@ -66,7 +66,7 @@ Node <- R6::R6Class(
     #' Does the node have any child nodes? (DOM-style)
     #' @return 
     #' TRUE if node has children, FALSE if not
-    hasChildNodes = function() {
+    has_child_nodes = function() {
       return(length(private$edges)>0)
     },
     
@@ -74,7 +74,7 @@ Node <- R6::R6Class(
     #' Return list of child nodes (DOM-style)
     #' @return 
     #' list of child Nodes
-    childNodes = function() {
+    child_nodes = function() {
       children = list()
       for (e in private$edges) {
         children <- c(children, e$getToNode())
@@ -91,8 +91,8 @@ Node <- R6::R6Class(
         # push current node to path
         nodes[[length(nodes)+1]] <<- node
         # process child nodes if not leaf
-        if (node$hasChildNodes()) {
-          for (child in node$childNodes()) {
+        if (node$has_child_nodes()) {
+          for (child in node$child_nodes()) {
             toLeaf(child)
           }
         }
@@ -113,7 +113,7 @@ Node <- R6::R6Class(
     #' node type (DOM-style)
     #' @return 
     #' Node class, as character string
-    nodeType = function() {
+    node_type = function() {
       c <- class(self)[1]
       return(c)
     },
@@ -132,9 +132,9 @@ Node <- R6::R6Class(
         # push current node to path
         path[[length(path)+1]] <<- node
         # leaf reached; store the path
-        if (node$hasChildNodes()) {
+        if (node$has_child_nodes()) {
           # process child nodes
-          for (child in node$childNodes()) {
+          for (child in node$child_nodes()) {
             toLeaf(child)
           }
         }
@@ -160,7 +160,7 @@ Node <- R6::R6Class(
     #' Return label of edge which links to specified child node
     #' @param childNode child node to which find label of linking edge
     #' @return label as character string
-    getLabel = function(childNode) {
+    get_label = function(childNode) {
       rv <- NA
       ie <- private$whichEdge(childNode)
       if (!is.na(ie)){

@@ -35,7 +35,7 @@ Path <- R6::R6Class(
         }
       })
       last <- nodes[[length(nodes)]]
-      if (last$nodeType() != 'State') {
+      if (last$node_type() != 'State') {
         stop("Path$new: the supplied path in nodes must end on a State")
       }
       private$nodes <- nodes
@@ -56,8 +56,8 @@ Path <- R6::R6Class(
       for (i in 1:(length(private$nodes)-1)) {
         thisNode <- private$nodes[[i]]
         nextNode <- private$nodes[[i+1]]
-        if (thisNode$nodeType()=='DecisionNode') {
-          rc <- thisNode$getLabel(nextNode)
+        if (thisNode$node_type()=='DecisionNode') {
+          rc <- thisNode$get_label(nextNode)
           break
         }
       }
@@ -76,7 +76,7 @@ Path <- R6::R6Class(
       # assume leaf node is the last node in the pathway
       node <- private$nodes[[length(private$nodes)]]
       # if leaf node, return its pathway
-      if (node$nodeType()=='State') {
+      if (node$node_type()=='State') {
         rc <- node$get_name()
       }
       return(rc)
@@ -94,7 +94,7 @@ Path <- R6::R6Class(
       for (i in 1:(length(private$nodes)-1)){
         thisNode <- private$nodes[[i]]
         # if chance node, get p for the path to the next node
-        if (thisNode$nodeType()=='ChanceNode') {
+        if (thisNode$node_type()=='ChanceNode') {
           nextNode <- private$nodes[[i+1]]
           nodeP <- thisNode$getP(nextNode)
           p <- p * nodeP

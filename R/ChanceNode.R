@@ -11,7 +11,7 @@
 #' that branch given that the node has been reached) and a cost. 
 #' 
 #' @docType class
-#' @author Andrew Sims \email{andrew.sims5@@nhs.net}
+#' @author Andrew Sims \email{andrew.sims@@newcastle.ac.uk}
 #' @export
 #' 
 ChanceNode <- R6::R6Class(
@@ -71,21 +71,25 @@ ChanceNode <- R6::R6Class(
       
       ## check child nodes
       if (length(children) < 2) {
-        stop("ChanceNode$new: `children` must contain at least two objects of class `Node`.")
+        rlang::abort("Argument 'children' must contain at least two objects of class 'Node'.",
+                     class="incorrect_child_count")
       }
       sapply(children, function(x) {
         if (!inherits(x, what="Node")){
-          stop("ChanceNode$new: Each element in `children` must be of class `Node`")
+          rlang::abort("Each element in 'children' must be of class 'Node'.",
+                       class="non-Node_child")
         }
       })
 
       ## check edge labels
       if (length(edgelabels) != length(children)) {
-        stop("ChanceNode$new: `edgelabels` must contain the same number of objects as `children`.")
+        rlang::abort("Argument 'edgelabels' must contain the same number of objects as 'children'.",
+                     class="incorrect_edge_label_count")
       }
       sapply(edgelabels, function(x) {
         if (!is.character(x)){
-          stop("ChanceNode$new: Each element in `edgelabels` must be of class `character`.")
+          rlang::abort("Each element in 'edgelabels' must be of class 'character'.",
+                       class="non-string_edge_label")
         }
       })
 
@@ -114,7 +118,8 @@ ChanceNode <- R6::R6Class(
 
       ## set ptype
       if (!is.character(ptype)) {
-        stop("ChanceNode$new: `ptype`` must be of class `character`")
+        rlang::abort("Argument 'ptype' must be of class 'character'",
+                     class="non-string_ptype")
       }
       else {
         private$ptype <- ptype  
