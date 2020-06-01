@@ -9,7 +9,7 @@
 #' a wrapper for an ordered list of Nodes.
 #' 
 #' @docType class
-#' @author Andrew J. Sims \email{andrew.sims5@@nhs.net}
+#' @author Andrew J. Sims \email{andrew.sims@@newcastle.ac.uk}
 #' @export
 #' 
 Path <- R6::R6Class(
@@ -35,8 +35,8 @@ Path <- R6::R6Class(
         }
       })
       last <- nodes[[length(nodes)]]
-      if (last$nodeType() != 'LeafNode') {
-        stop("Path$new: the supplied path in nodes must end on a LeafNode")
+      if (last$nodeType() != 'State') {
+        stop("Path$new: the supplied path in nodes must end on a State")
       }
       private$nodes <- nodes
     },
@@ -66,7 +66,7 @@ Path <- R6::R6Class(
     },
     
     #' @description Returns the name of the pathway from the (final) leaf
-    #' node of a list of nodes. 
+    #' node of a list of nodes (a 'State' node). 
     #' @note Assumes the leaf node is the last node in the list.
     #' @return name of pathway; specifically the @code{pathway}
     #'         field of the final leaf node in @code{nodes}. 
@@ -76,8 +76,8 @@ Path <- R6::R6Class(
       # assume leaf node is the last node in the pathway
       node <- private$nodes[[length(private$nodes)]]
       # if leaf node, return its pathway
-      if (node$nodeType()=='LeafNode') {
-        rc <- node$getName()
+      if (node$nodeType()=='State') {
+        rc <- node$get_name()
       }
       return(rc)
     },
@@ -105,20 +105,23 @@ Path <- R6::R6Class(
     
     #' @description Calculates the sum of the pathway costs in
     #' the tree traversal.
-    #' @note Assumes that the final node is a leaf node.
+    #' @note Assumes that the cost is associated with final 'state' node.
     #' @return Sum of the pathway costs.
-    getCost = function() {
+    get_cost = function() {
       # cost value to return
       cost <- 0
       # step through each node in the path
-      for (i in 1:(length(private$nodes)-1)){
-        thisNode <- private$nodes[[i]]
+      for (i in 1:(length(private$nodes))){
+        n <- private$nodes[[i]]
         # if chance node, get cost for the path to the next node
-        if (thisNode$nodeType() %in% c('ChanceNode', 'DecisionNode')) {
-          nextNode <- private$nodes[[i+1]]
-          nodeCost <- thisNode$getCost(nextNode)
-          cost <- cost + nodeCost
-        }
+#        if (thisNode$nodeType() %in% c('ChanceNode', 'DecisionNode')) {
+#          nextNode <- private$nodes[[i+1]]
+#          nodeCost <- thisNode$getCost(nextNode)
+#          cost <- cost + nodeCost
+#        }
+       if (inherits(n, what="State")) {
+         cost <- cost + n$get_cost()
+       }
       }
       return(cost)
     },
@@ -127,15 +130,15 @@ Path <- R6::R6Class(
     #' the tree traversal.
     #' @note Assumes that only the final leaf node has a utility value.
     #' @return Sum of pathway utilities
-    getUtility = function() {
+    get_utility = function() {
       # cost value to return
       utility <- NA
       # step through each node in the path
       for (i in 1:length(private$nodes)){
         n <- private$nodes[[i]]
-        # if leaf node, get utility
-        if (inherits(n, what='LeafNode')) {
-          utility <- n$getUtility()
+        # if state node, get utility
+        if (inherits(n, what='State')) {
+          utility <- n$get_utility()
           break
         }
       }
@@ -158,8 +161,8 @@ Path <- R6::R6Class(
         'Choice' = self$getChoice(),
         'Pathway' = self$getName(),
         'Probability' = self$getProbability(),
-        'Cost' = self$getCost(),
-        'Utility' = self$getUtility()
+        'Cost' = self$get_cost(),
+        'Utility' = self$get_utility()
       )
       # return it
       return(DF)

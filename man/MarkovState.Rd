@@ -8,7 +8,7 @@
 An R6 class for a state in a Markov model
 }
 \details{
-A class to represent a single state in a Markov model.
+Class to represent a single state in a Markov model.
 }
 \author{
 Andrew J. Sims \email{andrew.sims@newcastle.ac.uk}
@@ -18,12 +18,14 @@ Andrew J. Sims \email{andrew.sims@newcastle.ac.uk}
 \itemize{
 \item \href{#method-new}{\code{MarkovState$new()}}
 \item \href{#method-get_name}{\code{MarkovState$get_name()}}
-\item \href{#method-hasCycleLimit}{\code{MarkovState$hasCycleLimit()}}
-\item \href{#method-getCycleLimit}{\code{MarkovState$getCycleLimit()}}
+\item \href{#method-has_cycle_limit}{\code{MarkovState$has_cycle_limit()}}
+\item \href{#method-get_cycle_limit}{\code{MarkovState$get_cycle_limit()}}
+\item \href{#method-is_absorbing}{\code{MarkovState$is_absorbing()}}
 \item \href{#method-setAnnualCost}{\code{MarkovState$setAnnualCost()}}
 \item \href{#method-getAnnualCost}{\code{MarkovState$getAnnualCost()}}
 \item \href{#method-setEntryCost}{\code{MarkovState$setEntryCost()}}
 \item \href{#method-getEntryCost}{\code{MarkovState$getEntryCost()}}
+\item \href{#method-get_utility}{\code{MarkovState$get_utility()}}
 \item \href{#method-clone}{\code{MarkovState$clone()}}
 }
 }
@@ -37,8 +39,9 @@ Create a Markov state object.
   name,
   annualCost = 0,
   entryCost = 0,
-  hasCycleLimit = F,
-  cycleLimit = NA
+  utility = 1,
+  cycleLimit = NA,
+  absorbing = FALSE
 )}\if{html}{\out{</div>}}
 }
 
@@ -51,11 +54,13 @@ Create a Markov state object.
 
 \item{\code{entryCost}}{The cost to enter the state.}
 
-\item{\code{hasCycleLimit}}{Whether the state has a cycle limit; logical.}
+\item{\code{utility}}{The utility associated with being in the state.}
 
-\item{\code{cycleLimit}}{The maximum length of stay (1 for cohort tunnel states); numeric.}
+\item{\code{cycleLimit}}{The maximum length of stay;
+numeric. Leave unset for no cycle limit (normal behaviour).}
 
-\item{\code{isTemporaryState}}{Logical; TRUE if the state is a tunnel state.}
+\item{\code{absorbing}}{Logical; TRUE if the state is an absorbing state,
+FALSE otherwise. Must be FALSE (default) if cycleLimit is set.}
 }
 \if{html}{\out{</div>}}
 }
@@ -77,12 +82,12 @@ State name.
 }
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-hasCycleLimit"></a>}}
-\if{latex}{\out{\hypertarget{method-hasCycleLimit}{}}}
-\subsection{Method \code{hasCycleLimit()}}{
+\if{html}{\out{<a id="method-has_cycle_limit"></a>}}
+\if{latex}{\out{\hypertarget{method-has_cycle_limit}{}}}
+\subsection{Method \code{has_cycle_limit()}}{
 Accessor function to identify if the state has a cycle limit.
 \subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{MarkovState$hasCycleLimit()}\if{html}{\out{</div>}}
+\if{html}{\out{<div class="r">}}\preformatted{MarkovState$has_cycle_limit()}\if{html}{\out{</div>}}
 }
 
 \subsection{Returns}{
@@ -90,16 +95,29 @@ TRUE if temporary state; false otherwise.
 }
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-getCycleLimit"></a>}}
-\if{latex}{\out{\hypertarget{method-getCycleLimit}{}}}
-\subsection{Method \code{getCycleLimit()}}{
+\if{html}{\out{<a id="method-get_cycle_limit"></a>}}
+\if{latex}{\out{\hypertarget{method-get_cycle_limit}{}}}
+\subsection{Method \code{get_cycle_limit()}}{
 Accessor function to find the cycle limit.
 \subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{MarkovState$getCycleLimit()}\if{html}{\out{</div>}}
+\if{html}{\out{<div class="r">}}\preformatted{MarkovState$get_cycle_limit()}\if{html}{\out{</div>}}
 }
 
 \subsection{Returns}{
 The cycle limit; integer.
+}
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-is_absorbing"></a>}}
+\if{latex}{\out{\hypertarget{method-is_absorbing}{}}}
+\subsection{Method \code{is_absorbing()}}{
+Test whether this is an absorbing state.
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{MarkovState$is_absorbing()}\if{html}{\out{</div>}}
+}
+
+\subsection{Returns}{
+TRUE if state was defined as absorbing.
 }
 }
 \if{html}{\out{<hr>}}
@@ -166,6 +184,19 @@ Gets the entry cost of state occupancy.
 
 \subsection{Returns}{
 Entry cost; numeric.
+}
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-get_utility"></a>}}
+\if{latex}{\out{\hypertarget{method-get_utility}{}}}
+\subsection{Method \code{get_utility()}}{
+Gets the utility associated with the state.
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{MarkovState$get_utility()}\if{html}{\out{</div>}}
+}
+
+\subsection{Returns}{
+Utility; numeric.
 }
 }
 \if{html}{\out{<hr>}}

@@ -35,36 +35,45 @@ structure which is allowed to have zero or more child nodes; any child
 nodes must have already been declared before their parent node is declared.
 This implies that a tree should be constructed from right to left, starting
 with leaf nodes which have no children (leaf nodes are synonymous with
-pathways in Briggs' terminology). The final node to be constructed 
-is the left-most decision node in the model.
+pathways in Briggs' terminology, and called 'States' in `rdecision`). The
+final node to be constructed is the left-most decision node in the model.
 
 ```{r echo=T}
+# Time horizon
+th <- as.difftime(48, units="hours")
+
+# Model variables
+sumatriptan <- 16.10
+caffeine <- 1.32
+ED <- 63.16
+admission <- 1093
+
 # Sumatriptan branch
-leaf.a <- LeafNode$new("A", utility=1.0)
-leaf.b <- LeafNode$new("B", utility=0.9)
-leaf.c <- LeafNode$new("C", utility=-0.3)
-leaf.d <- LeafNode$new("D", utility=0.1)
-leaf.e <- LeafNode$new("E", utility=-0.3)
+state.a <- State$new("A", cost=(sumatriptan), utility=1.0, interval=th)
+state.b <- State$new("B", cost=(2*sumatriptan), utility=0.9, interval=th)
+state.c <- State$new("C", cost=(sumatriptan), utility=-0.3, interval=th)
+state.d <- State$new("D", cost=(sumatriptan+ED), utility=0.1, interval=th)
+state.e <- State$new("E", cost=(sumatriptan+ED+admission), utility=-0.3, interval=th)
 
 c.8 <- ChanceNode$new(
   p = list(0.998, 0.002),
-  children = list(leaf.d, leaf.e),
+  children = list(state.d, state.e),
   edgelabels = list("Relief", "Hospitalization"),
-  costs = list(0, 1093.0)
+  costs = list(0, 0)
 )
 
 c.4 <- ChanceNode$new(
   p = list(0.594, 0.406),
-  children = list(leaf.a, leaf.b),
+  children = list(state.a, state.b),
   edgelabels = list("No recurrence", "Recurrence relieved with 2nd dose"),
-  costs = list(0, 16.10)
+  costs = list(0, 0)
 )
 
 c.5 <- ChanceNode$new(
   p = list(0.920, 0.080),
-  children = list(leaf.c, c.8),
+  children = list(state.c, c.8),
   edgelabels = list("Endures attack", "ER"),
-  costs = list(0, 63.16)
+  costs = list(0, 0)
 )
 
 c.2 <- ChanceNode$new(
@@ -75,31 +84,31 @@ c.2 <- ChanceNode$new(
 )
 
 # Caffeine/Ergotamine branch
-leaf.f <- LeafNode$new("F", utility=1.0)
-leaf.g <- LeafNode$new("G", utility=0.9)
-leaf.h <- LeafNode$new("H", utility=-0.3)
-leaf.i <- LeafNode$new("I", utility=0.1)
-leaf.j <- LeafNode$new("J", utility=-0.3)
+state.f <- State$new("F", cost=(caffeine), utility=1.0, interval=th)
+state.g <- State$new("G", cost=(2*caffeine), utility=0.9, interval=th)
+state.h <- State$new("H", cost=(caffeine), utility=-0.3, interval=th)
+state.i <- State$new("I", cost=(caffeine+ED), utility=0.1, interval=th)
+state.j <- State$new("J", cost=(caffeine+ED+admission), utility=-0.3, interval=th)
 
 c.9 <- ChanceNode$new(
   p = list(0.998, 0.002),
-  children = list(leaf.i, leaf.j),
+  children = list(state.i, state.j),
   edgelabels = list("Relief", "Hospitalization"),
-  costs = list(0, 1093.0)
+  costs = list(0, 0)
 )
 
 c.6 <- ChanceNode$new(
   p = list(0.703, 0.297),
-  children = list(leaf.f, leaf.g),
+  children = list(state.f, state.g),
   edgelabels = list("No recurrence", "Recurrence relieved with 2nd dose"),
-  costs = list(0, 1.32)
+  costs = list(0, 0)
 )
 
 c.7 <- ChanceNode$new(
   p = list(0.920, 0.080),
-  children = list(leaf.h, c.9),
+  children = list(state.h, c.9),
   edgelabels = list("Endures attack", "ER"),
-  costs = list(0, 63.13)
+  costs = list(0, 0)
 )
 
 c.3 <- ChanceNode$new(
@@ -113,7 +122,7 @@ c.3 <- ChanceNode$new(
 d.1 <- DecisionNode$new(
   children = list(c.2, c.3),
   edgelabels = list("Sumatriptan", "Caffeine/Ergotamine"),
-  costs = list(16.10, 1.32)
+  costs = list(0, 0)
 )
 ```
 
@@ -123,7 +132,7 @@ the probability, cost and utility of traversing each root-to-leaf path
 in the model. In the Sumatriptan model there are eight such paths, each 
 of which begins with the decision node and ends with a leaf node. For example,
 pathway A involves a traversal of nodes `d.1`, `c.2`, `c.4` and
-`leaf.a`. 
+`state.a`. 
 
 # Model results
 The results of the scenario model, using the code from the previous sections,

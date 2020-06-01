@@ -1,5 +1,5 @@
 rm(list=ls())
 devtools::load_all()
-rmarkdown::render("../vignettes/Ex25.Rmd")
+rmarkdown::render("vignettes/Tegaderm.Rmd")
 rm(list=ls())
 
