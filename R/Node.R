@@ -5,12 +5,12 @@
 #' An R6 class to represent a node in a decision tree
 #' 
 #' @details 
-#' Base class to represent a single node in a decision tree. Non subclassed
-#' nodes are not expected to be created as model objects. Document Object
+#' Base class to represent a single node in a decision tree. Objects of base
+#' class Node are not expected to be created as model objects. Document Object
 #' Model (DOM) names are used for node methods as far as possibe.
-
+#'
 #' @docType class
-#' @author Andrew Sims \email{andrew.sims5@@nhs.net}
+#' @author Andrew Sims \email{andrew.sims@@newcastle.ac.uk}
 #' @export
 #' 
 Node <- R6::R6Class(
@@ -18,7 +18,7 @@ Node <- R6::R6Class(
   private = list(
     
     # field list of Edge objects linking to child objects
-    edges = 'list',
+    edges = NULL,
     
     # description
     # Add an edge linking to a child node
@@ -29,7 +29,8 @@ Node <- R6::R6Class(
         private$edges <- c(private$edges, edge)
       }
       else {
-        stop('Argument to Node::addEdge must inherit from Edge')
+        rlang::abort("Argument edge must inherit from Edge",
+                     class="non-Edge_edge")
       }
       return(invisible(self))
     },
