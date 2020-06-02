@@ -1,0 +1,7 @@
+rm(list=ls())
+library("tools")
+op <- options()
+Sweave("article.Rnw")
+texi2pdf("article.tex")
+options(op)
+rm(list=ls())
