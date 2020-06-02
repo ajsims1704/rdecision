@@ -79,10 +79,12 @@ test_that("rdecision replicates Evans et al, Sumatriptan base case", {
   # decision node
   d <- DecisionNode$new(
     children = list(c.2, c.3),
-    edgelabels = list("Sumatriptan", "Caffeine/Ergotamine")
+    choices = list("Sumatriptan", "Caffeine/Ergotamine")
   )
+  # tree
+  dt <- DecisionTree$new(d)
   # evaluate
-  RES <- d$evaluateChoices()
+  RES <- dt$evaluateChoices()
   expect_true(is.data.frame(RES))
   c.Sumatriptan <- round(RES[RES$Run==1 & RES$Choice=="Sumatriptan", "Cost"],2)
   expect_equal(c.Sumatriptan, 22.06)
