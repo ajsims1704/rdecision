@@ -16,10 +16,9 @@ test_that("incorrect labels are rejected", {
 test_that("node is defined correctly", {
   n1 <- Node$new()
   n2 <- Node$new()
-  expect_silent(e <- Edge$new(n1, n2, "e1", FALSE))
+  expect_silent(e <- Edge$new(n1, n2, "e1"))
   expect_true(n1$is_same_node(e$get_source()))
   expect_true(n2$is_same_node(e$get_target()))
   expect_equal(e$get_label(), "e1")
-  expect_false(e$is_directed())
 })
 

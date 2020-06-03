@@ -2,7 +2,7 @@
 #' Edge
 #' 
 #' @description
-#' An R6 class to represent an edge in a graph
+#' An R6 class to represent an directed edge in a digraph
 #' 
 #' @details Edges are the formal term for links between pairs of nodes in a
 #' graph. It is not intended that package users creating models should 
@@ -20,22 +20,17 @@ Edge <- R6::R6Class(
   private = list(
     source = NULL,
     target = NULL,
-    label = "",
-    directed = TRUE
+    label = ""
   ),
   public = list(
     
     #' @description
     #' Create an object of type 'Edge'.
-    #' @param source first Node to which the edge connects.
+    #' @param source Node from which the edge comes.
     #' @param target second Node to which the edge connects.
     #' @param label Character string containing the edge label.
-    #' @param directed If TRUE the edge is directed from source
-    #' to target node. Otherwise source and target are simply
-    #' names for the pair of nodes. Default is TRUE, as this is normally the
-    #' case for health economic models.
     #' @return A new `Edge` object.
-    initialize = function(source, target, label="", directed=TRUE) {
+    initialize = function(source, target, label="") {
       # check and set source
       if (!inherits(source, what="Node")) {
         rlang::abort("Argument 'source' must inherit from type 'Node'",
@@ -60,21 +55,8 @@ Edge <- R6::R6Class(
       else {
         private$label <- label
       }
-      # check and set directed
-      if (!is.logical(directed)) {
-        rlang::abort("Argument 'directed' must be logical", 
-                     class="non-logical_directed")
-      }
-      private$directed <- directed
     },
 
-    #' @description 
-    #' Access whether the edge is directed.
-    #' @return Logical.
-    is_directed = function() {
-      return(private$directed)
-    },
-        
     #' @description
     #' Access source node.
     #' @return `Node` from which the edge leads.
