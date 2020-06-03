@@ -43,8 +43,8 @@ Node <- R6::R6Class(
       re <- NA
       for (i in 1:length(private$edges)) {
         e <- private$edges[[i]]
-        toNode <- e$getToNode()
-        if (toNode$isSameNode(childNode)) {
+        toNode <- e$get_target()
+        if (toNode$is_same_node(childNode)) {
           re <- i
           break
         }
@@ -78,7 +78,7 @@ Node <- R6::R6Class(
     child_nodes = function() {
       children = list()
       for (e in private$edges) {
-        children <- c(children, e$getToNode())
+        children <- c(children, e$get_target())
       }
       return(children)
     },
@@ -106,7 +106,7 @@ Node <- R6::R6Class(
     #' Is this node the same as the argument? (DOM-style)
     #' @param otherNode node to compare with this one
     #' @return TRUE if `otherNode` is also this one
-    isSameNode = function(otherNode) {
+    is_same_node = function(otherNode) {
       return(identical(self, otherNode)) 
     },
     
@@ -166,7 +166,7 @@ Node <- R6::R6Class(
       ie <- private$whichEdge(childNode)
       if (!is.na(ie)){
         edge <- private$edges[[ie]]
-        rv <- edge$getLabel()
+        rv <- edge$get_label()
       }
       return(rv)
     },

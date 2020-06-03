@@ -2,13 +2,13 @@
 #' Edge
 #' 
 #' @description
-#' An R6 class to represent an edge in a decision tree
+#' An R6 class to represent an edge in a graph
 #' 
-#' @details Edges are the formal term for paths linking nodes in a
-#' hierarchical tree. It is not intended that package users creating models
-#' should instantiate the `Edge` class. Instead, it is included in the
+#' @details Edges are the formal term for links between pairs of nodes in a
+#' graph. It is not intended that package users creating models should 
+#' instantiate the `Edge` class. Instead, it is included in the
 #' package as a convenience class used in the construction and traversal
-#' of decision trees by the package methods themselves, and for examining
+#' of models by the package methods themselves, and for examining
 #' and printing model structure.
 #' 
 #' @docType class
@@ -18,56 +18,81 @@
 Edge <- R6::R6Class(
   classname = "Edge",
   private = list(
-    fromNode = NULL,
-    toNode = NULL,
-    label = ""
+    source = NULL,
+    target = NULL,
+    label = "",
+    directed = TRUE
   ),
   public = list(
     
     #' @description
-    #' Create an object of type `Edge`.
-    #' @param fromNode Node nearest the root to which the edge connects.
-    #' @param toNode Node nearest the leaf to which the edge connects.
+    #' Create an object of type 'Edge'.
+    #' @param source first Node to which the edge connects.
+    #' @param target second Node to which the edge connects.
     #' @param label Character string containing the edge label.
+    #' @param directed If TRUE the edge is directed from source
+    #' to target node. Otherwise source and target are simply
+    #' names for the pair of nodes. Default is TRUE, as this is normally the
+    #' case for health economic models.
     #' @return A new `Edge` object.
-    initialize = function(fromNode, toNode, label) {
-      
-      # check and set fromNode
-      if (!inherits(fromNode, what="Node")) {
-        stop("Edge$new: `fromNode` must inherit from type `Node`")
+    initialize = function(source, target, label="", directed=TRUE) {
+      # check and set source
+      if (!inherits(source, what="Node")) {
+        rlang::abort("Argument 'source' must inherit from type 'Node'",
+                     class="non-Node_source")
       }
       else {
-        private$fromNode <- fromNode
+        private$source <- source
       }
-      
-      # check and set toNode
-      if (!inherits(toNode, what="Node")) {
-        stop(paste("Edge$new: `toNode` must inherit from type `Node` for ", label))
+      # check and set target
+      if (!inherits(target, what="Node")) {
+        rlang::abort("Argument 'target' must inherit from type 'Node'",
+                      class="non-Node_target")
       }
       else {
-        private$toNode <- toNode
+        private$target <- target
       }
-      
       # check and set label
       if (!is.character(label)) {
-        stop("Edge$new: `label` must be of type `character` not ", class(label))
+        rlang::abort("Argument 'label' must be of type 'character'", 
+                     class="non-string_label")
       }
       else {
         private$label <- label
       }
+      # check and set directed
+      if (!is.logical(directed)) {
+        rlang::abort("Argument 'directed' must be logical", 
+                     class="non-logical_directed")
+      }
+      private$directed <- directed
+    },
+
+    #' @description 
+    #' Access whether the edge is directed.
+    #' @return Logical.
+    is_directed = function() {
+      return(private$directed)
+    },
+        
+    #' @description
+    #' Access source node.
+    #' @return `Node` from which the edge leads.
+    get_source = function() {
+      return(private$source)
     },
     
     #' @description
-    #' Access toNode.
+    #' Access target node.
     #' @return `Node` to which the edge leads.
-    getToNode = function() {
-      return(private$toNode)
+    get_target = function() {
+      return(private$target)
     },
     
     #' @description
     #' Access label.
     #' @return Label of the edge; character string.
-    getLabel = function() {
+    get_label = function() {
       return(private$label)
     }
 

@@ -59,7 +59,7 @@ DecisionNode <- R6::R6Class(
     #' Return names of the choices associated with this node.
     #' @return A vector of character strings.
     get_choices = function() {
-      choices <- sapply(private$edges, FUN=function(e){e$getLabel()})
+      choices <- sapply(private$edges, FUN=function(e){e$get_label()})
       return(choices)
     }
     
