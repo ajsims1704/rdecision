@@ -11,7 +11,7 @@ test_that("incorrect node and edge types are rejected", {
   expect_error(Digraph$new(list(n1,n2), list(e1,42)), class="non-Edge_edge")
 })
 
-# tests of digraph properties
+# tests of simple digraph properties
 test_that("order and size are correct", {
 #
   n1 <- Node$new()
@@ -31,8 +31,8 @@ test_that("order and size are correct", {
   expect_equal(G$size(), 0)
 })
 
-# tests of successor and predecessor nodes
-test_that("successor and predecessor nodes are identified", {
+# test 4 node graph with a cycle
+test_that("4 node graph with cycle is correct", {
   a <- Node$new()
   b <- Node$new()
   c <- Node$new()
@@ -48,13 +48,18 @@ test_that("successor and predecessor nodes are identified", {
   #
   expect_error(G$direct_successors(42), class="non-Node_node")
   expect_error(G$direct_successors(e), class="node_not_in_tree")
-  expect_equal(G$direct_successors(a), list(b,d))
-  expect_equal(G$direct_successors(c), list(a))
-  expect_equal(G$direct_successors(d), list())
+  expect_identical(G$direct_successors(a), list(b,d))
+  expect_identical(G$direct_successors(c), list(a))
+  expect_identical(G$direct_successors(d), list())
   #
   expect_error(G$direct_predecessors(42), class="non-Node_node")
   expect_error(G$direct_predecessors(e), class="node_not_in_tree")
-  expect_equal(G$direct_predecessors(a), list(c))
-  expect_equal(G$direct_predecessors(c), list(b))
-  expect_equal(G$direct_predecessors(d), list(a))
+  expect_identical(G$direct_predecessors(a), list(c))
+  expect_identical(G$direct_predecessors(c), list(b))
+  expect_identical(G$direct_predecessors(d), list(a))
+  # 
+  expect_error(G$DFS(42), class="non-Node_node")
+  expect_error(G$DFS(e), class="node_not_in_tree")
+  expect_identical(G$DFS(a), list(a,b,c,d))
+  expect_identical(G$DFS(b), list(b,c,d))
 })

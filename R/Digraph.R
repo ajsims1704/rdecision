@@ -92,11 +92,11 @@ Digraph <- R6::R6Class(
     direct_successors = function(v) {
       successors <- list()
       if (!inherits(v, what="Node")) {
-        rlang::abort("Argument 'n' is not a Node",
+        rlang::abort("Argument 'v' is not a Node",
                      class="non-Node_node")
       }
       if (!any(sapply(private$V, function(n) {return(n$is_same_node(v))}))) {
-        rlang::abort("Argument 'n' is not in the tree", 
+        rlang::abort("Argument 'v' is not in the tree", 
                      class="node_not_in_tree")
       }
       sapply(private$E, function(e) {
@@ -114,11 +114,11 @@ Digraph <- R6::R6Class(
     direct_predecessors = function(v) {
       pred <- list()
       if (!inherits(v, what="Node")) {
-        rlang::abort("Argument 'n' is not a Node",
+        rlang::abort("Argument 'v' is not a Node",
                      class="non-Node_node")
       }
       if (!any(sapply(private$V, function(n) {return(n$is_same_node(v))}))) {
-        rlang::abort("Argument 'n' is not in the tree", 
+        rlang::abort("Argument 'v' is not in the tree", 
                      class="node_not_in_tree")
       }
       sapply(private$E, function(e) {
@@ -127,14 +127,45 @@ Digraph <- R6::R6Class(
         }
       })
       return(pred)
-    }
+    },
 
     #' @description 
     #' Non-recursive depth-first search. Starts with a specified node and
     #' finds all the nodes reachable from it.
     #' @return List of reachable nodes.
     DFS = function(v) {
-      
+      # check argument
+      if (!inherits(v, what="Node")) {
+        rlang::abort("Argument 'v' is not a Node",
+                     class="non-Node_node")
+      }
+      if (!any(sapply(private$V, function(n) {return(n$is_same_node(v))}))) {
+        rlang::abort("Argument 'v' is not in the tree", 
+                     class="node_not_in_tree")
+      }
+      # List of discovered nodes, and a stack
+      D <- list()
+      S <- list()
+      # S.push(v)
+      S <- c(S,v)
+      # while S is not empty do
+      while (length(S)>0) {
+        # v = S.pop()
+        v <- S[[length(S)]]
+        S[[length(S)]] <- NULL
+        # if v is not labelled as discovered then
+        if (!any(sapply(D,function(n){return(n$is_same_node(v))}))) {
+          # label v as discovered
+          D <- c(D,v)
+          # for all edges from v to w in G.adjacentEdges(v) do
+          for (w in self$direct_successors(v)) {
+            # S.push(w)
+            S <- c(S,w)
+          }
+        }
+      }
+      # return discovered nodes
+      return(D)
     }  
         
 #    procedure DFS-iterative(G, v) is
