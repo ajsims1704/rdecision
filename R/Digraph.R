@@ -8,7 +8,8 @@
 #' @details 
 #' The types of health economic model supported by `rdecision` are forms of
 #' digraph, insofar as they are a set of objects in which some pairs of objects
-#' are related. in `rdecision` terminology, the objects (vertices) are Nodes
+#' are directionally related. in `rdecision` terminology, the objects (vertices) 
+#' are Nodes
 #' and the relationships are directed edges (arrows). Formally, each type of
 #' model is a particular form of digraph, as follows:
 #' \describe{
@@ -132,7 +133,7 @@ Digraph <- R6::R6Class(
     #' @description 
     #' Non-recursive depth-first search. Starts with a specified node and
     #' finds all the nodes reachable from it.
-    #' @return List of reachable nodes.
+    #' @return List of reachable nodes, including self.
     DFS = function(v) {
       # check argument
       if (!inherits(v, what="Node")) {

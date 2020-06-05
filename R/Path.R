@@ -57,7 +57,7 @@ Path <- R6::R6Class(
         thisNode <- private$nodes[[i]]
         nextNode <- private$nodes[[i+1]]
         if (thisNode$node_type()=='DecisionNode') {
-          rc <- thisNode$get_label(nextNode)
+          rc <- thisNode$get_edge_label(nextNode)
           break
         }
       }

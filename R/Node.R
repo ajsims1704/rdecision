@@ -16,6 +16,7 @@
 Node <- R6::R6Class(
   classname = "Node",
   private = list(
+    label = "",
     
     # field list of Edge objects linking to child objects
     edges = NULL,
@@ -57,10 +58,22 @@ Node <- R6::R6Class(
     
     #' @description
     #' Create new Node object.
+    #' @param label An optional label for the node.
     #' @return A new Node object.
-    initialize = function() {
+    initialize = function(label="") {
+      if (!is.character(label)) {
+        rlang::abort("Argument label is not a string", class="non-string_label")
+      }
+      private$label <- label
       private$edges <- list()
       return(invisible(self))
+    },
+    
+    #' @description 
+    #' Return the label of the node.
+    #' @return Label as a character string.
+    get_label = function() {
+      return(private$label)
     },
     
     #' @description
@@ -161,7 +174,7 @@ Node <- R6::R6Class(
     #' Return label of edge which links to specified child node
     #' @param childNode child node to which find label of linking edge
     #' @return label as character string
-    get_label = function(childNode) {
+    get_edge_label = function(childNode) {
       rv <- NA
       ie <- private$whichEdge(childNode)
       if (!is.na(ie)){
