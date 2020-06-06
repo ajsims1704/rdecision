@@ -18,20 +18,20 @@ Node <- R6::R6Class(
   private = list(
     label = "",
     
-    # field list of Edge objects linking to child objects
+    # field list of Arrow objects linking to child objects
     edges = NULL,
     
     # description
     # Add an edge linking to a child node
     # return 
     # An updated Node object
-    addEdge = function(edge) {
-      if (inherits(x=edge, what='Edge')) {
+    addArrow = function(edge) {
+      if (inherits(x=edge, what='Arrow')) {
         private$edges <- c(private$edges, edge)
       }
       else {
-        rlang::abort("Argument edge must inherit from Edge",
-                     class="non-Edge_edge")
+        rlang::abort("Argument edge must inherit from Arrow",
+                     class="non-Arrow_edge")
       }
       return(invisible(self))
     },
@@ -40,7 +40,7 @@ Node <- R6::R6Class(
     # find index of edge connected to a given child node
     # param childNode child node to which to find edge
     # return index of edge, or NA if no link to that child
-    whichEdge = function(childNode) {
+    whichArrow = function(childNode) {
       re <- NA
       for (i in 1:length(private$edges)) {
         e <- private$edges[[i]]
@@ -176,7 +176,7 @@ Node <- R6::R6Class(
     #' @return label as character string
     get_edge_label = function(childNode) {
       rv <- NA
-      ie <- private$whichEdge(childNode)
+      ie <- private$whichArrow(childNode)
       if (!is.na(ie)){
         edge <- private$edges[[ie]]
         rv <- edge$get_label()

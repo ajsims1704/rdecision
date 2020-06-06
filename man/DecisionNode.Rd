@@ -4,9 +4,6 @@
 \name{DecisionNode}
 \alias{DecisionNode}
 \title{DecisionNode}
-\value{
-Updated DecisionNode object.
-}
 \description{
 An R6 class for a decision node in a decision tree
 }
@@ -24,28 +21,23 @@ Andrew J. Sims \email{andrew.sims@newcastle.ac.uk}
 \subsection{Public methods}{
 \itemize{
 \item \href{#method-new}{\code{DecisionNode$new()}}
-\item \href{#method-get_modvars}{\code{DecisionNode$get_modvars()}}
-\item \href{#method-sample_modvars}{\code{DecisionNode$sample_modvars()}}
-\item \href{#method-updateEdges}{\code{DecisionNode$updateEdges()}}
-\item \href{#method-updateTree}{\code{DecisionNode$updateTree()}}
-\item \href{#method-evaluatePathways}{\code{DecisionNode$evaluatePathways()}}
-\item \href{#method-evaluateChoices}{\code{DecisionNode$evaluateChoices()}}
+\item \href{#method-get_choices}{\code{DecisionNode$get_choices()}}
 \item \href{#method-clone}{\code{DecisionNode$clone()}}
 }
 }
 \if{html}{
 \out{<details ><summary>Inherited methods</summary>}
 \itemize{
-\item \out{<span class="pkg-link" data-pkg="rdecision" data-topic="Node" data-id="childNodes">}\href{../../rdecision/html/Node.html#method-childNodes}{\code{rdecision::Node$childNodes()}}\out{</span>}
+\item \out{<span class="pkg-link" data-pkg="rdecision" data-topic="Node" data-id="child_nodes">}\href{../../rdecision/html/Node.html#method-child_nodes}{\code{rdecision::Node$child_nodes()}}\out{</span>}
 \item \out{<span class="pkg-link" data-pkg="rdecision" data-topic="Node" data-id="descendantNodes">}\href{../../rdecision/html/Node.html#method-descendantNodes}{\code{rdecision::Node$descendantNodes()}}\out{</span>}
-\item \out{<span class="pkg-link" data-pkg="rdecision" data-topic="Node" data-id="getCost">}\href{../../rdecision/html/Node.html#method-getCost}{\code{rdecision::Node$getCost()}}\out{</span>}
-\item \out{<span class="pkg-link" data-pkg="rdecision" data-topic="Node" data-id="getLabel">}\href{../../rdecision/html/Node.html#method-getLabel}{\code{rdecision::Node$getLabel()}}\out{</span>}
-\item \out{<span class="pkg-link" data-pkg="rdecision" data-topic="Node" data-id="getP">}\href{../../rdecision/html/Node.html#method-getP}{\code{rdecision::Node$getP()}}\out{</span>}
+\item \out{<span class="pkg-link" data-pkg="rdecision" data-topic="Node" data-id="get_edge_label">}\href{../../rdecision/html/Node.html#method-get_edge_label}{\code{rdecision::Node$get_edge_label()}}\out{</span>}
+\item \out{<span class="pkg-link" data-pkg="rdecision" data-topic="Node" data-id="get_label">}\href{../../rdecision/html/Node.html#method-get_label}{\code{rdecision::Node$get_label()}}\out{</span>}
+\item \out{<span class="pkg-link" data-pkg="rdecision" data-topic="Node" data-id="get_modvars">}\href{../../rdecision/html/Node.html#method-get_modvars}{\code{rdecision::Node$get_modvars()}}\out{</span>}
 \item \out{<span class="pkg-link" data-pkg="rdecision" data-topic="Node" data-id="getPathways">}\href{../../rdecision/html/Node.html#method-getPathways}{\code{rdecision::Node$getPathways()}}\out{</span>}
-\item \out{<span class="pkg-link" data-pkg="rdecision" data-topic="Node" data-id="getUtility">}\href{../../rdecision/html/Node.html#method-getUtility}{\code{rdecision::Node$getUtility()}}\out{</span>}
-\item \out{<span class="pkg-link" data-pkg="rdecision" data-topic="Node" data-id="hasChildNodes">}\href{../../rdecision/html/Node.html#method-hasChildNodes}{\code{rdecision::Node$hasChildNodes()}}\out{</span>}
-\item \out{<span class="pkg-link" data-pkg="rdecision" data-topic="Node" data-id="isSameNode">}\href{../../rdecision/html/Node.html#method-isSameNode}{\code{rdecision::Node$isSameNode()}}\out{</span>}
-\item \out{<span class="pkg-link" data-pkg="rdecision" data-topic="Node" data-id="nodeType">}\href{../../rdecision/html/Node.html#method-nodeType}{\code{rdecision::Node$nodeType()}}\out{</span>}
+\item \out{<span class="pkg-link" data-pkg="rdecision" data-topic="Node" data-id="has_child_nodes">}\href{../../rdecision/html/Node.html#method-has_child_nodes}{\code{rdecision::Node$has_child_nodes()}}\out{</span>}
+\item \out{<span class="pkg-link" data-pkg="rdecision" data-topic="Node" data-id="is_same_node">}\href{../../rdecision/html/Node.html#method-is_same_node}{\code{rdecision::Node$is_same_node()}}\out{</span>}
+\item \out{<span class="pkg-link" data-pkg="rdecision" data-topic="Node" data-id="node_type">}\href{../../rdecision/html/Node.html#method-node_type}{\code{rdecision::Node$node_type()}}\out{</span>}
+\item \out{<span class="pkg-link" data-pkg="rdecision" data-topic="Node" data-id="sample_modvars">}\href{../../rdecision/html/Node.html#method-sample_modvars}{\code{rdecision::Node$sample_modvars()}}\out{</span>}
 \item \out{<span class="pkg-link" data-pkg="rdecision" data-topic="Node" data-id="tabulate_modvars">}\href{../../rdecision/html/Node.html#method-tabulate_modvars}{\code{rdecision::Node$tabulate_modvars()}}\out{</span>}
 }
 \out{</details>}
@@ -56,7 +48,7 @@ Andrew J. Sims \email{andrew.sims@newcastle.ac.uk}
 \subsection{Method \code{new()}}{
 Create a new decision node.
 \subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{DecisionNode$new(children, edgelabels, costs)}\if{html}{\out{</div>}}
+\if{html}{\out{<div class="r">}}\preformatted{DecisionNode$new(children, choices)}\if{html}{\out{</div>}}
 }
 
 \subsection{Arguments}{
@@ -65,12 +57,8 @@ Create a new decision node.
 \item{\code{children}}{A list of Nodes which are the children of this
 decision node.}
 
-\item{\code{edgelabels}}{A vector of character stings containing the labels
+\item{\code{choices}}{A list of character stings containing the labels
 of each choice associated with the decision.}
-
-\item{\code{costs}}{A list of values containing the costs associated
-with each choice. Each value can be a numeric variable,
-or a ModVar.}
 }
 \if{html}{\out{</div>}}
 }
@@ -79,152 +67,16 @@ A new DecisionNode object
 }
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-get_modvars"></a>}}
-\if{latex}{\out{\hypertarget{method-get_modvars}{}}}
-\subsection{Method \code{get_modvars()}}{
-Return the list of model variables associated with the node. The
-model variables may be associated with costs or probabilities.
+\if{html}{\out{<a id="method-get_choices"></a>}}
+\if{latex}{\out{\hypertarget{method-get_choices}{}}}
+\subsection{Method \code{get_choices()}}{
+Return names of the choices associated with this node.
 \subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{DecisionNode$get_modvars()}\if{html}{\out{</div>}}
+\if{html}{\out{<div class="r">}}\preformatted{DecisionNode$get_choices()}\if{html}{\out{</div>}}
 }
 
 \subsection{Returns}{
-List of model variables.
-}
-}
-\if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-sample_modvars"></a>}}
-\if{latex}{\out{\hypertarget{method-sample_modvars}{}}}
-\subsection{Method \code{sample_modvars()}}{
-Sample all model variables in this node and update edges.
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{DecisionNode$sample_modvars(expected = FALSE)}\if{html}{\out{</div>}}
-}
-
-\subsection{Arguments}{
-\if{html}{\out{<div class="arguments">}}
-\describe{
-\item{\code{expected}}{If TRUE cause each model variable to return its expected
-value at the next call to `value()`. If FALSE each model variable
-will return the sampled value. Default is FALSE.}
-}
-\if{html}{\out{</div>}}
-}
-\subsection{Returns}{
-An updated DecisionNode object.
-}
-}
-\if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-updateEdges"></a>}}
-\if{latex}{\out{\hypertarget{method-updateEdges}{}}}
-\subsection{Method \code{updateEdges()}}{
-Update numerical values in edges.
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{DecisionNode$updateEdges()}\if{html}{\out{</div>}}
-}
-
-\subsection{Returns}{
-An updated Node object.
-}
-}
-\if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-updateTree"></a>}}
-\if{latex}{\out{\hypertarget{method-updateTree}{}}}
-\subsection{Method \code{updateTree()}}{
-Update the tree by sampling model variables and then updating numerical
-edge values.
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{DecisionNode$updateTree(expected = TRUE)}\if{html}{\out{</div>}}
-}
-
-\subsection{Arguments}{
-\if{html}{\out{<div class="arguments">}}
-\describe{
-\item{\code{expected}}{if TRUE set model variables to their expectation; 
-otherwise sample from their uncertainty distributions.}
-}
-\if{html}{\out{</div>}}
-}
-}
-\if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-evaluatePathways"></a>}}
-\if{latex}{\out{\hypertarget{method-evaluatePathways}{}}}
-\subsection{Method \code{evaluatePathways()}}{
-Evaluate a decision. Starting with this decision node, the function
-works though all possible paths and computes the probability,
-cost and utility of each.
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{DecisionNode$evaluatePathways(expected = TRUE, uncorrelate = FALSE)}\if{html}{\out{</div>}}
-}
-
-\subsection{Arguments}{
-\if{html}{\out{<div class="arguments">}}
-\describe{
-\item{\code{expected}}{If TRUE, evaluate each model variable as its mean value,
-otherwise sample each one from their uncertainty distrbution.}
-
-\item{\code{uncorrelate}}{If TRUE, resample and update the tree between
-the evaluation of each choice. This causes any model variables that
-are common to more than one choice to be resampled between choices,
-and removes correlation due to shared model variables. Other forms
-of correlation may not be removed.}
-}
-\if{html}{\out{</div>}}
-}
-\subsection{Returns}{
-A data frame with one row per path and columns organized as
-follows:
-\describe{
-\item{Choice}{The choice with which the path is associated.}
-\item{Pathway}{The leaf node on which the pathway ends; normally the 
-clinical outcome.}
-\item{Probability}{The probability of traversing the pathway. The total
-probability of each choice should sum to unity; i.e. the sum of the 
-Probability column should equal the number of branches leaving the 
-decision node.}
-\item{Cost}{The cost of traversing the pathway.}
-\item{ExpectedCost}{Cost \eqn{*} probability of traversing the pathway.}
-\item{Utility}{The utility associated with the outcome.}
-\item{ExpectedUtility}{Utility \eqn{*} probability of traversing the pathway.}
-}
-}
-}
-\if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-evaluateChoices"></a>}}
-\if{latex}{\out{\hypertarget{method-evaluateChoices}{}}}
-\subsection{Method \code{evaluateChoices()}}{
-Evaluate each choice. Starting with this decision node, the function
-works though all possible paths and computes the probability,
-cost and utility of each, then aggregates by choice.
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{DecisionNode$evaluateChoices(expected = TRUE, uncorrelate = FALSE, N = 1)}\if{html}{\out{</div>}}
-}
-
-\subsection{Arguments}{
-\if{html}{\out{<div class="arguments">}}
-\describe{
-\item{\code{expected}}{If TRUE, evaluate each model variable as its mean value,
-otherwise sample each one from their uncertainty distrbution.}
-
-\item{\code{uncorrelate}}{If TRUE, resample and update the tree between
-the evaluation of each choice. This causes any model variables that
-are common to more than one choice to be resampled between choices,
-and removes correlation due to shared model variables.}
-
-\item{\code{N}}{Number of replicates. Intended for use with PSA (expected=F);
-use with expected=T will be repetitive and uninformative.}
-}
-\if{html}{\out{</div>}}
-}
-\subsection{Returns}{
-A data frame with one row per choice per run and columns
-organized as follows:
-\describe{
-\item{Run}{The run number}
-\item{Choice}{The choice.}
-\item{Cost}{Aggregate cost of the choice.}
-\item{Utility}{Aggregate utility of the choice.}
-}
+A vector of character strings.
 }
 }
 \if{html}{\out{<hr>}}

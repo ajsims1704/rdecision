@@ -5,7 +5,18 @@
 #' An R6 class for a Markov model with cohort simulation.
 #' 
 #' @details 
-#' A class to represent a complete Markov model.
+#' A class to represent a Markov model.
+#' 
+#' @note
+#' In graph theory, a Markov model is a directed multigraph permitting loops (a 
+#' loop multidigraph), optionally labelled, or 'quiver'. It is a multigraph
+#' because there are two edges between each pair of nodes {A,B} representing
+#' the transition
+#' probabilities from A to B and *vice-versa*. And it is a directed graph because
+#' the transition probabilities refer to transitions in one direction. Each
+#' edge can be optionally labelled. It permits loops (edges whose source and
+#' target are the same node) to represent patients that remain in the same 
+#' state between cycles.}
 #' 
 #' @docType class
 #' @author Andrew J. Sims \email{andrew.sims@@newcastle.ac.uk}

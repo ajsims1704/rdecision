@@ -8,31 +8,28 @@
 An R6 class to represent a node in a decision tree
 }
 \details{
-Base class to represent a single node in a decision tree. Non subclassed
-nodes are not expected to be created as model objects. Document Object
+Base class to represent a single node in a decision tree. Objects of base
+class Node are not expected to be created as model objects. Document Object
 Model (DOM) names are used for node methods as far as possibe.
 }
 \author{
-Andrew Sims \email{andrew.sims5@nhs.net}
+Andrew Sims \email{andrew.sims@newcastle.ac.uk}
 }
 \section{Methods}{
 \subsection{Public methods}{
 \itemize{
 \item \href{#method-new}{\code{Node$new()}}
-\item \href{#method-hasChildNodes}{\code{Node$hasChildNodes()}}
-\item \href{#method-childNodes}{\code{Node$childNodes()}}
+\item \href{#method-get_label}{\code{Node$get_label()}}
+\item \href{#method-has_child_nodes}{\code{Node$has_child_nodes()}}
+\item \href{#method-child_nodes}{\code{Node$child_nodes()}}
 \item \href{#method-descendantNodes}{\code{Node$descendantNodes()}}
-\item \href{#method-isSameNode}{\code{Node$isSameNode()}}
-\item \href{#method-nodeType}{\code{Node$nodeType()}}
+\item \href{#method-is_same_node}{\code{Node$is_same_node()}}
+\item \href{#method-node_type}{\code{Node$node_type()}}
 \item \href{#method-getPathways}{\code{Node$getPathways()}}
-\item \href{#method-getLabel}{\code{Node$getLabel()}}
-\item \href{#method-getP}{\code{Node$getP()}}
-\item \href{#method-getUtility}{\code{Node$getUtility()}}
-\item \href{#method-getCost}{\code{Node$getCost()}}
+\item \href{#method-get_edge_label}{\code{Node$get_edge_label()}}
 \item \href{#method-get_modvars}{\code{Node$get_modvars()}}
 \item \href{#method-tabulate_modvars}{\code{Node$tabulate_modvars()}}
 \item \href{#method-sample_modvars}{\code{Node$sample_modvars()}}
-\item \href{#method-updateEdges}{\code{Node$updateEdges()}}
 \item \href{#method-clone}{\code{Node$clone()}}
 }
 }
@@ -42,20 +39,40 @@ Andrew Sims \email{andrew.sims5@nhs.net}
 \subsection{Method \code{new()}}{
 Create new Node object.
 \subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{Node$new()}\if{html}{\out{</div>}}
+\if{html}{\out{<div class="r">}}\preformatted{Node$new(label = "")}\if{html}{\out{</div>}}
 }
 
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{label}}{An optional label for the node.}
+}
+\if{html}{\out{</div>}}
+}
 \subsection{Returns}{
 A new Node object.
 }
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-hasChildNodes"></a>}}
-\if{latex}{\out{\hypertarget{method-hasChildNodes}{}}}
-\subsection{Method \code{hasChildNodes()}}{
+\if{html}{\out{<a id="method-get_label"></a>}}
+\if{latex}{\out{\hypertarget{method-get_label}{}}}
+\subsection{Method \code{get_label()}}{
+Return the label of the node.
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{Node$get_label()}\if{html}{\out{</div>}}
+}
+
+\subsection{Returns}{
+Label as a character string.
+}
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-has_child_nodes"></a>}}
+\if{latex}{\out{\hypertarget{method-has_child_nodes}{}}}
+\subsection{Method \code{has_child_nodes()}}{
 Does the node have any child nodes? (DOM-style)
 \subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{Node$hasChildNodes()}\if{html}{\out{</div>}}
+\if{html}{\out{<div class="r">}}\preformatted{Node$has_child_nodes()}\if{html}{\out{</div>}}
 }
 
 \subsection{Returns}{
@@ -63,12 +80,12 @@ TRUE if node has children, FALSE if not
 }
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-childNodes"></a>}}
-\if{latex}{\out{\hypertarget{method-childNodes}{}}}
-\subsection{Method \code{childNodes()}}{
+\if{html}{\out{<a id="method-child_nodes"></a>}}
+\if{latex}{\out{\hypertarget{method-child_nodes}{}}}
+\subsection{Method \code{child_nodes()}}{
 Return list of child nodes (DOM-style)
 \subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{Node$childNodes()}\if{html}{\out{</div>}}
+\if{html}{\out{<div class="r">}}\preformatted{Node$child_nodes()}\if{html}{\out{</div>}}
 }
 
 \subsection{Returns}{
@@ -89,12 +106,12 @@ List of descendent nodes, including self.
 }
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-isSameNode"></a>}}
-\if{latex}{\out{\hypertarget{method-isSameNode}{}}}
-\subsection{Method \code{isSameNode()}}{
+\if{html}{\out{<a id="method-is_same_node"></a>}}
+\if{latex}{\out{\hypertarget{method-is_same_node}{}}}
+\subsection{Method \code{is_same_node()}}{
 Is this node the same as the argument? (DOM-style)
 \subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{Node$isSameNode(otherNode)}\if{html}{\out{</div>}}
+\if{html}{\out{<div class="r">}}\preformatted{Node$is_same_node(otherNode)}\if{html}{\out{</div>}}
 }
 
 \subsection{Arguments}{
@@ -109,12 +126,12 @@ TRUE if `otherNode` is also this one
 }
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-nodeType"></a>}}
-\if{latex}{\out{\hypertarget{method-nodeType}{}}}
-\subsection{Method \code{nodeType()}}{
+\if{html}{\out{<a id="method-node_type"></a>}}
+\if{latex}{\out{\hypertarget{method-node_type}{}}}
+\subsection{Method \code{node_type()}}{
 node type (DOM-style)
 \subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{Node$nodeType()}\if{html}{\out{</div>}}
+\if{html}{\out{<div class="r">}}\preformatted{Node$node_type()}\if{html}{\out{</div>}}
 }
 
 \subsection{Returns}{
@@ -145,12 +162,12 @@ with choice, if defined.
 }
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-getLabel"></a>}}
-\if{latex}{\out{\hypertarget{method-getLabel}{}}}
-\subsection{Method \code{getLabel()}}{
+\if{html}{\out{<a id="method-get_edge_label"></a>}}
+\if{latex}{\out{\hypertarget{method-get_edge_label}{}}}
+\subsection{Method \code{get_edge_label()}}{
 Return label of edge which links to specified child node
 \subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{Node$getLabel(childNode)}\if{html}{\out{</div>}}
+\if{html}{\out{<div class="r">}}\preformatted{Node$get_edge_label(childNode)}\if{html}{\out{</div>}}
 }
 
 \subsection{Arguments}{
@@ -162,60 +179,6 @@ Return label of edge which links to specified child node
 }
 \subsection{Returns}{
 label as character string
-}
-}
-\if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-getP"></a>}}
-\if{latex}{\out{\hypertarget{method-getP}{}}}
-\subsection{Method \code{getP()}}{
-Function to return the conditional probability of the edge which links to
-the specified child node
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{Node$getP(childNode)}\if{html}{\out{</div>}}
-}
-
-\subsection{Arguments}{
-\if{html}{\out{<div class="arguments">}}
-\describe{
-\item{\code{childNode}}{child node to which to find probability of linking edge}
-}
-\if{html}{\out{</div>}}
-}
-\subsection{Returns}{
-numerical value of probability
-}
-}
-\if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-getUtility"></a>}}
-\if{latex}{\out{\hypertarget{method-getUtility}{}}}
-\subsection{Method \code{getUtility()}}{
-function to return the utility associated with the node
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{Node$getUtility()}\if{html}{\out{</div>}}
-}
-
-\subsection{Returns}{
-Utility, numeric
-}
-}
-\if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-getCost"></a>}}
-\if{latex}{\out{\hypertarget{method-getCost}{}}}
-\subsection{Method \code{getCost()}}{
-Function to return the cost of the edge which links to the specified child node
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{Node$getCost(childNode)}\if{html}{\out{</div>}}
-}
-
-\subsection{Arguments}{
-\if{html}{\out{<div class="arguments">}}
-\describe{
-\item{\code{childNode}}{child node to identify edge with associated cost of traversal}
-}
-\if{html}{\out{</div>}}
-}
-\subsection{Returns}{
-Cost, numerical value
 }
 }
 \if{html}{\out{<hr>}}
@@ -285,19 +248,6 @@ the node; otherwise sample from their uncertainty distributions.}
 }
 \if{html}{\out{</div>}}
 }
-\subsection{Returns}{
-Updated Node object
-}
-}
-\if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-updateEdges"></a>}}
-\if{latex}{\out{\hypertarget{method-updateEdges}{}}}
-\subsection{Method \code{updateEdges()}}{
-Update the values on the edges associated with the node.
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{Node$updateEdges()}\if{html}{\out{</div>}}
-}
-
 \subsection{Returns}{
 Updated Node object
 }

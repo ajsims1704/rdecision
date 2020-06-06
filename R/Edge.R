@@ -2,14 +2,10 @@
 #' Edge
 #' 
 #' @description
-#' An R6 class to represent an directed edge in a digraph
+#' An R6 class to represent an edge in a graph.
 #' 
 #' @details Edges are the formal term for links between pairs of nodes in a
-#' graph. It is not intended that package users creating models should 
-#' instantiate the `Edge` class. Instead, it is included in the
-#' package as a convenience class used in the construction and traversal
-#' of models by the package methods themselves, and for examining
-#' and printing model structure.
+#' graph. 
 #' 
 #' @docType class
 #' @author Andrew J. Sims \email{andrew.sims@@newcastle.ac.uk}
@@ -18,65 +14,54 @@
 Edge <- R6::R6Class(
   classname = "Edge",
   private = list(
-    source = NULL,
-    target = NULL,
-    label = ""
+    v1 = NULL,
+    v2 = NULL,
+    edgelabel = ""
   ),
   public = list(
     
     #' @description
     #' Create an object of type 'Edge'.
-    #' @param source Node from which the edge comes.
-    #' @param target second Node to which the edge connects.
+    #' @param v1 Node at one endpoint of the edge.
+    #' @param v2 Node at the other endpoint of the edge.
     #' @param label Character string containing the edge label.
     #' @return A new `Edge` object.
-    initialize = function(source, target, label="") {
-      # check and set source
-      if (!inherits(source, what="Node")) {
-        rlang::abort("Argument 'source' must inherit from type 'Node'",
-                     class="non-Node_source")
+    initialize = function(v1, v2, label="") {
+      # check and set v1
+      if (!inherits(v1, what="Node")) {
+        rlang::abort("'v1' must be a 'Node'", class="non-Node_endpoint")
       }
       else {
-        private$source <- source
+        private$v1 <- v1
       }
-      # check and set target
-      if (!inherits(target, what="Node")) {
-        rlang::abort("Argument 'target' must inherit from type 'Node'",
-                      class="non-Node_target")
+      # check and set v2
+      if (!inherits(v2, what="Node")) {
+        rlang::abort("'v2' must be a 'Node'", class="non-Node_endpoint")
       }
       else {
-        private$target <- target
+        private$v2 <- v2
       }
       # check and set label
       if (!is.character(label)) {
-        rlang::abort("Argument 'label' must be of type 'character'", 
-                     class="non-string_label")
+        rlang::abort("'label' must be a string", class="non-string_label")
       }
       else {
-        private$label <- label
+        private$edgelabel <- label
       }
-    },
-
-    #' @description
-    #' Access source node.
-    #' @return `Node` from which the edge leads.
-    get_source = function() {
-      return(private$source)
     },
     
     #' @description
-    #' Access target node.
-    #' @return `Node` to which the edge leads.
-    get_target = function() {
-      return(private$target)
+    #' Retrieve the endpoints of the edge.
+    #' @return List of two nodes to which the edge is connected.
+    endpoints = function() {
+      return(c(private$v1, private$v2))
     },
     
     #' @description
     #' Access label.
     #' @return Label of the edge; character string.
-    get_label = function() {
-      return(private$label)
+    label = function() {
+      return(private$edgelabel)
     }
-
   )
 )

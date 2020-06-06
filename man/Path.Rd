@@ -19,12 +19,12 @@ Assumes the leaf node is the last node in the list.
 Assumes the nodes are supplied in order of traversal and that
 the final node is a leaf node.
 
-Assumes that the final node is a leaf node.
+Assumes that the cost is associated with final 'state' node.
 
 Assumes that only the final leaf node has a utility value.
 }
 \author{
-Andrew J. Sims \email{andrew.sims5@nhs.net}
+Andrew J. Sims \email{andrew.sims@newcastle.ac.uk}
 }
 \section{Methods}{
 \subsection{Public methods}{
@@ -33,8 +33,8 @@ Andrew J. Sims \email{andrew.sims5@nhs.net}
 \item \href{#method-getChoice}{\code{Path$getChoice()}}
 \item \href{#method-getName}{\code{Path$getName()}}
 \item \href{#method-getProbability}{\code{Path$getProbability()}}
-\item \href{#method-getCost}{\code{Path$getCost()}}
-\item \href{#method-getUtility}{\code{Path$getUtility()}}
+\item \href{#method-get_cost}{\code{Path$get_cost()}}
+\item \href{#method-get_utility}{\code{Path$get_utility()}}
 \item \href{#method-tabulate}{\code{Path$tabulate()}}
 \item \href{#method-clone}{\code{Path$clone()}}
 }
@@ -78,7 +78,7 @@ label of the choice; specifically the \code{edgelabel}
 \if{latex}{\out{\hypertarget{method-getName}{}}}
 \subsection{Method \code{getName()}}{
 Returns the name of the pathway from the (final) leaf
-node of a list of nodes.
+node of a list of nodes (a 'State' node).
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{Path$getName()}\if{html}{\out{</div>}}
 }
@@ -103,13 +103,13 @@ Product of conditional probabilities.
 }
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-getCost"></a>}}
-\if{latex}{\out{\hypertarget{method-getCost}{}}}
-\subsection{Method \code{getCost()}}{
+\if{html}{\out{<a id="method-get_cost"></a>}}
+\if{latex}{\out{\hypertarget{method-get_cost}{}}}
+\subsection{Method \code{get_cost()}}{
 Calculates the sum of the pathway costs in
 the tree traversal.
 \subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{Path$getCost()}\if{html}{\out{</div>}}
+\if{html}{\out{<div class="r">}}\preformatted{Path$get_cost()}\if{html}{\out{</div>}}
 }
 
 \subsection{Returns}{
@@ -117,13 +117,13 @@ Sum of the pathway costs.
 }
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-getUtility"></a>}}
-\if{latex}{\out{\hypertarget{method-getUtility}{}}}
-\subsection{Method \code{getUtility()}}{
+\if{html}{\out{<a id="method-get_utility"></a>}}
+\if{latex}{\out{\hypertarget{method-get_utility}{}}}
+\subsection{Method \code{get_utility()}}{
 Calculates the sum of the pathway utilities in
 the tree traversal.
 \subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{Path$getUtility()}\if{html}{\out{</div>}}
+\if{html}{\out{<div class="r">}}\preformatted{Path$get_utility()}\if{html}{\out{</div>}}
 }
 
 \subsection{Returns}{

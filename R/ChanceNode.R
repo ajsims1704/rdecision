@@ -89,8 +89,8 @@ ChanceNode <- R6::R6Class(
 
       ## add edges to this node
       for (i in 1:length(children)) {
-        edge <- Edge$new(self, children[[i]], edgelabels[[i]])
-        private$addEdge(edge)
+        edge <- Arrow$new(self, children[[i]], edgelabels[[i]])
+        private$addArrow(edge)
       }
 
       ## set ptype
@@ -196,7 +196,7 @@ ChanceNode <- R6::R6Class(
       }
       # return the single p value associated with the edge to the given child node
       rv <- 0
-      ie <- private$whichEdge(childNode)
+      ie <- private$whichArrow(childNode)
       if (!is.na(ie)){
         rv <- pedge[ie]
       }

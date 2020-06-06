@@ -49,8 +49,8 @@ DecisionNode <- R6::R6Class(
       })
       # add edges to this node
       for (i in 1:length(children)) {
-        edge <- Edge$new(self, children[[i]], choices[[i]])
-        private$addEdge(edge)
+        edge <- Arrow$new(self, children[[i]], choices[[i]])
+        private$addArrow(edge)
       }
       return(invisible(self))
     },

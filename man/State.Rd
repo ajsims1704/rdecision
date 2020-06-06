@@ -16,7 +16,7 @@ a leaf node with no children or a Markov state, in the construction of a
 Markov cycle tree.
 }
 \author{
-Andrew J. Sims \email{andrew.sims5@newcastle.ac.uk}
+Andrew J. Sims \email{andrew.sims@newcastle.ac.uk}
 }
 \section{Super class}{
 \code{\link[rdecision:Node]{rdecision::Node}} -> \code{State}
@@ -26,6 +26,7 @@ Andrew J. Sims \email{andrew.sims5@newcastle.ac.uk}
 \itemize{
 \item \href{#method-new}{\code{State$new()}}
 \item \href{#method-get_name}{\code{State$get_name()}}
+\item \href{#method-get_cost}{\code{State$get_cost()}}
 \item \href{#method-get_utility}{\code{State$get_utility()}}
 \item \href{#method-clone}{\code{State$clone()}}
 }
@@ -33,20 +34,17 @@ Andrew J. Sims \email{andrew.sims5@newcastle.ac.uk}
 \if{html}{
 \out{<details ><summary>Inherited methods</summary>}
 \itemize{
-\item \out{<span class="pkg-link" data-pkg="rdecision" data-topic="Node" data-id="childNodes">}\href{../../rdecision/html/Node.html#method-childNodes}{\code{rdecision::Node$childNodes()}}\out{</span>}
+\item \out{<span class="pkg-link" data-pkg="rdecision" data-topic="Node" data-id="child_nodes">}\href{../../rdecision/html/Node.html#method-child_nodes}{\code{rdecision::Node$child_nodes()}}\out{</span>}
 \item \out{<span class="pkg-link" data-pkg="rdecision" data-topic="Node" data-id="descendantNodes">}\href{../../rdecision/html/Node.html#method-descendantNodes}{\code{rdecision::Node$descendantNodes()}}\out{</span>}
+\item \out{<span class="pkg-link" data-pkg="rdecision" data-topic="Node" data-id="get_edge_label">}\href{../../rdecision/html/Node.html#method-get_edge_label}{\code{rdecision::Node$get_edge_label()}}\out{</span>}
+\item \out{<span class="pkg-link" data-pkg="rdecision" data-topic="Node" data-id="get_label">}\href{../../rdecision/html/Node.html#method-get_label}{\code{rdecision::Node$get_label()}}\out{</span>}
 \item \out{<span class="pkg-link" data-pkg="rdecision" data-topic="Node" data-id="get_modvars">}\href{../../rdecision/html/Node.html#method-get_modvars}{\code{rdecision::Node$get_modvars()}}\out{</span>}
-\item \out{<span class="pkg-link" data-pkg="rdecision" data-topic="Node" data-id="getCost">}\href{../../rdecision/html/Node.html#method-getCost}{\code{rdecision::Node$getCost()}}\out{</span>}
-\item \out{<span class="pkg-link" data-pkg="rdecision" data-topic="Node" data-id="getLabel">}\href{../../rdecision/html/Node.html#method-getLabel}{\code{rdecision::Node$getLabel()}}\out{</span>}
-\item \out{<span class="pkg-link" data-pkg="rdecision" data-topic="Node" data-id="getP">}\href{../../rdecision/html/Node.html#method-getP}{\code{rdecision::Node$getP()}}\out{</span>}
 \item \out{<span class="pkg-link" data-pkg="rdecision" data-topic="Node" data-id="getPathways">}\href{../../rdecision/html/Node.html#method-getPathways}{\code{rdecision::Node$getPathways()}}\out{</span>}
-\item \out{<span class="pkg-link" data-pkg="rdecision" data-topic="Node" data-id="getUtility">}\href{../../rdecision/html/Node.html#method-getUtility}{\code{rdecision::Node$getUtility()}}\out{</span>}
-\item \out{<span class="pkg-link" data-pkg="rdecision" data-topic="Node" data-id="hasChildNodes">}\href{../../rdecision/html/Node.html#method-hasChildNodes}{\code{rdecision::Node$hasChildNodes()}}\out{</span>}
-\item \out{<span class="pkg-link" data-pkg="rdecision" data-topic="Node" data-id="isSameNode">}\href{../../rdecision/html/Node.html#method-isSameNode}{\code{rdecision::Node$isSameNode()}}\out{</span>}
-\item \out{<span class="pkg-link" data-pkg="rdecision" data-topic="Node" data-id="nodeType">}\href{../../rdecision/html/Node.html#method-nodeType}{\code{rdecision::Node$nodeType()}}\out{</span>}
+\item \out{<span class="pkg-link" data-pkg="rdecision" data-topic="Node" data-id="has_child_nodes">}\href{../../rdecision/html/Node.html#method-has_child_nodes}{\code{rdecision::Node$has_child_nodes()}}\out{</span>}
+\item \out{<span class="pkg-link" data-pkg="rdecision" data-topic="Node" data-id="is_same_node">}\href{../../rdecision/html/Node.html#method-is_same_node}{\code{rdecision::Node$is_same_node()}}\out{</span>}
+\item \out{<span class="pkg-link" data-pkg="rdecision" data-topic="Node" data-id="node_type">}\href{../../rdecision/html/Node.html#method-node_type}{\code{rdecision::Node$node_type()}}\out{</span>}
 \item \out{<span class="pkg-link" data-pkg="rdecision" data-topic="Node" data-id="sample_modvars">}\href{../../rdecision/html/Node.html#method-sample_modvars}{\code{rdecision::Node$sample_modvars()}}\out{</span>}
 \item \out{<span class="pkg-link" data-pkg="rdecision" data-topic="Node" data-id="tabulate_modvars">}\href{../../rdecision/html/Node.html#method-tabulate_modvars}{\code{rdecision::Node$tabulate_modvars()}}\out{</span>}
-\item \out{<span class="pkg-link" data-pkg="rdecision" data-topic="Node" data-id="updateEdges">}\href{../../rdecision/html/Node.html#method-updateEdges}{\code{rdecision::Node$updateEdges()}}\out{</span>}
 }
 \out{</details>}
 }
@@ -98,16 +96,30 @@ Name of the clinical outcome or state; character string.
 }
 }
 \if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-get_cost"></a>}}
+\if{latex}{\out{\hypertarget{method-get_cost}{}}}
+\subsection{Method \code{get_cost()}}{
+Return the cost incurred by being in the state for the interval.
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{State$get_cost()}\if{html}{\out{</div>}}
+}
+
+\subsection{Returns}{
+Cost, as a numeric value.
+}
+}
+\if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-get_utility"></a>}}
 \if{latex}{\out{\hypertarget{method-get_utility}{}}}
 \subsection{Method \code{get_utility()}}{
-Return the utility associated with the clinical outcome.
+Return the incremental utility associated with being in the state for
+the interval.
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{State$get_utility()}\if{html}{\out{</div>}}
 }
 
 \subsection{Returns}{
-Utility (numeric value).
+Incremental utility (numeric value).
 }
 }
 \if{html}{\out{<hr>}}

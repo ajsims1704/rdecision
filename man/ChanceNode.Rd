@@ -14,7 +14,7 @@ of which has a conditional probability (the probability of following
 that branch given that the node has been reached) and a cost.
 }
 \author{
-Andrew Sims \email{andrew.sims5@nhs.net}
+Andrew Sims \email{andrew.sims@newcastle.ac.uk}
 }
 \section{Super class}{
 \code{\link[rdecision:Node]{rdecision::Node}} -> \code{ChanceNode}
@@ -23,25 +23,23 @@ Andrew Sims \email{andrew.sims5@nhs.net}
 \subsection{Public methods}{
 \itemize{
 \item \href{#method-new}{\code{ChanceNode$new()}}
+\item \href{#method-get_p}{\code{ChanceNode$get_p()}}
 \item \href{#method-get_modvars}{\code{ChanceNode$get_modvars()}}
-\item \href{#method-sample_modvars}{\code{ChanceNode$sample_modvars()}}
-\item \href{#method-updateEdges}{\code{ChanceNode$updateEdges()}}
 \item \href{#method-clone}{\code{ChanceNode$clone()}}
 }
 }
 \if{html}{
 \out{<details ><summary>Inherited methods</summary>}
 \itemize{
-\item \out{<span class="pkg-link" data-pkg="rdecision" data-topic="Node" data-id="childNodes">}\href{../../rdecision/html/Node.html#method-childNodes}{\code{rdecision::Node$childNodes()}}\out{</span>}
+\item \out{<span class="pkg-link" data-pkg="rdecision" data-topic="Node" data-id="child_nodes">}\href{../../rdecision/html/Node.html#method-child_nodes}{\code{rdecision::Node$child_nodes()}}\out{</span>}
 \item \out{<span class="pkg-link" data-pkg="rdecision" data-topic="Node" data-id="descendantNodes">}\href{../../rdecision/html/Node.html#method-descendantNodes}{\code{rdecision::Node$descendantNodes()}}\out{</span>}
-\item \out{<span class="pkg-link" data-pkg="rdecision" data-topic="Node" data-id="getCost">}\href{../../rdecision/html/Node.html#method-getCost}{\code{rdecision::Node$getCost()}}\out{</span>}
-\item \out{<span class="pkg-link" data-pkg="rdecision" data-topic="Node" data-id="getLabel">}\href{../../rdecision/html/Node.html#method-getLabel}{\code{rdecision::Node$getLabel()}}\out{</span>}
-\item \out{<span class="pkg-link" data-pkg="rdecision" data-topic="Node" data-id="getP">}\href{../../rdecision/html/Node.html#method-getP}{\code{rdecision::Node$getP()}}\out{</span>}
+\item \out{<span class="pkg-link" data-pkg="rdecision" data-topic="Node" data-id="get_edge_label">}\href{../../rdecision/html/Node.html#method-get_edge_label}{\code{rdecision::Node$get_edge_label()}}\out{</span>}
+\item \out{<span class="pkg-link" data-pkg="rdecision" data-topic="Node" data-id="get_label">}\href{../../rdecision/html/Node.html#method-get_label}{\code{rdecision::Node$get_label()}}\out{</span>}
 \item \out{<span class="pkg-link" data-pkg="rdecision" data-topic="Node" data-id="getPathways">}\href{../../rdecision/html/Node.html#method-getPathways}{\code{rdecision::Node$getPathways()}}\out{</span>}
-\item \out{<span class="pkg-link" data-pkg="rdecision" data-topic="Node" data-id="getUtility">}\href{../../rdecision/html/Node.html#method-getUtility}{\code{rdecision::Node$getUtility()}}\out{</span>}
-\item \out{<span class="pkg-link" data-pkg="rdecision" data-topic="Node" data-id="hasChildNodes">}\href{../../rdecision/html/Node.html#method-hasChildNodes}{\code{rdecision::Node$hasChildNodes()}}\out{</span>}
-\item \out{<span class="pkg-link" data-pkg="rdecision" data-topic="Node" data-id="isSameNode">}\href{../../rdecision/html/Node.html#method-isSameNode}{\code{rdecision::Node$isSameNode()}}\out{</span>}
-\item \out{<span class="pkg-link" data-pkg="rdecision" data-topic="Node" data-id="nodeType">}\href{../../rdecision/html/Node.html#method-nodeType}{\code{rdecision::Node$nodeType()}}\out{</span>}
+\item \out{<span class="pkg-link" data-pkg="rdecision" data-topic="Node" data-id="has_child_nodes">}\href{../../rdecision/html/Node.html#method-has_child_nodes}{\code{rdecision::Node$has_child_nodes()}}\out{</span>}
+\item \out{<span class="pkg-link" data-pkg="rdecision" data-topic="Node" data-id="is_same_node">}\href{../../rdecision/html/Node.html#method-is_same_node}{\code{rdecision::Node$is_same_node()}}\out{</span>}
+\item \out{<span class="pkg-link" data-pkg="rdecision" data-topic="Node" data-id="node_type">}\href{../../rdecision/html/Node.html#method-node_type}{\code{rdecision::Node$node_type()}}\out{</span>}
+\item \out{<span class="pkg-link" data-pkg="rdecision" data-topic="Node" data-id="sample_modvars">}\href{../../rdecision/html/Node.html#method-sample_modvars}{\code{rdecision::Node$sample_modvars()}}\out{</span>}
 \item \out{<span class="pkg-link" data-pkg="rdecision" data-topic="Node" data-id="tabulate_modvars">}\href{../../rdecision/html/Node.html#method-tabulate_modvars}{\code{rdecision::Node$tabulate_modvars()}}\out{</span>}
 }
 \out{</details>}
@@ -52,7 +50,7 @@ Andrew Sims \email{andrew.sims5@nhs.net}
 \subsection{Method \code{new()}}{
 Create a new ChanceNode object
 \subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{ChanceNode$new(children, edgelabels, costs, p, ptype = "auto")}\if{html}{\out{</div>}}
+\if{html}{\out{<div class="r">}}\preformatted{ChanceNode$new(children, edgelabels, p, ptype = "auto")}\if{html}{\out{</div>}}
 }
 
 \subsection{Arguments}{
@@ -64,10 +62,6 @@ of this node.}
 \item{\code{edgelabels}}{a list of \eqn{k} character strings to label each edge 
 (branch) leaving the `ChanceNode`, given in the same order as
 `children`.}
-
-\item{\code{costs}}{A list of \eqn{k} costs associated with each edge (branch) 
-leaving the `ChanceNode`. Each element may be of type `numeric` or
-`ModVar`; given in the same order as `children`.}
 
 \item{\code{p}}{a list of probabilities associated with \eqn{k} branches.
        There are four possible configurations of the list 
@@ -104,6 +98,27 @@ A new `ChanceNode` object
 }
 }
 \if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-get_p"></a>}}
+\if{latex}{\out{\hypertarget{method-get_p}{}}}
+\subsection{Method \code{get_p()}}{
+Function to return the conditional probability of the edge which links to
+the specified child node.
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{ChanceNode$get_p(childNode)}\if{html}{\out{</div>}}
+}
+
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{childNode}}{child node to which to find probability of linking edge}
+}
+\if{html}{\out{</div>}}
+}
+\subsection{Returns}{
+Numerical value of probability.
+}
+}
+\if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-get_modvars"></a>}}
 \if{latex}{\out{\hypertarget{method-get_modvars}{}}}
 \subsection{Method \code{get_modvars()}}{
@@ -115,41 +130,6 @@ model variables may be associated with costs or probabilities.
 
 \subsection{Returns}{
 List of model variables.
-}
-}
-\if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-sample_modvars"></a>}}
-\if{latex}{\out{\hypertarget{method-sample_modvars}{}}}
-\subsection{Method \code{sample_modvars()}}{
-Sample all model variables in this node and update edges.
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{ChanceNode$sample_modvars(expected = F)}\if{html}{\out{</div>}}
-}
-
-\subsection{Arguments}{
-\if{html}{\out{<div class="arguments">}}
-\describe{
-\item{\code{expected}}{If TRUE cause each model variable to return its expected
-value at the next call to `value()`. If FALSE each model variable
-will return the sampled value. Default is FALSE.}
-}
-\if{html}{\out{</div>}}
-}
-\subsection{Returns}{
-An updated ChanceNode object.
-}
-}
-\if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-updateEdges"></a>}}
-\if{latex}{\out{\hypertarget{method-updateEdges}{}}}
-\subsection{Method \code{updateEdges()}}{
-Update numerical values in edges.
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{ChanceNode$updateEdges()}\if{html}{\out{</div>}}
-}
-
-\subsection{Returns}{
-An updated object.
 }
 }
 \if{html}{\out{<hr>}}
