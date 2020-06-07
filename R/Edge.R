@@ -51,6 +51,14 @@ Edge <- R6::R6Class(
     },
     
     #' @description
+    #' Is this edge the same as the argument? (DOM-style)
+    #' @param e edge to compare with this one
+    #' @return TRUE if `e` is also this one.
+    is_same_edge = function(e) {
+      return(identical(self,e))
+    },
+    
+    #' @description
     #' Retrieve the endpoints of the edge.
     #' @return List of two nodes to which the edge is connected.
     endpoints = function() {

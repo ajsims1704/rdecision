@@ -38,6 +38,11 @@ Graph <- R6::R6Class(
       if (length(unique(V)) != length(V)) {
         rlang::abort("Each V must be unique", class="repeated_nodes")
       }
+      nodelabels <- sapply(V, function(v) {v$get_label()})
+      nodelabels <- nodelabels[nchar(nodelabels)>0]
+      if (length(unique(nodelabels))!=length(nodelabels)) {
+        rlang::abort("Each defined node label must be unique", class="repeated_node_labels")
+      }
       private$V <- V
       # check and set edges
       if (!is.list(E)) {
@@ -47,9 +52,62 @@ Graph <- R6::R6Class(
         if (!inherits(e, what="Edge")) {
           rlang::abort("Each E must be an Edge", class="non-Edge_edge")
         }
+        W <- e$endpoints()
+        sapply(W, function(w){
+          if (!any(sapply(private$V, function(v) {return(v$is_same_node(W[[1]]))}))) {
+            rlang::abort("Edge vertices must be in graph", class="not_in_graph")
+          }  
+          if (!any(sapply(private$V, function(v) {return(v$is_same_node(W[[2]]))}))) {
+            rlang::abort("Edge vertices must be in graph", class="not_in_graph")
+          }  
+        })
       })
+      if (length(unique(E)) != length(E)) {
+        rlang::abort("Each E must be unique", class="repeated_edges")
+      }
+      edgelabels <- sapply(E, function(e) {e$label()})
+      edgelabels <- edgelabels[nchar(edgelabels)>0]
+      if (length(unique(edgelabels))!=length(edgelabels)) {
+        rlang::abort("Each defined edge label must be unique", class="repeated_edge_labels")
+      }
       private$E <- E
       return(invisible(self))
+    },
+    
+    #' @description 
+    #' Test whether a vertex or an edge is an element of the graph.
+    #' @param x Subject vertex or edge
+    #' @return TRUE if x is an element of V(G), the vertex set,
+    #' or x is an element of E(G), the edge set.
+    is_element = function(x) {
+      member <- FALSE
+      if (inherits(x, what="Node")) {
+        member <- any(sapply(private$V, function(v) {return(x$is_same_node(v))}))
+      } else if (inherits(x, what="Edge")) {
+        member <- any(sapply(private$E, function(e) {return(x$is_same_edge(e))}))
+      } else {
+        rlang::abort("Argument 'x' is not a Node or an Edge", class="incorrect_type")
+      }
+      return(member)
+    },
+    
+    #' @description 
+    #' Find the index of vertex v in the vertices of the graph. The vertices
+    #' will normally stored internally in the same order they were defined
+    #' in the call to $new(), but this cannot be guaranteed. The index returned
+    #' by this function will be same as the index of the vertex returned by 
+    #' other methods, e.g. adjacancy_matrix.
+    #' @param v The subject node.
+    #' @return The index of the vertex (integer).
+    vertex_index = function(v) {
+      if (!inherits(v, what="Node")) {
+        rlang::abort("Argument 'v' is not a Node", class="non-Node_node")
+      }
+      iv <- which(sapply(private$V,function(w){w$is_same_node(v)}), arr.ind=TRUE)      
+      if (length(iv)==0) {
+        rlang::abort("Argument 'v' is not in graph", class="not_in_graph")
+      }
+      return(iv)
     },
     
     #' @description 
@@ -75,17 +133,41 @@ Graph <- R6::R6Class(
     
     #' @description 
     #' Compute the adjacency matrix for the graph. Each cell contains the
-    #' number of edges linking the two vertexes, with the convention of
-    #' self loops being counted twice, unless 'logical' is TRUE when cells are
+    #' number of edges joining the two vertexes, with the convention of
+    #' self loops being counted twice, unless 'binary' is TRUE when cells are
     #' either 0 (not adjacent) or 1 (adjacent).
-    #' @param logical If TRUE, the adjacency matrix is logical, each cell is
+    #' @param binary If TRUE, the adjacency matrix is logical, each cell is
     #' {0,1}.
     #' @return A square numeric matrix with the number of rows and columns
     #' equal to the order of the graph. The rows and columns are in the
     #' same order as V. If all the nodes have labels the
-    #' dimnames of the matrix are the labels of the vertexes. 
-    adjacency_matrix = function(logical=FALSE) {
-      
+    #' dimnames of the matrix are the labels of the nodes. 
+    adjacency_matrix = function(binary=FALSE) {
+      # check argument
+      if (!is.logical(binary)) {
+        rlang::abort("Argument 'binary' must be 'logical'.", class="non-logical_boolean")
+      }
+      # create matrix
+      L <- sapply(private$V,function(v){v$get_label()})
+      n <- self$order()
+      if (all(nchar(L)>0)) {
+        A <- matrix(rep(0,times=n*n), nrow=n, dimnames=list(out.node=L,in.node=L))
+      } else {
+        A <- matrix(rep(0,times=n*n), nrow=n)
+      }
+      # populate it
+      sapply(private$E, function(e) {
+        W <- e$endpoints()
+        iv1 <- self$vertex_index(W[[1]])
+        iv2 <- self$vertex_index(W[[2]])
+        A[iv1,iv2] <<- A[iv1,iv2]+1
+        A[iv2,iv1] <<- A[iv2,iv1]+1
+      })
+      # convert to binary, if required
+      if (binary) {
+        A <- apply(A, MARGIN=c(1,2), FUN=function(c){ifelse(c>1,1,c)})
+      }
+      return(A)
     },
     
     #' @description 
@@ -99,6 +181,8 @@ Graph <- R6::R6Class(
       if (!any(sapply(private$V, function(n) {return(n$is_same_node(v))}))) {
         rlang::abort("Argument 'v' is not in graph", class="not_in_graph")
       }
+      A <- self$adjacency_matrix()
+
       d <- 0
       sapply(private$E, function(e) {
         sapply(e$endpoints(), function(w) {
@@ -114,7 +198,7 @@ Graph <- R6::R6Class(
     #' Find the neigbours of a node. A property of the graph, not the node.
     #' Does not include self, even in the case of a loop to self.
     #' @param v The subject node. 
-    #' @return A list of nodes which are joined by an edge to the subject.
+    #' @return A list of nodes which are joined to the subject.
     neighbours = function(v) {
       if (!inherits(v, what="Node")) {
         rlang::abort("Argument 'v' is not a Node", class="non-Node_node")

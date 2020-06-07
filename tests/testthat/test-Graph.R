@@ -15,11 +15,32 @@ test_that("incorrect node and edge types are rejected", {
   n1 <- Node$new()
   n2 <- Node$new()
   e1 <- Edge$new(n1, n2)
+  #
   expect_error(Graph$new(n1, list(e1)), class="non-list_vertices")
   expect_error(Graph$new(list(n1,n2), e1), class="non-list_edges")
   expect_error(Graph$new(list(n1,42), list(e1)), class="non-Node_vertex")
   expect_error(Graph$new(list(n1,n2), list(e1,42)), class="non-Edge_edge")
   expect_error(Graph$new(V=list(n1,n1), E=list(e1)), class="repeated_nodes")
+  expect_error(Graph$new(V=list(n1,n2), E=list(e1,e1)), class="repeated_edges")
+  #
+  n3 <- Node$new()
+  e2 <- Edge$new(n1,n3)
+  expect_error(Graph$new(V=list(n1,n2),E=list(e1,e2)), class="not_in_graph")
+  #
+  n1 <- Node$new("n1")
+  n2 <- Node$new("n1")
+  n3 <- Node$new()
+  e1 <- Edge$new(n1,n2,"e1")
+  expect_error(Graph$new(V=list(n1,n2),E=list(e1)), class="repeated_node_labels")
+  expect_error(Graph$new(V=list(n1,n2,n3),E=list(e1)), class="repeated_node_labels")
+  #
+  n1 <- Node$new("n1")
+  n2 <- Node$new("n2")
+  e1 <- Edge$new(n1,n2,"e1")
+  e2 <- Edge$new(n2,n1,"e1")
+  e3 <- Edge$new(n1,n2)
+  expect_error(Graph$new(V=list(n1,n2),E=list(e1,e2)), class="repeated_edge_labels")
+  expect_error(Graph$new(V=list(n1,n2),E=list(e1,e2,e3)), class="repeated_edge_labels")
 })
 
 # tests of simple graph properties
@@ -52,10 +73,59 @@ test_that("vertex and edge properties are correct", {
   E <- list(e1)
   G <- Graph$new(V, E)
   #
+  expect_equal(G$vertex_index(n1),1)
+  expect_equal(G$vertex_index(n2),2)
+  #
   expect_error(G$degree(42), class="non-Node_node")
   expect_error(G$degree(n3), class="not_in_graph")
   expect_error(G$degree(e1), class="non-Node_node")
   expect_equal(G$degree(n1), 1)
+})
+
+# tests of adjacency matrix
+test_that("adjacency matrix has correct properties", {
+  # empty graph
+  G <- Graph$new(V=list(),E=list())
+  expect_error(G$adjacency_matrix(42), class="non-logical_boolean")
+  A <- G$adjacency_matrix()
+  expect_true(is.matrix(A))
+  expect_equal(nrow(A),0)
+  expect_equal(ncol(A),0)
+  # trivial graph
+  n1 <- Node$new()
+  G <- Graph$new(V=list(n1),E=list())
+  A <- G$adjacency_matrix()
+  expect_true(is.matrix(A))
+  expect_equal(nrow(A),1)
+  expect_equal(ncol(A),1)
+  expect_equal(A[1,1],0)
+  # named nodes
+  n1 <- Node$new("n1")
+  n2 <- Node$new()
+  e1 <- Edge$new(n1,n2)
+  G <- Graph$new(V=list(n1,n2),E=list(e1))
+  A <- G$adjacency_matrix()
+  expect_true(is.null(dimnames(A))) 
+  n1 <- Node$new("n1")
+  n2 <- Node$new("n2")
+  e1 <- Edge$new(n1,n2)
+  G <- Graph$new(V=list(n1,n2),E=list(e1))
+  A <- G$adjacency_matrix()
+  dn <- dimnames(A)
+  expect_equal(names(dn), c("out.node", "in.node"))  
+  expect_equal(dn$out.node, c("n1", "n2"))
+  expect_equal(dn$in.node, c("n1", "n2"))
+  expect_equal(sum(A-matrix(c(0,1,0,1),nrow=2)),0)
+  # binary
+  n1 <- Node$new("n1")
+  n2 <- Node$new("n2")
+  e1 <- Edge$new(n1,n2)
+  e2 <- Edge$new(n1,n1)
+  G <- Graph$new(V=list(n1,n2),E=list(e1,e2))
+  A <- G$adjacency_matrix(binary=FALSE)
+  expect_equal(A["n1","n1"],2)
+  A <- G$adjacency_matrix(binary=TRUE)
+  expect_equal(A["n1","n1"],1)
 })
 
 # Known examples
@@ -79,6 +149,12 @@ test_that("Fig 1.1.1 from Gross & Yellen (2003, ISBN 9780203490204) is replicate
   expect_equal(G$degree(v), 4)
   expect_equal(G$degree(w), 2)
   expect_equal(G$degree(x), 4)
+  # adjacency
+  A <- G$adjacency_matrix()
+  EA <- matrix(c(0,2,0,0, 2,0,1,1, 0,1,0,1, 0,1,1,2), nrow=4, byrow=TRUE,
+               dimnames=list(out.node=c("u","v","w","x"),
+                             in.node=c("u","v","w","x")))
+  expect_identical(A, EA)
   # neighbours
   expect_true(nodesetequal(G$neighbours(u),list(v)))
   expect_true(nodesetequal(G$neighbours(v),list(u,w,x)))
