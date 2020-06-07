@@ -6,7 +6,7 @@
 #' 
 #' @details 
 #' Encapulates and provides methods for computation and checking of undirected
-#' graphs. 
+#' graphs. Graphs are systems of vertices connected in pairs by edges.
 #' 
 #' @docType class
 #' @author Andrew Sims \email{andrew.sims@@newcastle.ac.uk}
@@ -75,39 +75,73 @@ Graph <- R6::R6Class(
     },
     
     #' @description 
-    #' Test whether a vertex or an edge is an element of the graph.
+    #' Test whether a vertex an element of the graph.
+    #' @param v Subject vertex.
+    #' @return TRUE if v is an element of V(G).
+    has_vertex = function(v) {
+      member <- FALSE
+      if (inherits(v, what="Node")) {
+        member <- any(sapply(private$V, function(w) {return(v$is_same_node(w))}))
+      } else {
+        rlang::abort("Argument 'v' must be a Node", class="incorrect_element_type")
+      }
+      return(member)
+    },
+
+    #' @description 
+    #' Test whether an edge is element of the graph.
+    #' @param e Subject edge.
+    #' @return TRUE if x is an element of V(G).
+    has_edge = function(e) {
+      member <- FALSE
+      if (inherits(e, what="Edge")) {
+        member <- any(sapply(private$E, function(ee) {return(e$is_same_edge(ee))}))
+      } else {
+        rlang::abort("Argument 'e' must be an edge", class="incorrect_element_type")
+      }
+      return(member)
+    },
+
+    #' @description 
+    #' Test whether an edge is an element of the graph.
     #' @param x Subject vertex or edge
     #' @return TRUE if x is an element of V(G), the vertex set,
     #' or x is an element of E(G), the edge set.
-    is_element = function(x) {
+    has_element = function(x) {
       member <- FALSE
       if (inherits(x, what="Node")) {
         member <- any(sapply(private$V, function(v) {return(x$is_same_node(v))}))
       } else if (inherits(x, what="Edge")) {
         member <- any(sapply(private$E, function(e) {return(x$is_same_edge(e))}))
       } else {
-        rlang::abort("Argument 'x' is not a Node or an Edge", class="incorrect_type")
+        rlang::abort("Argument 'x' must be a Node or an Edge", class="incorrect_element_type")
       }
       return(member)
     },
-    
+
     #' @description 
-    #' Find the index of vertex v in the vertices of the graph. The vertices
-    #' will normally stored internally in the same order they were defined
-    #' in the call to $new(), but this cannot be guaranteed. The index returned
-    #' by this function will be same as the index of the vertex returned by 
-    #' other methods, e.g. adjacancy_matrix.
-    #' @param v The subject node.
-    #' @return The index of the vertex (integer).
-    vertex_index = function(v) {
-      if (!inherits(v, what="Node")) {
-        rlang::abort("Argument 'v' is not a Node", class="non-Node_node")
+    #' Find the index of element x in the vertices or edges of the graph. The
+    #' vertices and edges are normally stored internally in the same order they 
+    #' were defined in the call to $new(), but this cannot be guaranteed. The index 
+    #' returned by this function will be same as the index of a vertex or edge 
+    #' returned by other methods, e.g. adjacancy_matrix.
+    #' @param x The subject element (a Node or Edge).
+    #' @return The index of the element (integer).
+    element_index = function(x) {
+      index <- NA
+      # check (has_element will check type)
+      if (self$has_element(x)) {
+        if (inherits(x, what="Node")) {
+          index <- which(sapply(private$V,function(w){w$is_same_node(x)}), arr.ind=TRUE)      
+        } else if (inherits(x, what="Edge")) {
+          index <- which(sapply(private$E,function(e){e$is_same_edge(x)}), arr.ind=TRUE)      
+        } else {
+          rlang::abort("Argument 'x' must be a Node or an Edge", class="incorrect_element_type")
+        }
+      } else {
+        rlang::abort("Element 'x' must be a Node or Edge in the graph", class="not_in_graph")
       }
-      iv <- which(sapply(private$V,function(w){w$is_same_node(v)}), arr.ind=TRUE)      
-      if (length(iv)==0) {
-        rlang::abort("Argument 'v' is not in graph", class="not_in_graph")
-      }
-      return(iv)
+      return(index)
     },
     
     #' @description 
@@ -124,12 +158,20 @@ Graph <- R6::R6Class(
       return(length(private$E))  
     },
 
-#    #' @description 
-#    #' A simple graph has no self loops or multi-edges.
-#    #' @return TRUE if simple, FALSE if not.    
-#    is_simple = function() {
-#      
-#    },
+    #' @description 
+    #' A simple graph has no self loops or multi-edges.
+    #' @return TRUE if simple, FALSE if not.    
+    is_simple = function() {
+      simple <- TRUE
+      A <- self$adjacency_matrix()
+      if (sum(diag(A))>0) {
+        simple <- FALSE
+      }
+      if (max(A)>1) {
+        simple <- FALSE
+      }
+      return(simple)
+    },
     
     #' @description 
     #' Compute the adjacency matrix for the graph. Each cell contains the
@@ -158,8 +200,8 @@ Graph <- R6::R6Class(
       # populate it
       sapply(private$E, function(e) {
         W <- e$endpoints()
-        iv1 <- self$vertex_index(W[[1]])
-        iv2 <- self$vertex_index(W[[2]])
+        iv1 <- self$element_index(W[[1]])
+        iv2 <- self$element_index(W[[2]])
         A[iv1,iv2] <<- A[iv1,iv2]+1
         A[iv2,iv1] <<- A[iv2,iv1]+1
       })
@@ -175,56 +217,36 @@ Graph <- R6::R6Class(
     #' @param v The subject node.
     #' @return Degree of the vertex, integer.
     degree = function(v) {
-      if (!inherits(v, what="Node")) {
-        rlang::abort("Argument 'v' is not a Node", class="non-Node_node")
-      }
-      if (!any(sapply(private$V, function(n) {return(n$is_same_node(v))}))) {
+      d <- NA
+      if (self$has_vertex(v)) {
+        A <- self$adjacency_matrix()
+        iv <- self$element_index(v)
+        d <- sum(A[iv,])
+      } else {
         rlang::abort("Argument 'v' is not in graph", class="not_in_graph")
       }
-      A <- self$adjacency_matrix()
-
-      d <- 0
-      sapply(private$E, function(e) {
-        sapply(e$endpoints(), function(w) {
-          if (w$is_same_node(v)) {
-            d <<- d + 1  
-          }
-        })
-      })
       return(d)
     },
-    
+
     #' @description 
     #' Find the neigbours of a node. A property of the graph, not the node.
     #' Does not include self, even in the case of a loop to self.
     #' @param v The subject node. 
     #' @return A list of nodes which are joined to the subject.
     neighbours = function(v) {
-      if (!inherits(v, what="Node")) {
-        rlang::abort("Argument 'v' is not a Node", class="non-Node_node")
-      }
-      if (!any(sapply(private$V, function(n) {return(n$is_same_node(v))}))) {
-        rlang::abort("Argument 'v' is not in graph", class="not_in_graph")
-      }
       n <- list()
-      sapply(private$E, function(e) {
-        W <- e$endpoints()
-        if (v$is_same_node(W[[1]])) {
-          if (!v$is_same_node(W[[2]])) {
-            n <<- c(n, W[[2]])
-          }
-        }
-        if (v$is_same_node(W[[2]])) {
-          if (!v$is_same_node(W[[1]])) {
-            n <<- c(n, W[[1]])
-          }
-        }
-      })
-      # count each neighbour once
-      n <- unique(n)
+      if (self$has_vertex(v)) {
+        A <- self$adjacency_matrix()
+        diag(A) <- 0
+        iv <- self$element_index(v)
+        ni <- which(A[iv,]>0, arr.ind=TRUE)
+        n <- private$V[ni]
+      } else {
+        rlang::abort("Argument 'v' is not in graph", class="not_in_graph")
+      }     
       return(n)
     },
-    
+
     #' @description 
     #' Non-recursive depth-first search. Starts with a specified node and
     #' finds all the nodes reachable from it.
@@ -261,8 +283,6 @@ Graph <- R6::R6Class(
       # return discovered nodes
       return(D)
     }  
-    
-    
   )
 )
 

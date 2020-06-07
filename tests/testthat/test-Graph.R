@@ -44,7 +44,7 @@ test_that("incorrect node and edge types are rejected", {
 })
 
 # tests of simple graph properties
-test_that("order and size are correct", {
+test_that("basic graph properties are set and got", {
   #
   n1 <- Node$new()
   n2 <- Node$new()
@@ -64,21 +64,27 @@ test_that("order and size are correct", {
 })
 
 # tests of vertex and edge properties
-test_that("vertex and edge properties are correct", {
+test_that("vertex and edge properties are set and got", {
   n1 <- Node$new()
   n2 <- Node$new()
   n3 <- Node$new()
   e1 <- Edge$new(n1, n2)
-  V <- list(n1,n2)
-  E <- list(e1)
-  G <- Graph$new(V, E)
+  G <- Graph$new(V=list(n1,n2), E=list(e1))
   #
-  expect_equal(G$vertex_index(n1),1)
-  expect_equal(G$vertex_index(n2),2)
+  expect_error(G$has_element(42), class="incorrect_element_type")
+  expect_true(G$has_element(n1))
+  expect_true(G$has_vertex(n2))
+  expect_true(G$has_element(e1))
+  expect_true(G$has_edge(e1))
+  expect_false(G$has_element(n3))
   #
-  expect_error(G$degree(42), class="non-Node_node")
+  expect_equal(G$element_index(n1),1)
+  expect_equal(G$element_index(n2),2)
+  expect_equal(G$element_index(e1),1)
+  #
+  expect_error(G$degree(42), class="incorrect_element_type")
   expect_error(G$degree(n3), class="not_in_graph")
-  expect_error(G$degree(e1), class="non-Node_node")
+  expect_error(G$degree(e1), class="incorrect_element_type")
   expect_equal(G$degree(n1), 1)
 })
 
@@ -126,6 +132,24 @@ test_that("adjacency matrix has correct properties", {
   expect_equal(A["n1","n1"],2)
   A <- G$adjacency_matrix(binary=TRUE)
   expect_equal(A["n1","n1"],1)
+})
+
+# tests of more complex graph properties
+test_that("complex graph properties are set and got", {
+  n1 <- Node$new()
+  n2 <- Node$new()
+  e1 <- Edge$new(n1,n2)
+  #
+  G <- Graph$new(V=list(n1,n2), E=list(e1))
+  expect_true(G$is_simple())
+  #
+  e2 <- Edge$new(n1,n1)
+  G <- Graph$new(V=list(n1,n2), E=list(e1,e2))
+  expect_false(G$is_simple())
+  #
+  e2 <- Edge$new(n2,n1)
+  G <- Graph$new(V=list(n1,n2), E=list(e1,e2))
+  expect_false(G$is_simple())
 })
 
 # Known examples
