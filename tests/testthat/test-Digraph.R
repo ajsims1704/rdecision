@@ -109,19 +109,19 @@ test_that("4 node digraph with cycle is correct", {
   expect_equal(G$order(), 4)
   expect_equal(G$size(), 4)
   #
-  expect_error(G$direct_successors(42), class="non-Node_node")
+  expect_error(G$direct_successors(42), class="incorrect_element_type")
   expect_error(G$direct_successors(e), class="not_in_graph")
   expect_true(nodesetequal(G$direct_successors(a), list(b,d)))
   expect_true(nodesetequal(G$direct_successors(c), list(a)))
   expect_true(length(G$direct_successors(d))==0)
   #
-  expect_error(G$direct_predecessors(42), class="non-Node_node")
+  expect_error(G$direct_predecessors(42), class="incorrect_element_type")
   expect_error(G$direct_predecessors(e), class="not_in_graph")
   expect_true(nodesetequal(G$direct_predecessors(a), list(c)))
   expect_true(nodesetequal(G$direct_predecessors(c), list(b)))
   expect_true(nodesetequal(G$direct_predecessors(d), list(a)))
   # 
-  expect_error(G$DFS(42), class="non-Node_node")
+  expect_error(G$DFS(42), class="incorrect_element_type")
   expect_error(G$DFS(e), class="not_in_graph")
   expect_true(nodesetequal(G$DFS(a), list(a,b,c,d)))
   expect_true(nodesetequal(G$DFS(b), list(a,b,c,d)))

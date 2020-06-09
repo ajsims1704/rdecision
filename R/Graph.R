@@ -253,10 +253,7 @@ Graph <- R6::R6Class(
     #' @return List of reachable nodes, including self.
     DFS = function(v) {
       # check argument
-      if (!inherits(v, what="Node")) {
-        rlang::abort("Argument 'v' is not a Node", class="non-Node_node")
-      }
-      if (!any(sapply(private$V, function(n) {return(n$is_same_node(v))}))) {
+      if (!self$has_vertex(v)) {
         rlang::abort("Argument 'v' is not in graph", class="not_in_graph")
       }
       # List of discovered nodes, and a stack

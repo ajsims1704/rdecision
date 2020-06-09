@@ -2,8 +2,7 @@
 #' Digraph
 #' 
 #' @description
-#' An R6 class to represent a digraph (a directed graph, from discrete
-#' mathematics).
+#' An R6 class to represent a digraph (a directed graph).
 #' 
 #' @details 
 #' Encapulates, and provides methods for computation and checking of directed
@@ -87,17 +86,14 @@ Digraph <- R6::R6Class(
     #' node has no successors.
     direct_successors = function(v) {
       successors <- list()
-      if (!inherits(v, what="Node")) {
-        rlang::abort("Argument 'v' is not a Node", class="non-Node_node")
+      if (self$has_vertex(v)) {
+        AA <- self$adjacency_matrix(binary=TRUE)
+        iv <- self$element_index(v)
+        iw <- which(AA[iv,]>0,arr.ind=TRUE)
+        successors <- private$V[iw]
+      } else {
+        rlang::abort("Argument 'v' is not in graph", class="not_in_graph")
       }
-      if (!any(sapply(private$V, function(n) {return(n$is_same_node(v))}))) {
-        rlang::abort("Node 'v' is not in graph", class="not_in_graph")
-      }
-      sapply(private$A, function(a) {
-        if (v$is_same_node(a$get_source())) {
-          successors <<- c(successors, a$get_target())
-        }
-      })
       return(successors)
     },
       
@@ -107,17 +103,14 @@ Digraph <- R6::R6Class(
     #' node has no predecessors.
     direct_predecessors = function(v) {
       pred <- list()
-      if (!inherits(v, what="Node")) {
-        rlang::abort("Argument 'v' is not a Node", class="non-Node_node")
-      }
-      if (!any(sapply(private$V, function(n) {return(n$is_same_node(v))}))) {
+      if (self$has_vertex(v)) {
+        AA <- self$adjacency_matrix(binary=TRUE)
+        iv <- self$element_index(v)
+        iw <- which(AA[,iv]>0,arr.ind=TRUE)
+        pred <- private$V[iw]
+      } else {
         rlang::abort("Argument 'v' is not in graph", class="not_in_graph")
       }
-      sapply(private$A, function(a) {
-        if (v$is_same_node(a$get_target())) {
-          pred <<- c(pred, a$get_source())
-        }
-      })
       return(pred)
     },
     
@@ -135,10 +128,7 @@ Digraph <- R6::R6Class(
     #' @return List of reachable nodes, including self.
     DFS = function(v) {
       # check argument
-      if (!inherits(v, what="Node")) {
-        rlang::abort("Argument 'v' is not a Node", class="non-Node_node")
-      }
-      if (!any(sapply(private$V, function(n) {return(n$is_same_node(v))}))) {
+      if (!self$has_vertex(v)) {
         rlang::abort("Argument 'v' is not in graph", class="not_in_graph")
       }
       # List of discovered nodes, and a stack
