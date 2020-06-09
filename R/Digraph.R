@@ -43,6 +43,44 @@ Digraph <- R6::R6Class(
       return(invisible(self))
     },
 
+    #' @description 
+    #' Compute the adjacency matrix for the digraph. Each cell contains the
+    #' number of edges from the row vertex to the column vertex, with the 
+    #' convention of self loops being counted once, unless 'binary' is TRUE
+    #' when cells are either 0 (not adjacent) or 1 (adjacent).
+    #' @param binary If TRUE, the adjacency matrix is logical, each cell is
+    #' {0,1}.
+    #' @return A square numeric matrix with the number of rows and columns
+    #' equal to the order of the graph. The rows and columns are in the
+    #' same order as V. If all the nodes have labels the
+    #' dimnames of the matrix are the labels of the nodes. 
+    adjacency_matrix = function(binary=FALSE) {
+      # check argument
+      if (!is.logical(binary)) {
+        rlang::abort("Argument 'binary' must be 'logical'.", class="non-logical_boolean")
+      }
+      # create matrix
+      L <- sapply(private$V,function(v){v$get_label()})
+      n <- self$order()
+      if (all(nchar(L)>0)) {
+        A <- matrix(rep(0,times=n*n), nrow=n, dimnames=list(out.node=L,in.node=L))
+      } else {
+        A <- matrix(rep(0,times=n*n), nrow=n)
+      }
+      # populate it
+      sapply(private$E, function(e) {
+        W <- e$endpoints()
+        iv1 <- self$element_index(W[[1]])
+        iv2 <- self$element_index(W[[2]])
+        A[iv1,iv2] <<- A[iv1,iv2]+1
+      })
+      # convert to binary, if required
+      if (binary) {
+        A <- apply(A, MARGIN=c(1,2), FUN=function(c){ifelse(c>1,1,c)})
+      }
+      return(A)
+    },
+    
     #' @description
     #' Find the direct successors of a node. 
     #' @return A list of nodes or an empty list if the specified

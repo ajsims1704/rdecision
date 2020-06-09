@@ -41,7 +41,56 @@ test_that("order and size are correct", {
   expect_equal(G$size(), 0)
 })
 
-# test 4 node graph with a cycle
+# tests of adjacency matrix
+test_that("adjacency matrix has correct properties", {
+  # empty graph
+  G <- Digraph$new(V=list(),A=list())
+  expect_error(G$adjacency_matrix(42), class="non-logical_boolean")
+  A <- G$adjacency_matrix()
+  expect_true(is.matrix(A))
+  expect_equal(nrow(A),0)
+  expect_equal(ncol(A),0)
+  # trivial graph
+  n1 <- Node$new()
+  G <- Digraph$new(V=list(n1),A=list())
+  A <- G$adjacency_matrix()
+  expect_true(is.matrix(A))
+  expect_equal(nrow(A),1)
+  expect_equal(ncol(A),1)
+  expect_equal(A[1,1],0)
+  # named nodes
+  n1 <- Node$new("n1")
+  n2 <- Node$new()
+  e1 <- Arrow$new(n1,n2)
+  G <- Digraph$new(V=list(n1,n2),A=list(e1))
+  A <- G$adjacency_matrix()
+  expect_true(is.null(dimnames(A))) 
+  n1 <- Node$new("n1")
+  n2 <- Node$new("n2")
+  e1 <- Arrow$new(n1,n2)
+  G <- Digraph$new(V=list(n1,n2),A=list(e1))
+  A <- G$adjacency_matrix()
+  dn <- dimnames(A)
+  expect_equal(names(dn), c("out.node", "in.node"))  
+  expect_equal(dn$out.node, c("n1", "n2"))
+  expect_equal(dn$in.node, c("n1", "n2"))
+  expect_equal(sum(A-matrix(c(0,1,0,0),nrow=2,byrow=TRUE)),0)
+  # binary
+  n1 <- Node$new("n1")
+  n2 <- Node$new("n2")
+  e1 <- Arrow$new(n1,n2)
+  e2 <- Arrow$new(n1,n2)
+  e3 <- Arrow$new(n1,n1)
+  G <- Digraph$new(V=list(n1,n2),A=list(e1,e2,e3))
+  A <- G$adjacency_matrix(binary=FALSE)
+  expect_equal(A["n1","n1"],1)
+  expect_equal(A["n1","n2"],2)
+  A <- G$adjacency_matrix(binary=TRUE)
+  expect_equal(A["n1","n1"],1)
+  expect_equal(A["n1","n2"],1)
+})
+
+# example (Wikipedia URL)
 test_that("4 node digraph with cycle is correct", {
   # construct graph
   a <- Node$new('a')
