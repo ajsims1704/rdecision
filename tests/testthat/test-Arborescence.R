@@ -10,7 +10,7 @@ nodesetequal <- function(A,B) {
   return(AinB & BinA)
 }
 
-# tests of digraph creation
+# tests of arborescence creation
 test_that("incorrect node and edge types are rejected", {
   n1 <- Node$new()
   n2 <- Node$new()
@@ -19,4 +19,17 @@ test_that("incorrect node and edge types are rejected", {
   expect_error(Arborescence$new(list(n1,n2), a1), class="non-list_arrows")
   expect_error(Arborescence$new(list(n1,42), list(a1)), class="non-Node_vertex")
   expect_error(Arborescence$new(list(n1,n2), list(a1,42)), class="non-Arrow_edge")
+})
+
+test_that("graphs that are not trees are rejected", {
+  n1 <- Node$new()
+  n2 <- Node$new()
+  n3 <- Node$new()
+  e1 <- Arrow$new(n1,n2)
+  e2 <- Arrow$new(n1,n3)
+  expect_silent(Arborescence$new(V=list(n1,n2,n3), A=list(e1,e2)))
+  #
+  e3 <- Arrow$new(n2,n3)
+  expect_error(Arborescence$new(V=list(n1,n2,n3), A=list(e1,e2,e3)),
+               class="not_tree")
 })

@@ -45,7 +45,7 @@ test_that("order and size are correct", {
 test_that("adjacency matrix has correct properties", {
   # empty graph
   G <- Digraph$new(V=list(),A=list())
-  expect_error(G$adjacency_matrix(42), class="non-logical_boolean")
+  expect_error(G$adjacency_matrix(42), class="non-logical_binary")
   A <- G$adjacency_matrix()
   expect_true(is.matrix(A))
   expect_equal(nrow(A),0)

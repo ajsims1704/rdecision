@@ -56,7 +56,7 @@ Digraph <- R6::R6Class(
     adjacency_matrix = function(binary=FALSE) {
       # check argument
       if (!is.logical(binary)) {
-        rlang::abort("Argument 'binary' must be 'logical'.", class="non-logical_boolean")
+        rlang::abort("Argument 'binary' must be 'logical'.", class="non-logical_binary")
       }
       # create matrix
       L <- sapply(private$V,function(v){v$get_label()})
@@ -155,27 +155,6 @@ Digraph <- R6::R6Class(
       # return discovered nodes
       return(D)
     }  
-        
-#    procedure DFS-iterative(G, v) is
-#    let S be a stack
-#    S.push(v)
-#    while S is not empty do
-#        v = S.pop()
-#        if v is not labeled as discovered then
-#            label v as discovered
-#            for all edges from v to w in G.adjacentEdges(v) do 
-#                S.push(w)
-    
-#    Find the vertex with no incoming edges (if there is more than one or no such vertex, fail).
-#    
-#    Do a breadth-first or depth-first search from that vertex. If you encounter an already visited vertex, it's not a tree.
-#
-# If you're done and there are unexplored vertices, it's not a tree - the graph is not connected.
-
-#Otherwise, it's a tree.    
-    
-    
-    
         
   ) 
 )

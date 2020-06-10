@@ -159,21 +159,6 @@ Graph <- R6::R6Class(
     },
 
     #' @description 
-    #' A simple graph has no self loops or multi-edges.
-    #' @return TRUE if simple, FALSE if not.    
-    is_simple = function() {
-      simple <- TRUE
-      A <- self$adjacency_matrix()
-      if (sum(diag(A))>0) {
-        simple <- FALSE
-      }
-      if (max(A)>1) {
-        simple <- FALSE
-      }
-      return(simple)
-    },
-    
-    #' @description 
     #' Compute the adjacency matrix for the graph. Each cell contains the
     #' number of edges joining the two vertexes, with the convention of
     #' self loops being counted twice, unless 'binary' is TRUE when cells are
@@ -187,7 +172,7 @@ Graph <- R6::R6Class(
     adjacency_matrix = function(binary=FALSE) {
       # check argument
       if (!is.logical(binary)) {
-        rlang::abort("Argument 'binary' must be 'logical'.", class="non-logical_boolean")
+        rlang::abort("Argument 'binary' must be 'logical'.", class="non-logical_binary")
       }
       # create matrix
       L <- sapply(private$V,function(v){v$get_label()})
@@ -212,6 +197,96 @@ Graph <- R6::R6Class(
       return(A)
     },
     
+    #' @description 
+    #' A simple graph has no self loops or multi-edges.
+    #' @return TRUE if simple, FALSE if not.    
+    is_simple = function() {
+      simple <- TRUE
+      A <- self$adjacency_matrix()
+      if (nrow(A) > 0) {
+        if (sum(diag(A))>0) {
+          simple <- FALSE
+        }
+        if (max(A)>1) {
+          simple <- FALSE
+        }
+      }
+      return(simple)
+    },
+    
+    #' @description 
+    #' Test whether the graph is connected. Graphs with no vertices are 
+    #' considered unconnected; graphs with 1 vertex are considered
+    #' connected. Otherwise a graph is connected if all nodes can be 
+    #' reached from an arbitrary starting point.
+    #' @return TRUE if connected, FALSE if not.
+    is_connected = function() {
+      connected <- FALSE
+      if (self$order()==0) {
+        connected <- FALSE
+      } else if (self$order()==1) {
+        connected <- TRUE
+      } else {
+        nodes <- self$DFS(private$V[[1]])
+        if (length(nodes)==self$order()) {
+          connected <- TRUE
+        }
+      }
+      return(connected)
+    },
+
+    #' @description 
+    #' Checks for the presence of a cycle in the graph using a depth-first
+    #' search from each node to detect the presence of back edges. A back
+    #' edge is an edge from the current node joining a previously detected 
+    #' (visited) node, that is not the parent node of the current one.
+    #' @return TRUE if no cycles detected.
+    is_acyclic = function() {
+      # not acyclic if there are self loops or multi-edges
+      if (!self$is_simple()) {
+        return(FALSE)
+      }
+      # DFS from each vertex
+      for (v in private$V) {
+        # D (element d) is an expanding list of discovered nodes
+        # S (element s) is a stack of nodes being processed
+        # P (element p) is a stack of parents of nodes being processed
+        D <- list()
+        S <- list(v)
+        P <- list(NA)
+        # DFS
+        while (length(S)>0) {
+          # get next node to be processed from the stack
+          s <- S[[length(S)]]
+          S[[length(S)]] <- NULL
+          # and get its parent
+          p <- P[[length(P)]]
+          P[[length(P)]] <- NULL
+          #
+          if (!any(sapply(D,function(d){return(d$is_same_node(s))}))) {
+            D <- c(D,s)
+            for (n in self$neighbours(s)) {
+              if (!identical(n,p)) {
+                if (any(sapply(D,function(d){d$is_same_node(n)}))) {
+                   return(FALSE)
+                }
+              }
+              S <- c(S,n)
+              P <- c(P,s)
+            }
+          }
+        }
+      }
+      return(TRUE)
+    },    
+    
+    #' @description 
+    #' Compute whether the graph is connected and acyclic.
+    #' @return TRUE if the graph is a tree; FALSE if not.
+    is_tree = function() {
+      return(self$is_connected() && self$is_acyclic())
+    },
+
     #' @description 
     #' The degree of a vertex in the graph, or number of incident edges.
     #' @param v The subject node.
@@ -246,7 +321,7 @@ Graph <- R6::R6Class(
       }     
       return(n)
     },
-
+  
     #' @description 
     #' Non-recursive depth-first search. Starts with a specified node and
     #' finds all the nodes reachable from it.
@@ -256,7 +331,8 @@ Graph <- R6::R6Class(
       if (!self$has_vertex(v)) {
         rlang::abort("Argument 'v' is not in graph", class="not_in_graph")
       }
-      # List of discovered nodes, and a stack
+      # D (element d) is a growing list of discovered nodes
+      # S (element s) is a stack of nodes being processed
       D <- list()
       S <- list()
       # S.push(v)
@@ -264,16 +340,16 @@ Graph <- R6::R6Class(
       # while S is not empty do
       while (length(S)>0) {
         # v = S.pop()
-        v <- S[[length(S)]]
+        s <- S[[length(S)]]
         S[[length(S)]] <- NULL
-        # if v is not labelled as discovered then
-        if (!any(sapply(D,function(n){return(n$is_same_node(v))}))) {
-          # label v as discovered
-          D <- c(D,v)
-          # for all edges from v to w in G.adjacentEdges(v) do
-          for (w in self$neighbours(v)) {
+        # if s is not labelled as discovered then
+        if (!any(sapply(D,function(d){return(d$is_same_node(s))}))) {
+          # label s as discovered
+          D <- c(D,s)
+          # for all edges from v to n in G.adjacentEdges(v) do
+          for (n in self$neighbours(s)) {
             # S.push(w)
-            S <- c(S,w)
+            S <- c(S,n)
           }
         }
       }

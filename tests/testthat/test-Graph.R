@@ -92,7 +92,7 @@ test_that("vertex and edge properties are set and got", {
 test_that("adjacency matrix has correct properties", {
   # empty graph
   G <- Graph$new(V=list(),E=list())
-  expect_error(G$adjacency_matrix(42), class="non-logical_boolean")
+  expect_error(G$adjacency_matrix(42), class="non-logical_binary")
   A <- G$adjacency_matrix()
   expect_true(is.matrix(A))
   expect_equal(nrow(A),0)
@@ -134,8 +134,8 @@ test_that("adjacency matrix has correct properties", {
   expect_equal(A["n1","n1"],1)
 })
 
-# tests of more complex graph properties
-test_that("complex graph properties are set and got", {
+# tests of graph algorithms
+test_that("simple and non-simple graphs are detected", {
   n1 <- Node$new()
   n2 <- Node$new()
   e1 <- Edge$new(n1,n2)
@@ -152,7 +152,83 @@ test_that("complex graph properties are set and got", {
   expect_false(G$is_simple())
 })
 
-# Known examples
+test_that("connected and non-connected graphs are identified", {
+  #
+  G <- Graph$new(V=list(), E=list())
+  expect_false(G$is_connected())
+  # 
+  n1 <- Node$new()
+  G <- Graph$new(V=list(n1), E=list())
+  expect_true(G$is_connected())
+  e1 <- Edge$new(n1,n1)
+  G <- Graph$new(V=list(n1), E=list(e1))
+  expect_true(G$is_connected())
+  #
+  n1 <- Node$new()
+  n2 <- Node$new()
+  n3 <- Node$new()
+  e1 <- Edge$new(n1,n2)
+  e2 <- Edge$new(n3,n3)
+  G <- Graph$new(V=list(n1,n2,n3), E=list(e1,e2))
+  expect_false(G$is_connected())
+})
+
+test_that("cyclic and acyclic graphs are identified", {
+  # 
+  G <- Graph$new(V=list(), E=list())
+  expect_true(G$is_acyclic())
+  #
+  n1 <- Node$new()
+  G <- Graph$new(V=list(n1), E=list())
+  expect_true(G$is_acyclic())
+  #
+  n1 <- Node$new()
+  e1 <- Edge$new(n1,n1)
+  G <- Graph$new(V=list(n1), E=list(e1))
+  expect_false(G$is_acyclic())
+  #
+  n0 <- Node$new("0")
+  n1 <- Node$new("1")
+  n2 <- Node$new("2")
+  n3 <- Node$new("3")
+  e1 <- Edge$new(n0,n1)
+  e2 <- Edge$new(n1,n2)
+  e3 <- Edge$new(n2,n3)
+  #
+  G <- Graph$new(V=list(n0,n1,n2,n3), E=list(e1,e2,e3))
+  expect_true(G$is_acyclic())
+  #
+  e4 <- Edge$new(n0,n2)
+  G <- Graph$new(V=list(n0,n1,n2,n3), E=list(e1,e2,e3,e4))
+  expect_false(G$is_acyclic())
+})
+
+test_that("a simple tree is searched in DFS order", {
+  # create graph
+  A <- Node$new("A")
+  B <- Node$new("B")
+  C <- Node$new("C")
+  D <- Node$new("D")
+  E <- Node$new("E")
+  F <- Node$new("F")
+  e1 <- Edge$new(A,B)
+  e2 <- Edge$new(A,C)
+  e3 <- Edge$new(B,D)
+  e4 <- Edge$new(C,E)
+  e5 <- Edge$new(C,F)
+  G <- Graph$new(V=list(A,B,C,D,E,F), E=list(e1,e2,e3,e4,e5))
+  # check
+  expect_true(G$is_connected())
+  expect_true(G$is_acyclic())
+  expect_true(G$is_tree())
+  # search
+  N <- G$DFS(A)
+  # check order
+  L <- paste(sapply(N, function(n) {n$get_label()}), sep='', collapse='')
+  expect_true((L=="ABDCEF" || L=="ABDCFE" || L=="ACEFBD" || L=="ACFEBD"))
+})
+
+# Published examples
 test_that("Fig 1.1.1 from Gross & Yellen (2003, ISBN 9780203490204) is replicated", {
   # the graph
   u <- Node$new("u")
@@ -184,25 +260,11 @@ test_that("Fig 1.1.1 from Gross & Yellen (2003, ISBN 9780203490204) is replicate
   expect_true(nodesetequal(G$neighbours(v),list(u,w,x)))
   expect_true(nodesetequal(G$neighbours(w),list(v,x)))
   expect_true(nodesetequal(G$neighbours(x),list(v,w)))
+  # connected
+  expect_true(G$is_connected())
+  # cycle
+  expect_false(G$is_acyclic())
+  # tree
+  expect_false(G$is_tree())
 })
 
-test_that("Simple tree is searched in DFS order", {
-  # create graph
-  A <- Node$new("A")
-  B <- Node$new("B")
-  C <- Node$new("C")
-  D <- Node$new("D")
-  E <- Node$new("E")
-  F <- Node$new("F")
-  e1 <- Edge$new(A,B)
-  e2 <- Edge$new(A,C)
-  e3 <- Edge$new(B,D)
-  e4 <- Edge$new(C,E)
-  e5 <- Edge$new(C,F)
-  G <- Graph$new(V=list(A,B,C,D,E,F), E=list(e1,e2,e3,e4,e5))
-  # search
-  N <- G$DFS(A)
-  # check order
-  L <- paste(sapply(N, function(n) {n$get_label()}), sep='', collapse='')
-  expect_true((L=="ABDCEF" || L=="ABDCFE" || L=="ACEFBD" || L=="ACFEBD"))
-})

@@ -2,10 +2,10 @@
 #' Arborescence
 #' 
 #' @description
-#' An R6 class to represent a rooted tree (arborescence).
+#' An R6 class to represent an arborescence (rooted directed tree).
 #' 
 #' @details 
-#' Class to encapsulate a rooted tree specialization of a digraph.
+#' Class to encapsulate a directed rooted tree specialization of a digraph.
 #' 
 #' @docType class
 #' @author Andrew Sims \email{andrew.sims@@newcastle.ac.uk}
@@ -13,9 +13,8 @@
 #' 
 Arborescence <- R6::R6Class(
   classname = "Arborescence",
-  inherit = Graph,
+  inherit = Digraph,
   private = list(
-    A = NULL
   ),
   public = list(
     
@@ -25,20 +24,14 @@ Arborescence <- R6::R6Class(
     #' @param A A list of Arrows.
     #' @return An Arborescence object.
     initialize = function(V, A) {
-      # check and set arrows
-      if (!is.list(A)) {
-        rlang::abort("A must be a list", class="non-list_arrows")
-      }
-      sapply(A, FUN=function(a) {
-        if (!inherits(a, what="Arrow")) {
-          rlang::abort("Each A must be an Arrow", class="non-Arrow_edge")
-        }
-      })
-      private$A <- A
-      # initialize the base Digraph class (also checks V)
+      # initialize the base Digraph class (checks V, A)
       super$initialize(V, A)
+      # check that the graph is an arborescence
+      if (!self$is_tree()) {
+        rlang::abort("The graph must be a tree", class="not_tree")
+      }
       # return new Arborescence object
-      return(invisible$self)
+      return(invisible(self))
     }
   
   )
