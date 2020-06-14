@@ -80,6 +80,75 @@ Digraph <- R6::R6Class(
       return(A)
     },
     
+    #' @description 
+    #' Attempt to topologically sort the vertexes in the directed graph using
+    #' Kahn's algorithm (https://doi.org/10.1145%2F368996.369025).
+    #' @return A list of vertexes, topologically sorted. If the digraph has
+    #' cycles, the returned ordered list will not contain all the vertexes
+    #' in the graph, but no error will be raised.
+    topological_sort = function() {
+      # get the adjacency matrix (note: only vertex indexes are needed)
+      AA <- self$adjacency_matrix()
+      # L is an empty list that will contain the sorted vertexes
+      L <- list()
+      # S is a set of all vertexes with no incoming edge
+      S <- list()
+      for (n in 1:ncol(AA)) {
+        if (sum(AA[,n])==0) {
+          S <- c(S,n)
+        }
+      }
+      # while S is not empty
+      while(length(S)>0) {
+        # remove a vertex n from S
+        n <- S[[length(S)]]
+        S[[length(S)]] <- NULL
+        # add n to tail of L
+        L <- c(L, n)
+        # for each node m with an edge e from n to m
+        for (m in which(AA[n,]>0,arr.ind=TRUE)) {
+          # remove edge e from graph
+          AA[n,m] <- 0
+          # if m has no other incoming edges, insert m into S
+          if (sum(AA[,m])==0) {
+            S <- c(S,m)
+          }
+        }
+      }
+      # return list of nodes indexed by L
+      LL <- sapply(L, function(l) {
+        return(private$V[[l]])
+      })
+      return(LL)
+    },
+    
+    #' @description 
+    #' Checks for the presence of a cycle in the graph by attempting to do 
+    #' a topological sort. If the sort does not contain all vertexes, the
+    #' digraph contains at least one cycle.
+    #' This method overrides 'is_acyclic' in Graph.
+    #' @return TRUE if no cycles detected.
+    is_acyclic = function() {
+      L <- self$topological_sort()
+      return(length(L)==length(private$V))
+    },    
+
+    #' @description 
+    #' Compute whether the digraph's underlying graph is a tree (connected and
+    #' acyclic).
+    #' @return TRUE if the underlying graph is a tree; FALSE if not.
+    is_tree = function() {
+      return(super$is_connected() && super$is_acyclic())
+    },
+    
+    #' @description 
+    #' Compute whether the digraph's underlying graph is a tree (connected and
+    #' acyclic). Synonymous with 'is_graph'.
+    #' @return TRUE if the underlying graph is a tree; FALSE if not.
+    is_polytree = function() {
+      return(self$is_tree())
+    },
+    
     #' @description
     #' Find the direct successors of a node. 
     #' @return A list of nodes or an empty list if the specified
@@ -115,14 +184,6 @@ Digraph <- R6::R6Class(
     },
     
     #' @description 
-    #' Establish whether the graph is weakly connected, i.e. whether it is
-    #' a connected undirected graph. 
-    #' @return TRUE if graph is connected, assuming the edges are undirected.
-    weakly_connected = function() {
-      
-    },
-
-    #' @description 
     #' Non-recursive depth-first search. Starts with a specified node and
     #' finds all the nodes reachable from it.
     #' @return List of reachable nodes, including self.
@@ -154,7 +215,48 @@ Digraph <- R6::R6Class(
       }
       # return discovered nodes
       return(D)
-    }  
+    },
+    
+    #' @description 
+    #' Find all directed paths from source node 's' to target node 't'.
+    #' Uses a recursive depth-first search algorithm.
+    #' @return A list of ordered node lists. 
+    directed_paths = function(s,t) {
+      # check arguments
+      if (!self$has_vertex(s)) {
+        rlang::abort("Argument 's' is not in graph", class="not_in_graph")
+      }
+      if (!self$has_vertex(t)) {
+        rlang::abort("Argument 't' is not in graph", class="not_in_graph")
+      }
+      # D is list of discovered nodes
+      D <- list()
+      # PL is list of paths
+      PL <- list()
+      # recursive function
+      toTarget <- function(n) {
+        # push current node to discovered node list
+        D[[length(D)+1]] <<- n
+        # if target not reached, continue
+        if (!n$is_same_node(t)) {
+          # process successors that have not been visited before
+          for (m in self$direct_successors(n)) {
+            if (!any(sapply(D,function(d){m$is_same_node(d)}))) {
+              toTarget(m)
+            }
+          }
+        }
+        else {
+          # if target is reached, save the path
+          PL[[length(PL)+1]] <<- D
+        }
+        # pop current node from path
+        D <<- D[1:(length(D)-1)]
+      }
+      toTarget(s)
+      # return the list of paths
+      return(PL)
+    }
         
   ) 
 )

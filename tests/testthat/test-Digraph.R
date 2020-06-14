@@ -90,8 +90,57 @@ test_that("adjacency matrix has correct properties", {
   expect_equal(A["n1","n2"],1)
 })
 
+# tests of topological sort
+# (https://www.cs.hmc.edu/~keller/courses/cs60/s98/examples/acyclic/)
+test_that("topological sorting is correct", {
+  # non-trivial DAG with one sort order
+  n1 <- Node$new("1")
+  n2 <- Node$new("2")
+  n3 <- Node$new("3")
+  n4 <- Node$new("4")
+  n5 <- Node$new("5")
+  n6 <- Node$new("6")
+  e1 <- Arrow$new(n1,n2)
+  e2 <- Arrow$new(n2,n3)
+  e3 <- Arrow$new(n2,n4)
+  e4 <- Arrow$new(n4,n6)
+  e5 <- Arrow$new(n4,n5)
+  e6 <- Arrow$new(n5,n6)
+  e7 <- Arrow$new(n6,n3)
+  V <- list(n1,n2,n3,n4,n5,n6)
+  A <- list(e1,e2,e3,e4,e5,e6,e7)
+  G <- Digraph$new(V,A)
+  L <- G$topological_sort()
+  expect_identical(L, list(n1,n2,n4,n5,n6,n3))
+  # same graph with e4 reversed, making a cycle
+  e4 <- Arrow$new(n6,n4)
+  A <- list(e1,e2,e3,e4,e5,e6,e7)
+  G <- Digraph$new(V,A)
+  L <- G$topological_sort()
+  expect_false(length(L)==length(V))
+})
+
+# tests of directed paths
+test_that("all paths in a 4-node graph with cycle are discovered", {
+  # https://www.geeksforgeeks.org/find-paths-given-source-destination/
+  n0 <- Node$new("0")
+  n1 <- Node$new("1")
+  n2 <- Node$new("2")
+  n3 <- Node$new("3")
+  ea <- Arrow$new(n0,n2)
+  eb <- Arrow$new(n2,n0)
+  ec <- Arrow$new(n0,n1)
+  ed <- Arrow$new(n0,n3)
+  ee <- Arrow$new(n2,n1)
+  G <- Digraph$new(V=list(n0,n1,n2,n3),A=list(ea,eb,ec,ed,ee))
+  #
+  P <- G$directed_paths(n2,n3)
+  print(P)
+  expect_equal(length(P),3)
+})
+
 # example (Wikipedia URL)
-test_that("4 node digraph with cycle is correct", {
+test_that("example of 4 node digraph with cycle has correct properties", {
   # construct graph
   a <- Node$new('a')
   b <- Node$new('b')
@@ -126,4 +175,37 @@ test_that("4 node digraph with cycle is correct", {
   expect_true(nodesetequal(G$DFS(a), list(a,b,c,d)))
   expect_true(nodesetequal(G$DFS(b), list(a,b,c,d)))
   expect_true(nodesetequal(G$DFS(d), list(d)))
+  #
+  expect_false(G$is_acyclic())
+})
+
+# example - New Scientist puzzle 62; 6th June 2020
+test_that("rdecision solves New Scientist Puzzle 62", {
+  # create vertices
+  V <- list()
+  for (i in 1:5) {
+    for (j in 1:5) {
+      V <- c(V, Node$new(paste("N",i,j,sep="")))
+    }
+  }
+  # create edges
+  E <- list()
+  for (i in 1:5) {
+    for (j in 1:4) {
+      E <- c(E, Arrow$new(V[[5*(i-1)+j]], V[[5*(i-1)+j+1]], paste("H",i,j,sep="")))
+    }
+  } 
+  for (i in 1:4) {
+    for (j in 1:5) {
+      E <- c(E, Arrow$new(V[[5*(i-1)+j]], V[[5*i+j]], paste("V",i,j,sep="")))
+    }
+  } 
+  # create graph
+  G <- Digraph$new(V,E)
+  # test graph properties
+  expect_true(G$is_simple())
+  expect_true(G$is_connected())
+  expect_false(G$is_tree())
+  expect_false(G$is_polytree())
+  expect_true(G$is_acyclic())
 })
