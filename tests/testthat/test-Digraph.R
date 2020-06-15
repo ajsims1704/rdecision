@@ -45,7 +45,7 @@ test_that("order and size are correct", {
 test_that("adjacency matrix has correct properties", {
   # empty graph
   G <- Digraph$new(V=list(),A=list())
-  expect_error(G$adjacency_matrix(42), class="non-logical_binary")
+  expect_error(G$adjacency_matrix(42), class="non-logical_boolean")
   A <- G$adjacency_matrix()
   expect_true(is.matrix(A))
   expect_equal(nrow(A),0)
@@ -75,19 +75,19 @@ test_that("adjacency matrix has correct properties", {
   expect_equal(dn$out.node, c("n1", "n2"))
   expect_equal(dn$in.node, c("n1", "n2"))
   expect_equal(sum(A-matrix(c(0,1,0,0),nrow=2,byrow=TRUE)),0)
-  # binary
+  # boolean
   n1 <- Node$new("n1")
   n2 <- Node$new("n2")
   e1 <- Arrow$new(n1,n2)
   e2 <- Arrow$new(n1,n2)
   e3 <- Arrow$new(n1,n1)
   G <- Digraph$new(V=list(n1,n2),A=list(e1,e2,e3))
-  A <- G$adjacency_matrix(binary=FALSE)
+  A <- G$adjacency_matrix(boolean=FALSE)
   expect_equal(A["n1","n1"],1)
   expect_equal(A["n1","n2"],2)
-  A <- G$adjacency_matrix(binary=TRUE)
-  expect_equal(A["n1","n1"],1)
-  expect_equal(A["n1","n2"],1)
+  A <- G$adjacency_matrix(boolean=TRUE)
+  expect_true(A["n1","n1"])
+  expect_true(A["n1","n2"])
 })
 
 # tests of topological sort
@@ -132,9 +132,10 @@ test_that("all paths in a 4-node graph with cycle are discovered", {
   ec <- Arrow$new(n0,n1)
   ed <- Arrow$new(n0,n3)
   ee <- Arrow$new(n2,n1)
-  G <- Digraph$new(V=list(n0,n1,n2,n3),A=list(ea,eb,ec,ed,ee))
+  ef <- Arrow$new(n1,n3)
+  G <- Digraph$new(V=list(n0,n1,n2,n3),A=list(ea,eb,ec,ed,ee,ef))
   #
-  P <- G$directed_paths(n2,n3)
+  P <- G$paths(n2,n3)
   print(P)
   expect_equal(length(P),3)
 })

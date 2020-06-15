@@ -45,18 +45,18 @@ Digraph <- R6::R6Class(
     #' @description 
     #' Compute the adjacency matrix for the digraph. Each cell contains the
     #' number of edges from the row vertex to the column vertex, with the 
-    #' convention of self loops being counted once, unless 'binary' is TRUE
-    #' when cells are either 0 (not adjacent) or 1 (adjacent).
-    #' @param binary If TRUE, the adjacency matrix is logical, each cell is
-    #' {0,1}.
+    #' convention of self loops being counted once, unless 'boolean' is TRUE
+    #' when cells are either FALSE (not adjacent) or TRUE (adjacent).
+    #' @param boolean If TRUE, the adjacency matrix is logical, each cell is
+    #' {FALSE,TRUE}.
     #' @return A square numeric matrix with the number of rows and columns
     #' equal to the order of the graph. The rows and columns are in the
     #' same order as V. If all the nodes have labels the
     #' dimnames of the matrix are the labels of the nodes. 
-    adjacency_matrix = function(binary=FALSE) {
+    adjacency_matrix = function(boolean=FALSE) {
       # check argument
-      if (!is.logical(binary)) {
-        rlang::abort("Argument 'binary' must be 'logical'.", class="non-logical_binary")
+      if (!is.logical(boolean)) {
+        rlang::abort("Argument 'boolean' must be 'logical'.", class="non-logical_boolean")
       }
       # create matrix
       L <- sapply(private$V,function(v){v$get_label()})
@@ -73,9 +73,9 @@ Digraph <- R6::R6Class(
         iv2 <- self$element_index(W[[2]])
         A[iv1,iv2] <<- A[iv1,iv2]+1
       })
-      # convert to binary, if required
-      if (binary) {
-        A <- apply(A, MARGIN=c(1,2), FUN=function(c){ifelse(c>1,1,c)})
+      # convert to logical, if required
+      if (boolean) {
+        A <- apply(A, MARGIN=c(1,2), FUN=function(c){ifelse(c>=1,TRUE,FALSE)})
       }
       return(A)
     },
@@ -156,9 +156,9 @@ Digraph <- R6::R6Class(
     direct_successors = function(v) {
       successors <- list()
       if (self$has_vertex(v)) {
-        AA <- self$adjacency_matrix(binary=TRUE)
+        AA <- self$adjacency_matrix(boolean=TRUE)
         iv <- self$element_index(v)
-        iw <- which(AA[iv,]>0,arr.ind=TRUE)
+        iw <- which(AA[iv,],arr.ind=TRUE)
         successors <- private$V[iw]
       } else {
         rlang::abort("Argument 'v' is not in graph", class="not_in_graph")
@@ -173,9 +173,9 @@ Digraph <- R6::R6Class(
     direct_predecessors = function(v) {
       pred <- list()
       if (self$has_vertex(v)) {
-        AA <- self$adjacency_matrix(binary=TRUE)
+        AA <- self$adjacency_matrix(boolean=TRUE)
         iv <- self$element_index(v)
-        iw <- which(AA[,iv]>0,arr.ind=TRUE)
+        iw <- which(AA[,iv],arr.ind=TRUE)
         pred <- private$V[iw]
       } else {
         rlang::abort("Argument 'v' is not in graph", class="not_in_graph")
@@ -218,45 +218,62 @@ Digraph <- R6::R6Class(
     },
     
     #' @description 
-    #' Find all directed paths from source node 's' to target node 't'.
+    #' Find all directed paths from source node 's' to target node 't'. In this
+    #' definition, 'path' is a simple path, i.e. all vertexes are unique.s
     #' Uses a recursive depth-first search algorithm.
     #' @return A list of ordered node lists. 
-    directed_paths = function(s,t) {
+    paths = function(s,t) {
       # check arguments
       if (!self$has_vertex(s)) {
         rlang::abort("Argument 's' is not in graph", class="not_in_graph")
       }
+      s <- self$element_index(s)
       if (!self$has_vertex(t)) {
         rlang::abort("Argument 't' is not in graph", class="not_in_graph")
       }
+      t <- self$element_index(t)
+      # AA is the adjacency matrix
+      AA <- self$adjacency_matrix(boolean=TRUE)
       # D is list of discovered nodes
       D <- list()
+      # P is current path
+      P <- list()
       # PL is list of paths
       PL <- list()
-      # recursive function
-      toTarget <- function(n) {
-        # push current node to discovered node list
-        D[[length(D)+1]] <<- n
-        # if target not reached, continue
-        if (!n$is_same_node(t)) {
-          # process successors that have not been visited before
-          for (m in self$direct_successors(n)) {
-            if (!any(sapply(D,function(d){m$is_same_node(d)}))) {
-              toTarget(m)
+      # recurse
+      dfs <- function(v) {
+        D <<- c(D,v)
+        P <<- c(P,v)
+        if (v==t) {
+          PL[[length(PL)+1]] <<- P
+        } else {
+          for (w in which(AA[v,],arr.ind=TRUE)) {
+            if (!(w %in% D)) {
+              dfs(w)
             }
           }
         }
-        else {
-          # if target is reached, save the path
-          PL[[length(PL)+1]] <<- D
-        }
-        # pop current node from path
-        D <<- D[1:(length(D)-1)]
+        P[[length(P)]] <<- NULL
+        D[[length(D)]] <<- NULL
       }
-      toTarget(s)
-      # return the list of paths
+      dfs(s)
       return(PL)
     }
-        
   ) 
 )
+
+# dfs <- function(v) {
+#   D <<- c(D,v)
+#   P <<- c(P,v)
+#   if (identical(v,t)) {
+#     PL[[length(PL)+1]] <<- P
+#   } else {
+#     for (w in self$direct_successors(v)) {
+#       if (!any(sapply(D,function(d){identical(d,w)}))) {
+#         dfs(w)
+#       }
+#     }
+#   }
+#   P[[length(P)]] <<- NULL
+#   D[[length(D)]] <<- NULL
+# }
