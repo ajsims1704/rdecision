@@ -136,7 +136,6 @@ test_that("all paths in a 4-node graph with cycle are discovered", {
   G <- Digraph$new(V=list(n0,n1,n2,n3),A=list(ea,eb,ec,ed,ee,ef))
   #
   P <- G$paths(n2,n3)
-  print(P)
   expect_equal(length(P),3)
 })
 

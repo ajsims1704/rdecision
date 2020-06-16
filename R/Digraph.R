@@ -90,35 +90,32 @@ Digraph <- R6::R6Class(
       # get the adjacency matrix (note: only vertex indexes are needed)
       AA <- self$adjacency_matrix()
       # L is an empty list that will contain the sorted vertexes
-      L <- list()
-      # S is a set of all vertexes with no incoming edge
-      S <- list()
+      L <- Stack$new()
+      # S is a stack of all vertexes with no incoming edge
+      S <- Stack$new()
       for (n in 1:ncol(AA)) {
         if (sum(AA[,n])==0) {
-          S <- c(S,n)
+          S$push(n)
         }
       }
       # while S is not empty
-      while(length(S)>0) {
+      while(S$size()>0) {
         # remove a vertex n from S
-        n <- S[[length(S)]]
-        S[[length(S)]] <- NULL
+        n <- S$pop()
         # add n to tail of L
-        L <- c(L, n)
+        L$push(n)
         # for each node m with an edge e from n to m
         for (m in which(AA[n,]>0,arr.ind=TRUE)) {
           # remove edge e from graph
           AA[n,m] <- 0
           # if m has no other incoming edges, insert m into S
           if (sum(AA[,m])==0) {
-            S <- c(S,m)
+            S$push(m)
           }
         }
       }
       # return list of nodes indexed by L
-      LL <- sapply(L, function(l) {
-        return(private$V[[l]])
-      })
+      LL <- sapply(L$as_list(), function(l) {private$V[[l]]})
       return(LL)
     },
     
@@ -234,27 +231,27 @@ Digraph <- R6::R6Class(
       t <- self$element_index(t)
       # AA is the adjacency matrix
       AA <- self$adjacency_matrix(boolean=TRUE)
-      # D is list of discovered nodes
-      D <- list()
+      # D marks nodes as discovered
+      D <- vector(length=self$order())
       # P is current path
-      P <- list()
+      P <- Stack$new()
       # PL is list of paths
       PL <- list()
       # recurse
       dfs <- function(v) {
-        D <<- c(D,v)
-        P <<- c(P,v)
+        D[v] <<- TRUE
+        P$push(v)
         if (v==t) {
-          PL[[length(PL)+1]] <<- P
+          PL[[length(PL)+1]] <<- P$as_list()
         } else {
           for (w in which(AA[v,],arr.ind=TRUE)) {
-            if (!(w %in% D)) {
+            if (!D[w]) {
               dfs(w)
             }
           }
         }
-        P[[length(P)]] <<- NULL
-        D[[length(D)]] <<- NULL
+        P$pop()
+        D[v] <<- FALSE
       }
       dfs(s)
       return(PL)
@@ -262,18 +259,3 @@ Digraph <- R6::R6Class(
   ) 
 )
 
-# dfs <- function(v) {
-#   D <<- c(D,v)
-#   P <<- c(P,v)
-#   if (identical(v,t)) {
-#     PL[[length(PL)+1]] <<- P
-#   } else {
-#     for (w in self$direct_successors(v)) {
-#       if (!any(sapply(D,function(d){identical(d,w)}))) {
-#         dfs(w)
-#       }
-#     }
-#   }
-#   P[[length(P)]] <<- NULL
-#   D[[length(D)]] <<- NULL
-# }
