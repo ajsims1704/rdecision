@@ -163,16 +163,16 @@ Graph <- R6::R6Class(
     #' number of edges joining the two vertexes, with the convention of
     #' self loops being counted twice, unless 'binary' is TRUE when cells are
     #' either 0 (not adjacent) or 1 (adjacent).
-    #' @param binary If TRUE, the adjacency matrix is logical, each cell is
-    #' {0,1}.
+    #' @param boolean If TRUE, the adjacency matrix is logical, each cell is
+    #' {FALSE,TRUE}.
     #' @return A square numeric matrix with the number of rows and columns
     #' equal to the order of the graph. The rows and columns are in the
     #' same order as V. If all the nodes have labels the
     #' dimnames of the matrix are the labels of the nodes. 
-    adjacency_matrix = function(binary=FALSE) {
+    adjacency_matrix = function(boolean=FALSE) {
       # check argument
-      if (!is.logical(binary)) {
-        rlang::abort("Argument 'binary' must be 'logical'.", class="non-logical_binary")
+      if (!is.logical(boolean)) {
+        rlang::abort("Argument 'boolean' must be 'logical'.", class="non-logical_boolean")
       }
       # create matrix
       L <- sapply(private$V,function(v){v$get_label()})
@@ -190,9 +190,9 @@ Graph <- R6::R6Class(
         A[iv1,iv2] <<- A[iv1,iv2]+1
         A[iv2,iv1] <<- A[iv2,iv1]+1
       })
-      # convert to binary, if required
-      if (binary) {
-        A <- apply(A, MARGIN=c(1,2), FUN=function(c){ifelse(c>1,1,c)})
+      # convert to boolean, if required
+      if (boolean) {
+        A <- apply(A, MARGIN=c(1,2), FUN=function(c){ifelse(c>=1,TRUE,FALSE)})
       }
       return(A)
     },
@@ -218,7 +218,8 @@ Graph <- R6::R6Class(
     #' Test whether the graph is connected. Graphs with no vertices are 
     #' considered unconnected; graphs with 1 vertex are considered
     #' connected. Otherwise a graph is connected if all nodes can be 
-    #' reached from an arbitrary starting point.
+    #' reached from an arbitrary starting point. Uses a depth first
+    #' search.
     #' @return TRUE if connected, FALSE if not.
     is_connected = function() {
       connected <- FALSE
@@ -227,8 +228,28 @@ Graph <- R6::R6Class(
       } else if (self$order()==1) {
         connected <- TRUE
       } else {
-        nodes <- self$DFS(private$V[[1]])
-        if (length(nodes)==self$order()) {
+        # get the adjacency matrix
+        A <- self$adjacency_matrix(boolean=TRUE)
+        # D marks nodes as discovered
+        D <- vector(mode="logical", length=self$order())
+        # S is a stack of nodes being processed
+        S <- Stack$new()
+        # start with first vertex
+        S$push(1)
+        # while S is not empty, do
+        while (S$size()>0) {
+          s <- S$pop()
+          # if s is not labelled as discovered then
+          if (!D[s]) {
+            # label s as discovered
+            D[s] <- TRUE
+            # for all edges from s to n
+            for (n in which(A[s,], arr.ind=TRUE)) {
+              S$push(n)
+            }
+          }
+        }
+        if (all(D)) {
           connected <- TRUE
         }
       }
@@ -242,37 +263,44 @@ Graph <- R6::R6Class(
     #' (visited) node, that is not the parent node of the current one.
     #' @return TRUE if no cycles detected.
     is_acyclic = function() {
+      # acyclic if trivial
+      if (self$order()==0) {
+        return(TRUE)
+      }
       # not acyclic if there are self loops or multi-edges
       if (!self$is_simple()) {
         return(FALSE)
       }
+      # get the adjacency matrix
+      A <- self$adjacency_matrix(boolean=TRUE)
       # DFS from each vertex
-      for (v in private$V) {
-        # D (element d) is an expanding list of discovered nodes
-        # S (element s) is a stack of nodes being processed
+      for (v in 1:self$order()) {
+        # D marks nodes as discovered
+        D <- vector(mode="logical", length=self$order())
+        # S is a stack of nodes being processed
+        S <- Stack$new()
+        S$push(v)
         # P (element p) is a stack of parents of nodes being processed
-        D <- list()
-        S <- list(v)
-        P <- list(NA)
+        P <- Stack$new()
+        P$push(as.integer(NA))
         # DFS
-        while (length(S)>0) {
+        while (S$size()>0) {
           # get next node to be processed from the stack
-          s <- S[[length(S)]]
-          S[[length(S)]] <- NULL
+          s <- S$pop()
           # and get its parent
-          p <- P[[length(P)]]
-          P[[length(P)]] <- NULL
-          #
-          if (!any(sapply(D,function(d){return(d$is_same_node(s))}))) {
-            D <- c(D,s)
-            for (n in self$neighbours(s)) {
-              if (!identical(n,p)) {
-                if (any(sapply(D,function(d){d$is_same_node(n)}))) {
-                   return(FALSE)
+          p <- P$pop()
+          # if not discovered, mark and process it
+          if (!D[s]) {
+            D[s] <- TRUE
+            # process neighbours
+            for (n in which(A[s,],arr.ind=TRUE)) {
+              if (!is.na(p) && n!=p) {
+                if (D[n]) {
+                  return(FALSE)
                 }
               }
-              S <- c(S,n)
-              P <- c(P,s)
+              S$push(n)
+              P$push(s)
             }
           }
         }
@@ -304,7 +332,7 @@ Graph <- R6::R6Class(
     },
 
     #' @description 
-    #' Find the neigbours of a node. A property of the graph, not the node.
+    #' Find the neighbours of a node. A property of the graph, not the node.
     #' Does not include self, even in the case of a loop to self.
     #' @param v The subject node. 
     #' @return A list of nodes which are joined to the subject.
@@ -320,42 +348,42 @@ Graph <- R6::R6Class(
         rlang::abort("Argument 'v' is not in graph", class="not_in_graph")
       }     
       return(n)
-    },
+    }
   
-    #' @description 
-    #' Non-recursive depth-first search. Starts with a specified node and
-    #' finds all the nodes reachable from it.
-    #' @return List of reachable nodes, including self.
-    DFS = function(v) {
-      # check argument
-      if (!self$has_vertex(v)) {
-        rlang::abort("Argument 'v' is not in graph", class="not_in_graph")
-      }
-      # D (element d) is a growing list of discovered nodes
-      # S (element s) is a stack of nodes being processed
-      D <- list()
-      S <- list()
-      # S.push(v)
-      S <- c(S,v)
-      # while S is not empty do
-      while (length(S)>0) {
-        # v = S.pop()
-        s <- S[[length(S)]]
-        S[[length(S)]] <- NULL
-        # if s is not labelled as discovered then
-        if (!any(sapply(D,function(d){return(d$is_same_node(s))}))) {
-          # label s as discovered
-          D <- c(D,s)
-          # for all edges from v to n in G.adjacentEdges(v) do
-          for (n in self$neighbours(s)) {
-            # S.push(w)
-            S <- c(S,n)
-          }
-        }
-      }
-      # return discovered nodes
-      return(D)
-    }  
+    #' #' @description 
+    #' #' Non-recursive depth-first search. Starts with a specified node and
+    #' #' finds all the nodes reachable from it.
+    #' #' @return List of reachable nodes, including self.
+    #' DFS = function(v) {
+    #'   # check argument
+    #'   if (!self$has_vertex(v)) {
+    #'     rlang::abort("Argument 'v' is not in graph", class="not_in_graph")
+    #'   }
+    #'   # D (element d) is a growing list of discovered nodes
+    #'   # S (element s) is a stack of nodes being processed
+    #'   D <- list()
+    #'   S <- list()
+    #'   # S.push(v)
+    #'   S <- c(S,v)
+    #'   # while S is not empty do
+    #'   while (length(S)>0) {
+    #'     # v = S.pop()
+    #'     s <- S[[length(S)]]
+    #'     S[[length(S)]] <- NULL
+    #'     # if s is not labelled as discovered then
+    #'     if (!any(sapply(D,function(d){return(d$is_same_node(s))}))) {
+    #'       # label s as discovered
+    #'       D <- c(D,s)
+    #'       # for all edges from v to n in G.adjacentEdges(v) do
+    #'       for (n in self$neighbours(s)) {
+    #'         # S.push(w)
+    #'         S <- c(S,n)
+    #'       }
+    #'     }
+    #'   }
+    #'   # return discovered nodes
+    #'   return(D)
+    #' }  
   )
 )
 

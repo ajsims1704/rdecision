@@ -92,7 +92,7 @@ test_that("vertex and edge properties are set and got", {
 test_that("adjacency matrix has correct properties", {
   # empty graph
   G <- Graph$new(V=list(),E=list())
-  expect_error(G$adjacency_matrix(42), class="non-logical_binary")
+  expect_error(G$adjacency_matrix(42), class="non-logical_boolean")
   A <- G$adjacency_matrix()
   expect_true(is.matrix(A))
   expect_equal(nrow(A),0)
@@ -128,10 +128,10 @@ test_that("adjacency matrix has correct properties", {
   e1 <- Edge$new(n1,n2)
   e2 <- Edge$new(n1,n1)
   G <- Graph$new(V=list(n1,n2),E=list(e1,e2))
-  A <- G$adjacency_matrix(binary=FALSE)
+  A <- G$adjacency_matrix(boolean=FALSE)
   expect_equal(A["n1","n1"],2)
-  A <- G$adjacency_matrix(binary=TRUE)
-  expect_equal(A["n1","n1"],1)
+  A <- G$adjacency_matrix(boolean=TRUE)
+  expect_true(A["n1","n1"])
 })
 
 # tests of graph algorithms
@@ -176,6 +176,7 @@ test_that("connected and non-connected graphs are identified", {
 test_that("cyclic and acyclic graphs are identified", {
   # 
   G <- Graph$new(V=list(), E=list())
+  expect_true(G$is_simple())
   expect_true(G$is_acyclic())
   #
   n1 <- Node$new()
@@ -201,31 +202,6 @@ test_that("cyclic and acyclic graphs are identified", {
   e4 <- Edge$new(n0,n2)
   G <- Graph$new(V=list(n0,n1,n2,n3), E=list(e1,e2,e3,e4))
   expect_false(G$is_acyclic())
-})
-
-test_that("a simple tree is searched in DFS order", {
-  # create graph
-  A <- Node$new("A")
-  B <- Node$new("B")
-  C <- Node$new("C")
-  D <- Node$new("D")
-  E <- Node$new("E")
-  F <- Node$new("F")
-  e1 <- Edge$new(A,B)
-  e2 <- Edge$new(A,C)
-  e3 <- Edge$new(B,D)
-  e4 <- Edge$new(C,E)
-  e5 <- Edge$new(C,F)
-  G <- Graph$new(V=list(A,B,C,D,E,F), E=list(e1,e2,e3,e4,e5))
-  # check
-  expect_true(G$is_connected())
-  expect_true(G$is_acyclic())
-  expect_true(G$is_tree())
-  # search
-  N <- G$DFS(A)
-  # check order
-  L <- paste(sapply(N, function(n) {n$get_label()}), sep='', collapse='')
-  expect_true((L=="ABDCEF" || L=="ABDCFE" || L=="ACEFBD" || L=="ACFEBD"))
 })
 
 # Published examples
