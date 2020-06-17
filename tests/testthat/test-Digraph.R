@@ -41,7 +41,7 @@ test_that("order and size are correct", {
   expect_equal(G$size(), 0)
 })
 
-# tests of adjacency matrix
+# tests of adjacency and incidence matrix
 test_that("adjacency matrix has correct properties", {
   # empty graph
   G <- Digraph$new(V=list(),A=list())
@@ -90,7 +90,28 @@ test_that("adjacency matrix has correct properties", {
   expect_true(A["n1","n2"])
 })
 
-# tests of topological sort
+test_that("incidence matrix has correct properties", {
+  # named nodes
+  n1 <- Node$new("n1")
+  n2 <- Node$new()
+  e1 <- Arrow$new(n1,n2)
+  G <- Digraph$new(V=list(n1,n2),A=list(e1))
+  B <- G$incidence_matrix()
+  expect_true(is.null(dimnames(B))) 
+  n1 <- Node$new("n1")
+  n2 <- Node$new("n2")
+  ea <- Arrow$new(n1,n2,"a")
+  eb <- Arrow$new(n1,n2,"b")
+  G <- Digraph$new(V=list(n1,n2),A=list(ea,eb))
+  B <- G$incidence_matrix()
+  dn <- dimnames(B)
+  expect_equal(names(dn), c("vertex", "edge"))  
+  expect_equal(dn$vertex, c("n1", "n2"))
+  expect_equal(dn$edge, c("a", "b"))
+  expect_equal(sum(B-matrix(c(-1,1,1,-1),nrow=2,byrow=TRUE)),0)
+})
+
+# tests of topological sorting
 # (https://www.cs.hmc.edu/~keller/courses/cs60/s98/examples/acyclic/)
 test_that("topological sorting is correct", {
   # non-trivial DAG with one sort order
@@ -208,4 +229,19 @@ test_that("rdecision solves New Scientist Puzzle 62", {
   expect_false(G$is_tree())
   expect_false(G$is_polytree())
   expect_true(G$is_acyclic())
+  # get all paths from A to B
+  A <- V[[1]]
+  B <- V[[25]]
+  P <- G$paths(A,B)
+  # convert paths to walks
+  W <- lapply(P,function(p){G$walk(p)})
+  # count and tabulate how many special edges each walk traverses
+  BB <- c("V11", "H22", "V25", "H33", "V32", "H44", "V43")
+  nw <- sapply(W, function(w) {
+     lv <- sapply(w, function(e) {e$label() %in% BB}) 
+     return(sum(lv))
+  })
+  ct <- as.data.frame(table(nw))
+  # check that 23 paths traverse one special edge
+  expect_equal(ct$Freq[ct$nw==1],23)
 })

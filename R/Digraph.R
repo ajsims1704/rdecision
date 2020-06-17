@@ -16,7 +16,6 @@ Digraph <- R6::R6Class(
   classname = "Digraph",
   inherit = Graph,
   private = list(
-    A = NULL
   ),
   public = list(
     
@@ -35,7 +34,6 @@ Digraph <- R6::R6Class(
           rlang::abort("Each A must be an Arrow", class="non-Arrow_edge")
         }
       })
-      private$A <- A
       # initialize the base Graph class (also checks V)
       super$initialize(V, A)
       # return new Digraph object
@@ -68,16 +66,44 @@ Digraph <- R6::R6Class(
       }
       # populate it
       sapply(private$E, function(e) {
-        W <- e$endpoints()
-        iv1 <- self$element_index(W[[1]])
-        iv2 <- self$element_index(W[[2]])
-        A[iv1,iv2] <<- A[iv1,iv2]+1
+        s <- self$element_index(e$source())
+        t <- self$element_index(e$target())
+        A[s,t] <<- A[s,t]+1
       })
       # convert to logical, if required
       if (boolean) {
         A <- apply(A, MARGIN=c(1,2), FUN=function(c){ifelse(c>=1,TRUE,FALSE)})
       }
       return(A)
+    },
+    
+    #' @description 
+    #' Compute the incidence matrix for the graph. Each row is a vertex and
+    #' each column is an edge. Edges leaving a vertex have value -1 and edges
+    #' entering have value +1. if all vertexes and edges have labels, the
+    #' dimnames of the matrix are the labels of the vertexes and edges.
+    #' @return The incidence matrix.
+    incidence_matrix = function() {
+      # create matrix
+      LV <- sapply(private$V,function(v){v$get_label()})
+      LE <- sapply(private$E,function(e){e$label()})
+      nv <- self$order()
+      ne <- self$size()
+      if (all(nchar(LV)>0) & all(nchar(LE)>0)) {
+        B <- matrix(rep(0,times=nv*ne), nrow=nv, dimnames=list(vertex=LV,edge=LE))
+      } else {
+        B <- matrix(rep(0,times=nv*ne), nrow=nv)
+      }
+      # populate it
+      sapply(private$E, function(e) {
+        s <- self$element_index(e$source())
+        t <- self$element_index(e$target())
+        e <- self$element_index(e)
+        B[s,e] <<- -1
+        B[t,e] <<- 1
+      })
+      # return matrix
+      return(B)
     },
     
     #' @description 
@@ -216,7 +242,7 @@ Digraph <- R6::R6Class(
     
     #' @description 
     #' Find all directed paths from source node 's' to target node 't'. In this
-    #' definition, 'path' is a simple path, i.e. all vertexes are unique.s
+    #' definition, 'path' is a simple path, i.e. all vertexes are unique.
     #' Uses a recursive depth-first search algorithm.
     #' @return A list of ordered node lists. 
     paths = function(s,t) {
@@ -254,7 +280,50 @@ Digraph <- R6::R6Class(
         D[v] <<- FALSE
       }
       dfs(s)
-      return(PL)
+      # convert vertex indices into vertices before returning
+      VPL <- lapply(PL, function(p){
+        vp <- lapply(p, function(v) {private$V[[v]]})
+      })
+      return(VPL)
+    },
+    
+    #' @description 
+    #' Construct the sequence of edges which joins the specified
+    #' sequence of vertexes in this graph.
+    #' @param p A list of Nodes
+    #' @return A list of Edges
+    walk = function(P) {
+      # check vertexes
+      sapply(P, function(n) {
+        # reject if vertex is not in the graph
+        if (!self$has_vertex(n)) {
+          rlang::abort("At least one Node is not in graph", class="not_in_graph")
+        }
+      })
+      # get the incidence matrix
+      B <- self$incidence_matrix()
+      # create list of edges
+      W <- Stack$new()
+      # loop through the ordered vertexes
+      if (length(P) > 1) {
+        for (i in 1:(length(P)-1)) {
+          # get index of vertex
+          s <- self$element_index(P[[i]])
+          t <- self$element_index(P[[i+1]])
+          # look for edges leaving s and entering t
+          e.leave <- which(B[s,]==-1, arr.ind=TRUE)
+          e.enter <- which(B[t,]==1, arr.ind=TRUE)
+          e <- intersect(e.leave, e.enter)
+          if (length(e)>=1) {
+            W$push(private$E[[e[1]]])
+          } else {
+            rlang::abort("There must be an edge between adjacent nodes in 'P'",
+                         class="missing_edge")
+          }
+        }
+      }
+      # return the walk 
+      return(W$as_list())
     }
   ) 
 )

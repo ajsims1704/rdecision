@@ -2,8 +2,8 @@
 
 test_that("incorrect source and target are rejected", {
   n1 <- Node$new()
-  expect_error(e <- Arrow$new(42, n1), class="non-Node_source")
-  expect_error(e <- Arrow$new(n1, 42), class="non-Node_target")
+  expect_error(e <- Arrow$new(42, n1), class="non-Node_endpoint")
+  expect_error(e <- Arrow$new(n1, 42), class="non-Node_endpoint")
 })
 
 test_that("incorrect labels are rejected", {
@@ -16,8 +16,8 @@ test_that("arrow is defined correctly", {
   n1 <- Node$new()
   n2 <- Node$new()
   expect_silent(a <- Arrow$new(n1, n2, "a1"))
-  expect_true(n1$is_same_node(a$get_source()))
-  expect_true(n2$is_same_node(a$get_target()))
+  expect_true(n1$is_same_node(a$source()))
+  expect_true(n2$is_same_node(a$target()))
   expect_equal(a$label(), "a1")
 })
 

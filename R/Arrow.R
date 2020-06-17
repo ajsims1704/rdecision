@@ -15,48 +15,33 @@ Arrow <- R6::R6Class(
   classname = "Arrow",
   inherit = Edge,
   private = list(
-    source = NULL,
-    target = NULL
   ),
   public = list(
     
     #' @description
     #' Create an object of type 'Arrow'.
-    #' @param source Node from which the arrow emerges.
-    #' @param target second Node to which the arrow points.
+    #' @param source Node from which the arrow leaves.
+    #' @param target second Node to which the arrow enters.
     #' @param label Character string containing the arrow label.
     #' @return A new `Arrow` object.
     initialize = function(source, target, label="") {
-      # check and set source
-      if (!inherits(source, what="Node")) {
-        rlang::abort("'source' must be a 'Node'", class="non-Node_source")
-      }
-      else {
-        private$source <- source
-      }
-      # check and set target
-      if (!inherits(target, what="Node")) {
-        rlang::abort("'target' must be a 'Node'", class="non-Node_target")
-      }
-      else {
-        private$target <- target
-      }
-      # create base class object
-      super$initialize(source, target, label)
+      # base class
+      super$initialize(v1=source, v2=target, label=label)
+      return(invisible(self))
     },
 
     #' @description
     #' Access source node.
     #' @return `Node` from which the arrow leads.
-    get_source = function() {
-      return(private$source)
+    source = function() {
+      return(private$v1)
     },
     
     #' @description
     #' Access target node.
     #' @return `Node` to which the arrow points.
-    get_target = function() {
-      return(private$target)
+    target = function() {
+      return(private$v2)
     }
   )
 )
