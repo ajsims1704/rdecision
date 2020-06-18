@@ -238,8 +238,8 @@ test_that("rdecision solves New Scientist Puzzle 62", {
   # count and tabulate how many special edges each walk traverses
   BB <- c("V11", "H22", "V25", "H33", "V32", "H44", "V43")
   nw <- sapply(W, function(w) {
-     lv <- sapply(w, function(e) {e$label() %in% BB}) 
-     return(sum(lv))
+  lv <- sapply(w, function(e) {e$label() %in% BB}) 
+   return(sum(lv))
   })
   ct <- as.data.frame(table(nw))
   # check that 23 paths traverse one special edge

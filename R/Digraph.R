@@ -16,6 +16,7 @@ Digraph <- R6::R6Class(
   classname = "Digraph",
   inherit = Graph,
   private = list(
+    B = NULL     # incidence matrix
   ),
   public = list(
     
@@ -36,6 +37,8 @@ Digraph <- R6::R6Class(
       })
       # initialize the base Graph class (also checks V)
       super$initialize(V, A)
+      # compute and save the incidence matrix
+      private$B <- self$incidence_matrix()
       # return new Digraph object
       return(invisible(self))
     },
@@ -102,6 +105,8 @@ Digraph <- R6::R6Class(
         B[s,e] <<- -1
         B[t,e] <<- 1
       })
+      # save a local copy
+      private$B <- B
       # return matrix
       return(B)
     },
@@ -293,37 +298,37 @@ Digraph <- R6::R6Class(
     #' @param p A list of Nodes
     #' @return A list of Edges
     walk = function(P) {
-      # check vertexes
-      sapply(P, function(n) {
+      # check vertexes and get index of each
+      p <- sapply(P, function(n) {
         # reject if vertex is not in the graph
         if (!self$has_vertex(n)) {
           rlang::abort("At least one Node is not in graph", class="not_in_graph")
         }
+        return(self$element_index(n))
       })
-      # get the incidence matrix
-      B <- self$incidence_matrix()
-      # create list of edges
-      W <- Stack$new()
       # loop through the ordered vertexes
       if (length(P) > 1) {
-        for (i in 1:(length(P)-1)) {
-          # get index of vertex
-          s <- self$element_index(P[[i]])
-          t <- self$element_index(P[[i+1]])
+        pairs <- data.frame(
+          s = p[1:(length(P)-1)],
+          t = p[2:length(P)]
+        )
+        W <- apply(pairs, MARGIN=1, function(r) {
           # look for edges leaving s and entering t
-          e.leave <- which(B[s,]==-1, arr.ind=TRUE)
-          e.enter <- which(B[t,]==1, arr.ind=TRUE)
-          e <- intersect(e.leave, e.enter)
+          e <- which((private$B[r[1],]==-1) & (private$B[r[2],]==1), arr.ind=TRUE)
           if (length(e)>=1) {
-            W$push(private$E[[e[1]]])
+            return(e[1])
           } else {
             rlang::abort("There must be an edge between adjacent nodes in 'P'",
                          class="missing_edge")
           }
-        }
+        })
+      } else {
+        W <- list()
       }
+      # convert edge indices into edges before returning
+      E <- lapply(W, function(e){private$E[[e]]})
       # return the walk 
-      return(W$as_list())
+      return(E)
     }
   ) 
 )
