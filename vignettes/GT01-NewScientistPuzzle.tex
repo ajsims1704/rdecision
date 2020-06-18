@@ -36,7 +36,7 @@
 \IfFileExists{xurl.sty}{\usepackage{xurl}}{} % add URL line breaks if available
 \IfFileExists{bookmark.sty}{\usepackage{bookmark}}{\usepackage{hyperref}}
 \hypersetup{
-  pdftitle={Burger run},
+  pdftitle={A directed graph solution to a New Scientist puzzle},
   pdfauthor={Andrew J. Sims},
   hidelinks,
   pdfcreator={LaTeX via pandoc}}
@@ -82,6 +82,15 @@
 \newcommand{\VariableTok}[1]{\textcolor[rgb]{0.00,0.00,0.00}{#1}}
 \newcommand{\VerbatimStringTok}[1]{\textcolor[rgb]{0.31,0.60,0.02}{#1}}
 \newcommand{\WarningTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\usepackage{longtable,booktabs}
+% Correct order of tables after \paragraph or \subparagraph
+\usepackage{etoolbox}
+\makeatletter
+\patchcmd\longtable{\par}{\if@noskipsec\mbox{}\fi\par}{}{}
+\makeatother
+% Allow footnotes in longtable head/foot
+\IfFileExists{footnotehyper.sty}{\usepackage{footnotehyper}}{\usepackage{footnote}}
+\makesavenoteenv{longtable}
 \usepackage{graphicx,grffile}
 \makeatletter
 \def\maxwidth{\ifdim\Gin@nat@width>\linewidth\linewidth\else\Gin@nat@width\fi}
@@ -100,16 +109,16 @@
   \setlength{\itemsep}{0pt}\setlength{\parskip}{0pt}}
 \setcounter{secnumdepth}{-\maxdimen} % remove section numbering
 
-\title{Burger run}
+\title{A directed graph solution to a \emph{New Scientist} puzzle}
 \usepackage{etoolbox}
 \makeatletter
 \providecommand{\subtitle}[1]{% add subtitle to \maketitle
   \apptocmd{\@title}{\par {\large #1 \par}}{}{}
 }
 \makeatother
-\subtitle{A directed graph solution to a \emph{New Scientist} puzzle}
+\subtitle{Burger run}
 \author{Andrew J. Sims}
-\date{2020-06-13}
+\date{18th June 2020}
 
 \begin{document}
 \maketitle
@@ -117,12 +126,32 @@
 \hypertarget{introduction}{%
 \section{Introduction}\label{introduction}}
 
+This puzzle was published in \emph{New Scientist} in June
+2020.\textsuperscript{1} It is a practical example of a problem in graph
+theory. This vignette explains how the puzzle can be solved with
+\texttt{redecison}.
+
+\hypertarget{the-puzzle}{%
+\section{The puzzle}\label{the-puzzle}}
+
+Three friends agree to drive from A to B via the shortest road possible
+(driving down or right at all times). They are hungry, so also want to
+drive through a Big Burger restaurant, marked in red. They are arguing
+about how many shortest routes will pass through exactly one Big Burger.
+Xenia: ``I reckon there are 10.'' Yolanda: ``I'd say more like 20.''
+Zara: ``No you're both wrong, I bet there are more than 50.'' Who is
+right, or closest to right?
+
+\begin{center}\includegraphics[width=8cm]{GT01-NewScientistPuzzle_files/figure-latex/diagram-1} \end{center}
+
 \hypertarget{constructing-the-graph}{%
 \section{Constructing the graph}\label{constructing-the-graph}}
 
 The grid has 25 nodes and 40 edges (20 horizontal and 20 vertical).
 These form a directed graph because it is allowed to drive down or right
-only. Seven of the edges are defined as ``Big Burger'' edges.
+only. Seven of the edges are defined as ``Big Burger'' edges. Because it
+is not possible to find a path from any node which revisits that node,
+the graph is acyclic (a directed acyclic graph, DAG).
 
 Although it possible to construct the graph by creating 25 node objects
 explicitly, it is more compact to create a list of vertices in a loop
@@ -131,10 +160,10 @@ identify grid intersections in the vertical and horizontal directions
 respectively. Each node is labelled as \(N_{i,j}\) and the index of node
 \(N_{i,j}\) in the list is \(5(i-1)+j\).
 
-Similarly, edges (arrows) are constructed more compactly in a list, with
-horizontal edges being labelled \(H_{ij}\) (the horizontal edge joining
-node \(N_{i,j}\) to node \(N_{i,j+1}\)) and the vertical edges similarly
-as \(V_{i,j}\).
+Similarly, the 40 edges (arrows) are constructed more compactly in a
+list, with horizontal edges being labelled \(H_{i,j}\) (the horizontal
+edge joining node \(N_{i,j}\) to node \(N_{i,j+1}\)) and the vertical
+edges similarly as \(V_{i,j}\).
 
 \begin{Shaded}
 \begin{Highlighting}[]
@@ -161,5 +190,79 @@ as \(V_{i,j}\).
 \NormalTok{G <-}\StringTok{ }\NormalTok{Digraph}\OperatorTok{$}\KeywordTok{new}\NormalTok{(V,E)}
 \end{Highlighting}
 \end{Shaded}
+
+\hypertarget{finding-the-paths}{%
+\section{Finding the paths}\label{finding-the-paths}}
+
+Method \texttt{paths} finds all possible paths between any two nodes,
+where a \emph{path} is defined as a sequence of distinct and adjacent
+nodes. Because the restaurants are specific edges, each path is
+converted to a \emph{walk}, which is a path defined as sequence of
+connected, non-repeating edges.
+
+In this case, the number of restaurants traversed by each path is
+counted by comparing the label associated with each edge in each path
+with the labels of the edges which contain a restaurant.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{# get all paths from A to B}
+\NormalTok{A <-}\StringTok{ }\NormalTok{V[[}\DecValTok{1}\NormalTok{]]}
+\NormalTok{B <-}\StringTok{ }\NormalTok{V[[}\DecValTok{25}\NormalTok{]]}
+\NormalTok{P <-}\StringTok{ }\NormalTok{G}\OperatorTok{$}\KeywordTok{paths}\NormalTok{(A,B)}
+\CommentTok{# convert paths to walks}
+\NormalTok{W <-}\StringTok{ }\KeywordTok{lapply}\NormalTok{(P,}\ControlFlowTok{function}\NormalTok{(p)\{G}\OperatorTok{$}\KeywordTok{walk}\NormalTok{(p)\})}
+\CommentTok{# count and tabulate how many special edges each walk traverses}
+\NormalTok{BB <-}\StringTok{ }\KeywordTok{c}\NormalTok{(}\StringTok{"V11"}\NormalTok{, }\StringTok{"H22"}\NormalTok{, }\StringTok{"V25"}\NormalTok{, }\StringTok{"H33"}\NormalTok{, }\StringTok{"V32"}\NormalTok{, }\StringTok{"H44"}\NormalTok{, }\StringTok{"V43"}\NormalTok{)}
+\NormalTok{nw <-}\StringTok{ }\KeywordTok{sapply}\NormalTok{(W, }\ControlFlowTok{function}\NormalTok{(w) \{}
+\NormalTok{  lv <-}\StringTok{ }\KeywordTok{sapply}\NormalTok{(w, }\ControlFlowTok{function}\NormalTok{(e) \{e}\OperatorTok{$}\KeywordTok{label}\NormalTok{() }\OperatorTok{%in%}\StringTok{ }\NormalTok{BB\}) }
+  \KeywordTok{return}\NormalTok{(}\KeywordTok{sum}\NormalTok{(lv))}
+\NormalTok{\})}
+\CommentTok{# tabulate }
+\NormalTok{ct <-}\StringTok{ }\KeywordTok{as.data.frame}\NormalTok{(}\KeywordTok{table}\NormalTok{(nw))}
+\end{Highlighting}
+\end{Shaded}
+
+\hypertarget{solution-found-by-rdecision}{%
+\section{\texorpdfstring{Solution found by
+\texttt{rdecision}}{Solution found by rdecision}}\label{solution-found-by-rdecision}}
+
+The number of paths which pass through exactly one Big Burger is 23. In
+total there are 70 paths from A to B, with the number of restaurants
+\(n\), traversed by each path as follows:
+
+\begin{longtable}[]{@{}lr@{}}
+\toprule
+n & frequency\tabularnewline
+\midrule
+\endhead
+0 & 6\tabularnewline
+1 & 23\tabularnewline
+2 & 27\tabularnewline
+3 & 13\tabularnewline
+4 & 1\tabularnewline
+\bottomrule
+\end{longtable}
+
+\hypertarget{provided-solution}{%
+\section{Provided solution}\label{provided-solution}}
+
+Yolanda's estimate is closest - there are 23 shortest routes from A to B
+that pass through exactly one Big Burger. One way to solve this kind of
+puzzle is to systematically work from A and keep track of how many ways
+there are of reaching each point. With this problem, you should keep a
+separate count of how many ways there are of reaching each point after
+(a) zero or (b) one Big Burger visits. For line segments that contain a
+Big Burger, (b) becomes equal to (a) then becomes equal to 0 with the
+old value for (b) effectively discarded.
+
+\hypertarget{references}{%
+\section*{References}\label{references}}
+\addcontentsline{toc}{section}{References}
+
+\hypertarget{refs}{}
+\leavevmode\hypertarget{ref-bodycombe:2020a}{}%
+1. Bodycombe, D. Puzzle 62, Burger run. \emph{New Scientist}
+\textbf{246}, 54 (2020).
 
 \end{document}
