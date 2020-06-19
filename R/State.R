@@ -7,8 +7,8 @@
 #' @details A State is a clinical outcome, the end point (leaf node or terminal node)
 #' of a decision tree and the base class for a Markov state. It represents a state of
 #' being, and is associated with an annual cost and an incremental utility. It 
-#' inherits from class Node so that it can be part of a decision tree, either as
-#' a leaf node with no children or a Markov state, in the construction of a 
+#' inherits from class Node so that it can be part of a decision tree as
+#' a leaf node with no children, or a Markov state in a Markov model or  
 #' Markov cycle tree. 
 #' 
 #' @docType class

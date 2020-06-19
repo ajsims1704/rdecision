@@ -111,6 +111,29 @@ test_that("incidence matrix has correct properties", {
   expect_equal(sum(B-matrix(c(-1,1,1,-1),nrow=2,byrow=TRUE)),0)
 })
 
+test_that("arborescences are detected", {
+  # out tree (single root)
+  n1 <- Node$new()
+  n2 <- Node$new()
+  n3 <- Node$new()
+  e1 <- Arrow$new(n1,n2)
+  e2 <- Arrow$new(n1,n3)
+  G <- Digraph$new(V=list(n1,n2,n3),A=list(e1,e2))
+  expect_true(G$is_arborescence())
+  # in tree (2 roots)
+  e1 <- Arrow$new(n2,n1)
+  e2 <- Arrow$new(n3,n1)
+  G <- Digraph$new(V=list(n1,n2,n3), A=list(e1,e2))
+  expect_false(G$is_arborescence())
+  # tree with zero roots
+  n4 <- Node$new()
+  e1 <- Arrow$new(n2,n1)
+  e2 <- Arrow$new(n2,n3)
+  e3 <- Arrow$new(n2,n4)
+  G <- Digraph$new(V=list(n1,n2,n3,n4), A=list(e1,e2,e3))
+  expect_false(G$is_arborescence())
+})
+
 # tests of topological sorting
 # (https://www.cs.hmc.edu/~keller/courses/cs60/s98/examples/acyclic/)
 test_that("topological sorting is correct", {
@@ -190,12 +213,6 @@ test_that("example of 4 node digraph with cycle has correct properties", {
   expect_true(nodesetequal(G$direct_predecessors(a), list(c)))
   expect_true(nodesetequal(G$direct_predecessors(c), list(b)))
   expect_true(nodesetequal(G$direct_predecessors(d), list(a)))
-  # 
-  expect_error(G$DFS(42), class="incorrect_element_type")
-  expect_error(G$DFS(e), class="not_in_graph")
-  expect_true(nodesetequal(G$DFS(a), list(a,b,c,d)))
-  expect_true(nodesetequal(G$DFS(b), list(a,b,c,d)))
-  expect_true(nodesetequal(G$DFS(d), list(d)))
   #
   expect_false(G$is_acyclic())
 })

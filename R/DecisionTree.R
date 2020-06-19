@@ -14,7 +14,7 @@
 #' 'arborescence'. This is considered a form of directed graph (digraph) by
 #' several authors. In `rdecision` the root is a DecisionNode and in decision 
 #' trees used in health
-#' economics there is an implied directionality, from root to leaf nodes.}
+#' economics there is an implied directionality, from root to leaf nodes.
 #' 
 #' @docType class
 #' @author Andrew J. Sims \email{andrew.sims@@newcastle.ac.uk}

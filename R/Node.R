@@ -44,7 +44,7 @@ Node <- R6::R6Class(
       re <- NA
       for (i in 1:length(private$edges)) {
         e <- private$edges[[i]]
-        toNode <- e$get_target()
+        toNode <- e$target()
         if (toNode$is_same_node(childNode)) {
           re <- i
           break
@@ -91,7 +91,7 @@ Node <- R6::R6Class(
     child_nodes = function() {
       children = list()
       for (e in private$edges) {
-        children <- c(children, e$get_target())
+        children <- c(children, e$target())
       }
       return(children)
     },
@@ -179,7 +179,7 @@ Node <- R6::R6Class(
       ie <- private$whichArrow(childNode)
       if (!is.na(ie)){
         edge <- private$edges[[ie]]
-        rv <- edge$get_label()
+        rv <- edge$label()
       }
       return(rv)
     },

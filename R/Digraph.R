@@ -6,7 +6,7 @@
 #' 
 #' @details 
 #' Encapulates, and provides methods for computation and checking of directed
-#' graphs (digraphs). Inherits from class Graph.
+#' graphs (digraphs). Inherits from class Graph. 
 #' 
 #' @docType class
 #' @author Andrew Sims \email{andrew.sims@@newcastle.ac.uk}
@@ -176,7 +176,33 @@ Digraph <- R6::R6Class(
     is_polytree = function() {
       return(self$is_tree())
     },
-    
+
+    #' @description    
+    #' Check whether the digraph is an arborescence (a tree with a
+    #' single root and unique paths from the root).
+    #' @return TRUE if the digraph is an arboresecence; FALSE if not.
+    is_arborescence = function() {
+      # the underlying graph must be a tree
+      if (!self$is_tree()) {
+        return(FALSE)
+      }
+      # there must be one and only one root vertex
+      u <- which(apply(private$B[], MARGIN=1, function(r){!any(r>0)}),arr.ind=TRUE)
+      if (length(u) != 1) {
+        return(FALSE)
+      }
+      # there must be exactly one path from the root to all other vertexes
+      np <- sapply(setdiff(seq(length(private$V)),u), function(v) {
+        P <- self$paths(private$V[[u]], private$V[[v]])
+        return(length(P))
+      })
+      if (any(np != 1)) {
+        return(FALSE)
+      }
+      # otherwise return TRUE
+      return(TRUE)
+    },
+
     #' @description
     #' Find the direct successors of a node. 
     #' @return A list of nodes or an empty list if the specified
@@ -210,41 +236,7 @@ Digraph <- R6::R6Class(
       }
       return(pred)
     },
-    
-    #' @description 
-    #' Non-recursive depth-first search. Starts with a specified node and
-    #' finds all the nodes reachable from it.
-    #' @return List of reachable nodes, including self.
-    DFS = function(v) {
-      # check argument
-      if (!self$has_vertex(v)) {
-        rlang::abort("Argument 'v' is not in graph", class="not_in_graph")
-      }
-      # List of discovered nodes, and a stack
-      D <- list()
-      S <- list()
-      # S.push(v)
-      S <- c(S,v)
-      # while S is not empty do
-      while (length(S)>0) {
-        # v = S.pop()
-        v <- S[[length(S)]]
-        S[[length(S)]] <- NULL
-        # if v is not labelled as discovered then
-        if (!any(sapply(D,function(n){return(n$is_same_node(v))}))) {
-          # label v as discovered
-          D <- c(D,v)
-          # for all edges from v to w in G.adjacentEdges(v) do
-          for (w in self$direct_successors(v)) {
-            # S.push(w)
-            S <- c(S,w)
-          }
-        }
-      }
-      # return discovered nodes
-      return(D)
-    },
-    
+
     #' @description 
     #' Find all directed paths from source node 's' to target node 't'. In this
     #' definition, 'path' is a simple path, i.e. all vertexes are unique.
