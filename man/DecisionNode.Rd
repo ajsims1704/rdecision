@@ -26,19 +26,10 @@ Andrew J. Sims \email{andrew.sims@newcastle.ac.uk}
 }
 }
 \if{html}{
-\out{<details ><summary>Inherited methods</summary>}
+\out{<details open ><summary>Inherited methods</summary>}
 \itemize{
-\item \out{<span class="pkg-link" data-pkg="rdecision" data-topic="Node" data-id="child_nodes">}\href{../../rdecision/html/Node.html#method-child_nodes}{\code{rdecision::Node$child_nodes()}}\out{</span>}
-\item \out{<span class="pkg-link" data-pkg="rdecision" data-topic="Node" data-id="descendantNodes">}\href{../../rdecision/html/Node.html#method-descendantNodes}{\code{rdecision::Node$descendantNodes()}}\out{</span>}
-\item \out{<span class="pkg-link" data-pkg="rdecision" data-topic="Node" data-id="get_edge_label">}\href{../../rdecision/html/Node.html#method-get_edge_label}{\code{rdecision::Node$get_edge_label()}}\out{</span>}
-\item \out{<span class="pkg-link" data-pkg="rdecision" data-topic="Node" data-id="get_label">}\href{../../rdecision/html/Node.html#method-get_label}{\code{rdecision::Node$get_label()}}\out{</span>}
-\item \out{<span class="pkg-link" data-pkg="rdecision" data-topic="Node" data-id="get_modvars">}\href{../../rdecision/html/Node.html#method-get_modvars}{\code{rdecision::Node$get_modvars()}}\out{</span>}
-\item \out{<span class="pkg-link" data-pkg="rdecision" data-topic="Node" data-id="getPathways">}\href{../../rdecision/html/Node.html#method-getPathways}{\code{rdecision::Node$getPathways()}}\out{</span>}
-\item \out{<span class="pkg-link" data-pkg="rdecision" data-topic="Node" data-id="has_child_nodes">}\href{../../rdecision/html/Node.html#method-has_child_nodes}{\code{rdecision::Node$has_child_nodes()}}\out{</span>}
-\item \out{<span class="pkg-link" data-pkg="rdecision" data-topic="Node" data-id="is_same_node">}\href{../../rdecision/html/Node.html#method-is_same_node}{\code{rdecision::Node$is_same_node()}}\out{</span>}
-\item \out{<span class="pkg-link" data-pkg="rdecision" data-topic="Node" data-id="node_type">}\href{../../rdecision/html/Node.html#method-node_type}{\code{rdecision::Node$node_type()}}\out{</span>}
-\item \out{<span class="pkg-link" data-pkg="rdecision" data-topic="Node" data-id="sample_modvars">}\href{../../rdecision/html/Node.html#method-sample_modvars}{\code{rdecision::Node$sample_modvars()}}\out{</span>}
-\item \out{<span class="pkg-link" data-pkg="rdecision" data-topic="Node" data-id="tabulate_modvars">}\href{../../rdecision/html/Node.html#method-tabulate_modvars}{\code{rdecision::Node$tabulate_modvars()}}\out{</span>}
+\item \out{<span class="pkg-link" data-pkg="rdecision" data-topic="Node" data-id="label">}\href{../../rdecision/html/Node.html#method-label}{\code{rdecision::Node$label()}}\out{</span>}
+\item \out{<span class="pkg-link" data-pkg="rdecision" data-topic="Node" data-id="type">}\href{../../rdecision/html/Node.html#method-type}{\code{rdecision::Node$type()}}\out{</span>}
 }
 \out{</details>}
 }

@@ -16,7 +16,7 @@
 #' the transition probabilities refer to transitions in one direction. Each
 #' edge can be optionally labelled. It permits loops (edges whose source and
 #' target are the same node) to represent patients that remain in the same 
-#' state between cycles.}
+#' state between cycles.
 #' 
 #' @docType class
 #' @author Andrew J. Sims \email{andrew.sims@@newcastle.ac.uk}

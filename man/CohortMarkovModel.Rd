@@ -8,7 +8,10 @@
 An R6 class for a Markov model with cohort simulation.
 }
 \details{
-A class to represent a complete Markov model.
+A class to represent a Markov model.
+}
+\note{
+
 }
 \author{
 Andrew J. Sims \email{andrew.sims@newcastle.ac.uk}

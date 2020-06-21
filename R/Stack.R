@@ -33,7 +33,7 @@ Stack <- R6::R6Class(
     
     #' @description 
     #' Push an item onto the stack.
-    #' @parameter x The item to push onto the top of the stack. It should be
+    #' @param x The item to push onto the top of the stack. It should be
     #' of the same class as items previously pushed on to the stack. It is not
     #' checked.
     #' @return An updated Stack object

@@ -20,7 +20,7 @@ LeafNode <- R6::R6Class(
     node.cost = 0,
     node.utility = 1,
     node.benefit = 0,
-    interval = as.difftime(tim=365.25, units="days")
+    node.interval = as.difftime(tim=365.25, units="days")
   ),
   public = list(
     
@@ -45,7 +45,7 @@ LeafNode <- R6::R6Class(
       if (!is.numeric(cost) && !inherits(cost, what="ModVar")) {
         rlang::abort("Argument 'cost' must be of type 'numeric' or 'ModVar'")
       }
-      private$cost <- cost    
+      private$node.cost <- cost    
       # check and set utility
       if (!is.numeric(utility)) {
         rlang::abort("Argument 'utility' must be a numeric value.")
@@ -53,17 +53,17 @@ LeafNode <- R6::R6Class(
       if (utility > 1) {
         rlang.abort("Argument 'utility' must be in the range [-Inf,1].")
       }
-      private$utility <- utility
+      private$node.utility <- utility
       # check and set benefit
       if (!is.numeric(benefit) && !inherits(benefit, what="ModVar")) {
         rlang::abort("Argument 'benefit' must be of type 'numeric' or 'ModVar'")
       }
-      private$benefit <- benefit    
+      private$node.benefit <- benefit    
       # check and set the interval
       if (class(interval) != 'difftime') {
         rlang::abort("Argument 'interval' must be of class 'difftime'.")
       }
-      private$interval <- interval
+      private$node.interval <- interval
     },
     
     #' #' @description 

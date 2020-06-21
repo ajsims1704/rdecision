@@ -19,8 +19,8 @@ ChanceNode <- R6::R6Class(
   inherit = Node,
   private = list(
     # private fields
-    p = NULL,
-    ptype = "numeric"
+    # p = NULL,
+    # ptype = "numeric"
   ),
   public = list(
     
@@ -58,168 +58,168 @@ ChanceNode <- R6::R6Class(
     #' the types of elements of p}
     #' }
     #' @return A new `ChanceNode` object
-    initialize = function(children, edgelabels, p, ptype='auto') {
-
+    initialize = function(label="") {
       ## ensure base class fields are initialized
-      super$initialize()
-      
-      ## check child nodes
-      if (length(children) < 2) {
-        rlang::abort("Argument 'children' must contain at least two objects of class 'Node'.",
-                     class="incorrect_child_count")
-      }
-      sapply(children, function(x) {
-        if (!inherits(x, what="Node")){
-          rlang::abort("Each element in 'children' must be of class 'Node'.",
-                       class="non-Node_child")
-        }
-      })
-
-      ## check edge labels
-      if (length(edgelabels) != length(children)) {
-        rlang::abort("Argument 'edgelabels' must contain the same number of objects as 'children'.",
-                     class="incorrect_edge_label_count")
-      }
-      sapply(edgelabels, function(x) {
-        if (!is.character(x)){
-          rlang::abort("Each element in 'edgelabels' must be of class 'character'.",
-                       class="non-string_edge_label")
-        }
-      })
-
-      ## add edges to this node
-      for (i in 1:length(children)) {
-        edge <- Arrow$new(self, children[[i]], edgelabels[[i]])
-        private$addArrow(edge)
-      }
-
-      ## set ptype
-      if (!is.character(ptype)) {
-        rlang::abort("Argument 'ptype' must be of class 'character'",
-                     class="non-string_ptype")
-      }
-      else {
-        private$ptype <- ptype  
-      }
-
-      ## check and store p values
-      
-      # count each type of member of p
-      k <- length(p)
-      nna <- sum(is.na(p))
-      nnu <- sum(sapply(p, is.numeric))
-      nmv <- sum(sapply(p, FUN=function(e){return(inherits(e, what='ModVar'))}))
-      
-      # switch on ptype 
-      if (ptype == 'numeric') {
-        if (k != length(children)) {
-          stop('ChanceNode$new: `p` must contain the same number of elements as children')
-        }
-        if (nnu != k) {
-          stop('ChanceNode$new: all elements of `p` must be of type `numeric` for ptype=numeric')
-        }
-        private$p <- p
-      }
-      else if (ptype == 'MV') {
-        if (k != length(children)) {
-          stop('ChanceNode$new: `p` must contain the same number of elements as children')
-        }
-        if (nna != 1) {
-          stop("ChanceNode$new: one element of p must be NA for `ptype='MVE`.")
-        }
-        if (nmv < 1) {
-          stop("ChanceNode$new: at least one element of p must be a ModVar for `ptype=MVE`.")
-        }
-        if ((nna+nmv+nnu) != k) {
-          stop("ChanceNode$new: all elements of `p` must be of type `numeric`, `ModVar` or `NA` for `ptype=MVE`")
-        }
-        warning("ChanceNode$new: `ptype='MV'` may lead to p values out of range [0,1].")
-        private$p <- p
-      }
-      else if (ptype == 'Beta') {
-        stop("ChanceNode$new: `ptype=Beta` not yet implemented")
-      }
-      else if (ptype == 'Dirichlet') {
-        stop("ChanceNode$new: `ptype=Dirichlet` not yet implemented")
-      }
-      else if (ptype == "auto") {
-        if (nnu == k) {
-          private$ptype <- 'numeric'
-          private$p <- p
-        }
-        else if ( (nna==1) && (nmv>=1) & ((nna+nmv+nnu)==k) ) {
-          private$ptype <- 'MV'
-          private$p <- p
-          warning("ChanceNode$new: 'ptype=\"MV\"' may cause p values outside [0,1].",
-                  call.=FALSE)
-        }
-        else {
-          stop("ChanceNode$new: cannot guess `ptype` from supplied p for `ptype=auto`.")
-        }
-      }
-      # anything else is illegal
-      else {
-        stop("ChanceNode$new: `ptype` must be one of 'numeric', 'MV', 'Beta' or 'Dirichlet'")
-      }
-    },
-
-    #' @description
-    #' Function to return the conditional probability of the edge which links to
-    #' the specified child node.
-    #' @param childNode child node to which to find probability of linking edge 
-    #' @return Numerical value of probability.
-    get_p = function(childNode) {
-      # create vector of p values, with one element per edge
-      pedge <- vector('numeric', length=length(private$edges))
-      # compute the probability associated with each edge
-      if (private$ptype == 'numeric') {
-        for (i in 1:length(private$edges)) {
-          pedge[i] <- private$p[[i]]
-        }
-      }
-      else if (private$ptype == 'MV') {
-        for (i in 1:length(private$edges)) {
-          p <- private$p[[i]]
-          if (inherits(p, what='ModVar')) {
-            v <- p$value()
-            pedge[i] <- v
-          }
-          else {
-            pedge[i] <- p
-          }
-        }
-        pedge[is.na(pedge)] <- 1 - sum(pedge, na.rm=T)
-      }
-      else {
-        rlang::abort("Only ptype='numeric' and ptype='MV' are currently supported",
-                     class="unsupported_ptype")
-      }
-      # return the single p value associated with the edge to the given child node
-      rv <- 0
-      ie <- private$whichArrow(childNode)
-      if (!is.na(ie)){
-        rv <- pedge[ie]
-      }
-      return(rv)
-    },
-
-    #' @description
-    #' Return the list of model variables associated with the node. The
-    #' model variables may be associated with costs or probabilities.
-    #' @return List of model variables. 
-    get_modvars = function() {
-      # make a list of all private objects that may be associated with model variables
-      mv <- c(private$p)
-      # iterate objects and create list of model variables
-      mvlist <- list()
-      lapply(mv, FUN=function(v) {
-        if (inherits(v, what='ModVar')) {
-          mvlist <<- c(mvlist, v)
-        }
-      })
-      # return list of model variables
-      return(mvlist)
+      super$initialize(label)
+      # ## check child nodes
+      # if (length(children) < 2) {
+      #   rlang::abort("Argument 'children' must contain at least two objects of class 'Node'.",
+      #                class="incorrect_child_count")
+      # }
+      # sapply(children, function(x) {
+      #   if (!inherits(x, what="Node")){
+      #     rlang::abort("Each element in 'children' must be of class 'Node'.",
+      #                  class="non-Node_child")
+      #   }
+      # })
+      # 
+      # ## check edge labels
+      # if (length(edgelabels) != length(children)) {
+      #   rlang::abort("Argument 'edgelabels' must contain the same number of objects as 'children'.",
+      #                class="incorrect_edge_label_count")
+      # }
+      # sapply(edgelabels, function(x) {
+      #   if (!is.character(x)){
+      #     rlang::abort("Each element in 'edgelabels' must be of class 'character'.",
+      #                  class="non-string_edge_label")
+      #   }
+      # })
+      # 
+      # ## add edges to this node
+      # for (i in 1:length(children)) {
+      #   edge <- Arrow$new(self, children[[i]], edgelabels[[i]])
+      #   private$addArrow(edge)
+      # }
+      # 
+      # ## set ptype
+      # if (!is.character(ptype)) {
+      #   rlang::abort("Argument 'ptype' must be of class 'character'",
+      #                class="non-string_ptype")
+      # }
+      # else {
+      #   private$ptype <- ptype  
+      # }
+      # 
+      # ## check and store p values
+      # 
+      # # count each type of member of p
+      # k <- length(p)
+      # nna <- sum(is.na(p))
+      # nnu <- sum(sapply(p, is.numeric))
+      # nmv <- sum(sapply(p, FUN=function(e){return(inherits(e, what='ModVar'))}))
+      # 
+      # # switch on ptype 
+      # if (ptype == 'numeric') {
+      #   if (k != length(children)) {
+      #     stop('ChanceNode$new: `p` must contain the same number of elements as children')
+      #   }
+      #   if (nnu != k) {
+      #     stop('ChanceNode$new: all elements of `p` must be of type `numeric` for ptype=numeric')
+      #   }
+      #   private$p <- p
+      # }
+      # else if (ptype == 'MV') {
+      #   if (k != length(children)) {
+      #     stop('ChanceNode$new: `p` must contain the same number of elements as children')
+      #   }
+      #   if (nna != 1) {
+      #     stop("ChanceNode$new: one element of p must be NA for `ptype='MVE`.")
+      #   }
+      #   if (nmv < 1) {
+      #     stop("ChanceNode$new: at least one element of p must be a ModVar for `ptype=MVE`.")
+      #   }
+      #   if ((nna+nmv+nnu) != k) {
+      #     stop("ChanceNode$new: all elements of `p` must be of type `numeric`, `ModVar` or `NA` for `ptype=MVE`")
+      #   }
+      #   warning("ChanceNode$new: `ptype='MV'` may lead to p values out of range [0,1].")
+      #   private$p <- p
+      # }
+      # else if (ptype == 'Beta') {
+      #   stop("ChanceNode$new: `ptype=Beta` not yet implemented")
+      # }
+      # else if (ptype == 'Dirichlet') {
+      #   stop("ChanceNode$new: `ptype=Dirichlet` not yet implemented")
+      # }
+      # else if (ptype == "auto") {
+      #   if (nnu == k) {
+      #     private$ptype <- 'numeric'
+      #     private$p <- p
+      #   }
+      #   else if ( (nna==1) && (nmv>=1) & ((nna+nmv+nnu)==k) ) {
+      #     private$ptype <- 'MV'
+      #     private$p <- p
+      #     warning("ChanceNode$new: 'ptype=\"MV\"' may cause p values outside [0,1].",
+      #             call.=FALSE)
+      #   }
+      #   else {
+      #     stop("ChanceNode$new: cannot guess `ptype` from supplied p for `ptype=auto`.")
+      #   }
+      # }
+      # # anything else is illegal
+      # else {
+      #   stop("ChanceNode$new: `ptype` must be one of 'numeric', 'MV', 'Beta' or 'Dirichlet'")
+      # }
+      # return a ChanceNode object
+      return(invisible(self))
     }
+
+    #' #' @description
+    #' #' Function to return the conditional probability of the edge which links to
+    #' #' the specified child node.
+    #' #' @param childNode child node to which to find probability of linking edge 
+    #' #' @return Numerical value of probability.
+    #' get_p = function(childNode) {
+    #'   # create vector of p values, with one element per edge
+    #'   pedge <- vector('numeric', length=length(private$edges))
+    #'   # compute the probability associated with each edge
+    #'   if (private$ptype == 'numeric') {
+    #'     for (i in 1:length(private$edges)) {
+    #'       pedge[i] <- private$p[[i]]
+    #'     }
+    #'   }
+    #'   else if (private$ptype == 'MV') {
+    #'     for (i in 1:length(private$edges)) {
+    #'       p <- private$p[[i]]
+    #'       if (inherits(p, what='ModVar')) {
+    #'         v <- p$value()
+    #'         pedge[i] <- v
+    #'       }
+    #'       else {
+    #'         pedge[i] <- p
+    #'       }
+    #'     }
+    #'     pedge[is.na(pedge)] <- 1 - sum(pedge, na.rm=T)
+    #'   }
+    #'   else {
+    #'     rlang::abort("Only ptype='numeric' and ptype='MV' are currently supported",
+    #'                  class="unsupported_ptype")
+    #'   }
+    #'   # return the single p value associated with the edge to the given child node
+    #'   rv <- 0
+    #'   ie <- private$whichArrow(childNode)
+    #'   if (!is.na(ie)){
+    #'     rv <- pedge[ie]
+    #'   }
+    #'   return(rv)
+    #' },
+
+    #' #' @description
+    #' #' Return the list of model variables associated with the node. The
+    #' #' model variables may be associated with costs or probabilities.
+    #' #' @return List of model variables. 
+    #' get_modvars = function() {
+    #'   # make a list of all private objects that may be associated with model variables
+    #'   mv <- c(private$p)
+    #'   # iterate objects and create list of model variables
+    #'   mvlist <- list()
+    #'   lapply(mv, FUN=function(v) {
+    #'     if (inherits(v, what='ModVar')) {
+    #'       mvlist <<- c(mvlist, v)
+    #'     }
+    #'   })
+    #'   # return list of model variables
+    #'   return(mvlist)
+    #' }
     
   )
 )

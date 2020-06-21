@@ -9,24 +9,31 @@ An R6 class to represent an directed edge in a digraph.
 }
 \details{
 Arrows are the formal term for links between pairs of nodes in a
-graph. It is not intended that package users creating models should 
-instantiate the `Arrow` class. Instead, it is included in the
-package as a convenience class used in the construction and traversal
-of models by the package methods themselves, and for examining
-and printing model structure.
+directed graph. Inherits from class Edge.
 }
 \author{
 Andrew J. Sims \email{andrew.sims@newcastle.ac.uk}
+}
+\section{Super class}{
+\code{\link[rdecision:Edge]{rdecision::Edge}} -> \code{Arrow}
 }
 \section{Methods}{
 \subsection{Public methods}{
 \itemize{
 \item \href{#method-new}{\code{Arrow$new()}}
-\item \href{#method-get_source}{\code{Arrow$get_source()}}
-\item \href{#method-get_target}{\code{Arrow$get_target()}}
-\item \href{#method-get_label}{\code{Arrow$get_label()}}
+\item \href{#method-source}{\code{Arrow$source()}}
+\item \href{#method-target}{\code{Arrow$target()}}
 \item \href{#method-clone}{\code{Arrow$clone()}}
 }
+}
+\if{html}{
+\out{<details open ><summary>Inherited methods</summary>}
+\itemize{
+\item \out{<span class="pkg-link" data-pkg="rdecision" data-topic="Edge" data-id="endpoints">}\href{../../rdecision/html/Edge.html#method-endpoints}{\code{rdecision::Edge$endpoints()}}\out{</span>}
+\item \out{<span class="pkg-link" data-pkg="rdecision" data-topic="Edge" data-id="is_same_edge">}\href{../../rdecision/html/Edge.html#method-is_same_edge}{\code{rdecision::Edge$is_same_edge()}}\out{</span>}
+\item \out{<span class="pkg-link" data-pkg="rdecision" data-topic="Edge" data-id="label">}\href{../../rdecision/html/Edge.html#method-label}{\code{rdecision::Edge$label()}}\out{</span>}
+}
+\out{</details>}
 }
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-new"></a>}}
@@ -40,9 +47,9 @@ Create an object of type 'Arrow'.
 \subsection{Arguments}{
 \if{html}{\out{<div class="arguments">}}
 \describe{
-\item{\code{source}}{Node from which the arrow emerges.}
+\item{\code{source}}{Node from which the arrow leaves.}
 
-\item{\code{target}}{second Node to which the arrow points.}
+\item{\code{target}}{second Node to which the arrow enters.}
 
 \item{\code{label}}{Character string containing the arrow label.}
 }
@@ -53,12 +60,12 @@ A new `Arrow` object.
 }
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-get_source"></a>}}
-\if{latex}{\out{\hypertarget{method-get_source}{}}}
-\subsection{Method \code{get_source()}}{
+\if{html}{\out{<a id="method-source"></a>}}
+\if{latex}{\out{\hypertarget{method-source}{}}}
+\subsection{Method \code{source()}}{
 Access source node.
 \subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{Arrow$get_source()}\if{html}{\out{</div>}}
+\if{html}{\out{<div class="r">}}\preformatted{Arrow$source()}\if{html}{\out{</div>}}
 }
 
 \subsection{Returns}{
@@ -66,29 +73,16 @@ Access source node.
 }
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-get_target"></a>}}
-\if{latex}{\out{\hypertarget{method-get_target}{}}}
-\subsection{Method \code{get_target()}}{
+\if{html}{\out{<a id="method-target"></a>}}
+\if{latex}{\out{\hypertarget{method-target}{}}}
+\subsection{Method \code{target()}}{
 Access target node.
 \subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{Arrow$get_target()}\if{html}{\out{</div>}}
+\if{html}{\out{<div class="r">}}\preformatted{Arrow$target()}\if{html}{\out{</div>}}
 }
 
 \subsection{Returns}{
 `Node` to which the arrow points.
-}
-}
-\if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-get_label"></a>}}
-\if{latex}{\out{\hypertarget{method-get_label}{}}}
-\subsection{Method \code{get_label()}}{
-Access label.
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{Arrow$get_label()}\if{html}{\out{</div>}}
-}
-
-\subsection{Returns}{
-Label of the arrow; character string.
 }
 }
 \if{html}{\out{<hr>}}

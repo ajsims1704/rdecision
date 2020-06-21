@@ -9,8 +9,7 @@ An R6 class to represent a node in a decision tree
 }
 \details{
 Base class to represent a single node in a decision tree. Objects of base
-class Node are not expected to be created as model objects. Document Object
-Model (DOM) names are used for node methods as far as possibe.
+class Node are not expected to be created as model objects.
 }
 \author{
 Andrew Sims \email{andrew.sims@newcastle.ac.uk}
@@ -19,17 +18,8 @@ Andrew Sims \email{andrew.sims@newcastle.ac.uk}
 \subsection{Public methods}{
 \itemize{
 \item \href{#method-new}{\code{Node$new()}}
-\item \href{#method-get_label}{\code{Node$get_label()}}
-\item \href{#method-has_child_nodes}{\code{Node$has_child_nodes()}}
-\item \href{#method-child_nodes}{\code{Node$child_nodes()}}
-\item \href{#method-descendantNodes}{\code{Node$descendantNodes()}}
-\item \href{#method-is_same_node}{\code{Node$is_same_node()}}
-\item \href{#method-node_type}{\code{Node$node_type()}}
-\item \href{#method-getPathways}{\code{Node$getPathways()}}
-\item \href{#method-get_edge_label}{\code{Node$get_edge_label()}}
-\item \href{#method-get_modvars}{\code{Node$get_modvars()}}
-\item \href{#method-tabulate_modvars}{\code{Node$tabulate_modvars()}}
-\item \href{#method-sample_modvars}{\code{Node$sample_modvars()}}
+\item \href{#method-label}{\code{Node$label()}}
+\item \href{#method-type}{\code{Node$type()}}
 \item \href{#method-clone}{\code{Node$clone()}}
 }
 }
@@ -54,202 +44,186 @@ A new Node object.
 }
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-get_label"></a>}}
-\if{latex}{\out{\hypertarget{method-get_label}{}}}
-\subsection{Method \code{get_label()}}{
+\if{html}{\out{<a id="method-label"></a>}}
+\if{latex}{\out{\hypertarget{method-label}{}}}
+\subsection{Method \code{label()}}{
 Return the label of the node.
 \subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{Node$get_label()}\if{html}{\out{</div>}}
+\if{html}{\out{<div class="r">}}\preformatted{Node$label()}\if{html}{\out{</div>}}
 }
 
 \subsection{Returns}{
 Label as a character string.
+#' @description
+#' Return list of child nodes (DOM-style)
+#' @return 
+#' list of child Nodes
+child_nodes = function() {
+  children = list()
+  for (e in private$edges) {
+    children <- c(children, e$target())
+  }
+  return(children)
+},
+#' @description 
+#' Return list of descendent nodes.
+#' @return List of descendent nodes, including self.
+descendantNodes = function() {
+  nodes <- list()
+  toLeaf <- function(node) {
+    # push current node to path
+    nodes[[length(nodes)+1]] <<- node
+    # process child nodes if not leaf
+    if (node$has_child_nodes()) {
+      for (child in node$child_nodes()) {
+        toLeaf(child)
+      }
+    }
+  }
+  toLeaf(self)
+  return(nodes)
+},
+#' @description
+#' Is this node the same as the argument? (DOM-style)
+#' @param otherNode node to compare with this one
+#' @return TRUE if `otherNode` is also this one
+is_same_node = function(otherNode) {
+  return(identical(self, otherNode)) 
+},
 }
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-has_child_nodes"></a>}}
-\if{latex}{\out{\hypertarget{method-has_child_nodes}{}}}
-\subsection{Method \code{has_child_nodes()}}{
-Does the node have any child nodes? (DOM-style)
+\if{html}{\out{<a id="method-type"></a>}}
+\if{latex}{\out{\hypertarget{method-type}{}}}
+\subsection{Method \code{type()}}{
+node type
 \subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{Node$has_child_nodes()}\if{html}{\out{</div>}}
-}
-
-\subsection{Returns}{
-TRUE if node has children, FALSE if not
-}
-}
-\if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-child_nodes"></a>}}
-\if{latex}{\out{\hypertarget{method-child_nodes}{}}}
-\subsection{Method \code{child_nodes()}}{
-Return list of child nodes (DOM-style)
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{Node$child_nodes()}\if{html}{\out{</div>}}
-}
-
-\subsection{Returns}{
-list of child Nodes
-}
-}
-\if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-descendantNodes"></a>}}
-\if{latex}{\out{\hypertarget{method-descendantNodes}{}}}
-\subsection{Method \code{descendantNodes()}}{
-Return list of descendent nodes.
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{Node$descendantNodes()}\if{html}{\out{</div>}}
-}
-
-\subsection{Returns}{
-List of descendent nodes, including self.
-}
-}
-\if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-is_same_node"></a>}}
-\if{latex}{\out{\hypertarget{method-is_same_node}{}}}
-\subsection{Method \code{is_same_node()}}{
-Is this node the same as the argument? (DOM-style)
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{Node$is_same_node(otherNode)}\if{html}{\out{</div>}}
-}
-
-\subsection{Arguments}{
-\if{html}{\out{<div class="arguments">}}
-\describe{
-\item{\code{otherNode}}{node to compare with this one}
-}
-\if{html}{\out{</div>}}
-}
-\subsection{Returns}{
-TRUE if `otherNode` is also this one
-}
-}
-\if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-node_type"></a>}}
-\if{latex}{\out{\hypertarget{method-node_type}{}}}
-\subsection{Method \code{node_type()}}{
-node type (DOM-style)
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{Node$node_type()}\if{html}{\out{</div>}}
+\if{html}{\out{<div class="r">}}\preformatted{Node$type()}\if{html}{\out{</div>}}
 }
 
 \subsection{Returns}{
 Node class, as character string
+#' @description
+#' Trace and list all pathways ending on leaf nodes which start
+#' with this node.
+#' @param choice Name of choice. All pathways are returned if NA.
+#' @return A list of Path objects. Each member of the list is a
+#' path from this node to a leaf, limited to those associated
+#' with choice, if defined.
+getPathways = function(choice=NA) {
+  path <- list()
+  rc <- list()
+  toLeaf <- function(node) {
+    # push current node to path
+    path[[length(path)+1]] <<- node
+    # leaf reached; store the path
+    if (node$has_child_nodes()) {
+      # process child nodes
+      for (child in node$child_nodes()) {
+        toLeaf(child)
+      }
+    }
+    else {
+      p <- Path$new(path)
+      if (!is.na(choice)) {
+        if (p$getChoice()==choice) {
+          rc[[length(rc)+1]] <<- p
+        }
+      }
+      else {
+        rc[[length(rc)+1]] <<- p
+      }
+    }
+    # pop current node from path
+    path <<- path[1:(length(path)-1)]
+  }
+  toLeaf(self)
+  return(rc)
+},
+#' @description 
+#' Return label of edge which links to specified child node
+#' @param childNode child node to which find label of linking edge
+#' @return label as character string
+get_edge_label = function(childNode) {
+  rv <- NA
+  ie <- private$whichArrow(childNode)
+  if (!is.na(ie)){
+    edge <- private$edges[[ie]]
+    rv <- edge$label()
+  }
+  return(rv)
+},
+#' @description 
+#' Function to return a list of model variables associated with this node.
+#' @return 
+#' List of model variables associated with this node.
+get_modvars = function() {
+  return(list())
+},
+#' @description
+#' Tabulate all model variables associated with this node.
+#' @param include.descendants If TRUE, model variables associated
+#' with this node and its descendants are tabulated; otherwise only
+#' the ones that are associated with this node.
+#' @param include.operands If TRUE, recursively add model variables which are
+#' included in expressions in ExprModVars. Default is
+#' FALSE.
+#' @return Data frame with one row per model variable, as follows:
+#' \describe{
+#' \item{Label}{The label given to the variable on creation.}
+#' \item{Description}{As given at initialization.}
+#' \item{Units}{Units of the variable.}
+#' \item{Distribution}{The uncertainty distribution or an expression.} 
+#' \item{Mean}{Expected value.}
+#' \item{SD}{Standard deviation.}
+#' \item{Q2.5}{p=0.025 quantile.}
+#' \item{Q97.5}{p=0.975 quantile.}
+#' \item{Qhat}{Asterisk if the quantiles and SD were estimated by random sampling.}
+#' }
+tabulate_modvars = function(include.descendants=FALSE, 
+                            include.operands=FALSE) {
+  # create list of nodes
+  if (include.descendants) {
+    nodes <- self$descendantNodes()
+  } 
+  else {
+    nodes <- list(self)
+  }
+  # list model variables associated with these nodes
+  mvlist <- list()
+  sapply(nodes, FUN=function(n) {
+    mv <- n$get_modvars()
+    if (length(mv) > 0) {
+      mvlist <<- c(mvlist, unlist(mv))
+    }
+  })
+  # tabulate the model variables
+  DF <- do.call(
+    'rbind', 
+    lapply(mvlist, FUN=function(x){x$tabulate(include.operands)})
+  )
+  DF <- DF[!duplicated(DF),]
+  # order the table
+  if (nrow(DF) > 0) {
+    DF <- DF[order(DF$Label),]
+  }
+  # return the tabulated variables
+  return(DF)
+},
+#' @description 
+#' Sample the model variables associated with the node.
+#' @param expected if TRUE, use the expected value of the model variables in
+#'        the node; otherwise sample from their uncertainty distributions.
+#' @return Updated Node object
+sample_modvars = function(expected=FALSE) {
+  # get the model variables associated with this node
+  mvlist <- self$get_modvars()
+  # sample them
+  sapply(mvlist, FUN=function(mv) {
+    mv$sample(expected)
+  })
+  return(invisible(self))
 }
-}
-\if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-getPathways"></a>}}
-\if{latex}{\out{\hypertarget{method-getPathways}{}}}
-\subsection{Method \code{getPathways()}}{
-Trace and list all pathways ending on leaf nodes which start
-with this node.
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{Node$getPathways(choice = NA)}\if{html}{\out{</div>}}
-}
-
-\subsection{Arguments}{
-\if{html}{\out{<div class="arguments">}}
-\describe{
-\item{\code{choice}}{Name of choice. All pathways are returned if NA.}
-}
-\if{html}{\out{</div>}}
-}
-\subsection{Returns}{
-A list of Path objects. Each member of the list is a
-path from this node to a leaf, limited to those associated
-with choice, if defined.
-}
-}
-\if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-get_edge_label"></a>}}
-\if{latex}{\out{\hypertarget{method-get_edge_label}{}}}
-\subsection{Method \code{get_edge_label()}}{
-Return label of edge which links to specified child node
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{Node$get_edge_label(childNode)}\if{html}{\out{</div>}}
-}
-
-\subsection{Arguments}{
-\if{html}{\out{<div class="arguments">}}
-\describe{
-\item{\code{childNode}}{child node to which find label of linking edge}
-}
-\if{html}{\out{</div>}}
-}
-\subsection{Returns}{
-label as character string
-}
-}
-\if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-get_modvars"></a>}}
-\if{latex}{\out{\hypertarget{method-get_modvars}{}}}
-\subsection{Method \code{get_modvars()}}{
-Function to return a list of model variables associated with this node.
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{Node$get_modvars()}\if{html}{\out{</div>}}
-}
-
-\subsection{Returns}{
-List of model variables associated with this node.
-}
-}
-\if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-tabulate_modvars"></a>}}
-\if{latex}{\out{\hypertarget{method-tabulate_modvars}{}}}
-\subsection{Method \code{tabulate_modvars()}}{
-Tabulate all model variables associated with this node.
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{Node$tabulate_modvars(include.descendants = FALSE, include.operands = FALSE)}\if{html}{\out{</div>}}
-}
-
-\subsection{Arguments}{
-\if{html}{\out{<div class="arguments">}}
-\describe{
-\item{\code{include.descendants}}{If TRUE, model variables associated
-with this node and its descendants are tabulated; otherwise only
-the ones that are associated with this node.}
-
-\item{\code{include.operands}}{If TRUE, recursively add model variables which are
-included in expressions in ExprModVars. Default is
-FALSE.}
-}
-\if{html}{\out{</div>}}
-}
-\subsection{Returns}{
-Data frame with one row per model variable, as follows:
-\describe{
-\item{Label}{The label given to the variable on creation.}
-\item{Description}{As given at initialization.}
-\item{Units}{Units of the variable.}
-\item{Distribution}{The uncertainty distribution or an expression.} 
-\item{Mean}{Expected value.}
-\item{SD}{Standard deviation.}
-\item{Q2.5}{p=0.025 quantile.}
-\item{Q97.5}{p=0.975 quantile.}
-\item{Qhat}{Asterisk if the quantiles and SD were estimated by random sampling.}
-}
-}
-}
-\if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-sample_modvars"></a>}}
-\if{latex}{\out{\hypertarget{method-sample_modvars}{}}}
-\subsection{Method \code{sample_modvars()}}{
-Sample the model variables associated with the node.
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{Node$sample_modvars(expected = FALSE)}\if{html}{\out{</div>}}
-}
-
-\subsection{Arguments}{
-\if{html}{\out{<div class="arguments">}}
-\describe{
-\item{\code{expected}}{if TRUE, use the expected value of the model variables in
-the node; otherwise sample from their uncertainty distributions.}
-}
-\if{html}{\out{</div>}}
-}
-\subsection{Returns}{
-Updated Node object
 }
 }
 \if{html}{\out{<hr>}}

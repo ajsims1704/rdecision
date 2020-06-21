@@ -5,59 +5,59 @@
 \alias{Digraph}
 \title{Digraph}
 \description{
-An R6 class to represent a digraph (a directed graph, from discrete
-mathematics).
+An R6 class to represent a digraph (a directed graph).
 }
 \details{
-The types of health economic model supported by `rdecision` are forms of
-digraph, insofar as they are a set of objects in which some pairs of objects
-are directionally related. in `rdecision` terminology, the objects (vertices) 
-are Nodes
-and the relationships are directed edges (arrows). Formally, each type of
-model is a particular form of digraph, as follows:
-\describe{
-\item{Markov Model}{A directed multigraph permitting loops (a loop 
-multidigraph),
-optionally labelled, or 'quiver'. It is a multigraph because there are 
-two edges between each pair of nodes {A,B} representing the transition
-probabilities from A to B and vice-versa. And it is a directed graph because
-the transition probabilities refer to transitions in one direction. Each
-edge can be optionally labelled. It permits loops (edges whose source and
-target are the same node) to represent patients that remain in the same 
-state between cycles.}
-\item{DecisionTree}{A k-ary directed rooted tree, or 'arborescence'. This is 
-considered a form of directed graph (digraph) by several authors. In 
-`rdecision` the root is a DecisionNode and in decision trees used in health
-economics there is an implied directionality, from root to leaf nodes.}
-}
-It is not expected that modellers will create objects of type Digraph
-directly. It functions as a base class for the model types supported
-by `rdecision`, to provide methods for digraph computation and checking.
+Encapulates, and provides methods for computation and checking of directed
+graphs (digraphs). Inherits from class Graph.
 }
 \author{
 Andrew Sims \email{andrew.sims@newcastle.ac.uk}
+}
+\section{Super class}{
+\code{\link[rdecision:Graph]{rdecision::Graph}} -> \code{Digraph}
 }
 \section{Methods}{
 \subsection{Public methods}{
 \itemize{
 \item \href{#method-new}{\code{Digraph$new()}}
-\item \href{#method-order}{\code{Digraph$order()}}
-\item \href{#method-size}{\code{Digraph$size()}}
+\item \href{#method-adjacency_matrix}{\code{Digraph$adjacency_matrix()}}
+\item \href{#method-incidence_matrix}{\code{Digraph$incidence_matrix()}}
+\item \href{#method-topological_sort}{\code{Digraph$topological_sort()}}
+\item \href{#method-is_acyclic}{\code{Digraph$is_acyclic()}}
+\item \href{#method-is_tree}{\code{Digraph$is_tree()}}
+\item \href{#method-is_polytree}{\code{Digraph$is_polytree()}}
+\item \href{#method-is_arborescence}{\code{Digraph$is_arborescence()}}
 \item \href{#method-direct_successors}{\code{Digraph$direct_successors()}}
 \item \href{#method-direct_predecessors}{\code{Digraph$direct_predecessors()}}
-\item \href{#method-neighbours}{\code{Digraph$neighbours()}}
-\item \href{#method-weakly_connected}{\code{Digraph$weakly_connected()}}
-\item \href{#method-DFS}{\code{Digraph$DFS()}}
+\item \href{#method-paths}{\code{Digraph$paths()}}
+\item \href{#method-walk}{\code{Digraph$walk()}}
 \item \href{#method-clone}{\code{Digraph$clone()}}
 }
+}
+\if{html}{
+\out{<details ><summary>Inherited methods</summary>}
+\itemize{
+\item \out{<span class="pkg-link" data-pkg="rdecision" data-topic="Graph" data-id="degree">}\href{../../rdecision/html/Graph.html#method-degree}{\code{rdecision::Graph$degree()}}\out{</span>}
+\item \out{<span class="pkg-link" data-pkg="rdecision" data-topic="Graph" data-id="element_index">}\href{../../rdecision/html/Graph.html#method-element_index}{\code{rdecision::Graph$element_index()}}\out{</span>}
+\item \out{<span class="pkg-link" data-pkg="rdecision" data-topic="Graph" data-id="has_edge">}\href{../../rdecision/html/Graph.html#method-has_edge}{\code{rdecision::Graph$has_edge()}}\out{</span>}
+\item \out{<span class="pkg-link" data-pkg="rdecision" data-topic="Graph" data-id="has_element">}\href{../../rdecision/html/Graph.html#method-has_element}{\code{rdecision::Graph$has_element()}}\out{</span>}
+\item \out{<span class="pkg-link" data-pkg="rdecision" data-topic="Graph" data-id="has_vertex">}\href{../../rdecision/html/Graph.html#method-has_vertex}{\code{rdecision::Graph$has_vertex()}}\out{</span>}
+\item \out{<span class="pkg-link" data-pkg="rdecision" data-topic="Graph" data-id="is_connected">}\href{../../rdecision/html/Graph.html#method-is_connected}{\code{rdecision::Graph$is_connected()}}\out{</span>}
+\item \out{<span class="pkg-link" data-pkg="rdecision" data-topic="Graph" data-id="is_simple">}\href{../../rdecision/html/Graph.html#method-is_simple}{\code{rdecision::Graph$is_simple()}}\out{</span>}
+\item \out{<span class="pkg-link" data-pkg="rdecision" data-topic="Graph" data-id="neighbours">}\href{../../rdecision/html/Graph.html#method-neighbours}{\code{rdecision::Graph$neighbours()}}\out{</span>}
+\item \out{<span class="pkg-link" data-pkg="rdecision" data-topic="Graph" data-id="order">}\href{../../rdecision/html/Graph.html#method-order}{\code{rdecision::Graph$order()}}\out{</span>}
+\item \out{<span class="pkg-link" data-pkg="rdecision" data-topic="Graph" data-id="size">}\href{../../rdecision/html/Graph.html#method-size}{\code{rdecision::Graph$size()}}\out{</span>}
+}
+\out{</details>}
 }
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-new"></a>}}
 \if{latex}{\out{\hypertarget{method-new}{}}}
 \subsection{Method \code{new()}}{
-Create a new Graph object from sets of nodes and edges.
+Create a new Digraph object from sets of nodes and edges.
 \subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{Digraph$new(V, E)}\if{html}{\out{</div>}}
+\if{html}{\out{<div class="r">}}\preformatted{Digraph$new(V, A)}\if{html}{\out{</div>}}
 }
 
 \subsection{Arguments}{
@@ -65,7 +65,7 @@ Create a new Graph object from sets of nodes and edges.
 \describe{
 \item{\code{V}}{A list of Nodes.}
 
-\item{\code{E}}{A list of Arrows.}
+\item{\code{A}}{A list of Arrows.}
 }
 \if{html}{\out{</div>}}
 }
@@ -74,29 +74,120 @@ A Digraph object.
 }
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-order"></a>}}
-\if{latex}{\out{\hypertarget{method-order}{}}}
-\subsection{Method \code{order()}}{
-Return the order of the graph (number of vertices).
+\if{html}{\out{<a id="method-adjacency_matrix"></a>}}
+\if{latex}{\out{\hypertarget{method-adjacency_matrix}{}}}
+\subsection{Method \code{adjacency_matrix()}}{
+Compute the adjacency matrix for the digraph. Each cell contains the
+number of edges from the row vertex to the column vertex, with the 
+convention of self loops being counted once, unless 'boolean' is TRUE
+when cells are either FALSE (not adjacent) or TRUE (adjacent).
 \subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{Digraph$order()}\if{html}{\out{</div>}}
+\if{html}{\out{<div class="r">}}\preformatted{Digraph$adjacency_matrix(boolean = FALSE)}\if{html}{\out{</div>}}
 }
 
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{boolean}}{If TRUE, the adjacency matrix is logical, each cell is
+{FALSE,TRUE}.}
+}
+\if{html}{\out{</div>}}
+}
 \subsection{Returns}{
-Order of the graph (integer).
+A square numeric matrix with the number of rows and columns
+equal to the order of the graph. The rows and columns are in the
+same order as V. If all the nodes have labels the
+dimnames of the matrix are the labels of the nodes.
 }
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-size"></a>}}
-\if{latex}{\out{\hypertarget{method-size}{}}}
-\subsection{Method \code{size()}}{
-Return the size of the graph (number of edges).
+\if{html}{\out{<a id="method-incidence_matrix"></a>}}
+\if{latex}{\out{\hypertarget{method-incidence_matrix}{}}}
+\subsection{Method \code{incidence_matrix()}}{
+Compute the incidence matrix for the graph. Each row is a vertex and
+each column is an edge. Edges leaving a vertex have value -1 and edges
+entering have value +1. if all vertexes and edges have labels, the
+dimnames of the matrix are the labels of the vertexes and edges.
 \subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{Digraph$size()}\if{html}{\out{</div>}}
+\if{html}{\out{<div class="r">}}\preformatted{Digraph$incidence_matrix()}\if{html}{\out{</div>}}
 }
 
 \subsection{Returns}{
-Size of the graph (integer).
+The incidence matrix.
+}
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-topological_sort"></a>}}
+\if{latex}{\out{\hypertarget{method-topological_sort}{}}}
+\subsection{Method \code{topological_sort()}}{
+Attempt to topologically sort the vertexes in the directed graph using
+Kahn's algorithm (https://doi.org/10.1145%2F368996.369025).
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{Digraph$topological_sort()}\if{html}{\out{</div>}}
+}
+
+\subsection{Returns}{
+A list of vertexes, topologically sorted. If the digraph has
+cycles, the returned ordered list will not contain all the vertexes
+in the graph, but no error will be raised.
+}
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-is_acyclic"></a>}}
+\if{latex}{\out{\hypertarget{method-is_acyclic}{}}}
+\subsection{Method \code{is_acyclic()}}{
+Checks for the presence of a cycle in the graph by attempting to do 
+a topological sort. If the sort does not contain all vertexes, the
+digraph contains at least one cycle.
+This method overrides 'is_acyclic' in Graph.
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{Digraph$is_acyclic()}\if{html}{\out{</div>}}
+}
+
+\subsection{Returns}{
+TRUE if no cycles detected.
+}
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-is_tree"></a>}}
+\if{latex}{\out{\hypertarget{method-is_tree}{}}}
+\subsection{Method \code{is_tree()}}{
+Compute whether the digraph's underlying graph is a tree (connected and
+acyclic).
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{Digraph$is_tree()}\if{html}{\out{</div>}}
+}
+
+\subsection{Returns}{
+TRUE if the underlying graph is a tree; FALSE if not.
+}
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-is_polytree"></a>}}
+\if{latex}{\out{\hypertarget{method-is_polytree}{}}}
+\subsection{Method \code{is_polytree()}}{
+Compute whether the digraph's underlying graph is a tree (connected and
+acyclic). Synonymous with 'is_graph'.
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{Digraph$is_polytree()}\if{html}{\out{</div>}}
+}
+
+\subsection{Returns}{
+TRUE if the underlying graph is a tree; FALSE if not.
+}
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-is_arborescence"></a>}}
+\if{latex}{\out{\hypertarget{method-is_arborescence}{}}}
+\subsection{Method \code{is_arborescence()}}{
+Check whether the digraph is an arborescence (a tree with a
+single root and unique paths from the root).
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{Digraph$is_arborescence()}\if{html}{\out{</div>}}
+}
+
+\subsection{Returns}{
+TRUE if the digraph is an arboresecence; FALSE if not.
 }
 }
 \if{html}{\out{<hr>}}
@@ -128,45 +219,39 @@ node has no predecessors.
 }
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-neighbours"></a>}}
-\if{latex}{\out{\hypertarget{method-neighbours}{}}}
-\subsection{Method \code{neighbours()}}{
-Find the neigbours of a node.
+\if{html}{\out{<a id="method-paths"></a>}}
+\if{latex}{\out{\hypertarget{method-paths}{}}}
+\subsection{Method \code{paths()}}{
+Find all directed paths from source node 's' to target node 't'. In this
+definition, 'path' is a simple path, i.e. all vertexes are unique.
+Uses a recursive depth-first search algorithm.
 \subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{Digraph$neighbours(v)}\if{html}{\out{</div>}}
+\if{html}{\out{<div class="r">}}\preformatted{Digraph$paths(s, t)}\if{html}{\out{</div>}}
 }
 
 \subsection{Returns}{
-A list of nodes which are either direct successors or direct
-predecessors of the node.
+A list of ordered node lists.
 }
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-weakly_connected"></a>}}
-\if{latex}{\out{\hypertarget{method-weakly_connected}{}}}
-\subsection{Method \code{weakly_connected()}}{
-Establish whether the graph is weakly connected, i.e. whether it is
-a connected undirected graph.
+\if{html}{\out{<a id="method-walk"></a>}}
+\if{latex}{\out{\hypertarget{method-walk}{}}}
+\subsection{Method \code{walk()}}{
+Construct the sequence of edges which joins the specified
+sequence of vertexes in this graph.
 \subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{Digraph$weakly_connected()}\if{html}{\out{</div>}}
+\if{html}{\out{<div class="r">}}\preformatted{Digraph$walk(P)}\if{html}{\out{</div>}}
 }
 
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{p}}{A list of Nodes}
+}
+\if{html}{\out{</div>}}
+}
 \subsection{Returns}{
-TRUE if graph is connected, assuming the edges are undirected.
-}
-}
-\if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-DFS"></a>}}
-\if{latex}{\out{\hypertarget{method-DFS}{}}}
-\subsection{Method \code{DFS()}}{
-Non-recursive depth-first search. Starts with a specified node and
-finds all the nodes reachable from it.
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{Digraph$DFS(v)}\if{html}{\out{</div>}}
-}
-
-\subsection{Returns}{
-List of reachable nodes, including self.
+A list of Edges
 }
 }
 \if{html}{\out{<hr>}}
