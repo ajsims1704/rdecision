@@ -1,19 +1,8 @@
 
 
-test_that("incorrect edge types are rejected", {
-  C1 <- Node$new()
-  C2 <- Node$new()
-  ParentNode <- R6::R6Class(
-    classname = "ParentNode",
-    inherit = Node,
-    public=list(
-      initialize=function() {},
-      public_add_edge=function(e) {private$addArrow(e)}
-    )
-  )
-  P <- ParentNode$new()
-  expect_error(P$public_add_edge(42), class="non-Arrow_edge")
-  e <- Arrow$new(P, C1, "edge 1")
-  expect_silent(P$public_add_edge(e))
-  expect_error(P$public_add_edge(e))
+test_that("incorrect label types are rejected", {
+  expect_silent(n1 <- Node$new("n1"))
+  expect_equal(n1$label(), "n1")
+  expect_error(Node$new(42), class="non-string_label")
+  expect_error(Node$new(TRUE), class="non-string_label")
 })

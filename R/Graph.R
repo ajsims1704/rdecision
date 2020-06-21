@@ -38,7 +38,7 @@ Graph <- R6::R6Class(
       if (length(unique(V)) != length(V)) {
         rlang::abort("Each V must be unique", class="repeated_nodes")
       }
-      nodelabels <- sapply(V, function(v) {v$get_label()})
+      nodelabels <- sapply(V, function(v) {v$label()})
       nodelabels <- nodelabels[nchar(nodelabels)>0]
       if (length(unique(nodelabels))!=length(nodelabels)) {
         rlang::abort("Each defined node label must be unique", class="repeated_node_labels")
@@ -52,12 +52,8 @@ Graph <- R6::R6Class(
         if (!inherits(e, what="Edge")) {
           rlang::abort("Each E must be an Edge", class="non-Edge_edge")
         }
-        W <- e$endpoints()
-        sapply(W, function(w){
-          if (!any(sapply(private$V, function(v) {return(v$is_same_node(W[[1]]))}))) {
-            rlang::abort("Edge vertices must be in graph", class="not_in_graph")
-          }  
-          if (!any(sapply(private$V, function(v) {return(v$is_same_node(W[[2]]))}))) {
+        sapply(e$endpoints(), function(w){
+          if (!self$has_vertex(w)) {
             rlang::abort("Edge vertices must be in graph", class="not_in_graph")
           }  
         })
@@ -81,7 +77,7 @@ Graph <- R6::R6Class(
     has_vertex = function(v) {
       member <- FALSE
       if (inherits(v, what="Node")) {
-        member <- any(sapply(private$V, function(w) {return(v$is_same_node(w))}))
+        member <- any(sapply(private$V, function(w) {identical(v,w)}))
       } else {
         rlang::abort("Argument 'v' must be a Node", class="incorrect_element_type")
       }
@@ -110,7 +106,7 @@ Graph <- R6::R6Class(
     has_element = function(x) {
       member <- FALSE
       if (inherits(x, what="Node")) {
-        member <- any(sapply(private$V, function(v) {return(x$is_same_node(v))}))
+        member <- self$has_vertex(x)
       } else if (inherits(x, what="Edge")) {
         member <- any(sapply(private$E, function(e) {return(x$is_same_edge(e))}))
       } else {
@@ -132,7 +128,7 @@ Graph <- R6::R6Class(
       # check (has_element will check type)
       if (self$has_element(x)) {
         if (inherits(x, what="Node")) {
-          index <- which(sapply(private$V,function(w){w$is_same_node(x)}), arr.ind=TRUE)      
+          index <- which(sapply(private$V,function(v){identical(v,x)}), arr.ind=TRUE)      
         } else if (inherits(x, what="Edge")) {
           index <- which(sapply(private$E,function(e){e$is_same_edge(x)}), arr.ind=TRUE)      
         } else {
@@ -175,7 +171,7 @@ Graph <- R6::R6Class(
         rlang::abort("Argument 'boolean' must be 'logical'.", class="non-logical_boolean")
       }
       # create matrix
-      L <- sapply(private$V,function(v){v$get_label()})
+      L <- sapply(private$V,function(v){v$label()})
       n <- self$order()
       if (all(nchar(L)>0)) {
         A <- matrix(rep(0,times=n*n), nrow=n, dimnames=list(out.node=L,in.node=L))

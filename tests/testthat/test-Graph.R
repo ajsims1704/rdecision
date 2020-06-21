@@ -2,10 +2,10 @@
 # setequal function for Nodes
 nodesetequal <- function(A,B) {
   AinB <- all(sapply(A, function(a) {
-    return(any(sapply(B, function(b){return(b$is_same_node(a))})))
+    return(any(sapply(B, function(b){identical(a,b)})))
   }))  
   BinA <- all(sapply(B, function(b) {
-    return(any(sapply(A, function(a){return(a$is_same_node(b))})))
+    return(any(sapply(A, function(a){identical(a,b)})))
   }))
   return(AinB & BinA)
 }

@@ -60,7 +60,7 @@ Digraph <- R6::R6Class(
         rlang::abort("Argument 'boolean' must be 'logical'.", class="non-logical_boolean")
       }
       # create matrix
-      L <- sapply(private$V,function(v){v$get_label()})
+      L <- sapply(private$V,function(v){v$label()})
       n <- self$order()
       if (all(nchar(L)>0)) {
         A <- matrix(rep(0,times=n*n), nrow=n, dimnames=list(out.node=L,in.node=L))
@@ -88,7 +88,7 @@ Digraph <- R6::R6Class(
     #' @return The incidence matrix.
     incidence_matrix = function() {
       # create matrix
-      LV <- sapply(private$V,function(v){v$get_label()})
+      LV <- sapply(private$V,function(v){v$label()})
       LE <- sapply(private$E,function(e){e$label()})
       nv <- self$order()
       ne <- self$size()
