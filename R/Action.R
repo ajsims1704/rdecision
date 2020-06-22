@@ -22,9 +22,18 @@ Action <- R6::R6Class(
     #' Create an object of type 'Action'.
     #' @param source Decision node from which the arrow leaves.
     #' @param target Node which the arrow enters.
-    #' @param label Character string containing the arrow label.
+    #' @param label Character string containing the arrow label. This
+    #' must be defined for an action because the label is used in
+    #' tabulation of strategies.
     #' @return A new \code{Action} object.
-    initialize = function(source, target, label="") {
+    initialize = function(source, target, label) {
+      # check label
+      if (!is.character(label)) {
+        rlang::abort("Argument label must be a string", class="non-string_label")
+      }
+      if (nchar(label)==0) {
+        rlang::abort("Argument label must be defined", class="empty_label")
+      }
       # initialize base class
       super$initialize(source=source, target=target, label=label)
       # check that source inherits from DecisionNode

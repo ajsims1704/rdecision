@@ -31,16 +31,16 @@ test_that("incorrect node and edge types are rejected", {
   n2 <- Node$new("n1")
   n3 <- Node$new()
   e1 <- Edge$new(n1,n2,"e1")
-  expect_error(Graph$new(V=list(n1,n2),E=list(e1)), class="repeated_node_labels")
-  expect_error(Graph$new(V=list(n1,n2,n3),E=list(e1)), class="repeated_node_labels")
+  expect_silent(Graph$new(V=list(n1,n2),E=list(e1)))
+  expect_silent(Graph$new(V=list(n1,n2,n3),E=list(e1)))
   #
   n1 <- Node$new("n1")
   n2 <- Node$new("n2")
   e1 <- Edge$new(n1,n2,"e1")
   e2 <- Edge$new(n2,n1,"e1")
   e3 <- Edge$new(n1,n2)
-  expect_error(Graph$new(V=list(n1,n2),E=list(e1,e2)), class="repeated_edge_labels")
-  expect_error(Graph$new(V=list(n1,n2),E=list(e1,e2,e3)), class="repeated_edge_labels")
+  expect_silent(Graph$new(V=list(n1,n2),E=list(e1,e2)))
+  expect_silent(Graph$new(V=list(n1,n2),E=list(e1,e2,e3)))
 })
 
 # tests of simple graph properties
@@ -111,6 +111,7 @@ test_that("adjacency matrix has correct properties", {
   e1 <- Edge$new(n1,n2)
   G <- Graph$new(V=list(n1,n2),E=list(e1))
   A <- G$adjacency_matrix()
+  print(A)
   expect_true(is.null(dimnames(A))) 
   n1 <- Node$new("n1")
   n2 <- Node$new("n2")

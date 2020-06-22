@@ -38,11 +38,6 @@ Graph <- R6::R6Class(
       if (length(unique(V)) != length(V)) {
         rlang::abort("Each V must be unique", class="repeated_nodes")
       }
-      nodelabels <- sapply(V, function(v) {v$label()})
-      nodelabels <- nodelabels[nchar(nodelabels)>0]
-      if (length(unique(nodelabels))!=length(nodelabels)) {
-        rlang::abort("Each defined node label must be unique", class="repeated_node_labels")
-      }
       private$V <- V
       # check and set edges
       if (!is.list(E)) {
@@ -60,11 +55,6 @@ Graph <- R6::R6Class(
       })
       if (length(unique(E)) != length(E)) {
         rlang::abort("Each E must be unique", class="repeated_edges")
-      }
-      edgelabels <- sapply(E, function(e) {e$label()})
-      edgelabels <- edgelabels[nchar(edgelabels)>0]
-      if (length(unique(edgelabels))!=length(edgelabels)) {
-        rlang::abort("Each defined edge label must be unique", class="repeated_edge_labels")
       }
       private$E <- E
       return(invisible(self))
@@ -163,7 +153,7 @@ Graph <- R6::R6Class(
     #' {FALSE,TRUE}.
     #' @return A square numeric matrix with the number of rows and columns
     #' equal to the order of the graph. The rows and columns are in the
-    #' same order as V. If all the nodes have labels the
+    #' same order as V. If the nodes have defined and unique labels the
     #' dimnames of the matrix are the labels of the nodes. 
     adjacency_matrix = function(boolean=FALSE) {
       # check argument
@@ -173,7 +163,7 @@ Graph <- R6::R6Class(
       # create matrix
       L <- sapply(private$V,function(v){v$label()})
       n <- self$order()
-      if (all(nchar(L)>0)) {
+      if (length(unique(L))==length(L) && all(nchar(L)>0)) {
         A <- matrix(rep(0,times=n*n), nrow=n, dimnames=list(out.node=L,in.node=L))
       } else {
         A <- matrix(rep(0,times=n*n), nrow=n)
@@ -346,40 +336,6 @@ Graph <- R6::R6Class(
       return(n)
     }
   
-    #' #' @description 
-    #' #' Non-recursive depth-first search. Starts with a specified node and
-    #' #' finds all the nodes reachable from it.
-    #' #' @return List of reachable nodes, including self.
-    #' DFS = function(v) {
-    #'   # check argument
-    #'   if (!self$has_vertex(v)) {
-    #'     rlang::abort("Argument 'v' is not in graph", class="not_in_graph")
-    #'   }
-    #'   # D (element d) is a growing list of discovered nodes
-    #'   # S (element s) is a stack of nodes being processed
-    #'   D <- list()
-    #'   S <- list()
-    #'   # S.push(v)
-    #'   S <- c(S,v)
-    #'   # while S is not empty do
-    #'   while (length(S)>0) {
-    #'     # v = S.pop()
-    #'     s <- S[[length(S)]]
-    #'     S[[length(S)]] <- NULL
-    #'     # if s is not labelled as discovered then
-    #'     if (!any(sapply(D,function(d){return(d$is_same_node(s))}))) {
-    #'       # label s as discovered
-    #'       D <- c(D,s)
-    #'       # for all edges from v to n in G.adjacentEdges(v) do
-    #'       for (n in self$neighbours(s)) {
-    #'         # S.push(w)
-    #'         S <- c(S,n)
-    #'       }
-    #'     }
-    #'   }
-    #'   # return discovered nodes
-    #'   return(D)
-    #' }  
   )
 )
 

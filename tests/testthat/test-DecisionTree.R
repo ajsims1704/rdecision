@@ -24,84 +24,73 @@ test_that("rdecision replicates Evans et al, Sumatriptan base case", {
   c.I <- caffeine+ED
   c.J <- caffeine+ED+admission
   admission <- 1093
+  #
   # Sumatriptan branch
-  leaf.a <- LeafNode$new("A", cost=c.A, utility=1.0, interval=th)
-  leaf.b <- LeafNode$new("B", cost=c.B, utility=0.9, interval=th)
-  c.4 <- ChanceNode$new("c.4")
-
-  #   p = list(0.594, 0.406),
-  #   children = list(state.a, state.b),
-  #   edgelabels = list("No recurrence", "Recurrence relieved with 2nd dose")
-  # )
-  leaf.c <- LeafNode$new("C", cost=c.C, utility=-0.3, interval=th)
-  leaf.d <- LeafNode$new("D", cost=c.D, utility=0.1, interval=th)
-  leaf.e <- LeafNode$new("E", cost=c.E, utility=-0.3, interval=th)
-  expect_equal(leaf.e$label(), "E")
-  c.8 <- ChanceNode$new("c.8")
-  #   p = list(0.998, 0.002),
-  #   children = list(state.d, state.e),
-  #   edgelabels = list("Relief", "Hospitalization")
-  # )
-  c.5 <- ChanceNode$new("c.5")
-  #   p = list(0.920, 0.080),
-  #   children = list(state.c, c.8),
-  #   edgelabels = list("Endures attack", "ER")
-  # )
-  c.2 <- ChanceNode$new("c.2")
-  #   p = list(0.558, 0.442),
-  #   children = list(c.4, c.5),
-  #   edgelabels = list("Relief", "No relief")
-  # )
+  #
+  n.a <- LeafNode$new("A", cost=c.A, utility=1.0, interval=th)
+  n.b <- LeafNode$new("B", cost=c.B, utility=0.9, interval=th)
+  n.4 <- ChanceNode$new("n.4")
+  e.4a <- Reaction$new(n.4, n.a, p=0.594, label="No recurrence")
+  e.4b <- Reaction$new(n.4, n.b, p=0.406, label="Recurrence relieved with 2nd dose")
+  #
+  n.d <- LeafNode$new("D", cost=c.D, utility=0.1, interval=th)
+  n.e <- LeafNode$new("E", cost=c.E, utility=-0.3, interval=th)
+  n.8 <- ChanceNode$new("n.8")
+  e.8d <- Reaction$new(n.8, n.d, p=0.998, label="Relief")
+  e.8e <- Reaction$new(n.8, n.e, p=0.002, label="Hospitalization")
+  #
+  n.c <- LeafNode$new("C", cost=c.C, utility=-0.3, interval=th)
+  n.5 <- ChanceNode$new("n.5")
+  e.5c <- Reaction$new(n.5, n.c, p=0.920, label="Endures attack")
+  e.58 <- Reaction$new(n.5, n.8, p=0.008, label="Emergency Department")
+  #
+  n.2 <- ChanceNode$new("n.2")
+  e.24 <- Reaction$new(n.2, n.4, p=0.558, label="Relief")
+  e.25 <- Reaction$new(n.2, n.5, p=0.442, label="No relief")
+  #
   # Caffeine/Ergotamine branch
-  leaf.f <- LeafNode$new("F", cost=c.F, utility=1.0, interval=th)
-  leaf.g <- LeafNode$new("G", cost=c.G, utility=0.9, interval=th)
-  leaf.h <- LeafNode$new("H", cost=c.H, utility=-0.3, interval=th)
-  leaf.i <- LeafNode$new("I", cost=c.I, utility=0.1, interval=th)
-  leaf.j <- LeafNode$new("J", cost=c.J, utility=-0.3, interval=th)
-  c.9 <- ChanceNode$new("C.9")
-  #   p = list(0.998, 0.002),
-  #   children = list(state.i, state.j),
-  #   edgelabels = list("Relief", "Hospitalization")
-  # )
-  c.6 <- ChanceNode$new("c.6")
-  #   p = list(0.703, 0.297),
-  #   children = list(state.f, state.g),
-  #   edgelabels = list("No recurrence", "Recurrence relieved with 2nd dose")
-  # )
-  c.7 <- ChanceNode$new("c.7")
-  #   p = list(0.920, 0.080),
-  #   children = list(state.h, c.9),
-  #   edgelabels = list("Endures attack", "ER")
-  # )
-  c.3 <- ChanceNode$new("c.3")
-  expect_equal(c.3$label(), "c.3")
-  #   p = list(0.379, 0.621),
-  #   children = list(c.6, c.7),
-  #   edgelabels = list("Relief", "No relief")
-  # )
+  #
+  n.f <- LeafNode$new("F", cost=c.F, utility=1.0, interval=th)
+  n.g <- LeafNode$new("G", cost=c.G, utility=0.9, interval=th)
+  n.6 <- ChanceNode$new("n.6")
+  e.6f <- Reaction$new(n.6, n.f, p=0.703, label="No recurrence")
+  e.6g <- Reaction$new(n.6, n.g, p=0.297, label="Recurrence relieved with 2nd dose")
+  #
+  n.i <- LeafNode$new("I", cost=c.I, utility=0.1, interval=th)
+  n.j <- LeafNode$new("J", cost=c.J, utility=-0.3, interval=th)
+  n.9 <- ChanceNode$new("C.9")
+  e.9i <- Reaction$new(n.9, n.i, p=0.998, label="Relief")
+  e.9j <- Reaction$new(n.9, n.j, p=0.002, label="Hospitalization")
+  # 
+  n.h <- LeafNode$new("H", cost=c.H, utility=-0.3, interval=th)
+  n.7 <- ChanceNode$new("n.7")
+  e.7h <- Reaction$new(n.7, n.h, p=0.920, label="Endures attack")
+  e.79 <- Reaction$new(n.7, n.9, p=0.080, label="Emergency Department")
+  #
+  n.3 <- ChanceNode$new("n.3")
+  expect_equal(n.3$label(), "n.3")
+  e.36 <- Reaction$new(n.3, n.6, p=0.379, label="Relief")
+  e.37 <- Reaction$new(n.3, n.7, p=0.621, label="No relief")
+  #
   # decision node
-  d <- DecisionNode$new("d")
-  expect_equal(d$label(), "d")
-  e.17 <- Action$new(d,c.2)
-  e.18 <- Action$new(d,c.3)
-  
-  #   children = list(c.2, c.3),
-  #   choices = list("Sumatriptan", "Caffeine/Ergotamine")
-  # )
+  n.1 <- DecisionNode$new("n.1")
+  expect_equal(n.1$label(), "n.1")
+  e.12 <- Action$new(n.1, n.2, label="Sumatriptan")
+  e.13 <- Action$new(n.1, n.3, label="Caffeine/Ergotamine")
+  # 
   # create lists of nodes and edges
   V <- list(
-    d,
-#    leaf.a, leaf.b, leaf.c, leaf.d, leaf.e,
-    c.2,  #c.8, c.4, c.5, c.2,
-#    leaf.f, leaf.g, leaf.h, leaf.i, leaf.j,
-    c.3 #c.9, c.6, c.7, c.3
+    n.1, n.2, n.3, n.4, n.5, n.6, n.7, n.8, n.9,
+    n.a, n.b, n.c, n.d, n.e, n.f, n.g, n.h, n.i, n.j
   )
   E <- list(
-    e.17, e.18
+    e.12, e.13, 
+    e.24, e.25, e.36, e.37, 
+    e.4a, e.4b, e.5c, e.58, e.8d, e.8e,
+    e.6f, e.6g, e.7h, e.79, e.9i, e.9j
   )
-  
   # tree
-  dt <- DecisionTree$new(V,E)
+  expect_silent(dt <- DecisionTree$new(V,E))
   # # evaluate
   # RES <- dt$evaluateChoices()
   # expect_true(is.data.frame(RES))

@@ -52,7 +52,7 @@ Digraph <- R6::R6Class(
     #' {FALSE,TRUE}.
     #' @return A square numeric matrix with the number of rows and columns
     #' equal to the order of the graph. The rows and columns are in the
-    #' same order as V. If all the nodes have labels the
+    #' same order as V. If the nodes have defined and unique labels the
     #' dimnames of the matrix are the labels of the nodes. 
     adjacency_matrix = function(boolean=FALSE) {
       # check argument
@@ -62,7 +62,7 @@ Digraph <- R6::R6Class(
       # create matrix
       L <- sapply(private$V,function(v){v$label()})
       n <- self$order()
-      if (all(nchar(L)>0)) {
+      if (length(unique(L))==length(L) && all(nchar(L)>0)) {
         A <- matrix(rep(0,times=n*n), nrow=n, dimnames=list(out.node=L,in.node=L))
       } else {
         A <- matrix(rep(0,times=n*n), nrow=n)
@@ -83,8 +83,9 @@ Digraph <- R6::R6Class(
     #' @description 
     #' Compute the incidence matrix for the graph. Each row is a vertex and
     #' each column is an edge. Edges leaving a vertex have value -1 and edges
-    #' entering have value +1. if all vertexes and edges have labels, the
-    #' dimnames of the matrix are the labels of the vertexes and edges.
+    #' entering have value +1. if all vertexes have defined and unique labels and all
+    #' edges have defined and unique labels, the dimnames of the matrix are the labels of
+    #' the vertexes and edges.
     #' @return The incidence matrix.
     incidence_matrix = function() {
       # create matrix
@@ -92,7 +93,8 @@ Digraph <- R6::R6Class(
       LE <- sapply(private$E,function(e){e$label()})
       nv <- self$order()
       ne <- self$size()
-      if (all(nchar(LV)>0) & all(nchar(LE)>0)) {
+      if ((length(unique(LV))==length(LV)) && (length(unique(LE))==length(LE)) &&
+          all(nchar(LV)>0) && all(nchar(LE)>0)) {
         B <- matrix(rep(0,times=nv*ne), nrow=nv, dimnames=list(vertex=LV,edge=LE))
       } else {
         B <- matrix(rep(0,times=nv*ne), nrow=nv)
