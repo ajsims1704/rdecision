@@ -41,7 +41,7 @@ Arborescence <- R6::R6Class(
     #' @param v Node to test
     #' @return TRUE if v has one or more child nodes, FALSE otherwise.
     is_parent = function(v) {
-      # check if this vertex has direct successors (also chacks v)
+      # check if this vertex has direct successors (also checks v)
       C <- self$direct_successors(v)
       return(length(C)>0)
     }

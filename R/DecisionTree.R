@@ -27,6 +27,10 @@
 #' chance nodes must inherit from \code{Reaction}.}
 #' \item{The sum of probabilities of each set of reaction edges 
 #' with a common source endpoint must be 1.}
+#' \item{Each \code{DecisionNode} must have a label, and the labels of all
+#' \code{DecisionNodes} must be unique within the model.}
+#' \item{Each \code{Action} must have a label, and the labels of  
+#' \code{Action}s that share a common source endpoint must be unique.}
 #' }
 #' 
 #' @docType class
@@ -88,6 +92,20 @@ DecisionTree <- R6::R6Class(
       if (!all(eok)) {
         rlang::abort("Actions must start at DecisionNodes; Reactions must start at ChanceNodes",
                      class = "incorrect_edge_type ")
+      }
+      # DecisionNode labels must be unique and all their Action labels must be unique
+      D.lab <- sapply(D,function(d){
+        ACT <- which(private$B[,d]==-1, arr.ind=TRUE)
+        ACT.lab <- sapply(ACT,function(e){e$label()})
+        if (length(ACT.lab) != length(unique(ACT.lab))) {
+          rlang::abort("Labels of actions with a common source node must be unique",
+                       class="non_unique_labels")
+        }
+        v <- private$V[[d]]
+        return(v$label())
+      })
+      if (length(D.lab) != length(unique(D.lab))) {
+        rlang::abort("Labels of DecisionNodes must be unique", class="non_unique_labels")
       }
       # return a new DecisionTree object
       return(invisible(self))

@@ -21,9 +21,17 @@ DecisionNode <- R6::R6Class(
 
     #' @description 
     #' Create a new decision node.
-    #' @param label A label for the node.
+    #' @param label A label for the node. Must be defined because the label is
+    #' used in tabulation of strategies.
     #' @return A new DecisionNode object
-    initialize = function(label="") {
+    initialize = function(label) {
+      # check label
+      if (!is.character(label)) {
+        rlang::abort("Argument label must be a string", class="non-string_label")
+      }
+      if (nchar(label)==0) {
+        rlang::abort("Argument label must be defined", class="empty_label")
+      }
       # ensure base class fields are initialized
       super$initialize(label)
       # # check child nodes
