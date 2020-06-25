@@ -243,6 +243,8 @@ Digraph <- R6::R6Class(
     #' Find all directed paths from source node 's' to target node 't'. In this
     #' definition, 'path' is a simple path, i.e. all vertexes are unique.
     #' Uses a recursive depth-first search algorithm.
+    #' @param s Source node.
+    #' @param t Target node.
     #' @return A list of ordered node lists. 
     paths = function(s,t) {
       # check arguments

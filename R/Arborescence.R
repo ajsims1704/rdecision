@@ -47,11 +47,11 @@ Arborescence <- R6::R6Class(
     },
     
     #' @description 
-    #' Test whether the given vertex is a leaf. In an arboresecence,
+    #' Test whether the given vertex is a leaf. In an arborescence,
     #' \code{is_parent()} and \code{is_leaf()} will be mutually exclusive.
     #' @param v Vertex to test.
     #' @return TRUE if v has no child nodes, FALSE otherwise. 
-    is_leaf = function() {
+    is_leaf = function(v) {
       # check if this vertex has direct successors (also checks v)
       C <- self$direct_successors(v)
       return(length(C)==0)
@@ -63,9 +63,25 @@ Arborescence <- R6::R6Class(
     root = function() {
       # vertex with no incoming edges (only one, checked in initialize)
       u <- which(apply(private$B, MARGIN=1, function(r){!any(r>0)}),arr.ind=TRUE)
-      return(u[[1]])
-    }
+      return(private$V[[u]])
+    },
     
+    #' @description 
+    #' Find all directed paths from the root of the tree to the leaves.
+    #' @return A list of ordered node lists. 
+    root_to_leaf_paths = function() {
+      # Find the root
+      r <- self$root()
+      P <- list()
+      sapply(private$V, function(v){
+        if (self$is_leaf(v)) {
+          pp <- self$paths(r,v)
+          P[[length(P)+1]] <<- pp[[1]]    
+        }
+      })
+      # return the paths
+      return(P)
+    }
   )
   
 )

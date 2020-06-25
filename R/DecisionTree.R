@@ -120,7 +120,7 @@ DecisionTree <- R6::R6Class(
     #' decision tree. For each path, the strategy, probability, cost,
     #' benefit and utility are calculated.
     #' @param expected If TRUE, evaluate each model variable as its mean value,
-    #'        otherwise sample each one from their uncertainty distrbution.
+    #'        otherwise sample each one from their uncertainty distribution.
     #' @param uncorrelate If TRUE, resample and update the tree between
     #' the evaluation of each choice. This causes any model variables that
     #' are common to more than one choice to be resampled between choices,
@@ -131,8 +131,8 @@ DecisionTree <- R6::R6Class(
     #' \describe{
     #' \item{Strategy}{The strategy used to traverse the path; i.e. a list of 
     #' decision nodes and the decision made at each.}
-    #' \item{Leaf}{The leaf node on which the pathway ends; normally the 
-    #' clinical outcome.}
+    #' \item{Leaf}{The label of the leaf node on which the pathway ends; 
+    #' normally the clinical outcome.}
     #' \item{Probability}{The probability of traversing the pathway. The total
     #' probability of each strategy should sum to unity.}
     #' \item{Cost}{The cost of traversing the pathway.}
@@ -142,17 +142,22 @@ DecisionTree <- R6::R6Class(
     #' }
     payoffs = function(expected=TRUE, uncorrelate=FALSE) {
       
-      # get all pathways through the tree
-      r <- self$root()
-      P <- list()
-      sapply(private$V, function(v){
-        if (self$is_leaf(v)) {
-          pp <- self$paths(r,v)
-          P <- list(P, pp[[1]])    
-        }
-      })
-      
-      
+      # find all root to leaf paths
+      P <- self$root_to_leaf_paths()
+      # create data frame
+      RES <- data.frame(
+        Probability = sapply(P, function(p) {
+          pr <- 1
+          w <- self$walk(p)
+          sapply(w, function(e) {
+            if (inherits(e, what="Reaction")) {
+              pr <<- pr * e$p()
+            }
+          })
+          return(pr)
+        }),
+        Leaf = sapply(P, function(p){p[[length(p)]]$label()})
+      )
       
       # # if no requirement to uncorrelate, resample the tree once
       # if (!uncorrelate) {

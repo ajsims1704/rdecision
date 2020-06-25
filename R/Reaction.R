@@ -61,6 +61,19 @@ Reaction <- R6::R6Class(
       private$edge.benefit <- benefit
       # Return reaction node
       return(invisible(self))
+    },
+    
+    #' @description
+    #' Return the current value of the edge probability.
+    #' @return Numeric value in range [0,1].
+    p = function() {
+      prob <- 0
+      if (inherits(private$edge.p, what="ModVar")) {
+        prob <- private$edge.p$value()
+      } else {
+        prob <- private$edge.p
+      }
+      return(prob)
     }
   
   )
