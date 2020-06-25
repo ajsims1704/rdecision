@@ -44,9 +44,28 @@ Arborescence <- R6::R6Class(
       # check if this vertex has direct successors (also checks v)
       C <- self$direct_successors(v)
       return(length(C)>0)
-    }
+    },
+    
+    #' @description 
+    #' Test whether the given vertex is a leaf. In an arboresecence,
+    #' \code{is_parent()} and \code{is_leaf()} will be mutually exclusive.
+    #' @param v Vertex to test.
+    #' @return TRUE if v has no child nodes, FALSE otherwise. 
+    is_leaf = function() {
+      # check if this vertex has direct successors (also checks v)
+      C <- self$direct_successors(v)
+      return(length(C)==0)
+    },
 
-  
+    #' @description 
+    #' Find the root vertex of the arborescence.
+    #' @return The root vertex.
+    root = function() {
+      # vertex with no incoming edges (only one, checked in initialize)
+      u <- which(apply(private$B, MARGIN=1, function(r){!any(r>0)}),arr.ind=TRUE)
+      return(u[[1]])
+    }
+    
   )
   
 )

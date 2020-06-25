@@ -91,8 +91,8 @@ test_that("rdecision replicates Evans et al, Sumatriptan base case", {
   )
   # tree
   expect_silent(dt <- DecisionTree$new(V,E))
-  # # evaluate
-  # RES <- dt$evaluateChoices()
+  # evaluate
+  RES <- dt$payoffs()
   # expect_true(is.data.frame(RES))
   # c.Sumatriptan <- round(RES[RES$Run==1 & RES$Choice=="Sumatriptan", "Cost"],2)
   # expect_equal(c.Sumatriptan, 22.06)

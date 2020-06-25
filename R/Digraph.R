@@ -189,7 +189,7 @@ Digraph <- R6::R6Class(
         return(FALSE)
       }
       # there must be one and only one root vertex
-      u <- which(apply(private$B[], MARGIN=1, function(r){!any(r>0)}),arr.ind=TRUE)
+      u <- which(apply(private$B, MARGIN=1, function(r){!any(r>0)}),arr.ind=TRUE)
       if (length(u) != 1) {
         return(FALSE)
       }

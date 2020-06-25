@@ -95,13 +95,17 @@ DecisionTree <- R6::R6Class(
       }
       # DecisionNode labels must be unique and all their Action labels must be unique
       D.lab <- sapply(D,function(d){
-        ACT <- which(private$B[,d]==-1, arr.ind=TRUE)
-        ACT.lab <- sapply(ACT,function(e){e$label()})
-        if (length(ACT.lab) != length(unique(ACT.lab))) {
+        v <- private$V[[d]]
+        K <- self$direct_successors(v)
+        choices <- sapply(K, function(k) {
+          w <- self$walk(list(v,k))
+          e <- w[[1]]
+          return(e$label())
+        })
+        if (length(choices) != length(unique(choices))) {
           rlang::abort("Labels of actions with a common source node must be unique",
                        class="non_unique_labels")
         }
-        v <- private$V[[d]]
         return(v$label())
       })
       if (length(D.lab) != length(unique(D.lab))) {
@@ -109,6 +113,67 @@ DecisionTree <- R6::R6Class(
       }
       # return a new DecisionTree object
       return(invisible(self))
+    },
+    
+    #' @description 
+    #' Compute the components of payoff associated with the paths in the
+    #' decision tree. For each path, the strategy, probability, cost,
+    #' benefit and utility are calculated.
+    #' @param expected If TRUE, evaluate each model variable as its mean value,
+    #'        otherwise sample each one from their uncertainty distrbution.
+    #' @param uncorrelate If TRUE, resample and update the tree between
+    #' the evaluation of each choice. This causes any model variables that
+    #' are common to more than one choice to be resampled between choices,
+    #' and removes correlation due to shared model variables. Other forms
+    #' of correlation may not be removed.
+    #' @return A data frame with one row per path and columns organized as
+    #' follows:
+    #' \describe{
+    #' \item{Strategy}{The strategy used to traverse the path; i.e. a list of 
+    #' decision nodes and the decision made at each.}
+    #' \item{Leaf}{The leaf node on which the pathway ends; normally the 
+    #' clinical outcome.}
+    #' \item{Probability}{The probability of traversing the pathway. The total
+    #' probability of each strategy should sum to unity.}
+    #' \item{Cost}{The cost of traversing the pathway.}
+    #' \item{ExpectedCost}{Cost \eqn{*} probability of traversing the pathway.}
+    #' \item{Utility}{The utility associated with the outcome.}
+    #' \item{ExpectedUtility}{Utility \eqn{*} probability of traversing the pathway.}
+    #' }
+    payoffs = function(expected=TRUE, uncorrelate=FALSE) {
+      
+      # get all pathways through the tree
+      r <- self$root()
+      P <- list()
+      sapply(private$V, function(v){
+        if (self$is_leaf(v)) {
+          pp <- self$paths(r,v)
+          P <- list(P, pp[[1]])    
+        }
+      })
+      
+      
+      
+      # # if no requirement to uncorrelate, resample the tree once
+      # if (!uncorrelate) {
+      #   self$update(expected)
+      # }
+      # # choice by choice
+      # choices <- private$dn$get_choices()
+      # choicerows <- lapply(choices, FUN=function(choice) {
+      #   if (uncorrelate) {
+      #     self$update(expected)
+      #   }
+      #   paths <- private$dn$getPathways(choice)
+      #   RCH <- do.call('rbind', lapply(paths, FUN=function(x){x$tabulate()}))
+      #   return(RCH)
+      # })
+      # RES <- do.call('rbind', choicerows)
+      # # add expected cost and utility     
+      # RES$ExpectedCost <- RES$Probability*RES$Cost
+      # RES$ExpectedUtility <- RES$Probability*RES$Utility
+      
+      return(RES)
     }
     
   )
