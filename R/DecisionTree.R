@@ -116,18 +116,13 @@ DecisionTree <- R6::R6Class(
     },
     
     #' @description 
-    #' Compute the components of payoff associated with the paths in the
+    #' Evaluate the components of payoff associated with the paths in the
     #' decision tree. For each path, the strategy, probability, cost,
     #' benefit and utility are calculated.
     #' @param expected If TRUE, evaluate each model variable as its mean value,
     #'        otherwise sample each one from their uncertainty distribution.
-    #' @param uncorrelate If TRUE, resample and update the tree between
-    #' the evaluation of each choice. This causes any model variables that
-    #' are common to more than one choice to be resampled between choices,
-    #' and removes correlation due to shared model variables. Other forms
-    #' of correlation may not be removed.
-    #' @return A data frame with one row per path and columns organized as
-    #' follows:
+    #' @return A data frame (payoff table) with one row per path and columns
+    #' organized as follows:
     #' \describe{
     #' \item{Strategy}{The strategy used to traverse the path; i.e. a list of 
     #' decision nodes and the decision made at each.}
@@ -140,24 +135,42 @@ DecisionTree <- R6::R6Class(
     #' \item{Utility}{The utility associated with the outcome.}
     #' \item{ExpectedUtility}{Utility \eqn{*} probability of traversing the pathway.}
     #' }
-    payoffs = function(expected=TRUE, uncorrelate=FALSE) {
+    evaluate = function(expected=TRUE) {
       
       # find all root to leaf paths
       P <- self$root_to_leaf_paths()
-      # create data frame
-      RES <- data.frame(
-        Probability = sapply(P, function(p) {
-          pr <- 1
-          w <- self$walk(p)
-          sapply(w, function(e) {
-            if (inherits(e, what="Reaction")) {
-              pr <<- pr * e$p()
-            }
-          })
-          return(pr)
-        }),
-        Leaf = sapply(P, function(p){p[[length(p)]]$label()})
-      )
+      # get the names of all decision nodes and create a data frame
+      dn <- list()
+      sapply(private$V, function(v) {
+        if (inherits(v, what="DecisionNode")) {
+          dn <<- c(dn, v$label())
+        }
+      })
+      PAYOFF <- data.frame(PID=seq_along(P))
+      DM <- matrix(data=as.character(NA), nrow=length(P), ncol=length(dn),
+                   dimnames=list(list(),dn))
+      PAYOFF <- cbind(PAYOFF, DM, deparse.level=1)
+      
+      # # create data frame
+      # RES <- data.frame(
+      #   # identifier for the strategy for choosing the path
+      #   Strategy = sapply(P, function(p) {
+      #     
+      #   })
+      #   # probability of walking the path
+      #   Probability = sapply(P, function(p) {
+      #     pr <- 1
+      #     w <- self$walk(p)
+      #     sapply(w, function(e) {
+      #       if (inherits(e, what="Reaction")) {
+      #         pr <<- pr * e$p()
+      #       }
+      #     })
+      #     return(pr)
+      #   }),
+      #   # label of the leaf node at end of the path
+      #   Leaf = sapply(P, function(p){p[[length(p)]]$label()})
+      # )
       
       # # if no requirement to uncorrelate, resample the tree once
       # if (!uncorrelate) {
@@ -178,7 +191,7 @@ DecisionTree <- R6::R6Class(
       # RES$ExpectedCost <- RES$Probability*RES$Cost
       # RES$ExpectedUtility <- RES$Probability*RES$Utility
       
-      return(RES)
+      return(PAYOFF)
     }
     
   )

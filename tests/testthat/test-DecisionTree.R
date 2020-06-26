@@ -92,7 +92,7 @@ test_that("rdecision replicates Evans et al, Sumatriptan base case", {
   # tree
   expect_silent(dt <- DecisionTree$new(V,E))
   # evaluate
-  RES <- dt$payoffs()
+  RES <- dt$evaluate()
   print(RES)
   expect_true(FALSE)
   # expect_true(is.data.frame(RES))
