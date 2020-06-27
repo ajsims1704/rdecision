@@ -56,7 +56,7 @@ Arborescence <- R6::R6Class(
       C <- self$direct_successors(v)
       return(length(C)==0)
     },
-
+  
     #' @description 
     #' Find the root vertex of the arborescence.
     #' @return The root vertex.
@@ -82,6 +82,7 @@ Arborescence <- R6::R6Class(
       # return the paths
       return(P)
     }
+    
   )
   
 )

@@ -65,16 +65,45 @@ Reaction <- R6::R6Class(
     
     #' @description
     #' Return the current value of the edge probability.
+    #' @param expected Parameter passed to the \code{value} method of the model
+    #' variable used to define probability; ignored otherwise.
     #' @return Numeric value in range [0,1].
-    p = function() {
+    p = function(expected=FALSE) {
       prob <- 0
       if (inherits(private$edge.p, what="ModVar")) {
-        prob <- private$edge.p$value()
+        prob <- private$edge.p$value(expected)
       } else {
         prob <- private$edge.p
       }
       return(prob)
-    }
-  
+    },
+    
+    #' @description 
+    #' Return the cost associated with traversing the edge.
+    #' @param expected Parameter passed to the \code{value} method of the model
+    #' variable used to define cost; ignored otherwise.
+    #' @return Cost.
+    cost = function(expected=FALSE) {
+      if (inherits(private$edge.cost, what="ModVar")) {
+        rv <- private$edge.cost$value(expected)
+      } else {
+        rv <- private$edge.cost
+      }
+      return(rv)
+    },
+    
+    #' @description 
+    #' Return the benefit associated with traversing the edge.
+    #' @param expected Parameter passed to the \code{value} method of the model
+    #' variable used to define cost; ignored otherwise.
+    #' @return Benefit.
+    benefit = function(expected=FALSE) {
+      if (inherits(private$edge.benefit, what="ModVar")) {
+        rv <- private$edge.benefit$value(expected)
+      } else {
+        rv <- private$edge.benefit
+      }
+      return(rv)
+    }  
   )
 )

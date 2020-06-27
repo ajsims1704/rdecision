@@ -61,7 +61,35 @@ Action <- R6::R6Class(
       private$edge.benefit <- benefit
       # Return Action node
       return(invisible(self))
-    }
-  
+    },
+    
+    #' @description 
+    #' Return the cost associated with traversing the edge.
+    #' @param expected Parameter passed to the \code{value} method of the model
+    #' variable used to define cost; ignored otherwise.
+    #' @return Cost.
+    cost = function(expected=FALSE) {
+      if (inherits(private$edge.cost, what="ModVar")) {
+        rv <- private$edge.cost$value(expected)
+      } else {
+        rv <- private$edge.cost
+      }
+      return(rv)
+    },
+    
+    #' @description 
+    #' Return the benefit associated with traversing the edge.
+    #' @param expected Parameter passed to the \code{value} method of the model
+    #' variable used to define cost; ignored otherwise.
+    #' @return Benefit.
+    benefit = function(expected=FALSE) {
+      if (inherits(private$edge.benefit, what="ModVar")) {
+        rv <- private$edge.benefit$value(expected)
+      } else {
+        rv <- private$edge.benefit
+      }
+      return(rv)
+    }  
+
   )
 )

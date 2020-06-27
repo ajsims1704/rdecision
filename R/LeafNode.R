@@ -66,20 +66,15 @@ LeafNode <- R6::R6Class(
       private$node.interval <- interval
     },
     
-    #' #' @description 
-    #' #' Return the label of the state; the name of the clinical outcome.
-    #' #' @return Name of the clinical outcome or state; character string.
-    #' get_name = function() {
-    #'   return(private$name)
-    #' },
-    
     #' @description 
     #' Return the cost incurred by being in the state for the interval.
+    #' @param expected Parameter passed to the \code{value} method of the model
+    #' variable used to define cost; ignored otherwise.
     #' @return Cost, as a numeric value.
-    cost = function() {
+    cost = function(expected=FALSE) {
       rv <- private$node.cost
       if (inherits(rv, what="ModVar")) {
-        rv <- rv$value()
+        rv <- rv$value(expected)
       } 
       return(rv)
     },
@@ -87,17 +82,29 @@ LeafNode <- R6::R6Class(
     #' @description 
     #' Return the incremental utility associated with being in the state for
     #' the interval.
+    #' @param expected Parameter passed to the \code{value} method of the model
+    #' variable used to define utility; ignored otherwise.
     #' @return Incremental utility (numeric value).
-    utility = function() {
-      return(private$node.utility)
+    utility = function(expected) {
+      rv <- private$node.utility
+      if (inherits(rv, what="ModVar")) {
+        rv <- rv$value(expected)
+      } 
+      return(rv)
     },
     
     #' @description 
     #' Return the benefit (payoff) associated with being in the state for
     #' the interval.
+    #' @param expected Parameter passed to the \code{value} method of the model
+    #' variable used to define benefit; ignored otherwise.
     #' @return Benefit (numeric value).
-    benefit = function() {
-      return(private$node.benefit)
+    benefit = function(expected=FALSE) {
+      rv <- private$node.benefit
+      if (inherits(rv, what="ModVar")) {
+        rv <- rv$value(expected)
+      } 
+      return(rv)
     }
   )
  )

@@ -77,7 +77,7 @@ Graph <- R6::R6Class(
     #' @description 
     #' Test whether an edge is element of the graph.
     #' @param e Subject edge.
-    #' @return TRUE if x is an element of V(G).
+    #' @return TRUE if e is an element of E(G).
     has_edge = function(e) {
       member <- FALSE
       if (inherits(e, what="Edge")) {

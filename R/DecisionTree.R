@@ -124,19 +124,26 @@ DecisionTree <- R6::R6Class(
     #' @return A data frame (payoff table) with one row per path and columns
     #' organized as follows:
     #' \describe{
-    #' \item{Strategy}{The strategy used to traverse the path; i.e. a list of 
-    #' decision nodes and the decision made at each.}
+    #' \item{<label of decision node>}{One column for each decision node
+    #' in the mode. Each column is named with the label of the node. For each
+    #' row (path) the value is the label of the Action edge taken from the
+    #' decision node.}
+    #' \item{Strategy}{A character string unique to the sequence of decisions
+    #' used to traverse path. The form of the string is constructed from node
+    #' and edge indexes, but is subject to change in future versions, and
+    #' guaranteed only to be unique.}
     #' \item{Leaf}{The label of the leaf node on which the pathway ends; 
     #' normally the clinical outcome.}
     #' \item{Probability}{The probability of traversing the pathway. The total
     #' probability of each strategy should sum to unity.}
     #' \item{Cost}{The cost of traversing the pathway.}
-    #' \item{ExpectedCost}{Cost \eqn{*} probability of traversing the pathway.}
-    #' \item{Utility}{The utility associated with the outcome.}
-    #' \item{ExpectedUtility}{Utility \eqn{*} probability of traversing the pathway.}
+    #' \item{Benefit}{The benefit derived from traversing the pathway.}
+    #' \item{Utility}{The utility associated with the outcome (leaf node).}
+    #' \item{ECost}{Cost \eqn{*} probability of traversing the pathway.}
+    #' \item{EBenefit}{Benefit \eqn{*} probability of traversing the pathway.}
+    #' \item{EUtility}{Utility \eqn{*} probability of traversing the pathway.}
     #' }
-    evaluate = function(expected=TRUE) {
-      
+    evaluate_paths = function(expected=TRUE) {
       # find all root to leaf paths
       P <- self$root_to_leaf_paths()
       # get the names of all decision nodes and create a data frame
@@ -146,53 +153,118 @@ DecisionTree <- R6::R6Class(
           dn <<- c(dn, v$label())
         }
       })
-      PAYOFF <- data.frame(PID=seq_along(P))
+      PAYOFF <- data.frame(PID=seq_along(P), stringsAsFactors=FALSE)
       DM <- matrix(data=as.character(NA), nrow=length(P), ncol=length(dn),
                    dimnames=list(list(),dn))
-      PAYOFF <- cbind(PAYOFF, DM, deparse.level=1)
-      
-      # # create data frame
-      # RES <- data.frame(
-      #   # identifier for the strategy for choosing the path
-      #   Strategy = sapply(P, function(p) {
-      #     
-      #   })
-      #   # probability of walking the path
-      #   Probability = sapply(P, function(p) {
-      #     pr <- 1
-      #     w <- self$walk(p)
-      #     sapply(w, function(e) {
-      #       if (inherits(e, what="Reaction")) {
-      #         pr <<- pr * e$p()
-      #       }
-      #     })
-      #     return(pr)
-      #   }),
-      #   # label of the leaf node at end of the path
-      #   Leaf = sapply(P, function(p){p[[length(p)]]$label()})
-      # )
-      
-      # # if no requirement to uncorrelate, resample the tree once
-      # if (!uncorrelate) {
-      #   self$update(expected)
-      # }
-      # # choice by choice
-      # choices <- private$dn$get_choices()
-      # choicerows <- lapply(choices, FUN=function(choice) {
-      #   if (uncorrelate) {
-      #     self$update(expected)
-      #   }
-      #   paths <- private$dn$getPathways(choice)
-      #   RCH <- do.call('rbind', lapply(paths, FUN=function(x){x$tabulate()}))
-      #   return(RCH)
-      # })
-      # RES <- do.call('rbind', choicerows)
-      # # add expected cost and utility     
-      # RES$ExpectedCost <- RES$Probability*RES$Cost
-      # RES$ExpectedUtility <- RES$Probability*RES$Utility
-      
+      PAYOFF <- cbind(PAYOFF, DM, deparse.level=1, stringsAsFactors=FALSE)
+      PAYOFF$Strategy <- rep(as.character(NA), length(P))
+      PAYOFF$Probability <- rep(as.numeric(NA), length(P))
+      PAYOFF$Cost <- rep(as.numeric(NA), length(P))
+      PAYOFF$Benefit <- rep(as.numeric(NA), length(P))
+      # evaluate each path
+      for (i in seq_along(P)) {
+        # get path
+        path <- P[[i]]
+        # decisions
+        strategy <- ""
+        sapply(self$walk(path), function(e) {
+          v <- e$source()
+          if (inherits(v, what="DecisionNode")) {
+            PAYOFF[PAYOFF$PID==i, v$label()] <<- e$label()
+            strategy <<- paste(
+              strategy, 
+              paste(self$element_index(v),self$element_index(e), sep=":"), 
+              sep="|")
+          }
+        })
+        PAYOFF[PAYOFF$PID==i, "Strategy"] <- strategy
+        # label of the leaf node at end of the path
+        PAYOFF[PAYOFF$PID==i, "Leaf"] <- path[[length(path)]]$label()
+        # probability
+        pr <- 1
+        sapply(self$walk(path), function(e) {
+          if (inherits(e, what="Reaction")) {
+            pr <<- pr * e$p(expected)
+          }
+        })
+        PAYOFF[PAYOFF$PID==i,"Probability"] <- pr
+        # cost
+        cost <- 0
+        sapply(self$walk(path), function(e) {
+          cost <<- cost + e$cost(expected)
+        })
+        PAYOFF[PAYOFF$PID==i,"Cost"] <- cost
+        # benefit
+        benefit <- 0
+        sapply(self$walk(path), function(e) {
+          benefit <<- benefit + e$benefit(expected)
+        })
+        PAYOFF[PAYOFF$PID==i,"Benefit"] <- benefit
+        # utility of the leaf node at end of the path
+        PAYOFF[PAYOFF$PID==i, "Utility"] <- path[[length(path)]]$utility(expected)
+      }
+      # add expected cost and utility     
+      PAYOFF$ECost <- PAYOFF$Probability*PAYOFF$Cost
+      PAYOFF$EBenefit <- PAYOFF$Probability*PAYOFF$Benefit
+      PAYOFF$EUtility <- PAYOFF$Probability*PAYOFF$Utility
+      # return the payoff table      
       return(PAYOFF)
+    },
+    
+    #' @description 
+    #' Evaluate each strategy. Starting with the root, the function
+    #' works though all possible paths to leaf nodes and computes the probability,
+    #' cost, benefit and utility of each, then aggregates by strategy.   
+    #' @param expected If TRUE, evaluate each model variable as its mean value,
+    #' otherwise sample each one from their uncertainty distribution.
+    #' @param N Number of replicates. Intended for use with PSA (expected=F);
+    #' use with expected=T will be repetitive and uninformative. 
+    #' @return A data frame with one row per strategy per run and columns
+    #' organized as follows:
+    #' \describe{
+    #' \item{Run}{The run number}
+    #' \item{Strategy}{The strategy.}
+    #' \item{Cost}{Aggregate cost of the choice.}
+    #' \item{Utility}{Aggregate utility of the choice.}
+    #' }
+    evaluate = function(expected=TRUE, N=1) {
+      # names of columns to aggregate
+      keep <- c("ECost", "EBenefit", "EUtility")
+      # names of columns to copy to identify each strategy
+      dn <- c()
+      sapply(private$V, function(v) {
+        if (inherits(v, what="DecisionNode")) {
+          dn <<- c(dn, v$label())
+        }
+      })
+      # make repeated calls 
+      DF <- do.call('rbind', lapply(1:N, FUN=function(n){
+        # evaluate pathways
+        RES <- self$evaluate_paths(expected)
+        RES$Strategy <- as.character(RES$Strategy)
+        # aggregate them by strategy
+        SUM <- aggregate(
+          RES[,keep],
+          by = list(RES$Strategy),
+          FUN = sum
+        )
+        names(SUM) <- c("Strategy", "Cost", "Benefit", "Utility")
+        SUM <- cbind(Run=rep(n, times=nrow(SUM)), SUM)
+        # aggregate the Reaction paths by strategy
+        DEC <- aggregate(
+          RES[,dn],
+          by = list(RES$Strategy),
+          FUN = function(x){x[1]}
+        )
+        names(DEC) <- c("Strategy", dn)
+        SUM <- merge(SUM, DEC, by="Strategy")
+        # return the aggregates
+        return(SUM)
+      }))
+      DF$Strategy <- NULL
+      return(DF)
     }
+    
     
   )
 )
