@@ -166,18 +166,16 @@ DecisionTree <- R6::R6Class(
         # get path
         path <- P[[i]]
         # decisions
-        strategy <- ""
+        st <- ""
         sapply(self$walk(path), function(e) {
           v <- e$source()
           if (inherits(v, what="DecisionNode")) {
             PAYOFF[PAYOFF$PID==i, v$label()] <<- e$label()
-            strategy <<- paste(
-              strategy, 
-              paste(self$element_index(v),self$element_index(e), sep=":"), 
-              sep="|")
+            s <- paste(self$element_index(v),self$element_index(e), sep=":")
+            st <<- ifelse(nchar(st)>0, paste(st, s, sep="|"), s)
           }
         })
-        PAYOFF[PAYOFF$PID==i, "Strategy"] <- strategy
+        PAYOFF[PAYOFF$PID==i, "Strategy"] <- st
         # label of the leaf node at end of the path
         PAYOFF[PAYOFF$PID==i, "Leaf"] <- path[[length(path)]]$label()
         # probability
@@ -224,8 +222,9 @@ DecisionTree <- R6::R6Class(
     #' \describe{
     #' \item{Run}{The run number}
     #' \item{Strategy}{The strategy.}
-    #' \item{Cost}{Aggregate cost of the choice.}
-    #' \item{Utility}{Aggregate utility of the choice.}
+    #' \item{Cost}{Aggregate cost of the strategy.}
+    #' \item{Benefit}{Aggregate benefit of the strategy.}
+    #' \item{Utility}{Aggregate utility of the strategy.}
     #' }
     evaluate = function(expected=TRUE, N=1) {
       # names of columns to aggregate
@@ -264,8 +263,7 @@ DecisionTree <- R6::R6Class(
       DF$Strategy <- NULL
       return(DF)
     }
-    
-    
+
   )
 )
 
