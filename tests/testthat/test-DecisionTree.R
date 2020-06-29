@@ -1,4 +1,26 @@
 
+# tests of basic tree properties (Kaminski et al CEJOR 2018;26:135-139)
+test_that("simple decision trees are modelled correctly", {
+  # nodes & edges
+  d1 <- DecisionNode$new("d1")
+  c1 <- ChanceNode$new("c1")
+  t1 <- LeafNode$new("t1")
+  t2 <- LeafNode$new("t2")
+  t3 <- LeafNode$new("t3")
+  e1 <- Action$new(d1,c1,benefit=10,label="e1")
+  e2 <- Reaction$new(c1,t1,p=0.75,benefit=20,label="e2")
+  e3 <- Reaction$new(c1,t2,p=0.25,label="e3")
+  e4 <- Action$new(d1,t3,benefit=20,label="e4")
+  # tree
+  V <- list(d1,c1,t1,t2,t3)
+  E <- list(e1,e2,e3,e4)
+  expect_silent(DT <- DecisionTree$new(V,E))
+  # properties
+  A <- DT$actions(d1)
+  expect_true(setequal(sapply(A,function(a){a$label()}),c("e1","e4")))
+})
+
+
 # -----------------------------------------------------------------------------
 # Evans et al, Pharmacoeconomics, 1997;12:565-577, Sumatriptan for migraine
 # (base case)

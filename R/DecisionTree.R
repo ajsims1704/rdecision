@@ -116,6 +116,25 @@ DecisionTree <- R6::R6Class(
     },
     
     #' @description 
+    #' Return the edges that have the specified decision node as their source.
+    #' @param d A decision node.
+    #' @return A list of Action edges.
+    actions = function(d) {
+      # check argument
+      if (!self$has_element(d)) {
+        rlang::abort("Node 'd' is not in the Decision Tree", class="not_in_tree")
+      }
+      if (!inherits(d, what="DecisionNode")) {
+        rlang::abort("Node 'd' is not a Decision Node", class="not_decision_node")
+      }
+      id <- self$element_index(d)
+      # find the edges with d as their source 
+      B <- self$incidence_matrix()
+      ie <- which(B[id,]==-1,arr.ind=TRUE)
+      return(private$E[ie])
+    },
+    
+    #' @description 
     #' Evaluate the components of payoff associated with the paths in the
     #' decision tree. For each path, the strategy, probability, cost,
     #' benefit and utility are calculated.
