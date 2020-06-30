@@ -116,6 +116,33 @@ DecisionTree <- R6::R6Class(
     },
     
     #' @description 
+    #' Find the decision nodes in the tree.
+    #' @return A list of \code{DecisionNode} objects.
+    decision_nodes = function() {
+      id <- which(sapply(private$V, function(v){inherits(v,what="DecisionNode")}),
+                  arr.ind=TRUE)
+      return(private$V[id])      
+    },
+
+    #' @description 
+    #' Find the chance nodes in the tree.
+    #' @return A list of \code{ChanceNode} objects.
+    chance_nodes = function() {
+      ic <- which(sapply(private$V, function(v){inherits(v,what="ChanceNode")}),
+                  arr.ind=TRUE)
+      return(private$V[ic])      
+    },
+    
+    #' @description 
+    #' Find the leaf nodes in the tree.
+    #' @return A list of \code{LeafNode} objects.
+    leaf_nodes = function() {
+      il <- which(sapply(private$V, function(v){inherits(v,what="LeafNode")}),
+                  arr.ind=TRUE)
+      return(private$V[il])      
+    },
+
+    #' @description 
     #' Return the edges that have the specified decision node as their source.
     #' @param d A decision node.
     #' @return A list of Action edges.
@@ -249,16 +276,23 @@ DecisionTree <- R6::R6Class(
       # names of columns to aggregate
       keep <- c("ECost", "EBenefit", "EUtility")
       # names of columns to copy to identify each strategy
-      dn <- c()
-      sapply(private$V, function(v) {
-        if (inherits(v, what="DecisionNode")) {
-          dn <<- c(dn, v$label())
-        }
-      })
+      dn <- sapply(self$decision_nodes(), function(d){d$label()})
+      # build a truth table of all combinations of decisions
+      f <- lapply(self$decision_nodes(), function(d) {
+        a <- lapply(self$actions(d), function(a){a$label()})
+        a <- c(a, as.character(NA))
+        return(a)
+      })     
+      names(f) <- dn
+      TT <- expand.grid(f)
+      print("TT")
+      print(TT)
       # make repeated calls 
       DF <- do.call('rbind', lapply(1:N, FUN=function(n){
         # evaluate pathways
         RES <- self$evaluate_paths(expected)
+        # find and sum the paths reachable by each strategy
+
         RES$Strategy <- as.character(RES$Strategy)
         # aggregate them by strategy
         SUM <- aggregate(
