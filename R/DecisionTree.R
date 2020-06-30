@@ -162,6 +162,46 @@ DecisionTree <- R6::R6Class(
     },
     
     #' @description 
+    #' Find all the root to leaf paths traversable under the specified strategy.
+    #' A strategy is a unanimous prescription of an action in each decision
+    #' node. 
+    #' @param strategy A list of Actions, with one action per decision node.
+    #' @return A list of root to leaf paths.
+    strategy_paths = function(strategy) {
+      # get decision nodes
+      D <- self$decision_nodes()
+      # check argument
+      if (length(strategy)!=length(D)) {
+        rlang::abort("Argument 'strategy' must have as many elements as DecisionNodes",
+                     class="incorrect_strategy_length")
+      }
+      sapply(strategy, function(e) {
+        if (!inherits(e,what="Action")) {
+          rlang::abort("Argument 'strategy' must only contain Action elements",
+                       class="incorrect_strategy_type")
+        }
+      })
+      DS <- sapply(strategy, function(e){e$source()})
+      iDS <- sapply(DS, function(v){self$element_index(v)})
+      iD <- sapply(D, function(v){self$element_index(v)})
+      if (!setequal(iD, iDS)) {
+        rlang::abort("Argument 'strategy' must have one Action per DecisionNode")
+      }
+      # all non-strategy action edges are forbidden
+      eAction <- which(sapply(private$E, function(e){inherits(e,what="Action")}),arr.ind=TRUE)
+      eAllowed <- sapply(strategy, function(e){self$element_index(e)})
+      eForbidden <- setdiff(eAction, eAllowed)
+      # find all root to leaf paths and filter out those traversing forbidden edges
+      P <- self$root_to_leaf_paths()
+      bAllowed <- sapply(P, function(p) {
+        w <- self$walk(p)
+        eWalk <- sapply(w, function(e){self$element_index(e)})
+        return(length(intersect(eWalk,eForbidden))==0)
+      })
+      return(P[bAllowed])
+    },
+    
+    #' @description 
     #' Evaluate the components of payoff associated with the paths in the
     #' decision tree. For each path, the strategy, probability, cost,
     #' benefit and utility are calculated.
@@ -278,42 +318,49 @@ DecisionTree <- R6::R6Class(
       # names of columns to copy to identify each strategy
       dn <- sapply(self$decision_nodes(), function(d){d$label()})
       # build a truth table of all combinations of decisions
-      f <- lapply(self$decision_nodes(), function(d) {
-        a <- lapply(self$actions(d), function(a){a$label()})
-        a <- c(a, as.character(NA))
+      f <- sapply(self$decision_nodes(), function(d) {
+        a <- sapply(self$actions(d), function(a){a$label()})
         return(a)
       })     
       names(f) <- dn
-      TT <- expand.grid(f)
+      str(f)
+      TT <- expand.grid(f, KEEP.OUT.ATTRS=FALSE, stringsAsFactors=FALSE)
       print("TT")
+      str(TT)
       print(TT)
       # make repeated calls 
       DF <- do.call('rbind', lapply(1:N, FUN=function(n){
         # evaluate pathways
-        RES <- self$evaluate_paths(expected)
+        PTH <- self$evaluate_paths(expected)
+        print("PTH")
+        str(PTH)
+        print(PTH)
         # find and sum the paths reachable by each strategy
-
-        RES$Strategy <- as.character(RES$Strategy)
-        # aggregate them by strategy
-        SUM <- aggregate(
-          RES[,keep],
-          by = list(RES$Strategy),
-          FUN = sum
-        )
-        names(SUM) <- c("Strategy", "Cost", "Benefit", "Utility")
-        SUM <- cbind(Run=rep(n, times=nrow(SUM)), SUM)
-        # aggregate the Reaction paths by strategy
-        DEC <- aggregate(
-          RES[,dn],
-          by = list(RES$Strategy),
-          FUN = function(x){x[1]}
-        )
-        names(DEC) <- c("Strategy", dn)
-        SUM <- merge(SUM, DEC, by="Strategy")
-        # return the aggregates
-        return(SUM)
+        RES <- merge(TT, PTH, all.x=TRUE)
+        print("RES")
+        str(RES)
+        print(RES)
+      #   RES$Strategy <- as.character(RES$Strategy)
+      #   # aggregate them by strategy
+      #   SUM <- aggregate(
+      #     RES[,keep],
+      #     by = list(RES$Strategy),
+      #     FUN = sum
+      #   )
+      #   names(SUM) <- c("Strategy", "Cost", "Benefit", "Utility")
+      #   SUM <- cbind(Run=rep(n, times=nrow(SUM)), SUM)
+      #   # aggregate the Reaction paths by strategy
+      #   DEC <- aggregate(
+      #     RES[,dn],
+      #     by = list(RES$Strategy),
+      #     FUN = function(x){x[1]}
+      #   )
+      #   names(DEC) <- c("Strategy", dn)
+      #   SUM <- merge(SUM, DEC, by="Strategy")
+      #   # return the aggregates
+      #   return(SUM)
       }))
-      DF$Strategy <- NULL
+      # DF$Strategy <- NULL
       return(DF)
     }
 

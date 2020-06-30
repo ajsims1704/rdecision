@@ -18,6 +18,13 @@ test_that("simple decision trees are modelled correctly", {
   # properties
   A <- DT$actions(d1)
   expect_true(setequal(sapply(A,function(a){a$label()}),c("e1","e4")))
+  # strategy paths
+  P <- DT$root_to_leaf_paths()
+  expect_equal(length(P),3)
+  PS <- DT$strategy_paths(list(e1))
+  expect_equal(length(PS),2)
+  PS <- DT$strategy_paths(list(e4))
+  expect_equal(length(PS),1)
 })
 
 
@@ -179,10 +186,6 @@ test_that("rdecision replacates Kaminski et al, fig 7", {
   expect_silent(DT<-DecisionTree$new(V,E))
   # evaluate
   RES <- DT$evaluate_paths()
-  print("DT")
-  print(RES)
   expect_true(is.data.frame(RES))
   RES <- DT$evaluate()
-  print("DT")
-  print(RES)
 })
