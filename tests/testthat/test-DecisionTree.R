@@ -18,21 +18,23 @@ test_that("simple decision trees are modelled correctly", {
   # properties
   A <- DT$actions(d1)
   expect_true(setequal(sapply(A,function(a){a$label()}),c("e1","e4")))
+  expect_equal(DT$decision_nodes("label"), "d1")
   # strategy paths
   P <- DT$root_to_leaf_paths()
   expect_equal(length(P),3)
-  PS <- DT$strategy_paths(list(e1))
+  PS <- DT$paths_in_strategy(list(e1))
   expect_equal(length(PS),2)
-  PS <- DT$strategy_paths(list(e4))
+  PS <- DT$paths_in_strategy(list(e4))
   expect_equal(length(PS),1)
+  # strategies
+  S <- DT$strategies()
+  expect_equal(nrow(S),2)
+  # evaluations
+  RES <- DT$evaluate_strategy(list(e1))
 })
 
-
-# -----------------------------------------------------------------------------
 # Evans et al, Pharmacoeconomics, 1997;12:565-577, Sumatriptan for migraine
 # (base case)
-# -----------------------------------------------------------------------------
-
 test_that("rdecision replicates Evans et al, Sumatriptan base case", {
   # Time horizon
   th <- as.difftime(48, units="hours")
@@ -184,8 +186,19 @@ test_that("rdecision replacates Kaminski et al, fig 7", {
   # tree
   V <- list(d1,d2,d3, c1,c2,c3,c4, t1,t2,t3,t4,t5,t6,t7,t8,t9)
   expect_silent(DT<-DecisionTree$new(V,E))
-  # evaluate
-  RES <- DT$evaluate_paths()
+  # strategies
+  S <- DT$strategies("label")
+  expect_equal(nrow(S),6)
+  # evaluate one strategy (test/sell/sell)
+  RES <- DT$evaluate_strategy(list(E[[5]],E[[7]],E[[12]]))
   expect_true(is.data.frame(RES))
+  expect_equal(sum(RES$Probability),1)
+  expect_equal(sum(RES$Cost),50)
+  expect_equal(sum(RES$Benefit),888)
+  # find optimal strategies
   RES <- DT$evaluate()
+  expect_equal(nrow(RES),6)
+  imax <- which.max(RES$Benefit-RES$Cost)
+  popt <- paste(RES$d1[imax], RES$d2[imax], RES$d3[imax], sep="/")
+  expect_equal(popt, "test/sell/dig")
 })
