@@ -57,19 +57,19 @@ test_that("rdecision replicates Evans et al, Sumatriptan base case", {
   #
   # Sumatriptan branch
   #
-  n.a <- LeafNode$new("A", cost=c.A, utility=1.0, interval=th)
-  n.b <- LeafNode$new("B", cost=c.B, utility=0.9, interval=th)
+  ta <- LeafNode$new("A", cost=c.A, utility=1.0, interval=th)
+  tb <- LeafNode$new("B", cost=c.B, utility=0.9, interval=th)
   n.4 <- ChanceNode$new("n.4")
   e.4a <- Reaction$new(n.4, n.a, p=0.594, label="No recurrence")
   e.4b <- Reaction$new(n.4, n.b, p=0.406, cost=sumatriptan, label="Recurrence relieved with 2nd dose")
   #
-  n.d <- LeafNode$new("D", cost=c.D, utility=0.1, interval=th)
-  n.e <- LeafNode$new("E", cost=c.E, utility=-0.3, interval=th)
+  td <- LeafNode$new("D", cost=c.D, utility=0.1, interval=th)
+  te <- LeafNode$new("E", cost=c.E, utility=-0.3, interval=th)
   n.8 <- ChanceNode$new("n.8")
   e.8d <- Reaction$new(n.8, n.d, p=0.998, label="Relief")
   e.8e <- Reaction$new(n.8, n.e, p=0.002, cost=admission, label="Hospitalization")
   #
-  n.c <- LeafNode$new("C", cost=c.C, utility=-0.3, interval=th)
+  tc <- LeafNode$new("C", cost=c.C, utility=-0.3, interval=th)
   n.5 <- ChanceNode$new("n.5")
   e.5c <- Reaction$new(n.5, n.c, p=0.920, label="Endures attack")
   e.58 <- Reaction$new(n.5, n.8, p=0.080, cost=ED, label="Emergency Department")
@@ -80,19 +80,19 @@ test_that("rdecision replicates Evans et al, Sumatriptan base case", {
   #
   # Caffeine/Ergotamine branch
   #
-  n.f <- LeafNode$new("F", cost=c.F, utility=1.0, interval=th)
-  n.g <- LeafNode$new("G", cost=c.G, utility=0.9, interval=th)
-  n.6 <- ChanceNode$new("n.6")
+  tf <- LeafNode$new("F", cost=c.F, utility=1.0, interval=th)
+  tg <- LeafNode$new("G", cost=c.G, utility=0.9, interval=th)
+  c <- ChanceNode$new("n.6")
   e.6f <- Reaction$new(n.6, n.f, p=0.703, label="No recurrence")
   e.6g <- Reaction$new(n.6, n.g, p=0.297, cost=caffeine, label="Recurrence relieved with 2nd dose")
   #
-  n.i <- LeafNode$new("I", cost=c.I, utility=0.1, interval=th)
-  n.j <- LeafNode$new("J", cost=c.J, utility=-0.3, interval=th)
+  ti <- LeafNode$new("I", cost=c.I, utility=0.1, interval=th)
+  tj <- LeafNode$new("J", cost=c.J, utility=-0.3, interval=th)
   n.9 <- ChanceNode$new("C.9")
   e.9i <- Reaction$new(n.9, n.i, p=0.998, label="Relief")
   e.9j <- Reaction$new(n.9, n.j, p=0.002, cost=admission, label="Hospitalization")
   # 
-  n.h <- LeafNode$new("H", cost=c.H, utility=-0.3, interval=th)
+  th <- LeafNode$new("H", cost=c.H, utility=-0.3, interval=th)
   n.7 <- ChanceNode$new("n.7")
   e.7h <- Reaction$new(n.7, n.h, p=0.920, label="Endures attack")
   e.79 <- Reaction$new(n.7, n.9, p=0.080, cost=ED, label="Emergency Department")

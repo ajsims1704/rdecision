@@ -2,14 +2,13 @@
 title: "Sumatriptan versus caffeine for migraine"
 subtitle: "A decision tree example"
 author: "Andrew J. Sims"
-date: "`r Sys.Date()`"
+date: "April 2020"
 output: rmarkdown::pdf_document
 vignette: >
   %\VignetteIndexEntry{Sumatriptan versus caffeine for migraine}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 bibliography: "references.bib"
-csl: "scientific-reports.csl"
 ---
 ```{r, include = FALSE}
 knitr::opts_chunk$set(
