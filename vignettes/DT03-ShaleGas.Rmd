@@ -2,14 +2,13 @@
 title: "Shale gas"
 subtitle: "A decision tree example"
 author: "Andrew J. Sims"
-date: "`r Sys.Date()`"
+date: "July 2020"
 output: rmarkdown::pdf_document
 vignette: >
   %\VignetteIndexEntry{Shale gas}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 bibliography: "references.bib"
-csl: "scientific-reports.csl"
 ---
 ```{r, include = FALSE}
 knitr::opts_chunk$set(
@@ -27,7 +26,7 @@ Kamiński *et al* [-@kaminski:2018a, Fig 7] provide an example of a decision tre
 with multiple decision nodes, including some that are descendants of another
 decision node. This vignette illustrates how `rdecision` can be used to model
 a complex decision tree, using the example from Figure 7 of Kamiński 
-*et al* [-@kaminski:2018a].
+*et al* [-@kaminski:2018a]. 
 
 # The problem
 Kamiński *et al* [-@kaminski:2018a] state the problem as follows:
@@ -96,11 +95,12 @@ or a Reaction object.
   # tree
   V <- list(d1,d2,d3, c1,c2,c3,c4, t1,t2,t3,t4,t5,t6,t7,t8,t9)
   DT<-DecisionTree$new(V,E)
+  
 ```
 
 # Evaluating the strategies
 There are a total of 12 possible strategies (3 choices from node `d1`
-$\times$ 2 choices at node `d2` $\times$ choices at node `d3`). But 
+$\times$ 2 choices at node `d2` $\times$ 2 choices at node `d3`). But 
 some of these are not unique. For example if the choice at node `d1` is
 "sell", the choices at nodes `d2` and `d3` (4 possible combinations) are
 unimportant; all four such strategies are identical. In identifying
@@ -112,22 +112,35 @@ represents the identical "sell/sell/dig", "sell/dig/sell" and
 
 Similarly, four strategies with choice "dig" at node `d1` are
 identical. Removing the six repeated strategies leaves a total
-of six possible strategies to evaluate:
+of six possible strategies to evaluate.
 
-```{r strategies, echo=TRUE}
-# strategies
-S <- DT$strategies("label")
-knitr::kable(S, row.names=FALSE)
-```
+Unique strategies are identified by `rdecision` automatically.
+Method `evaluate` calculates the expected cost, benefit and
+utility of each traversable path for each strategy, and aggregates
+by strategy. The results for the gas problem are computed
+as follows. Payoff is defined as benefit minus cost. 
 
 ```{r evaluate, echo=TRUE}
-  # evaluate one strategy (test/sell/sell)
-  RES <- DT$evaluate_strategy(list(E[[5]],E[[7]],E[[12]]))
-  # find optimal strategies
-  RES <- DT$evaluate()
-  imax <- which.max(RES$Benefit-RES$Cost)
-  popt <- paste(RES$d1[imax], RES$d2[imax], RES$d3[imax], sep="/")
+# find optimal strategies
+RES <- DT$evaluate()
+RES$Payoff <- RES$Benefit-RES$Cost
 ```
+
+This gives the following payoff for each unique strategy:
+
+```{r results, echo=FALSE, results='asis'}
+RES$Run <- NULL
+RES$Probability <- NULL
+knitr::kable(RES, row.names=FALSE)
+```
+
+```{r poptimal, echo=FALSE}
+imax <- which.max(RES$Payoff)
+popt <- paste(RES$d1[imax], RES$d2[imax], RES$d3[imax], sep="/")
+```
+The optimal strategy is `r popt`, *i.e.* test, sell if negative and
+dig otherwise. The expected payoff from this strategy is
+`r RES$Payoff[imax]`.
 
 # References
 
