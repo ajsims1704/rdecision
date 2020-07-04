@@ -39,85 +39,82 @@ test_that("rdecision replicates Evans et al, Sumatriptan base case", {
   # Time horizon
   th <- as.difftime(48, units="hours")
   # model variables
-  sumatriptan <- 16.10
-  caffeine <- 1.32
-  ED <- 63.16
-  admission <- 1093
+  c.sumatriptan <- 16.10
+  c.caffeine <- 1.32
+  c.ED <- 63.16
+  c.admission <- 1093
   # Expressions
-  c.A <- sumatriptan
-  c.B <- 2*sumatriptan
-  c.C <- sumatriptan
-  c.D <- sumatriptan+ED
-  c.E <- sumatriptan+ED+admission
-  c.F <- caffeine
-  c.G <- 2*caffeine
-  c.H <- caffeine
-  c.I <- caffeine+ED
-  c.J <- caffeine+ED+admission
+  # c.A <- sumatriptan
+  # c.B <- 2*sumatriptan
+  # c.C <- sumatriptan
+  # c.D <- sumatriptan+ED
+  # c.E <- sumatriptan+ED+admission
+  # c.F <- caffeine
+  # c.G <- 2*caffeine
+  # c.H <- caffeine
+  # c.I <- caffeine+ED
+  # c.J <- caffeine+ED+admission
   #
   # Sumatriptan branch
   #
-  ta <- LeafNode$new("A", cost=c.A, utility=1.0, interval=th)
-  tb <- LeafNode$new("B", cost=c.B, utility=0.9, interval=th)
-  n.4 <- ChanceNode$new("n.4")
-  e.4a <- Reaction$new(n.4, n.a, p=0.594, label="No recurrence")
-  e.4b <- Reaction$new(n.4, n.b, p=0.406, cost=sumatriptan, label="Recurrence relieved with 2nd dose")
+  ta <- LeafNode$new("A", utility=1.0, interval=th)
+  tb <- LeafNode$new("B", utility=0.9, interval=th)
+  c3 <- ChanceNode$new("c3")
+  e1 <- Reaction$new(c3, ta, p=0.594, label="No recurrence")
+  e2 <- Reaction$new(c3, tb, p=0.406, cost=c.sumatriptan, label="Recurrence relieved with 2nd dose")
   #
-  td <- LeafNode$new("D", cost=c.D, utility=0.1, interval=th)
-  te <- LeafNode$new("E", cost=c.E, utility=-0.3, interval=th)
-  n.8 <- ChanceNode$new("n.8")
-  e.8d <- Reaction$new(n.8, n.d, p=0.998, label="Relief")
-  e.8e <- Reaction$new(n.8, n.e, p=0.002, cost=admission, label="Hospitalization")
+  td <- LeafNode$new("D", utility=0.1, interval=th)
+  te <- LeafNode$new("E", utility=-0.3, interval=th)
+  c7 <- ChanceNode$new("c7")
+  e3 <- Reaction$new(c7, td, p=0.998, label="Relief")
+  e4 <- Reaction$new(c7, te, p=0.002, cost=c.admission, label="Hospitalization")
   #
-  tc <- LeafNode$new("C", cost=c.C, utility=-0.3, interval=th)
-  n.5 <- ChanceNode$new("n.5")
-  e.5c <- Reaction$new(n.5, n.c, p=0.920, label="Endures attack")
-  e.58 <- Reaction$new(n.5, n.8, p=0.080, cost=ED, label="Emergency Department")
+  tc <- LeafNode$new("C", utility=-0.3, interval=th)
+  c4 <- ChanceNode$new("c4")
+  e5 <- Reaction$new(c4, tc, p=0.920, label="Endures attack")
+  e6 <- Reaction$new(c4, c7, p=0.080, cost=c.ED, label="Emergency Department")
   #
-  n.2 <- ChanceNode$new("n.2")
-  e.24 <- Reaction$new(n.2, n.4, p=0.558, label="Relief")
-  e.25 <- Reaction$new(n.2, n.5, p=0.442, label="No relief")
+  c1 <- ChanceNode$new("c1")
+  e7 <- Reaction$new(c1, c3, p=0.558, label="Relief")
+  e8 <- Reaction$new(c1, c4, p=0.442, label="No relief")
   #
   # Caffeine/Ergotamine branch
   #
-  tf <- LeafNode$new("F", cost=c.F, utility=1.0, interval=th)
-  tg <- LeafNode$new("G", cost=c.G, utility=0.9, interval=th)
-  c <- ChanceNode$new("n.6")
-  e.6f <- Reaction$new(n.6, n.f, p=0.703, label="No recurrence")
-  e.6g <- Reaction$new(n.6, n.g, p=0.297, cost=caffeine, label="Recurrence relieved with 2nd dose")
+  tf <- LeafNode$new("F", utility=1.0, interval=th)
+  tg <- LeafNode$new("G", utility=0.9, interval=th)
+  c5 <- ChanceNode$new("c5")
+  e9 <- Reaction$new(c5, tf, p=0.703, label="No recurrence")
+  e10 <- Reaction$new(c5, tg, p=0.297, cost=c.caffeine, label="Recurrence relieved with 2nd dose")
   #
-  ti <- LeafNode$new("I", cost=c.I, utility=0.1, interval=th)
-  tj <- LeafNode$new("J", cost=c.J, utility=-0.3, interval=th)
-  n.9 <- ChanceNode$new("C.9")
-  e.9i <- Reaction$new(n.9, n.i, p=0.998, label="Relief")
-  e.9j <- Reaction$new(n.9, n.j, p=0.002, cost=admission, label="Hospitalization")
+  ti <- LeafNode$new("I", utility=0.1, interval=th)
+  tj <- LeafNode$new("J", utility=-0.3, interval=th)
+  c8 <- ChanceNode$new("c8")
+  e11 <- Reaction$new(c8, ti, p=0.998, label="Relief")
+  e12 <- Reaction$new(c8, tj, p=0.002, cost=c.admission, label="Hospitalization")
   # 
-  th <- LeafNode$new("H", cost=c.H, utility=-0.3, interval=th)
-  n.7 <- ChanceNode$new("n.7")
-  e.7h <- Reaction$new(n.7, n.h, p=0.920, label="Endures attack")
-  e.79 <- Reaction$new(n.7, n.9, p=0.080, cost=ED, label="Emergency Department")
+  th <- LeafNode$new("H", utility=-0.3, interval=th)
+  c6 <- ChanceNode$new("c6")
+  e13 <- Reaction$new(c6, th, p=0.920, label="Endures attack")
+  e14 <- Reaction$new(c6, c8, p=0.080, cost=c.ED, label="Emergency Department")
   #
-  n.3 <- ChanceNode$new("n.3")
-  expect_equal(n.3$label(), "n.3")
-  e.36 <- Reaction$new(n.3, n.6, p=0.379, label="Relief")
-  e.37 <- Reaction$new(n.3, n.7, p=0.621, label="No relief")
+  c2 <- ChanceNode$new("c2")
+  expect_equal(c2$label(), "c2")
+  e15 <- Reaction$new(c2, c5, p=0.379, label="Relief")
+  e16 <- Reaction$new(c2, c6, p=0.621, label="No relief")
   #
   # decision node
-  n.1 <- DecisionNode$new("n.1")
-  expect_equal(n.1$label(), "n.1")
-  e.12 <- Action$new(n.1, n.2, cost=sumatriptan, label="Sumatriptan")
-  e.13 <- Action$new(n.1, n.3, cost=caffeine, label="Caffeine/Ergotamine")
+  d1 <- DecisionNode$new("d1")
+  expect_equal(d1$label(), "d1")
+  e17 <- Action$new(d1, c1, cost=c.sumatriptan, label="Sumatriptan")
+  e18 <- Action$new(d1, c2, cost=c.caffeine, label="Caffeine/Ergotamine")
   # 
   # create lists of nodes and edges
   V <- list(
-    n.1, n.2, n.3, n.4, n.5, n.6, n.7, n.8, n.9,
-    n.a, n.b, n.c, n.d, n.e, n.f, n.g, n.h, n.i, n.j
+    d1, c1, c2, c3, c4, c5, c6, c7, c8,
+    ta, tb, tc, td, te, tf, tg, th, ti, tj
   )
   E <- list(
-    e.12, e.13, 
-    e.24, e.25, e.36, e.37, 
-    e.4a, e.4b, e.5c, e.58, e.8d, e.8e,
-    e.6f, e.6g, e.7h, e.79, e.9i, e.9j
+    e1, e2, e3, e4, e5, e6, e7, e8, e9, e10, e11, e12, e13, e14, e15, e16, e17, e18
   )
   # tree
   expect_silent(dt <- DecisionTree$new(V,E))
@@ -125,13 +122,13 @@ test_that("rdecision replicates Evans et al, Sumatriptan base case", {
   RES <- dt$evaluate()
   # check
   expect_true(is.data.frame(RES))
-  c.Sumatriptan <- round(RES[RES$Run==1 & RES$n.1=="Sumatriptan", "Cost"],2)
+  c.Sumatriptan <- round(RES[RES$Run==1 & RES$d1=="Sumatriptan", "Cost"],2)
   expect_equal(c.Sumatriptan, 22.06)
-  c.Caffeine <- round(RES[RES$Run==1 & RES$n.1=="Caffeine/Ergotamine", "Cost"],2)
+  c.Caffeine <- round(RES[RES$Run==1 & RES$d1=="Caffeine/Ergotamine", "Cost"],2)
   expect_equal(c.Caffeine, 4.71)
-  u.Sumatriptan <- round(RES[RES$Run==1 & RES$n.1=="Sumatriptan", "Utility"],2)
+  u.Sumatriptan <- round(RES[RES$Run==1 & RES$d1=="Sumatriptan", "Utility"],2)
   expect_equal(u.Sumatriptan, 0.42)
-  u.Caffeine <- round(RES[RES$Run==1 & RES$n.1=="Caffeine/Ergotamine", "Utility"],2)
+  u.Caffeine <- round(RES[RES$Run==1 & RES$d1=="Caffeine/Ergotamine", "Utility"],2)
   expect_equal(u.Caffeine, 0.20)
 })
 

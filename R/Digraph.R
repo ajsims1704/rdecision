@@ -182,7 +182,7 @@ Digraph <- R6::R6Class(
     #' @description    
     #' Check whether the digraph is an arborescence (a tree with a
     #' single root and unique paths from the root).
-    #' @return TRUE if the digraph is an arboresecence; FALSE if not.
+    #' @return TRUE if the digraph is an arborescence; FALSE if not.
     is_arborescence = function() {
       # the underlying graph must be a tree
       if (!self$is_tree()) {
