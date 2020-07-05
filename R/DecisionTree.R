@@ -307,6 +307,9 @@ DecisionTree <- R6::R6Class(
       for (i in seq_along(P)) {
         # get path
         path <- P[[i]]
+        # leaf node
+        leaf.label <- path[[length(path)]]$label()
+        PAYOFF[PAYOFF$PID==i,"Leaf"] <- leaf.label
         # probability
         pr <- 1
         sapply(self$walk(path), function(e) {

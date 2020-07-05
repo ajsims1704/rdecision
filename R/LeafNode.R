@@ -4,9 +4,8 @@
 #' @description 
 #' An R6 class for a leaf node in a decision tree representing a clinical state.
 #'
-#' @details It represents a state of being, and is associated with an annual cost,
-#' an incremental utility and a benefit. It inherits from class Node so that it 
-#' can be part of a decision tree as a leaf node with no children. 
+#' @details It represents a state of being, and is associated with an incremental
+#' utility. 
 #' 
 #' @docType class
 #' @author Andrew J. Sims \email{andrew.sims@@newcastle.ac.uk}
@@ -17,9 +16,7 @@ LeafNode <- R6::R6Class(
   classname = "LeafNode",
   inherit = Node,
   private = list(
-#    node.cost = 0,
     node.utility = 1,
-#    node.benefit = 0,
     node.interval = as.difftime(tim=365.25, units="days")
   ),
   public = list(
@@ -30,7 +27,7 @@ LeafNode <- R6::R6Class(
     #' @param utility The incremental utility that a user associates with
     #' being in the health state (range -Inf to 1) for the interval. Intended
     #' for use with cost benefit analysis.
-    #' @param interval The time interval, over which the \code{utility} parameters
+    #' @param interval The time interval over which the \code{utility} parameters
     #' apply, expressed as an R \code{difftime} object; default 1 year.
     #' @return A new \code{LeafNode} object
     initialize = function(name, utility=1,

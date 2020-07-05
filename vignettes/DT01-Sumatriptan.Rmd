@@ -28,137 +28,130 @@ which itself is based on a decision tree which compared oral Sumatriptan versus
 oral caffeine/Ergotamine for migraine [@evans:1997a].
 
 # Creating the model
-The following code constructs the decision tree, node by node. In the
-formulation used by `rdecision`, each node is a potentially recursive
-structure which is allowed to have zero or more child nodes; any child
-nodes must have already been declared before their parent node is declared.
-This implies that a tree should be constructed from right to left, starting
-with leaf nodes which have no children (leaf nodes are synonymous with
-pathways in Briggs' terminology, and called 'States' in `rdecision`). The
-final node to be constructed is the left-most decision node in the model.
+The following code constructs the decision tree. In the
+formulation used by `rdecision`, a decision tree is a form of
+*arborescence*, a directed graph of nodes and edges, with a single
+root and a unique path from the root to each leaf node. Decision trees
+comprise three types of node: decision, chance and leaf nodes and two
+types of edge: actions (whose sources are decision nodes) and reactions
+(whose sources are chance nodes). 
 
 ```{r echo=T}
 # Time horizon
 th <- as.difftime(48, units="hours")
 
-# Model variables
-sumatriptan <- 16.10
-caffeine <- 1.32
-ED <- 63.16
-admission <- 1093
+# model variables for cost
+c.sumatriptan <- 16.10
+c.caffeine <- 1.32
+c.ED <- 63.16
+c.admission <- 1093
 
 # Sumatriptan branch
-state.a <- State$new("A", cost=(sumatriptan), utility=1.0, interval=th)
-state.b <- State$new("B", cost=(2*sumatriptan), utility=0.9, interval=th)
-state.c <- State$new("C", cost=(sumatriptan), utility=-0.3, interval=th)
-state.d <- State$new("D", cost=(sumatriptan+ED), utility=0.1, interval=th)
-state.e <- State$new("E", cost=(sumatriptan+ED+admission), utility=-0.3, interval=th)
+ta <- LeafNode$new("A", utility=1.0, interval=th)
+tb <- LeafNode$new("B", utility=0.9, interval=th)
+c3 <- ChanceNode$new("c3")
+e1 <- Reaction$new(c3, ta, p=0.594, label="No recurrence")
+e2 <- Reaction$new(c3, tb, p=0.406, cost=c.sumatriptan, 
+                   label="Recurrence relieved with 2nd dose")
 
-c.8 <- ChanceNode$new(
-  p = list(0.998, 0.002),
-  children = list(state.d, state.e),
-  edgelabels = list("Relief", "Hospitalization"),
-  costs = list(0, 0)
-)
+td <- LeafNode$new("D", utility=0.1, interval=th)
+te <- LeafNode$new("E", utility=-0.3, interval=th)
+c7 <- ChanceNode$new("c7")
+e3 <- Reaction$new(c7, td, p=0.998, label="Relief")
+e4 <- Reaction$new(c7, te, p=0.002, cost=c.admission, label="Hospitalization")
 
-c.4 <- ChanceNode$new(
-  p = list(0.594, 0.406),
-  children = list(state.a, state.b),
-  edgelabels = list("No recurrence", "Recurrence relieved with 2nd dose"),
-  costs = list(0, 0)
-)
+tc <- LeafNode$new("C", utility=-0.3, interval=th)
+c4 <- ChanceNode$new("c4")
+e5 <- Reaction$new(c4, tc, p=0.920, label="Endures attack")
+e6 <- Reaction$new(c4, c7, p=0.080, cost=c.ED, label="Emergency Department")
 
-c.5 <- ChanceNode$new(
-  p = list(0.920, 0.080),
-  children = list(state.c, c.8),
-  edgelabels = list("Endures attack", "ER"),
-  costs = list(0, 0)
-)
-
-c.2 <- ChanceNode$new(
-  p = list(0.558, 0.442),
-  children = list(c.4, c.5),
-  edgelabels = list("Relief", "No relief"),
-  costs = list(0, 0)
-)
+c1 <- ChanceNode$new("c1")
+e7 <- Reaction$new(c1, c3, p=0.558, label="Relief")
+e8 <- Reaction$new(c1, c4, p=0.442, label="No relief")
 
 # Caffeine/Ergotamine branch
-state.f <- State$new("F", cost=(caffeine), utility=1.0, interval=th)
-state.g <- State$new("G", cost=(2*caffeine), utility=0.9, interval=th)
-state.h <- State$new("H", cost=(caffeine), utility=-0.3, interval=th)
-state.i <- State$new("I", cost=(caffeine+ED), utility=0.1, interval=th)
-state.j <- State$new("J", cost=(caffeine+ED+admission), utility=-0.3, interval=th)
+tf <- LeafNode$new("F", utility=1.0, interval=th)
+tg <- LeafNode$new("G", utility=0.9, interval=th)
+c5 <- ChanceNode$new("c5")
+e9 <- Reaction$new(c5, tf, p=0.703, label="No recurrence")
+e10 <- Reaction$new(c5, tg, p=0.297, cost=c.caffeine, 
+                    label="Recurrence relieved with 2nd dose")
 
-c.9 <- ChanceNode$new(
-  p = list(0.998, 0.002),
-  children = list(state.i, state.j),
-  edgelabels = list("Relief", "Hospitalization"),
-  costs = list(0, 0)
-)
+ti <- LeafNode$new("I", utility=0.1, interval=th)
+tj <- LeafNode$new("J", utility=-0.3, interval=th)
+c8 <- ChanceNode$new("c8")
+e11 <- Reaction$new(c8, ti, p=0.998, label="Relief")
+e12 <- Reaction$new(c8, tj, p=0.002, cost=c.admission, label="Hospitalization")
+ 
+th <- LeafNode$new("H", utility=-0.3, interval=th)
+c6 <- ChanceNode$new("c6")
+e13 <- Reaction$new(c6, th, p=0.920, label="Endures attack")
+e14 <- Reaction$new(c6, c8, p=0.080, cost=c.ED, label="Emergency Department")
 
-c.6 <- ChanceNode$new(
-  p = list(0.703, 0.297),
-  children = list(state.f, state.g),
-  edgelabels = list("No recurrence", "Recurrence relieved with 2nd dose"),
-  costs = list(0, 0)
-)
-
-c.7 <- ChanceNode$new(
-  p = list(0.920, 0.080),
-  children = list(state.h, c.9),
-  edgelabels = list("Endures attack", "ER"),
-  costs = list(0, 0)
-)
-
-c.3 <- ChanceNode$new(
-  p = list(0.379, 0.621),
-  children = list(c.6, c.7),
-  edgelabels = list("Relief", "No relief"),
-  costs = list(0, 0)
-)
+c2 <- ChanceNode$new("c2")
+expect_equal(c2$label(), "c2")
+e15 <- Reaction$new(c2, c5, p=0.379, label="Relief")
+e16 <- Reaction$new(c2, c6, p=0.621, label="No relief")
 
 # decision node
-d.1 <- DecisionNode$new(
-  children = list(c.2, c.3),
-  edgelabels = list("Sumatriptan", "Caffeine/Ergotamine"),
-  costs = list(0, 0)
+d1 <- DecisionNode$new("d1")
+expect_equal(d1$label(), "d1")
+e17 <- Action$new(d1, c1, cost=c.sumatriptan, label="Sumatriptan")
+e18 <- Action$new(d1, c2, cost=c.caffeine, label="Caffeine/Ergotamine")
+ 
+# create lists of nodes and edges
+V <- list(
+  d1, c1, c2, c3, c4, c5, c6, c7, c8,
+  ta, tb, tc, td, te, tf, tg, th, ti, tj
 )
+E <- list(
+  e1, e2, e3, e4, e5, e6, e7, e8, e9, e10, e11, e12, e13, e14, e15, e16, e17, e18
+)
+# tree
+DT <- DecisionTree$new(V,E)
 ```
 
 # Running the model
-The method `evaluatePathways` of decision nodes computes
-the probability, cost and utility of traversing each root-to-leaf path
-in the model. In the Sumatriptan model there are eight such paths, each 
-of which begins with the decision node and ends with a leaf node. For example,
-pathway A involves a traversal of nodes `d.1`, `c.2`, `c.4` and
-`state.a`. 
+The method `evaluate` of decision tree objects computes
+the probability, cost and utility of each *strategy* for the model. A strategy
+is a unanimous prescription of the actions at each decision node. In this
+example there is a single decision node with two actions, and the strategies
+are simply the two forms of treatment to be compared. More complex decision
+trees are also possible.
+
+The paths traversable for a particular strategy can be evaluated individually
+using the method `evaluate_strategy`. In `rdecision` a strategy is defined as
+a set of action edges with one action edge per decision node. It is necessary to 
+call the method `evaluate_strategy` only if information about each pathway is required;
+normally it is sufficient to call `evaluate` which will automatically identify
+all possible strategies in a decision tree and evaluate them.
 
 # Model results
-The results of the scenario model, using the code from the previous sections,
-yields the following result:
+The evaluation of each pathway, for each strategy, yields the following table:
 ```{r echo=FALSE}
 local({
-  RES <- d.1$evaluatePathways()
-  names(RES) <- c('Choice', 'Pathway', 'Probability', 'Cost', 'Utility',
-                  'Expected Cost', 'Expected Utility')
-  keep <- c('Choice', 'Pathway', 'Probability', 'Cost', 'Expected Cost',
-            'Utility', 'Expected Utility')
-  knitr::kable(RES[,keep], row.names=F, digits=c(NA,NA,3,2,2,2,5))
+  R.S <- DT$evaluate_strategy(list(e17))
+  R.C <- DT$evaluate_strategy(list(e18))
+  RES <- rbind(R.S, R.C)
+  RES$Path.Benefit <- NULL
+  RES$Benefit <- NULL
+  knitr::kable(RES, row.names=FALSE, digits=c(NA,4,2,1,NA,2,4))
 })
 ```
 
-There are, as expected, eight root-to-leaf pathways. The total probability, expected
+There are, as expected, ten pathways (5 per strategy). The expected
 cost and expected utility for each choice can be calculated from the table above, or
-by invoking the `evaluateChoices` method of a decision node. This 
+by invoking the `evaluate` method of a decision tree object. This 
 gives the following result, consistent with that reported by
 Evans *et al* [-@evans:1997a].
 
 ```{r echo=F}
 local({
-  SUM <- d.1$evaluateChoices()
-  names(SUM) <- c('Run', 'Choice', 'Expected Cost', 'Expected Utility')
-  keep <- c('Choice', 'Expected Cost', 'Expected Utility')
-  knitr::kable(SUM[,keep], row.names=F, digits=c(NA,2,5))
+  SUM <- DT$evaluate()
+  SUM$Run <- NULL
+  SUM$Probability <- NULL
+  SUM$Benefit <- NULL
+  knitr::kable(SUM, row.names=FALSE, digits=c(NA,2,5))
 })
 ```
 

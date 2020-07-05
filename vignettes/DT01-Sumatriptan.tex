@@ -1,0 +1,304 @@
+% Options for packages loaded elsewhere
+\PassOptionsToPackage{unicode}{hyperref}
+\PassOptionsToPackage{hyphens}{url}
+%
+\documentclass[
+]{article}
+\usepackage{lmodern}
+\usepackage{amssymb,amsmath}
+\usepackage{ifxetex,ifluatex}
+\ifnum 0\ifxetex 1\fi\ifluatex 1\fi=0 % if pdftex
+  \usepackage[T1]{fontenc}
+  \usepackage[utf8]{inputenc}
+  \usepackage{textcomp} % provide euro and other symbols
+\else % if luatex or xetex
+  \usepackage{unicode-math}
+  \defaultfontfeatures{Scale=MatchLowercase}
+  \defaultfontfeatures[\rmfamily]{Ligatures=TeX,Scale=1}
+\fi
+% Use upquote if available, for straight quotes in verbatim environments
+\IfFileExists{upquote.sty}{\usepackage{upquote}}{}
+\IfFileExists{microtype.sty}{% use microtype if available
+  \usepackage[]{microtype}
+  \UseMicrotypeSet[protrusion]{basicmath} % disable protrusion for tt fonts
+}{}
+\makeatletter
+\@ifundefined{KOMAClassName}{% if non-KOMA class
+  \IfFileExists{parskip.sty}{%
+    \usepackage{parskip}
+  }{% else
+    \setlength{\parindent}{0pt}
+    \setlength{\parskip}{6pt plus 2pt minus 1pt}}
+}{% if KOMA class
+  \KOMAoptions{parskip=half}}
+\makeatother
+\usepackage{xcolor}
+\IfFileExists{xurl.sty}{\usepackage{xurl}}{} % add URL line breaks if available
+\IfFileExists{bookmark.sty}{\usepackage{bookmark}}{\usepackage{hyperref}}
+\hypersetup{
+  pdftitle={Sumatriptan versus caffeine for migraine},
+  pdfauthor={Andrew J. Sims},
+  hidelinks,
+  pdfcreator={LaTeX via pandoc}}
+\urlstyle{same} % disable monospaced font for URLs
+\usepackage[margin=1in]{geometry}
+\usepackage{color}
+\usepackage{fancyvrb}
+\newcommand{\VerbBar}{|}
+\newcommand{\VERB}{\Verb[commandchars=\\\{\}]}
+\DefineVerbatimEnvironment{Highlighting}{Verbatim}{commandchars=\\\{\}}
+% Add ',fontsize=\small' for more characters per line
+\usepackage{framed}
+\definecolor{shadecolor}{RGB}{248,248,248}
+\newenvironment{Shaded}{\begin{snugshade}}{\end{snugshade}}
+\newcommand{\AlertTok}[1]{\textcolor[rgb]{0.94,0.16,0.16}{#1}}
+\newcommand{\AnnotationTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\newcommand{\AttributeTok}[1]{\textcolor[rgb]{0.77,0.63,0.00}{#1}}
+\newcommand{\BaseNTok}[1]{\textcolor[rgb]{0.00,0.00,0.81}{#1}}
+\newcommand{\BuiltInTok}[1]{#1}
+\newcommand{\CharTok}[1]{\textcolor[rgb]{0.31,0.60,0.02}{#1}}
+\newcommand{\CommentTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textit{#1}}}
+\newcommand{\CommentVarTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\newcommand{\ConstantTok}[1]{\textcolor[rgb]{0.00,0.00,0.00}{#1}}
+\newcommand{\ControlFlowTok}[1]{\textcolor[rgb]{0.13,0.29,0.53}{\textbf{#1}}}
+\newcommand{\DataTypeTok}[1]{\textcolor[rgb]{0.13,0.29,0.53}{#1}}
+\newcommand{\DecValTok}[1]{\textcolor[rgb]{0.00,0.00,0.81}{#1}}
+\newcommand{\DocumentationTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\newcommand{\ErrorTok}[1]{\textcolor[rgb]{0.64,0.00,0.00}{\textbf{#1}}}
+\newcommand{\ExtensionTok}[1]{#1}
+\newcommand{\FloatTok}[1]{\textcolor[rgb]{0.00,0.00,0.81}{#1}}
+\newcommand{\FunctionTok}[1]{\textcolor[rgb]{0.00,0.00,0.00}{#1}}
+\newcommand{\ImportTok}[1]{#1}
+\newcommand{\InformationTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\newcommand{\KeywordTok}[1]{\textcolor[rgb]{0.13,0.29,0.53}{\textbf{#1}}}
+\newcommand{\NormalTok}[1]{#1}
+\newcommand{\OperatorTok}[1]{\textcolor[rgb]{0.81,0.36,0.00}{\textbf{#1}}}
+\newcommand{\OtherTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{#1}}
+\newcommand{\PreprocessorTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textit{#1}}}
+\newcommand{\RegionMarkerTok}[1]{#1}
+\newcommand{\SpecialCharTok}[1]{\textcolor[rgb]{0.00,0.00,0.00}{#1}}
+\newcommand{\SpecialStringTok}[1]{\textcolor[rgb]{0.31,0.60,0.02}{#1}}
+\newcommand{\StringTok}[1]{\textcolor[rgb]{0.31,0.60,0.02}{#1}}
+\newcommand{\VariableTok}[1]{\textcolor[rgb]{0.00,0.00,0.00}{#1}}
+\newcommand{\VerbatimStringTok}[1]{\textcolor[rgb]{0.31,0.60,0.02}{#1}}
+\newcommand{\WarningTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\usepackage{longtable,booktabs}
+% Correct order of tables after \paragraph or \subparagraph
+\usepackage{etoolbox}
+\makeatletter
+\patchcmd\longtable{\par}{\if@noskipsec\mbox{}\fi\par}{}{}
+\makeatother
+% Allow footnotes in longtable head/foot
+\IfFileExists{footnotehyper.sty}{\usepackage{footnotehyper}}{\usepackage{footnote}}
+\makesavenoteenv{longtable}
+\usepackage{graphicx,grffile}
+\makeatletter
+\def\maxwidth{\ifdim\Gin@nat@width>\linewidth\linewidth\else\Gin@nat@width\fi}
+\def\maxheight{\ifdim\Gin@nat@height>\textheight\textheight\else\Gin@nat@height\fi}
+\makeatother
+% Scale images if necessary, so that they will not overflow the page
+% margins by default, and it is still possible to overwrite the defaults
+% using explicit options in \includegraphics[width, height, ...]{}
+\setkeys{Gin}{width=\maxwidth,height=\maxheight,keepaspectratio}
+% Set default figure placement to htbp
+\makeatletter
+\def\fps@figure{htbp}
+\makeatother
+\setlength{\emergencystretch}{3em} % prevent overfull lines
+\providecommand{\tightlist}{%
+  \setlength{\itemsep}{0pt}\setlength{\parskip}{0pt}}
+\setcounter{secnumdepth}{-\maxdimen} % remove section numbering
+
+\title{Sumatriptan versus caffeine for migraine}
+\usepackage{etoolbox}
+\makeatletter
+\providecommand{\subtitle}[1]{% add subtitle to \maketitle
+  \apptocmd{\@title}{\par {\large #1 \par}}{}{}
+}
+\makeatother
+\subtitle{A decision tree example}
+\author{Andrew J. Sims}
+\date{April 2020}
+
+\begin{document}
+\maketitle
+
+\hypertarget{introduction}{%
+\section{Introduction}\label{introduction}}
+
+This vignette is an example of modelling a decision tree using the
+\texttt{rdecision} package. It is based on the example given by Briggs
+(2006, Box 2.3) which itself is based on a decision tree which compared
+oral Sumatriptan versus oral caffeine/Ergotamine for migraine (Evans et
+al. 1997).
+
+\hypertarget{creating-the-model}{%
+\section{Creating the model}\label{creating-the-model}}
+
+The following code constructs the decision tree. In the formulation used
+by \texttt{rdecision}, a decision tree is a form of \emph{arborescence},
+a directed graph of nodes and edges, with a single root and a unique
+path from the root to each leaf node. Decision trees comprise three
+types of node: decision, chance and leaf nodes and two types of edge:
+actions (whose sources are decision nodes) and reactions (whose sources
+are chance nodes).
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{# Time horizon}
+\NormalTok{th <-}\StringTok{ }\KeywordTok{as.difftime}\NormalTok{(}\DecValTok{48}\NormalTok{, }\DataTypeTok{units=}\StringTok{"hours"}\NormalTok{)}
+
+\CommentTok{# model variables for cost}
+\NormalTok{c.sumatriptan <-}\StringTok{ }\FloatTok{16.10}
+\NormalTok{c.caffeine <-}\StringTok{ }\FloatTok{1.32}
+\NormalTok{c.ED <-}\StringTok{ }\FloatTok{63.16}
+\NormalTok{c.admission <-}\StringTok{ }\DecValTok{1093}
+
+\CommentTok{# Sumatriptan branch}
+\NormalTok{ta <-}\StringTok{ }\NormalTok{LeafNode}\OperatorTok{$}\KeywordTok{new}\NormalTok{(}\StringTok{"A"}\NormalTok{, }\DataTypeTok{utility=}\FloatTok{1.0}\NormalTok{, }\DataTypeTok{interval=}\NormalTok{th)}
+\NormalTok{tb <-}\StringTok{ }\NormalTok{LeafNode}\OperatorTok{$}\KeywordTok{new}\NormalTok{(}\StringTok{"B"}\NormalTok{, }\DataTypeTok{utility=}\FloatTok{0.9}\NormalTok{, }\DataTypeTok{interval=}\NormalTok{th)}
+\NormalTok{c3 <-}\StringTok{ }\NormalTok{ChanceNode}\OperatorTok{$}\KeywordTok{new}\NormalTok{(}\StringTok{"c3"}\NormalTok{)}
+\NormalTok{e1 <-}\StringTok{ }\NormalTok{Reaction}\OperatorTok{$}\KeywordTok{new}\NormalTok{(c3, ta, }\DataTypeTok{p=}\FloatTok{0.594}\NormalTok{, }\DataTypeTok{label=}\StringTok{"No recurrence"}\NormalTok{)}
+\NormalTok{e2 <-}\StringTok{ }\NormalTok{Reaction}\OperatorTok{$}\KeywordTok{new}\NormalTok{(c3, tb, }\DataTypeTok{p=}\FloatTok{0.406}\NormalTok{, }\DataTypeTok{cost=}\NormalTok{c.sumatriptan, }
+                   \DataTypeTok{label=}\StringTok{"Recurrence relieved with 2nd dose"}\NormalTok{)}
+
+\NormalTok{td <-}\StringTok{ }\NormalTok{LeafNode}\OperatorTok{$}\KeywordTok{new}\NormalTok{(}\StringTok{"D"}\NormalTok{, }\DataTypeTok{utility=}\FloatTok{0.1}\NormalTok{, }\DataTypeTok{interval=}\NormalTok{th)}
+\NormalTok{te <-}\StringTok{ }\NormalTok{LeafNode}\OperatorTok{$}\KeywordTok{new}\NormalTok{(}\StringTok{"E"}\NormalTok{, }\DataTypeTok{utility=}\OperatorTok{-}\FloatTok{0.3}\NormalTok{, }\DataTypeTok{interval=}\NormalTok{th)}
+\NormalTok{c7 <-}\StringTok{ }\NormalTok{ChanceNode}\OperatorTok{$}\KeywordTok{new}\NormalTok{(}\StringTok{"c7"}\NormalTok{)}
+\NormalTok{e3 <-}\StringTok{ }\NormalTok{Reaction}\OperatorTok{$}\KeywordTok{new}\NormalTok{(c7, td, }\DataTypeTok{p=}\FloatTok{0.998}\NormalTok{, }\DataTypeTok{label=}\StringTok{"Relief"}\NormalTok{)}
+\NormalTok{e4 <-}\StringTok{ }\NormalTok{Reaction}\OperatorTok{$}\KeywordTok{new}\NormalTok{(c7, te, }\DataTypeTok{p=}\FloatTok{0.002}\NormalTok{, }\DataTypeTok{cost=}\NormalTok{c.admission, }\DataTypeTok{label=}\StringTok{"Hospitalization"}\NormalTok{)}
+
+\NormalTok{tc <-}\StringTok{ }\NormalTok{LeafNode}\OperatorTok{$}\KeywordTok{new}\NormalTok{(}\StringTok{"C"}\NormalTok{, }\DataTypeTok{utility=}\OperatorTok{-}\FloatTok{0.3}\NormalTok{, }\DataTypeTok{interval=}\NormalTok{th)}
+\NormalTok{c4 <-}\StringTok{ }\NormalTok{ChanceNode}\OperatorTok{$}\KeywordTok{new}\NormalTok{(}\StringTok{"c4"}\NormalTok{)}
+\NormalTok{e5 <-}\StringTok{ }\NormalTok{Reaction}\OperatorTok{$}\KeywordTok{new}\NormalTok{(c4, tc, }\DataTypeTok{p=}\FloatTok{0.920}\NormalTok{, }\DataTypeTok{label=}\StringTok{"Endures attack"}\NormalTok{)}
+\NormalTok{e6 <-}\StringTok{ }\NormalTok{Reaction}\OperatorTok{$}\KeywordTok{new}\NormalTok{(c4, c7, }\DataTypeTok{p=}\FloatTok{0.080}\NormalTok{, }\DataTypeTok{cost=}\NormalTok{c.ED, }\DataTypeTok{label=}\StringTok{"Emergency Department"}\NormalTok{)}
+
+\NormalTok{c1 <-}\StringTok{ }\NormalTok{ChanceNode}\OperatorTok{$}\KeywordTok{new}\NormalTok{(}\StringTok{"c1"}\NormalTok{)}
+\NormalTok{e7 <-}\StringTok{ }\NormalTok{Reaction}\OperatorTok{$}\KeywordTok{new}\NormalTok{(c1, c3, }\DataTypeTok{p=}\FloatTok{0.558}\NormalTok{, }\DataTypeTok{label=}\StringTok{"Relief"}\NormalTok{)}
+\NormalTok{e8 <-}\StringTok{ }\NormalTok{Reaction}\OperatorTok{$}\KeywordTok{new}\NormalTok{(c1, c4, }\DataTypeTok{p=}\FloatTok{0.442}\NormalTok{, }\DataTypeTok{label=}\StringTok{"No relief"}\NormalTok{)}
+
+\CommentTok{# Caffeine/Ergotamine branch}
+\NormalTok{tf <-}\StringTok{ }\NormalTok{LeafNode}\OperatorTok{$}\KeywordTok{new}\NormalTok{(}\StringTok{"F"}\NormalTok{, }\DataTypeTok{utility=}\FloatTok{1.0}\NormalTok{, }\DataTypeTok{interval=}\NormalTok{th)}
+\NormalTok{tg <-}\StringTok{ }\NormalTok{LeafNode}\OperatorTok{$}\KeywordTok{new}\NormalTok{(}\StringTok{"G"}\NormalTok{, }\DataTypeTok{utility=}\FloatTok{0.9}\NormalTok{, }\DataTypeTok{interval=}\NormalTok{th)}
+\NormalTok{c5 <-}\StringTok{ }\NormalTok{ChanceNode}\OperatorTok{$}\KeywordTok{new}\NormalTok{(}\StringTok{"c5"}\NormalTok{)}
+\NormalTok{e9 <-}\StringTok{ }\NormalTok{Reaction}\OperatorTok{$}\KeywordTok{new}\NormalTok{(c5, tf, }\DataTypeTok{p=}\FloatTok{0.703}\NormalTok{, }\DataTypeTok{label=}\StringTok{"No recurrence"}\NormalTok{)}
+\NormalTok{e10 <-}\StringTok{ }\NormalTok{Reaction}\OperatorTok{$}\KeywordTok{new}\NormalTok{(c5, tg, }\DataTypeTok{p=}\FloatTok{0.297}\NormalTok{, }\DataTypeTok{cost=}\NormalTok{c.caffeine, }
+                    \DataTypeTok{label=}\StringTok{"Recurrence relieved with 2nd dose"}\NormalTok{)}
+
+\NormalTok{ti <-}\StringTok{ }\NormalTok{LeafNode}\OperatorTok{$}\KeywordTok{new}\NormalTok{(}\StringTok{"I"}\NormalTok{, }\DataTypeTok{utility=}\FloatTok{0.1}\NormalTok{, }\DataTypeTok{interval=}\NormalTok{th)}
+\NormalTok{tj <-}\StringTok{ }\NormalTok{LeafNode}\OperatorTok{$}\KeywordTok{new}\NormalTok{(}\StringTok{"J"}\NormalTok{, }\DataTypeTok{utility=}\OperatorTok{-}\FloatTok{0.3}\NormalTok{, }\DataTypeTok{interval=}\NormalTok{th)}
+\NormalTok{c8 <-}\StringTok{ }\NormalTok{ChanceNode}\OperatorTok{$}\KeywordTok{new}\NormalTok{(}\StringTok{"c8"}\NormalTok{)}
+\NormalTok{e11 <-}\StringTok{ }\NormalTok{Reaction}\OperatorTok{$}\KeywordTok{new}\NormalTok{(c8, ti, }\DataTypeTok{p=}\FloatTok{0.998}\NormalTok{, }\DataTypeTok{label=}\StringTok{"Relief"}\NormalTok{)}
+\NormalTok{e12 <-}\StringTok{ }\NormalTok{Reaction}\OperatorTok{$}\KeywordTok{new}\NormalTok{(c8, tj, }\DataTypeTok{p=}\FloatTok{0.002}\NormalTok{, }\DataTypeTok{cost=}\NormalTok{c.admission, }\DataTypeTok{label=}\StringTok{"Hospitalization"}\NormalTok{)}
+ 
+\NormalTok{th <-}\StringTok{ }\NormalTok{LeafNode}\OperatorTok{$}\KeywordTok{new}\NormalTok{(}\StringTok{"H"}\NormalTok{, }\DataTypeTok{utility=}\OperatorTok{-}\FloatTok{0.3}\NormalTok{, }\DataTypeTok{interval=}\NormalTok{th)}
+\NormalTok{c6 <-}\StringTok{ }\NormalTok{ChanceNode}\OperatorTok{$}\KeywordTok{new}\NormalTok{(}\StringTok{"c6"}\NormalTok{)}
+\NormalTok{e13 <-}\StringTok{ }\NormalTok{Reaction}\OperatorTok{$}\KeywordTok{new}\NormalTok{(c6, th, }\DataTypeTok{p=}\FloatTok{0.920}\NormalTok{, }\DataTypeTok{label=}\StringTok{"Endures attack"}\NormalTok{)}
+\NormalTok{e14 <-}\StringTok{ }\NormalTok{Reaction}\OperatorTok{$}\KeywordTok{new}\NormalTok{(c6, c8, }\DataTypeTok{p=}\FloatTok{0.080}\NormalTok{, }\DataTypeTok{cost=}\NormalTok{c.ED, }\DataTypeTok{label=}\StringTok{"Emergency Department"}\NormalTok{)}
+
+\NormalTok{c2 <-}\StringTok{ }\NormalTok{ChanceNode}\OperatorTok{$}\KeywordTok{new}\NormalTok{(}\StringTok{"c2"}\NormalTok{)}
+\KeywordTok{expect_equal}\NormalTok{(c2}\OperatorTok{$}\KeywordTok{label}\NormalTok{(), }\StringTok{"c2"}\NormalTok{)}
+\NormalTok{e15 <-}\StringTok{ }\NormalTok{Reaction}\OperatorTok{$}\KeywordTok{new}\NormalTok{(c2, c5, }\DataTypeTok{p=}\FloatTok{0.379}\NormalTok{, }\DataTypeTok{label=}\StringTok{"Relief"}\NormalTok{)}
+\NormalTok{e16 <-}\StringTok{ }\NormalTok{Reaction}\OperatorTok{$}\KeywordTok{new}\NormalTok{(c2, c6, }\DataTypeTok{p=}\FloatTok{0.621}\NormalTok{, }\DataTypeTok{label=}\StringTok{"No relief"}\NormalTok{)}
+
+\CommentTok{# decision node}
+\NormalTok{d1 <-}\StringTok{ }\NormalTok{DecisionNode}\OperatorTok{$}\KeywordTok{new}\NormalTok{(}\StringTok{"d1"}\NormalTok{)}
+\KeywordTok{expect_equal}\NormalTok{(d1}\OperatorTok{$}\KeywordTok{label}\NormalTok{(), }\StringTok{"d1"}\NormalTok{)}
+\NormalTok{e17 <-}\StringTok{ }\NormalTok{Action}\OperatorTok{$}\KeywordTok{new}\NormalTok{(d1, c1, }\DataTypeTok{cost=}\NormalTok{c.sumatriptan, }\DataTypeTok{label=}\StringTok{"Sumatriptan"}\NormalTok{)}
+\NormalTok{e18 <-}\StringTok{ }\NormalTok{Action}\OperatorTok{$}\KeywordTok{new}\NormalTok{(d1, c2, }\DataTypeTok{cost=}\NormalTok{c.caffeine, }\DataTypeTok{label=}\StringTok{"Caffeine/Ergotamine"}\NormalTok{)}
+ 
+\CommentTok{# create lists of nodes and edges}
+\NormalTok{V <-}\StringTok{ }\KeywordTok{list}\NormalTok{(}
+\NormalTok{  d1, c1, c2, c3, c4, c5, c6, c7, c8,}
+\NormalTok{  ta, tb, tc, td, te, tf, tg, th, ti, tj}
+\NormalTok{)}
+\NormalTok{E <-}\StringTok{ }\KeywordTok{list}\NormalTok{(}
+\NormalTok{  e1, e2, e3, e4, e5, e6, e7, e8, e9, e10, e11, e12, e13, e14, e15, e16, e17, e18}
+\NormalTok{)}
+\CommentTok{# tree}
+\NormalTok{DT <-}\StringTok{ }\NormalTok{DecisionTree}\OperatorTok{$}\KeywordTok{new}\NormalTok{(V,E)}
+\end{Highlighting}
+\end{Shaded}
+
+\hypertarget{running-the-model}{%
+\section{Running the model}\label{running-the-model}}
+
+The method \texttt{evaluate} of decision tree objects computes the
+probability, cost and utility of each \emph{strategy} for the model. A
+strategy is a unanimous prescription of the actions at each decision
+node. In this example there is a single decision node with two actions,
+and the strategies are simply the two forms of treatment to be compared.
+More complex decision trees are also possible.
+
+The paths traversable for a particular strategy can be evaluated
+individually using the method \texttt{evaluate\_strategy}. In
+\texttt{rdecision} a strategy is defined as a set with one action edge
+per decision node. It is necessary to call the method
+\texttt{evaluate\_strategy} only if information about each pathway is
+required; normally it is sufficient to call \texttt{evaluate} which will
+automatically identify all possible strategies in a decision tree and
+evaluate them.
+
+\hypertarget{model-results}{%
+\section{Model results}\label{model-results}}
+
+The evaluation of each pathway, for each strategy, yields the following
+table:
+
+\begin{longtable}[]{@{}lrrrlrr@{}}
+\toprule
+d1 & Probability & Path.Cost & Path.Utility & Leaf & Cost &
+Utility\tabularnewline
+\midrule
+\endhead
+Sumatriptan & 0.3315 & 16.10 & 1.0 & A & 5.34 & 0.3315\tabularnewline
+Sumatriptan & 0.2265 & 32.20 & 0.9 & B & 7.29 & 0.2039\tabularnewline
+Sumatriptan & 0.4066 & 16.10 & -0.3 & C & 6.55 & -0.1220\tabularnewline
+Sumatriptan & 0.0353 & 79.26 & 0.1 & D & 2.80 & 0.0035\tabularnewline
+Sumatriptan & 0.0001 & 1172.26 & -0.3 & E & 0.08 & 0.0000\tabularnewline
+Caffeine/Ergotamine & 0.2664 & 1.32 & 1.0 & F & 0.35 &
+0.2664\tabularnewline
+Caffeine/Ergotamine & 0.1126 & 2.64 & 0.9 & G & 0.30 &
+0.1013\tabularnewline
+Caffeine/Ergotamine & 0.5713 & 1.32 & -0.3 & H & 0.75 &
+-0.1714\tabularnewline
+Caffeine/Ergotamine & 0.0496 & 64.48 & 0.1 & I & 3.20 &
+0.0050\tabularnewline
+Caffeine/Ergotamine & 0.0001 & 1157.48 & -0.3 & J & 0.12 &
+0.0000\tabularnewline
+\bottomrule
+\end{longtable}
+
+There are, as expected, ten pathways (5 per strategy). The expected cost
+and expected utility for each choice can be calculated from the table
+above, or by invoking the \texttt{evaluate} method of a decision tree
+object. This gives the following result, consistent with that reported
+by Evans \emph{et al} (1997).
+
+\begin{longtable}[]{@{}lrr@{}}
+\toprule
+d1 & Cost & Utility\tabularnewline
+\midrule
+\endhead
+Sumatriptan & 22.06 & 0.41686\tabularnewline
+Caffeine/Ergotamine & 4.71 & 0.20128\tabularnewline
+\bottomrule
+\end{longtable}
+
+\hypertarget{references}{%
+\section*{References}\label{references}}
+\addcontentsline{toc}{section}{References}
+
+\hypertarget{refs}{}
+\leavevmode\hypertarget{ref-briggs:2002a}{}%
+Briggs, Andrew, Karl Claxton, and Mark Sculpher. 2006. \emph{Decision
+Modelling for Health Economic Evaluation}. Oxford, UK: Oxford University
+Press.
+
+\leavevmode\hypertarget{ref-evans:1997a}{}%
+Evans, Kenneth W., John A. Boan, John L. Evans, and Ashfaq Shuaib. 1997.
+``Economic Evaluation of Oral Sumatriptan Compared with Oral
+Caffeine/Ergotamine for Migraine.'' \emph{Pharmacoeconomics} 12 (5):
+565--77.
+
+\end{document}

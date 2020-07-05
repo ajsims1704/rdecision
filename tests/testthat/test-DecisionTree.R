@@ -43,17 +43,6 @@ test_that("rdecision replicates Evans et al, Sumatriptan base case", {
   c.caffeine <- 1.32
   c.ED <- 63.16
   c.admission <- 1093
-  # Expressions
-  # c.A <- sumatriptan
-  # c.B <- 2*sumatriptan
-  # c.C <- sumatriptan
-  # c.D <- sumatriptan+ED
-  # c.E <- sumatriptan+ED+admission
-  # c.F <- caffeine
-  # c.G <- 2*caffeine
-  # c.H <- caffeine
-  # c.I <- caffeine+ED
-  # c.J <- caffeine+ED+admission
   #
   # Sumatriptan branch
   #
