@@ -80,14 +80,26 @@ ExprModVar <- R6::R6Class(
     #' @return An object of type ExprModVar
     initialize = function(description, units, expr, envir=globalenv()) {
       super$initialize(description, units)
-      # check and process the expression
-      if (!rlang::is_expression(expr)) {
-        warning("ExprModVar$new: expr must be an expression")
-      }
-      private$expr <- expr
+      # *** test
+      #print(class(expr))
+      #quo <- rlang::enquo(expr)
+      print(rlang::is_quosure(expr))
+      print(rlang::quo_get_env(expr))
+      print(rlang::quo_get_expr(expr))
+      z <- rlang::eval_tidy(expr)
+      #print("boo")
+      print(z)
+      
+  #    # check and process the expression
+  #    if (!rlang::is_expression(expr)) {
+  #      rlang::abort("Argument expr must be an expression",
+  #                   class="expr_not_expression")
+  #    }
+  #    private$expr <- expr
       # check the environment
       if (!is.environment(envir)) {
-        stop("ExprModVar$new: envir must be of type 'environment'")
+        rlang::abort("Argument 'envir' must be of type 'environment'",
+                     class="envir_not_environment")
       }
       private$env <- envir
       # parse the expression

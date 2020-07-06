@@ -188,3 +188,120 @@ test_that("rdecision replacates Kaminski et al, fig 7", {
   popt <- paste(RES$d1[imax], RES$d2[imax], RES$d3[imax], sep="/")
   expect_equal(popt, "test/sell/dig")
 })
+
+# ------------------------------------------------------------
+# Jenks et al, App Health Econ & Health Policy 2016;14:135-149
+# ------------------------------------------------------------
+test_that("redecision replicates Jenks et al, 2016", {
+  
+  # clinical variables
+  r.CRBSI <- NormModVar$new(
+    'Baseline CRBSI rate', '/1000 catheter days', mu=1.48, sigma=0.074
+  )
+  hr.CRBSI <- LogNormModVar$new(
+    'Tegaderm CRBSI HR', 'ratio', p1=-0.911, p2=0.393
+  )
+  r.LSI <- NormModVar$new(
+    'Baseline LSI rate', '/patient', mu=0.1, sigma=0.01 
+  )
+  hr.LSI <- LogNormModVar$new(
+    'Tegaderm LSI HR', 'ratio', p1=-0.911, p2=0.393
+  )
+  r.Dermatitis <- NormModVar$new(
+    'Baseline dermatitis risk', '/catheter', mu=0.0026, sigma=0.00026
+  )
+  rr.Dermatitis <- LogNormModVar$new(
+    'Tegaderm Dermatitis RR', 'ratio',  p1=1.482, p2=0.490
+  )
+
+  # cost variables
+  c.CRBSI <- GammaModVar$new(
+    'CRBSI cost', 'GBP', alpha=198.0, beta=50
+  )
+  c.Dermatitis <- GammaModVar$new(
+    'Dermatitis cost', 'GBP', alpha=30, beta=5
+  )
+  c.LSI <- GammaModVar$new(
+    'LSI cost', 'GBP', alpha=50, beta=5
+  )
+  c.Tegaderm <- ConstModVar$new(
+    'Tegaderm CHG cost', 'GBP', const=6.21
+  )
+  c.Standard <- ConstModVar$new(
+    'Standard dressing cost', 'GBP', const=1.34
+  )
+  n.cathdays <- NormModVar$new(
+    'No. days with catheter', 'days', mu=10, sigma=2
+  )  
+  n.dressings <- NormModVar$new(
+    'No. dressings', 'dressings', mu=3, sigma=0.3 
+  )
+
+  # probabilities
+  p.Dermatitis.S <- ExprModVar$new(
+    'P(dermatitis|standard dressing)', 'P', quote(n.dressings*r.Dermatitis)
+  )
+  p.Dermatitis.T <- ExprModVar$new(
+    'P(dermatitis|Tegaderm)', 'P', quote(n.dressings*r.Dermatitis*rr.Dermatitis)
+  )
+  r.LSI.T <- ExprModVar$new(
+    'P(LSI|Tegaderm)', 'P', quote(r.LSI*hr.LSI)
+  )
+  p.CRBSI.S <- ExprModVar$new(
+    'P(CRBSI|standard dressing)', 'P',  quote(r.CRBSI*n.cathdays/1000)
+  )
+  p.CRBSI.T <- ExprModVar$new(
+    'P(CRBSI|Tegaderm)', 'P', quote(r.CRBSI*n.cathdays*hr.CRBSI/1000)
+  )
+  p.NoComp.S <- ExprModVar$new("P(No comp|standard dressing)", "P",
+    quote(1-(p.Dermatitis.S+r.LSI+p.CRBSI.S))
+  )
+  p.NoComp.T <- ExprModVar$new("P(No comp|Tegaderm)", "P",
+    quote(1-(p.Dermatitis.T+r.LSI.T+p.CRBSI.T))
+  )
+
+  # costs to each branch
+  c.S <- ExprModVar$new(
+    'Cost of standard dressing', 'GBP', quote(n.dressings*c.Standard)
+  )
+  c.T <- ExprModVar$new(
+    'Cost of Tegaderm', 'GBP', quote(n.dressings*c.Tegaderm)
+  )
+#  c.Dermatitis.S <- ExprModVar$new("c(Dermatitis,Std)", "GBP", quote(c.Dermatitis+c.S))
+#  c.Dermatitis.T <- ExprModVar$new("c(Dermatitis,Teg)", "GBP", quote(c.Dermatitis+c.T))
+#  c.LSI.S <- ExprModVar$new("c(LSI,Std)", "GBP", quote(c.LSI+c.S))
+#  c.LSI.T <- ExprModVar$new("c(LSI,Teg)", "GBP", quote(c.LSI+c.T))
+#  c.CRBSI.S <- ExprModVar$new("c(CRBSI),Std)", "GBP", quote(c.CRBSI+c.S))
+#  c.CRBSI.T <- ExprModVar$new("c(CRBSI),Teg)", "GBP", quote(c.CRBSI+c.T))
+
+  # Time horizon
+  th <- as.difftime(7, units="days")
+  # standard dressing branch
+  t1 <- LeafNode$new("Dermatitis", interval=th)
+  t2 <- LeafNode$new("LSI", interval=th)
+  t3 <- LeafNode$new("CRBSI", interval=th)
+  t4 <- LeafNode$new("No comp", interval=th)
+  c1 <- ChanceNode$new()
+  e1 <- Reaction$new(c1,t1,p=p.Dermatitis.S,cost=c.Dermatitis)
+  e2 <- Reaction$new(c1,t2,p=r.LSI,cost=c.LSI)
+  e3 <- Reaction$new(c1,t3,p=p.CRBSI.S,cost=c.CRBSI)
+  e4 <- Reaction$new(c1,t4,p=p.NoComp.S,cost=0)
+  # Tegaderm dressing branch
+  t5 <- LeafNode$new("Dermatitis", cost=c.Dermatitis.T, interval=th)
+  t6 <- LeafNode$new("LSI", cost=c.LSI.T, interval=th)
+  t7 <- LeafNode$new("CRBSI", cost=c.CRBSI.T, interval=th)
+  t8 <- LeafNode$new("No comp", cost=c.T, interval=th)
+  c2 <- ChanceNode$new()
+  e5 <- Reaction$new(c2,t5,p=p.Dermatitis.T,cost=c.Dermatitis)
+  e6 <- Reaction$new(c2,t6,p=r.LSI.T,cost=c.LSI)
+  e7 <- Reaction$new(c2,t7,p=p.CRBSI.T,cost=c.CRBSI)
+  e8 <- Reaction$new(c2,t8,p=p.NoComp.T,cost=0)
+  # decision node
+  d1 <- DecisionNode$new("d1")
+  e9 <- Action$new(d1,c1,label="Standard",cost=c.Standard)
+  e10 <- Action$new(d1,c2,label="Tegaderm",cost=c.Tegaderm)
+  # create decision tree
+  V <- list(d1,c1,c2,t1,t2,t3,t4,t5,t6,t7,t8)
+  E <- list(e1,e2,e3,e4,e5,e6,e7,e8,e9,e10)
+  expect_silent(DT <- DecisionTree$new(V,E))
+})

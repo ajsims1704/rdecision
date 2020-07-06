@@ -116,7 +116,7 @@ expressions, which involve model variables and are themselves
 model variables. Forms of expression involving R's numerical functions and
 multiple model variables are supported, provided they conform to R syntax.
 The following code creates the model variable expressions to be used as values in the
-decision tree nodes.
+decision tree edges.
 
 ```{r expressions, echo=TRUE}
 # probabilities
@@ -152,16 +152,13 @@ c.CRBSI.T <- ExprModVar$new("c(CRBSI),Teg)", "GBP", quote(c.CRBSI+c.T))
 ```
 
 ## The decision tree
-The following code constructs the decision tree, node by node, based on figure 2
-of Jenks *et al* [-@jenks:2016a]. In the
-formulation used by `rdecision`, each node is a potentially recursive
-structure which is allowed to have zero or more child nodes; any child
-nodes must have already been declared before their parent node is declared.
-This implies that a tree should be constructed from right to left, starting
-with leaf nodes which have no children (leaf nodes are synonymous with
-pathways in Briggs' terminology [-@briggs:2002a]). The final node to be constructed 
-is the node representing the decision problem. The time horizon is not stated
-explicitly in the model, and is assumed to be 7 days here. It was implied
+The following code constructs the decision tree based on figure 2
+of Jenks *et al* [-@jenks:2016a]. In the formulation used by `rdecision`, 
+the decision tree is constructed from sets of decision, chance and 
+leaf nodes and from edges (actions and reactions).
+Leaf nodes are synonymous with
+pathways in Briggs' terminology [-@briggs:2002a]). The time horizon is
+not stated explicitly in the model, and is assumed to be 7 days here. It was implied
 that the time horizon was ICU stay plus some follow-up, and the costs reflect
 those incurred in that period, so the assumption of 7 days does not affect
 the `rdecision` implementation of the model.
