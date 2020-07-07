@@ -131,6 +131,7 @@ This gives the following payoff for each unique strategy:
 ```{r results, echo=FALSE, results='asis'}
 RES$Run <- NULL
 RES$Probability <- NULL
+RES$Utility <- NULL
 knitr::kable(RES, row.names=FALSE)
 ```
 
