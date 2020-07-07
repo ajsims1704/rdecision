@@ -31,10 +31,10 @@ ExprModVar <- R6::R6Class(
   inherit =  ModVar,
   private = list(
     # fields
-    expr = 'call',
-    expr.value = 'call',
-    expr.mean = 'call',
-    env = 'environment',
+    expr = NULL,
+    expr.value = NULL,
+    expr.mean = NULL,
+    env = NULL,
     Nsim = 1000,
 
     # function to create an expression involving calling ModVar
@@ -77,25 +77,16 @@ ExprModVar <- R6::R6Class(
     #' environment it must be specified. If creating an object from
     #' within a function, for example, set `envir=environment()` in the
     #' parameter list.
+    #' @note In future rlang::quosure may be used to replace (expr,envir).
     #' @return An object of type ExprModVar
     initialize = function(description, units, expr, envir=globalenv()) {
       super$initialize(description, units)
-      # *** test
-      #print(class(expr))
-      #quo <- rlang::enquo(expr)
-      print(rlang::is_quosure(expr))
-      print(rlang::quo_get_env(expr))
-      print(rlang::quo_get_expr(expr))
-      z <- rlang::eval_tidy(expr)
-      #print("boo")
-      print(z)
-      
-  #    # check and process the expression
-  #    if (!rlang::is_expression(expr)) {
-  #      rlang::abort("Argument expr must be an expression",
-  #                   class="expr_not_expression")
-  #    }
-  #    private$expr <- expr
+      # check and process the expression
+      if (!rlang::is_expression(expr)) {
+        rlang::abort("Argument expr must be an expression",
+                     class="expr_not_expression")
+      }
+      private$expr <- expr
       # check the environment
       if (!is.environment(envir)) {
         rlang::abort("Argument 'envir' must be of type 'environment'",

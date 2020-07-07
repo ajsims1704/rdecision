@@ -239,10 +239,12 @@ test_that("redecision replicates Jenks et al, 2016", {
 
   # probabilities
   p.Dermatitis.S <- ExprModVar$new(
-    'P(dermatitis|standard dressing)', 'P', quote(n.dressings*r.Dermatitis)
+    'P(dermatitis|standard dressing)', 'P', quote(n.dressings*r.Dermatitis),
+    envir=environment()
   )
   p.Dermatitis.T <- ExprModVar$new(
-    'P(dermatitis|Tegaderm)', 'P', quote(n.dressings*r.Dermatitis*rr.Dermatitis)
+    'P(dermatitis|Tegaderm)', 'P', quote(n.dressings*r.Dermatitis*rr.Dermatitis),
+    envir=environment()
   )
   r.LSI.T <- ExprModVar$new(
     'P(LSI|Tegaderm)', 'P', quote(r.LSI*hr.LSI)
