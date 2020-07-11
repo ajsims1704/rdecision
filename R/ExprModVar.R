@@ -68,6 +68,8 @@ ExprModVar <- R6::R6Class(
     #' a complex model it may help to tabulate how model variables are
     #' combined into costs, probablities and rates.
     #' @param units Units in which the variable is expressed.
+    #' @param quo A quosure (see package rlang), which contains an expression
+    #' and its environment. The usage is `quo(x+y)` or `rlang::quo(x+y)`.
     #' @param expr An R expression involving model variables which would be 
     #' syntactically correct were each model variable to be replaced by
     #' numerical variables. Create either by `quote(x+y)` or `rlang::expr(x+y)`.
@@ -79,23 +81,31 @@ ExprModVar <- R6::R6Class(
     #' parameter list.
     #' @note In future rlang::quosure may be used to replace (expr,envir).
     #' @return An object of type ExprModVar
-    initialize = function(description, units, expr, envir=globalenv()) {
+#    initialize = function(description, units, expr, envir=globalenv()) {
+    initialize = function(description, units, quo) {
+      # initialize the base class
       super$initialize(description, units)
-      # check and process the expression
-      if (!rlang::is_expression(expr)) {
-        rlang::abort("Argument expr must be an expression",
-                     class="expr_not_expression")
+      # check and process the quosure
+      if (!rlang::is_quosure(quo)) {
+        rlang::abort("Argument quo must be a quosure", class="quo_not_quosure")
       }
-      private$expr <- expr
-      # check the environment
-      if (!is.environment(envir)) {
-        rlang::abort("Argument 'envir' must be of type 'environment'",
-                     class="envir_not_environment")
-      }
-      private$env <- envir
+      private$expr <- rlang::quo_get_expr(quo)
+      private$env <- rlang::quo_get_env(quo)
+      # # check and process the expression
+      # if (!rlang::is_expression(expr)) {
+      #   rlang::abort("Argument expr must be an expression",
+      #                class="expr_not_expression")
+      # }
+      # private$expr <- expr
+      # # check the environment
+      # if (!is.environment(envir)) {
+      #   rlang::abort("Argument 'envir' must be of type 'environment'",
+      #                class="envir_not_environment")
+      # }
+      # private$env <- envir
       # parse the expression
-      private$expr.value <- private$subExpr(expr, 'value()')
-      private$expr.mean <- private$subExpr(expr, 'getMean()')
+      private$expr.value <- private$subExpr(private$expr, 'value()')
+      private$expr.mean <- private$subExpr(private$expr, 'getMean()')
       # set this model variable and its operands to their expected values
       self$sample(T)
     },
