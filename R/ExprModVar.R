@@ -81,7 +81,6 @@ ExprModVar <- R6::R6Class(
     #' parameter list.
     #' @note In future rlang::quosure may be used to replace (expr,envir).
     #' @return An object of type ExprModVar
-#    initialize = function(description, units, expr, envir=globalenv()) {
     initialize = function(description, units, quo) {
       # initialize the base class
       super$initialize(description, units)
@@ -91,18 +90,6 @@ ExprModVar <- R6::R6Class(
       }
       private$expr <- rlang::quo_get_expr(quo)
       private$env <- rlang::quo_get_env(quo)
-      # # check and process the expression
-      # if (!rlang::is_expression(expr)) {
-      #   rlang::abort("Argument expr must be an expression",
-      #                class="expr_not_expression")
-      # }
-      # private$expr <- expr
-      # # check the environment
-      # if (!is.environment(envir)) {
-      #   rlang::abort("Argument 'envir' must be of type 'environment'",
-      #                class="envir_not_environment")
-      # }
-      # private$env <- envir
       # parse the expression
       private$expr.value <- private$subExpr(private$expr, 'value()')
       private$expr.mean <- private$subExpr(private$expr, 'getMean()')
@@ -119,7 +106,7 @@ ExprModVar <- R6::R6Class(
     #'        expectation of the variable. Default is FALSE.
     #' @return Updated ExprModVar object.
     sample = function(expected=F) {
-      sapply(self$getOperands(), FUN=function(o) {
+      sapply(self$operands(), FUN=function(o) {
         o$sample(expected)        
       })
       return(invisible(self))
@@ -137,7 +124,7 @@ ExprModVar <- R6::R6Class(
     #' Accessor function for the name of the expression model variable.
     #' @return Expression as a character string with all control characters
     #' having been removed.
-    getDistribution = function() {
+    distribution = function() {
       estr <- rlang::expr_text(private$expr)
       estr <- gsub("[[:cntrl:]]", "", estr)
       return(estr)
@@ -146,7 +133,7 @@ ExprModVar <- R6::R6Class(
     #' @description 
     #' Return the expected value of the expression variable. 
     #' @return Expected value as a numeric value.
-    getMean = function() {
+    mean = function() {
       rv <- eval(private$expr.mean, envir=private$env)
       return(rv)  
     },
@@ -154,7 +141,7 @@ ExprModVar <- R6::R6Class(
     #' @description 
     #' Return the standard deviation of the distribution. 
     #' @return Standard deviation as a numeric value
-    getSD = function() {
+    SD = function() {
       # sample values from the variable
       S <- self$r(private$Nsim)
       return(sd(S))
@@ -164,7 +151,7 @@ ExprModVar <- R6::R6Class(
     #' Return the quantiles by sampling the variable.
     #' @param probs Vector of probabilities, in range [0,1].    
     #' @return Vector of quantiles.
-    getQuantile = function(probs) {
+    quantile = function(probs) {
       # check inputs
       sapply(probs, FUN=function(x) {
         if (!is.numeric(probs)) {
@@ -182,16 +169,16 @@ ExprModVar <- R6::R6Class(
     #' Return a list of operands that are themselves ModVars given
     #' in the expression.
     #' @return A list of model variables.
-    getOperands = function() {
+    operands = function() {
       # filter the expression variables that are ModVars
       mvlist <- list()
       sapply(all.vars(private$expr), FUN=function(v) {
         vv <- eval(str2lang(v), envir=private$env)
-        if (inherits(vv, what='ModVar')) {
+        if (inherits(vv, what="ModVar")) {
           # add the variable to the list
           mvlist <<- c(mvlist, vv)
           # and add its operands, if any
-          sapply(vv$getOperands(), FUN=function(o) {
+          sapply(vv$operands(), FUN=function(o) {
             mvlist <<- c(mvlist, o)
           })
         }

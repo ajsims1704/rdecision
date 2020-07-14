@@ -1,75 +1,44 @@
 
-
-# --------------------------------------------
-# Tests of variable label, used in tabulations
-# --------------------------------------------
-
-test_that("the MV returns the correct environment, case 1", {
-  mv <- ModVar$new('Variable description', 'GBP')
-  v.env <- mv$get_environment()
-  expect_type(v.env, 'environment')
-  c.env <- rlang::current_env()
-  expect_identical(c.env, v.env)
+test_that("illegal arguments are rejected", {
+  expect_error(ModVar$new(42, "GBP"), class="description_not_string")
+  expect_error(ModVar$new(TRUE, "GBP"), class="description_not_string")
+  expect_error(ModVar$new("x", 42), class="units_not_string")
+  expect_error(ModVar$new("x", FALSE), class="units_not_string")
 })
 
-test_that("the MV returns the correct environment, case 2", {
-  mv <- ModVar$new('Variable description', 'GBP')
-  c.env <- rlang::current_env()
-  f <- function() {
-    v.env <- mv$get_environment()
-    expect_identical(c.env, v.env)
+test_that("ModVar description is saved", {
+  # same environment
+  x <- ModVar$new("x", "GBP")
+  expect_equal(x$description(), "x")
+  # child environment
+  f <- function(){
+    expect_equal(x$description(), "x")
   }
   f()
-})
-
-test_that("an MV's label is auto-detected, case 1", {
-  mv <- ModVar$new('Variable description', 'GBP')
-  expect_equal(mv$get_label(), "mv")
-})
-
-test_that("an MV's label is auto-detected, case 2", {
-  mv <- ModVar$new('Variable description', 'GBP')
-  cmv <- mv
-  expect_equal(cmv$get_label(), 'mv')
-})
-
-test_that("an MV's label is auto-detected, case 3", {
-  mv <- ModVar$new('Variable description', 'GBP')
-  f <- function() {
-    fmv <- mv
-    expect_equal(fmv$get_label(), 'mv')
+  # parent environment
+  g <- function(){
+    y <- ModVar$new("y", "GBP")
+    return(y)
   }
-  f()
+  yy <- g()
+  expect_equal(yy$description(), "y")
 })
 
-test_that("an MV's label is auto-detected, case 4", {
-  mv1 <- ModVar$new('First variable', 'GBP')
-  mv2 <- ModVar$new('Second variable', 'GBP')
-  mvlist <- list(mv1, mv2)
-  labels <- sapply(mvlist, FUN=function(x) {
-    return(x$get_label())
-  })
-  expect_equal(labels, c('mv1', 'mv2'))
+test_that("illegal arguments to probs are rejected", {
+  x <- ModVar$new("x", "GBP")
+  probs <- c(0.1, 0.2, 0.5)
+  expect_silent(x$quantile(probs))
+  probs <- c(0.1, NA, 0.5)
+  expect_error(x$quantile(probs), class="probs_not_defined")
+  probs <- c(0.1, "boo", 0.5)
+  expect_error(x$quantile(probs), class="probs_not_numeric")
+  probs <- c(0.1, 0.4, 1.5)
+  expect_error(x$quantile(probs), class="probs_out_of_range")
 })
 
-test_that("an MV's label is auto-detected, case 5", {
-  f <- function() {
-    mv <- ModVar$new('MV in f', 'GBP')
-    mv$get_label()  # work-around
-    return(mv)
-  }
-  g <- function(modvar) {
-    expect_equal(modvar$get_label(), 'mv')
-  }
-  pmv <- f()
-  g(pmv)
+test_that("illegal arguments to r are rejected", {
+  x <- ModVar$new("x", "GBP")
+  expect_silent(x$r(42))  
+  expect_error(x$r(NA), class="n_not_defined")
+  expect_error(x$r(0), class="n_out_of_range")
 })
-
-test_that("an MV's label can be set and unset", {
-  mv <- ModVar$new('Variable description', 'GBP')
-  mv$set_label("mylabel")
-  expect_equal(mv$get_label(), "mylabel")
-  mv$unset_label()
-  expect_equal(mv$get_label(), "mv")
-})
-

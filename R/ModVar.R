@@ -19,63 +19,39 @@
 ModVar <- R6::R6Class(
   classname = "ModVar",
   private = list(
-    label = as.character(NA),
-    description = as.character(NA),
-    units = as.character(NA),
-    val = 0,
-    
-    # Function to find self in an environment
-    # Uses a looping environment walk function adapted from Hadley Whickham's
-    # 'Advanced R'. Starts at leaf and walks towards the ancestor
-    # empty environment and updates myenv if it finds a match. Successful
-    # matches are overwritten by matches nearer the root of the tree, so
-    # that if a reference copy of a variable exists it will cede priority
-    # to its origin nearer the root. 
-    whereami = function(env = rlang::caller_env()) {
-      myenv <- rlang::empty_env()
-      while (!identical(env, rlang::empty_env())) {
-        # check if I am in this environment
-        sapply(rlang::env_names(env), FUN=function(objname) {
-          obj <- rlang::env_get(env, objname)
-          if (identical(obj, self)) myenv <<- env
-        })
-        # inspect parent
-        env <- rlang::env_parent(env)
-      }
-      return(myenv)
-    }
-
+    mv.description = NULL,
+    mv.units = NULL,
+    val = 0
   ),
   public = list(
     
     #' @description 
     #' Create an object of type `ModVar`
     #' @param description A character string description of the variable
-    #'        and its role in the
-    #'        model. This description will be used in a tabulation of the
-    #'        variables linked to a model.
+    #' and its role in the model. This description will be used in a
+    #' tabulation of the variables linked to a model.
     #' @param units A character string description of the units, e.g. 'GBP',
-    #'        'per year'.
+    #' 'per year'.
     #' @return A new ModVar object.
     initialize = function(description, units) {
-      private$description <- description
-      private$units <- units
+      # test and set description
+      if (!is.character(description)) {
+        rlang::abort("Argument 'description' must be a string", 
+                     class="description_not_string")
+      }
+      private$mv.description <- description
+      if (!is.character(units)) {
+        rlang::abort("Argument 'units' must be a string", 
+                     class="units_not_string")
+      }
+      private$mv.units <- units
     },
 
-    #' @description Find the environment nearest the global environment in which
-    #' this model variable or a reference to it, lives.
-    #' @return An environment. If not found, returns the empty environment.
-    # * Don't call from class methods; use private$whereami instead. *
-    get_environment = function() {
-      myenv <- private$whereami(rlang::caller_env())
-      return(myenv)
-    },   
-    
     #' @description 
     #' Is this ModVar an expression?
     #' @return TRUE if it inherits from ExprModVar, FALSE otherwise.
-    isExpression = function() {
-      return(inherits(self, what='ExprModVar'))
+    is_expression = function() {
+      return(inherits(self, what="ExprModVar"))
     },
     
     #' @description
@@ -100,77 +76,25 @@ ModVar <- R6::R6Class(
     value = function() {
       return(private$val)  
     },
-    
-    #' @description
-    #' Accessor function for the label. Unless `set_label` has been called, this
-    #' function will return the variable's own name. As far as possible, this will 
-    #' be the variable name used when the object was first created in the model,
-    #' so that it aligns with the variable name used in ExprModVar
-    #' and tabulations of variables used in models. But due to the nature of R's
-    #' non-standard evaluation, this is not ensured. It will sometimes return
-    #' the name of a reference to the original variable, if
-    #' the original environment is not an ancestor of the calling environment of
-    #' this function. In cases where references to model variables are routinely
-    #' created, destroyed and passed around, it is advised to call this method
-    #' from the environment of the original object as soon as possible after
-    #' it is created. Subsequent calls will return the original name.
-    #' @return Label of model variable as character string.
-    get_label = function() {
-      if (is.na(private$label)) {
-        # find the environment, starting with parent
-        my.env <- private$whereami(rlang::caller_env()) 
-        if (!identical(my.env, rlang::empty_env())) {
-          sapply(rlang::env_names(my.env), FUN=function(on){
-            v <- eval(rlang::parse_expr(on), envir=my.env)
-            if (identical(v,self)) private$label <- on
-          })      
-        }
-      }
-      return(private$label)
-    },
-    
-    #' @description 
-    #' Function to set the label. Normally this is not required because the label
-    #' is set to the name given to the variable by the user. This function allows
-    #' the default behaviour to be overridden.
-    #' @param label The label to use.
-    #' @return Updated ModVar object
-    set_label = function(label) {
-      if (!is.character(label)) {
-        stop("ModVar$set_label: argument 'label' must be a character string",
-             call.=FALSE)
-      }
-      private$label <- label
-      return(invisible(self))
-    },
-    
-    #' @description 
-    #' Function to unset the label. Causes the label to revert to its default, i.e.
-    #' its variable name at the next call to `get_label`.
-    #' @return Updated ModVar object
-    unset_label = function() {
-      private$label <- as.character(NA)
-      return(invisible(self))
-    },
-    
+
     #' @description
     #' Accessor function for the description.
     #' @return Description of model variable as character string.
-    getDescription = function() {
-      return(private$description)
+    description = function() {
+      return(private$mv.description)
     },
     
     #' @description
     #' Accessor function for units.
     #' @return Description of units as character string.
-    getUnits = function() {
-      return(private$units)
+    units = function() {
+      return(private$mv.units)
     },
     
     #' @description 
     #' Accessor function for the name of the uncertainty distribution.
     #' @return Distribution name as character string.
-    getDistribution = function() {
+    distribution = function() {
       return(NA)
     },
 
@@ -181,7 +105,7 @@ ModVar <- R6::R6Class(
     #' avoid type checking inside iterators.
     #' @return A list of operands that are themselves ModVars. An empty list 
     #' for non-expression model variables.
-    getOperands = function() {
+    operands = function() {
       return(list())
     },
 
@@ -205,39 +129,46 @@ ModVar <- R6::R6Class(
     #' \item{Qhat}{Asterisk (*) if the quantiles and SD have been estimated
     #' by random sampling.}
     #' }
-    tabulate = function(include.operands=FALSE) {
-      # create list of model variables
-      mvlist <- list(self)
-      if (include.operands) {
-        mvlist <- c(mvlist, self$getOperands())
-      }
-      # create a data frame of model variables
-      DF <- data.frame(
-        Label = sapply(mvlist, FUN=function(x){x$get_label()}),
-        Description = sapply(mvlist, FUN=function(x){x$getDescription()}),
-        Units = sapply(mvlist, FUN=function(x){x$getUnits()}),
-        Distribution = sapply(mvlist, FUN=function(x){x$getDistribution()}),
-        Mean = sapply(mvlist, FUN=function(x){x$getMean()}),
-        SD = sapply(mvlist, FUN=function(x){x$getSD()}),
-        Q2.5 = sapply(mvlist, FUN=function(x){x$getQuantile(probs=c(0.025))}),
-        Q97.5 = sapply(mvlist, FUN=function(x){x$getQuantile(probs=c(0.975))}),
-        Qhat = sapply(mvlist, FUN=function(exp){return(ifelse(exp$isExpression(),'*',''))})
-      )
-      # Return the table
-      return(DF)
-    },
+#    tabulate = function(include.operands=FALSE) {
+#      # create list of model variables
+#      mvlist <- list(self)
+#      if (include.operands) {
+#        mvlist <- c(mvlist, self$getOperands())
+#      }
+#      # create a data frame of model variables
+#      DF <- data.frame(
+#        Label = sapply(mvlist, FUN=function(x){x$get_label()}),
+#        Description = sapply(mvlist, FUN=function(x){x$getDescription()}),
+#        Units = sapply(mvlist, FUN=function(x){x$getUnits()}),
+#        Distribution = sapply(mvlist, FUN=function(x){x$getDistribution()}),
+#        Mean = sapply(mvlist, FUN=function(x){x$getMean()}),
+#        SD = sapply(mvlist, FUN=function(x){x$getSD()}),
+#        Q2.5 = sapply(mvlist, FUN=function(x){x$getQuantile(probs=c(0.025))}),
+#        Q97.5 = sapply(mvlist, FUN=function(x){x$getQuantile(probs=c(0.975))}),
+#        Qhat = sapply(mvlist, FUN=function(exp){return(ifelse(exp$isExpression(),'*',''))})
+#      )
+#      # Return the table
+#      return(DF)
+#    },
+
+     #' @description 
+     #' Return the point estimate of the variable. 
+     #' @return Point estimate as a numeric value.
+     point_estimate = function() {
+      return(NA)
+     },
 
     #' @description 
     #' Return the expected value of the distribution. 
     #' @return Expected value as a numeric value.
-    getMean = function() {
+    mean = function() {
       return(NA)
     },
     
     #' @description 
     #' Return the standard deviation of the distribution. 
     #' @return Standard deviation as a numeric value
-    getSD = function() {
+    SD = function() {
       return(NA)
     },
     
@@ -245,7 +176,22 @@ ModVar <- R6::R6Class(
     #' Find quantiles of the uncertainty distribution. 
     #' @param probs Numeric vector of probabilities, each in range [0,1].
     #' @return Vector of numeric values of the same length as `probs`.
-    getQuantile = function(probs) {
+    quantile = function(probs) {
+      # test argument
+      sapply(probs, FUN=function(x) {
+        if (is.na(x)) {
+          rlang::abort("All elements of 'probs' must be defined",
+                       class="probs_not_defined")
+        }
+        if (!is.numeric(x)) {
+          rlang::abort("Argument 'probs' must be a numeric vector",
+                       class="probs_not_numeric")
+        }
+        if (x<0 || x>1) {
+          rlang::abort("Elements of 'probs' must be in range[0,1]",
+                       class="probs_out_of_range")
+        }
+      })
       return(NA)
     },
     
@@ -256,14 +202,17 @@ ModVar <- R6::R6Class(
     #' @return Numeric vector of samples drawn at random.
     r = function(n) {
       # check the input
+      if (is.na(n)) {
+        rlang::abort("Argument 'n' must be defined", class="n_not_defined")
+      }
       if (!is.numeric(n)) {
-        stop('ModVar$r: argument n must be numeric', call.=FALSE)
+        rlang::abort("Argument 'n' must be numeric", class="non-numeric_n")
       }
       if (n < 1) {
-        stop('ModVar$r: argument n must be at least 1', call.=FALSE)
+        rlang::abort("Argument n must be at least 1", class="n_out_of_range")
       }
       # make random draws
-      rv <- vector(mode='numeric', length=n)
+      rv <- vector(mode="numeric", length=n)
       for (i in 1:n) {
         self$sample(expected=F)
         rv[i] <- self$value()

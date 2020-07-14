@@ -86,7 +86,7 @@ GammaModVar <- R6::R6Class(
     #' @return Vector of quantiles.
     getQuantile = function(probs) {
       sapply(probs, FUN=function(x) {
-        if (!is.numeric(probs)) {
+        if (!is.numeric(x)) {
           stop("GammaModVar$getQuantile: argument must be a numeric vector",
                call. = FALSE)
         }

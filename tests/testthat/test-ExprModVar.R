@@ -4,7 +4,7 @@ test_that("ExprModVar obeys scoping rules" , {
   x <- 2
   y <- 3
   z <- ExprModVar$new("z", "Z", quo=rlang::quo(x+y))
-  expect_equal(z$getDistribution(), "x + y")
+  expect_equal(z$distribution(), "x + y")
   expect_equal(z$value(), 5)
   # operands in different function environments
   f = function() {
