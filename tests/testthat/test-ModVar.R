@@ -24,7 +24,17 @@ test_that("ModVar description is saved", {
   expect_equal(yy$description(), "y")
 })
 
-test_that("illegal arguments to probs are rejected", {
+test_that("illegal arguments to value are rejected", {
+  x <- ModVar$new("x", "GBP")
+  expect_silent(x$value())
+  expect_silent(x$value("pe"))
+  expect_silent(x$value("r"))
+  expect_silent(x$value("mean"))
+  expect_error(x$value(42), class="what_not_string")
+  expect_error(x$value("arthur"), class="unknown_what")
+})
+
+test_that("illegal arguments to quantile are rejected", {
   x <- ModVar$new("x", "GBP")
   probs <- c(0.1, 0.2, 0.5)
   expect_silent(x$quantile(probs))
@@ -36,9 +46,3 @@ test_that("illegal arguments to probs are rejected", {
   expect_error(x$quantile(probs), class="probs_out_of_range")
 })
 
-test_that("illegal arguments to r are rejected", {
-  x <- ModVar$new("x", "GBP")
-  expect_silent(x$r(42))  
-  expect_error(x$r(NA), class="n_not_defined")
-  expect_error(x$r(0), class="n_out_of_range")
-})

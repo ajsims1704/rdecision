@@ -70,16 +70,6 @@ ExprModVar <- R6::R6Class(
     #' @param units Units in which the variable is expressed.
     #' @param quo A quosure (see package rlang), which contains an expression
     #' and its environment. The usage is `quo(x+y)` or `rlang::quo(x+y)`.
-    #' @param expr An R expression involving model variables which would be 
-    #' syntactically correct were each model variable to be replaced by
-    #' numerical variables. Create either by `quote(x+y)` or `rlang::expr(x+y)`.
-    #' @param envir The environment in which the model variables live. Normally,
-    #' and by default, this is the global environment. But if an object is
-    #' created which refers to model variables created in a different 
-    #' environment it must be specified. If creating an object from
-    #' within a function, for example, set `envir=environment()` in the
-    #' parameter list.
-    #' @note In future rlang::quosure may be used to replace (expr,envir).
     #' @return An object of type ExprModVar
     initialize = function(description, units, quo) {
       # initialize the base class

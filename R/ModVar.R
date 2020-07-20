@@ -19,9 +19,8 @@
 ModVar <- R6::R6Class(
   classname = "ModVar",
   private = list(
-    mv.description = NULL,
-    mv.units = NULL,
-    val = 0
+    .description = NULL,
+    .units = NULL
   ),
   public = list(
     
@@ -39,12 +38,12 @@ ModVar <- R6::R6Class(
         rlang::abort("Argument 'description' must be a string", 
                      class="description_not_string")
       }
-      private$mv.description <- description
+      private$.description <- description
       if (!is.character(units)) {
         rlang::abort("Argument 'units' must be a string", 
                      class="units_not_string")
       }
-      private$mv.units <- units
+      private$.units <- units
     },
 
     #' @description 
@@ -54,41 +53,64 @@ ModVar <- R6::R6Class(
       return(inherits(self, what="ExprModVar"))
     },
     
-    #' @description
-    #' Set the value of the model variable from its uncertainty distribution.
-    #' Nothing is returned; the sampled value is returned at the next
-    #' call to `value()`.
-    #' @param expected Logical; if TRUE sets the value of the model variable
-    #'        returned at subsequent calls to `value()` to be equal to the 
-    #'        expectation of the variable. Default is FALSE.
-    #' @return Updated ModVar object.
-    sample = function(expected=F) {
-      private$val <- 0
-      return(invisible(self))
-    },
+    #' #' @description
+    #' #' Set the value of the model variable to a value from its uncertainty
+    #' #' distribution. Nothing is returned; the sampled value is returned at
+    #' #'  the next call to `value()`.
+    #' #' @param expected Logical; if TRUE sets the value of the model variable
+    #' #'        returned at subsequent calls to `value()` to be equal to the 
+    #' #'        expectation of the variable. Default is FALSE.
+    #' #' @return Updated ModVar object.
+    #' sample = function(expected=F) {
+    #'   private$val <- 0
+    #'   return(invisible(self))
+    #' },
     
     #' @description
     #' Return the current value of the model variable. This will be the 
     #' expected value if the argument to the most recent call to `sample`
     #' was TRUE or after creation of the object; otherwise it will return
     #' a value sampled from the uncertainty distribution. 
+    #' @param what Determines what is returned (a character string). Options
+    #' are as follows:
+    #' \describe{
+    #'   \item{"pe"}{Point estimate}
+    #'   \item{"r"}{A single random sample from the uncertainty distribution}
+    #'   \item{"mean"}{Mean of the uncertainty distribution}
+    #' }
     #' @return Numeric value of the model variable.
-    value = function() {
-      return(private$val)  
+    value = function(what="pe") {
+      # check argument
+      if (!is.character(what)) {
+        rlang::abort("Argument 'what' must be a character string", 
+                     class="what_not_string")
+      }
+      # returned requested value
+      v <- as.numeric(NA)
+      if (what=="pe") {
+        v <- self$point_estimate()
+      } else if (what=="mean") {
+        v <- self$mean()
+      } else if (what=="r") {
+        v <- self$r()
+      } else {
+        rlang::abort("Argument 'what' must be (pe|r|mean)", class="unknown_what")
+      }
+      return(v)  
     },
 
     #' @description
     #' Accessor function for the description.
     #' @return Description of model variable as character string.
     description = function() {
-      return(private$mv.description)
+      return(private$.description)
     },
     
     #' @description
     #' Accessor function for units.
     #' @return Description of units as character string.
     units = function() {
-      return(private$mv.units)
+      return(private$.units)
     },
     
     #' @description 
@@ -151,16 +173,25 @@ ModVar <- R6::R6Class(
 #      return(DF)
 #    },
 
-     #' @description 
-     #' Return the point estimate of the variable. 
-     #' @return Point estimate as a numeric value.
-     point_estimate = function() {
+    #' @description 
+    #' Return the point estimate of the variable. 
+    #' @return Point estimate as a numeric value.
+    point_estimate = function() {
       return(NA)
-     },
+    },
 
     #' @description 
-    #' Return the expected value of the distribution. 
-    #' @return Expected value as a numeric value.
+    #' Draw a random sample from the model variable. Normally accessed by a 
+    #' call to value(what="r").
+    #' @return A sample drawn at random.
+    r = function() {
+      # return the sample
+      return(NA)
+    },
+
+    #' @description 
+    #' Return the mean value of the distribution. 
+    #' @return Mean value as a numeric value.
     mean = function() {
       return(NA)
     },
@@ -193,34 +224,7 @@ ModVar <- R6::R6Class(
         }
       })
       return(NA)
-    },
-    
-    #' @description 
-    #' Draw random samples from the model variable. After returning the
-    #' sample, the next call to `value()` will return the expected value.
-    #' @param n Number of samples to return
-    #' @return Numeric vector of samples drawn at random.
-    r = function(n) {
-      # check the input
-      if (is.na(n)) {
-        rlang::abort("Argument 'n' must be defined", class="n_not_defined")
-      }
-      if (!is.numeric(n)) {
-        rlang::abort("Argument 'n' must be numeric", class="non-numeric_n")
-      }
-      if (n < 1) {
-        rlang::abort("Argument n must be at least 1", class="n_out_of_range")
-      }
-      # make random draws
-      rv <- vector(mode="numeric", length=n)
-      for (i in 1:n) {
-        self$sample(expected=F)
-        rv[i] <- self$value()
-      }
-      # reset the variable 
-      self$sample(expected=T)
-      # return the sample
-      return(rv)
     }
+    
   )
 )

@@ -19,7 +19,9 @@
 ConstModVar <- R6::R6Class(
   classname = "ConstModVar",
   inherit = ModVar,
-  
+  private = list(
+    val = NULL
+  ),
   public = list(
     
     #' @description 
@@ -34,35 +36,52 @@ ConstModVar <- R6::R6Class(
     #' @return A new ConstModVar object.
     initialize = function(description, units, const) {
       super$initialize(description, units)
+      if (!is.numeric(const)) {
+        rlang::abort("Argument 'const' must be numeric", class="const_not_numeric")
+      }
       private$val <- const
     },
     
-    #' @description
-    #' Not applicable for a constant variable, no action is taken on sampling.
-    #' @param expected Logical; ignored.
-    #' @return Updated ConstModVar object.
-    sample = function(expected=F) {
-      return(invisible(self))
-    },
+    #' #' @description
+    #' #' Not applicable for a constant variable, no action is taken on sampling.
+    #' #' @param expected Logical; ignored.
+    #' #' @return Updated ConstModVar object.
+    #' sample = function(expected=F) {
+    #'   return(invisible(self))
+    #' },
 
     #' @description 
     #' Accessor function for the name of the uncertainty distribution.
     #' @return Distribution name as character string.
-    getDistribution = function() {
+    distribution = function() {
       return("Constant")
     },
     
     #' @description 
+    #' Return the point estimate of the distribution.
+    #' @return Value of the constant.
+    point_estimate = function() {
+      return(private$val)
+    },
+
+    #' @description 
     #' Return the expected value of the distribution. 
     #' @return Expected value as a numeric value.
-    getMean = function() {
+    mean = function() {
+      return(private$val)
+    },
+    
+    #' @description 
+    #' Return a random sample from the distribution. 
+    #' @return Constant value as a numeric value.
+    r = function() {
       return(private$val)
     },
     
     #' @description 
     #' Return the standard deviation of the distribution. 
     #' @return Standard deviation as a numeric value
-    getSD = function() {
+    SD = function() {
       return(0)
     },
     
@@ -71,7 +90,7 @@ ConstModVar <- R6::R6Class(
     #' quantiles are returned as the value of the constant.
     #' @param probs Numeric vector of probabilities, each in range [0,1].
     #' @return Vector of numeric values of the same length as `probs`.
-    getQuantile = function(probs) {
+    quantile = function(probs) {
       sapply(probs, FUN=function(x) {
         if (!is.numeric(probs)) {
           stop("ConstModVar$getQuantile: argument must be a numeric vector",
