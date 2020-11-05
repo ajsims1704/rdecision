@@ -16,8 +16,8 @@ test_that("arrow is defined correctly", {
   n1 <- Node$new()
   n2 <- Node$new()
   expect_silent(a <- Arrow$new(n1, n2, "a1"))
-  expect_true(n1$is_same_node(a$source()))
-  expect_true(n2$is_same_node(a$target()))
+  expect_identical(n1, a$source())
+  expect_identical(n2, a$target())
   expect_equal(a$label(), "a1")
 })
 

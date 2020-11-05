@@ -15,7 +15,7 @@
 Node <- R6::R6Class(
   classname = "Node",
   private = list(
-    nodelabel = ""
+    .label = ""
   ),
   
   public = list(
@@ -28,7 +28,7 @@ Node <- R6::R6Class(
       if (!is.character(label)) {
         rlang::abort("Argument label is not a string", class="non-string_label")
       }
-      private$nodelabel <- label
+      private$.label <- label
       return(invisible(self))
     },
     
@@ -36,7 +36,7 @@ Node <- R6::R6Class(
     #' Return the label of the node.
     #' @return Label as a character string.
     label = function() {
-      return(private$nodelabel)
+      return(private$.label)
     },
     
     #' #' @description

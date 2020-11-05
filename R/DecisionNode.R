@@ -27,6 +27,10 @@ DecisionNode <- R6::R6Class(
     #' name in a data frame.
     #' @return A new DecisionNode object
     initialize = function(label) {
+      # check there is a label
+      if (rlang::is_missing(label)) {
+        rlang::abort("Argument label must not be missing", class="missing_label")
+      }
       # check label and make syntactically valid
       if (!is.character(label)) {
         rlang::abort("Argument label must be a string", class="non-string_label")
