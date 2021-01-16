@@ -6,6 +6,16 @@ test_that("illegal initializations are rejected", {
   expect_error(ConstModVar$new("const","GBP","42"), class="const_not_numeric")
 })
 
+test_that("it is not an expression", {
+  lue <- ConstModVar$new("lue", "GBP", 42)
+  expect_false(lue$is_expression())
+})
+
+test_that("it has correct distribution name", {
+  lue <- ConstModVar$new("lue", "GBP", 42)
+  expect_equal(lue$distribution(), "Constant")  
+})
+
 test_that("const values are returned", {
   x <- ConstModVar$new("const", "GBP", 42)
   expect_equal(x$value(),42)

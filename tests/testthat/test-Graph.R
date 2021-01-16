@@ -111,7 +111,6 @@ test_that("adjacency matrix has correct properties", {
   e1 <- Edge$new(n1,n2)
   G <- Graph$new(V=list(n1,n2),E=list(e1))
   A <- G$adjacency_matrix()
-  print(A)
   expect_true(is.null(dimnames(A))) 
   n1 <- Node$new("n1")
   n2 <- Node$new("n2")

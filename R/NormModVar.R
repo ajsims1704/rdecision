@@ -19,8 +19,9 @@ NormModVar <- R6::R6Class(
   classname = "NormModVar",
   inherit = ModVar,
   private = list(
-    mu = 'numeric',
-    sigma = 'numeric'
+    mu = NULL,
+    sigma = NULL,
+    val = NULL
   ),
   public = list(
 
@@ -35,33 +36,21 @@ NormModVar <- R6::R6Class(
     #' @return A NormModVar object.
     initialize = function(description, units, mu, sigma) {
       super$initialize(description, units)
+      if (!is.numeric(mu)) {
+        rlang::abort("Argument 'mu' must be numeric", class="mu_not_numeric")
+      }
       private$mu <- mu
-      private$sigma <- sigma
       private$val <- mu
-    },
-    
-    #' @description
-    #' Set the value of the model variable from its uncertainty distribution.
-    #' Nothing is returned; the sampled value is returned at the next
-    #' call to `value()`.
-    #' @param expected Logical; if TRUE sets the value of the model variable
-    #'        returned at subsequent calls to `value()` to be equal to the 
-    #'        expectation of the variable. Default is FALSE.
-    #' @return Updated NormModVar object.
-    sample = function(expected=F) {
-      if (expected) {
-        private$val <- self$getMean()
+      if (!is.numeric(sigma)) {
+        rlang::abort("Argument 'sigma' must be numeric", class="sigma_not_numeric")
       }
-      else {
-        private$val <- rnorm(1, mean=private$mu, sd=private$sigma)
-      }
-      invisible(self)
+      private$sigma <- sigma
     },
     
     #' @description 
     #' Accessor function for the name of the uncertainty distribution.
     #' @return Distribution name as character string.
-    getDistribution = function() {
+    distribution = function() {
       rv <- paste('N(', 
                   format(private$mu, digits=4, scientific=F),
                   ',', 
@@ -69,34 +58,71 @@ NormModVar <- R6::R6Class(
                   ')', sep='')
       return(rv)
     },
-    
+
     #' @description 
-    #' Return the expected value of the distribution. 
-    #' @return Expected value as a numeric value.
-    getMean = function() {
+    #' Return the point estimate of the variable. 
+    #' @return Point estimate as a numeric value.
+    point_estimate = function() {
       return(private$mu)
-    },
-
-    #' @description 
-    #' Return the standard deviation of the distribution. 
-    #' @return Standard deviation as a numeric value
-    getSD = function() {
-      return(private$sigma)
-    },
-
-    #' @description
-    #' Return the quantiles of the Normal uncertainty distribution.
-    #' @param probs Vector of probabilities, in range [0,1].    
-    #' @return Vector of quantiles.
-    getQuantile = function(probs) {
-      sapply(probs, FUN=function(x) {
-        if (!is.numeric(probs)) {
-          stop("NormalModVar$getQuantile: argument must be a numeric vector")
-        }
-      })
-      q <- qnorm(probs, mean=private$mu, sd=private$sigma)
-      return(q)
     }
+    
+    #' #' @description
+    #' #' Set the value of the model variable from its uncertainty distribution.
+    #' #' Nothing is returned; the sampled value is returned at the next
+    #' #' call to `value()`.
+    #' #' @param expected Logical; if TRUE sets the value of the model variable
+    #' #'        returned at subsequent calls to `value()` to be equal to the 
+    #' #'        expectation of the variable. Default is FALSE.
+    #' #' @return Updated NormModVar object.
+    #' sample = function(expected=F) {
+    #'   if (expected) {
+    #'     private$val <- self$getMean()
+    #'   }
+    #'   else {
+    #'     private$val <- rnorm(1, mean=private$mu, sd=private$sigma)
+    #'   }
+    #'   invisible(self)
+    #' },
+    #' 
+    #' #' @description 
+    #' #' Accessor function for the name of the uncertainty distribution.
+    #' #' @return Distribution name as character string.
+    #' getDistribution = function() {
+    #'   rv <- paste('N(', 
+    #'               format(private$mu, digits=4, scientific=F),
+    #'               ',', 
+    #'               format(private$sigma, digits=4, scientific=F), 
+    #'               ')', sep='')
+    #'   return(rv)
+    #' },
+    #' 
+    #' #' @description 
+    #' #' Return the expected value of the distribution. 
+    #' #' @return Expected value as a numeric value.
+    #' getMean = function() {
+    #'   return(private$mu)
+    #' },
+    #' 
+    #' #' @description 
+    #' #' Return the standard deviation of the distribution. 
+    #' #' @return Standard deviation as a numeric value
+    #' getSD = function() {
+    #'   return(private$sigma)
+    #' },
+    #' 
+    #' #' @description
+    #' #' Return the quantiles of the Normal uncertainty distribution.
+    #' #' @param probs Vector of probabilities, in range [0,1].    
+    #' #' @return Vector of quantiles.
+    #' getQuantile = function(probs) {
+    #'   sapply(probs, FUN=function(x) {
+    #'     if (!is.numeric(probs)) {
+    #'       stop("NormalModVar$getQuantile: argument must be a numeric vector")
+    #'     }
+    #'   })
+    #'   q <- qnorm(probs, mean=private$mu, sd=private$sigma)
+    #'   return(q)
+    #' }
     
   )
 )

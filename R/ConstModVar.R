@@ -41,14 +41,6 @@ ConstModVar <- R6::R6Class(
       }
       private$val <- const
     },
-    
-    #' #' @description
-    #' #' Not applicable for a constant variable, no action is taken on sampling.
-    #' #' @param expected Logical; ignored.
-    #' #' @return Updated ConstModVar object.
-    #' sample = function(expected=F) {
-    #'   return(invisible(self))
-    #' },
 
     #' @description 
     #' Accessor function for the name of the uncertainty distribution.

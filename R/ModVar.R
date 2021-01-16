@@ -52,20 +52,7 @@ ModVar <- R6::R6Class(
     is_expression = function() {
       return(inherits(self, what="ExprModVar"))
     },
-    
-    #' #' @description
-    #' #' Set the value of the model variable to a value from its uncertainty
-    #' #' distribution. Nothing is returned; the sampled value is returned at
-    #' #'  the next call to `value()`.
-    #' #' @param expected Logical; if TRUE sets the value of the model variable
-    #' #'        returned at subsequent calls to `value()` to be equal to the 
-    #' #'        expectation of the variable. Default is FALSE.
-    #' #' @return Updated ModVar object.
-    #' sample = function(expected=F) {
-    #'   private$val <- 0
-    #'   return(invisible(self))
-    #' },
-    
+
     #' @description
     #' Return the current value of the model variable. This will be the 
     #' expected value if the argument to the most recent call to `sample`

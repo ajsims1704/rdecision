@@ -16,9 +16,9 @@ test_that("stacks of exotic objects are supported", {
   S$push(Node$new("n1"))
   S$push(Node$new("n2"))
   expect_equal(S$size(),2)
-  expect_equal(S$pop()$get_label(),"n2")
+  expect_equal(S$pop()$label(),"n2")
   expect_equal(S$size(),1)
-  expect_equal(S$pop()$get_label(),"n1")
+  expect_equal(S$pop()$label(),"n1")
   expect_equal(S$size(),0)
 })
 
@@ -34,5 +34,5 @@ test_that("the stack can be extracted as a list", {
   S$push(Node$new("n1"))
   S$push(Node$new("n2"))
   L <- S$as_list()
-  expect_equal(L[[2]]$get_label(), "n2")
+  expect_equal(L[[2]]$label(), "n2")
 })
