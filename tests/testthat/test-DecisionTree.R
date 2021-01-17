@@ -1,5 +1,5 @@
 
-# tests of basic tree properties (Kaminski et al CEJOR 2018;26:135-139)
+# tests of basic tree properties (Kaminski et al CEJOR 2018;26:135-139, fig 1)
 test_that("simple decision trees are modelled correctly", {
   # nodes & edges
   d1 <- DecisionNode$new("d1")

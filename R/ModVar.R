@@ -44,6 +44,7 @@ ModVar <- R6::R6Class(
                      class="units_not_string")
       }
       private$.units <- units
+      return(invisible(self))
     },
 
     #' @description 
@@ -53,38 +54,38 @@ ModVar <- R6::R6Class(
       return(inherits(self, what="ExprModVar"))
     },
 
-    #' @description
-    #' Return the current value of the model variable. This will be the 
-    #' expected value if the argument to the most recent call to `sample`
-    #' was TRUE or after creation of the object; otherwise it will return
-    #' a value sampled from the uncertainty distribution. 
-    #' @param what Determines what is returned (a character string). Options
-    #' are as follows:
-    #' \describe{
-    #'   \item{"pe"}{Point estimate}
-    #'   \item{"r"}{A single random sample from the uncertainty distribution}
-    #'   \item{"mean"}{Mean of the uncertainty distribution}
-    #' }
-    #' @return Numeric value of the model variable.
-    value = function(what="pe") {
-      # check argument
-      if (!is.character(what)) {
-        rlang::abort("Argument 'what' must be a character string", 
-                     class="what_not_string")
-      }
-      # returned requested value
-      v <- as.numeric(NA)
-      if (what=="pe") {
-        v <- self$point_estimate()
-      } else if (what=="mean") {
-        v <- self$mean()
-      } else if (what=="r") {
-        v <- self$r()
-      } else {
-        rlang::abort("Argument 'what' must be (pe|r|mean)", class="unknown_what")
-      }
-      return(v)  
-    },
+    #' #' @description
+    #' #' Return the current value of the model variable. This will be the 
+    #' #' expected value if the argument to the most recent call to `sample`
+    #' #' was TRUE or after creation of the object; otherwise it will return
+    #' #' a value sampled from the uncertainty distribution. 
+    #' #' @param what Determines what is returned (a character string). Options
+    #' #' are as follows:
+    #' #' \describe{
+    #' #'   \item{"pe"}{Point estimate}
+    #' #'   \item{"r"}{A single random sample from the uncertainty distribution}
+    #' #'   \item{"mean"}{Mean of the uncertainty distribution}
+    #' #' }
+    #' #' @return Numeric value of the model variable.
+    #' value = function(what="pe") {
+    #'   # check argument
+    #'   if (!is.character(what)) {
+    #'     rlang::abort("Argument 'what' must be a character string", 
+    #'                  class="what_not_string")
+    #'   }
+    #'   # returned requested value
+    #'   v <- as.numeric(NA)
+    #'   if (what=="pe") {
+    #'     v <- self$point_estimate()
+    #'   } else if (what=="mean") {
+    #'     v <- self$mean()
+    #'   } else if (what=="r") {
+    #'     v <- self$r(1)
+    #'   } else {
+    #'     rlang::abort("Argument 'what' must be (pe|r|mean)", class="unknown_what")
+    #'   }
+    #'   return(v)  
+    #' },
 
     #' @description
     #' Accessor function for the description.
@@ -161,17 +162,11 @@ ModVar <- R6::R6Class(
 #    },
 
     #' @description 
-    #' Return the point estimate of the variable. 
-    #' @return Point estimate as a numeric value.
-    point_estimate = function() {
-      return(NA)
-    },
-
-    #' @description 
     #' Draw a random sample from the model variable. Normally accessed by a 
     #' call to value(what="r").
+    #' @param n Number of samples to draw.
     #' @return A sample drawn at random.
-    r = function() {
+    r = function(n=1) {
       # return the sample
       return(NA)
     },
@@ -180,14 +175,21 @@ ModVar <- R6::R6Class(
     #' Return the mean value of the distribution. 
     #' @return Mean value as a numeric value.
     mean = function() {
-      return(NA)
+      return(as.numeric(NA))
     },
     
+    #' @description 
+    #' Return the mode of the variable. 
+    #' @return Mode as a numeric value.
+    mode = function() {
+      return(as.numeric(NA))
+    },
+
     #' @description 
     #' Return the standard deviation of the distribution. 
     #' @return Standard deviation as a numeric value
     SD = function() {
-      return(NA)
+      return(as.numeric(NA))
     },
     
     #' @description 

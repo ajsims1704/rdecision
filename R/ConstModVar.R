@@ -46,13 +46,16 @@ ConstModVar <- R6::R6Class(
     #' Accessor function for the name of the uncertainty distribution.
     #' @return Distribution name as character string.
     distribution = function() {
-      return("Constant")
+      rv <- paste('Const(', 
+                  format(private$val, digits=4, scientific=F),
+                  ')', sep='')
+      return(rv)
     },
     
     #' @description 
-    #' Return the point estimate of the distribution.
+    #' Return the mode of the distribution.
     #' @return Value of the constant.
-    point_estimate = function() {
+    mode = function() {
       return(private$val)
     },
 

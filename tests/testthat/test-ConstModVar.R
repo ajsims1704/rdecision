@@ -13,7 +13,7 @@ test_that("it is not an expression", {
 
 test_that("it has correct distribution name", {
   lue <- ConstModVar$new("lue", "GBP", 42)
-  expect_equal(lue$distribution(), "Constant")  
+  expect_equal(lue$distribution(), "Const(42)")  
 })
 
 test_that("const values are returned", {

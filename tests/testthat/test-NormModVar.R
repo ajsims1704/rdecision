@@ -18,3 +18,22 @@ test_that("modvar has correct distribution name", {
   n <- NormModVar$new("n", "GBP", 42, 1)
   expect_equal(n$distribution(), "N(42,1)")  
 })
+
+test_that("pe, mean, sd and quantiles are returned correctly", {
+  sn <- NormModVar$new("sn", "GBP", 0, 1)
+  expect_equal(sn$mean(), 0)
+  expect_equal(sn$SD(), 1)
+  expect_equal(sn$point_estimate(), 0)
+  probs <- c(0.025, 0.975)
+  q <- sn$quantile(probs)
+  expect_equal(round(q[1],2), -1.96)
+  expect_equal(round(q[2],2), 1.96)
+})
+
+test_that("random sampling is from a Normal distribution", {
+  sn <- NormModVar$new("sn", "GBP", 0, 1)
+  samp <- sn$r(1000)
+  expect_equal(length(samp), 1000)
+  expect_equal(round(mean(samp),1), 0)
+  expect_equal(round(sd(samp),1), 1)
+})

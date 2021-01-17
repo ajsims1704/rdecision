@@ -38,9 +38,9 @@ LogNormModVar <- R6::R6Class(
   classname = "LogNormModVar",
   inherit = ModVar,
   private = list(
-    meanlog = 'numeric',
-    sdlog = 'numeric',
-    parametrization = 'character'
+    meanlog = NULL,
+    sdlog = NULL,
+    parametrization = NULL
   ),
   public = list(
     
@@ -57,83 +57,87 @@ LogNormModVar <- R6::R6Class(
     #' @return A LogNormModVar object.
     initialize = function(description, units, p1, p2, parametrization='LN1') {
       super$initialize(description, units)
+      # check that p1 and p2 are numeric
+      if (!is.numeric(p1)) {
+        rlang::abort("Argument 'p1' must be numeric", class="p1_not_numeric")
+      }
+      if (!is.numeric(p2)) {
+        rlang::abort("Argument 'p2' must be numeric", class="p2_not_numeric")
+      }
       # transform parameters according to parametrization
       private$parametrization <- parametrization
-      if (parametrization == 'LN1') {
+      if (parametrization == "LN1") {
         private$meanlog <- p1
         private$sdlog <- p2
       }
-      else if (parametrization == 'LN2') {
+      else if (parametrization == "LN2") {
         private$meanlog <- p1
         private$sdlog <- sqrt(p2)
       }
-      else if (parametrization == 'LN3') {
+      else if (parametrization == "LN3") {
         private$meanlog <- log(p1)
         private$sdlog <- p2
       }
-      else if (parametrization == 'LN4') {
+      else if (parametrization == "LN4") {
         private$meanlog <- log(p1)
         private$sdlog <- sqrt(log(p2^2+1))
       }
-      else if (parametrization == 'LN5') {
+      else if (parametrization == "LN5") {
         private$meanlog <- p1
         private$sdlog <- 1/sqrt(p2)
       }
-      else if (parametrization == 'LN6') {
+      else if (parametrization == "LN6") {
         private$meanlog <- log(p1) 
         private$sdlog <- log(p2)
       }
-      else if (parametrization == 'LN7') {
+      else if (parametrization == "LN7") {
         private$meanlog <- log(p1/sqrt(1+(p2^2)/(p1^2))) 
         private$sdlog <- sqrt(log(1+(p2^2)/(p1^2)))
       }
       else {
         stop("LogNormModVar::new: parameter 'parametrize must be one of 'LN1' through 'LN7'.")
       }
+      return(invisible(self))
+    },
 
-      # set the next value returned to be the mean
-      private$val <- self$getMean()
-    },
-    
-    #' @description
-    #' Set the value of the model variable from its uncertainty distribution.
-    #' Nothing is returned; the sampled value is returned at the next
-    #' call to `value()`.
-    #' @param expected Logical; if TRUE sets the value of the model variable
-    #'        returned at subsequent calls to `value()` to be equal to the 
-    #'        expectation of the variable. Default is FALSE.
-    #' @return Updated NormalModVar object.
-    sample = function(expected=F) {
-      if (expected) {
-        private$val <- self$getMean()
-      }
-      else {
-        private$val <- rlnorm(1, mean=private$meanlog, sd=private$sdlog)
-      }
-      invisible(self)
-    },
-    
     #' @description 
     #' Accessor function for the name of the uncertainty distribution.
     #' @return Distribution name as character string (LN1, LN2 etc).
-    getDistribution = function() {
+    distribution = function() {
       rv <- paste(private$parametrization, '(', round(private$meanlog,3), ',', 
                   round(private$sdlog,3), ')', sep='')
+      return(rv)
+    },
+    
+    #' @description
+    #' Draw a random sample from the model variable. Normally accessed by a 
+    #' call to value(what="r").
+    #' @param n Number of samples to draw.
+    #' @return A sample drawn at random.
+    r = function(n=1) {
+      rv <- rlnorm(n, mean=private$meanlog, sd=private$sdlog)
       return(rv)
     },
     
     #' @description 
     #' Return the expected value of the distribution. 
     #' @return Expected value as a numeric value.
-    getMean = function() {
+    mean = function() {
       E <- exp(private$meanlog + 0.5*private$sdlog^2)
       return(E)
+    },
+
+    #' @description 
+    #' Return the point estimate of the variable. 
+    #' @return Point estimate (mode) of the LN distribution.
+    point_estimate = function() {
+      return(exp(private$meanlog-private$sdlog^2))
     },
     
     #' @description 
     #' Return the standard deviation of the distribution. 
     #' @return Standard deviation as a numeric value
-    getSD = function() {
+    SD = function() {
       S <- exp(private$meanlog + 0.5*private$sdlog^2) *
            sqrt(exp(private$sdlog^2) - 1)
       return(S)
@@ -143,10 +147,20 @@ LogNormModVar <- R6::R6Class(
     #' Return the quantiles of the logNormal uncertainty distribution.
     #' @param probs Vector of probabilities, in range [0,1].    
     #' @return Vector of quantiles.
-    getQuantile = function(probs) {
+    quantile = function(probs) {
+      # test argument
       sapply(probs, FUN=function(x) {
-        if (!is.numeric(probs)) {
-          stop("LogNormModVar$getQuantile: argument must be a numeric vector")
+        if (is.na(x)) {
+          rlang::abort("All elements of 'probs' must be defined",
+                       class="probs_not_defined")
+        }
+        if (!is.numeric(x)) {
+          rlang::abort("Argument 'probs' must be a numeric vector",
+                       class="probs_not_numeric")
+        }
+        if (x<0 || x>1) {
+          rlang::abort("Elements of 'probs' must be in range[0,1]",
+                       class="probs_out_of_range")
         }
       })
       q <- qlnorm(probs, mean=private$meanlog, sd=private$sdlog)
