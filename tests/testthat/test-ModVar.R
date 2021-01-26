@@ -6,6 +6,12 @@ test_that("illegal arguments are rejected", {
   expect_error(ModVar$new("x", FALSE), class="units_not_string")
 })
 
+test_that("properties are set correctly", {
+  v <- ModVar$new("dummy", "m")
+  expect_true(is.na(v$is_probabilistic()))
+  expect_false(v$is_expression())
+})
+
 test_that("ModVar description is saved", {
   # same environment
   x <- ModVar$new("x", "GBP")
@@ -22,16 +28,6 @@ test_that("ModVar description is saved", {
   }
   yy <- g()
   expect_equal(yy$description(), "y")
-})
-
-test_that("illegal arguments to value are rejected", {
-  x <- ModVar$new("x", "GBP")
-  expect_silent(x$value())
-  expect_silent(x$value("pe"))
-  expect_silent(x$value("r"))
-  expect_silent(x$value("mean"))
-  expect_error(x$value(42), class="what_not_string")
-  expect_error(x$value("arthur"), class="unknown_what")
 })
 
 test_that("illegal arguments to quantile are rejected", {

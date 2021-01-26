@@ -11,11 +11,12 @@ test_that("illegal initializations are rejected", {
   expect_error(GammaModVar$new("gamma","GBP",k,0), class="scale_not_supported")
 })
 
-test_that("modvar is not an expression", {
+test_that("properties are correct", {
   k <- 9
   theta <- 0.5
   g <- GammaModVar$new("gamma", "GBP", k, theta)
   expect_false(g$is_expression())
+  expect_true(g$is_probabilistic())
 })
 
 test_that("modvar has correct distribution name", {
@@ -25,23 +26,25 @@ test_that("modvar has correct distribution name", {
   expect_equal(g$distribution(), "Ga(9,0.5)")
 })
 
-test_that("pe, mean, sd and quantiles are returned correctly", {
+test_that("mean, mode, sd and quantiles are returned correctly", {
   k <- 9
   theta <- 0.5
   g <- GammaModVar$new("gamma", "GBP", k, theta)
   expect_equal(g$mean(), k*theta, tolerance=0.01)
   expect_equal(g$SD(), sqrt(k)*theta, tolerance=0.01)
-  expect_equal(g$point_estimate(), (k-1)*theta)
+  expect_equal(g$mode(), (k-1)*theta)
   probs <- c(0.025, 0.975)
   q <- g$quantile(probs)
   expect_equal(round(q[1],2), 2.06, tolerance=0.01)
   expect_equal(round(q[2],2), 7.88, tolerance=0.01)
 })
 
-# test_that("random sampling is from a Normal distribution", {
-#   sn <- NormModVar$new("sn", "GBP", 0, 1)
-#   samp <- sn$r(1000)
-#   expect_equal(length(samp), 1000)
-#   expect_equal(round(mean(samp),1), 0)
-#   expect_equal(round(sd(samp),1), 1)
-# })
+test_that("random sampling is from a Gamma distribution", {
+  k <- 9
+  theta <- 0.5
+  g <- GammaModVar$new("gamma", "GBP", k, theta)
+  samp <- g$r(1000)
+  expect_equal(length(samp), 1000)
+  expect_equal(mean(samp), 4.5, tolerance=0.1)
+  expect_equal(sd(samp), 1.5, tolerance=0.1)
+})

@@ -46,7 +46,16 @@ NormModVar <- R6::R6Class(
       # return
       return(invisible(self))
     },
-    
+
+    #' @description 
+    #' Tests whether the model variable is probabilistic, i.e. a random
+    #' variable that follows a distribution, or an expression involving
+    #' random variables, some of which follow distributions. 
+    #' @return TRUE if probabilistic
+    is_probabilistic = function() {
+      return(TRUE)
+    },
+
     #' @description 
     #' Accessor function for the name of the uncertainty distribution.
     #' @return Distribution name as character string.
@@ -77,13 +86,6 @@ NormModVar <- R6::R6Class(
       return(private$mu)
     },
 
-    #' @description 
-    #' Return the point estimate of the variable. 
-    #' @return Point estimate as a numeric value.
-    point_estimate = function() {
-      return(private$mu)
-    },
-    
     #' @description
     #' Return the standard deviation of the distribution.
     #' @return Standard deviation as a numeric value

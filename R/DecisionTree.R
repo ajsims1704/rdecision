@@ -370,7 +370,7 @@ DecisionTree <- R6::R6Class(
         # evaluate each strategy
         ALL <- apply(TT, MARGIN=1, function(row) {
           strategy <- private$E[row]
-          RES <- self$evaluate_strategy(strategy)
+          RES <- self$evaluate_strategy(strategy, expected)
           f <- as.formula(
             paste(
               "cbind(Probability, Cost, Benefit, Utility)",

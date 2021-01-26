@@ -41,6 +41,15 @@ ConstModVar <- R6::R6Class(
       }
       private$val <- const
     },
+    
+    #' @description 
+    #' Tests whether the model variable is probabilistic, i.e. a random
+    #' variable that follows a distribution, or an expression involving
+    #' random variables, some of which follow distributions. 
+    #' @return TRUE if probabilistic
+    is_probabilistic = function() {
+      return(FALSE)
+    },
 
     #' @description 
     #' Accessor function for the name of the uncertainty distribution.

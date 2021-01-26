@@ -54,6 +54,15 @@ ModVar <- R6::R6Class(
       return(inherits(self, what="ExprModVar"))
     },
 
+    #' @description 
+    #' Tests whether the model variable is probabilistic, i.e. a random
+    #' variable that follows a distribution, or an expression involving
+    #' random variables, some of which follow distributions. 
+    #' @return TRUE if probabilistic
+    is_probabilistic = function() {
+      return(as.logical(NA))
+    },
+    
     #' #' @description
     #' #' Return the current value of the model variable. This will be the 
     #' #' expected value if the argument to the most recent call to `sample`
@@ -107,17 +116,17 @@ ModVar <- R6::R6Class(
     distribution = function() {
       return(NA)
     },
-
-    #' @description 
-    #' Return a list of operands given in the expression used to form the
-    #' expression. Only relevant for objects of inherited type 
-    #' ExprModVar, but defined for the base class for convenience to
-    #' avoid type checking inside iterators.
-    #' @return A list of operands that are themselves ModVars. An empty list 
-    #' for non-expression model variables.
-    operands = function() {
-      return(list())
-    },
+    
+    #' #' @description 
+    #' #' Return a list of operands given in the expression used to form the
+    #' #' expression. Only relevant for objects of inherited type 
+    #' #' ExprModVar, but defined for the base class for convenience to
+    #' #' avoid type checking inside iterators.
+    #' #' @return A list of operands that are themselves ModVars. An empty list 
+    #' #' for non-expression model variables.
+    #' operands = function() {
+    #'   return(list())
+    #' },
 
     #' @description 
     #' Tabulate the model variable and optionally include its operands.
@@ -162,8 +171,7 @@ ModVar <- R6::R6Class(
 #    },
 
     #' @description 
-    #' Draw a random sample from the model variable. Normally accessed by a 
-    #' call to value(what="r").
+    #' Draw a random sample from the model variable. 
     #' @param n Number of samples to draw.
     #' @return A sample drawn at random.
     r = function(n=1) {
@@ -179,7 +187,9 @@ ModVar <- R6::R6Class(
     },
     
     #' @description 
-    #' Return the mode of the variable. 
+    #' Return the mode of the variable. By default returns NA, which will be
+    #' the case for most ExprModVar variables, because an arbitrary expression
+    #' is not guaranteed to be unimodel.
     #' @return Mode as a numeric value.
     mode = function() {
       return(as.numeric(NA))

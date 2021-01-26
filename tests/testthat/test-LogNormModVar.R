@@ -7,9 +7,10 @@ test_that("illegal initializations are rejected", {
   expect_error(LogNormModVar$new("lognorm","GBP",1,"1"), class="p2_not_numeric")
 })
 
-test_that("modvar is not an expression", {
+test_that("properties are correct", {
   ln <- LogNormModVar$new("lognorm", "GBP", 1, 1)
   expect_false(ln$is_expression())
+  expect_true(ln$is_probabilistic())
 })
 
 test_that("modvar has correct distribution name", {
@@ -19,14 +20,14 @@ test_that("modvar has correct distribution name", {
   expect_equal(ln$distribution(), "LN2(1,1)")
 })
 
-test_that("pe, mean, sd and quantiles are returned correctly", {
+test_that("mean, mode, sd and quantiles are returned correctly", {
   mu <- 0
   sigma <- 0.25
   ln <- LogNormModVar$new("ln", "GBP", p1=mu, p2=sigma, "LN1")
   expect_equal(ln$mean(), exp(mu+(sigma^2)/2))
   sd <- sqrt( (exp(sigma^2)-1)*(exp(2*mu+sigma^2)) )
   expect_equal(ln$SD(), sd)
-  expect_equal(ln$point_estimate(), exp(mu-sigma^2))
+  expect_equal(ln$mode(), exp(mu-sigma^2))
   # quantiles
   expect_equal(ln$quantile(c(0.5)), exp(mu))
   erf.inv <- function(x){qnorm((x+1)/2)/sqrt(2)}

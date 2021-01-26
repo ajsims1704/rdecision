@@ -71,7 +71,7 @@ Reaction <- R6::R6Class(
     p = function(expected=FALSE) {
       prob <- 0
       if (inherits(private$edge.p, what="ModVar")) {
-        prob <- private$edge.p$value(expected)
+        prob <- private$edge.p$get(expected)
       } else {
         prob <- private$edge.p
       }
@@ -85,7 +85,7 @@ Reaction <- R6::R6Class(
     #' @return Cost.
     cost = function(expected=FALSE) {
       if (inherits(private$edge.cost, what="ModVar")) {
-        rv <- private$edge.cost$value(expected)
+        rv <- private$edge.cost$get(expected)
       } else {
         rv <- private$edge.cost
       }
@@ -99,7 +99,7 @@ Reaction <- R6::R6Class(
     #' @return Benefit.
     benefit = function(expected=FALSE) {
       if (inherits(private$edge.benefit, what="ModVar")) {
-        rv <- private$edge.benefit$value(expected)
+        rv <- private$edge.benefit$get(expected)
       } else {
         rv <- private$edge.benefit
       }

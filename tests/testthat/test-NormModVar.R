@@ -7,9 +7,10 @@ test_that("illegal initializations are rejected", {
   expect_error(NormModVar$new("norm","GBP",0,"1"), class="sigma_not_numeric")
 })
 
-test_that("modvar is not an expression", {
+test_that("properties are correct", {
   sn <- NormModVar$new("sn", "GBP", 0, 1)
   expect_false(sn$is_expression())
+  expect_true(sn$is_probabilistic())
 })
 
 test_that("modvar has correct distribution name", {
@@ -23,17 +24,16 @@ test_that("pe, mean, sd and quantiles are returned correctly", {
   sn <- NormModVar$new("sn", "GBP", 0, 1)
   expect_equal(sn$mean(), 0)
   expect_equal(sn$SD(), 1)
-  expect_equal(sn$point_estimate(), 0)
   probs <- c(0.025, 0.975)
   q <- sn$quantile(probs)
-  expect_equal(round(q[1],2), -1.96)
-  expect_equal(round(q[2],2), 1.96)
+  expect_equal(q[1], -1.96, tolerance=0.05)
+  expect_equal(q[2], 1.96, tolerance=0.05)
 })
 
 test_that("random sampling is from a Normal distribution", {
   sn <- NormModVar$new("sn", "GBP", 0, 1)
   samp <- sn$r(1000)
   expect_equal(length(samp), 1000)
-  expect_equal(round(mean(samp),1), 0)
-  expect_equal(round(sd(samp),1), 1)
+  expect_equal(mean(samp), 0, tolerance=0.1)
+  expect_equal(sd(samp), 1, tolerance=0.1)
 })

@@ -216,13 +216,13 @@ test_that("redecision replicates Jenks et al, 2016", {
 
   # cost variables
   c.CRBSI <- GammaModVar$new(
-    'CRBSI cost', 'GBP', alpha=198.0, beta=50
+    'CRBSI cost', 'GBP', shape=198.0, scale=50
   )
   c.Dermatitis <- GammaModVar$new(
-    'Dermatitis cost', 'GBP', alpha=30, beta=5
+    'Dermatitis cost', 'GBP', shape=30, scale=5
   )
   c.LSI <- GammaModVar$new(
-    'LSI cost', 'GBP', alpha=50, beta=5
+    'LSI cost', 'GBP', shape=50, scale=5
   )
   c.Tegaderm <- ConstModVar$new(
     'Tegaderm CHG cost', 'GBP', const=6.21
@@ -239,44 +239,30 @@ test_that("redecision replicates Jenks et al, 2016", {
 
   # probabilities
   p.Dermatitis.S <- ExprModVar$new(
-    'P(dermatitis|standard dressing)', 'P', quote(n.dressings*r.Dermatitis),
-    envir=environment()
+    'P(dermatitis|standard dressing)', 'P', 
+    rlang::quo(n.dressings*r.Dermatitis)
   )
   p.Dermatitis.T <- ExprModVar$new(
-    'P(dermatitis|Tegaderm)', 'P', quote(n.dressings*r.Dermatitis*rr.Dermatitis),
-    envir=environment()
+    'P(dermatitis|Tegaderm)', 'P', 
+    rlang::quo(n.dressings*r.Dermatitis*rr.Dermatitis)
   )
   r.LSI.T <- ExprModVar$new(
-    'P(LSI|Tegaderm)', 'P', quote(r.LSI*hr.LSI)
+    'P(LSI|Tegaderm)', 'P', rlang::quo(r.LSI*hr.LSI)
   )
   p.CRBSI.S <- ExprModVar$new(
-    'P(CRBSI|standard dressing)', 'P',  quote(r.CRBSI*n.cathdays/1000)
+    'P(CRBSI|standard dressing)', 'P',  rlang::quo(r.CRBSI*n.cathdays/1000)
   )
   p.CRBSI.T <- ExprModVar$new(
-    'P(CRBSI|Tegaderm)', 'P', quote(r.CRBSI*n.cathdays*hr.CRBSI/1000)
+    'P(CRBSI|Tegaderm)', 'P', rlang::quo(r.CRBSI*n.cathdays*hr.CRBSI/1000)
   )
   p.NoComp.S <- ExprModVar$new("P(No comp|standard dressing)", "P",
-    quote(1-(p.Dermatitis.S+r.LSI+p.CRBSI.S))
+    rlang::quo(1-(p.Dermatitis.S+r.LSI+p.CRBSI.S))
   )
   p.NoComp.T <- ExprModVar$new("P(No comp|Tegaderm)", "P",
-    quote(1-(p.Dermatitis.T+r.LSI.T+p.CRBSI.T))
+    rlang::quo(1-(p.Dermatitis.T+r.LSI.T+p.CRBSI.T))
   )
 
-  # costs to each branch
-  c.S <- ExprModVar$new(
-    'Cost of standard dressing', 'GBP', quote(n.dressings*c.Standard)
-  )
-  c.T <- ExprModVar$new(
-    'Cost of Tegaderm', 'GBP', quote(n.dressings*c.Tegaderm)
-  )
-#  c.Dermatitis.S <- ExprModVar$new("c(Dermatitis,Std)", "GBP", quote(c.Dermatitis+c.S))
-#  c.Dermatitis.T <- ExprModVar$new("c(Dermatitis,Teg)", "GBP", quote(c.Dermatitis+c.T))
-#  c.LSI.S <- ExprModVar$new("c(LSI,Std)", "GBP", quote(c.LSI+c.S))
-#  c.LSI.T <- ExprModVar$new("c(LSI,Teg)", "GBP", quote(c.LSI+c.T))
-#  c.CRBSI.S <- ExprModVar$new("c(CRBSI),Std)", "GBP", quote(c.CRBSI+c.S))
-#  c.CRBSI.T <- ExprModVar$new("c(CRBSI),Teg)", "GBP", quote(c.CRBSI+c.T))
-
-  # Time horizon
+  # create decision tree
   th <- as.difftime(7, units="days")
   # standard dressing branch
   t1 <- LeafNode$new("Dermatitis", interval=th)
@@ -289,10 +275,10 @@ test_that("redecision replicates Jenks et al, 2016", {
   e3 <- Reaction$new(c1,t3,p=p.CRBSI.S,cost=c.CRBSI)
   e4 <- Reaction$new(c1,t4,p=p.NoComp.S,cost=0)
   # Tegaderm dressing branch
-  t5 <- LeafNode$new("Dermatitis", cost=c.Dermatitis.T, interval=th)
-  t6 <- LeafNode$new("LSI", cost=c.LSI.T, interval=th)
-  t7 <- LeafNode$new("CRBSI", cost=c.CRBSI.T, interval=th)
-  t8 <- LeafNode$new("No comp", cost=c.T, interval=th)
+  t5 <- LeafNode$new("Dermatitis", interval=th)
+  t6 <- LeafNode$new("LSI", interval=th)
+  t7 <- LeafNode$new("CRBSI", interval=th)
+  t8 <- LeafNode$new("No comp", interval=th)
   c2 <- ChanceNode$new()
   e5 <- Reaction$new(c2,t5,p=p.Dermatitis.T,cost=c.Dermatitis)
   e6 <- Reaction$new(c2,t6,p=r.LSI.T,cost=c.LSI)
@@ -306,4 +292,10 @@ test_that("redecision replicates Jenks et al, 2016", {
   V <- list(d1,c1,c2,t1,t2,t3,t4,t5,t6,t7,t8)
   E <- list(e1,e2,e3,e4,e5,e6,e7,e8,e9,e10)
   expect_silent(DT <- DecisionTree$new(V,E))
+  
+  # evaluate the tree
+  E <- DT$evaluate()
+  str(E)
+  print(E)
+  
 })

@@ -55,6 +55,15 @@ GammaModVar <- R6::R6Class(
     },
 
     #' @description 
+    #' Tests whether the model variable is probabilistic, i.e. a random
+    #' variable that follows a distribution, or an expression involving
+    #' random variables, some of which follow distributions. 
+    #' @return TRUE if probabilistic
+    is_probabilistic = function() {
+      return(TRUE)
+    },
+
+    #' @description 
     #' Accessor function for the name of the uncertainty distribution.
     #' @return Distribution name as character string.
     distribution = function() {
@@ -67,6 +76,17 @@ GammaModVar <- R6::R6Class(
     #' @return Expected value as a numeric value.
     mean = function() {
       return(private$shape*private$scale)
+    },
+
+    #' @description 
+    #' Return the mode of the distribution (if shape >= 1) 
+    #' @return mode as a numeric value.
+    mode = function() {
+      rv <- as.numeric(NA)
+      if (private$shape>=1) {
+        rv <- (private$shape-1)*private$scale 
+      }
+      return(rv)
     },
 
     #' @description 
