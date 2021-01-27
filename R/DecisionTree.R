@@ -264,8 +264,7 @@ DecisionTree <- R6::R6Class(
     #' Evaluate the components of payoff associated with the paths in the
     #' decision tree. For each path, the strategy, probability, cost,
     #' benefit and utility are calculated.
-    #' @param expected If TRUE, evaluate each model variable as its mean value,
-    #'        otherwise sample each one from their uncertainty distribution.
+    #' @param strategy A list of Actions, with one action per decision node.
     #' @return A data frame (payoff table) with one row per path and columns
     #' organized as follows:
     #' \describe{
@@ -284,7 +283,18 @@ DecisionTree <- R6::R6Class(
     #' \item{Benefit}{Path.Benefit \eqn{*} probability of traversing the pathway.}
     #' \item{Utility}{Path.Utility \eqn{*} probability of traversing the pathway.}
     #' }
-    evaluate_strategy = function(strategy, expected=TRUE) {
+    evaluate_strategy = function(strategy) {
+      # check argument
+      if (length(strategy)!=length(self$decision_nodes())) {
+        rlang::abort("Argument 'strategy' must have as many elements as DecisionNodes",
+                     class="incorrect_strategy_length")
+      }
+      sapply(strategy, function(e) {
+        if (!inherits(e,what="Action")) {
+          rlang::abort("Argument 'strategy' must only contain Action elements",
+                       class="incorrect_strategy_type")
+        }
+      })
       # find all root to leaf paths for the specified strategy
       P <- self$paths_in_strategy(strategy)
       # create a matrix of strategies
@@ -314,24 +324,24 @@ DecisionTree <- R6::R6Class(
         pr <- 1
         sapply(self$walk(path), function(e) {
           if (inherits(e, what="Reaction")) {
-            pr <<- pr * e$p(expected)
+            pr <<- pr * e$p()
           }
         })
         PAYOFF[PAYOFF$PID==i,"Probability"] <- pr
         # cost
         cost <- 0
         sapply(self$walk(path), function(e) {
-          cost <<- cost + e$cost(expected)
+          cost <<- cost + e$cost()
         })
         PAYOFF[PAYOFF$PID==i,"Path.Cost"] <- cost
         # benefit
         benefit <- 0
         sapply(self$walk(path), function(e) {
-          benefit <<- benefit + e$benefit(expected)
+          benefit <<- benefit + e$benefit()
         })
         PAYOFF[PAYOFF$PID==i,"Path.Benefit"] <- benefit
         # utility of the leaf node at end of the path
-        PAYOFF[PAYOFF$PID==i, "Path.Utility"] <- path[[length(path)]]$utility(expected)
+        PAYOFF[PAYOFF$PID==i, "Path.Utility"] <- path[[length(path)]]$utility()
       }
       # add expected cost and utility     
       PAYOFF$Cost <- PAYOFF$Probability*PAYOFF$Path.Cost
@@ -370,7 +380,7 @@ DecisionTree <- R6::R6Class(
         # evaluate each strategy
         ALL <- apply(TT, MARGIN=1, function(row) {
           strategy <- private$E[row]
-          RES <- self$evaluate_strategy(strategy, expected)
+          RES <- self$evaluate_strategy(strategy)
           f <- as.formula(
             paste(
               "cbind(Probability, Cost, Benefit, Utility)",

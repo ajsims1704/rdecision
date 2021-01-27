@@ -23,13 +23,15 @@ test_that("properties are set correctly", {
 test_that("illegal sample sizes for estimating parameters are rejected", {
   x <- 3
   y <- NormModVar$new("y", "GBP", mu=0, sigma=1)
-  expect_error(ExprModVar$new("z", "GBP", quo=rlang::quo(x*y), "100"), 
-               class="n_not_numeric")
-  expect_error(ExprModVar$new("z", "GBP", quo=rlang::quo(x*y), 3), 
-               class="n_too_small")
-  expect_error(ExprModVar$new("z", "GBP", quo=rlang::quo(x*y), 999.5), 
-               class="n_too_small")
-  expect_silent(ExprModVar$new("z", "GBP", quo=rlang::quo(x*y), 10000))
+  z <- ExprModVar$new("z", "GBP", quo=rlang::quo(x*y))
+  expect_error(z$mu_hat("100"), class="nest_not_numeric")
+  expect_error(z$mu_hat(3), class="nest_too_small")
+  expect_error(z$mu_hat(999.5), class="nest_too_small")
+  expect_silent(z$mu_hat(10000))
+  expect_error(z$sigma_hat("100"), class="nest_not_numeric")
+  expect_error(z$sigma_hat(3), class="nest_too_small")
+  expect_error(z$sigma_hat(999.5), class="nest_too_small")
+  expect_silent(z$sigma_hat(10000))
 })
 
 test_that("ExprModVar obeys scoping rules" , {
@@ -80,8 +82,10 @@ test_that("expression chi square from SN is correct", {
   # x = N(0,1), y = x^2 = Chisq(k=1)
   x <- NormModVar$new("SN", "m", mu=0, sigma=1)
   y <- ExprModVar$new("z","m^2",rlang::quo(x^2))
-  expect_equal(y$mean(),1, tolerance=0.2)  # mean is k
+  expect_equal(y$mean(), 0)  # true mean is k=1, expression at mean inputs is 0
+  expect_equal(y$mu_hat(), 1, tolerance=0.2)  # true mean is k=1
   expect_true(is.na(y$mode()))  # mode is undefined for ExprModVar
-  expect_equal(y$SD(), sqrt(2), tolerance=0.2) # variance is 2k
+  expect_true(is.na(y$SD()))  # SD is undefined for ExprModVar
+  expect_equal(y$sigma_hat(), sqrt(2), tolerance=0.2) # variance is 2k
 })
 

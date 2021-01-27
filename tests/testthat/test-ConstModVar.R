@@ -24,3 +24,19 @@ test_that("const values are returned", {
   expect_equal(x$mode(),42)
   expect_equal(x$quantile(probs=c(0.22)),42)
 })
+
+test_that("set and get function as expected", {
+  x <- ConstModVar$new("y", "GBP", 42)
+  expect_true(is.na(x$get()))
+  expect_error(x$set("red"), class="expected_not_logical")
+  expect_silent(x$set())
+  expect_silent(x$set(TRUE))
+  expect_equal(x$get(), 42, tolerance=0.01)
+  S <- vector(mode="numeric", length=1000)
+  for (i in 1:1000) {
+    x$set()
+    S[i] <- x$get() 
+  }  
+  expect_equal(mean(S), 42, tolerance=0.001)
+  expect_equal(sd(S), 0, tolerance=0.001)
+})

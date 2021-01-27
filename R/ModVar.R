@@ -20,7 +20,8 @@ ModVar <- R6::R6Class(
   classname = "ModVar",
   private = list(
     .description = NULL,
-    .units = NULL
+    .units = NULL,
+    .val = NA
   ),
   public = list(
     
@@ -176,7 +177,7 @@ ModVar <- R6::R6Class(
     #' @return A sample drawn at random.
     r = function(n=1) {
       # return the sample
-      return(NA)
+      return(rep(as.numeric(NA),n))
     },
 
     #' @description 
@@ -222,8 +223,34 @@ ModVar <- R6::R6Class(
                        class="probs_out_of_range")
         }
       })
-      return(NA)
+      return(rep(as.numeric(NA), length(probs)))
+    },
+
+    #' @description
+    #' Sets the value of the ModVar that will be returned by subsequent
+    #' calls to get() until set() is called again. 
+    #' @param expected Logical; TRUE to set the value to the mean of the model
+    #' variable.
+    #' @return Updated ModVar.
+    set = function(expected=FALSE) {
+      # check argument
+      if (!is.logical(expected)) {
+        rlang::abort("Argument expected must be a logical", 
+                     class="expected_not_logical")
+
+      }
+      private$.val <- ifelse(expected, self$mean(), self$r())
+      return(invisible(self))
+    },
+    
+    #' @description
+    #' Gets the value of the ExprModVar that was set by the most recent call
+    #' to set().
+    #' @return Value determined by last set().
+    get = function() {
+      return(private$.val)
     }
+
     
   )
 )

@@ -30,7 +30,11 @@ test_that("ModVar description is saved", {
   expect_equal(yy$description(), "y")
 })
 
-test_that("illegal arguments to quantile are rejected", {
+test_that("random sampler checks and returns correct types", {
+  
+})
+
+test_that("stub quantile function checks inputs and has correct output", {
   x <- ModVar$new("x", "GBP")
   probs <- c(0.1, 0.2, 0.5)
   expect_silent(x$quantile(probs))
@@ -40,5 +44,7 @@ test_that("illegal arguments to quantile are rejected", {
   expect_error(x$quantile(probs), class="probs_not_numeric")
   probs <- c(0.1, 0.4, 1.5)
   expect_error(x$quantile(probs), class="probs_out_of_range")
+  probs <- c(0.1, 0.2, 0.5)
+  expect_equal(length(x$quantile(probs)),3)
 })
 

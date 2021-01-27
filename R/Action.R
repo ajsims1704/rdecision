@@ -16,7 +16,7 @@ Action <- R6::R6Class(
   inherit = Arrow,
   private = list(
     edge.cost = NULL,
-    edge.benefit = 0
+    edge.benefit = NULL
   ),
   public = list(
     
@@ -47,30 +47,36 @@ Action <- R6::R6Class(
       if (!inherits(source, what="DecisionNode")) {
         rlang::abort("Node 'source' must be a DecisionNode", class="non-Decision_source")
       }
-      # check and set cost
-      if (!inherits(cost, what=c("numeric", "ModVar"))){
+      # check and set cost, ensuring initialization
+      if (inherits(cost, what="numeric")) {
+        private$edge.cost <- cost
+      } else if (inherits(cost, "ModVar")) {
+        private$edge.cost <- cost
+        private$edge.cost$set(TRUE)
+      } else {
         rlang::abort("Argument 'cost' must be of type 'numeric' or 'ModVar'.",
                      class = "incorrect_type")
       }
-      private$edge.cost <- cost
-      # check and set benefit
-      if (!inherits(benefit, what=c("numeric", "ModVar"))){
+      # check and set benefit, ensuring initialization
+      if (inherits(benefit, what="numeric")) {
+        private$edge.benefit <- benefit
+      } else if (inherits(benefit, "ModVar")) {
+        private$edge.benefit <- benefit
+        private$edge.benefit$set(TRUE)
+      } else {
         rlang::abort("Argument 'benefit' must be of type 'numeric' or 'ModVar'.",
                      class = "incorrect_type")
       }
-      private$edge.benefit <- benefit
       # Return Action node
       return(invisible(self))
     },
     
     #' @description 
     #' Return the cost associated with traversing the edge.
-    #' @param expected Parameter passed to the \code{value} method of the model
-    #' variable used to define cost; ignored otherwise.
     #' @return Cost.
-    cost = function(expected=FALSE) {
+    cost = function() {
       if (inherits(private$edge.cost, what="ModVar")) {
-        rv <- private$edge.cost$value(expected)
+        rv <- private$edge.cost$get()
       } else {
         rv <- private$edge.cost
       }
@@ -79,12 +85,10 @@ Action <- R6::R6Class(
     
     #' @description 
     #' Return the benefit associated with traversing the edge.
-    #' @param expected Parameter passed to the \code{value} method of the model
-    #' variable used to define cost; ignored otherwise.
     #' @return Benefit.
-    benefit = function(expected=FALSE) {
+    benefit = function() {
       if (inherits(private$edge.benefit, what="ModVar")) {
-        rv <- private$edge.benefit$value(expected)
+        rv <- private$edge.benefit$get()
       } else {
         rv <- private$edge.benefit
       }

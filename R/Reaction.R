@@ -41,37 +41,47 @@ Reaction <- R6::R6Class(
       if (!inherits(source, what="ChanceNode")) {
         rlang::abort("Node 'source' must be a ChanceNode", class="non-Chance_source")
       }
-      # Check and save p value
-      if (!inherits(p, what=c("numeric", "ModVar"))){
+      # check and set p, ensuring initialization
+      if (inherits(p, what="numeric")) {
+        private$edge.p <- p
+      } else if (inherits(p, "ModVar")) {
+        private$edge.p <- p
+        private$edge.p$set(TRUE)
+      } else {
         rlang::abort("Argument 'p' must be of type 'numeric' or 'ModVar'.",
                      class = "incorrect_type")
       }
-      private$edge.p <- p
-      # check and set cost
-      if (!inherits(cost, what=c("numeric", "ModVar"))){
+      # check and set cost, ensuring initialization
+      if (inherits(cost, what="numeric")) {
+        private$edge.cost <- cost
+      } else if (inherits(cost, "ModVar")) {
+        private$edge.cost <- cost
+        private$edge.cost$set(TRUE)
+      } else {
         rlang::abort("Argument 'cost' must be of type 'numeric' or 'ModVar'.",
                      class = "incorrect_type")
       }
-      private$edge.cost <- cost
-      # check and set benefit
-      if (!inherits(benefit, what=c("numeric", "ModVar"))){
+      # check and set benefit, ensuring initialization
+      if (inherits(benefit, what="numeric")) {
+        private$edge.benefit <- benefit
+      } else if (inherits(benefit, "ModVar")) {
+        private$edge.benefit <- benefit
+        private$edge.benefit$set(TRUE)
+      } else {
         rlang::abort("Argument 'benefit' must be of type 'numeric' or 'ModVar'.",
                      class = "incorrect_type")
       }
-      private$edge.benefit <- benefit
       # Return reaction node
       return(invisible(self))
     },
     
     #' @description
     #' Return the current value of the edge probability.
-    #' @param expected Parameter passed to the \code{value} method of the model
-    #' variable used to define probability; ignored otherwise.
     #' @return Numeric value in range [0,1].
-    p = function(expected=FALSE) {
+    p = function() {
       prob <- 0
       if (inherits(private$edge.p, what="ModVar")) {
-        prob <- private$edge.p$get(expected)
+        prob <- private$edge.p$get()
       } else {
         prob <- private$edge.p
       }
@@ -80,12 +90,10 @@ Reaction <- R6::R6Class(
     
     #' @description 
     #' Return the cost associated with traversing the edge.
-    #' @param expected Parameter passed to the \code{value} method of the model
-    #' variable used to define cost; ignored otherwise.
     #' @return Cost.
-    cost = function(expected=FALSE) {
+    cost = function() {
       if (inherits(private$edge.cost, what="ModVar")) {
-        rv <- private$edge.cost$get(expected)
+        rv <- private$edge.cost$get()
       } else {
         rv <- private$edge.cost
       }
@@ -94,12 +102,10 @@ Reaction <- R6::R6Class(
     
     #' @description 
     #' Return the benefit associated with traversing the edge.
-    #' @param expected Parameter passed to the \code{value} method of the model
-    #' variable used to define cost; ignored otherwise.
     #' @return Benefit.
-    benefit = function(expected=FALSE) {
+    benefit = function() {
       if (inherits(private$edge.benefit, what="ModVar")) {
-        rv <- private$edge.benefit$get(expected)
+        rv <- private$edge.benefit$get()
       } else {
         rv <- private$edge.benefit
       }
