@@ -30,10 +30,6 @@ test_that("ModVar description is saved", {
   expect_equal(yy$description(), "y")
 })
 
-test_that("random sampler checks and returns correct types", {
-  
-})
-
 test_that("stub quantile function checks inputs and has correct output", {
   x <- ModVar$new("x", "GBP")
   probs <- c(0.1, 0.2, 0.5)
@@ -46,5 +42,10 @@ test_that("stub quantile function checks inputs and has correct output", {
   expect_error(x$quantile(probs), class="probs_out_of_range")
   probs <- c(0.1, 0.2, 0.5)
   expect_equal(length(x$quantile(probs)),3)
+})
+
+test_that("get is initialized to NA for base class", {
+  x <- ModVar$new("x", "GBP")
+  expect_true(is.na(x$get()))
 })
 

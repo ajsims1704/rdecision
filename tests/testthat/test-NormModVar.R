@@ -38,16 +38,22 @@ test_that("random sampling is from a Normal distribution", {
   expect_equal(sd(samp), 1, tolerance=0.1)
 })
 
+test_that("First call to get() returns mean", {
+  sn <- NormModVar$new("sn", "GBP", 0, 1)
+  expect_equal(sn$get(), 0)  
+})
+
 test_that("variable passing and persistency of get/set are correct", {
   f <- function(mv) {
-    expect_true(is.na(mv$get()))
-    mv$set(TRUE)
+    expect_equal(mv$get(), 0)
+    mv$set(FALSE)
   }
   g <- function(mv) {
     expect_equal(mv$get(), 0)
   }
   sn <- NormModVar$new("sn", "GBP", 0, 1)
   f(sn)
-  expect_false(is.na(sn$get()))
+  expect_false(sn$get()==0)
+  sn$set(TRUE)
   g(sn)
 })

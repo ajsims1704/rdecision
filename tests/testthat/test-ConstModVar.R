@@ -27,7 +27,7 @@ test_that("const values are returned", {
 
 test_that("set and get function as expected", {
   x <- ConstModVar$new("y", "GBP", 42)
-  expect_true(is.na(x$get()))
+  expect_equal(x$get(), 42, tolerance=0.01)
   expect_error(x$set("red"), class="expected_not_logical")
   expect_silent(x$set())
   expect_silent(x$set(TRUE))

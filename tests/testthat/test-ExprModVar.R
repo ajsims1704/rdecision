@@ -20,20 +20,6 @@ test_that("properties are set correctly", {
   expect_true(z$is_probabilistic())
 })
 
-test_that("illegal sample sizes for estimating parameters are rejected", {
-  x <- 3
-  y <- NormModVar$new("y", "GBP", mu=0, sigma=1)
-  z <- ExprModVar$new("z", "GBP", quo=rlang::quo(x*y))
-  expect_error(z$mu_hat("100"), class="nest_not_numeric")
-  expect_error(z$mu_hat(3), class="nest_too_small")
-  expect_error(z$mu_hat(999.5), class="nest_too_small")
-  expect_silent(z$mu_hat(10000))
-  expect_error(z$sigma_hat("100"), class="nest_not_numeric")
-  expect_error(z$sigma_hat(3), class="nest_too_small")
-  expect_error(z$sigma_hat(999.5), class="nest_too_small")
-  expect_silent(z$sigma_hat(10000))
-})
-
 test_that("ExprModVar obeys scoping rules" , {
   # operands in a function environment (test_that)
   x <- 2
@@ -60,22 +46,65 @@ test_that("ExprModVar obeys scoping rules" , {
   g(z)
 })
 
+test_that("operands are identified correctly", {
+  # simple case
+  x <- 2
+  y <- NormModVar$new("y", "GBP", mu=0, sigma=1)
+  z <- ConstModVar$new("z", "GPB", 42)
+  e <- ExprModVar$new("e", "GBP", quo=rlang::quo(x*y + z))
+  mv <- e$operands()
+  expect_equal(length(mv), 2)  # y and z
+  d <- sapply(mv, function(v) {
+    return(v$description())
+  })
+  expect_equal(d[order(d)], c("y", "z"))
+  # nested case, with repeats
+  e1 <- ExprModVar$new("e1", "GBP", quo=rlang::quo(x*y + z))
+  e2 <- ExprModVar$new("e2", "GBP", quo=rlang::quo(z+3))
+  e3 <- ExprModVar$new("e3", "GBP", quo=rlang::quo(e1+e2))
+  mv <- e3$operands()
+  expect_equal(length(mv), 4)  # y, z, e1, e2
+  d <- sapply(mv, function(v) {
+    return(v$description())
+  })
+  expect_equal(d[order(d)], c("e1", "e2", "y", "z"))
+})
+
 test_that("set and get function as expected", {
+  # check initialization
   x <- 2
   y <- NormModVar$new("y", "GBP", mu=0, sigma=1)
   z <- ExprModVar$new("z", "GBP", quo=rlang::quo(x*y))
   expect_true(is.na(z$get()))
+  # check illegal input
   expect_error(z$set("red"), class="expected_not_logical")
+  # check that set() is ignored for ExprModVar
   expect_silent(z$set())
-  expect_silent(z$set(TRUE))
-  expect_equal(z$get(), 0, tolerance=0.15)
+  expect_true(is.na(z$get()))
+  # check that set() for operands affects get() for the expression
+  y$set(TRUE)
+  expect_equal(z$get(), 0, tolerance=0.01)
   S <- vector(mode="numeric", length=1000)
   for (i in 1:1000) {
-    z$set()
+    y$set()
     S[i] <- z$get() 
   }  
   expect_equal(mean(S), 0, tolerance=0.1)
   expect_equal(sd(S), 2, tolerance=0.1)
+})
+
+test_that("illegal sample sizes for estimating parameters are rejected", {
+  x <- 3
+  y <- NormModVar$new("y", "GBP", mu=0, sigma=1)
+  z <- ExprModVar$new("z", "GBP", quo=rlang::quo(x*y))
+  expect_error(z$mu_hat("100"), class="nest_not_numeric")
+  expect_error(z$mu_hat(3), class="nest_too_small")
+  expect_error(z$mu_hat(999.5), class="nest_too_small")
+  expect_silent(z$mu_hat(10000))
+  expect_error(z$sigma_hat("100"), class="nest_not_numeric")
+  expect_error(z$sigma_hat(3), class="nest_too_small")
+  expect_error(z$sigma_hat(999.5), class="nest_too_small")
+  expect_silent(z$sigma_hat(10000))
 })
 
 test_that("expression chi square from SN is correct", {

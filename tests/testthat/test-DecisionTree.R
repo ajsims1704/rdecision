@@ -292,9 +292,17 @@ test_that("redecision replicates Jenks et al, 2016", {
   V <- list(d1,c1,c2,t1,t2,t3,t4,t5,t6,t7,t8)
   E <- list(e1,e2,e3,e4,e5,e6,e7,e8,e9,e10)
   expect_silent(DT <- DecisionTree$new(V,E))
-  # evaluate the tree
+  # check the model variables
+  mv <- DT$modvars()
+  expect_equal(length(mv), 20)
+  # evaluate the tree (base case)
   E <- DT$evaluate()
-  str(E)
   print(E)
-  
+  # PSA
+  PSA <- DT$evaluate(expected=FALSE,N=100)
+  RES <<- reshape(PSA, idvar='Run', timevar='d1', direction='wide')
+  RES$Difference <<- RES$Cost.Standard - RES$Cost.Tegaderm
+  print(mean(RES$Difference))
+  print(RES)
+
 })

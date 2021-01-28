@@ -51,31 +51,7 @@ ExprModVar <- R6::R6Class(
   private = list(
     # fields
     expr = NULL,
-#    expr.value = NULL,
-#    expr.mean = NULL,
     env = NULL
-
-    # # function to create an expression involving calling ModVar
-    # # methods. For example if method='value()', each model variable X
-    # # in the expression will be replaced by X$value().
-    # # Returns a substituted expression.
-    # subExpr = function(expr, method) {
-    #   # paired list of variables to substitute
-    #   mv <- list()
-    #   # substitute model variable names with call to value() method
-    #   for (v in all.vars(expr)) {
-    #     # v is a string containing a variable name
-    #     if (inherits(eval(str2lang(v), envir=private$env), what='ModVar')) {
-    #       rep <- gsub(v, paste(v, method, sep='$'), v)
-    #     }
-    #     else {
-    #       rep <- v
-    #     }
-    #     mv[[v]] <- str2lang(rep)
-    #   }
-    #   emod <- eval(substitute(substitute(e, env=mv), env=list(e=expr)))
-    #   return(emod)
-    # }
   ),
   public = list(
     
@@ -122,28 +98,28 @@ ExprModVar <- R6::R6Class(
       return(any(lv))
     },
 
-    #' #' @description
-    #' #' Set the value of the model variable from its uncertainty distribution.
-    #' #' Nothing is returned; the sampled value is returned at the next
-    #' #' call to `value()`.
-    #' #' @param expected Logical; if TRUE, sets the value of the model variable
-    #' #'        returned at subsequent calls to `value()` to be equal to the 
-    #' #'        expectation of the variable. Default is FALSE.
-    #' #' @return Updated ExprModVar object.
-    #' sample = function(expected=F) {
-    #'   sapply(self$operands(), FUN=function(o) {
-    #'     o$sample(expected)        
-    #'   })
-    #'   return(invisible(self))
-    #' },
-
-    #' #' @description
-    #' #' Evaluate the expression.
-    #' #' @return Numerical value of the evaluated expression.
-    #' value = function() {
-    #'   rv <- eval(private$expr.value, envir=private$env)
-    #'   return(rv)  
-    #' },
+    #' @description
+    #' Return a list of operands that are themselves ModVars given
+    #' in the expression.
+    #' @return A list of model variables.
+    operands = function() {
+      # filter the expression variables that are ModVars
+      mvlist <- list()
+      sapply(all.vars(private$expr), FUN=function(v) {
+        vv <- eval(str2lang(v), envir=private$env)
+        if (inherits(vv, what="ModVar")) {
+          # add the variable to the list
+          mvlist <<- c(mvlist, vv)
+          # and add its operands, if any
+          if (inherits(vv, what="ExprModVar")) {
+            sapply(vv$operands(), FUN=function(o) {
+              mvlist <<- c(mvlist, o)
+            })
+          }
+        }
+      })
+      return(unique(mvlist))
+    },
     
     #' @description 
     #' Accessor function for the name of the expression model variable.
@@ -321,28 +297,52 @@ ExprModVar <- R6::R6Class(
       # return the quantiles of the sample
       q <- quantile(S, probs)
       return(q)
-    }
+    },
     
-    #' #' @description 
-    #' #' Return a list of operands that are themselves ModVars given
-    #' #' in the expression.
-    #' #' @return A list of model variables.
-    #' operands = function() {
-    #'   # filter the expression variables that are ModVars
-    #'   mvlist <- list()
-    #'   sapply(all.vars(private$expr), FUN=function(v) {
-    #'     vv <- eval(str2lang(v), envir=private$env)
-    #'     if (inherits(vv, what="ModVar")) {
-    #'       # add the variable to the list
-    #'       mvlist <<- c(mvlist, vv)
-    #'       # and add its operands, if any
-    #'       sapply(vv$operands(), FUN=function(o) {
-    #'         mvlist <<- c(mvlist, o)
-    #'       })
-    #'     }
-    #'   })
-    #'   return(mvlist)
-    #' }
+    #' @description
+    #' Sets the value of the ExprModVar that will be returned by subsequent
+    #' calls to get() until set() is called again. Because an ExprModVar can be 
+    #' considered the LHS of an equation, the idea of \code{set}ting a value
+    #' is meaningless, and calls to this method have no effect. To affect the
+    #' value returned by the next call to \code{get}, call \code{set} for each
+    #' of the operands of this expression.
+    #' @param expected Logical; for compatibility with non-expression ModVars
+    #' only; not used.
+    #' @return Updated ExprModVar.
+    set = function(expected=FALSE) {
+      # check argument
+      if (!is.logical(expected)) {
+        rlang::abort("Argument expected must be a logical", 
+                     class="expected_not_logical")
+
+      }
+      return(invisible(self))
+    },
+    
+    #' @description
+    #' Gets the value of the ExprModVar that was set by the most recent call
+    #' to set() to each operand of the expression.
+    #' @return Value determined by last set().
+    get = function() {
+      # build expression with each variable replaced with $get()
+      mv <- list()
+      method <- "get()"
+      # substitute model variable names with call to get() method
+      for (v in all.vars(private$expr)) {
+        # v is a string containing a variable name
+        if (inherits(eval(str2lang(v), envir=private$env), what='ModVar')) {
+          rep <- gsub(v, paste(v, method, sep='$'), v)
+        }
+        else {
+          rep <- v
+        }
+        mv[[v]] <- str2lang(rep)
+      }
+      emod <- eval(substitute(substitute(e, env=mv), env=list(e=private$expr)))
+      # evaluate the expression
+      rv <- eval(emod, envir=private$env)
+      return(rv)
+    }
 
   )
 )

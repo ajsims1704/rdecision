@@ -175,6 +175,23 @@ DecisionTree <- R6::R6Class(
       return(private$E[ie])
     },
     
+    #' @description 
+    #' Find all the model variables of type ModVar that have been specified
+    #' as values associated with the nodes and edges of the tree.
+    #' @return A list of \code{ModVar}s.
+    modvars = function() {
+      # create list
+      mv <- list()
+      # find the ModVars in Actions and Reactions
+      sapply(private$E, function(e){
+        if (inherits(e, what=c("Action", "Reaction"))) {
+          mv <<- c(mv, e$modvars())
+        }
+      })
+      # return a unique list
+      return(unique(mv))
+    },
+    
     #' @description Find all the root to leaf paths traversable under 
     #' the specified strategy. A strategy is a unanimous prescription 
     #' of an action in each decision node. 
@@ -213,7 +230,7 @@ DecisionTree <- R6::R6Class(
       })
       return(P[bAllowed])
     },
-    
+
     #' @description Find all unique strategies for the decision tree. A
     #' strategy is a unanimous prescription of the actions at each decision 
     #' node. In trees where there are decision nodes that are descendants
@@ -377,6 +394,10 @@ DecisionTree <- R6::R6Class(
       dn <- self$decision_nodes("label")
       # make repeated calls 
       DF <- do.call('rbind', sapply(1:N, FUN=function(n){
+        # set the ModVar values (either mean or sampled)
+        for (v in self$modvars()) {
+          v$set(expected)
+        }
         # evaluate each strategy
         ALL <- apply(TT, MARGIN=1, function(row) {
           strategy <- private$E[row]

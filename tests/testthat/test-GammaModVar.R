@@ -26,6 +26,13 @@ test_that("modvar has correct distribution name", {
   expect_equal(g$distribution(), "Ga(9,0.5)")
 })
 
+test_that("get() is initialized correctly", {
+  k <- 9
+  theta <- 0.5
+  g <- GammaModVar$new("gamma", "GBP", k, theta)
+  expect_equal(g$get(), k*theta, tolerance=0.01)
+})
+
 test_that("mean, mode, sd and quantiles are returned correctly", {
   k <- 9
   theta <- 0.5

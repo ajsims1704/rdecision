@@ -97,6 +97,9 @@ LogNormModVar <- R6::R6Class(
       else {
         stop("LogNormModVar::new: parameter 'parametrize must be one of 'LN1' through 'LN7'.")
       }
+      # ensure first call to get() is valid
+      self$set(TRUE)
+      # return new object
       return(invisible(self))
     },
 

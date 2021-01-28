@@ -232,8 +232,8 @@ More complex decision trees are also possible.
 
 The paths traversable for a particular strategy can be evaluated
 individually using the method \texttt{evaluate\_strategy}. In
-\texttt{rdecision} a strategy is defined as a set with one action edge
-per decision node. It is necessary to call the method
+\texttt{rdecision} a strategy is defined as a set of action edges with
+one action edge per decision node. It is necessary to call the method
 \texttt{evaluate\_strategy} only if information about each pathway is
 required; normally it is sufficient to call \texttt{evaluate} which will
 automatically identify all possible strategies in a decision tree and

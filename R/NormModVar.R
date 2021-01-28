@@ -43,6 +43,8 @@ NormModVar <- R6::R6Class(
         rlang::abort("Argument 'sigma' must be numeric", class="sigma_not_numeric")
       }
       private$sigma <- sigma
+      # initialize next get() call
+      self$set(TRUE)
       # return
       return(invisible(self))
     },

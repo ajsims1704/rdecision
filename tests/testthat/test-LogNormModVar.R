@@ -36,6 +36,13 @@ test_that("mean, mode, sd and quantiles are returned correctly", {
   expect_equal(ln$quantile(c(0.75)), ln.quant(mu,sigma,0.75))
 })
 
+test_that("get() is initialized correctly", {
+  mu <- 0
+  sigma <- 0.25
+  ln <- LogNormModVar$new("ln", "GBP", p1=mu, p2=sigma, "LN1")
+  expect_equal(ln$get(), exp(mu+(sigma^2)/2))
+})
+
 test_that("random sampling is from a log normal distribution", {
   mu <- 0
   sigma <- 0.25

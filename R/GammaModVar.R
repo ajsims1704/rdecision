@@ -51,6 +51,9 @@ GammaModVar <- R6::R6Class(
         rlang::abort("Argument 'scale' must be > 0", class="scale_not_supported")
       }
       private$scale <- scale
+      # ensure first call to get() is valid
+      self$set(TRUE)
+      # return object
       return(invisible(self))
     },
 

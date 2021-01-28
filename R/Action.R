@@ -52,7 +52,6 @@ Action <- R6::R6Class(
         private$edge.cost <- cost
       } else if (inherits(cost, "ModVar")) {
         private$edge.cost <- cost
-        private$edge.cost$set(TRUE)
       } else {
         rlang::abort("Argument 'cost' must be of type 'numeric' or 'ModVar'.",
                      class = "incorrect_type")
@@ -62,13 +61,33 @@ Action <- R6::R6Class(
         private$edge.benefit <- benefit
       } else if (inherits(benefit, "ModVar")) {
         private$edge.benefit <- benefit
-        private$edge.benefit$set(TRUE)
       } else {
         rlang::abort("Argument 'benefit' must be of type 'numeric' or 'ModVar'.",
                      class = "incorrect_type")
       }
       # Return Action node
       return(invisible(self))
+    },
+    
+    #' @description 
+    #' Find all the model variables of type ModVar that have been specified
+    #' as values associated with this Action. Includes operands of these
+    #' \code{ModVar}s, if they are expressions.
+    #' @return A list of \code{ModVar}s.
+    modvars = function() {
+      # create lists of input variables and output ModVars
+      iv <- c(private$edge.cost, private$edge.benefit)
+      ov <- list()
+      sapply(iv, function(v) {
+        if (inherits(v, what="ModVar")) {
+          ov <<- c(ov, v)
+          if (inherits(v, what="ExprModVar")) {
+            ov <<- c(ov, v$operands())
+          } 
+        }
+      })
+      # return the unique list
+      return(unique(ov))
     },
     
     #' @description 

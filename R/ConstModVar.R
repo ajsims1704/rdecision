@@ -40,6 +40,10 @@ ConstModVar <- R6::R6Class(
         rlang::abort("Argument 'const' must be numeric", class="const_not_numeric")
       }
       private$val <- const
+      # initialize next get() call
+      self$set(TRUE)
+      # return object
+      return(invisible(self))
     },
     
     #' @description 

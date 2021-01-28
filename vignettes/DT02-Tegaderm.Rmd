@@ -21,6 +21,7 @@ knitr::opts_chunk$set(
 
 ```{r setup, echo=F}
 library('rdecision')
+library("rlang")
 ```
 
 # Introduction
@@ -82,14 +83,14 @@ rr.Dermatitis <- LogNormModVar$new(
 
 # cost variables
 c.CRBSI <- GammaModVar$new(
-  'CRBSI cost', 'GBP', alpha=198.0, beta=50
+  'CRBSI cost', 'GBP', shape=198.0, scale=50
 )
 c.Dermatitis <- GammaModVar$new(
-  'Dermatitis cost', 'GBP', alpha=30, beta=5
+  'Dermatitis cost', 'GBP', shape=30, scale=5
 )
 c.LSI <- GammaModVar$new(
-  'LSI cost', 'GBP', alpha=50, beta=5
-)
+    'LSI cost', 'GBP', shape=50, scale=5
+  )
 c.Tegaderm <- ConstModVar$new(
   'Tegaderm CHG cost', 'GBP', const=6.21
 )
@@ -121,34 +122,29 @@ decision tree edges.
 ```{r expressions, echo=TRUE}
 # probabilities
 p.Dermatitis.S <- ExprModVar$new(
-  'P(dermatitis|standard dressing)', 'P', quote(n.dressings*r.Dermatitis)
+  'P(dermatitis|standard dressing)', 'P', 
+  rlang::quo(n.dressings*r.Dermatitis)
 )
 p.Dermatitis.T <- ExprModVar$new(
-  'P(dermatitis|Tegaderm)', 'P', quote(n.dressings*r.Dermatitis*rr.Dermatitis)
+  'P(dermatitis|Tegaderm)', 'P', 
+  rlang::quo(n.dressings*r.Dermatitis*rr.Dermatitis)
 )
 r.LSI.T <- ExprModVar$new(
-  'P(LSI|Tegaderm)', 'P', quote(r.LSI*hr.LSI)
+  'P(LSI|Tegaderm)', 'P', rlang::quo(r.LSI*hr.LSI)
 )
 p.CRBSI.S <- ExprModVar$new(
-  'P(CRBSI|standard dressing)', 'P',  quote(r.CRBSI*n.cathdays/1000)
+  'P(CRBSI|standard dressing)', 'P',  rlang::quo(r.CRBSI*n.cathdays/1000)
 )
 p.CRBSI.T <- ExprModVar$new(
-  'P(CRBSI|Tegaderm)', 'P', quote(r.CRBSI*n.cathdays*hr.CRBSI/1000)
+  'P(CRBSI|Tegaderm)', 'P', rlang::quo(r.CRBSI*n.cathdays*hr.CRBSI/1000)
+)
+p.NoComp.S <- ExprModVar$new("P(No comp|standard dressing)", "P",
+  rlang::quo(1-(p.Dermatitis.S+r.LSI+p.CRBSI.S))
+)
+p.NoComp.T <- ExprModVar$new("P(No comp|Tegaderm)", "P",
+  rlang::quo(1-(p.Dermatitis.T+r.LSI.T+p.CRBSI.T))
 )
 
-# costs to each branch
-c.S <- ExprModVar$new(
-  'Cost of standard dressing', 'GBP', quote(n.dressings*c.Standard)
-)
-c.T <- ExprModVar$new(
-  'Cost of Tegaderm', 'GBP', quote(n.dressings*c.Tegaderm)
-)
-c.Dermatitis.S <- ExprModVar$new("c(Dermatitis,Std)", "GBP", quote(c.Dermatitis+c.S))
-c.Dermatitis.T <- ExprModVar$new("c(Dermatitis,Teg)", "GBP", quote(c.Dermatitis+c.T))
-c.LSI.S <- ExprModVar$new("c(LSI,Std)", "GBP", quote(c.LSI+c.S))
-c.LSI.T <- ExprModVar$new("c(LSI,Teg)", "GBP", quote(c.LSI+c.T))
-c.CRBSI.S <- ExprModVar$new("c(CRBSI),Std)", "GBP", quote(c.CRBSI+c.S))
-c.CRBSI.T <- ExprModVar$new("c(CRBSI),Teg)", "GBP", quote(c.CRBSI+c.T))
 ```
 
 ## The decision tree
@@ -164,57 +160,36 @@ those incurred in that period, so the assumption of 7 days does not affect
 the `rdecision` implementation of the model.
 
 ```{r tree, echo=T}
-# Time horizon
+# create decision tree
 th <- as.difftime(7, units="days")
-
 # standard dressing branch
-state.S.Dermatitis <- State$new(
-  "Dermatitis (Standard Dressing)", cost=c.Dermatitis.S, interval=th
-)
-state.S.LSI <- State$new(
-  "Local site infection (Standard Dressing)", cost=c.LSI.S, interval=th
-)
-state.S.CRBSI <- State$new(
-  "CRBSI (Standard Dressing)", cost=c.CRBSI.S, interval=th
-)
-state.S.NoComp <- State$new(
-  "No complication (Standard Dressing)", cost=c.S, interval=th
-)
-
-chance.S <- ChanceNode$new(
-  children = list(state.S.Dermatitis, state.S.LSI, state.S.CRBSI, state.S.NoComp),
-  edgelabels = c('Dermatitis', 'Local site infection', 'CRBSI', 'No complication'),
-  costs = list(0, 0, 0, 0),
-  p = list(p.Dermatitis.S, r.LSI, p.CRBSI.S, NA)
-)
-
+t1 <- LeafNode$new("Dermatitis", interval=th)
+t2 <- LeafNode$new("LSI", interval=th)
+t3 <- LeafNode$new("CRBSI", interval=th)
+t4 <- LeafNode$new("No comp", interval=th)
+c1 <- ChanceNode$new()
+e1 <- Reaction$new(c1,t1,p=p.Dermatitis.S,cost=c.Dermatitis)
+e2 <- Reaction$new(c1,t2,p=r.LSI,cost=c.LSI)
+e3 <- Reaction$new(c1,t3,p=p.CRBSI.S,cost=c.CRBSI)
+e4 <- Reaction$new(c1,t4,p=p.NoComp.S,cost=0)
 # Tegaderm dressing branch
-state.T.Dermatitis <- State$new(
-  "Dermatitis (Tegaderm CHG)", cost=c.Dermatitis.T, interval=th
-)
-state.T.LSI <- State$new(
-  "Local site infection (Tegaderm CHG)", cost=c.LSI.T, interval=th
-)
-state.T.CRBSI <- State$new(
-  "CRBSI (Tegaderm CHG)", cost=c.CRBSI.T, interval=th
-)
-state.T.NoComp <- State$new(
-  "No complication (Tegaderm CHG)", cost=c.T, interval=th
-)
-
-chance.T <- ChanceNode$new(
-  children = list(state.T.Dermatitis, state.T.LSI, state.T.CRBSI, state.T.NoComp),
-  edgelabels = c('Dermatitis', 'Local site infection', 'CRBSI', 'No complication'),
-  costs = list(0, 0, 0, 0),
-  p = list(p.Dermatitis.T, r.LSI.T, p.CRBSI.T, NA)
-)
-
+t5 <- LeafNode$new("Dermatitis", interval=th)
+t6 <- LeafNode$new("LSI", interval=th)
+t7 <- LeafNode$new("CRBSI", interval=th)
+t8 <- LeafNode$new("No comp", interval=th)
+c2 <- ChanceNode$new()
+e5 <- Reaction$new(c2,t5,p=p.Dermatitis.T,cost=c.Dermatitis)
+e6 <- Reaction$new(c2,t6,p=r.LSI.T,cost=c.LSI)
+e7 <- Reaction$new(c2,t7,p=p.CRBSI.T,cost=c.CRBSI)
+e8 <- Reaction$new(c2,t8,p=p.NoComp.T,cost=0)
 # decision node
-d <- DecisionNode$new(
-  children = list(chance.S, chance.T),
-  edgelabels = c('Standard', 'Tegaderm'),
-  costs = list(0, 0)
-)
+d1 <- DecisionNode$new("d1")
+e9 <- Action$new(d1,c1,label="Standard",cost=c.Standard)
+e10 <- Action$new(d1,c2,label="Tegaderm",cost=c.Tegaderm)
+# create decision tree
+V <- list(d1,c1,c2,t1,t2,t3,t4,t5,t6,t7,t8)
+E <- list(e1,e2,e3,e4,e5,e6,e7,e8,e9,e10)
+DT <- DecisionTree$new(V,E)
 ```
 In the manufacturer's model, the uncertainties in the probabilities associated
 with the polytomous chance nodes were modelled as independent variables. This is
