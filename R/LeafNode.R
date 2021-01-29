@@ -63,7 +63,28 @@ LeafNode <- R6::R6Class(
       }
       private$node.interval <- interval
     },
-    
+
+    #' @description 
+    #' Find all the model variables of type ModVar that have been specified
+    #' as values associated with this LeafNode. Includes operands of these
+    #' \code{ModVar}s, if they are expressions.
+    #' @return A list of \code{ModVar}s.
+    modvars = function() {
+      # create lists of input variables and output ModVars
+      iv <- c(private$node.utility)
+      ov <- list()
+      sapply(iv, function(v) {
+        if (inherits(v, what="ModVar")) {
+          ov <<- c(ov, v)
+          if (inherits(v, what="ExprModVar")) {
+            ov <<- c(ov, v$operands())
+          } 
+        }
+      })
+      # return the unique list
+      return(unique(ov))
+    },
+
     #' @description 
     #' Return the incremental utility associated with being in the state for
     #' the interval.

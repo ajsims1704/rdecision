@@ -1,0 +1,457 @@
+% Options for packages loaded elsewhere
+\PassOptionsToPackage{unicode}{hyperref}
+\PassOptionsToPackage{hyphens}{url}
+%
+\documentclass[
+]{article}
+\usepackage{lmodern}
+\usepackage{amssymb,amsmath}
+\usepackage{ifxetex,ifluatex}
+\ifnum 0\ifxetex 1\fi\ifluatex 1\fi=0 % if pdftex
+  \usepackage[T1]{fontenc}
+  \usepackage[utf8]{inputenc}
+  \usepackage{textcomp} % provide euro and other symbols
+\else % if luatex or xetex
+  \usepackage{unicode-math}
+  \defaultfontfeatures{Scale=MatchLowercase}
+  \defaultfontfeatures[\rmfamily]{Ligatures=TeX,Scale=1}
+\fi
+% Use upquote if available, for straight quotes in verbatim environments
+\IfFileExists{upquote.sty}{\usepackage{upquote}}{}
+\IfFileExists{microtype.sty}{% use microtype if available
+  \usepackage[]{microtype}
+  \UseMicrotypeSet[protrusion]{basicmath} % disable protrusion for tt fonts
+}{}
+\makeatletter
+\@ifundefined{KOMAClassName}{% if non-KOMA class
+  \IfFileExists{parskip.sty}{%
+    \usepackage{parskip}
+  }{% else
+    \setlength{\parindent}{0pt}
+    \setlength{\parskip}{6pt plus 2pt minus 1pt}}
+}{% if KOMA class
+  \KOMAoptions{parskip=half}}
+\makeatother
+\usepackage{xcolor}
+\IfFileExists{xurl.sty}{\usepackage{xurl}}{} % add URL line breaks if available
+\IfFileExists{bookmark.sty}{\usepackage{bookmark}}{\usepackage{hyperref}}
+\hypersetup{
+  pdftitle={Tegaderm CHG IV Securement Dressing for Central Venous and Arterial Catheter Insertion Sites},
+  pdfauthor={Andrew J. Sims},
+  hidelinks,
+  pdfcreator={LaTeX via pandoc}}
+\urlstyle{same} % disable monospaced font for URLs
+\usepackage[margin=1in]{geometry}
+\usepackage{color}
+\usepackage{fancyvrb}
+\newcommand{\VerbBar}{|}
+\newcommand{\VERB}{\Verb[commandchars=\\\{\}]}
+\DefineVerbatimEnvironment{Highlighting}{Verbatim}{commandchars=\\\{\}}
+% Add ',fontsize=\small' for more characters per line
+\usepackage{framed}
+\definecolor{shadecolor}{RGB}{248,248,248}
+\newenvironment{Shaded}{\begin{snugshade}}{\end{snugshade}}
+\newcommand{\AlertTok}[1]{\textcolor[rgb]{0.94,0.16,0.16}{#1}}
+\newcommand{\AnnotationTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\newcommand{\AttributeTok}[1]{\textcolor[rgb]{0.77,0.63,0.00}{#1}}
+\newcommand{\BaseNTok}[1]{\textcolor[rgb]{0.00,0.00,0.81}{#1}}
+\newcommand{\BuiltInTok}[1]{#1}
+\newcommand{\CharTok}[1]{\textcolor[rgb]{0.31,0.60,0.02}{#1}}
+\newcommand{\CommentTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textit{#1}}}
+\newcommand{\CommentVarTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\newcommand{\ConstantTok}[1]{\textcolor[rgb]{0.00,0.00,0.00}{#1}}
+\newcommand{\ControlFlowTok}[1]{\textcolor[rgb]{0.13,0.29,0.53}{\textbf{#1}}}
+\newcommand{\DataTypeTok}[1]{\textcolor[rgb]{0.13,0.29,0.53}{#1}}
+\newcommand{\DecValTok}[1]{\textcolor[rgb]{0.00,0.00,0.81}{#1}}
+\newcommand{\DocumentationTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\newcommand{\ErrorTok}[1]{\textcolor[rgb]{0.64,0.00,0.00}{\textbf{#1}}}
+\newcommand{\ExtensionTok}[1]{#1}
+\newcommand{\FloatTok}[1]{\textcolor[rgb]{0.00,0.00,0.81}{#1}}
+\newcommand{\FunctionTok}[1]{\textcolor[rgb]{0.00,0.00,0.00}{#1}}
+\newcommand{\ImportTok}[1]{#1}
+\newcommand{\InformationTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\newcommand{\KeywordTok}[1]{\textcolor[rgb]{0.13,0.29,0.53}{\textbf{#1}}}
+\newcommand{\NormalTok}[1]{#1}
+\newcommand{\OperatorTok}[1]{\textcolor[rgb]{0.81,0.36,0.00}{\textbf{#1}}}
+\newcommand{\OtherTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{#1}}
+\newcommand{\PreprocessorTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textit{#1}}}
+\newcommand{\RegionMarkerTok}[1]{#1}
+\newcommand{\SpecialCharTok}[1]{\textcolor[rgb]{0.00,0.00,0.00}{#1}}
+\newcommand{\SpecialStringTok}[1]{\textcolor[rgb]{0.31,0.60,0.02}{#1}}
+\newcommand{\StringTok}[1]{\textcolor[rgb]{0.31,0.60,0.02}{#1}}
+\newcommand{\VariableTok}[1]{\textcolor[rgb]{0.00,0.00,0.00}{#1}}
+\newcommand{\VerbatimStringTok}[1]{\textcolor[rgb]{0.31,0.60,0.02}{#1}}
+\newcommand{\WarningTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\usepackage{longtable,booktabs}
+% Correct order of tables after \paragraph or \subparagraph
+\usepackage{etoolbox}
+\makeatletter
+\patchcmd\longtable{\par}{\if@noskipsec\mbox{}\fi\par}{}{}
+\makeatother
+% Allow footnotes in longtable head/foot
+\IfFileExists{footnotehyper.sty}{\usepackage{footnotehyper}}{\usepackage{footnote}}
+\makesavenoteenv{longtable}
+\usepackage{graphicx,grffile}
+\makeatletter
+\def\maxwidth{\ifdim\Gin@nat@width>\linewidth\linewidth\else\Gin@nat@width\fi}
+\def\maxheight{\ifdim\Gin@nat@height>\textheight\textheight\else\Gin@nat@height\fi}
+\makeatother
+% Scale images if necessary, so that they will not overflow the page
+% margins by default, and it is still possible to overwrite the defaults
+% using explicit options in \includegraphics[width, height, ...]{}
+\setkeys{Gin}{width=\maxwidth,height=\maxheight,keepaspectratio}
+% Set default figure placement to htbp
+\makeatletter
+\def\fps@figure{htbp}
+\makeatother
+\setlength{\emergencystretch}{3em} % prevent overfull lines
+\providecommand{\tightlist}{%
+  \setlength{\itemsep}{0pt}\setlength{\parskip}{0pt}}
+\setcounter{secnumdepth}{-\maxdimen} % remove section numbering
+
+\title{Tegaderm CHG IV Securement Dressing for Central Venous and Arterial
+Catheter Insertion Sites}
+\usepackage{etoolbox}
+\makeatletter
+\providecommand{\subtitle}[1]{% add subtitle to \maketitle
+  \apptocmd{\@title}{\par {\large #1 \par}}{}{}
+}
+\makeatother
+\subtitle{A decision tree example with probabilistic sensitivity analysis}
+\author{Andrew J. Sims}
+\date{2021-01-29}
+
+\begin{document}
+\maketitle
+
+\hypertarget{introduction}{%
+\section{Introduction}\label{introduction}}
+
+This vignette is an example of modelling a decision tree using the
+\texttt{rdecision} package, with probabilistic sensitivity analysis. It
+is based on the model reported by Jenks \emph{et al} {[}1{]} in which a
+transparent dressing used to secure vascular catheters (Tegaderm CHG)
+was compared with a standard dressing.
+
+Two methods of evaluating the decision are presented. The first method
+constructs a decision tree and evaluates the costs associated with
+traversing each pathway through it. The second method is a direct
+calculation and summation of costs, without the need to construct a
+tree. Point estimates and probabilistic sensitivity analysis are
+conducted for both methods.
+
+\hypertarget{model-variables}{%
+\section{Model variables}\label{model-variables}}
+
+Thirteen variables were used in the model. The choice of variables,
+their distributions and their parameters are taken from table 3 of Jenks
+\emph{et al} {[}1{]}, with the following corrections:
+
+\begin{itemize}
+\tightlist
+\item
+  For variables with lognormal uncertainty, the manufacturer gave values
+  for the mean \(m\) and standard deviation \(s\) in log space. However,
+  their standard deviations were quoted as negative values. This was an
+  error, but had no effect on their results, because they sampled values
+  of \(\exp(m + sz)\), where \(z\) is a sample from a standard normal
+  distribution and is symmetrical about 0. For the variables with log
+  normal uncertainty given below, positive standard deviation
+  parameters, with the same absolute value, have been used as
+  hyperparameters of the log normal distributions. Also note that the
+  \emph{median} value on the natural scale of a random variable
+  distributed as \(logN(m,s)\), where \(\mu\) and \(\sigma\) are the
+  mean and standard deviation on the log scale, is \(e^\mu\); the mean
+  on the natural scale is slightly larger. For example, the hazard ratio
+  for CRBSI with Tegaderm versus standard dressing was modelled as
+  \(logN(-0.911,0.393)\), which has median 0.402 (the point estimate of
+  the ratio from the literature) and mean 0.434.
+\item
+  The relative risk for dermatitis was modelled as
+  \(logN(1.482,0.490)\).
+\item
+  The point estimate cost of CRBSI was £9900, not £9990, although the
+  parameters (198,50) are quoted correctly.
+\end{itemize}
+
+The 13 model variables were constructed as follows:
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{# clinical variables}
+\NormalTok{r.CRBSI <-}\StringTok{ }\NormalTok{NormModVar}\OperatorTok{$}\KeywordTok{new}\NormalTok{(}
+  \StringTok{'Baseline CRBSI rate'}\NormalTok{, }\StringTok{'/1000 catheter days'}\NormalTok{, }\DataTypeTok{mu=}\FloatTok{1.48}\NormalTok{, }\DataTypeTok{sigma=}\FloatTok{0.074}
+\NormalTok{)}
+\NormalTok{hr.CRBSI <-}\StringTok{ }\NormalTok{LogNormModVar}\OperatorTok{$}\KeywordTok{new}\NormalTok{(}
+  \StringTok{'Tegaderm CRBSI HR'}\NormalTok{, }\StringTok{'ratio'}\NormalTok{, }\DataTypeTok{p1=}\OperatorTok{-}\FloatTok{0.911}\NormalTok{, }\DataTypeTok{p2=}\FloatTok{0.393}
+\NormalTok{)}
+\NormalTok{r.LSI <-}\StringTok{ }\NormalTok{NormModVar}\OperatorTok{$}\KeywordTok{new}\NormalTok{(}
+  \StringTok{'Baseline LSI rate'}\NormalTok{, }\StringTok{'/patient'}\NormalTok{, }\DataTypeTok{mu=}\FloatTok{0.1}\NormalTok{, }\DataTypeTok{sigma=}\FloatTok{0.01}
+\NormalTok{)}
+\NormalTok{hr.LSI <-}\StringTok{ }\NormalTok{LogNormModVar}\OperatorTok{$}\KeywordTok{new}\NormalTok{(}
+  \StringTok{'Tegaderm LSI HR'}\NormalTok{, }\StringTok{'ratio'}\NormalTok{, }\DataTypeTok{p1=}\OperatorTok{-}\FloatTok{0.911}\NormalTok{, }\DataTypeTok{p2=}\FloatTok{0.393}
+\NormalTok{)}
+\NormalTok{r.Dermatitis <-}\StringTok{ }\NormalTok{NormModVar}\OperatorTok{$}\KeywordTok{new}\NormalTok{(}
+  \StringTok{'Baseline dermatitis risk'}\NormalTok{, }\StringTok{'/catheter'}\NormalTok{, }\DataTypeTok{mu=}\FloatTok{0.0026}\NormalTok{, }\DataTypeTok{sigma=}\FloatTok{0.00026}
+\NormalTok{)}
+\NormalTok{rr.Dermatitis <-}\StringTok{ }\NormalTok{LogNormModVar}\OperatorTok{$}\KeywordTok{new}\NormalTok{(}
+  \StringTok{'Tegaderm Dermatitis RR'}\NormalTok{, }\StringTok{'ratio'}\NormalTok{,  }\DataTypeTok{p1=}\FloatTok{1.482}\NormalTok{, }\DataTypeTok{p2=}\FloatTok{0.490}
+\NormalTok{)}
+
+\CommentTok{# cost variables}
+\NormalTok{c.CRBSI <-}\StringTok{ }\NormalTok{GammaModVar}\OperatorTok{$}\KeywordTok{new}\NormalTok{(}
+  \StringTok{'CRBSI cost'}\NormalTok{, }\StringTok{'GBP'}\NormalTok{, }\DataTypeTok{shape=}\FloatTok{198.0}\NormalTok{, }\DataTypeTok{scale=}\DecValTok{50}
+\NormalTok{)}
+\NormalTok{c.Dermatitis <-}\StringTok{ }\NormalTok{GammaModVar}\OperatorTok{$}\KeywordTok{new}\NormalTok{(}
+  \StringTok{'Dermatitis cost'}\NormalTok{, }\StringTok{'GBP'}\NormalTok{, }\DataTypeTok{shape=}\DecValTok{30}\NormalTok{, }\DataTypeTok{scale=}\DecValTok{5}
+\NormalTok{)}
+\NormalTok{c.LSI <-}\StringTok{ }\NormalTok{GammaModVar}\OperatorTok{$}\KeywordTok{new}\NormalTok{(}
+    \StringTok{'LSI cost'}\NormalTok{, }\StringTok{'GBP'}\NormalTok{, }\DataTypeTok{shape=}\DecValTok{50}\NormalTok{, }\DataTypeTok{scale=}\DecValTok{5}
+\NormalTok{  )}
+\NormalTok{c.Tegaderm <-}\StringTok{ }\NormalTok{ConstModVar}\OperatorTok{$}\KeywordTok{new}\NormalTok{(}
+  \StringTok{'Tegaderm CHG cost'}\NormalTok{, }\StringTok{'GBP'}\NormalTok{, }\DataTypeTok{const=}\FloatTok{6.21}
+\NormalTok{)}
+\NormalTok{c.Standard <-}\StringTok{ }\NormalTok{ConstModVar}\OperatorTok{$}\KeywordTok{new}\NormalTok{(}
+  \StringTok{'Standard dressing cost'}\NormalTok{, }\StringTok{'GBP'}\NormalTok{, }\DataTypeTok{const=}\FloatTok{1.34}
+\NormalTok{)}
+\NormalTok{n.cathdays <-}\StringTok{ }\NormalTok{NormModVar}\OperatorTok{$}\KeywordTok{new}\NormalTok{(}
+  \StringTok{'No. days with catheter'}\NormalTok{, }\StringTok{'days'}\NormalTok{, }\DataTypeTok{mu=}\DecValTok{10}\NormalTok{, }\DataTypeTok{sigma=}\DecValTok{2}
+\NormalTok{)}
+\NormalTok{n.dressings <-}\StringTok{ }\NormalTok{NormModVar}\OperatorTok{$}\KeywordTok{new}\NormalTok{(}
+  \StringTok{'No. dressings'}\NormalTok{, }\StringTok{'dressings'}\NormalTok{, }\DataTypeTok{mu=}\DecValTok{3}\NormalTok{, }\DataTypeTok{sigma=}\FloatTok{0.3}
+\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\hypertarget{the-decision-tree-approach}{%
+\section{The decision tree approach}\label{the-decision-tree-approach}}
+
+The decision problem may be solved by constructing a decision tree
+comprising decision nodes, chance nodes and leaf nodes. The general
+approach is to create expressions involving model variables, construct a
+tree, and then evaluate the decision for the base case and its
+uncertainty.
+
+\hypertarget{model-variable-expressions}{%
+\subsection{Model variable
+expressions}\label{model-variable-expressions}}
+
+Variables in the model may be included in the decision tree via
+mathematical expressions, which involve model variables and are
+themselves model variables. Forms of expression involving R's numerical
+functions and multiple model variables are supported, provided they
+conform to R syntax. The following code creates the model variable
+expressions to be used as values in the decision tree edges.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{# probabilities}
+\NormalTok{p.Dermatitis.S <-}\StringTok{ }\NormalTok{ExprModVar}\OperatorTok{$}\KeywordTok{new}\NormalTok{(}
+  \StringTok{'P(dermatitis|standard dressing)'}\NormalTok{, }\StringTok{'P'}\NormalTok{, }
+\NormalTok{  rlang}\OperatorTok{::}\KeywordTok{quo}\NormalTok{(n.dressings}\OperatorTok{*}\NormalTok{r.Dermatitis)}
+\NormalTok{)}
+\NormalTok{p.Dermatitis.T <-}\StringTok{ }\NormalTok{ExprModVar}\OperatorTok{$}\KeywordTok{new}\NormalTok{(}
+  \StringTok{'P(dermatitis|Tegaderm)'}\NormalTok{, }\StringTok{'P'}\NormalTok{, }
+\NormalTok{  rlang}\OperatorTok{::}\KeywordTok{quo}\NormalTok{(n.dressings}\OperatorTok{*}\NormalTok{r.Dermatitis}\OperatorTok{*}\NormalTok{rr.Dermatitis)}
+\NormalTok{)}
+\NormalTok{r.LSI.T <-}\StringTok{ }\NormalTok{ExprModVar}\OperatorTok{$}\KeywordTok{new}\NormalTok{(}
+  \StringTok{'P(LSI|Tegaderm)'}\NormalTok{, }\StringTok{'P'}\NormalTok{, rlang}\OperatorTok{::}\KeywordTok{quo}\NormalTok{(r.LSI}\OperatorTok{*}\NormalTok{hr.LSI)}
+\NormalTok{)}
+\NormalTok{p.CRBSI.S <-}\StringTok{ }\NormalTok{ExprModVar}\OperatorTok{$}\KeywordTok{new}\NormalTok{(}
+  \StringTok{'P(CRBSI|standard dressing)'}\NormalTok{, }\StringTok{'P'}\NormalTok{,  rlang}\OperatorTok{::}\KeywordTok{quo}\NormalTok{(r.CRBSI}\OperatorTok{*}\NormalTok{n.cathdays}\OperatorTok{/}\DecValTok{1000}\NormalTok{)}
+\NormalTok{)}
+\NormalTok{p.CRBSI.T <-}\StringTok{ }\NormalTok{ExprModVar}\OperatorTok{$}\KeywordTok{new}\NormalTok{(}
+  \StringTok{'P(CRBSI|Tegaderm)'}\NormalTok{, }\StringTok{'P'}\NormalTok{, rlang}\OperatorTok{::}\KeywordTok{quo}\NormalTok{(r.CRBSI}\OperatorTok{*}\NormalTok{n.cathdays}\OperatorTok{*}\NormalTok{hr.CRBSI}\OperatorTok{/}\DecValTok{1000}\NormalTok{)}
+\NormalTok{)}
+\NormalTok{p.NoComp.S <-}\StringTok{ }\NormalTok{ExprModVar}\OperatorTok{$}\KeywordTok{new}\NormalTok{(}\StringTok{"P(No comp|standard dressing)"}\NormalTok{, }\StringTok{"P"}\NormalTok{,}
+\NormalTok{  rlang}\OperatorTok{::}\KeywordTok{quo}\NormalTok{(}\DecValTok{1}\OperatorTok{-}\NormalTok{(p.Dermatitis.S}\OperatorTok{+}\NormalTok{r.LSI}\OperatorTok{+}\NormalTok{p.CRBSI.S))}
+\NormalTok{)}
+\NormalTok{p.NoComp.T <-}\StringTok{ }\NormalTok{ExprModVar}\OperatorTok{$}\KeywordTok{new}\NormalTok{(}\StringTok{"P(No comp|Tegaderm)"}\NormalTok{, }\StringTok{"P"}\NormalTok{,}
+\NormalTok{  rlang}\OperatorTok{::}\KeywordTok{quo}\NormalTok{(}\DecValTok{1}\OperatorTok{-}\NormalTok{(p.Dermatitis.T}\OperatorTok{+}\NormalTok{r.LSI.T}\OperatorTok{+}\NormalTok{p.CRBSI.T))}
+\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\hypertarget{the-decision-tree}{%
+\subsection{The decision tree}\label{the-decision-tree}}
+
+The following code constructs the decision tree based on figure 2 of
+Jenks \emph{et al} {[}1{]}. In the formulation used by
+\texttt{rdecision}, the decision tree is constructed from sets of
+decision, chance and leaf nodes and from edges (actions and reactions).
+Leaf nodes are synonymous with pathways in Briggs' terminology {[}2{]}).
+The time horizon is not stated explicitly in the model, and is assumed
+to be 7 days here. It was implied that the time horizon was ICU stay
+plus some follow-up, and the costs reflect those incurred in that
+period, so the assumption of 7 days does not affect the
+\texttt{rdecision} implementation of the model.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{# create decision tree}
+\NormalTok{th <-}\StringTok{ }\KeywordTok{as.difftime}\NormalTok{(}\DecValTok{7}\NormalTok{, }\DataTypeTok{units=}\StringTok{"days"}\NormalTok{)}
+\CommentTok{# standard dressing branch}
+\NormalTok{t1 <-}\StringTok{ }\NormalTok{LeafNode}\OperatorTok{$}\KeywordTok{new}\NormalTok{(}\StringTok{"Dermatitis"}\NormalTok{, }\DataTypeTok{interval=}\NormalTok{th)}
+\NormalTok{t2 <-}\StringTok{ }\NormalTok{LeafNode}\OperatorTok{$}\KeywordTok{new}\NormalTok{(}\StringTok{"LSI"}\NormalTok{, }\DataTypeTok{interval=}\NormalTok{th)}
+\NormalTok{t3 <-}\StringTok{ }\NormalTok{LeafNode}\OperatorTok{$}\KeywordTok{new}\NormalTok{(}\StringTok{"CRBSI"}\NormalTok{, }\DataTypeTok{interval=}\NormalTok{th)}
+\NormalTok{t4 <-}\StringTok{ }\NormalTok{LeafNode}\OperatorTok{$}\KeywordTok{new}\NormalTok{(}\StringTok{"No comp"}\NormalTok{, }\DataTypeTok{interval=}\NormalTok{th)}
+\NormalTok{c1 <-}\StringTok{ }\NormalTok{ChanceNode}\OperatorTok{$}\KeywordTok{new}\NormalTok{()}
+\NormalTok{e1 <-}\StringTok{ }\NormalTok{Reaction}\OperatorTok{$}\KeywordTok{new}\NormalTok{(c1,t1,}\DataTypeTok{p=}\NormalTok{p.Dermatitis.S,}\DataTypeTok{cost=}\NormalTok{c.Dermatitis)}
+\NormalTok{e2 <-}\StringTok{ }\NormalTok{Reaction}\OperatorTok{$}\KeywordTok{new}\NormalTok{(c1,t2,}\DataTypeTok{p=}\NormalTok{r.LSI,}\DataTypeTok{cost=}\NormalTok{c.LSI)}
+\NormalTok{e3 <-}\StringTok{ }\NormalTok{Reaction}\OperatorTok{$}\KeywordTok{new}\NormalTok{(c1,t3,}\DataTypeTok{p=}\NormalTok{p.CRBSI.S,}\DataTypeTok{cost=}\NormalTok{c.CRBSI)}
+\NormalTok{e4 <-}\StringTok{ }\NormalTok{Reaction}\OperatorTok{$}\KeywordTok{new}\NormalTok{(c1,t4,}\DataTypeTok{p=}\NormalTok{p.NoComp.S,}\DataTypeTok{cost=}\DecValTok{0}\NormalTok{)}
+\CommentTok{# Tegaderm dressing branch}
+\NormalTok{t5 <-}\StringTok{ }\NormalTok{LeafNode}\OperatorTok{$}\KeywordTok{new}\NormalTok{(}\StringTok{"Dermatitis"}\NormalTok{, }\DataTypeTok{interval=}\NormalTok{th)}
+\NormalTok{t6 <-}\StringTok{ }\NormalTok{LeafNode}\OperatorTok{$}\KeywordTok{new}\NormalTok{(}\StringTok{"LSI"}\NormalTok{, }\DataTypeTok{interval=}\NormalTok{th)}
+\NormalTok{t7 <-}\StringTok{ }\NormalTok{LeafNode}\OperatorTok{$}\KeywordTok{new}\NormalTok{(}\StringTok{"CRBSI"}\NormalTok{, }\DataTypeTok{interval=}\NormalTok{th)}
+\NormalTok{t8 <-}\StringTok{ }\NormalTok{LeafNode}\OperatorTok{$}\KeywordTok{new}\NormalTok{(}\StringTok{"No comp"}\NormalTok{, }\DataTypeTok{interval=}\NormalTok{th)}
+\NormalTok{c2 <-}\StringTok{ }\NormalTok{ChanceNode}\OperatorTok{$}\KeywordTok{new}\NormalTok{()}
+\NormalTok{e5 <-}\StringTok{ }\NormalTok{Reaction}\OperatorTok{$}\KeywordTok{new}\NormalTok{(c2,t5,}\DataTypeTok{p=}\NormalTok{p.Dermatitis.T,}\DataTypeTok{cost=}\NormalTok{c.Dermatitis)}
+\NormalTok{e6 <-}\StringTok{ }\NormalTok{Reaction}\OperatorTok{$}\KeywordTok{new}\NormalTok{(c2,t6,}\DataTypeTok{p=}\NormalTok{r.LSI.T,}\DataTypeTok{cost=}\NormalTok{c.LSI)}
+\NormalTok{e7 <-}\StringTok{ }\NormalTok{Reaction}\OperatorTok{$}\KeywordTok{new}\NormalTok{(c2,t7,}\DataTypeTok{p=}\NormalTok{p.CRBSI.T,}\DataTypeTok{cost=}\NormalTok{c.CRBSI)}
+\NormalTok{e8 <-}\StringTok{ }\NormalTok{Reaction}\OperatorTok{$}\KeywordTok{new}\NormalTok{(c2,t8,}\DataTypeTok{p=}\NormalTok{p.NoComp.T,}\DataTypeTok{cost=}\DecValTok{0}\NormalTok{)}
+\CommentTok{# decision node}
+\NormalTok{d1 <-}\StringTok{ }\NormalTok{DecisionNode}\OperatorTok{$}\KeywordTok{new}\NormalTok{(}\StringTok{"d1"}\NormalTok{)}
+\NormalTok{e9 <-}\StringTok{ }\NormalTok{Action}\OperatorTok{$}\KeywordTok{new}\NormalTok{(d1,c1,}\DataTypeTok{label=}\StringTok{"Standard"}\NormalTok{,}\DataTypeTok{cost=}\NormalTok{c.Standard)}
+\NormalTok{e10 <-}\StringTok{ }\NormalTok{Action}\OperatorTok{$}\KeywordTok{new}\NormalTok{(d1,c2,}\DataTypeTok{label=}\StringTok{"Tegaderm"}\NormalTok{,}\DataTypeTok{cost=}\NormalTok{c.Tegaderm)}
+\CommentTok{# create decision tree}
+\NormalTok{V <-}\StringTok{ }\KeywordTok{list}\NormalTok{(d1,c1,c2,t1,t2,t3,t4,t5,t6,t7,t8)}
+\NormalTok{E <-}\StringTok{ }\KeywordTok{list}\NormalTok{(e1,e2,e3,e4,e5,e6,e7,e8,e9,e10)}
+\NormalTok{DT <-}\StringTok{ }\NormalTok{DecisionTree}\OperatorTok{$}\KeywordTok{new}\NormalTok{(V,E)}
+\end{Highlighting}
+\end{Shaded}
+
+In the manufacturer's model, the uncertainties in the probabilities
+associated with the polytomous chance nodes were modelled as independent
+variables. This is not recommended because there is a chance that a
+particular run of the PSA will yield probabilities that are outside the
+range {[}0,1{]}. Representing the uncertain probabilities with draws
+from a Dirichlet distribution is preferred. Creating a
+\texttt{ChanceNode} with ModVars is permitted, but results in a warning
+being issued.
+
+\hypertarget{summary-of-the-model}{%
+\subsection{Summary of the model}\label{summary-of-the-model}}
+
+The model variables and their operands associated with a node and
+(optionally) its descendants can be tabulated using the method
+\texttt{tabulate\_modvars}. This returns a data frame describing each
+variable, its description, units and uncertainty distribution. Variables
+inheriting from type \texttt{ModVar} will be included in the tabulation;
+regular numeric values will not be listed. For extensive models,
+variables associated with separate branches of a tree can be tabulated
+separately by calling the method for different head nodes.
+
+The operands of model variables which are expressions of other model
+variables can be included in the tabulation via the
+\texttt{include.operands} parameter. This is recursive, allowing the
+complete structure of a model, \emph{i.e.} its model variables and the
+way in which they are combined, to be tabulated. In the Tegaderm model,
+the complete structure is as follows:
+
+\begin{longtable}[]{@{}ll@{}}
+\toprule
+Description & Distribution\tabularnewline
+\midrule
+\endhead
+Dermatitis cost & Ga(30,5)\tabularnewline
+P(dermatitis\textbar standard dressing) & n.dressings *
+r.Dermatitis\tabularnewline
+No.~dressings & N(3,0.3)\tabularnewline
+Baseline dermatitis risk & N(0.0026,0.00026)\tabularnewline
+LSI cost & Ga(50,5)\tabularnewline
+Baseline LSI rate & N(0.1,0.01)\tabularnewline
+CRBSI cost & Ga(198,50)\tabularnewline
+P(CRBSI\textbar standard dressing) & r.CRBSI *
+n.cathdays/1000\tabularnewline
+Baseline CRBSI rate & N(1.48,0.074)\tabularnewline
+No.~days with catheter & N(10,2)\tabularnewline
+P(No comp\textbar standard dressing) & 1 - (p.Dermatitis.S + r.LSI +
+p.CRBSI.S)\tabularnewline
+P(dermatitis\textbar Tegaderm) & n.dressings * r.Dermatitis *
+rr.Dermatitis\tabularnewline
+Tegaderm Dermatitis RR & LN1(1.482,0.49)\tabularnewline
+P(LSI\textbar Tegaderm) & r.LSI * hr.LSI\tabularnewline
+Tegaderm LSI HR & LN1(-0.911,0.393)\tabularnewline
+P(CRBSI\textbar Tegaderm) & r.CRBSI * n.cathdays *
+hr.CRBSI/1000\tabularnewline
+Tegaderm CRBSI HR & LN1(-0.911,0.393)\tabularnewline
+P(No comp\textbar Tegaderm) & 1 - (p.Dermatitis.T + r.LSI.T +
+p.CRBSI.T)\tabularnewline
+Standard dressing cost & Const(1.34)\tabularnewline
+Tegaderm CHG cost & Const(6.21)\tabularnewline
+\bottomrule
+\end{longtable}
+
+\hypertarget{point-estimates-and-distributions-of-model-variables}{%
+\subsection{Point estimates and distributions of model
+variables}\label{point-estimates-and-distributions-of-model-variables}}
+
+The point estimates, units and distributional properties are obtained
+from the same call, in the remaining columns. Rows with \texttt{Qhat}
+indicate that the quantiles have been estimated from simulation.
+
+\begin{longtable}[]{@{}llrlll@{}}
+\toprule
+Description & Units & Mean & Q2.5 & Q97.5 & Qhat\tabularnewline
+\midrule
+\endhead
+Dermatitis cost & GBP & 150.000 & NA & NA & NA\tabularnewline
+P(dermatitis\textbar standard dressing) & P & 0.008 & NA & NA &
+NA\tabularnewline
+No.~dressings & dressings & 3.000 & NA & NA & NA\tabularnewline
+Baseline dermatitis risk & /catheter & 0.003 & NA & NA &
+NA\tabularnewline
+LSI cost & GBP & 250.000 & NA & NA & NA\tabularnewline
+Baseline LSI rate & /patient & 0.100 & NA & NA & NA\tabularnewline
+CRBSI cost & GBP & 9900.000 & NA & NA & NA\tabularnewline
+P(CRBSI\textbar standard dressing) & P & 0.015 & NA & NA &
+NA\tabularnewline
+Baseline CRBSI rate & /1000 catheter days & 1.480 & NA & NA &
+NA\tabularnewline
+No.~days with catheter & days & 10.000 & NA & NA & NA\tabularnewline
+P(No comp\textbar standard dressing) & P & 0.877 & NA & NA &
+NA\tabularnewline
+P(dermatitis\textbar Tegaderm) & P & 0.039 & NA & NA & NA\tabularnewline
+Tegaderm Dermatitis RR & ratio & 4.963 & NA & NA & NA\tabularnewline
+P(LSI\textbar Tegaderm) & P & 0.043 & NA & NA & NA\tabularnewline
+Tegaderm LSI HR & ratio & 0.434 & NA & NA & NA\tabularnewline
+P(CRBSI\textbar Tegaderm) & P & 0.006 & NA & NA & NA\tabularnewline
+Tegaderm CRBSI HR & ratio & 0.434 & NA & NA & NA\tabularnewline
+P(No comp\textbar Tegaderm) & P & 0.911 & NA & NA & NA\tabularnewline
+Standard dressing cost & GBP & 1.340 & NA & NA & NA\tabularnewline
+Tegaderm CHG cost & GBP & 6.210 & NA & NA & NA\tabularnewline
+\bottomrule
+\end{longtable}
+
+\hypertarget{running-the-model}{%
+\subsection{Running the model}\label{running-the-model}}
+
+The following code runs a single model scenario, using the
+\texttt{evaluatePathways} method of a decision node to evaluate each
+pathway from the decision node. In the model there are eight possible
+root-to-leaf paths, each of which begins with the decision node and ends
+with a leaf node. For example, pathway
+\texttt{Dermatitis\ (Standard\ Dressing)} involves a traversal of nodes
+\texttt{d}, \texttt{chance.S}, and \texttt{leaf.S.Dermatitis}. The
+method \texttt{evaluateChoices} is similar, but aggregates the results
+by choice. The results of the scenario model, using the code from the
+previous section, yields the following table. This model did not
+consider utility, and the columns associated with utility are removed.
+
+\hypertarget{references}{%
+\section*{References}\label{references}}
+\addcontentsline{toc}{section}{References}
+
+\hypertarget{refs}{}
+\leavevmode\hypertarget{ref-jenks:2016a}{}%
+1 Jenks M, Craig JA, Green W \emph{et al.} Tegaderm CHG IV securement
+dressing for central venous and arterial catheter insertion sites: A
+NICE Medical Technology Guidance. \emph{Applied Health Economics and
+Health Policy} 2016;\textbf{14}:135--49.
+
+\leavevmode\hypertarget{ref-briggs:2002a}{}%
+2 Briggs A, Claxton K, Sculpher M. \emph{Decision modelling for health
+economic evaluation}. Oxford, UK:: Oxford University Press 2006.
+
+\end{document}

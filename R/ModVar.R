@@ -118,59 +118,6 @@ ModVar <- R6::R6Class(
       return(NA)
     },
     
-    #' #' @description 
-    #' #' Return a list of operands given in the expression used to form the
-    #' #' expression. Only relevant for objects of inherited type 
-    #' #' ExprModVar, but defined for the base class for convenience to
-    #' #' avoid type checking inside iterators.
-    #' #' @return A list of operands that are themselves ModVars. An empty list 
-    #' #' for non-expression model variables.
-    #' operands = function() {
-    #'   return(list())
-    #' },
-
-    #' @description 
-    #' Tabulate the model variable and optionally include its operands.
-    #' @param include.operands If TRUE include the operands of this model
-    #' variable in the table. Otherwise return a table with one row, 
-    #' describing this variable.
-    #' @return Data frame with one row per model variable, as follows:
-    #' \describe{
-    #' \item{Label}{The label given to the variable on creation.}
-    #' \item{Description}{As given at initialization.}
-    #' \item{Units}{Units of the variable.}
-    #' \item{Distribution}{Either the uncertainty distribution, if
-    #' it is a regular model variable, or the expression used to create it,
-    #' if it is an ExprModVar.}
-    #' \item{Mean}{Expected value.}
-    #' \item{SD}{Standard deviation.}
-    #' \item{Q2.5}{p=0.025 quantile.}
-    #' \item{Q97.5}{p=0.975 quantile.}
-    #' \item{Qhat}{Asterisk (*) if the quantiles and SD have been estimated
-    #' by random sampling.}
-    #' }
-#    tabulate = function(include.operands=FALSE) {
-#      # create list of model variables
-#      mvlist <- list(self)
-#      if (include.operands) {
-#        mvlist <- c(mvlist, self$getOperands())
-#      }
-#      # create a data frame of model variables
-#      DF <- data.frame(
-#        Label = sapply(mvlist, FUN=function(x){x$get_label()}),
-#        Description = sapply(mvlist, FUN=function(x){x$getDescription()}),
-#        Units = sapply(mvlist, FUN=function(x){x$getUnits()}),
-#        Distribution = sapply(mvlist, FUN=function(x){x$getDistribution()}),
-#        Mean = sapply(mvlist, FUN=function(x){x$getMean()}),
-#        SD = sapply(mvlist, FUN=function(x){x$getSD()}),
-#        Q2.5 = sapply(mvlist, FUN=function(x){x$getQuantile(probs=c(0.025))}),
-#        Q97.5 = sapply(mvlist, FUN=function(x){x$getQuantile(probs=c(0.975))}),
-#        Qhat = sapply(mvlist, FUN=function(exp){return(ifelse(exp$isExpression(),'*',''))})
-#      )
-#      # Return the table
-#      return(DF)
-#    },
-
     #' @description 
     #' Draw a random sample from the model variable. 
     #' @param n Number of samples to draw.

@@ -1,0 +1,210 @@
+## Model results
+
+### Base case
+```{r basecase-summary, echo=FALSE}
+PE.saving <- 0
+local({
+  SUM <- d$evaluateChoices(expected=T)
+  PE.saving <<- SUM$Cost[SUM$Choice=='Tegaderm'] - 
+                SUM$Cost[SUM$Choice=='Standard']
+})
+```
+The total cost for each choice can be calculated from the table above, or by calling
+`evaluateChoices`, giving a point estimate of the saving of `r round(-1*PE.saving,2)`
+GBP. This is close to the sponsor's point 
+estimate of cost saving estimated from their probabilistic sensitivity analysis,
+77.26 GBP, reported in Jenks *et al* [-@jenks:2016a].
+
+### Probabilistic senstivity analysis
+When they are created, each `ModVar` returns its expected value when its
+method `value()` is called. Calling the method `sample()` of a model variable causes
+it to sample from its uncertainty distribution, and return the sampled value when
+method `value()` is next called. The same sampled value will be returned until
+`sample()` is called again. Calling `sample(expected=T)` causes `value()` to 
+return the expected value of the variable. 
+
+Probabilistic sensitivity analysis
+is supported through the use of sampling model variables. In practice, because the
+model variables enter the model via nodes, the methods `evaluatePathways` and
+`evaluateChoices` provided by decision nodes provide a convenient interface for
+sampling from model variables. These methods, called with `expected=FALSE` cause
+each model variable associated with the decision node and its descendants to be
+sampled. For further convenience the method `evaluateChoices` permits replicates
+to be run (parameter `N`), making PSA straightforward. The first few runs of
+PSA are as follows:
+
+```{r PSA, echo=FALSE}
+local({
+  PSA <- d$evaluateChoices(expected=F, uncorrelate=F, N=1000)
+  RES <<- reshape(PSA, idvar='Run', timevar='Choice', direction='wide')
+  RES$Difference <<- RES$Cost.Tegaderm - RES$Cost.Standard
+  keep<- c('Run', 'Cost.Tegaderm', 'Cost.Standard', 'Difference')
+  knitr::kable(head(RES[,keep], n=10), digits=2, row.names=F)
+})
+```
+
+From PSA (1000 runs), the mean cost of treatment with Tegaderm 
+was `r round(mean(RES$Cost.Tegaderm),2)`,
+the mean cost of treatment with standard dressings was `r round(mean(RES$Cost.Standard),2)`
+and the mean cost saving was `r round(mean(RES$Difference),2)`. The 95% confidence 
+interval for cost saving was `r round(quantile(RES$Difference, probs=c(0.025)),2)` to 
+`r round(quantile(RES$Difference, probs=c(0.975)),2)`; the standard deviation of the
+cost saving was `r round(sd(RES$Difference),2)`.
+Overall, `r round(100*sum(RES$Difference<0)/nrow(RES),2)`% of runs found that Tegaderm
+was cost saving. These results replicate those reported by the manufucturer (saving
+of 77.26, 98.5% cases cost saving).
+
+```{r echo=F}
+rm(RES)
+```
+
+# An alternative, tree-free approach
+It is possible to solve the decision problem without first constructing a tree, by
+combining model variables directly. This is, in essence, the approach taken in
+many decision tree models constructed in Excel. 
+
+## Components of cost
+Each cost component is defined as an expression involving two or more
+of the 13 model inputs. In contrast to the tree approach, which computed
+the cost of traversing each pathway, this approach allows the costs of the
+technology and its comparator to be constructed as sub-totals.
+```{r treefree, echo=TRUE}
+# component costs, standard dressing
+CHG.S <- ExprModVar$new(
+  "Cost std dressing", "GBP", quote(n.dressings*c.Standard)
+)
+CRBSI.S <- ExprModVar$new(
+  "Cost CRBSI, std dressing", "GBP", quote(c.CRBSI*r.CRBSI*n.cathdays/1000)
+)
+LSI.S <- ExprModVar$new(
+  "Cost LSI, std dressing", "GBP", quote(c.LSI*r.LSI)
+)
+Dermatitis.S <- ExprModVar$new(
+  "Cost dermatitis, std dressing", "GBP", quote(r.Dermatitis*c.Dermatitis*n.dressings)
+)
+
+# component costs, Tegaderm
+CHG.T <- ExprModVar$new(
+  "Cost Tegaderm", "GBP", quote(n.dressings*c.Tegaderm)
+)
+CRBSI.T <- ExprModVar$new(
+  "Cost CRBSI, Tegaderm", "GBP", quote(c.CRBSI*r.CRBSI*hr.CRBSI*n.cathdays/1000)
+)
+LSI.T <- ExprModVar$new(
+  "Cost LSI, Tegaderm", "GBP", quote(c.LSI*r.LSI*hr.LSI)
+)
+Dermatitis.T <- ExprModVar$new(
+  "Cost dermatitis, Tegaderm", "GBP", 
+   quote(r.Dermatitis*c.Dermatitis*rr.Dermatitis*n.dressings)
+)
+
+# per-patient costs
+total.T <- ExprModVar$new(
+  'Treatment cost, Tegaderm', 'GBP', quote(CHG.T+CRBSI.T+LSI.T+Dermatitis.T)
+)
+total.S <- ExprModVar$new(
+  'Treatment cost, Standard', 'GBP', quote(CHG.S+CRBSI.S+LSI.S+Dermatitis.S)
+)
+c.diff <- ExprModVar$new(
+  'Cost difference', 'GBP', quote(total.T-total.S)
+)
+```
+
+## Base case
+The components of cost can be extracted by tabulating the model variables
+in the cost difference model variable, `c.diff` via method `tabulate`. In this
+case, only the rows containing component costs are displayed.
+```{r treefree-base, echo=FALSE}
+local({
+  MV <- c.diff$tabulate(include.operands=TRUE)
+  vars <- c('CHG.S', 'CRBSI.S', 'LSI.S', 'Dermatitis.S',
+            'CHG.T', 'CRBSI.T', 'LSI.T', 'Dermatitis.T',
+            'total.S', 'total.T', 'c.diff')
+  keep <- c('Description', 'Units', 'Mean', 'SD', 'Q2.5', 'Q97.5', 'Qhat')
+  knitr::kable(MV[MV$Label %in% vars, keep], row.names=F, 
+               format.args=list(scientific=F), digits=2
+               )
+})
+```
+
+The point estimate of saving is obtained directly from the expectation
+of the cost difference variable, `r round(-1*c.diff$getMean(),2)`. This
+is identical to the value obtained from the full tree. The table also
+indicates, by the quantiles of the cost difference, the approximate
+confidence interval of the saving.
+
+## Probabilistic sensitivity analysis
+```{r echo=FALSE}
+tf.psa <- c.diff$r(1000)
+```
+Each model variable provides a method, `r`, to make random draws from its
+uncertainty distribution. The PSA for the cost difference can therefore be 
+achieved by a single call to this method. From this, the mean cost saving
+was `r round(mean(tf.psa),2)`, the 
+95% confidence interval of the saving was `r round(quantile(tf.psa,0.025),2)` 
+to `r round(quantile(tf.psa,0.975),2)` 
+and `r round(100*sum(tf.psa<0)/length(tf.psa),2)`% of runs generated a cost saving.
+Within fluctuation error this is consistent with the manufacturer's reported
+saving of 77.26 with 98.5% of runs being cost saving.
+
+# A note on correlation of model variables
+Of the 13 input variables defined in the tree model, eight appear in both the
+main branches of the decision tree. If, in PSA, common variables are sampled
+from their uncertainty distributions once per run, rather being sampled for 
+each choice within a run, the costs of each arm will be correlated.
+
+```{r CORR, echo=FALSE}
+local({
+  PSA <- d$evaluateChoices(expected=F, uncorrelate=F, N=1000)
+  RES.C <<- reshape(PSA, idvar='Run', timevar='Choice', direction='wide')
+  RES.C$Difference <<- RES.C$Cost.Tegaderm - RES.C$Cost.Standard
+  R.C <<- cor(RES.C$Cost.Tegaderm, RES.C$Cost.Standard)
+
+  PSA <- d$evaluateChoices(expected=F, uncorrelate=T, N=1000)
+  RES.U <<- reshape(PSA, idvar='Run', timevar='Choice', direction='wide')
+  RES.U$Difference <<- RES.U$Cost.Tegaderm - RES.U$Cost.Standard
+  R.U <<- cor(RES.U$Cost.Tegaderm, RES.U$Cost.Standard)
+  
+  sd.T <<- sd(RES.C$Cost.Tegaderm)
+  sd.S <<- sd(RES.C$Cost.Standard)
+  cov.TS <<- cov(RES.C$Cost.Tegaderm, RES.C$Cost.Standard)  
+})
+```
+
+In the original Excel model submitted by the manufacturer, the model variables
+were sampled once per run. The tree model constructed using `rdecision` described
+in this vignette made the same assumption, and replicated the manufacturer's
+results. The correlation coefficient between 1000 samples from the cost of 
+treatment with Tegaderm and the cost with standard care was `r round(R.C, 3)`. This
+reflects the relatively high degree of correlation between the two choice
+arms of the model, because of the eight shared model variables.
+
+However, `rdecision` includes the facility to resample the model
+variables for each choice, within each run, by setting parameter
+`uncorrelate=TRUE` in method `evaluateChoices` of a decision node.
+With this option, the equivalent correlation coefficient is `r round(R.U, 3)`;
+*i.e.* they are uncorrelated within statistical fluctuation. This does not
+affect the point estimate, but does alter the distribution of the
+cost difference, which has standard deviation `r round(sd(RES.U$Difference),2)`
+and 95% confidence interval `r round(quantile(RES.U$Difference, probs=c(0.025)),2)` 
+to `r round(quantile(RES.U$Difference, probs=c(0.975)),2)`, 
+with `r round(100*sum(RES.U<0)/nrow(RES.U),1)`% of simulations being
+cost saving.
+The confidence interval includes zero, but the percentage of
+cost saving cases exceeds 95%; with correlation removed, the evidence
+for a cost saving is therefore marginal, given the input parameters.
+
+Finally, the variance of the cost of treatment with Tegaderm 
+is `r round(sd.T,2)`$^2$, the variance of the cost of treatment with
+standard care is `r round(sd.S,2)`$^2$ and the covariance with
+correlated model variables is `r round(cov.TS,2)`. Via the relation
+$Var(X-Y) = Var(X) + Var(Y) - 2Cov(X,Y)$, the variance of the
+cost difference with correlated model variables 
+is `r round(sqrt(sd.T^2 + sd.S^2 - 2*cov.TS),2)`$^2$ and with the
+uncorrelated model variables 
+is `r round(sqrt(sd.T^2 + sd.S^2),2)`$^2$, close to the observed values.
+
+```{r CORREND, echo=FALSE}
+rm(RES.C, RES.U, R.C, R.U, sd.T, sd.S, cov.TS)
+```
+

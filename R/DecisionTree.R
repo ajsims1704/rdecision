@@ -188,10 +188,83 @@ DecisionTree <- R6::R6Class(
           mv <<- c(mv, e$modvars())
         }
       })
+      # find the modvars in leaf nodes
+      sapply(private$V, function(v){
+        if (inherits(v, what=c("LeafNode"))) {
+          mv <<- c(mv, v$modvars())
+        }
+      })
       # return a unique list
       return(unique(mv))
     },
     
+    #' @description 
+    #' Tabulate the model variables.
+    #' @return Data frame with one row per model variable, as follows:
+    #' \describe{
+    #' \item{Label}{The label given to the variable on creation.}
+    #' \item{Description}{As given at initialization.}
+    #' \item{Units}{Units of the variable.}
+    #' \item{Distribution}{Either the uncertainty distribution, if
+    #' it is a regular model variable, or the expression used to create it,
+    #' if it is an ExprModVar.}
+    #' \item{Mean}{Expected value.}
+    #' \item{SD}{Standard deviation.}
+    #' \item{Q2.5}{p=0.025 quantile.}
+    #' \item{Q97.5}{p=0.975 quantile.}
+    #' \item{Qhat}{Asterisk (*) if the quantiles and SD have been estimated
+    #' by random sampling.}
+    #' }
+    modvar_table = function() {
+    # create list of model variables in this decision tree
+    mvlist <- self$modvars()
+      # create a data frame of model variables
+      DF <- data.frame(
+        Description = sapply(mvlist, FUN=function(x){
+          rv <- x$description()
+          return(rv)
+        }),
+        Units = sapply(mvlist, FUN=function(x){
+          rv <- x$units()
+          return(rv)
+        }),
+        Distribution = sapply(mvlist, FUN=function(x){
+          rv <- x$distribution()
+          return(rv)
+        }),
+        Mean = sapply(mvlist, FUN=function(x){
+          rv <- x$mean()
+          return(rv)
+        }),
+        Expectation = sapply(mvlist, FUN=function(x){
+          rv <- ifelse(x$is_expression(), x$mu_hat(), x$mean())
+          return(rv)
+        }),
+        SD = sapply(mvlist, FUN=function(x){
+          # rv <- ifelse(x$is_expression(), x$sigma_hat(), x$SD())
+          rv <- NA
+          return(rv)
+        }),
+        Q2.5 = sapply(mvlist, FUN=function(x){
+          #rv <- ifelse(x$is_expression(), x$q_hat(probs=c(0.025)), x$quantile(probs=c(0.025)))
+          rv <- NA
+          return(rv)
+        }),
+        Q97.5 = sapply(mvlist, FUN=function(x){
+          #rv <- ifelse(x_is_expression(), x$q_hat(probs=c(0.975)), x$quantile(probs=c(0.975)))
+          rv <- NA
+          return(rv)
+        }),
+        Qhat = sapply(mvlist, FUN=function(exp){
+          #rv <- ifelse(exp$is_expression(),'*','')
+          rv <- NA
+          return(rv)
+        })
+      )
+      # Return the table
+      return(DF)
+    },
+
     #' @description Find all the root to leaf paths traversable under 
     #' the specified strategy. A strategy is a unanimous prescription 
     #' of an action in each decision node. 
