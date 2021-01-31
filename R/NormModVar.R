@@ -76,7 +76,7 @@ NormModVar <- R6::R6Class(
     #' @param n Number of samples to draw.
     #' @return A sample drawn at random.
     r = function(n=1) {
-      rv <- rnorm(n, mean=private$mu, sd=private$sigma)
+      rv <- rnorm(n=n, mean=private$mu, sd=private$sigma)
       # return the samples
       return(rv)
     },

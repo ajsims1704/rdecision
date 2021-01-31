@@ -216,8 +216,11 @@ DecisionTree <- R6::R6Class(
     #' by random sampling.}
     #' }
     modvar_table = function() {
-    # create list of model variables in this decision tree
-    mvlist <- self$modvars()
+      # create list of model variables in this decision tree
+      mvlist <- self$modvars()
+#      sapply(mvlist, function(v) {
+#        print(v)  
+#      })
       # create a data frame of model variables
       DF <- data.frame(
         Description = sapply(mvlist, FUN=function(x){
@@ -237,12 +240,11 @@ DecisionTree <- R6::R6Class(
           return(rv)
         }),
         Expectation = sapply(mvlist, FUN=function(x){
-          rv <- ifelse(x$is_expression(), x$mu_hat(), x$mean())
+          rv <- ifelse(x$is_expression(), x$mean(), x$mean())
           return(rv)
         }),
         SD = sapply(mvlist, FUN=function(x){
-          # rv <- ifelse(x$is_expression(), x$sigma_hat(), x$SD())
-          rv <- NA
+          rv <- ifelse(x$is_expression(), x$SD(), x$SD())
           return(rv)
         }),
         Q2.5 = sapply(mvlist, FUN=function(x){
@@ -256,8 +258,7 @@ DecisionTree <- R6::R6Class(
           return(rv)
         }),
         Qhat = sapply(mvlist, FUN=function(exp){
-          #rv <- ifelse(exp$is_expression(),'*','')
-          rv <- NA
+          rv <- ifelse(exp$is_expression(),'*','')
           return(rv)
         })
       )

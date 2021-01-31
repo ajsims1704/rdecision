@@ -75,12 +75,12 @@ test_that("set and get function as expected", {
   x <- 2
   y <- NormModVar$new("y", "GBP", mu=0, sigma=1)
   z <- ExprModVar$new("z", "GBP", quo=rlang::quo(x*y))
-  expect_true(is.na(z$get()))
+  expect_false(is.na(z$get()))
   # check illegal input
   expect_error(z$set("red"), class="expected_not_logical")
   # check that set() is ignored for ExprModVar
   expect_silent(z$set())
-  expect_true(is.na(z$get()))
+  expect_equal(z$get(),0)
   # check that set() for operands affects get() for the expression
   y$set(TRUE)
   expect_equal(z$get(), 0, tolerance=0.01)
@@ -88,9 +88,9 @@ test_that("set and get function as expected", {
   for (i in 1:1000) {
     y$set()
     S[i] <- z$get() 
-  }  
-  expect_equal(mean(S), 0, tolerance=0.1)
-  expect_equal(sd(S), 2, tolerance=0.1)
+  } 
+  expect_equal(mean(S), 0, tolerance=0.2)
+  expect_equal(sd(S), 2, tolerance=0.2)
 })
 
 test_that("illegal sample sizes for estimating parameters are rejected", {
@@ -100,6 +100,7 @@ test_that("illegal sample sizes for estimating parameters are rejected", {
   expect_error(z$mu_hat("100"), class="nest_not_numeric")
   expect_error(z$mu_hat(3), class="nest_too_small")
   expect_error(z$mu_hat(999.5), class="nest_too_small")
+  expect_silent(z$mu_hat())
   expect_silent(z$mu_hat(10000))
   expect_error(z$sigma_hat("100"), class="nest_not_numeric")
   expect_error(z$sigma_hat(3), class="nest_too_small")

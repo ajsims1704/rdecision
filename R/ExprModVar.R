@@ -151,6 +151,8 @@ ExprModVar <- R6::R6Class(
         mv[[v]] <- str2lang(rep)
       }
       emod <- eval(substitute(substitute(e, env=mv), env=list(e=private$expr)))
+      #rlang::expr_print(emod)
+      #rlang::expr_print(n)
       # evaluate the expression
       assign("n", n, envir=private$env)
       S <- eval(emod, envir=private$env)
@@ -244,7 +246,7 @@ ExprModVar <- R6::R6Class(
         rlang::abort("Argument nest must not be less than 1000", class="nest_too_small")
       }
       # sample values from the variable
-      S <- self$r(nest)
+      S <- self$r(n=nest)
       return(mean(S))
     },
     
