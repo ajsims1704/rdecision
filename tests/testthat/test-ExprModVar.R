@@ -108,6 +108,14 @@ test_that("illegal sample sizes for estimating parameters are rejected", {
   expect_silent(z$sigma_hat(10000))
 })
 
+test_that("scoping rules for mu_hat in nested expressions are obeyed", {
+  x <- NormModVar$new("SN", "m", mu=0, sigma=1)
+  y <- ExprModVar$new("SN2","m", rlang::quo(2*x))
+  b <- ExprModVar$new("z","m^2",rlang::quo(x*y))
+  b$mu_hat()
+  expect_silent(b$mu_hat())
+})
+
 test_that("expression chi square from SN is correct", {
   # x = N(0,1), y = x^2 = Chisq(k=1)
   x <- NormModVar$new("SN", "m", mu=0, sigma=1)

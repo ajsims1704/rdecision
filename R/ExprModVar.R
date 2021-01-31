@@ -138,7 +138,7 @@ ExprModVar <- R6::R6Class(
     r = function(n=1) {
       # build expression with each variable replaced with $r(n)
       mv <- list()
-      method <- "r(n)"
+      method <- paste0("r(", n, ")")
       # substitute model variable names with call to r(n) method
       for (v in all.vars(private$expr)) {
         # v is a string containing a variable name
@@ -154,9 +154,10 @@ ExprModVar <- R6::R6Class(
       #rlang::expr_print(emod)
       #rlang::expr_print(n)
       # evaluate the expression
-      assign("n", n, envir=private$env)
+      #assign("n", n, pos=private$env)
       S <- eval(emod, envir=private$env)
-      rm("n", envir=private$env)
+      #S <- rnorm(n)
+      #rm("n", pos=private$env)
       # return the sample
       return(S)
     },
