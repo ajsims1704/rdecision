@@ -198,21 +198,24 @@ test_that("redecision replicates Jenks et al, 2016", {
   r.CRBSI <- NormModVar$new(
     'Baseline CRBSI rate', '/1000 catheter days', mu=1.48, sigma=0.074
   )
-  hr.CRBSI <- LogNormModVar$new(
-    'Tegaderm CRBSI HR', 'ratio', p1=-0.911, p2=0.393
-  )
+#  hr.CRBSI <- LogNormModVar$new(
+#    'Tegaderm CRBSI HR', 'ratio', p1=-1.009, p2=0.443
+#  )
+  hr.CRBSI <- ConstModVar$new("Tegaderm CRBSI HR", "ratio", 1.0)
   r.LSI <- NormModVar$new(
     'Baseline LSI rate', '/patient', mu=0.1, sigma=0.01 
   )
-  hr.LSI <- LogNormModVar$new(
-    'Tegaderm LSI HR', 'ratio', p1=-0.911, p2=0.393
-  )
+#  hr.LSI <- LogNormModVar$new(
+#    'Tegaderm LSI HR', 'ratio', p1=-1.009, p2=0.443
+#  )
+  hr.LSI <- ConstModVar$new("Tegaderm LSI HR", "ratio", 1.0)
   r.Dermatitis <- NormModVar$new(
     'Baseline dermatitis risk', '/catheter', mu=0.0026, sigma=0.00026
   )
-  rr.Dermatitis <- LogNormModVar$new(
-    'Tegaderm Dermatitis RR', 'ratio',  p1=1.482, p2=0.490
-  )
+  # rr.Dermatitis <- LogNormModVar$new(
+  #   "Tegaderm Dermatitis RR", 'ratio',  p1=1.383, p2=0.443
+  # )
+  rr.Dermatitis <- ConstModVar$new("Tegaderm Dermatitis RR", 'ratio', 1.0)
 
   # cost variables
   c.CRBSI <- GammaModVar$new(
@@ -296,27 +299,21 @@ test_that("redecision replicates Jenks et al, 2016", {
   # check the model variables
   mv <- DT$modvars()
   expect_equal(length(mv), 20)
-  #MVT <- DT$modvar_table()
-  #expect_equal(nrow(MVT), 20)
-  #print(MVT)
+  MVT <- DT$modvar_table()
+  expect_equal(nrow(MVT), 20)
+  expect_equal(sum(MVT$Est),7)
+  print(MVT)
 
-  # check mu_hat
-  expect_silent(p.Dermatitis.S$mu_hat())
-  expect_silent(p.Dermatitis.T$mu_hat())
-  expect_silent(r.LSI.T$mu_hat())
-  expect_silent(p.CRBSI.S$mu_hat())
-  expect_silent(p.CRBSI.T$mu_hat())
-  expect_silent(p.NoComp.S$mu_hat())
-#  expect_silent(p.NoComp.T$mu_hat())
-  
   # evaluate the tree (base case)
-  #E <- DT$evaluate()
-  #print(E)
+  E <- DT$evaluate()
+  print(E)
   # PSA
-  #PSA <- DT$evaluate(expected=FALSE,N=100)
-  #RES <<- reshape(PSA, idvar='Run', timevar='d1', direction='wide')
-  #RES$Difference <<- RES$Cost.Standard - RES$Cost.Tegaderm
-  #print(mean(RES$Difference))
-  #print(RES)
+  PSA <- DT$evaluate(expected=FALSE,N=100)
+  RES <<- reshape(PSA, idvar='Run', timevar='d1', direction='wide')
+  RES$Difference <<- RES$Cost.Standard - RES$Cost.Tegaderm
+  print(mean(RES$Difference))
+  print(mean(RES$Cost.Standard))
+  print(mean(RES$Cost.Tegaderm))
+#  print(RES)
 
 })

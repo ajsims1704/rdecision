@@ -81,9 +81,10 @@ ConstModVar <- R6::R6Class(
     
     #' @description 
     #' Return a random sample from the distribution. 
+    #' @param n Number of samples to draw.
     #' @return Constant value as a numeric value.
-    r = function() {
-      return(private$val)
+    r = function(n=1) {
+      return(rep(private$val, times=n))
     },
     
     #' @description 

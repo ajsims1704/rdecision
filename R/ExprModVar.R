@@ -151,13 +151,8 @@ ExprModVar <- R6::R6Class(
         mv[[v]] <- str2lang(rep)
       }
       emod <- eval(substitute(substitute(e, env=mv), env=list(e=private$expr)))
-      #rlang::expr_print(emod)
-      #rlang::expr_print(n)
       # evaluate the expression
-      #assign("n", n, pos=private$env)
       S <- eval(emod, envir=private$env)
-      #S <- rnorm(n)
-      #rm("n", pos=private$env)
       # return the sample
       return(S)
     },

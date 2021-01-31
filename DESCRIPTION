@@ -19,6 +19,7 @@ Imports:
   R6,
   rlang (>= 0.4.2),
   grid,
+  pander,
   stats,
   utils
 Suggests:

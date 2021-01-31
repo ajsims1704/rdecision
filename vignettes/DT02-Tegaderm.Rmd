@@ -19,9 +19,10 @@ knitr::opts_chunk$set(
 )
 ```
 
-```{r setup, echo=F}
-library('rdecision')
+```{r setup, include=FALSE, echo=FALSE}
+library("rdecision")
 library("rlang")
+library("pander")
 ```
 
 # Introduction
@@ -66,19 +67,19 @@ r.CRBSI <- NormModVar$new(
   'Baseline CRBSI rate', '/1000 catheter days', mu=1.48, sigma=0.074
 )
 hr.CRBSI <- LogNormModVar$new(
-  'Tegaderm CRBSI HR', 'ratio', p1=-0.911, p2=0.393
+  "Tegaderm CRBSI HR", 'ratio', p1=-1.009, p2=0.443
 )
 r.LSI <- NormModVar$new(
   'Baseline LSI rate', '/patient', mu=0.1, sigma=0.01
 )
 hr.LSI <- LogNormModVar$new(
-  'Tegaderm LSI HR', 'ratio', p1=-0.911, p2=0.393
+  "Tegaderm LSI HR", "ratio", p1=-1.009, p2=0.443
 )
 r.Dermatitis <- NormModVar$new(
   'Baseline dermatitis risk', '/catheter', mu=0.0026, sigma=0.00026
 )
 rr.Dermatitis <- LogNormModVar$new(
-  'Tegaderm Dermatitis RR', 'ratio',  p1=1.482, p2=0.490
+  'Tegaderm Dermatitis RR', 'ratio',  p1=1.383, p2=0.443
 )
 
 # cost variables
@@ -104,6 +105,13 @@ n.dressings <- NormModVar$new(
   'No. dressings', 'dressings', mu=3, sigma=0.3
 )
 ```
+
+The lognormal parameters for variables `hr.CRBSI` and `hr.LSI` differ from those
+provided in Table 3 of Jenks *et al*, which were asumed to be in error because
+the $\alpha$ and $\beta$ coefficients provided do not give rise to the quoted
+mean value or confidence intervals for any known parametrization of the log
+normal distribtion, and were estimated - for this vignette - by fitting to 
+the required mean and 95% CI as closely as possible.
 
 # The decision tree approach
 The decision problem may be solved by constructing a decision tree
@@ -219,7 +227,7 @@ to be tabulated. In the Tegaderm model, the complete structure is as follows:
 local({
   DF <- DT$modvar_table()
   keep <- c("Description", "Distribution")
-  knitr::kable(DF[,keep], row.names=F, format.args=list(scientific=F), digits=3)
+  pander::pander(DF[,keep], row.names=F, digits=3, justify="left")
 })
 ```
 
@@ -231,8 +239,8 @@ quantiles have been estimated from simulation.
 ```{r modelinputs-pe, echo=FALSE}
 local({
   DF <- DT$modvar_table()
-  keep <- c("Description", "Units", "Mean", "Q2.5", "Q97.5", "Qhat")
-  knitr::kable(DF[,keep], row.names=F, format.args=list(scientific=F), digits=3)
+  keep <- c("Description", "Units", "Mean", "Q2.5", "Q97.5")
+  pander::pander(DF[,keep], row.names=F, digits=3, justify="left")
 })
 ```
 

@@ -208,19 +208,22 @@ DecisionTree <- R6::R6Class(
     #' \item{Distribution}{Either the uncertainty distribution, if
     #' it is a regular model variable, or the expression used to create it,
     #' if it is an ExprModVar.}
-    #' \item{Mean}{Expected value.}
-    #' \item{SD}{Standard deviation.}
-    #' \item{Q2.5}{p=0.025 quantile.}
-    #' \item{Q97.5}{p=0.975 quantile.}
-    #' \item{Qhat}{Asterisk (*) if the quantiles and SD have been estimated
-    #' by random sampling.}
+    #' \item{Mean}{Mean; calculated from means of operands if
+    #' an expression.}
+    #' \item{E}{Expectation; estimated from random sample if expression, 
+    #' mean otherwise.}
+    #' \item{SD}{Standard deviation; estimated from random sample if
+    #' expression, exact value otherwise.}
+    #' \item{Q2.5}{p=0.025 quantile; estimated from random sample if
+    #' expression, exact value otherwise.}
+    #' \item{Q97.5}{p=0.975 quantile; estimated from random sample if
+    #' expression, exact value otherwise.}
+    #' \item{Est}{TRUE if the quantiles and SD have been estimated by 
+    #' random sampling.}
     #' }
     modvar_table = function() {
       # create list of model variables in this decision tree
       mvlist <- self$modvars()
-#      sapply(mvlist, function(v) {
-#        print(v)  
-#      })
       # create a data frame of model variables
       DF <- data.frame(
         Description = sapply(mvlist, FUN=function(x){
@@ -239,26 +242,24 @@ DecisionTree <- R6::R6Class(
           rv <- x$mean()
           return(rv)
         }),
-        Expectation = sapply(mvlist, FUN=function(x){
-          rv <- ifelse(x$is_expression(), x$mean(), x$mean())
+        E = sapply(mvlist, FUN=function(x){
+          rv <- ifelse(x$is_expression(), x$mu_hat(), x$mean())
           return(rv)
         }),
         SD = sapply(mvlist, FUN=function(x){
-          rv <- ifelse(x$is_expression(), x$SD(), x$SD())
+          rv <- ifelse(x$is_expression(), x$sigma_hat(), x$SD())
           return(rv)
         }),
         Q2.5 = sapply(mvlist, FUN=function(x){
-          #rv <- ifelse(x$is_expression(), x$q_hat(probs=c(0.025)), x$quantile(probs=c(0.025)))
-          rv <- NA
+          rv <- ifelse(x$is_expression(), x$q_hat(probs=c(0.025)), x$quantile(probs=c(0.025)))
           return(rv)
         }),
         Q97.5 = sapply(mvlist, FUN=function(x){
-          #rv <- ifelse(x_is_expression(), x$q_hat(probs=c(0.975)), x$quantile(probs=c(0.975)))
-          rv <- NA
+          rv <- ifelse(x$is_expression(), x$q_hat(probs=c(0.975)), x$quantile(probs=c(0.975)))
           return(rv)
         }),
-        Qhat = sapply(mvlist, FUN=function(exp){
-          rv <- ifelse(exp$is_expression(),'*','')
+        Est = sapply(mvlist, FUN=function(exp){
+          rv <- ifelse(exp$is_expression(),TRUE,FALSE)
           return(rv)
         })
       )
