@@ -8,9 +8,8 @@
 An R6 class for a leaf node in a decision tree representing a clinical state.
 }
 \details{
-It represents a state of being, and is associated with an annual cost,
-an incremental utility and a benefit. It inherits from class Node so that it 
-can be part of a decision tree as a leaf node with no children.
+It represents a state of being, and is associated with an incremental
+utility.
 }
 \author{
 Andrew J. Sims \email{andrew.sims@newcastle.ac.uk}
@@ -22,9 +21,8 @@ Andrew J. Sims \email{andrew.sims@newcastle.ac.uk}
 \subsection{Public methods}{
 \itemize{
 \item \href{#method-new}{\code{LeafNode$new()}}
-\item \href{#method-cost}{\code{LeafNode$cost()}}
+\item \href{#method-modvars}{\code{LeafNode$modvars()}}
 \item \href{#method-utility}{\code{LeafNode$utility()}}
-\item \href{#method-benefit}{\code{LeafNode$benefit()}}
 \item \href{#method-clone}{\code{LeafNode$clone()}}
 }
 }
@@ -43,10 +41,8 @@ Andrew J. Sims \email{andrew.sims@newcastle.ac.uk}
 Create a new \code{LeafNode} object; synonymous with a clinical outcome.
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{LeafNode$new(
-  name,
-  cost = 0,
+  label,
   utility = 1,
-  benefit = 0,
   interval = as.difftime(365.25, units = "days")
 )}\if{html}{\out{</div>}}
 }
@@ -54,45 +50,37 @@ Create a new \code{LeafNode} object; synonymous with a clinical outcome.
 \subsection{Arguments}{
 \if{html}{\out{<div class="arguments">}}
 \describe{
-\item{\code{name}}{Character string; a label for the state.}
-
-\item{\code{cost}}{The cost of being in the state over the interval.}
+\item{\code{label}}{Character string; a label for the state; must be
+defined because it is used in tabulations. The label is automatically converted
+to a syntactically valid (in R) name to ensure it can be used as a column
+name in a data frame.}
 
 \item{\code{utility}}{The incremental utility that a user associates with
 being in the health state (range -Inf to 1) for the interval. Intended
 for use with cost benefit analysis.}
 
-\item{\code{benefit}}{The financial benefit accruing from reaching the node.
-Intended for use with cost-benefit analysis. Normally only one of
-utility or benefit are set.}
-
-\item{\code{interval}}{The time interval, over which the \code{cost} and
-\code{utility} parameters apply, expressed as an R \code{difftime} object;
-default 1 year.}
+\item{\code{interval}}{The time interval over which the \code{utility} parameters
+apply, expressed as an R \code{difftime} object; default 1 year.}
 }
 \if{html}{\out{</div>}}
 }
 \subsection{Returns}{
 A new \code{LeafNode} object
-#' @description 
-#' Return the label of the state; the name of the clinical outcome.
-#' @return Name of the clinical outcome or state; character string.
-get_name = function() {
-  return(private$name)
-},
 }
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-cost"></a>}}
-\if{latex}{\out{\hypertarget{method-cost}{}}}
-\subsection{Method \code{cost()}}{
-Return the cost incurred by being in the state for the interval.
+\if{html}{\out{<a id="method-modvars"></a>}}
+\if{latex}{\out{\hypertarget{method-modvars}{}}}
+\subsection{Method \code{modvars()}}{
+Find all the model variables of type ModVar that have been specified
+as values associated with this LeafNode. Includes operands of these
+\code{ModVar}s, if they are expressions.
 \subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{LeafNode$cost()}\if{html}{\out{</div>}}
+\if{html}{\out{<div class="r">}}\preformatted{LeafNode$modvars()}\if{html}{\out{</div>}}
 }
 
 \subsection{Returns}{
-Cost, as a numeric value.
+A list of \code{ModVar}s.
 }
 }
 \if{html}{\out{<hr>}}
@@ -102,25 +90,19 @@ Cost, as a numeric value.
 Return the incremental utility associated with being in the state for
 the interval.
 \subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{LeafNode$utility()}\if{html}{\out{</div>}}
+\if{html}{\out{<div class="r">}}\preformatted{LeafNode$utility(expected)}\if{html}{\out{</div>}}
 }
 
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{expected}}{Parameter passed to the \code{value} method of the model
+variable used to define utility; ignored otherwise.}
+}
+\if{html}{\out{</div>}}
+}
 \subsection{Returns}{
 Incremental utility (numeric value).
-}
-}
-\if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-benefit"></a>}}
-\if{latex}{\out{\hypertarget{method-benefit}{}}}
-\subsection{Method \code{benefit()}}{
-Return the benefit (payoff) associated with being in the state for
-the interval.
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{LeafNode$benefit()}\if{html}{\out{</div>}}
-}
-
-\subsection{Returns}{
-Benefit (numeric value).
 }
 }
 \if{html}{\out{<hr>}}

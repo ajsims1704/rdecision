@@ -23,8 +23,6 @@ Andrew Sims \email{andrew.sims@newcastle.ac.uk}
 \subsection{Public methods}{
 \itemize{
 \item \href{#method-new}{\code{ChanceNode$new()}}
-\item \href{#method-get_p}{\code{ChanceNode$get_p()}}
-\item \href{#method-get_modvars}{\code{ChanceNode$get_modvars()}}
 \item \href{#method-clone}{\code{ChanceNode$clone()}}
 }
 }
@@ -42,86 +40,18 @@ Andrew Sims \email{andrew.sims@newcastle.ac.uk}
 \subsection{Method \code{new()}}{
 Create a new ChanceNode object
 \subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{ChanceNode$new(children, edgelabels, p, ptype = "auto")}\if{html}{\out{</div>}}
+\if{html}{\out{<div class="r">}}\preformatted{ChanceNode$new(label = "")}\if{html}{\out{</div>}}
 }
 
 \subsection{Arguments}{
 \if{html}{\out{<div class="arguments">}}
 \describe{
-\item{\code{children}}{a list of \eqn{k \ge 2} Nodes which will be the children
-of this node.}
-
-\item{\code{edgelabels}}{a list of \eqn{k} character strings to label each edge 
-(branch) leaving the `ChanceNode`, given in the same order as
-`children`.}
-
-\item{\code{p}}{a list of probabilities associated with \eqn{k} branches.
-       There are four possible configurations of the list 
-       based on the \code{ptype} argument.
-\describe{
-\item{'numeric'}{\eqn{k} numeric values; the simplest case in which the   
-probabilities are certain. Supplied values should add
-to unity and be given in the same order as `children`.}
-\item{'MV'}{At least one `ModVar` and exactly one
-`NA``, and the remainder either `numeric` or `ModVar`, given in the
-same order as `children`. The single NA will be replaced on evaluation of
-the model variables by a value to ensure the sum of probabilities
-is unity. This option is not recommended, because there is
-a chance that during sampling, individual branch probabilities
-may be less than zero, or that the sum of the sampled model variable
-expressions may exceed 1.}
-\item{'Beta'}{One `BetaModVar` and one NA. Used for \eqn{k=2}. The 
-element defined as NA will be replaced by one minus the sampled 
-value of the supplied beta distribution.}
-\item{'Dirichlet'}{One DirichletModVar, with \eqn{k} parameters,
-given in the same order as `children`.}
-\item{'auto'}{Infer which of the previous options applies based on
-the types of elements of p}
-}}
-
-\item{\code{ptype}}{a character string taking one of four possible
-values to define how the \code{p} argument is defined:
-'numeric', 'MV', 'Beta' or 'Dirichlet'.}
+\item{\code{label}}{An optional label for the chance node.}
 }
 \if{html}{\out{</div>}}
 }
 \subsection{Returns}{
 A new `ChanceNode` object
-}
-}
-\if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-get_p"></a>}}
-\if{latex}{\out{\hypertarget{method-get_p}{}}}
-\subsection{Method \code{get_p()}}{
-Function to return the conditional probability of the edge which links to
-the specified child node.
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{ChanceNode$get_p(childNode)}\if{html}{\out{</div>}}
-}
-
-\subsection{Arguments}{
-\if{html}{\out{<div class="arguments">}}
-\describe{
-\item{\code{childNode}}{child node to which to find probability of linking edge}
-}
-\if{html}{\out{</div>}}
-}
-\subsection{Returns}{
-Numerical value of probability.
-}
-}
-\if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-get_modvars"></a>}}
-\if{latex}{\out{\hypertarget{method-get_modvars}{}}}
-\subsection{Method \code{get_modvars()}}{
-Return the list of model variables associated with the node. The
-model variables may be associated with costs or probabilities.
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{ChanceNode$get_modvars()}\if{html}{\out{</div>}}
-}
-
-\subsection{Returns}{
-List of model variables.
 }
 }
 \if{html}{\out{<hr>}}

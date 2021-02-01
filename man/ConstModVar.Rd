@@ -25,28 +25,24 @@ Andrew Sims \email{andrew.sims@newcastle.ac.uk}
 \subsection{Public methods}{
 \itemize{
 \item \href{#method-new}{\code{ConstModVar$new()}}
-\item \href{#method-sample}{\code{ConstModVar$sample()}}
-\item \href{#method-getDistribution}{\code{ConstModVar$getDistribution()}}
-\item \href{#method-getMean}{\code{ConstModVar$getMean()}}
-\item \href{#method-getSD}{\code{ConstModVar$getSD()}}
-\item \href{#method-getQuantile}{\code{ConstModVar$getQuantile()}}
+\item \href{#method-is_probabilistic}{\code{ConstModVar$is_probabilistic()}}
+\item \href{#method-distribution}{\code{ConstModVar$distribution()}}
+\item \href{#method-mode}{\code{ConstModVar$mode()}}
+\item \href{#method-mean}{\code{ConstModVar$mean()}}
+\item \href{#method-r}{\code{ConstModVar$r()}}
+\item \href{#method-SD}{\code{ConstModVar$SD()}}
+\item \href{#method-quantile}{\code{ConstModVar$quantile()}}
 \item \href{#method-clone}{\code{ConstModVar$clone()}}
 }
 }
 \if{html}{
-\out{<details ><summary>Inherited methods</summary>}
+\out{<details open ><summary>Inherited methods</summary>}
 \itemize{
-\item \out{<span class="pkg-link" data-pkg="rdecision" data-topic="ModVar" data-id="get_environment">}\href{../../rdecision/html/ModVar.html#method-get_environment}{\code{rdecision::ModVar$get_environment()}}\out{</span>}
-\item \out{<span class="pkg-link" data-pkg="rdecision" data-topic="ModVar" data-id="get_label">}\href{../../rdecision/html/ModVar.html#method-get_label}{\code{rdecision::ModVar$get_label()}}\out{</span>}
-\item \out{<span class="pkg-link" data-pkg="rdecision" data-topic="ModVar" data-id="getDescription">}\href{../../rdecision/html/ModVar.html#method-getDescription}{\code{rdecision::ModVar$getDescription()}}\out{</span>}
-\item \out{<span class="pkg-link" data-pkg="rdecision" data-topic="ModVar" data-id="getOperands">}\href{../../rdecision/html/ModVar.html#method-getOperands}{\code{rdecision::ModVar$getOperands()}}\out{</span>}
-\item \out{<span class="pkg-link" data-pkg="rdecision" data-topic="ModVar" data-id="getUnits">}\href{../../rdecision/html/ModVar.html#method-getUnits}{\code{rdecision::ModVar$getUnits()}}\out{</span>}
-\item \out{<span class="pkg-link" data-pkg="rdecision" data-topic="ModVar" data-id="isExpression">}\href{../../rdecision/html/ModVar.html#method-isExpression}{\code{rdecision::ModVar$isExpression()}}\out{</span>}
-\item \out{<span class="pkg-link" data-pkg="rdecision" data-topic="ModVar" data-id="r">}\href{../../rdecision/html/ModVar.html#method-r}{\code{rdecision::ModVar$r()}}\out{</span>}
-\item \out{<span class="pkg-link" data-pkg="rdecision" data-topic="ModVar" data-id="set_label">}\href{../../rdecision/html/ModVar.html#method-set_label}{\code{rdecision::ModVar$set_label()}}\out{</span>}
-\item \out{<span class="pkg-link" data-pkg="rdecision" data-topic="ModVar" data-id="tabulate">}\href{../../rdecision/html/ModVar.html#method-tabulate}{\code{rdecision::ModVar$tabulate()}}\out{</span>}
-\item \out{<span class="pkg-link" data-pkg="rdecision" data-topic="ModVar" data-id="unset_label">}\href{../../rdecision/html/ModVar.html#method-unset_label}{\code{rdecision::ModVar$unset_label()}}\out{</span>}
-\item \out{<span class="pkg-link" data-pkg="rdecision" data-topic="ModVar" data-id="value">}\href{../../rdecision/html/ModVar.html#method-value}{\code{rdecision::ModVar$value()}}\out{</span>}
+\item \out{<span class="pkg-link" data-pkg="rdecision" data-topic="ModVar" data-id="description">}\href{../../rdecision/html/ModVar.html#method-description}{\code{rdecision::ModVar$description()}}\out{</span>}
+\item \out{<span class="pkg-link" data-pkg="rdecision" data-topic="ModVar" data-id="get">}\href{../../rdecision/html/ModVar.html#method-get}{\code{rdecision::ModVar$get()}}\out{</span>}
+\item \out{<span class="pkg-link" data-pkg="rdecision" data-topic="ModVar" data-id="is_expression">}\href{../../rdecision/html/ModVar.html#method-is_expression}{\code{rdecision::ModVar$is_expression()}}\out{</span>}
+\item \out{<span class="pkg-link" data-pkg="rdecision" data-topic="ModVar" data-id="set">}\href{../../rdecision/html/ModVar.html#method-set}{\code{rdecision::ModVar$set()}}\out{</span>}
+\item \out{<span class="pkg-link" data-pkg="rdecision" data-topic="ModVar" data-id="units">}\href{../../rdecision/html/ModVar.html#method-units}{\code{rdecision::ModVar$units()}}\out{</span>}
 }
 \out{</details>}
 }
@@ -79,32 +75,27 @@ A new ConstModVar object.
 }
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-sample"></a>}}
-\if{latex}{\out{\hypertarget{method-sample}{}}}
-\subsection{Method \code{sample()}}{
-Not applicable for a constant variable, no action is taken on sampling.
+\if{html}{\out{<a id="method-is_probabilistic"></a>}}
+\if{latex}{\out{\hypertarget{method-is_probabilistic}{}}}
+\subsection{Method \code{is_probabilistic()}}{
+Tests whether the model variable is probabilistic, i.e. a random
+variable that follows a distribution, or an expression involving
+random variables, some of which follow distributions.
 \subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{ConstModVar$sample(expected = F)}\if{html}{\out{</div>}}
+\if{html}{\out{<div class="r">}}\preformatted{ConstModVar$is_probabilistic()}\if{html}{\out{</div>}}
 }
 
-\subsection{Arguments}{
-\if{html}{\out{<div class="arguments">}}
-\describe{
-\item{\code{expected}}{Logical; ignored.}
-}
-\if{html}{\out{</div>}}
-}
 \subsection{Returns}{
-Updated ConstModVar object.
+TRUE if probabilistic
 }
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-getDistribution"></a>}}
-\if{latex}{\out{\hypertarget{method-getDistribution}{}}}
-\subsection{Method \code{getDistribution()}}{
+\if{html}{\out{<a id="method-distribution"></a>}}
+\if{latex}{\out{\hypertarget{method-distribution}{}}}
+\subsection{Method \code{distribution()}}{
 Accessor function for the name of the uncertainty distribution.
 \subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{ConstModVar$getDistribution()}\if{html}{\out{</div>}}
+\if{html}{\out{<div class="r">}}\preformatted{ConstModVar$distribution()}\if{html}{\out{</div>}}
 }
 
 \subsection{Returns}{
@@ -112,12 +103,25 @@ Distribution name as character string.
 }
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-getMean"></a>}}
-\if{latex}{\out{\hypertarget{method-getMean}{}}}
-\subsection{Method \code{getMean()}}{
+\if{html}{\out{<a id="method-mode"></a>}}
+\if{latex}{\out{\hypertarget{method-mode}{}}}
+\subsection{Method \code{mode()}}{
+Return the mode of the distribution.
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{ConstModVar$mode()}\if{html}{\out{</div>}}
+}
+
+\subsection{Returns}{
+Value of the constant.
+}
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-mean"></a>}}
+\if{latex}{\out{\hypertarget{method-mean}{}}}
+\subsection{Method \code{mean()}}{
 Return the expected value of the distribution.
 \subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{ConstModVar$getMean()}\if{html}{\out{</div>}}
+\if{html}{\out{<div class="r">}}\preformatted{ConstModVar$mean()}\if{html}{\out{</div>}}
 }
 
 \subsection{Returns}{
@@ -125,12 +129,32 @@ Expected value as a numeric value.
 }
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-getSD"></a>}}
-\if{latex}{\out{\hypertarget{method-getSD}{}}}
-\subsection{Method \code{getSD()}}{
+\if{html}{\out{<a id="method-r"></a>}}
+\if{latex}{\out{\hypertarget{method-r}{}}}
+\subsection{Method \code{r()}}{
+Return a random sample from the distribution.
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{ConstModVar$r(n = 1)}\if{html}{\out{</div>}}
+}
+
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{n}}{Number of samples to draw.}
+}
+\if{html}{\out{</div>}}
+}
+\subsection{Returns}{
+Constant value as a numeric value.
+}
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-SD"></a>}}
+\if{latex}{\out{\hypertarget{method-SD}{}}}
+\subsection{Method \code{SD()}}{
 Return the standard deviation of the distribution.
 \subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{ConstModVar$getSD()}\if{html}{\out{</div>}}
+\if{html}{\out{<div class="r">}}\preformatted{ConstModVar$SD()}\if{html}{\out{</div>}}
 }
 
 \subsection{Returns}{
@@ -138,13 +162,13 @@ Standard deviation as a numeric value
 }
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-getQuantile"></a>}}
-\if{latex}{\out{\hypertarget{method-getQuantile}{}}}
-\subsection{Method \code{getQuantile()}}{
+\if{html}{\out{<a id="method-quantile"></a>}}
+\if{latex}{\out{\hypertarget{method-quantile}{}}}
+\subsection{Method \code{quantile()}}{
 Quantiles of the uncertainty distribution; for a constant all
 quantiles are returned as the value of the constant.
 \subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{ConstModVar$getQuantile(probs)}\if{html}{\out{</div>}}
+\if{html}{\out{<div class="r">}}\preformatted{ConstModVar$quantile(probs)}\if{html}{\out{</div>}}
 }
 
 \subsection{Arguments}{

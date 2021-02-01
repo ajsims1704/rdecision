@@ -151,7 +151,56 @@ Digraph <- R6::R6Class(
       LL <- sapply(L$as_list(), function(l) {private$V[[l]]})
       return(LL)
     },
-    
+
+    #' @description 
+    #' Test whether the graph is connected. For digraphs this will
+    #' always return FALSE because "connected" is not defined. Function
+    #' \code{weakly_connected} calculates whether the underlying
+    #' graph is connected.
+    #' @return TRUE if connected, FALSE if not.
+    is_connected = function() {
+      return(FALSE)
+    },
+
+    #' @description 
+    #' Test whether the digraph is weakly connected, i.e. if the
+    #' underlying graph is connected.
+    #' @return TRUE if connected, FALSE if not.
+    is_weakly_connected = function() {
+      connected <- FALSE
+      if (self$order()==0) {
+        connected <- FALSE
+      } else if (self$order()==1) {
+        connected <- TRUE
+      } else {
+        # get the adjacency matrix
+        A <- super$adjacency_matrix(boolean=TRUE)
+        # D marks nodes as discovered
+        D <- vector(mode="logical", length=self$order())
+        # S is a stack of nodes being processed
+        S <- Stack$new()
+        # start with first vertex
+        S$push(1)
+        # while S is not empty, do
+        while (S$size()>0) {
+          s <- S$pop()
+          # if s is not labelled as discovered then
+          if (!D[s]) {
+            # label s as discovered
+            D[s] <- TRUE
+            # for all edges from s to n
+            for (n in which(A[s,], arr.ind=TRUE)) {
+              S$push(n)
+            }
+          }
+        }
+        if (all(D)) {
+          connected <- TRUE
+        }
+      }
+      return(connected)
+    },
+
     #' @description 
     #' Checks for the presence of a cycle in the graph by attempting to do 
     #' a topological sort. If the sort does not contain all vertexes, the
@@ -168,7 +217,7 @@ Digraph <- R6::R6Class(
     #' acyclic).
     #' @return TRUE if the underlying graph is a tree; FALSE if not.
     is_tree = function() {
-      return(super$is_connected() && super$is_acyclic())
+      return(self$is_weakly_connected() && super$is_acyclic())
     },
     
     #' @description 
@@ -184,10 +233,6 @@ Digraph <- R6::R6Class(
     #' single root and unique paths from the root).
     #' @return TRUE if the digraph is an arborescence; FALSE if not.
     is_arborescence = function() {
-      # the underlying graph must be a tree
-      if (!self$is_tree()) {
-        return(FALSE)
-      }
       # there must be one and only one root vertex
       u <- which(apply(private$B, MARGIN=1, function(r){!any(r>0)}),arr.ind=TRUE)
       if (length(u) != 1) {
@@ -207,6 +252,7 @@ Digraph <- R6::R6Class(
 
     #' @description
     #' Find the direct successors of a node. 
+    #' @param v The index vertex.
     #' @return A list of nodes or an empty list if the specified
     #' node has no successors.
     direct_successors = function(v) {
@@ -224,6 +270,7 @@ Digraph <- R6::R6Class(
       
     #' @description
     #' Find the direct predecessors of a node. 
+    #' @param v The index vertex.
     #' @return A list of nodes or an empty list if the specified
     #' node has no predecessors.
     direct_predecessors = function(v) {
@@ -291,7 +338,7 @@ Digraph <- R6::R6Class(
     #' @description 
     #' Construct the sequence of edges which joins the specified
     #' sequence of vertexes in this graph.
-    #' @param p A list of Nodes
+    #' @param P A list of Nodes
     #' @return A list of Edges
     walk = function(P) {
       # check vertexes and get index of each

@@ -18,13 +18,13 @@ Depends: R (>= 3.1.0)
 Imports:
   R6,
   rlang (>= 0.4.2),
-  grid,
-  pander,
   stats,
   utils
 Suggests:
     rmarkdown,
     knitr,
+    grid,
+    pander,
     testthat
 License: GPL-3
 LazyData: true

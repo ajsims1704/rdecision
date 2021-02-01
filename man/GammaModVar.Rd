@@ -10,13 +10,16 @@ An R6 class for a model variable with Gamma function uncertainty
 \details{
 A model variable for which the uncertainty in the point estimate can
 be modelled with a Gamma distribution. The hyperparameters of the
-distribution are the shape (`alpha`) and the scale (`beta`) of
-the uncertainty distribution. Note that this variable naming 
-convention follos Briggs et al; `beta` is more usually used to
-describe the rate parameter (reciprocal of scale.)
+distribution are the shape (`alpha`) and the rate (`beta`) of
+the uncertainty distribution. Note that this is the conventional
+parametrization used in Bayesian statistics; in econometrics the
+shape/scale (`k`/`theta`) parametrization is more common (and the one
+used in this implementation). Note, however, that although Briggs et al
+use the shape/scale formulation, they use `alpha`/`beta` as parameter
+names.
 }
 \author{
-Andrew J. Sims \email{andrew.sims5@nhs.net}
+Andrew J. Sims \email{andrew.sims@newcastle.ac.uk}
 }
 \section{Super class}{
 \code{\link[rdecision:ModVar]{rdecision::ModVar}} -> \code{GammaModVar}
@@ -25,28 +28,24 @@ Andrew J. Sims \email{andrew.sims5@nhs.net}
 \subsection{Public methods}{
 \itemize{
 \item \href{#method-new}{\code{GammaModVar$new()}}
-\item \href{#method-sample}{\code{GammaModVar$sample()}}
-\item \href{#method-getDistribution}{\code{GammaModVar$getDistribution()}}
-\item \href{#method-getMean}{\code{GammaModVar$getMean()}}
-\item \href{#method-getSD}{\code{GammaModVar$getSD()}}
-\item \href{#method-getQuantile}{\code{GammaModVar$getQuantile()}}
+\item \href{#method-is_probabilistic}{\code{GammaModVar$is_probabilistic()}}
+\item \href{#method-distribution}{\code{GammaModVar$distribution()}}
+\item \href{#method-mean}{\code{GammaModVar$mean()}}
+\item \href{#method-mode}{\code{GammaModVar$mode()}}
+\item \href{#method-SD}{\code{GammaModVar$SD()}}
+\item \href{#method-r}{\code{GammaModVar$r()}}
+\item \href{#method-quantile}{\code{GammaModVar$quantile()}}
 \item \href{#method-clone}{\code{GammaModVar$clone()}}
 }
 }
 \if{html}{
-\out{<details ><summary>Inherited methods</summary>}
+\out{<details open ><summary>Inherited methods</summary>}
 \itemize{
-\item \out{<span class="pkg-link" data-pkg="rdecision" data-topic="ModVar" data-id="get_environment">}\href{../../rdecision/html/ModVar.html#method-get_environment}{\code{rdecision::ModVar$get_environment()}}\out{</span>}
-\item \out{<span class="pkg-link" data-pkg="rdecision" data-topic="ModVar" data-id="get_label">}\href{../../rdecision/html/ModVar.html#method-get_label}{\code{rdecision::ModVar$get_label()}}\out{</span>}
-\item \out{<span class="pkg-link" data-pkg="rdecision" data-topic="ModVar" data-id="getDescription">}\href{../../rdecision/html/ModVar.html#method-getDescription}{\code{rdecision::ModVar$getDescription()}}\out{</span>}
-\item \out{<span class="pkg-link" data-pkg="rdecision" data-topic="ModVar" data-id="getOperands">}\href{../../rdecision/html/ModVar.html#method-getOperands}{\code{rdecision::ModVar$getOperands()}}\out{</span>}
-\item \out{<span class="pkg-link" data-pkg="rdecision" data-topic="ModVar" data-id="getUnits">}\href{../../rdecision/html/ModVar.html#method-getUnits}{\code{rdecision::ModVar$getUnits()}}\out{</span>}
-\item \out{<span class="pkg-link" data-pkg="rdecision" data-topic="ModVar" data-id="isExpression">}\href{../../rdecision/html/ModVar.html#method-isExpression}{\code{rdecision::ModVar$isExpression()}}\out{</span>}
-\item \out{<span class="pkg-link" data-pkg="rdecision" data-topic="ModVar" data-id="r">}\href{../../rdecision/html/ModVar.html#method-r}{\code{rdecision::ModVar$r()}}\out{</span>}
-\item \out{<span class="pkg-link" data-pkg="rdecision" data-topic="ModVar" data-id="set_label">}\href{../../rdecision/html/ModVar.html#method-set_label}{\code{rdecision::ModVar$set_label()}}\out{</span>}
-\item \out{<span class="pkg-link" data-pkg="rdecision" data-topic="ModVar" data-id="tabulate">}\href{../../rdecision/html/ModVar.html#method-tabulate}{\code{rdecision::ModVar$tabulate()}}\out{</span>}
-\item \out{<span class="pkg-link" data-pkg="rdecision" data-topic="ModVar" data-id="unset_label">}\href{../../rdecision/html/ModVar.html#method-unset_label}{\code{rdecision::ModVar$unset_label()}}\out{</span>}
-\item \out{<span class="pkg-link" data-pkg="rdecision" data-topic="ModVar" data-id="value">}\href{../../rdecision/html/ModVar.html#method-value}{\code{rdecision::ModVar$value()}}\out{</span>}
+\item \out{<span class="pkg-link" data-pkg="rdecision" data-topic="ModVar" data-id="description">}\href{../../rdecision/html/ModVar.html#method-description}{\code{rdecision::ModVar$description()}}\out{</span>}
+\item \out{<span class="pkg-link" data-pkg="rdecision" data-topic="ModVar" data-id="get">}\href{../../rdecision/html/ModVar.html#method-get}{\code{rdecision::ModVar$get()}}\out{</span>}
+\item \out{<span class="pkg-link" data-pkg="rdecision" data-topic="ModVar" data-id="is_expression">}\href{../../rdecision/html/ModVar.html#method-is_expression}{\code{rdecision::ModVar$is_expression()}}\out{</span>}
+\item \out{<span class="pkg-link" data-pkg="rdecision" data-topic="ModVar" data-id="set">}\href{../../rdecision/html/ModVar.html#method-set}{\code{rdecision::ModVar$set()}}\out{</span>}
+\item \out{<span class="pkg-link" data-pkg="rdecision" data-topic="ModVar" data-id="units">}\href{../../rdecision/html/ModVar.html#method-units}{\code{rdecision::ModVar$units()}}\out{</span>}
 }
 \out{</details>}
 }
@@ -56,7 +55,7 @@ Andrew J. Sims \email{andrew.sims5@nhs.net}
 \subsection{Method \code{new()}}{
 Create an object of class GammaModVar.
 \subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{GammaModVar$new(description, units, alpha, beta)}\if{html}{\out{</div>}}
+\if{html}{\out{<div class="r">}}\preformatted{GammaModVar$new(description, units, shape, scale)}\if{html}{\out{</div>}}
 }
 
 \subsection{Arguments}{
@@ -66,9 +65,9 @@ Create an object of class GammaModVar.
 
 \item{\code{units}}{Units of the variable, as character string.}
 
-\item{\code{alpha}}{shape parameter of the Gamma distribution.}
+\item{\code{shape}}{shape parameter of the Gamma distribution.}
 
-\item{\code{beta}}{scale parameter of the Gamma distribution.}
+\item{\code{scale}}{scale parameter of the Gamma distribution.}
 }
 \if{html}{\out{</div>}}
 }
@@ -77,36 +76,27 @@ An object of class GammaModVar.
 }
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-sample"></a>}}
-\if{latex}{\out{\hypertarget{method-sample}{}}}
-\subsection{Method \code{sample()}}{
-Set the value of the model variable from its uncertainty distribution.
-Nothing is returned; the sampled value is returned at the next
-call to `value()`.
+\if{html}{\out{<a id="method-is_probabilistic"></a>}}
+\if{latex}{\out{\hypertarget{method-is_probabilistic}{}}}
+\subsection{Method \code{is_probabilistic()}}{
+Tests whether the model variable is probabilistic, i.e. a random
+variable that follows a distribution, or an expression involving
+random variables, some of which follow distributions.
 \subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{GammaModVar$sample(expected = FALSE)}\if{html}{\out{</div>}}
+\if{html}{\out{<div class="r">}}\preformatted{GammaModVar$is_probabilistic()}\if{html}{\out{</div>}}
 }
 
-\subsection{Arguments}{
-\if{html}{\out{<div class="arguments">}}
-\describe{
-\item{\code{expected}}{Logical; if TRUE sets the value of the model variable
-returned at subsequent calls to `value()` to be equal to the 
-expectation of the variable. Default is FALSE.}
-}
-\if{html}{\out{</div>}}
-}
 \subsection{Returns}{
-Updated GammaModVar object.
+TRUE if probabilistic
 }
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-getDistribution"></a>}}
-\if{latex}{\out{\hypertarget{method-getDistribution}{}}}
-\subsection{Method \code{getDistribution()}}{
+\if{html}{\out{<a id="method-distribution"></a>}}
+\if{latex}{\out{\hypertarget{method-distribution}{}}}
+\subsection{Method \code{distribution()}}{
 Accessor function for the name of the uncertainty distribution.
 \subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{GammaModVar$getDistribution()}\if{html}{\out{</div>}}
+\if{html}{\out{<div class="r">}}\preformatted{GammaModVar$distribution()}\if{html}{\out{</div>}}
 }
 
 \subsection{Returns}{
@@ -114,12 +104,12 @@ Distribution name as character string.
 }
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-getMean"></a>}}
-\if{latex}{\out{\hypertarget{method-getMean}{}}}
-\subsection{Method \code{getMean()}}{
+\if{html}{\out{<a id="method-mean"></a>}}
+\if{latex}{\out{\hypertarget{method-mean}{}}}
+\subsection{Method \code{mean()}}{
 Return the expected value of the distribution.
 \subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{GammaModVar$getMean()}\if{html}{\out{</div>}}
+\if{html}{\out{<div class="r">}}\preformatted{GammaModVar$mean()}\if{html}{\out{</div>}}
 }
 
 \subsection{Returns}{
@@ -127,12 +117,25 @@ Expected value as a numeric value.
 }
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-getSD"></a>}}
-\if{latex}{\out{\hypertarget{method-getSD}{}}}
-\subsection{Method \code{getSD()}}{
+\if{html}{\out{<a id="method-mode"></a>}}
+\if{latex}{\out{\hypertarget{method-mode}{}}}
+\subsection{Method \code{mode()}}{
+Return the mode of the distribution (if shape >= 1)
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{GammaModVar$mode()}\if{html}{\out{</div>}}
+}
+
+\subsection{Returns}{
+mode as a numeric value.
+}
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-SD"></a>}}
+\if{latex}{\out{\hypertarget{method-SD}{}}}
+\subsection{Method \code{SD()}}{
 Return the standard deviation of the distribution.
 \subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{GammaModVar$getSD()}\if{html}{\out{</div>}}
+\if{html}{\out{<div class="r">}}\preformatted{GammaModVar$SD()}\if{html}{\out{</div>}}
 }
 
 \subsection{Returns}{
@@ -140,12 +143,33 @@ Standard deviation as a numeric value
 }
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-getQuantile"></a>}}
-\if{latex}{\out{\hypertarget{method-getQuantile}{}}}
-\subsection{Method \code{getQuantile()}}{
+\if{html}{\out{<a id="method-r"></a>}}
+\if{latex}{\out{\hypertarget{method-r}{}}}
+\subsection{Method \code{r()}}{
+Draw a random sample from the model variable. Normally accessed by a 
+call to value(what="r").
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{GammaModVar$r(n = 1)}\if{html}{\out{</div>}}
+}
+
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{n}}{Number of samples to draw.}
+}
+\if{html}{\out{</div>}}
+}
+\subsection{Returns}{
+Samples drawn at random.
+}
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-quantile"></a>}}
+\if{latex}{\out{\hypertarget{method-quantile}{}}}
+\subsection{Method \code{quantile()}}{
 Return the quantiles of the Gamma uncertainty distribution.
 \subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{GammaModVar$getQuantile(probs)}\if{html}{\out{</div>}}
+\if{html}{\out{<div class="r">}}\preformatted{GammaModVar$quantile(probs)}\if{html}{\out{</div>}}
 }
 
 \subsection{Arguments}{

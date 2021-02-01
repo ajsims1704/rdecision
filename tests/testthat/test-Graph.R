@@ -171,6 +171,14 @@ test_that("connected and non-connected graphs are identified", {
   e2 <- Edge$new(n3,n3)
   G <- Graph$new(V=list(n1,n2,n3), E=list(e1,e2))
   expect_false(G$is_connected())
+  #
+  n1 <- Node$new()
+  n2 <- Node$new()
+  n3 <- Node$new()
+  e1 <- Edge$new(n1,n2)
+  e2 <- Edge$new(n1,n3)
+  G <- Graph$new(V=list(n2,n3,n1), E=list(e1,e2))
+  expect_true(G$is_connected())
 })
 
 test_that("cyclic and acyclic graphs are identified", {

@@ -50,6 +50,15 @@ Push an item onto the stack.
 \if{html}{\out{<div class="r">}}\preformatted{Stack$push(x)}\if{html}{\out{</div>}}
 }
 
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{x}}{The item to push onto the top of the stack. It should be
+of the same class as items previously pushed on to the stack. It is not
+checked.}
+}
+\if{html}{\out{</div>}}
+}
 \subsection{Returns}{
 An updated Stack object
 }

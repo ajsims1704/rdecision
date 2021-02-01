@@ -41,6 +41,22 @@ test_that("order and size are correct", {
   expect_equal(G$size(), 0)
 })
 
+test_that("connectedness of underlying graph is correct", {
+  # three nodes and two edges
+  n1 <- Node$new()
+  n2 <- Node$new()
+  n3 <- Node$new()
+  e1 <- Arrow$new(n1,n2)
+  e2 <- Arrow$new(n1,n3)
+  G <- Digraph$new(V=list(n1,n2,n3), A=list(e1,e2))
+  expect_false(G$is_connected())
+  expect_true(G$is_weakly_connected())
+  # same, but specified in different order
+  G <- Digraph$new(V=list(n2,n3,n1), A=list(e1,e2))
+  expect_false(G$is_connected())
+  expect_true(G$is_weakly_connected())
+})
+
 # tests of adjacency and incidence matrix
 test_that("adjacency matrix has correct properties", {
   # empty graph
@@ -125,10 +141,17 @@ test_that("arborescences are detected", {
   e2 <- Arrow$new(n3,n1)
   G <- Digraph$new(V=list(n1,n2,n3), A=list(e1,e2))
   expect_false(G$is_arborescence())
-  # tree with zero roots
+  # tree with one root and 3 branches
   n4 <- Node$new()
   e1 <- Arrow$new(n2,n1)
   e2 <- Arrow$new(n2,n3)
+  e3 <- Arrow$new(n2,n4)
+  G <- Digraph$new(V=list(n1,n2,n3,n4), A=list(e1,e2,e3))
+  expect_true(G$is_arborescence())
+  # tree with two roots
+  n4 <- Node$new()
+  e1 <- Arrow$new(n1,n2)
+  e2 <- Arrow$new(n3,n2)
   e3 <- Arrow$new(n2,n4)
   G <- Digraph$new(V=list(n1,n2,n3,n4), A=list(e1,e2,e3))
   expect_false(G$is_arborescence())
@@ -242,7 +265,8 @@ test_that("rdecision solves New Scientist Puzzle 62", {
   G <- Digraph$new(V,E)
   # test graph properties
   expect_true(G$is_simple())
-  expect_true(G$is_connected())
+  expect_false(G$is_connected())
+  expect_true(G$is_weakly_connected())
   expect_false(G$is_tree())
   expect_false(G$is_polytree())
   expect_true(G$is_acyclic())

@@ -1,20 +1,15 @@
 # rdecision 1.0.0
 
 * First full release of the package.
+* Added graph theory classes. Decision trees and Markov models are
+  forms of graph.
 * Renamed ModelVariable as ModVar for compactness, and renamed its derived
   classes similarly.
-* Renamed 'LeafNode' to 'State'; now also the base class for MarkovStates.
-* In decision tree models, costs can no longer be associated with branches 
-  leaving DecisionNodes and ChanceNodes, only with States (LeafNodes). Although
-  this makes code to model trees slightly more lengthy, because expression
-  variables are needed for the cost associated with each state, it improves
-  consistency in the usage and meaning of state variables between decision
-  trees and Markov models.
-* Added test scripts for ChanceNode, DecisionNode, MarkovState, 
-  TransitionMatrix, CohortMarkovModel.
+* Added test harnesses for more classes.
 * Collected vignette citations to file references.bib and changed 
-  to *Scientific Reports* csl style.
-
+  to *BMJ* csl style.
+* Added extra graph theory and decision tree vignettes.  
+  
 # rdecision 0.1.7
 
 * Removed the label argument from ModelVariable. 

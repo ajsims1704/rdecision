@@ -21,7 +21,6 @@ Andrew J. Sims \email{andrew.sims@newcastle.ac.uk}
 \subsection{Public methods}{
 \itemize{
 \item \href{#method-new}{\code{DecisionNode$new()}}
-\item \href{#method-get_choices}{\code{DecisionNode$get_choices()}}
 \item \href{#method-clone}{\code{DecisionNode$clone()}}
 }
 }
@@ -39,35 +38,21 @@ Andrew J. Sims \email{andrew.sims@newcastle.ac.uk}
 \subsection{Method \code{new()}}{
 Create a new decision node.
 \subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{DecisionNode$new(children, choices)}\if{html}{\out{</div>}}
+\if{html}{\out{<div class="r">}}\preformatted{DecisionNode$new(label)}\if{html}{\out{</div>}}
 }
 
 \subsection{Arguments}{
 \if{html}{\out{<div class="arguments">}}
 \describe{
-\item{\code{children}}{A list of Nodes which are the children of this
-decision node.}
-
-\item{\code{choices}}{A list of character stings containing the labels
-of each choice associated with the decision.}
+\item{\code{label}}{A label for the node. Must be defined because the label is
+used in tabulation of strategies. The label is automatically converted
+to a syntactically valid (in R) name to ensure it can be used as a column
+name in a data frame.}
 }
 \if{html}{\out{</div>}}
 }
 \subsection{Returns}{
 A new DecisionNode object
-}
-}
-\if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-get_choices"></a>}}
-\if{latex}{\out{\hypertarget{method-get_choices}{}}}
-\subsection{Method \code{get_choices()}}{
-Return names of the choices associated with this node.
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{DecisionNode$get_choices()}\if{html}{\out{</div>}}
-}
-
-\subsection{Returns}{
-A vector of character strings.
 }
 }
 \if{html}{\out{<hr>}}

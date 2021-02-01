@@ -22,6 +22,10 @@ Andrew Sims \email{andrew.sims@newcastle.ac.uk}
 \subsection{Public methods}{
 \itemize{
 \item \href{#method-new}{\code{Arborescence$new()}}
+\item \href{#method-is_parent}{\code{Arborescence$is_parent()}}
+\item \href{#method-is_leaf}{\code{Arborescence$is_leaf()}}
+\item \href{#method-root}{\code{Arborescence$root()}}
+\item \href{#method-root_to_leaf_paths}{\code{Arborescence$root_to_leaf_paths()}}
 \item \href{#method-clone}{\code{Arborescence$clone()}}
 }
 }
@@ -33,7 +37,6 @@ Andrew Sims \email{andrew.sims@newcastle.ac.uk}
 \item \out{<span class="pkg-link" data-pkg="rdecision" data-topic="Graph" data-id="has_edge">}\href{../../rdecision/html/Graph.html#method-has_edge}{\code{rdecision::Graph$has_edge()}}\out{</span>}
 \item \out{<span class="pkg-link" data-pkg="rdecision" data-topic="Graph" data-id="has_element">}\href{../../rdecision/html/Graph.html#method-has_element}{\code{rdecision::Graph$has_element()}}\out{</span>}
 \item \out{<span class="pkg-link" data-pkg="rdecision" data-topic="Graph" data-id="has_vertex">}\href{../../rdecision/html/Graph.html#method-has_vertex}{\code{rdecision::Graph$has_vertex()}}\out{</span>}
-\item \out{<span class="pkg-link" data-pkg="rdecision" data-topic="Graph" data-id="is_connected">}\href{../../rdecision/html/Graph.html#method-is_connected}{\code{rdecision::Graph$is_connected()}}\out{</span>}
 \item \out{<span class="pkg-link" data-pkg="rdecision" data-topic="Graph" data-id="is_simple">}\href{../../rdecision/html/Graph.html#method-is_simple}{\code{rdecision::Graph$is_simple()}}\out{</span>}
 \item \out{<span class="pkg-link" data-pkg="rdecision" data-topic="Graph" data-id="neighbours">}\href{../../rdecision/html/Graph.html#method-neighbours}{\code{rdecision::Graph$neighbours()}}\out{</span>}
 \item \out{<span class="pkg-link" data-pkg="rdecision" data-topic="Graph" data-id="order">}\href{../../rdecision/html/Graph.html#method-order}{\code{rdecision::Graph$order()}}\out{</span>}
@@ -44,8 +47,10 @@ Andrew Sims \email{andrew.sims@newcastle.ac.uk}
 \item \out{<span class="pkg-link" data-pkg="rdecision" data-topic="Digraph" data-id="incidence_matrix">}\href{../../rdecision/html/Digraph.html#method-incidence_matrix}{\code{rdecision::Digraph$incidence_matrix()}}\out{</span>}
 \item \out{<span class="pkg-link" data-pkg="rdecision" data-topic="Digraph" data-id="is_acyclic">}\href{../../rdecision/html/Digraph.html#method-is_acyclic}{\code{rdecision::Digraph$is_acyclic()}}\out{</span>}
 \item \out{<span class="pkg-link" data-pkg="rdecision" data-topic="Digraph" data-id="is_arborescence">}\href{../../rdecision/html/Digraph.html#method-is_arborescence}{\code{rdecision::Digraph$is_arborescence()}}\out{</span>}
+\item \out{<span class="pkg-link" data-pkg="rdecision" data-topic="Digraph" data-id="is_connected">}\href{../../rdecision/html/Digraph.html#method-is_connected}{\code{rdecision::Digraph$is_connected()}}\out{</span>}
 \item \out{<span class="pkg-link" data-pkg="rdecision" data-topic="Digraph" data-id="is_polytree">}\href{../../rdecision/html/Digraph.html#method-is_polytree}{\code{rdecision::Digraph$is_polytree()}}\out{</span>}
 \item \out{<span class="pkg-link" data-pkg="rdecision" data-topic="Digraph" data-id="is_tree">}\href{../../rdecision/html/Digraph.html#method-is_tree}{\code{rdecision::Digraph$is_tree()}}\out{</span>}
+\item \out{<span class="pkg-link" data-pkg="rdecision" data-topic="Digraph" data-id="is_weakly_connected">}\href{../../rdecision/html/Digraph.html#method-is_weakly_connected}{\code{rdecision::Digraph$is_weakly_connected()}}\out{</span>}
 \item \out{<span class="pkg-link" data-pkg="rdecision" data-topic="Digraph" data-id="paths">}\href{../../rdecision/html/Digraph.html#method-paths}{\code{rdecision::Digraph$paths()}}\out{</span>}
 \item \out{<span class="pkg-link" data-pkg="rdecision" data-topic="Digraph" data-id="topological_sort">}\href{../../rdecision/html/Digraph.html#method-topological_sort}{\code{rdecision::Digraph$topological_sort()}}\out{</span>}
 \item \out{<span class="pkg-link" data-pkg="rdecision" data-topic="Digraph" data-id="walk">}\href{../../rdecision/html/Digraph.html#method-walk}{\code{rdecision::Digraph$walk()}}\out{</span>}
@@ -72,6 +77,73 @@ Create a new Arborescence object from sets of nodes and edges.
 }
 \subsection{Returns}{
 An Arborescence object.
+}
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-is_parent"></a>}}
+\if{latex}{\out{\hypertarget{method-is_parent}{}}}
+\subsection{Method \code{is_parent()}}{
+Test whether the given node is a parent (has child nodes).
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{Arborescence$is_parent(v)}\if{html}{\out{</div>}}
+}
+
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{v}}{Node to test}
+}
+\if{html}{\out{</div>}}
+}
+\subsection{Returns}{
+TRUE if v has one or more child nodes, FALSE otherwise.
+}
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-is_leaf"></a>}}
+\if{latex}{\out{\hypertarget{method-is_leaf}{}}}
+\subsection{Method \code{is_leaf()}}{
+Test whether the given vertex is a leaf. In an arborescence,
+\code{is_parent()} and \code{is_leaf()} will be mutually exclusive.
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{Arborescence$is_leaf(v)}\if{html}{\out{</div>}}
+}
+
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{v}}{Vertex to test.}
+}
+\if{html}{\out{</div>}}
+}
+\subsection{Returns}{
+TRUE if v has no child nodes, FALSE otherwise.
+}
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-root"></a>}}
+\if{latex}{\out{\hypertarget{method-root}{}}}
+\subsection{Method \code{root()}}{
+Find the root vertex of the arborescence.
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{Arborescence$root()}\if{html}{\out{</div>}}
+}
+
+\subsection{Returns}{
+The root vertex.
+}
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-root_to_leaf_paths"></a>}}
+\if{latex}{\out{\hypertarget{method-root_to_leaf_paths}{}}}
+\subsection{Method \code{root_to_leaf_paths()}}{
+Find all directed paths from the root of the tree to the leaves.
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{Arborescence$root_to_leaf_paths()}\if{html}{\out{</div>}}
+}
+
+\subsection{Returns}{
+A list of ordered node lists.
 }
 }
 \if{html}{\out{<hr>}}

@@ -22,22 +22,18 @@ Andrew Sims \email{andrew.sims@newcastle.ac.uk}
 \subsection{Public methods}{
 \itemize{
 \item \href{#method-new}{\code{ModVar$new()}}
-\item \href{#method-get_environment}{\code{ModVar$get_environment()}}
-\item \href{#method-isExpression}{\code{ModVar$isExpression()}}
-\item \href{#method-sample}{\code{ModVar$sample()}}
-\item \href{#method-value}{\code{ModVar$value()}}
-\item \href{#method-get_label}{\code{ModVar$get_label()}}
-\item \href{#method-set_label}{\code{ModVar$set_label()}}
-\item \href{#method-unset_label}{\code{ModVar$unset_label()}}
-\item \href{#method-getDescription}{\code{ModVar$getDescription()}}
-\item \href{#method-getUnits}{\code{ModVar$getUnits()}}
-\item \href{#method-getDistribution}{\code{ModVar$getDistribution()}}
-\item \href{#method-getOperands}{\code{ModVar$getOperands()}}
-\item \href{#method-tabulate}{\code{ModVar$tabulate()}}
-\item \href{#method-getMean}{\code{ModVar$getMean()}}
-\item \href{#method-getSD}{\code{ModVar$getSD()}}
-\item \href{#method-getQuantile}{\code{ModVar$getQuantile()}}
+\item \href{#method-is_expression}{\code{ModVar$is_expression()}}
+\item \href{#method-is_probabilistic}{\code{ModVar$is_probabilistic()}}
+\item \href{#method-description}{\code{ModVar$description()}}
+\item \href{#method-units}{\code{ModVar$units()}}
+\item \href{#method-distribution}{\code{ModVar$distribution()}}
 \item \href{#method-r}{\code{ModVar$r()}}
+\item \href{#method-mean}{\code{ModVar$mean()}}
+\item \href{#method-mode}{\code{ModVar$mode()}}
+\item \href{#method-SD}{\code{ModVar$SD()}}
+\item \href{#method-quantile}{\code{ModVar$quantile()}}
+\item \href{#method-set}{\code{ModVar$set()}}
+\item \href{#method-get}{\code{ModVar$get()}}
 \item \href{#method-clone}{\code{ModVar$clone()}}
 }
 }
@@ -54,9 +50,8 @@ Create an object of type `ModVar`
 \if{html}{\out{<div class="arguments">}}
 \describe{
 \item{\code{description}}{A character string description of the variable
-and its role in the
-model. This description will be used in a tabulation of the
-variables linked to a model.}
+and its role in the model. This description will be used in a
+tabulation of the variables linked to a model.}
 
 \item{\code{units}}{A character string description of the units, e.g. 'GBP',
 'per year'.}
@@ -68,26 +63,12 @@ A new ModVar object.
 }
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-get_environment"></a>}}
-\if{latex}{\out{\hypertarget{method-get_environment}{}}}
-\subsection{Method \code{get_environment()}}{
-Find the environment nearest the global environment in which
-this model variable or a reference to it, lives.
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{ModVar$get_environment()}\if{html}{\out{</div>}}
-}
-
-\subsection{Returns}{
-An environment. If not found, returns the empty environment.
-}
-}
-\if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-isExpression"></a>}}
-\if{latex}{\out{\hypertarget{method-isExpression}{}}}
-\subsection{Method \code{isExpression()}}{
+\if{html}{\out{<a id="method-is_expression"></a>}}
+\if{latex}{\out{\hypertarget{method-is_expression}{}}}
+\subsection{Method \code{is_expression()}}{
 Is this ModVar an expression?
 \subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{ModVar$isExpression()}\if{html}{\out{</div>}}
+\if{html}{\out{<div class="r">}}\preformatted{ModVar$is_expression()}\if{html}{\out{</div>}}
 }
 
 \subsection{Returns}{
@@ -95,112 +76,59 @@ TRUE if it inherits from ExprModVar, FALSE otherwise.
 }
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-sample"></a>}}
-\if{latex}{\out{\hypertarget{method-sample}{}}}
-\subsection{Method \code{sample()}}{
-Set the value of the model variable from its uncertainty distribution.
-Nothing is returned; the sampled value is returned at the next
-call to `value()`.
+\if{html}{\out{<a id="method-is_probabilistic"></a>}}
+\if{latex}{\out{\hypertarget{method-is_probabilistic}{}}}
+\subsection{Method \code{is_probabilistic()}}{
+Tests whether the model variable is probabilistic, i.e. a random
+variable that follows a distribution, or an expression involving
+random variables, some of which follow distributions.
 \subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{ModVar$sample(expected = F)}\if{html}{\out{</div>}}
-}
-
-\subsection{Arguments}{
-\if{html}{\out{<div class="arguments">}}
-\describe{
-\item{\code{expected}}{Logical; if TRUE sets the value of the model variable
-returned at subsequent calls to `value()` to be equal to the 
-expectation of the variable. Default is FALSE.}
-}
-\if{html}{\out{</div>}}
-}
-\subsection{Returns}{
-Updated ModVar object.
-}
-}
-\if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-value"></a>}}
-\if{latex}{\out{\hypertarget{method-value}{}}}
-\subsection{Method \code{value()}}{
-Return the current value of the model variable. This will be the 
-expected value if the argument to the most recent call to `sample`
-was TRUE or after creation of the object; otherwise it will return
-a value sampled from the uncertainty distribution.
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{ModVar$value()}\if{html}{\out{</div>}}
+\if{html}{\out{<div class="r">}}\preformatted{ModVar$is_probabilistic()}\if{html}{\out{</div>}}
 }
 
 \subsection{Returns}{
-Numeric value of the model variable.
+TRUE if probabilistic
+#' @description
+#' Return the current value of the model variable. This will be the 
+#' expected value if the argument to the most recent call to `sample`
+#' was TRUE or after creation of the object; otherwise it will return
+#' a value sampled from the uncertainty distribution. 
+#' @param what Determines what is returned (a character string). Options
+#' are as follows:
+#' \describe{
+#'   \item{"pe"}{Point estimate}
+#'   \item{"r"}{A single random sample from the uncertainty distribution}
+#'   \item{"mean"}{Mean of the uncertainty distribution}
+#' }
+#' @return Numeric value of the model variable.
+value = function(what="pe") {
+  # check argument
+  if (!is.character(what)) {
+    rlang::abort("Argument 'what' must be a character string", 
+                 class="what_not_string")
+  }
+  # returned requested value
+  v <- as.numeric(NA)
+  if (what=="pe") {
+    v <- self$point_estimate()
+  } else if (what=="mean") {
+    v <- self$mean()
+  } else if (what=="r") {
+    v <- self$r(1)
+  } else {
+    rlang::abort("Argument 'what' must be (pe|r|mean)", class="unknown_what")
+  }
+  return(v)  
+},
 }
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-get_label"></a>}}
-\if{latex}{\out{\hypertarget{method-get_label}{}}}
-\subsection{Method \code{get_label()}}{
-Accessor function for the label. Unless `set_label` has been called, this
-function will return the variable's own name. As far as possible, this will 
-be the variable name used when the object was first created in the model,
-so that it aligns with the variable name used in ExprModVar
-and tabulations of variables used in models. But due to the nature of R's
-non-standard evaluation, this is not ensured. It will sometimes return
-the name of a reference to the original variable, if
-the original environment is not an ancestor of the calling environment of
-this function. In cases where references to model variables are routinely
-created, destroyed and passed around, it is advised to call this method
-from the environment of the original object as soon as possible after
-it is created. Subsequent calls will return the original name.
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{ModVar$get_label()}\if{html}{\out{</div>}}
-}
-
-\subsection{Returns}{
-Label of model variable as character string.
-}
-}
-\if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-set_label"></a>}}
-\if{latex}{\out{\hypertarget{method-set_label}{}}}
-\subsection{Method \code{set_label()}}{
-Function to set the label. Normally this is not required because the label
-is set to the name given to the variable by the user. This function allows
-the default behaviour to be overridden.
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{ModVar$set_label(label)}\if{html}{\out{</div>}}
-}
-
-\subsection{Arguments}{
-\if{html}{\out{<div class="arguments">}}
-\describe{
-\item{\code{label}}{The label to use.}
-}
-\if{html}{\out{</div>}}
-}
-\subsection{Returns}{
-Updated ModVar object
-}
-}
-\if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-unset_label"></a>}}
-\if{latex}{\out{\hypertarget{method-unset_label}{}}}
-\subsection{Method \code{unset_label()}}{
-Function to unset the label. Causes the label to revert to its default, i.e.
-its variable name at the next call to `get_label`.
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{ModVar$unset_label()}\if{html}{\out{</div>}}
-}
-
-\subsection{Returns}{
-Updated ModVar object
-}
-}
-\if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-getDescription"></a>}}
-\if{latex}{\out{\hypertarget{method-getDescription}{}}}
-\subsection{Method \code{getDescription()}}{
+\if{html}{\out{<a id="method-description"></a>}}
+\if{latex}{\out{\hypertarget{method-description}{}}}
+\subsection{Method \code{description()}}{
 Accessor function for the description.
 \subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{ModVar$getDescription()}\if{html}{\out{</div>}}
+\if{html}{\out{<div class="r">}}\preformatted{ModVar$description()}\if{html}{\out{</div>}}
 }
 
 \subsection{Returns}{
@@ -208,12 +136,12 @@ Description of model variable as character string.
 }
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-getUnits"></a>}}
-\if{latex}{\out{\hypertarget{method-getUnits}{}}}
-\subsection{Method \code{getUnits()}}{
+\if{html}{\out{<a id="method-units"></a>}}
+\if{latex}{\out{\hypertarget{method-units}{}}}
+\subsection{Method \code{units()}}{
 Accessor function for units.
 \subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{ModVar$getUnits()}\if{html}{\out{</div>}}
+\if{html}{\out{<div class="r">}}\preformatted{ModVar$units()}\if{html}{\out{</div>}}
 }
 
 \subsection{Returns}{
@@ -221,12 +149,12 @@ Description of units as character string.
 }
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-getDistribution"></a>}}
-\if{latex}{\out{\hypertarget{method-getDistribution}{}}}
-\subsection{Method \code{getDistribution()}}{
+\if{html}{\out{<a id="method-distribution"></a>}}
+\if{latex}{\out{\hypertarget{method-distribution}{}}}
+\subsection{Method \code{distribution()}}{
 Accessor function for the name of the uncertainty distribution.
 \subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{ModVar$getDistribution()}\if{html}{\out{</div>}}
+\if{html}{\out{<div class="r">}}\preformatted{ModVar$distribution()}\if{html}{\out{</div>}}
 }
 
 \subsection{Returns}{
@@ -234,78 +162,60 @@ Distribution name as character string.
 }
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-getOperands"></a>}}
-\if{latex}{\out{\hypertarget{method-getOperands}{}}}
-\subsection{Method \code{getOperands()}}{
-Return a list of operands given in the expression used to form the
-expression. Only relevant for objects of inherited type 
-ExprModVar, but defined for the base class for convenience to
-avoid type checking inside iterators.
+\if{html}{\out{<a id="method-r"></a>}}
+\if{latex}{\out{\hypertarget{method-r}{}}}
+\subsection{Method \code{r()}}{
+Draw a random sample from the model variable.
 \subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{ModVar$getOperands()}\if{html}{\out{</div>}}
-}
-
-\subsection{Returns}{
-A list of operands that are themselves ModVars. An empty list 
-for non-expression model variables.
-}
-}
-\if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-tabulate"></a>}}
-\if{latex}{\out{\hypertarget{method-tabulate}{}}}
-\subsection{Method \code{tabulate()}}{
-Tabulate the model variable and optionally include its operands.
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{ModVar$tabulate(include.operands = FALSE)}\if{html}{\out{</div>}}
+\if{html}{\out{<div class="r">}}\preformatted{ModVar$r(n = 1)}\if{html}{\out{</div>}}
 }
 
 \subsection{Arguments}{
 \if{html}{\out{<div class="arguments">}}
 \describe{
-\item{\code{include.operands}}{If TRUE include the operands of this model
-variable in the table. Otherwise return a table with one row, 
-describing this variable.}
+\item{\code{n}}{Number of samples to draw.}
 }
 \if{html}{\out{</div>}}
 }
 \subsection{Returns}{
-Data frame with one row per model variable, as follows:
-\describe{
-\item{Label}{The label given to the variable on creation.}
-\item{Description}{As given at initialization.}
-\item{Units}{Units of the variable.}
-\item{Distribution}{Either the uncertainty distribution, if
-it is a regular model variable, or the expression used to create it,
-if it is an ExprModVar.}
-\item{Mean}{Expected value.}
-\item{SD}{Standard deviation.}
-\item{Q2.5}{p=0.025 quantile.}
-\item{Q97.5}{p=0.975 quantile.}
-\item{Qhat}{Asterisk (*) if the quantiles and SD have been estimated
-by random sampling.}
-}
+A sample drawn at random.
 }
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-getMean"></a>}}
-\if{latex}{\out{\hypertarget{method-getMean}{}}}
-\subsection{Method \code{getMean()}}{
-Return the expected value of the distribution.
+\if{html}{\out{<a id="method-mean"></a>}}
+\if{latex}{\out{\hypertarget{method-mean}{}}}
+\subsection{Method \code{mean()}}{
+Return the mean value of the distribution.
 \subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{ModVar$getMean()}\if{html}{\out{</div>}}
+\if{html}{\out{<div class="r">}}\preformatted{ModVar$mean()}\if{html}{\out{</div>}}
 }
 
 \subsection{Returns}{
-Expected value as a numeric value.
+Mean value as a numeric value.
 }
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-getSD"></a>}}
-\if{latex}{\out{\hypertarget{method-getSD}{}}}
-\subsection{Method \code{getSD()}}{
+\if{html}{\out{<a id="method-mode"></a>}}
+\if{latex}{\out{\hypertarget{method-mode}{}}}
+\subsection{Method \code{mode()}}{
+Return the mode of the variable. By default returns NA, which will be
+the case for most ExprModVar variables, because an arbitrary expression
+is not guaranteed to be unimodel.
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{ModVar$mode()}\if{html}{\out{</div>}}
+}
+
+\subsection{Returns}{
+Mode as a numeric value.
+}
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-SD"></a>}}
+\if{latex}{\out{\hypertarget{method-SD}{}}}
+\subsection{Method \code{SD()}}{
 Return the standard deviation of the distribution.
 \subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{ModVar$getSD()}\if{html}{\out{</div>}}
+\if{html}{\out{<div class="r">}}\preformatted{ModVar$SD()}\if{html}{\out{</div>}}
 }
 
 \subsection{Returns}{
@@ -313,12 +223,12 @@ Standard deviation as a numeric value
 }
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-getQuantile"></a>}}
-\if{latex}{\out{\hypertarget{method-getQuantile}{}}}
-\subsection{Method \code{getQuantile()}}{
+\if{html}{\out{<a id="method-quantile"></a>}}
+\if{latex}{\out{\hypertarget{method-quantile}{}}}
+\subsection{Method \code{quantile()}}{
 Find quantiles of the uncertainty distribution.
 \subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{ModVar$getQuantile(probs)}\if{html}{\out{</div>}}
+\if{html}{\out{<div class="r">}}\preformatted{ModVar$quantile(probs)}\if{html}{\out{</div>}}
 }
 
 \subsection{Arguments}{
@@ -333,24 +243,39 @@ Vector of numeric values of the same length as `probs`.
 }
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-r"></a>}}
-\if{latex}{\out{\hypertarget{method-r}{}}}
-\subsection{Method \code{r()}}{
-Draw random samples from the model variable. After returning the
-sample, the next call to `value()` will return the expected value.
+\if{html}{\out{<a id="method-set"></a>}}
+\if{latex}{\out{\hypertarget{method-set}{}}}
+\subsection{Method \code{set()}}{
+Sets the value of the ModVar that will be returned by subsequent
+calls to get() until set() is called again.
 \subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{ModVar$r(n)}\if{html}{\out{</div>}}
+\if{html}{\out{<div class="r">}}\preformatted{ModVar$set(expected = FALSE)}\if{html}{\out{</div>}}
 }
 
 \subsection{Arguments}{
 \if{html}{\out{<div class="arguments">}}
 \describe{
-\item{\code{n}}{Number of samples to return}
+\item{\code{expected}}{Logical; TRUE to set the value to the mean of the model
+variable.}
 }
 \if{html}{\out{</div>}}
 }
 \subsection{Returns}{
-Numeric vector of samples drawn at random.
+Updated ModVar.
+}
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-get"></a>}}
+\if{latex}{\out{\hypertarget{method-get}{}}}
+\subsection{Method \code{get()}}{
+Gets the value of the ExprModVar that was set by the most recent call
+to set().
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{ModVar$get()}\if{html}{\out{</div>}}
+}
+
+\subsection{Returns}{
+Value determined by last set().
 }
 }
 \if{html}{\out{<hr>}}

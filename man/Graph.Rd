@@ -93,7 +93,7 @@ Test whether an edge is element of the graph.
 \if{html}{\out{</div>}}
 }
 \subsection{Returns}{
-TRUE if x is an element of V(G).
+TRUE if e is an element of E(G).
 }
 }
 \if{html}{\out{<hr>}}
@@ -190,7 +190,7 @@ either 0 (not adjacent) or 1 (adjacent).
 \subsection{Returns}{
 A square numeric matrix with the number of rows and columns
 equal to the order of the graph. The rows and columns are in the
-same order as V. If all the nodes have labels the
+same order as V. If the nodes have defined and unique labels the
 dimnames of the matrix are the labels of the nodes.
 }
 }
@@ -292,40 +292,6 @@ Does not include self, even in the case of a loop to self.
 }
 \subsection{Returns}{
 A list of nodes which are joined to the subject.
-#' @description 
-#' Non-recursive depth-first search. Starts with a specified node and
-#' finds all the nodes reachable from it.
-#' @return List of reachable nodes, including self.
-DFS = function(v) {
-  # check argument
-  if (!self$has_vertex(v)) {
-    rlang::abort("Argument 'v' is not in graph", class="not_in_graph")
-  }
-  # D (element d) is a growing list of discovered nodes
-  # S (element s) is a stack of nodes being processed
-  D <- list()
-  S <- list()
-  # S.push(v)
-  S <- c(S,v)
-  # while S is not empty do
-  while (length(S)>0) {
-    # v = S.pop()
-    s <- S[[length(S)]]
-    S[[length(S)]] <- NULL
-    # if s is not labelled as discovered then
-    if (!any(sapply(D,function(d){return(d$is_same_node(s))}))) {
-      # label s as discovered
-      D <- c(D,s)
-      # for all edges from v to n in G.adjacentEdges(v) do
-      for (n in self$neighbours(s)) {
-        # S.push(w)
-        S <- c(S,n)
-      }
-    }
-  }
-  # return discovered nodes
-  return(D)
-}
 }
 }
 \if{html}{\out{<hr>}}

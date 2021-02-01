@@ -3,13 +3,15 @@ title: "A directed graph solution to a *New Scientist* puzzle"
 subtitle: "Burger run"
 author: "Andrew J. Sims"
 date: "18th June 2020"
-output: rmarkdown::pdf_document
+output: 
+  rmarkdown::pdf_document:
+    fig_crop: false
 vignette: >
   %\VignetteIndexEntry{GT00 - A directed graph solution to a *New Scientist* puzzle}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 bibliography: "references.bib"
-csl: "scientific-reports.csl"
+csl: "bmj.csl"
 ---
 ```{r, include = FALSE}
 rm(list=ls())

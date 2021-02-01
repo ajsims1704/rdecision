@@ -1,0 +1,5214 @@
+\nonstopmode{}
+\documentclass[a4paper]{book}
+\usepackage[times,inconsolata,hyper]{Rd}
+\usepackage{makeidx}
+\usepackage[utf8]{inputenc} % @SET ENCODING@
+% \usepackage{graphicx} % @USE GRAPHICX@
+\makeindex{}
+\begin{document}
+\chapter*{}
+\begin{center}
+{\textbf{\huge Package `rdecision'}}
+\par\bigskip{\large \today}
+\end{center}
+\begin{description}
+\raggedright{}
+\inputencoding{utf8}
+\item[Title]\AsIs{Decision Analytic Modelling in Health Economics}
+\item[Version]\AsIs{1.0.0}
+\item[Description]\AsIs{Classes and functions for modelling healthcare interventions using
+cohort models (decision trees, Markov models and extended Markov models).
+It draws on terminology and examples from Briggs, Claxton and Sculpher, ``Decision
+Modelling for Health Economic Evaluation'', Oxford University Press, 2006.}
+\item[Depends]\AsIs{R (>= 3.1.0)}
+\item[Imports]\AsIs{R6, rlang (>= 0.4.2), stats, utils}
+\item[Suggests]\AsIs{rmarkdown, knitr, grid, pander, testthat}
+\item[License]\AsIs{GPL-3}
+\item[LazyData]\AsIs{true}
+\item[Encoding]\AsIs{UTF-8}
+\item[RoxygenNote]\AsIs{7.1.0}
+\item[VignetteBuilder]\AsIs{knitr, rmarkdown}
+\item[NeedsCompilation]\AsIs{no}
+\item[Author]\AsIs{Andrew Sims [aut, cre] (<https://orcid.org/0000-0002-9553-7278>),
+Kim Fairbairn [aut] (<https://orcid.org/0000-0001-5108-6279>)}
+\item[Maintainer]\AsIs{Andrew Sims }\email{andrew.sims@newcastle.ac.uk}\AsIs{}
+\end{description}
+\Rdcontents{\R{} topics documented:}
+\inputencoding{utf8}
+\HeaderA{Action}{Action}{Action}
+%
+\begin{Description}\relax
+An R6 class to represent an action (choice) edge in a decision tree.
+\end{Description}
+%
+\begin{Details}\relax
+A specialism of class Arrow which is used in a decision tree to
+represent edges with source nodes joined to \code{DecisionNode}s.
+\end{Details}
+%
+\begin{Section}{Super classes}
+\code{\LinkA{rdecision::Edge}{rdecision::Edge}} -> \code{\LinkA{rdecision::Arrow}{rdecision::Arrow}} -> \code{Action}
+\end{Section}
+%
+\begin{Section}{Methods}
+%
+\begin{SubSection}{Public methods}
+\begin{itemize}
+
+\item{} \Rhref{#method-new}{\code{Action\$new()}}
+\item{} \Rhref{#method-modvars}{\code{Action\$modvars()}}
+\item{} \Rhref{#method-cost}{\code{Action\$cost()}}
+\item{} \Rhref{#method-benefit}{\code{Action\$benefit()}}
+\item{} \Rhref{#method-clone}{\code{Action\$clone()}}
+
+\end{itemize}
+
+\end{SubSection}
+
+
+
+
+\hypertarget{method-new}{}
+%
+\begin{SubSection}{Method \code{new()}}
+Create an object of type 'Action'. Optionally, a cost and a benefit may 
+be associated with traversing the edge. A \dfn{payoff} (benefit-cost) 
+is sometimes used in edges of decision trees; the parametrization used 
+here is more general.
+%
+\begin{SubSubSection}{Usage}
+\begin{alltt}Action$new(source, target, label, cost = 0, benefit = 0)\end{alltt}
+
+\end{SubSubSection}
+
+
+%
+\begin{SubSubSection}{Arguments}
+
+\begin{description}
+
+\item[\code{source}] Decision node from which the arrow leaves.
+
+\item[\code{target}] Node which the arrow enters.
+
+\item[\code{label}] Character string containing the arrow label. This
+
+\item[\code{cost}] Cost associated with traversal of this edge.
+
+\item[\code{benefit}] Benefit associated with traversal of the edge.
+must be defined for an action because the label is used in
+tabulation of strategies.
+
+\end{description}
+
+
+\end{SubSubSection}
+
+%
+\begin{SubSubSection}{Returns}
+A new \code{Action} object.
+\end{SubSubSection}
+
+\end{SubSection}
+
+
+
+\hypertarget{method-modvars}{}
+%
+\begin{SubSection}{Method \code{modvars()}}
+Find all the model variables of type ModVar that have been specified
+as values associated with this Action. Includes operands of these
+\code{ModVar}s, if they are expressions.
+%
+\begin{SubSubSection}{Usage}
+\begin{alltt}Action$modvars()\end{alltt}
+
+\end{SubSubSection}
+
+
+%
+\begin{SubSubSection}{Returns}
+A list of \code{ModVar}s.
+\end{SubSubSection}
+
+\end{SubSection}
+
+
+
+\hypertarget{method-cost}{}
+%
+\begin{SubSection}{Method \code{cost()}}
+Return the cost associated with traversing the edge.
+%
+\begin{SubSubSection}{Usage}
+\begin{alltt}Action$cost()\end{alltt}
+
+\end{SubSubSection}
+
+
+%
+\begin{SubSubSection}{Returns}
+Cost.
+\end{SubSubSection}
+
+\end{SubSection}
+
+
+
+\hypertarget{method-benefit}{}
+%
+\begin{SubSection}{Method \code{benefit()}}
+Return the benefit associated with traversing the edge.
+%
+\begin{SubSubSection}{Usage}
+\begin{alltt}Action$benefit()\end{alltt}
+
+\end{SubSubSection}
+
+
+%
+\begin{SubSubSection}{Returns}
+Benefit.
+\end{SubSubSection}
+
+\end{SubSection}
+
+
+
+\hypertarget{method-clone}{}
+%
+\begin{SubSection}{Method \code{clone()}}
+The objects of this class are cloneable with this method.
+%
+\begin{SubSubSection}{Usage}
+\begin{alltt}Action$clone(deep = FALSE)\end{alltt}
+
+\end{SubSubSection}
+
+
+%
+\begin{SubSubSection}{Arguments}
+
+\begin{description}
+
+\item[\code{deep}] Whether to make a deep clone.
+
+\end{description}
+
+
+\end{SubSubSection}
+
+\end{SubSection}
+
+\end{Section}
+%
+\begin{Author}\relax
+Andrew J. Sims \email{andrew.sims@newcastle.ac.uk}
+\end{Author}
+\inputencoding{utf8}
+\HeaderA{Arborescence}{Arborescence}{Arborescence}
+%
+\begin{Description}\relax
+An R6 class to represent an arborescence (rooted directed tree).
+\end{Description}
+%
+\begin{Details}\relax
+Class to encapsulate a directed rooted tree specialization of a digraph.
+An arboresecence must be a directed tree with exactly one root and the
+directed paths from the root must be unique.
+\end{Details}
+%
+\begin{Section}{Super classes}
+\code{\LinkA{rdecision::Graph}{rdecision::Graph}} -> \code{\LinkA{rdecision::Digraph}{rdecision::Digraph}} -> \code{Arborescence}
+\end{Section}
+%
+\begin{Section}{Methods}
+%
+\begin{SubSection}{Public methods}
+\begin{itemize}
+
+\item{} \Rhref{#method-new}{\code{Arborescence\$new()}}
+\item{} \Rhref{#method-is_parent}{\code{Arborescence\$is\_parent()}}
+\item{} \Rhref{#method-is_leaf}{\code{Arborescence\$is\_leaf()}}
+\item{} \Rhref{#method-root}{\code{Arborescence\$root()}}
+\item{} \Rhref{#method-root_to_leaf_paths}{\code{Arborescence\$root\_to\_leaf\_paths()}}
+\item{} \Rhref{#method-clone}{\code{Arborescence\$clone()}}
+
+\end{itemize}
+
+\end{SubSection}
+
+
+
+
+\hypertarget{method-new}{}
+%
+\begin{SubSection}{Method \code{new()}}
+Create a new Arborescence object from sets of nodes and edges.
+%
+\begin{SubSubSection}{Usage}
+\begin{alltt}Arborescence$new(V, A)\end{alltt}
+
+\end{SubSubSection}
+
+
+%
+\begin{SubSubSection}{Arguments}
+
+\begin{description}
+
+\item[\code{V}] A list of Nodes.
+
+\item[\code{A}] A list of Arrows.
+
+\end{description}
+
+
+\end{SubSubSection}
+
+%
+\begin{SubSubSection}{Returns}
+An Arborescence object.
+\end{SubSubSection}
+
+\end{SubSection}
+
+
+
+\hypertarget{method-is_parent}{}
+%
+\begin{SubSection}{Method \code{is\_parent()}}
+Test whether the given node is a parent (has child nodes).
+%
+\begin{SubSubSection}{Usage}
+\begin{alltt}Arborescence$is_parent(v)\end{alltt}
+
+\end{SubSubSection}
+
+
+%
+\begin{SubSubSection}{Arguments}
+
+\begin{description}
+
+\item[\code{v}] Node to test
+
+\end{description}
+
+
+\end{SubSubSection}
+
+%
+\begin{SubSubSection}{Returns}
+TRUE if v has one or more child nodes, FALSE otherwise.
+\end{SubSubSection}
+
+\end{SubSection}
+
+
+
+\hypertarget{method-is_leaf}{}
+%
+\begin{SubSection}{Method \code{is\_leaf()}}
+Test whether the given vertex is a leaf. In an arborescence,
+\code{is\_parent()} and \code{is\_leaf()} will be mutually exclusive.
+%
+\begin{SubSubSection}{Usage}
+\begin{alltt}Arborescence$is_leaf(v)\end{alltt}
+
+\end{SubSubSection}
+
+
+%
+\begin{SubSubSection}{Arguments}
+
+\begin{description}
+
+\item[\code{v}] Vertex to test.
+
+\end{description}
+
+
+\end{SubSubSection}
+
+%
+\begin{SubSubSection}{Returns}
+TRUE if v has no child nodes, FALSE otherwise.
+\end{SubSubSection}
+
+\end{SubSection}
+
+
+
+\hypertarget{method-root}{}
+%
+\begin{SubSection}{Method \code{root()}}
+Find the root vertex of the arborescence.
+%
+\begin{SubSubSection}{Usage}
+\begin{alltt}Arborescence$root()\end{alltt}
+
+\end{SubSubSection}
+
+
+%
+\begin{SubSubSection}{Returns}
+The root vertex.
+\end{SubSubSection}
+
+\end{SubSection}
+
+
+
+\hypertarget{method-root_to_leaf_paths}{}
+%
+\begin{SubSection}{Method \code{root\_to\_leaf\_paths()}}
+Find all directed paths from the root of the tree to the leaves.
+%
+\begin{SubSubSection}{Usage}
+\begin{alltt}Arborescence$root_to_leaf_paths()\end{alltt}
+
+\end{SubSubSection}
+
+
+%
+\begin{SubSubSection}{Returns}
+A list of ordered node lists.
+\end{SubSubSection}
+
+\end{SubSection}
+
+
+
+\hypertarget{method-clone}{}
+%
+\begin{SubSection}{Method \code{clone()}}
+The objects of this class are cloneable with this method.
+%
+\begin{SubSubSection}{Usage}
+\begin{alltt}Arborescence$clone(deep = FALSE)\end{alltt}
+
+\end{SubSubSection}
+
+
+%
+\begin{SubSubSection}{Arguments}
+
+\begin{description}
+
+\item[\code{deep}] Whether to make a deep clone.
+
+\end{description}
+
+
+\end{SubSubSection}
+
+\end{SubSection}
+
+\end{Section}
+%
+\begin{Author}\relax
+Andrew Sims \email{andrew.sims@newcastle.ac.uk}
+\end{Author}
+\inputencoding{utf8}
+\HeaderA{Arrow}{Arrow}{Arrow}
+%
+\begin{Description}\relax
+An R6 class to represent an directed edge in a digraph.
+\end{Description}
+%
+\begin{Details}\relax
+Arrows are the formal term for links between pairs of nodes in a
+directed graph. Inherits from class Edge.
+\end{Details}
+%
+\begin{Section}{Super class}
+\code{\LinkA{rdecision::Edge}{rdecision::Edge}} -> \code{Arrow}
+\end{Section}
+%
+\begin{Section}{Methods}
+%
+\begin{SubSection}{Public methods}
+\begin{itemize}
+
+\item{} \Rhref{#method-new}{\code{Arrow\$new()}}
+\item{} \Rhref{#method-source}{\code{Arrow\$source()}}
+\item{} \Rhref{#method-target}{\code{Arrow\$target()}}
+\item{} \Rhref{#method-clone}{\code{Arrow\$clone()}}
+
+\end{itemize}
+
+\end{SubSection}
+
+
+
+
+\hypertarget{method-new}{}
+%
+\begin{SubSection}{Method \code{new()}}
+Create an object of type 'Arrow'.
+%
+\begin{SubSubSection}{Usage}
+\begin{alltt}Arrow$new(source, target, label = "")\end{alltt}
+
+\end{SubSubSection}
+
+
+%
+\begin{SubSubSection}{Arguments}
+
+\begin{description}
+
+\item[\code{source}] Node from which the arrow leaves.
+
+\item[\code{target}] second Node to which the arrow enters.
+
+\item[\code{label}] Character string containing the arrow label.
+
+\end{description}
+
+
+\end{SubSubSection}
+
+%
+\begin{SubSubSection}{Returns}
+A new `Arrow` object.
+\end{SubSubSection}
+
+\end{SubSection}
+
+
+
+\hypertarget{method-source}{}
+%
+\begin{SubSection}{Method \code{source()}}
+Access source node.
+%
+\begin{SubSubSection}{Usage}
+\begin{alltt}Arrow$source()\end{alltt}
+
+\end{SubSubSection}
+
+
+%
+\begin{SubSubSection}{Returns}
+`Node` from which the arrow leads.
+\end{SubSubSection}
+
+\end{SubSection}
+
+
+
+\hypertarget{method-target}{}
+%
+\begin{SubSection}{Method \code{target()}}
+Access target node.
+%
+\begin{SubSubSection}{Usage}
+\begin{alltt}Arrow$target()\end{alltt}
+
+\end{SubSubSection}
+
+
+%
+\begin{SubSubSection}{Returns}
+`Node` to which the arrow points.
+\end{SubSubSection}
+
+\end{SubSection}
+
+
+
+\hypertarget{method-clone}{}
+%
+\begin{SubSection}{Method \code{clone()}}
+The objects of this class are cloneable with this method.
+%
+\begin{SubSubSection}{Usage}
+\begin{alltt}Arrow$clone(deep = FALSE)\end{alltt}
+
+\end{SubSubSection}
+
+
+%
+\begin{SubSubSection}{Arguments}
+
+\begin{description}
+
+\item[\code{deep}] Whether to make a deep clone.
+
+\end{description}
+
+
+\end{SubSubSection}
+
+\end{SubSection}
+
+\end{Section}
+%
+\begin{Author}\relax
+Andrew J. Sims \email{andrew.sims@newcastle.ac.uk}
+\end{Author}
+\inputencoding{utf8}
+\HeaderA{ChanceNode}{ChanceNode}{ChanceNode}
+%
+\begin{Description}\relax
+An R6 class to represent a chance node in a decision tree.
+\end{Description}
+%
+\begin{Details}\relax
+An R6 class to represent a chance node in a decision tree. 
+The node is associated with at least two branches to other nodes, each 
+of which has a conditional probability (the probability of following
+that branch given that the node has been reached) and a cost.
+\end{Details}
+%
+\begin{Section}{Super class}
+\code{\LinkA{rdecision::Node}{rdecision::Node}} -> \code{ChanceNode}
+\end{Section}
+%
+\begin{Section}{Methods}
+%
+\begin{SubSection}{Public methods}
+\begin{itemize}
+
+\item{} \Rhref{#method-new}{\code{ChanceNode\$new()}}
+\item{} \Rhref{#method-clone}{\code{ChanceNode\$clone()}}
+
+\end{itemize}
+
+\end{SubSection}
+
+
+
+
+\hypertarget{method-new}{}
+%
+\begin{SubSection}{Method \code{new()}}
+Create a new ChanceNode object
+%
+\begin{SubSubSection}{Usage}
+\begin{alltt}ChanceNode$new(label = "")\end{alltt}
+
+\end{SubSubSection}
+
+
+%
+\begin{SubSubSection}{Arguments}
+
+\begin{description}
+
+\item[\code{label}] An optional label for the chance node.
+
+\end{description}
+
+
+\end{SubSubSection}
+
+%
+\begin{SubSubSection}{Returns}
+A new `ChanceNode` object
+\end{SubSubSection}
+
+\end{SubSection}
+
+
+
+\hypertarget{method-clone}{}
+%
+\begin{SubSection}{Method \code{clone()}}
+The objects of this class are cloneable with this method.
+%
+\begin{SubSubSection}{Usage}
+\begin{alltt}ChanceNode$clone(deep = FALSE)\end{alltt}
+
+\end{SubSubSection}
+
+
+%
+\begin{SubSubSection}{Arguments}
+
+\begin{description}
+
+\item[\code{deep}] Whether to make a deep clone.
+
+\end{description}
+
+
+\end{SubSubSection}
+
+\end{SubSection}
+
+\end{Section}
+%
+\begin{Author}\relax
+Andrew Sims \email{andrew.sims@newcastle.ac.uk}
+\end{Author}
+\inputencoding{utf8}
+\HeaderA{ConstModVar}{ConstModVar}{ConstModVar}
+%
+\begin{Description}\relax
+An R6 class for a constant in a model
+\end{Description}
+%
+\begin{Details}\relax
+A ModVar with no uncertainty in its value. It has no
+distribution and there are no hyperparameters. Its 
+benefit over using a regular 'numeric' variable in a model is that
+it will appear in automatic tabulations of the model variables
+associated with a model and therefore be explicitly documented
+as a model input.
+\end{Details}
+%
+\begin{Section}{Super class}
+\code{\LinkA{rdecision::ModVar}{rdecision::ModVar}} -> \code{ConstModVar}
+\end{Section}
+%
+\begin{Section}{Methods}
+%
+\begin{SubSection}{Public methods}
+\begin{itemize}
+
+\item{} \Rhref{#method-new}{\code{ConstModVar\$new()}}
+\item{} \Rhref{#method-is_probabilistic}{\code{ConstModVar\$is\_probabilistic()}}
+\item{} \Rhref{#method-distribution}{\code{ConstModVar\$distribution()}}
+\item{} \Rhref{#method-mode}{\code{ConstModVar\$mode()}}
+\item{} \Rhref{#method-mean}{\code{ConstModVar\$mean()}}
+\item{} \Rhref{#method-r}{\code{ConstModVar\$r()}}
+\item{} \Rhref{#method-SD}{\code{ConstModVar\$SD()}}
+\item{} \Rhref{#method-quantile}{\code{ConstModVar\$quantile()}}
+\item{} \Rhref{#method-clone}{\code{ConstModVar\$clone()}}
+
+\end{itemize}
+
+\end{SubSection}
+
+
+
+
+\hypertarget{method-new}{}
+%
+\begin{SubSection}{Method \code{new()}}
+Create a new constant model variable
+%
+\begin{SubSubSection}{Usage}
+\begin{alltt}ConstModVar$new(description, units, const)\end{alltt}
+
+\end{SubSubSection}
+
+
+%
+\begin{SubSubSection}{Arguments}
+
+\begin{description}
+
+\item[\code{description}] A character string description of the variable
+and its role in the
+model. This description will be used in a tabulation of the
+variables linked to a model.
+
+\item[\code{units}] A character string description of the units, e.g. 'GBP',
+'per year'.
+
+\item[\code{const}] The constant numerical value of the object.
+
+\end{description}
+
+
+\end{SubSubSection}
+
+%
+\begin{SubSubSection}{Returns}
+A new ConstModVar object.
+\end{SubSubSection}
+
+\end{SubSection}
+
+
+
+\hypertarget{method-is_probabilistic}{}
+%
+\begin{SubSection}{Method \code{is\_probabilistic()}}
+Tests whether the model variable is probabilistic, i.e. a random
+variable that follows a distribution, or an expression involving
+random variables, some of which follow distributions.
+%
+\begin{SubSubSection}{Usage}
+\begin{alltt}ConstModVar$is_probabilistic()\end{alltt}
+
+\end{SubSubSection}
+
+
+%
+\begin{SubSubSection}{Returns}
+TRUE if probabilistic
+\end{SubSubSection}
+
+\end{SubSection}
+
+
+
+\hypertarget{method-distribution}{}
+%
+\begin{SubSection}{Method \code{distribution()}}
+Accessor function for the name of the uncertainty distribution.
+%
+\begin{SubSubSection}{Usage}
+\begin{alltt}ConstModVar$distribution()\end{alltt}
+
+\end{SubSubSection}
+
+
+%
+\begin{SubSubSection}{Returns}
+Distribution name as character string.
+\end{SubSubSection}
+
+\end{SubSection}
+
+
+
+\hypertarget{method-mode}{}
+%
+\begin{SubSection}{Method \code{mode()}}
+Return the mode of the distribution.
+%
+\begin{SubSubSection}{Usage}
+\begin{alltt}ConstModVar$mode()\end{alltt}
+
+\end{SubSubSection}
+
+
+%
+\begin{SubSubSection}{Returns}
+Value of the constant.
+\end{SubSubSection}
+
+\end{SubSection}
+
+
+
+\hypertarget{method-mean}{}
+%
+\begin{SubSection}{Method \code{mean()}}
+Return the expected value of the distribution.
+%
+\begin{SubSubSection}{Usage}
+\begin{alltt}ConstModVar$mean()\end{alltt}
+
+\end{SubSubSection}
+
+
+%
+\begin{SubSubSection}{Returns}
+Expected value as a numeric value.
+\end{SubSubSection}
+
+\end{SubSection}
+
+
+
+\hypertarget{method-r}{}
+%
+\begin{SubSection}{Method \code{r()}}
+Return a random sample from the distribution.
+%
+\begin{SubSubSection}{Usage}
+\begin{alltt}ConstModVar$r(n = 1)\end{alltt}
+
+\end{SubSubSection}
+
+
+%
+\begin{SubSubSection}{Arguments}
+
+\begin{description}
+
+\item[\code{n}] Number of samples to draw.
+
+\end{description}
+
+
+\end{SubSubSection}
+
+%
+\begin{SubSubSection}{Returns}
+Constant value as a numeric value.
+\end{SubSubSection}
+
+\end{SubSection}
+
+
+
+\hypertarget{method-SD}{}
+%
+\begin{SubSection}{Method \code{SD()}}
+Return the standard deviation of the distribution.
+%
+\begin{SubSubSection}{Usage}
+\begin{alltt}ConstModVar$SD()\end{alltt}
+
+\end{SubSubSection}
+
+
+%
+\begin{SubSubSection}{Returns}
+Standard deviation as a numeric value
+\end{SubSubSection}
+
+\end{SubSection}
+
+
+
+\hypertarget{method-quantile}{}
+%
+\begin{SubSection}{Method \code{quantile()}}
+Quantiles of the uncertainty distribution; for a constant all
+quantiles are returned as the value of the constant.
+%
+\begin{SubSubSection}{Usage}
+\begin{alltt}ConstModVar$quantile(probs)\end{alltt}
+
+\end{SubSubSection}
+
+
+%
+\begin{SubSubSection}{Arguments}
+
+\begin{description}
+
+\item[\code{probs}] Numeric vector of probabilities, each in range [0,1].
+
+\end{description}
+
+
+\end{SubSubSection}
+
+%
+\begin{SubSubSection}{Returns}
+Vector of numeric values of the same length as `probs`.
+\end{SubSubSection}
+
+\end{SubSection}
+
+
+
+\hypertarget{method-clone}{}
+%
+\begin{SubSection}{Method \code{clone()}}
+The objects of this class are cloneable with this method.
+%
+\begin{SubSubSection}{Usage}
+\begin{alltt}ConstModVar$clone(deep = FALSE)\end{alltt}
+
+\end{SubSubSection}
+
+
+%
+\begin{SubSubSection}{Arguments}
+
+\begin{description}
+
+\item[\code{deep}] Whether to make a deep clone.
+
+\end{description}
+
+
+\end{SubSubSection}
+
+\end{SubSection}
+
+\end{Section}
+%
+\begin{Author}\relax
+Andrew Sims \email{andrew.sims@newcastle.ac.uk}
+\end{Author}
+\inputencoding{utf8}
+\HeaderA{DecisionNode}{DecisionNode}{DecisionNode}
+%
+\begin{Description}\relax
+An R6 class for a decision node in a decision tree
+\end{Description}
+%
+\begin{Details}\relax
+A class to represent a decision node in a decision tree. The node
+is associated with one or more branches to child nodes.
+\end{Details}
+%
+\begin{Section}{Super class}
+\code{\LinkA{rdecision::Node}{rdecision::Node}} -> \code{DecisionNode}
+\end{Section}
+%
+\begin{Section}{Methods}
+%
+\begin{SubSection}{Public methods}
+\begin{itemize}
+
+\item{} \Rhref{#method-new}{\code{DecisionNode\$new()}}
+\item{} \Rhref{#method-clone}{\code{DecisionNode\$clone()}}
+
+\end{itemize}
+
+\end{SubSection}
+
+
+
+
+\hypertarget{method-new}{}
+%
+\begin{SubSection}{Method \code{new()}}
+Create a new decision node.
+%
+\begin{SubSubSection}{Usage}
+\begin{alltt}DecisionNode$new(label)\end{alltt}
+
+\end{SubSubSection}
+
+
+%
+\begin{SubSubSection}{Arguments}
+
+\begin{description}
+
+\item[\code{label}] A label for the node. Must be defined because the label is
+used in tabulation of strategies. The label is automatically converted
+to a syntactically valid (in R) name to ensure it can be used as a column
+name in a data frame.
+
+\end{description}
+
+
+\end{SubSubSection}
+
+%
+\begin{SubSubSection}{Returns}
+A new DecisionNode object
+\end{SubSubSection}
+
+\end{SubSection}
+
+
+
+\hypertarget{method-clone}{}
+%
+\begin{SubSection}{Method \code{clone()}}
+The objects of this class are cloneable with this method.
+%
+\begin{SubSubSection}{Usage}
+\begin{alltt}DecisionNode$clone(deep = FALSE)\end{alltt}
+
+\end{SubSubSection}
+
+
+%
+\begin{SubSubSection}{Arguments}
+
+\begin{description}
+
+\item[\code{deep}] Whether to make a deep clone.
+
+\end{description}
+
+
+\end{SubSubSection}
+
+\end{SubSection}
+
+\end{Section}
+%
+\begin{Author}\relax
+Andrew J. Sims \email{andrew.sims@newcastle.ac.uk}
+\end{Author}
+\inputencoding{utf8}
+\HeaderA{DecisionTree}{DecisionTree}{DecisionTree}
+%
+\begin{Description}\relax
+An R6 class to represent a decision tree
+\end{Description}
+%
+\begin{Details}\relax
+A class to represent a decision tree. An object contains a tree of
+decision nodes, chance nodes and leaf nodes, connected by edges
+(either actions or reactions) and which satisfies the following
+conditions:
+\begin{enumerate}
+
+\item{} Nodes and edges must form a tree with a single root and
+there must be a unique path from the root to each node.
+In graph theory terminology, the directed graph formed by the nodes
+and edges must be an \dfn{arborescence}.
+\item{} Each node must inherit from one of \code{DecisionNode},
+\code{ChanceNode} or \code{LeafNode}. Formally the set of vertices
+must be a disjoint union of sets of decision nodes, chance nodes
+and leaf nodes.
+\item{} All and only leaf nodes must have no children.
+\item{} Each edge must inherit from either \code{Action} or
+\code{Reaction}.
+\item{} All and only edges that have source endpoints joined to 
+decision nodes must inherit from \code{Action}.
+\item{} All and only edges that have source endpoints joined to 
+chance nodes must inherit from \code{Reaction}.
+\item{} The sum of probabilities of each set of reaction edges 
+with a common source endpoint must be 1.
+\item{} Each \code{DecisionNode} must have a label, and the labels of all
+\code{DecisionNodes} must be unique within the model.
+\item{} Each \code{Action} must have a label, and the labels of  
+\code{Action}s that share a common source endpoint must be unique.
+
+\end{enumerate}
+
+\end{Details}
+%
+\begin{Section}{Super classes}
+\code{\LinkA{rdecision::Graph}{rdecision::Graph}} -> \code{\LinkA{rdecision::Digraph}{rdecision::Digraph}} -> \code{\LinkA{rdecision::Arborescence}{rdecision::Arborescence}} -> \code{DecisionTree}
+\end{Section}
+%
+\begin{Section}{Methods}
+%
+\begin{SubSection}{Public methods}
+\begin{itemize}
+
+\item{} \Rhref{#method-new}{\code{DecisionTree\$new()}}
+\item{} \Rhref{#method-decision_nodes}{\code{DecisionTree\$decision\_nodes()}}
+\item{} \Rhref{#method-chance_nodes}{\code{DecisionTree\$chance\_nodes()}}
+\item{} \Rhref{#method-leaf_nodes}{\code{DecisionTree\$leaf\_nodes()}}
+\item{} \Rhref{#method-actions}{\code{DecisionTree\$actions()}}
+\item{} \Rhref{#method-modvars}{\code{DecisionTree\$modvars()}}
+\item{} \Rhref{#method-modvar_table}{\code{DecisionTree\$modvar\_table()}}
+\item{} \Rhref{#method-paths_in_strategy}{\code{DecisionTree\$paths\_in\_strategy()}}
+\item{} \Rhref{#method-strategies}{\code{DecisionTree\$strategies()}}
+\item{} \Rhref{#method-evaluate_strategy}{\code{DecisionTree\$evaluate\_strategy()}}
+\item{} \Rhref{#method-evaluate}{\code{DecisionTree\$evaluate()}}
+\item{} \Rhref{#method-clone}{\code{DecisionTree\$clone()}}
+
+\end{itemize}
+
+\end{SubSection}
+
+
+
+
+\hypertarget{method-new}{}
+%
+\begin{SubSection}{Method \code{new()}}
+Create a new decision tree. The tree must consist of a set of
+nodes and a set of edges which satisfy the conditions given
+in the details section of this class.
+%
+\begin{SubSubSection}{Usage}
+\begin{alltt}DecisionTree$new(V, E)\end{alltt}
+
+\end{SubSubSection}
+
+
+%
+\begin{SubSubSection}{Arguments}
+
+\begin{description}
+
+\item[\code{V}] A list of nodes.
+
+\item[\code{E}] A list of edges.
+
+\end{description}
+
+
+\end{SubSubSection}
+
+%
+\begin{SubSubSection}{Returns}
+A DecisionTree object
+\end{SubSubSection}
+
+\end{SubSection}
+
+
+
+\hypertarget{method-decision_nodes}{}
+%
+\begin{SubSection}{Method \code{decision\_nodes()}}
+Find the decision nodes in the tree.
+%
+\begin{SubSubSection}{Usage}
+\begin{alltt}DecisionTree$decision_nodes(what = "node")\end{alltt}
+
+\end{SubSubSection}
+
+
+%
+\begin{SubSubSection}{Arguments}
+
+\begin{description}
+
+\item[\code{what}] A character string defining what to return. Must be one
+of "node", "label" or "index".
+
+\end{description}
+
+
+\end{SubSubSection}
+
+%
+\begin{SubSubSection}{Returns}
+A list of \code{DecisionNode} objects (for what="node"); a list
+of character strings (for what="label"); or a list of integer indexes of 
+the decision nodes (for what="index").
+\end{SubSubSection}
+
+\end{SubSection}
+
+
+
+\hypertarget{method-chance_nodes}{}
+%
+\begin{SubSection}{Method \code{chance\_nodes()}}
+Find the chance nodes in the tree.
+%
+\begin{SubSubSection}{Usage}
+\begin{alltt}DecisionTree$chance_nodes()\end{alltt}
+
+\end{SubSubSection}
+
+
+%
+\begin{SubSubSection}{Returns}
+A list of \code{ChanceNode} objects.
+\end{SubSubSection}
+
+\end{SubSection}
+
+
+
+\hypertarget{method-leaf_nodes}{}
+%
+\begin{SubSection}{Method \code{leaf\_nodes()}}
+Find the leaf nodes in the tree.
+%
+\begin{SubSubSection}{Usage}
+\begin{alltt}DecisionTree$leaf_nodes()\end{alltt}
+
+\end{SubSubSection}
+
+
+%
+\begin{SubSubSection}{Returns}
+A list of \code{LeafNode} objects.
+\end{SubSubSection}
+
+\end{SubSection}
+
+
+
+\hypertarget{method-actions}{}
+%
+\begin{SubSection}{Method \code{actions()}}
+Return the edges that have the specified decision node as their source.
+%
+\begin{SubSubSection}{Usage}
+\begin{alltt}DecisionTree$actions(d)\end{alltt}
+
+\end{SubSubSection}
+
+
+%
+\begin{SubSubSection}{Arguments}
+
+\begin{description}
+
+\item[\code{d}] A decision node.
+
+\end{description}
+
+
+\end{SubSubSection}
+
+%
+\begin{SubSubSection}{Returns}
+A list of Action edges.
+\end{SubSubSection}
+
+\end{SubSection}
+
+
+
+\hypertarget{method-modvars}{}
+%
+\begin{SubSection}{Method \code{modvars()}}
+Find all the model variables of type ModVar that have been specified
+as values associated with the nodes and edges of the tree.
+%
+\begin{SubSubSection}{Usage}
+\begin{alltt}DecisionTree$modvars()\end{alltt}
+
+\end{SubSubSection}
+
+
+%
+\begin{SubSubSection}{Returns}
+A list of \code{ModVar}s.
+\end{SubSubSection}
+
+\end{SubSection}
+
+
+
+\hypertarget{method-modvar_table}{}
+%
+\begin{SubSection}{Method \code{modvar\_table()}}
+Tabulate the model variables.
+%
+\begin{SubSubSection}{Usage}
+\begin{alltt}DecisionTree$modvar_table()\end{alltt}
+
+\end{SubSubSection}
+
+
+%
+\begin{SubSubSection}{Returns}
+Data frame with one row per model variable, as follows:
+\begin{description}
+
+\item[Label] The label given to the variable on creation.
+\item[Description] As given at initialization.
+\item[Units] Units of the variable.
+\item[Distribution] Either the uncertainty distribution, if
+it is a regular model variable, or the expression used to create it,
+if it is an ExprModVar.
+\item[Mean] Mean; calculated from means of operands if
+an expression.
+\item[E] Expectation; estimated from random sample if expression, 
+mean otherwise.
+\item[SD] Standard deviation; estimated from random sample if
+expression, exact value otherwise.
+\item[Q2.5] p=0.025 quantile; estimated from random sample if
+expression, exact value otherwise.
+\item[Q97.5] p=0.975 quantile; estimated from random sample if
+expression, exact value otherwise.
+\item[Est] TRUE if the quantiles and SD have been estimated by 
+random sampling.
+
+\end{description}
+
+\end{SubSubSection}
+
+\end{SubSection}
+
+
+
+\hypertarget{method-paths_in_strategy}{}
+%
+\begin{SubSection}{Method \code{paths\_in\_strategy()}}
+Find all the root to leaf paths traversable under 
+the specified strategy. A strategy is a unanimous prescription 
+of an action in each decision node.
+%
+\begin{SubSubSection}{Usage}
+\begin{alltt}DecisionTree$paths_in_strategy(strategy)\end{alltt}
+
+\end{SubSubSection}
+
+
+%
+\begin{SubSubSection}{Arguments}
+
+\begin{description}
+
+\item[\code{strategy}] A list of Actions, with one action per decision node.
+
+\end{description}
+
+
+\end{SubSubSection}
+
+%
+\begin{SubSubSection}{Returns}
+A list of root to leaf paths.
+\end{SubSubSection}
+
+\end{SubSection}
+
+
+
+\hypertarget{method-strategies}{}
+%
+\begin{SubSection}{Method \code{strategies()}}
+Find all unique strategies for the decision tree. A
+strategy is a unanimous prescription of the actions at each decision 
+node. In trees where there are decision nodes that are descendants
+of other decision nodes, not all decision nodes are reachable in 
+each strategy. Equivalently, different strategies involve the
+traversal of an identical set of paths and are considered non-
+unique. Only unique strategies are returned.
+%
+\begin{SubSubSection}{Usage}
+\begin{alltt}DecisionTree$strategies(what = "index")\end{alltt}
+
+\end{SubSubSection}
+
+
+%
+\begin{SubSubSection}{Arguments}
+
+\begin{description}
+
+\item[\code{what}] A character string defining what to return. Must be one
+of "label" or "index".
+
+\end{description}
+
+
+\end{SubSubSection}
+
+%
+\begin{SubSubSection}{Returns}
+A table (data frame) where each row is a strategy traversed by
+a unique set of paths, and each column is a Decision Node. Values are
+either the index of each action edge, or their label.
+\end{SubSubSection}
+
+\end{SubSection}
+
+
+
+\hypertarget{method-evaluate_strategy}{}
+%
+\begin{SubSection}{Method \code{evaluate\_strategy()}}
+Evaluate the components of payoff associated with the paths in the
+decision tree. For each path, the strategy, probability, cost,
+benefit and utility are calculated.
+%
+\begin{SubSubSection}{Usage}
+\begin{alltt}DecisionTree$evaluate_strategy(strategy)\end{alltt}
+
+\end{SubSubSection}
+
+
+%
+\begin{SubSubSection}{Arguments}
+
+\begin{description}
+
+\item[\code{strategy}] A list of Actions, with one action per decision node.
+
+\end{description}
+
+
+\end{SubSubSection}
+
+%
+\begin{SubSubSection}{Returns}
+A data frame (payoff table) with one row per path and columns
+organized as follows:
+\begin{description}
+
+\item[<label of decision node>] One column for each decision node
+in the mode. Each column is named with the label of the node. For each
+row (path) the value is the label of the Action edge taken from the
+decision node.
+\item[Leaf] The label of the leaf node on which the pathway ends; 
+normally the clinical outcome.
+\item[Probability] The probability of traversing the pathway. The total
+probability of each strategy should sum to unity.
+\item[Path.Cost] The cost of traversing the pathway.
+\item[Path.Benefit] The benefit derived from traversing the pathway.
+\item[Path.Utility] The utility associated with the outcome (leaf node).
+\item[Cost] Path.Cost \eqn{*}{} probability of traversing the pathway.
+\item[Benefit] Path.Benefit \eqn{*}{} probability of traversing the pathway.
+\item[Utility] Path.Utility \eqn{*}{} probability of traversing the pathway.
+
+\end{description}
+
+\end{SubSubSection}
+
+\end{SubSection}
+
+
+
+\hypertarget{method-evaluate}{}
+%
+\begin{SubSection}{Method \code{evaluate()}}
+Evaluate each strategy. Starting with the root, the function
+works though all possible paths to leaf nodes and computes the probability,
+cost, benefit and utility of each, then aggregates by strategy.
+%
+\begin{SubSubSection}{Usage}
+\begin{alltt}DecisionTree$evaluate(expected = TRUE, N = 1)\end{alltt}
+
+\end{SubSubSection}
+
+
+%
+\begin{SubSubSection}{Arguments}
+
+\begin{description}
+
+\item[\code{expected}] If TRUE, evaluate each model variable as its mean value,
+otherwise sample each one from their uncertainty distribution.
+
+\item[\code{N}] Number of replicates. Intended for use with PSA (expected=F);
+use with expected=T will be repetitive and uninformative.
+
+\end{description}
+
+
+\end{SubSubSection}
+
+%
+\begin{SubSubSection}{Returns}
+A data frame with one row per strategy per run and columns
+organized as follows:
+\begin{description}
+
+\item[Run] The run number
+\item[Strategy] The strategy.
+\item[Cost] Aggregate cost of the strategy.
+\item[Benefit] Aggregate benefit of the strategy.
+\item[Utility] Aggregate utility of the strategy.
+
+\end{description}
+
+\end{SubSubSection}
+
+\end{SubSection}
+
+
+
+\hypertarget{method-clone}{}
+%
+\begin{SubSection}{Method \code{clone()}}
+The objects of this class are cloneable with this method.
+%
+\begin{SubSubSection}{Usage}
+\begin{alltt}DecisionTree$clone(deep = FALSE)\end{alltt}
+
+\end{SubSubSection}
+
+
+%
+\begin{SubSubSection}{Arguments}
+
+\begin{description}
+
+\item[\code{deep}] Whether to make a deep clone.
+
+\end{description}
+
+
+\end{SubSubSection}
+
+\end{SubSection}
+
+\end{Section}
+%
+\begin{Author}\relax
+Andrew J. Sims \email{andrew.sims@newcastle.ac.uk}
+\end{Author}
+\inputencoding{utf8}
+\HeaderA{Digraph}{Digraph}{Digraph}
+%
+\begin{Description}\relax
+An R6 class to represent a digraph (a directed graph).
+\end{Description}
+%
+\begin{Details}\relax
+Encapulates, and provides methods for computation and checking of directed
+graphs (digraphs). Inherits from class Graph.
+\end{Details}
+%
+\begin{Section}{Super class}
+\code{\LinkA{rdecision::Graph}{rdecision::Graph}} -> \code{Digraph}
+\end{Section}
+%
+\begin{Section}{Methods}
+%
+\begin{SubSection}{Public methods}
+\begin{itemize}
+
+\item{} \Rhref{#method-new}{\code{Digraph\$new()}}
+\item{} \Rhref{#method-adjacency_matrix}{\code{Digraph\$adjacency\_matrix()}}
+\item{} \Rhref{#method-incidence_matrix}{\code{Digraph\$incidence\_matrix()}}
+\item{} \Rhref{#method-topological_sort}{\code{Digraph\$topological\_sort()}}
+\item{} \Rhref{#method-is_connected}{\code{Digraph\$is\_connected()}}
+\item{} \Rhref{#method-is_weakly_connected}{\code{Digraph\$is\_weakly\_connected()}}
+\item{} \Rhref{#method-is_acyclic}{\code{Digraph\$is\_acyclic()}}
+\item{} \Rhref{#method-is_tree}{\code{Digraph\$is\_tree()}}
+\item{} \Rhref{#method-is_polytree}{\code{Digraph\$is\_polytree()}}
+\item{} \Rhref{#method-is_arborescence}{\code{Digraph\$is\_arborescence()}}
+\item{} \Rhref{#method-direct_successors}{\code{Digraph\$direct\_successors()}}
+\item{} \Rhref{#method-direct_predecessors}{\code{Digraph\$direct\_predecessors()}}
+\item{} \Rhref{#method-paths}{\code{Digraph\$paths()}}
+\item{} \Rhref{#method-walk}{\code{Digraph\$walk()}}
+\item{} \Rhref{#method-clone}{\code{Digraph\$clone()}}
+
+\end{itemize}
+
+\end{SubSection}
+
+
+
+
+\hypertarget{method-new}{}
+%
+\begin{SubSection}{Method \code{new()}}
+Create a new Digraph object from sets of nodes and edges.
+%
+\begin{SubSubSection}{Usage}
+\begin{alltt}Digraph$new(V, A)\end{alltt}
+
+\end{SubSubSection}
+
+
+%
+\begin{SubSubSection}{Arguments}
+
+\begin{description}
+
+\item[\code{V}] A list of Nodes.
+
+\item[\code{A}] A list of Arrows.
+
+\end{description}
+
+
+\end{SubSubSection}
+
+%
+\begin{SubSubSection}{Returns}
+A Digraph object.
+\end{SubSubSection}
+
+\end{SubSection}
+
+
+
+\hypertarget{method-adjacency_matrix}{}
+%
+\begin{SubSection}{Method \code{adjacency\_matrix()}}
+Compute the adjacency matrix for the digraph. Each cell contains the
+number of edges from the row vertex to the column vertex, with the 
+convention of self loops being counted once, unless 'boolean' is TRUE
+when cells are either FALSE (not adjacent) or TRUE (adjacent).
+%
+\begin{SubSubSection}{Usage}
+\begin{alltt}Digraph$adjacency_matrix(boolean = FALSE)\end{alltt}
+
+\end{SubSubSection}
+
+
+%
+\begin{SubSubSection}{Arguments}
+
+\begin{description}
+
+\item[\code{boolean}] If TRUE, the adjacency matrix is logical, each cell is
+FALSE,TRUE.
+
+\end{description}
+
+
+\end{SubSubSection}
+
+%
+\begin{SubSubSection}{Returns}
+A square numeric matrix with the number of rows and columns
+equal to the order of the graph. The rows and columns are in the
+same order as V. If the nodes have defined and unique labels the
+dimnames of the matrix are the labels of the nodes.
+\end{SubSubSection}
+
+\end{SubSection}
+
+
+
+\hypertarget{method-incidence_matrix}{}
+%
+\begin{SubSection}{Method \code{incidence\_matrix()}}
+Compute the incidence matrix for the graph. Each row is a vertex and
+each column is an edge. Edges leaving a vertex have value -1 and edges
+entering have value +1. if all vertexes have defined and unique labels and all
+edges have defined and unique labels, the dimnames of the matrix are the labels of
+the vertexes and edges.
+%
+\begin{SubSubSection}{Usage}
+\begin{alltt}Digraph$incidence_matrix()\end{alltt}
+
+\end{SubSubSection}
+
+
+%
+\begin{SubSubSection}{Returns}
+The incidence matrix.
+\end{SubSubSection}
+
+\end{SubSection}
+
+
+
+\hypertarget{method-topological_sort}{}
+%
+\begin{SubSection}{Method \code{topological\_sort()}}
+Attempt to topologically sort the vertexes in the directed graph using
+Kahn's algorithm (https://doi.org/10.1145
+%
+\begin{SubSubSection}{Usage}
+\begin{alltt}Digraph$topological_sort()\end{alltt}
+
+\end{SubSubSection}
+
+
+%
+\begin{SubSubSection}{Returns}
+A list of vertexes, topologically sorted. If the digraph has
+cycles, the returned ordered list will not contain all the vertexes
+in the graph, but no error will be raised.
+\end{SubSubSection}
+
+\end{SubSection}
+
+
+
+\hypertarget{method-is_connected}{}
+%
+\begin{SubSection}{Method \code{is\_connected()}}
+Test whether the graph is connected. For digraphs this will
+always return FALSE because "connected" is not defined. Function
+\code{weakly\_connected} calculates whether the underlying
+graph is connected.
+%
+\begin{SubSubSection}{Usage}
+\begin{alltt}Digraph$is_connected()\end{alltt}
+
+\end{SubSubSection}
+
+
+%
+\begin{SubSubSection}{Returns}
+TRUE if connected, FALSE if not.
+\end{SubSubSection}
+
+\end{SubSection}
+
+
+
+\hypertarget{method-is_weakly_connected}{}
+%
+\begin{SubSection}{Method \code{is\_weakly\_connected()}}
+Test whether the digraph is weakly connected, i.e. if the
+underlying graph is connected.
+%
+\begin{SubSubSection}{Usage}
+\begin{alltt}Digraph$is_weakly_connected()\end{alltt}
+
+\end{SubSubSection}
+
+
+%
+\begin{SubSubSection}{Returns}
+TRUE if connected, FALSE if not.
+\end{SubSubSection}
+
+\end{SubSection}
+
+
+
+\hypertarget{method-is_acyclic}{}
+%
+\begin{SubSection}{Method \code{is\_acyclic()}}
+Checks for the presence of a cycle in the graph by attempting to do 
+a topological sort. If the sort does not contain all vertexes, the
+digraph contains at least one cycle.
+This method overrides 'is\_acyclic' in Graph.
+%
+\begin{SubSubSection}{Usage}
+\begin{alltt}Digraph$is_acyclic()\end{alltt}
+
+\end{SubSubSection}
+
+
+%
+\begin{SubSubSection}{Returns}
+TRUE if no cycles detected.
+\end{SubSubSection}
+
+\end{SubSection}
+
+
+
+\hypertarget{method-is_tree}{}
+%
+\begin{SubSection}{Method \code{is\_tree()}}
+Compute whether the digraph's underlying graph is a tree (connected and
+acyclic).
+%
+\begin{SubSubSection}{Usage}
+\begin{alltt}Digraph$is_tree()\end{alltt}
+
+\end{SubSubSection}
+
+
+%
+\begin{SubSubSection}{Returns}
+TRUE if the underlying graph is a tree; FALSE if not.
+\end{SubSubSection}
+
+\end{SubSection}
+
+
+
+\hypertarget{method-is_polytree}{}
+%
+\begin{SubSection}{Method \code{is\_polytree()}}
+Compute whether the digraph's underlying graph is a tree (connected and
+acyclic). Synonymous with 'is\_graph'.
+%
+\begin{SubSubSection}{Usage}
+\begin{alltt}Digraph$is_polytree()\end{alltt}
+
+\end{SubSubSection}
+
+
+%
+\begin{SubSubSection}{Returns}
+TRUE if the underlying graph is a tree; FALSE if not.
+\end{SubSubSection}
+
+\end{SubSection}
+
+
+
+\hypertarget{method-is_arborescence}{}
+%
+\begin{SubSection}{Method \code{is\_arborescence()}}
+Check whether the digraph is an arborescence (a tree with a
+single root and unique paths from the root).
+%
+\begin{SubSubSection}{Usage}
+\begin{alltt}Digraph$is_arborescence()\end{alltt}
+
+\end{SubSubSection}
+
+
+%
+\begin{SubSubSection}{Returns}
+TRUE if the digraph is an arborescence; FALSE if not.
+\end{SubSubSection}
+
+\end{SubSection}
+
+
+
+\hypertarget{method-direct_successors}{}
+%
+\begin{SubSection}{Method \code{direct\_successors()}}
+Find the direct successors of a node.
+%
+\begin{SubSubSection}{Usage}
+\begin{alltt}Digraph$direct_successors(v)\end{alltt}
+
+\end{SubSubSection}
+
+
+%
+\begin{SubSubSection}{Arguments}
+
+\begin{description}
+
+\item[\code{v}] The index vertex.
+
+\end{description}
+
+
+\end{SubSubSection}
+
+%
+\begin{SubSubSection}{Returns}
+A list of nodes or an empty list if the specified
+node has no successors.
+\end{SubSubSection}
+
+\end{SubSection}
+
+
+
+\hypertarget{method-direct_predecessors}{}
+%
+\begin{SubSection}{Method \code{direct\_predecessors()}}
+Find the direct predecessors of a node.
+%
+\begin{SubSubSection}{Usage}
+\begin{alltt}Digraph$direct_predecessors(v)\end{alltt}
+
+\end{SubSubSection}
+
+
+%
+\begin{SubSubSection}{Arguments}
+
+\begin{description}
+
+\item[\code{v}] The index vertex.
+
+\end{description}
+
+
+\end{SubSubSection}
+
+%
+\begin{SubSubSection}{Returns}
+A list of nodes or an empty list if the specified
+node has no predecessors.
+\end{SubSubSection}
+
+\end{SubSection}
+
+
+
+\hypertarget{method-paths}{}
+%
+\begin{SubSection}{Method \code{paths()}}
+Find all directed paths from source node 's' to target node 't'. In this
+definition, 'path' is a simple path, i.e. all vertexes are unique.
+Uses a recursive depth-first search algorithm.
+%
+\begin{SubSubSection}{Usage}
+\begin{alltt}Digraph$paths(s, t)\end{alltt}
+
+\end{SubSubSection}
+
+
+%
+\begin{SubSubSection}{Arguments}
+
+\begin{description}
+
+\item[\code{s}] Source node.
+
+\item[\code{t}] Target node.
+
+\end{description}
+
+
+\end{SubSubSection}
+
+%
+\begin{SubSubSection}{Returns}
+A list of ordered node lists.
+\end{SubSubSection}
+
+\end{SubSection}
+
+
+
+\hypertarget{method-walk}{}
+%
+\begin{SubSection}{Method \code{walk()}}
+Construct the sequence of edges which joins the specified
+sequence of vertexes in this graph.
+%
+\begin{SubSubSection}{Usage}
+\begin{alltt}Digraph$walk(P)\end{alltt}
+
+\end{SubSubSection}
+
+
+%
+\begin{SubSubSection}{Arguments}
+
+\begin{description}
+
+\item[\code{P}] A list of Nodes
+
+\end{description}
+
+
+\end{SubSubSection}
+
+%
+\begin{SubSubSection}{Returns}
+A list of Edges
+\end{SubSubSection}
+
+\end{SubSection}
+
+
+
+\hypertarget{method-clone}{}
+%
+\begin{SubSection}{Method \code{clone()}}
+The objects of this class are cloneable with this method.
+%
+\begin{SubSubSection}{Usage}
+\begin{alltt}Digraph$clone(deep = FALSE)\end{alltt}
+
+\end{SubSubSection}
+
+
+%
+\begin{SubSubSection}{Arguments}
+
+\begin{description}
+
+\item[\code{deep}] Whether to make a deep clone.
+
+\end{description}
+
+
+\end{SubSubSection}
+
+\end{SubSection}
+
+\end{Section}
+%
+\begin{Author}\relax
+Andrew Sims \email{andrew.sims@newcastle.ac.uk}
+\end{Author}
+\inputencoding{utf8}
+\HeaderA{Edge}{Edge}{Edge}
+%
+\begin{Description}\relax
+An R6 class to represent an edge in a graph.
+\end{Description}
+%
+\begin{Details}\relax
+Edges are the formal term for links between pairs of nodes in a
+graph.
+\end{Details}
+%
+\begin{Section}{Methods}
+%
+\begin{SubSection}{Public methods}
+\begin{itemize}
+
+\item{} \Rhref{#method-new}{\code{Edge\$new()}}
+\item{} \Rhref{#method-is_same_edge}{\code{Edge\$is\_same\_edge()}}
+\item{} \Rhref{#method-endpoints}{\code{Edge\$endpoints()}}
+\item{} \Rhref{#method-label}{\code{Edge\$label()}}
+\item{} \Rhref{#method-clone}{\code{Edge\$clone()}}
+
+\end{itemize}
+
+\end{SubSection}
+
+
+
+\hypertarget{method-new}{}
+%
+\begin{SubSection}{Method \code{new()}}
+Create an object of type 'Edge'.
+%
+\begin{SubSubSection}{Usage}
+\begin{alltt}Edge$new(v1, v2, label = "")\end{alltt}
+
+\end{SubSubSection}
+
+
+%
+\begin{SubSubSection}{Arguments}
+
+\begin{description}
+
+\item[\code{v1}] Node at one endpoint of the edge.
+
+\item[\code{v2}] Node at the other endpoint of the edge.
+
+\item[\code{label}] Character string containing the edge label.
+
+\end{description}
+
+
+\end{SubSubSection}
+
+%
+\begin{SubSubSection}{Returns}
+A new `Edge` object.
+\end{SubSubSection}
+
+\end{SubSection}
+
+
+
+\hypertarget{method-is_same_edge}{}
+%
+\begin{SubSection}{Method \code{is\_same\_edge()}}
+Is this edge the same as the argument? (DOM-style)
+%
+\begin{SubSubSection}{Usage}
+\begin{alltt}Edge$is_same_edge(e)\end{alltt}
+
+\end{SubSubSection}
+
+
+%
+\begin{SubSubSection}{Arguments}
+
+\begin{description}
+
+\item[\code{e}] edge to compare with this one
+
+\end{description}
+
+
+\end{SubSubSection}
+
+%
+\begin{SubSubSection}{Returns}
+TRUE if `e` is also this one.
+\end{SubSubSection}
+
+\end{SubSection}
+
+
+
+\hypertarget{method-endpoints}{}
+%
+\begin{SubSection}{Method \code{endpoints()}}
+Retrieve the endpoints of the edge.
+%
+\begin{SubSubSection}{Usage}
+\begin{alltt}Edge$endpoints()\end{alltt}
+
+\end{SubSubSection}
+
+
+%
+\begin{SubSubSection}{Returns}
+List of two nodes to which the edge is connected.
+\end{SubSubSection}
+
+\end{SubSection}
+
+
+
+\hypertarget{method-label}{}
+%
+\begin{SubSection}{Method \code{label()}}
+Access label.
+%
+\begin{SubSubSection}{Usage}
+\begin{alltt}Edge$label()\end{alltt}
+
+\end{SubSubSection}
+
+
+%
+\begin{SubSubSection}{Returns}
+Label of the edge; character string.
+\end{SubSubSection}
+
+\end{SubSection}
+
+
+
+\hypertarget{method-clone}{}
+%
+\begin{SubSection}{Method \code{clone()}}
+The objects of this class are cloneable with this method.
+%
+\begin{SubSubSection}{Usage}
+\begin{alltt}Edge$clone(deep = FALSE)\end{alltt}
+
+\end{SubSubSection}
+
+
+%
+\begin{SubSubSection}{Arguments}
+
+\begin{description}
+
+\item[\code{deep}] Whether to make a deep clone.
+
+\end{description}
+
+
+\end{SubSubSection}
+
+\end{SubSection}
+
+\end{Section}
+%
+\begin{Author}\relax
+Andrew J. Sims \email{andrew.sims@newcastle.ac.uk}
+\end{Author}
+\inputencoding{utf8}
+\HeaderA{ExprModVar}{ExprModVar}{ExprModVar}
+%
+\begin{Description}\relax
+An R6 class for a model variable constructed from an expression
+involving other model variables.
+\end{Description}
+%
+\begin{Details}\relax
+A class to support expressions involving objects
+of base class ModVar, which itself behaves like a 
+model variable. For example, if \code{A} and
+\code{B} are variables with base class \code{ModVar}
+and \code{c} is a variable of type \code{numeric}, then
+it is not possible to write, for example, 
+\code{x <- 42*A/B + c}, because R cannot manipulate class
+variables using the same operators as regular variables. 
+But such forms of expression may be desirable in constructing a
+model and this class provides a mechanism for doing so.
+\end{Details}
+%
+\begin{Section}{Super class}
+\code{\LinkA{rdecision::ModVar}{rdecision::ModVar}} -> \code{ExprModVar}
+\end{Section}
+%
+\begin{Section}{Methods}
+%
+\begin{SubSection}{Public methods}
+\begin{itemize}
+
+\item{} \Rhref{#method-new}{\code{ExprModVar\$new()}}
+\item{} \Rhref{#method-is_probabilistic}{\code{ExprModVar\$is\_probabilistic()}}
+\item{} \Rhref{#method-operands}{\code{ExprModVar\$operands()}}
+\item{} \Rhref{#method-distribution}{\code{ExprModVar\$distribution()}}
+\item{} \Rhref{#method-r}{\code{ExprModVar\$r()}}
+\item{} \Rhref{#method-mean}{\code{ExprModVar\$mean()}}
+\item{} \Rhref{#method-mode}{\code{ExprModVar\$mode()}}
+\item{} \Rhref{#method-SD}{\code{ExprModVar\$SD()}}
+\item{} \Rhref{#method-quantile}{\code{ExprModVar\$quantile()}}
+\item{} \Rhref{#method-mu_hat}{\code{ExprModVar\$mu\_hat()}}
+\item{} \Rhref{#method-sigma_hat}{\code{ExprModVar\$sigma\_hat()}}
+\item{} \Rhref{#method-q_hat}{\code{ExprModVar\$q\_hat()}}
+\item{} \Rhref{#method-set}{\code{ExprModVar\$set()}}
+\item{} \Rhref{#method-get}{\code{ExprModVar\$get()}}
+\item{} \Rhref{#method-clone}{\code{ExprModVar\$clone()}}
+
+\end{itemize}
+
+\end{SubSection}
+
+
+
+
+\hypertarget{method-new}{}
+%
+\begin{SubSection}{Method \code{new()}}
+Create a Model Variable formed from an expression involving other
+model variables.
+%
+\begin{SubSubSection}{Usage}
+\begin{alltt}ExprModVar$new(description, units, quo)\end{alltt}
+
+\end{SubSubSection}
+
+
+%
+\begin{SubSubSection}{Arguments}
+
+\begin{description}
+
+\item[\code{description}] Name for the model variable expresssion. In 
+a complex model it may help to tabulate how model variables are
+combined into costs, probablities and rates.
+
+\item[\code{units}] Units in which the variable is expressed.
+
+\item[\code{quo}] A quosure (see package rlang), which contains an expression
+and its environment. The usage is `quo(x+y)` or `rlang::quo(x+y)`.
+
+\end{description}
+
+
+\end{SubSubSection}
+
+%
+\begin{SubSubSection}{Returns}
+An object of type ExprModVar
+\end{SubSubSection}
+
+\end{SubSection}
+
+
+
+\hypertarget{method-is_probabilistic}{}
+%
+\begin{SubSection}{Method \code{is\_probabilistic()}}
+Tests whether the model variable is probabilistic, i.e. a random
+variable that follows a distribution, or an expression involving
+random variables, at least one of which follows a distribution.
+%
+\begin{SubSubSection}{Usage}
+\begin{alltt}ExprModVar$is_probabilistic()\end{alltt}
+
+\end{SubSubSection}
+
+
+%
+\begin{SubSubSection}{Returns}
+TRUE if probabilistic
+\end{SubSubSection}
+
+\end{SubSection}
+
+
+
+\hypertarget{method-operands}{}
+%
+\begin{SubSection}{Method \code{operands()}}
+Return a list of operands that are themselves ModVars given
+in the expression.
+%
+\begin{SubSubSection}{Usage}
+\begin{alltt}ExprModVar$operands()\end{alltt}
+
+\end{SubSubSection}
+
+
+%
+\begin{SubSubSection}{Returns}
+A list of model variables.
+\end{SubSubSection}
+
+\end{SubSection}
+
+
+
+\hypertarget{method-distribution}{}
+%
+\begin{SubSection}{Method \code{distribution()}}
+Accessor function for the name of the expression model variable.
+%
+\begin{SubSubSection}{Usage}
+\begin{alltt}ExprModVar$distribution()\end{alltt}
+
+\end{SubSubSection}
+
+
+%
+\begin{SubSubSection}{Returns}
+Expression as a character string with all control characters
+having been removed.
+\end{SubSubSection}
+
+\end{SubSection}
+
+
+
+\hypertarget{method-r}{}
+%
+\begin{SubSection}{Method \code{r()}}
+Draw a random sample from the model variable.
+%
+\begin{SubSubSection}{Usage}
+\begin{alltt}ExprModVar$r(n = 1)\end{alltt}
+
+\end{SubSubSection}
+
+
+%
+\begin{SubSubSection}{Arguments}
+
+\begin{description}
+
+\item[\code{n}] Number of samples to draw.
+
+\end{description}
+
+
+\end{SubSubSection}
+
+%
+\begin{SubSubSection}{Returns}
+A sample drawn at random.
+\end{SubSubSection}
+
+\end{SubSection}
+
+
+
+\hypertarget{method-mean}{}
+%
+\begin{SubSection}{Method \code{mean()}}
+Return the value of the expression when its operands take their
+mean value (i.e. value returned by call to \code{mean} or their
+value, if numeric). See notes on this class for further explanation.
+%
+\begin{SubSubSection}{Usage}
+\begin{alltt}ExprModVar$mean()\end{alltt}
+
+\end{SubSubSection}
+
+
+%
+\begin{SubSubSection}{Returns}
+Mean value as a numeric value.
+\end{SubSubSection}
+
+\end{SubSection}
+
+
+
+\hypertarget{method-mode}{}
+%
+\begin{SubSection}{Method \code{mode()}}
+Return the mode of the variable. By default returns NA, which will be
+the case for most ExprModVar variables, because an arbitrary expression
+is not guaranteed to be unimodel.
+%
+\begin{SubSubSection}{Usage}
+\begin{alltt}ExprModVar$mode()\end{alltt}
+
+\end{SubSubSection}
+
+
+%
+\begin{SubSubSection}{Returns}
+Mode as a numeric value.
+\end{SubSubSection}
+
+\end{SubSection}
+
+
+
+\hypertarget{method-SD}{}
+%
+\begin{SubSection}{Method \code{SD()}}
+Return the standard deviation of the distribution as NA because the
+variance is not available as a closed form for all functions of
+distributions.
+%
+\begin{SubSubSection}{Usage}
+\begin{alltt}ExprModVar$SD()\end{alltt}
+
+\end{SubSubSection}
+
+
+%
+\begin{SubSubSection}{Returns}
+Standard deviation as a numeric value
+\end{SubSubSection}
+
+\end{SubSection}
+
+
+
+\hypertarget{method-quantile}{}
+%
+\begin{SubSection}{Method \code{quantile()}}
+Find quantiles of the uncertainty distribution.  Not available
+as a closed form, and returned as NA.
+%
+\begin{SubSubSection}{Usage}
+\begin{alltt}ExprModVar$quantile(probs)\end{alltt}
+
+\end{SubSubSection}
+
+
+%
+\begin{SubSubSection}{Arguments}
+
+\begin{description}
+
+\item[\code{probs}] Numeric vector of probabilities, each in range [0,1].
+
+\end{description}
+
+
+\end{SubSubSection}
+
+%
+\begin{SubSubSection}{Returns}
+Vector of numeric values of the same length as `probs`.
+\end{SubSubSection}
+
+\end{SubSection}
+
+
+
+\hypertarget{method-mu_hat}{}
+%
+\begin{SubSection}{Method \code{mu\_hat()}}
+Return the estimated expected value of the expression variable. This is
+computed by numerical simulation because there is, in general, no closed
+form expressions for the mean of a function of distributions.
+%
+\begin{SubSubSection}{Usage}
+\begin{alltt}ExprModVar$mu_hat(nest = 1000)\end{alltt}
+
+\end{SubSubSection}
+
+
+%
+\begin{SubSubSection}{Arguments}
+
+\begin{description}
+
+\item[\code{nest}] Sample size to be used to estimate the mean. Values less than
+1000 (default) are unlikely to return meaningful estimates and will 
+be rejected.
+
+\end{description}
+
+
+\end{SubSubSection}
+
+%
+\begin{SubSubSection}{Returns}
+Expected value as a numeric value.
+\end{SubSubSection}
+
+\end{SubSection}
+
+
+
+\hypertarget{method-sigma_hat}{}
+%
+\begin{SubSection}{Method \code{sigma\_hat()}}
+Return the estimated standard deviation of the distribution. This is
+computed by numerical simulation because there is, in general, no closed
+form expressions for the SD of a function of distributions.
+%
+\begin{SubSubSection}{Usage}
+\begin{alltt}ExprModVar$sigma_hat(nest = 1000)\end{alltt}
+
+\end{SubSubSection}
+
+
+%
+\begin{SubSubSection}{Arguments}
+
+\begin{description}
+
+\item[\code{nest}] Sample size to be used to estimate the SD. Values less than
+1000 (default) are unlikely to return meaningful estimates and will 
+be rejected.
+
+\end{description}
+
+
+\end{SubSubSection}
+
+%
+\begin{SubSubSection}{Returns}
+Standard deviation as a numeric value.
+\end{SubSubSection}
+
+\end{SubSection}
+
+
+
+\hypertarget{method-q_hat}{}
+%
+\begin{SubSection}{Method \code{q\_hat()}}
+Return the estimated quantiles by sampling the variable. This is
+computed by numerical simulation because there is, in general, no closed
+form expressions for the quantiles of a function of distributions.
+%
+\begin{SubSubSection}{Usage}
+\begin{alltt}ExprModVar$q_hat(probs, nest = 1000)\end{alltt}
+
+\end{SubSubSection}
+
+
+%
+\begin{SubSubSection}{Arguments}
+
+\begin{description}
+
+\item[\code{probs}] Vector of probabilities, in range [0,1].
+
+\item[\code{nest}] Sample size to be used to estimate the SD. Values less than
+1000 (default) are unlikely to return meaningful estimates and will 
+be rejected.
+
+\end{description}
+
+
+\end{SubSubSection}
+
+%
+\begin{SubSubSection}{Returns}
+Vector of quantiles.
+\end{SubSubSection}
+
+\end{SubSection}
+
+
+
+\hypertarget{method-set}{}
+%
+\begin{SubSection}{Method \code{set()}}
+Sets the value of the ExprModVar that will be returned by subsequent
+calls to get() until set() is called again. Because an ExprModVar can be 
+considered the LHS of an equation, the idea of \code{set}ting a value
+is meaningless, and calls to this method have no effect. To affect the
+value returned by the next call to \code{get}, call \code{set} for each
+of the operands of this expression.
+%
+\begin{SubSubSection}{Usage}
+\begin{alltt}ExprModVar$set(expected = FALSE)\end{alltt}
+
+\end{SubSubSection}
+
+
+%
+\begin{SubSubSection}{Arguments}
+
+\begin{description}
+
+\item[\code{expected}] Logical; for compatibility with non-expression ModVars
+only; not used.
+
+\end{description}
+
+
+\end{SubSubSection}
+
+%
+\begin{SubSubSection}{Returns}
+Updated ExprModVar.
+\end{SubSubSection}
+
+\end{SubSection}
+
+
+
+\hypertarget{method-get}{}
+%
+\begin{SubSection}{Method \code{get()}}
+Gets the value of the ExprModVar that was set by the most recent call
+to set() to each operand of the expression.
+%
+\begin{SubSubSection}{Usage}
+\begin{alltt}ExprModVar$get()\end{alltt}
+
+\end{SubSubSection}
+
+
+%
+\begin{SubSubSection}{Returns}
+Value determined by last set().
+\end{SubSubSection}
+
+\end{SubSection}
+
+
+
+\hypertarget{method-clone}{}
+%
+\begin{SubSection}{Method \code{clone()}}
+The objects of this class are cloneable with this method.
+%
+\begin{SubSubSection}{Usage}
+\begin{alltt}ExprModVar$clone(deep = FALSE)\end{alltt}
+
+\end{SubSubSection}
+
+
+%
+\begin{SubSubSection}{Arguments}
+
+\begin{description}
+
+\item[\code{deep}] Whether to make a deep clone.
+
+\end{description}
+
+
+\end{SubSubSection}
+
+\end{SubSection}
+
+\end{Section}
+%
+\begin{Note}\relax
+For many expressions involving model variables there will 
+be no closed form expressions for the mean, standard deviation and
+the quantiles. Therefore they are obtained by simulation, via
+functions \code{mu\_hat}, \code{sigma\_hat} and \code{q\_hat}.
+
+For consistency with \code{ModVar}s which are not expressions, the
+function \code{mean} returns the value of the expression when all
+its operands take their mean values. This will, in general, not
+be the mean of the expression distribution (which can be obtained
+via \code{mu\_hat}), but is the value normally used in the base
+case of a model as the point estimate. As Briggs \emph{et al} note 
+(section 4.1.1) "in all but the most nonlinear models, the 
+difference between the expectation over the output of a 
+probabilistic model and that model evaluated at the mean values
+of the input parameters, is likely to be modest."
+
+Functions \code{SD}, \code{mode} and \code{quantile} return NA
+because they do not necessarily have a closed form. The standard
+deviation can be estimated by calling \code{sigma\_hat} and the
+quantiles by \code{q\_hat}. Because a unimodal distribution is not
+guaranteed, there is no estimator provided for the mode.
+
+Method \code{distribution} returns the string representation 
+of the expression used to create the model variable.
+\end{Note}
+%
+\begin{Author}\relax
+Andrew J. Sims \email{andrew.sims@newcastle.ac.uk}
+\end{Author}
+\inputencoding{utf8}
+\HeaderA{GammaModVar}{GammaModVar}{GammaModVar}
+%
+\begin{Description}\relax
+An R6 class for a model variable with Gamma function uncertainty
+\end{Description}
+%
+\begin{Details}\relax
+A model variable for which the uncertainty in the point estimate can
+be modelled with a Gamma distribution. The hyperparameters of the
+distribution are the shape (`alpha`) and the rate (`beta`) of
+the uncertainty distribution. Note that this is the conventional
+parametrization used in Bayesian statistics; in econometrics the
+shape/scale (`k`/`theta`) parametrization is more common (and the one
+used in this implementation). Note, however, that although Briggs et al
+use the shape/scale formulation, they use `alpha`/`beta` as parameter
+names.
+\end{Details}
+%
+\begin{Section}{Super class}
+\code{\LinkA{rdecision::ModVar}{rdecision::ModVar}} -> \code{GammaModVar}
+\end{Section}
+%
+\begin{Section}{Methods}
+%
+\begin{SubSection}{Public methods}
+\begin{itemize}
+
+\item{} \Rhref{#method-new}{\code{GammaModVar\$new()}}
+\item{} \Rhref{#method-is_probabilistic}{\code{GammaModVar\$is\_probabilistic()}}
+\item{} \Rhref{#method-distribution}{\code{GammaModVar\$distribution()}}
+\item{} \Rhref{#method-mean}{\code{GammaModVar\$mean()}}
+\item{} \Rhref{#method-mode}{\code{GammaModVar\$mode()}}
+\item{} \Rhref{#method-SD}{\code{GammaModVar\$SD()}}
+\item{} \Rhref{#method-r}{\code{GammaModVar\$r()}}
+\item{} \Rhref{#method-quantile}{\code{GammaModVar\$quantile()}}
+\item{} \Rhref{#method-clone}{\code{GammaModVar\$clone()}}
+
+\end{itemize}
+
+\end{SubSection}
+
+
+
+
+\hypertarget{method-new}{}
+%
+\begin{SubSection}{Method \code{new()}}
+Create an object of class GammaModVar.
+%
+\begin{SubSubSection}{Usage}
+\begin{alltt}GammaModVar$new(description, units, shape, scale)\end{alltt}
+
+\end{SubSubSection}
+
+
+%
+\begin{SubSubSection}{Arguments}
+
+\begin{description}
+
+\item[\code{description}] A character string describing the variable.
+
+\item[\code{units}] Units of the variable, as character string.
+
+\item[\code{shape}] shape parameter of the Gamma distribution.
+
+\item[\code{scale}] scale parameter of the Gamma distribution.
+
+\end{description}
+
+
+\end{SubSubSection}
+
+%
+\begin{SubSubSection}{Returns}
+An object of class GammaModVar.
+\end{SubSubSection}
+
+\end{SubSection}
+
+
+
+\hypertarget{method-is_probabilistic}{}
+%
+\begin{SubSection}{Method \code{is\_probabilistic()}}
+Tests whether the model variable is probabilistic, i.e. a random
+variable that follows a distribution, or an expression involving
+random variables, some of which follow distributions.
+%
+\begin{SubSubSection}{Usage}
+\begin{alltt}GammaModVar$is_probabilistic()\end{alltt}
+
+\end{SubSubSection}
+
+
+%
+\begin{SubSubSection}{Returns}
+TRUE if probabilistic
+\end{SubSubSection}
+
+\end{SubSection}
+
+
+
+\hypertarget{method-distribution}{}
+%
+\begin{SubSection}{Method \code{distribution()}}
+Accessor function for the name of the uncertainty distribution.
+%
+\begin{SubSubSection}{Usage}
+\begin{alltt}GammaModVar$distribution()\end{alltt}
+
+\end{SubSubSection}
+
+
+%
+\begin{SubSubSection}{Returns}
+Distribution name as character string.
+\end{SubSubSection}
+
+\end{SubSection}
+
+
+
+\hypertarget{method-mean}{}
+%
+\begin{SubSection}{Method \code{mean()}}
+Return the expected value of the distribution.
+%
+\begin{SubSubSection}{Usage}
+\begin{alltt}GammaModVar$mean()\end{alltt}
+
+\end{SubSubSection}
+
+
+%
+\begin{SubSubSection}{Returns}
+Expected value as a numeric value.
+\end{SubSubSection}
+
+\end{SubSection}
+
+
+
+\hypertarget{method-mode}{}
+%
+\begin{SubSection}{Method \code{mode()}}
+Return the mode of the distribution (if shape >= 1)
+%
+\begin{SubSubSection}{Usage}
+\begin{alltt}GammaModVar$mode()\end{alltt}
+
+\end{SubSubSection}
+
+
+%
+\begin{SubSubSection}{Returns}
+mode as a numeric value.
+\end{SubSubSection}
+
+\end{SubSection}
+
+
+
+\hypertarget{method-SD}{}
+%
+\begin{SubSection}{Method \code{SD()}}
+Return the standard deviation of the distribution.
+%
+\begin{SubSubSection}{Usage}
+\begin{alltt}GammaModVar$SD()\end{alltt}
+
+\end{SubSubSection}
+
+
+%
+\begin{SubSubSection}{Returns}
+Standard deviation as a numeric value
+\end{SubSubSection}
+
+\end{SubSection}
+
+
+
+\hypertarget{method-r}{}
+%
+\begin{SubSection}{Method \code{r()}}
+Draw a random sample from the model variable. Normally accessed by a 
+call to value(what="r").
+%
+\begin{SubSubSection}{Usage}
+\begin{alltt}GammaModVar$r(n = 1)\end{alltt}
+
+\end{SubSubSection}
+
+
+%
+\begin{SubSubSection}{Arguments}
+
+\begin{description}
+
+\item[\code{n}] Number of samples to draw.
+
+\end{description}
+
+
+\end{SubSubSection}
+
+%
+\begin{SubSubSection}{Returns}
+Samples drawn at random.
+\end{SubSubSection}
+
+\end{SubSection}
+
+
+
+\hypertarget{method-quantile}{}
+%
+\begin{SubSection}{Method \code{quantile()}}
+Return the quantiles of the Gamma uncertainty distribution.
+%
+\begin{SubSubSection}{Usage}
+\begin{alltt}GammaModVar$quantile(probs)\end{alltt}
+
+\end{SubSubSection}
+
+
+%
+\begin{SubSubSection}{Arguments}
+
+\begin{description}
+
+\item[\code{probs}] Vector of probabilities, in range [0,1].
+
+\end{description}
+
+
+\end{SubSubSection}
+
+%
+\begin{SubSubSection}{Returns}
+Vector of quantiles.
+\end{SubSubSection}
+
+\end{SubSection}
+
+
+
+\hypertarget{method-clone}{}
+%
+\begin{SubSection}{Method \code{clone()}}
+The objects of this class are cloneable with this method.
+%
+\begin{SubSubSection}{Usage}
+\begin{alltt}GammaModVar$clone(deep = FALSE)\end{alltt}
+
+\end{SubSubSection}
+
+
+%
+\begin{SubSubSection}{Arguments}
+
+\begin{description}
+
+\item[\code{deep}] Whether to make a deep clone.
+
+\end{description}
+
+
+\end{SubSubSection}
+
+\end{SubSection}
+
+\end{Section}
+%
+\begin{Author}\relax
+Andrew J. Sims \email{andrew.sims@newcastle.ac.uk}
+\end{Author}
+\inputencoding{utf8}
+\HeaderA{Graph}{Graph}{Graph}
+%
+\begin{Description}\relax
+An R6 class to represent a graph (from discrete mathematics).
+\end{Description}
+%
+\begin{Details}\relax
+Encapulates and provides methods for computation and checking of undirected
+graphs. Graphs are systems of vertices connected in pairs by edges.
+\end{Details}
+%
+\begin{Section}{Methods}
+%
+\begin{SubSection}{Public methods}
+\begin{itemize}
+
+\item{} \Rhref{#method-new}{\code{Graph\$new()}}
+\item{} \Rhref{#method-has_vertex}{\code{Graph\$has\_vertex()}}
+\item{} \Rhref{#method-has_edge}{\code{Graph\$has\_edge()}}
+\item{} \Rhref{#method-has_element}{\code{Graph\$has\_element()}}
+\item{} \Rhref{#method-element_index}{\code{Graph\$element\_index()}}
+\item{} \Rhref{#method-order}{\code{Graph\$order()}}
+\item{} \Rhref{#method-size}{\code{Graph\$size()}}
+\item{} \Rhref{#method-adjacency_matrix}{\code{Graph\$adjacency\_matrix()}}
+\item{} \Rhref{#method-is_simple}{\code{Graph\$is\_simple()}}
+\item{} \Rhref{#method-is_connected}{\code{Graph\$is\_connected()}}
+\item{} \Rhref{#method-is_acyclic}{\code{Graph\$is\_acyclic()}}
+\item{} \Rhref{#method-is_tree}{\code{Graph\$is\_tree()}}
+\item{} \Rhref{#method-degree}{\code{Graph\$degree()}}
+\item{} \Rhref{#method-neighbours}{\code{Graph\$neighbours()}}
+\item{} \Rhref{#method-clone}{\code{Graph\$clone()}}
+
+\end{itemize}
+
+\end{SubSection}
+
+
+
+\hypertarget{method-new}{}
+%
+\begin{SubSection}{Method \code{new()}}
+Create a new Graph object from sets of nodes and edges.
+%
+\begin{SubSubSection}{Usage}
+\begin{alltt}Graph$new(V, E)\end{alltt}
+
+\end{SubSubSection}
+
+
+%
+\begin{SubSubSection}{Arguments}
+
+\begin{description}
+
+\item[\code{V}] A list of Nodes.
+
+\item[\code{E}] A list of Edges.
+
+\end{description}
+
+
+\end{SubSubSection}
+
+%
+\begin{SubSubSection}{Returns}
+A Graph object.
+\end{SubSubSection}
+
+\end{SubSection}
+
+
+
+\hypertarget{method-has_vertex}{}
+%
+\begin{SubSection}{Method \code{has\_vertex()}}
+Test whether a vertex an element of the graph.
+%
+\begin{SubSubSection}{Usage}
+\begin{alltt}Graph$has_vertex(v)\end{alltt}
+
+\end{SubSubSection}
+
+
+%
+\begin{SubSubSection}{Arguments}
+
+\begin{description}
+
+\item[\code{v}] Subject vertex.
+
+\end{description}
+
+
+\end{SubSubSection}
+
+%
+\begin{SubSubSection}{Returns}
+TRUE if v is an element of V(G).
+\end{SubSubSection}
+
+\end{SubSection}
+
+
+
+\hypertarget{method-has_edge}{}
+%
+\begin{SubSection}{Method \code{has\_edge()}}
+Test whether an edge is element of the graph.
+%
+\begin{SubSubSection}{Usage}
+\begin{alltt}Graph$has_edge(e)\end{alltt}
+
+\end{SubSubSection}
+
+
+%
+\begin{SubSubSection}{Arguments}
+
+\begin{description}
+
+\item[\code{e}] Subject edge.
+
+\end{description}
+
+
+\end{SubSubSection}
+
+%
+\begin{SubSubSection}{Returns}
+TRUE if e is an element of E(G).
+\end{SubSubSection}
+
+\end{SubSection}
+
+
+
+\hypertarget{method-has_element}{}
+%
+\begin{SubSection}{Method \code{has\_element()}}
+Test whether an edge is an element of the graph.
+%
+\begin{SubSubSection}{Usage}
+\begin{alltt}Graph$has_element(x)\end{alltt}
+
+\end{SubSubSection}
+
+
+%
+\begin{SubSubSection}{Arguments}
+
+\begin{description}
+
+\item[\code{x}] Subject vertex or edge
+
+\end{description}
+
+
+\end{SubSubSection}
+
+%
+\begin{SubSubSection}{Returns}
+TRUE if x is an element of V(G), the vertex set,
+or x is an element of E(G), the edge set.
+\end{SubSubSection}
+
+\end{SubSection}
+
+
+
+\hypertarget{method-element_index}{}
+%
+\begin{SubSection}{Method \code{element\_index()}}
+Find the index of element x in the vertices or edges of the graph. The
+vertices and edges are normally stored internally in the same order they 
+were defined in the call to \$new(), but this cannot be guaranteed. The index 
+returned by this function will be same as the index of a vertex or edge 
+returned by other methods, e.g. adjacancy\_matrix.
+%
+\begin{SubSubSection}{Usage}
+\begin{alltt}Graph$element_index(x)\end{alltt}
+
+\end{SubSubSection}
+
+
+%
+\begin{SubSubSection}{Arguments}
+
+\begin{description}
+
+\item[\code{x}] The subject element (a Node or Edge).
+
+\end{description}
+
+
+\end{SubSubSection}
+
+%
+\begin{SubSubSection}{Returns}
+The index of the element (integer).
+\end{SubSubSection}
+
+\end{SubSection}
+
+
+
+\hypertarget{method-order}{}
+%
+\begin{SubSection}{Method \code{order()}}
+Return the order of the graph (number of vertices).
+%
+\begin{SubSubSection}{Usage}
+\begin{alltt}Graph$order()\end{alltt}
+
+\end{SubSubSection}
+
+
+%
+\begin{SubSubSection}{Returns}
+Order of the graph (integer).
+\end{SubSubSection}
+
+\end{SubSection}
+
+
+
+\hypertarget{method-size}{}
+%
+\begin{SubSection}{Method \code{size()}}
+Return the size of the graph (number of edges).
+%
+\begin{SubSubSection}{Usage}
+\begin{alltt}Graph$size()\end{alltt}
+
+\end{SubSubSection}
+
+
+%
+\begin{SubSubSection}{Returns}
+Size of the graph (integer).
+\end{SubSubSection}
+
+\end{SubSection}
+
+
+
+\hypertarget{method-adjacency_matrix}{}
+%
+\begin{SubSection}{Method \code{adjacency\_matrix()}}
+Compute the adjacency matrix for the graph. Each cell contains the
+number of edges joining the two vertexes, with the convention of
+self loops being counted twice, unless 'binary' is TRUE when cells are
+either 0 (not adjacent) or 1 (adjacent).
+%
+\begin{SubSubSection}{Usage}
+\begin{alltt}Graph$adjacency_matrix(boolean = FALSE)\end{alltt}
+
+\end{SubSubSection}
+
+
+%
+\begin{SubSubSection}{Arguments}
+
+\begin{description}
+
+\item[\code{boolean}] If TRUE, the adjacency matrix is logical, each cell is
+FALSE,TRUE.
+
+\end{description}
+
+
+\end{SubSubSection}
+
+%
+\begin{SubSubSection}{Returns}
+A square numeric matrix with the number of rows and columns
+equal to the order of the graph. The rows and columns are in the
+same order as V. If the nodes have defined and unique labels the
+dimnames of the matrix are the labels of the nodes.
+\end{SubSubSection}
+
+\end{SubSection}
+
+
+
+\hypertarget{method-is_simple}{}
+%
+\begin{SubSection}{Method \code{is\_simple()}}
+A simple graph has no self loops or multi-edges.
+%
+\begin{SubSubSection}{Usage}
+\begin{alltt}Graph$is_simple()\end{alltt}
+
+\end{SubSubSection}
+
+
+%
+\begin{SubSubSection}{Returns}
+TRUE if simple, FALSE if not.
+\end{SubSubSection}
+
+\end{SubSection}
+
+
+
+\hypertarget{method-is_connected}{}
+%
+\begin{SubSection}{Method \code{is\_connected()}}
+Test whether the graph is connected. Graphs with no vertices are 
+considered unconnected; graphs with 1 vertex are considered
+connected. Otherwise a graph is connected if all nodes can be 
+reached from an arbitrary starting point. Uses a depth first
+search.
+%
+\begin{SubSubSection}{Usage}
+\begin{alltt}Graph$is_connected()\end{alltt}
+
+\end{SubSubSection}
+
+
+%
+\begin{SubSubSection}{Returns}
+TRUE if connected, FALSE if not.
+\end{SubSubSection}
+
+\end{SubSection}
+
+
+
+\hypertarget{method-is_acyclic}{}
+%
+\begin{SubSection}{Method \code{is\_acyclic()}}
+Checks for the presence of a cycle in the graph using a depth-first
+search from each node to detect the presence of back edges. A back
+edge is an edge from the current node joining a previously detected 
+(visited) node, that is not the parent node of the current one.
+%
+\begin{SubSubSection}{Usage}
+\begin{alltt}Graph$is_acyclic()\end{alltt}
+
+\end{SubSubSection}
+
+
+%
+\begin{SubSubSection}{Returns}
+TRUE if no cycles detected.
+\end{SubSubSection}
+
+\end{SubSection}
+
+
+
+\hypertarget{method-is_tree}{}
+%
+\begin{SubSection}{Method \code{is\_tree()}}
+Compute whether the graph is connected and acyclic.
+%
+\begin{SubSubSection}{Usage}
+\begin{alltt}Graph$is_tree()\end{alltt}
+
+\end{SubSubSection}
+
+
+%
+\begin{SubSubSection}{Returns}
+TRUE if the graph is a tree; FALSE if not.
+\end{SubSubSection}
+
+\end{SubSection}
+
+
+
+\hypertarget{method-degree}{}
+%
+\begin{SubSection}{Method \code{degree()}}
+The degree of a vertex in the graph, or number of incident edges.
+%
+\begin{SubSubSection}{Usage}
+\begin{alltt}Graph$degree(v)\end{alltt}
+
+\end{SubSubSection}
+
+
+%
+\begin{SubSubSection}{Arguments}
+
+\begin{description}
+
+\item[\code{v}] The subject node.
+
+\end{description}
+
+
+\end{SubSubSection}
+
+%
+\begin{SubSubSection}{Returns}
+Degree of the vertex, integer.
+\end{SubSubSection}
+
+\end{SubSection}
+
+
+
+\hypertarget{method-neighbours}{}
+%
+\begin{SubSection}{Method \code{neighbours()}}
+Find the neighbours of a node. A property of the graph, not the node.
+Does not include self, even in the case of a loop to self.
+%
+\begin{SubSubSection}{Usage}
+\begin{alltt}Graph$neighbours(v)\end{alltt}
+
+\end{SubSubSection}
+
+
+%
+\begin{SubSubSection}{Arguments}
+
+\begin{description}
+
+\item[\code{v}] The subject node.
+
+\end{description}
+
+
+\end{SubSubSection}
+
+%
+\begin{SubSubSection}{Returns}
+A list of nodes which are joined to the subject.
+\end{SubSubSection}
+
+\end{SubSection}
+
+
+
+\hypertarget{method-clone}{}
+%
+\begin{SubSection}{Method \code{clone()}}
+The objects of this class are cloneable with this method.
+%
+\begin{SubSubSection}{Usage}
+\begin{alltt}Graph$clone(deep = FALSE)\end{alltt}
+
+\end{SubSubSection}
+
+
+%
+\begin{SubSubSection}{Arguments}
+
+\begin{description}
+
+\item[\code{deep}] Whether to make a deep clone.
+
+\end{description}
+
+
+\end{SubSubSection}
+
+\end{SubSection}
+
+\end{Section}
+%
+\begin{Author}\relax
+Andrew Sims \email{andrew.sims@newcastle.ac.uk}
+\end{Author}
+\inputencoding{utf8}
+\HeaderA{LeafNode}{LeafNode}{LeafNode}
+%
+\begin{Description}\relax
+An R6 class for a leaf node in a decision tree representing a clinical state.
+\end{Description}
+%
+\begin{Details}\relax
+It represents a state of being, and is associated with an incremental
+utility.
+\end{Details}
+%
+\begin{Section}{Super class}
+\code{\LinkA{rdecision::Node}{rdecision::Node}} -> \code{LeafNode}
+\end{Section}
+%
+\begin{Section}{Methods}
+%
+\begin{SubSection}{Public methods}
+\begin{itemize}
+
+\item{} \Rhref{#method-new}{\code{LeafNode\$new()}}
+\item{} \Rhref{#method-modvars}{\code{LeafNode\$modvars()}}
+\item{} \Rhref{#method-utility}{\code{LeafNode\$utility()}}
+\item{} \Rhref{#method-clone}{\code{LeafNode\$clone()}}
+
+\end{itemize}
+
+\end{SubSection}
+
+
+
+
+\hypertarget{method-new}{}
+%
+\begin{SubSection}{Method \code{new()}}
+Create a new \code{LeafNode} object; synonymous with a clinical outcome.
+%
+\begin{SubSubSection}{Usage}
+\begin{alltt}LeafNode$new(
+  label,
+  utility = 1,
+  interval = as.difftime(365.25, units = "days")
+)\end{alltt}
+
+\end{SubSubSection}
+
+
+%
+\begin{SubSubSection}{Arguments}
+
+\begin{description}
+
+\item[\code{label}] Character string; a label for the state; must be
+defined because it is used in tabulations. The label is automatically converted
+to a syntactically valid (in R) name to ensure it can be used as a column
+name in a data frame.
+
+\item[\code{utility}] The incremental utility that a user associates with
+being in the health state (range -Inf to 1) for the interval. Intended
+for use with cost benefit analysis.
+
+\item[\code{interval}] The time interval over which the \code{utility} parameters
+apply, expressed as an R \code{difftime} object; default 1 year.
+
+\end{description}
+
+
+\end{SubSubSection}
+
+%
+\begin{SubSubSection}{Returns}
+A new \code{LeafNode} object
+\end{SubSubSection}
+
+\end{SubSection}
+
+
+
+\hypertarget{method-modvars}{}
+%
+\begin{SubSection}{Method \code{modvars()}}
+Find all the model variables of type ModVar that have been specified
+as values associated with this LeafNode. Includes operands of these
+\code{ModVar}s, if they are expressions.
+%
+\begin{SubSubSection}{Usage}
+\begin{alltt}LeafNode$modvars()\end{alltt}
+
+\end{SubSubSection}
+
+
+%
+\begin{SubSubSection}{Returns}
+A list of \code{ModVar}s.
+\end{SubSubSection}
+
+\end{SubSection}
+
+
+
+\hypertarget{method-utility}{}
+%
+\begin{SubSection}{Method \code{utility()}}
+Return the incremental utility associated with being in the state for
+the interval.
+%
+\begin{SubSubSection}{Usage}
+\begin{alltt}LeafNode$utility(expected)\end{alltt}
+
+\end{SubSubSection}
+
+
+%
+\begin{SubSubSection}{Arguments}
+
+\begin{description}
+
+\item[\code{expected}] Parameter passed to the \code{value} method of the model
+variable used to define utility; ignored otherwise.
+
+\end{description}
+
+
+\end{SubSubSection}
+
+%
+\begin{SubSubSection}{Returns}
+Incremental utility (numeric value).
+\end{SubSubSection}
+
+\end{SubSection}
+
+
+
+\hypertarget{method-clone}{}
+%
+\begin{SubSection}{Method \code{clone()}}
+The objects of this class are cloneable with this method.
+%
+\begin{SubSubSection}{Usage}
+\begin{alltt}LeafNode$clone(deep = FALSE)\end{alltt}
+
+\end{SubSubSection}
+
+
+%
+\begin{SubSubSection}{Arguments}
+
+\begin{description}
+
+\item[\code{deep}] Whether to make a deep clone.
+
+\end{description}
+
+
+\end{SubSubSection}
+
+\end{SubSection}
+
+\end{Section}
+%
+\begin{Author}\relax
+Andrew J. Sims \email{andrew.sims@newcastle.ac.uk}
+\end{Author}
+\inputencoding{utf8}
+\HeaderA{LogNormModVar}{LogNormModVar}{LogNormModVar}
+%
+\begin{Description}\relax
+An R6 class for a model variable with Log Normal uncertainty
+\end{Description}
+%
+\begin{Details}\relax
+A model variable for which the uncertainty in the point estimate can
+be modelled with a Log Normal distribution. 
+\Rhref{https://sites.google.com/site/probonto/}{ProbOnto}
+defines seven parametrizations of the log normal distribution. These are linked,
+allowing the parameters of any one to be derived from any other. All
+7 parameterizations require two parameters; their meanings are as follows:
+\begin{description}
+
+\item[LN1] \eqn{p_1=\mu}{}, \eqn{p_2=\sigma}{}, where \eqn{\mu}{} and \eqn{\sigma}{} are the mean
+and standard deviation, both on the log scale.
+\item[LN2] \eqn{p_1=\mu}{}, \eqn{p_2=v}{}, where \eqn{\mu}{} and \eqn{v}{} are the mean
+and variance, both on the log scale.
+\item[LN3] \eqn{p_1=m}{}, \eqn{p_2=\sigma}{}, where \eqn{m}{} is the median on the natural
+scale and \eqn{\sigma}{} is the standard deviation on the log scale.
+\item[LN4] \eqn{p_1=m}{}, \eqn{p_2=c_v}{}, where \eqn{m}{} is the median on the natural
+scale and \eqn{c_v}{} is the coefficient of variation on the natural scale.
+\item[LN5] \eqn{p_1=\mu}{}, \eqn{p_2=\tau}{}, where \eqn{\mu}{} is the mean on the log
+scale and \eqn{\tau}{} is the precision on the log scale.
+\item[LN6] \eqn{p_1=m}{}, \eqn{p_2=\sigma_g}{}, where \eqn{m}{} is the median on
+the natural scale and \eqn{\sigma_g}{} is the geometric standard deviation on the
+natural scale.
+\item[LN7] \eqn{p_1=\mu_N}{}, \eqn{p1=\sigma_N}{}, where \eqn{\mu_N}{} is the mean on
+the natural scale and \eqn{\sigma_N}{} is the standard deviation on the
+natural scale.
+
+\end{description}
+
+\end{Details}
+%
+\begin{Section}{Super class}
+\code{\LinkA{rdecision::ModVar}{rdecision::ModVar}} -> \code{LogNormModVar}
+\end{Section}
+%
+\begin{Section}{Methods}
+%
+\begin{SubSection}{Public methods}
+\begin{itemize}
+
+\item{} \Rhref{#method-new}{\code{LogNormModVar\$new()}}
+\item{} \Rhref{#method-is_probabilistic}{\code{LogNormModVar\$is\_probabilistic()}}
+\item{} \Rhref{#method-distribution}{\code{LogNormModVar\$distribution()}}
+\item{} \Rhref{#method-r}{\code{LogNormModVar\$r()}}
+\item{} \Rhref{#method-mean}{\code{LogNormModVar\$mean()}}
+\item{} \Rhref{#method-mode}{\code{LogNormModVar\$mode()}}
+\item{} \Rhref{#method-SD}{\code{LogNormModVar\$SD()}}
+\item{} \Rhref{#method-quantile}{\code{LogNormModVar\$quantile()}}
+\item{} \Rhref{#method-clone}{\code{LogNormModVar\$clone()}}
+
+\end{itemize}
+
+\end{SubSection}
+
+
+
+
+\hypertarget{method-new}{}
+%
+\begin{SubSection}{Method \code{new()}}
+Create a model variable with log normal uncertainty.
+%
+\begin{SubSubSection}{Usage}
+\begin{alltt}LogNormModVar$new(description, units, p1, p2, parametrization = "LN1")\end{alltt}
+
+\end{SubSubSection}
+
+
+%
+\begin{SubSubSection}{Arguments}
+
+\begin{description}
+
+\item[\code{description}] A character string describing the variable.
+
+\item[\code{units}] Units of the quantity; character string.
+
+\item[\code{p1}] First hyperparameter, a measure of location. 
+See 'Details'.
+
+\item[\code{p2}] Second hyperparameter, a measure of spread.
+See 'Details'.
+
+\item[\code{parametrization}] A character string taking one of the values
+'LN1' (default) through 'LN7' (see 'Details').
+
+\end{description}
+
+
+\end{SubSubSection}
+
+%
+\begin{SubSubSection}{Returns}
+A LogNormModVar object.
+\end{SubSubSection}
+
+\end{SubSection}
+
+
+
+\hypertarget{method-is_probabilistic}{}
+%
+\begin{SubSection}{Method \code{is\_probabilistic()}}
+Tests whether the model variable is probabilistic, i.e. a random
+variable that follows a distribution, or an expression involving
+random variables, some of which follow distributions.
+%
+\begin{SubSubSection}{Usage}
+\begin{alltt}LogNormModVar$is_probabilistic()\end{alltt}
+
+\end{SubSubSection}
+
+
+%
+\begin{SubSubSection}{Returns}
+TRUE if probabilistic
+\end{SubSubSection}
+
+\end{SubSection}
+
+
+
+\hypertarget{method-distribution}{}
+%
+\begin{SubSection}{Method \code{distribution()}}
+Accessor function for the name of the uncertainty distribution.
+%
+\begin{SubSubSection}{Usage}
+\begin{alltt}LogNormModVar$distribution()\end{alltt}
+
+\end{SubSubSection}
+
+
+%
+\begin{SubSubSection}{Returns}
+Distribution name as character string (LN1, LN2 etc).
+\end{SubSubSection}
+
+\end{SubSection}
+
+
+
+\hypertarget{method-r}{}
+%
+\begin{SubSection}{Method \code{r()}}
+Draw a random sample from the model variable.
+%
+\begin{SubSubSection}{Usage}
+\begin{alltt}LogNormModVar$r(n = 1)\end{alltt}
+
+\end{SubSubSection}
+
+
+%
+\begin{SubSubSection}{Arguments}
+
+\begin{description}
+
+\item[\code{n}] Number of samples to draw.
+
+\end{description}
+
+
+\end{SubSubSection}
+
+%
+\begin{SubSubSection}{Returns}
+A sample drawn at random.
+\end{SubSubSection}
+
+\end{SubSection}
+
+
+
+\hypertarget{method-mean}{}
+%
+\begin{SubSection}{Method \code{mean()}}
+Return the expected value of the distribution.
+%
+\begin{SubSubSection}{Usage}
+\begin{alltt}LogNormModVar$mean()\end{alltt}
+
+\end{SubSubSection}
+
+
+%
+\begin{SubSubSection}{Returns}
+Expected value as a numeric value.
+\end{SubSubSection}
+
+\end{SubSection}
+
+
+
+\hypertarget{method-mode}{}
+%
+\begin{SubSection}{Method \code{mode()}}
+Return the point estimate of the variable.
+%
+\begin{SubSubSection}{Usage}
+\begin{alltt}LogNormModVar$mode()\end{alltt}
+
+\end{SubSubSection}
+
+
+%
+\begin{SubSubSection}{Returns}
+Point estimate (mode) of the LN distribution.
+\end{SubSubSection}
+
+\end{SubSection}
+
+
+
+\hypertarget{method-SD}{}
+%
+\begin{SubSection}{Method \code{SD()}}
+Return the standard deviation of the distribution.
+%
+\begin{SubSubSection}{Usage}
+\begin{alltt}LogNormModVar$SD()\end{alltt}
+
+\end{SubSubSection}
+
+
+%
+\begin{SubSubSection}{Returns}
+Standard deviation as a numeric value
+\end{SubSubSection}
+
+\end{SubSection}
+
+
+
+\hypertarget{method-quantile}{}
+%
+\begin{SubSection}{Method \code{quantile()}}
+Return the quantiles of the logNormal uncertainty distribution.
+%
+\begin{SubSubSection}{Usage}
+\begin{alltt}LogNormModVar$quantile(probs)\end{alltt}
+
+\end{SubSubSection}
+
+
+%
+\begin{SubSubSection}{Arguments}
+
+\begin{description}
+
+\item[\code{probs}] Vector of probabilities, in range [0,1].
+
+\end{description}
+
+
+\end{SubSubSection}
+
+%
+\begin{SubSubSection}{Returns}
+Vector of quantiles.
+\end{SubSubSection}
+
+\end{SubSection}
+
+
+
+\hypertarget{method-clone}{}
+%
+\begin{SubSection}{Method \code{clone()}}
+The objects of this class are cloneable with this method.
+%
+\begin{SubSubSection}{Usage}
+\begin{alltt}LogNormModVar$clone(deep = FALSE)\end{alltt}
+
+\end{SubSubSection}
+
+
+%
+\begin{SubSubSection}{Arguments}
+
+\begin{description}
+
+\item[\code{deep}] Whether to make a deep clone.
+
+\end{description}
+
+
+\end{SubSubSection}
+
+\end{SubSection}
+
+\end{Section}
+%
+\begin{Author}\relax
+Andrew J. Sims \email{andrew.sims@newcastle.ac.uk}
+\end{Author}
+\inputencoding{utf8}
+\HeaderA{ModVar}{ModVar}{ModVar}
+%
+\begin{Description}\relax
+An R6 class for a variable in an health economic model
+\end{Description}
+%
+\begin{Details}\relax
+Base class for a variable used in a health economic model. The base 
+class, which is not intended to be directly instantiated by model
+applications, wraps a numerical value which is used in calculations.
+The base class provides a framework for creating classes of model
+variables whose uncertainties are described by statistical distributions
+parametrized with hyperparameters.
+\end{Details}
+%
+\begin{Section}{Methods}
+%
+\begin{SubSection}{Public methods}
+\begin{itemize}
+
+\item{} \Rhref{#method-new}{\code{ModVar\$new()}}
+\item{} \Rhref{#method-is_expression}{\code{ModVar\$is\_expression()}}
+\item{} \Rhref{#method-is_probabilistic}{\code{ModVar\$is\_probabilistic()}}
+\item{} \Rhref{#method-description}{\code{ModVar\$description()}}
+\item{} \Rhref{#method-units}{\code{ModVar\$units()}}
+\item{} \Rhref{#method-distribution}{\code{ModVar\$distribution()}}
+\item{} \Rhref{#method-r}{\code{ModVar\$r()}}
+\item{} \Rhref{#method-mean}{\code{ModVar\$mean()}}
+\item{} \Rhref{#method-mode}{\code{ModVar\$mode()}}
+\item{} \Rhref{#method-SD}{\code{ModVar\$SD()}}
+\item{} \Rhref{#method-quantile}{\code{ModVar\$quantile()}}
+\item{} \Rhref{#method-set}{\code{ModVar\$set()}}
+\item{} \Rhref{#method-get}{\code{ModVar\$get()}}
+\item{} \Rhref{#method-clone}{\code{ModVar\$clone()}}
+
+\end{itemize}
+
+\end{SubSection}
+
+
+
+\hypertarget{method-new}{}
+%
+\begin{SubSection}{Method \code{new()}}
+Create an object of type `ModVar`
+%
+\begin{SubSubSection}{Usage}
+\begin{alltt}ModVar$new(description, units)\end{alltt}
+
+\end{SubSubSection}
+
+
+%
+\begin{SubSubSection}{Arguments}
+
+\begin{description}
+
+\item[\code{description}] A character string description of the variable
+and its role in the model. This description will be used in a
+tabulation of the variables linked to a model.
+
+\item[\code{units}] A character string description of the units, e.g. 'GBP',
+'per year'.
+
+\end{description}
+
+
+\end{SubSubSection}
+
+%
+\begin{SubSubSection}{Returns}
+A new ModVar object.
+\end{SubSubSection}
+
+\end{SubSection}
+
+
+
+\hypertarget{method-is_expression}{}
+%
+\begin{SubSection}{Method \code{is\_expression()}}
+Is this ModVar an expression?
+%
+\begin{SubSubSection}{Usage}
+\begin{alltt}ModVar$is_expression()\end{alltt}
+
+\end{SubSubSection}
+
+
+%
+\begin{SubSubSection}{Returns}
+TRUE if it inherits from ExprModVar, FALSE otherwise.
+\end{SubSubSection}
+
+\end{SubSection}
+
+
+
+\hypertarget{method-is_probabilistic}{}
+%
+\begin{SubSection}{Method \code{is\_probabilistic()}}
+Tests whether the model variable is probabilistic, i.e. a random
+variable that follows a distribution, or an expression involving
+random variables, some of which follow distributions.
+%
+\begin{SubSubSection}{Usage}
+\begin{alltt}ModVar$is_probabilistic()\end{alltt}
+
+\end{SubSubSection}
+
+
+%
+\begin{SubSubSection}{Returns}
+TRUE if probabilistic
+\#' @description
+\#' Return the current value of the model variable. This will be the 
+\#' expected value if the argument to the most recent call to `sample`
+\#' was TRUE or after creation of the object; otherwise it will return
+\#' a value sampled from the uncertainty distribution. 
+\#' @param what Determines what is returned (a character string). Options
+\#' are as follows:
+\#' \begin{description}
+
+\#'   \item["pe"] Point estimate
+\#'   \item["r"] A single random sample from the uncertainty distribution
+\#'   \item["mean"] Mean of the uncertainty distribution
+\#' 
+\end{description}
+
+\#' @return Numeric value of the model variable.
+value = function(what="pe") 
+\# check argument
+if (!is.character(what)) 
+rlang::abort("Argument 'what' must be a character string", 
+class="what\_not\_string")
+
+\# returned requested value
+v <- as.numeric(NA)
+if (what=="pe") 
+v <- self\$point\_estimate()
+ else if (what=="mean") 
+v <- self\$mean()
+ else if (what=="r") 
+v <- self\$r(1)
+ else 
+rlang::abort("Argument 'what' must be (pe|r|mean)", class="unknown\_what")
+
+return(v)  
+,
+\end{SubSubSection}
+
+\end{SubSection}
+
+
+
+\hypertarget{method-description}{}
+%
+\begin{SubSection}{Method \code{description()}}
+Accessor function for the description.
+%
+\begin{SubSubSection}{Usage}
+\begin{alltt}ModVar$description()\end{alltt}
+
+\end{SubSubSection}
+
+
+%
+\begin{SubSubSection}{Returns}
+Description of model variable as character string.
+\end{SubSubSection}
+
+\end{SubSection}
+
+
+
+\hypertarget{method-units}{}
+%
+\begin{SubSection}{Method \code{units()}}
+Accessor function for units.
+%
+\begin{SubSubSection}{Usage}
+\begin{alltt}ModVar$units()\end{alltt}
+
+\end{SubSubSection}
+
+
+%
+\begin{SubSubSection}{Returns}
+Description of units as character string.
+\end{SubSubSection}
+
+\end{SubSection}
+
+
+
+\hypertarget{method-distribution}{}
+%
+\begin{SubSection}{Method \code{distribution()}}
+Accessor function for the name of the uncertainty distribution.
+%
+\begin{SubSubSection}{Usage}
+\begin{alltt}ModVar$distribution()\end{alltt}
+
+\end{SubSubSection}
+
+
+%
+\begin{SubSubSection}{Returns}
+Distribution name as character string.
+\end{SubSubSection}
+
+\end{SubSection}
+
+
+
+\hypertarget{method-r}{}
+%
+\begin{SubSection}{Method \code{r()}}
+Draw a random sample from the model variable.
+%
+\begin{SubSubSection}{Usage}
+\begin{alltt}ModVar$r(n = 1)\end{alltt}
+
+\end{SubSubSection}
+
+
+%
+\begin{SubSubSection}{Arguments}
+
+\begin{description}
+
+\item[\code{n}] Number of samples to draw.
+
+\end{description}
+
+
+\end{SubSubSection}
+
+%
+\begin{SubSubSection}{Returns}
+A sample drawn at random.
+\end{SubSubSection}
+
+\end{SubSection}
+
+
+
+\hypertarget{method-mean}{}
+%
+\begin{SubSection}{Method \code{mean()}}
+Return the mean value of the distribution.
+%
+\begin{SubSubSection}{Usage}
+\begin{alltt}ModVar$mean()\end{alltt}
+
+\end{SubSubSection}
+
+
+%
+\begin{SubSubSection}{Returns}
+Mean value as a numeric value.
+\end{SubSubSection}
+
+\end{SubSection}
+
+
+
+\hypertarget{method-mode}{}
+%
+\begin{SubSection}{Method \code{mode()}}
+Return the mode of the variable. By default returns NA, which will be
+the case for most ExprModVar variables, because an arbitrary expression
+is not guaranteed to be unimodel.
+%
+\begin{SubSubSection}{Usage}
+\begin{alltt}ModVar$mode()\end{alltt}
+
+\end{SubSubSection}
+
+
+%
+\begin{SubSubSection}{Returns}
+Mode as a numeric value.
+\end{SubSubSection}
+
+\end{SubSection}
+
+
+
+\hypertarget{method-SD}{}
+%
+\begin{SubSection}{Method \code{SD()}}
+Return the standard deviation of the distribution.
+%
+\begin{SubSubSection}{Usage}
+\begin{alltt}ModVar$SD()\end{alltt}
+
+\end{SubSubSection}
+
+
+%
+\begin{SubSubSection}{Returns}
+Standard deviation as a numeric value
+\end{SubSubSection}
+
+\end{SubSection}
+
+
+
+\hypertarget{method-quantile}{}
+%
+\begin{SubSection}{Method \code{quantile()}}
+Find quantiles of the uncertainty distribution.
+%
+\begin{SubSubSection}{Usage}
+\begin{alltt}ModVar$quantile(probs)\end{alltt}
+
+\end{SubSubSection}
+
+
+%
+\begin{SubSubSection}{Arguments}
+
+\begin{description}
+
+\item[\code{probs}] Numeric vector of probabilities, each in range [0,1].
+
+\end{description}
+
+
+\end{SubSubSection}
+
+%
+\begin{SubSubSection}{Returns}
+Vector of numeric values of the same length as `probs`.
+\end{SubSubSection}
+
+\end{SubSection}
+
+
+
+\hypertarget{method-set}{}
+%
+\begin{SubSection}{Method \code{set()}}
+Sets the value of the ModVar that will be returned by subsequent
+calls to get() until set() is called again.
+%
+\begin{SubSubSection}{Usage}
+\begin{alltt}ModVar$set(expected = FALSE)\end{alltt}
+
+\end{SubSubSection}
+
+
+%
+\begin{SubSubSection}{Arguments}
+
+\begin{description}
+
+\item[\code{expected}] Logical; TRUE to set the value to the mean of the model
+variable.
+
+\end{description}
+
+
+\end{SubSubSection}
+
+%
+\begin{SubSubSection}{Returns}
+Updated ModVar.
+\end{SubSubSection}
+
+\end{SubSection}
+
+
+
+\hypertarget{method-get}{}
+%
+\begin{SubSection}{Method \code{get()}}
+Gets the value of the ExprModVar that was set by the most recent call
+to set().
+%
+\begin{SubSubSection}{Usage}
+\begin{alltt}ModVar$get()\end{alltt}
+
+\end{SubSubSection}
+
+
+%
+\begin{SubSubSection}{Returns}
+Value determined by last set().
+\end{SubSubSection}
+
+\end{SubSection}
+
+
+
+\hypertarget{method-clone}{}
+%
+\begin{SubSection}{Method \code{clone()}}
+The objects of this class are cloneable with this method.
+%
+\begin{SubSubSection}{Usage}
+\begin{alltt}ModVar$clone(deep = FALSE)\end{alltt}
+
+\end{SubSubSection}
+
+
+%
+\begin{SubSubSection}{Arguments}
+
+\begin{description}
+
+\item[\code{deep}] Whether to make a deep clone.
+
+\end{description}
+
+
+\end{SubSubSection}
+
+\end{SubSection}
+
+\end{Section}
+%
+\begin{Author}\relax
+Andrew Sims \email{andrew.sims@newcastle.ac.uk}
+\end{Author}
+\inputencoding{utf8}
+\HeaderA{Node}{Node}{Node}
+%
+\begin{Description}\relax
+An R6 class to represent a node in a decision tree
+\end{Description}
+%
+\begin{Details}\relax
+Base class to represent a single node in a decision tree. Objects of base
+class Node are not expected to be created as model objects.
+\end{Details}
+%
+\begin{Section}{Methods}
+%
+\begin{SubSection}{Public methods}
+\begin{itemize}
+
+\item{} \Rhref{#method-new}{\code{Node\$new()}}
+\item{} \Rhref{#method-label}{\code{Node\$label()}}
+\item{} \Rhref{#method-type}{\code{Node\$type()}}
+\item{} \Rhref{#method-clone}{\code{Node\$clone()}}
+
+\end{itemize}
+
+\end{SubSection}
+
+
+
+\hypertarget{method-new}{}
+%
+\begin{SubSection}{Method \code{new()}}
+Create new Node object.
+%
+\begin{SubSubSection}{Usage}
+\begin{alltt}Node$new(label = "")\end{alltt}
+
+\end{SubSubSection}
+
+
+%
+\begin{SubSubSection}{Arguments}
+
+\begin{description}
+
+\item[\code{label}] An optional label for the node.
+
+\end{description}
+
+
+\end{SubSubSection}
+
+%
+\begin{SubSubSection}{Returns}
+A new Node object.
+\end{SubSubSection}
+
+\end{SubSection}
+
+
+
+\hypertarget{method-label}{}
+%
+\begin{SubSection}{Method \code{label()}}
+Return the label of the node.
+%
+\begin{SubSubSection}{Usage}
+\begin{alltt}Node$label()\end{alltt}
+
+\end{SubSubSection}
+
+
+%
+\begin{SubSubSection}{Returns}
+Label as a character string.
+\#' @description
+\#' Return list of child nodes (DOM-style)
+\#' @return 
+\#' list of child Nodes
+child\_nodes = function() 
+children = list()
+for (e in private\$edges) 
+children <- c(children, e\$target())
+
+return(children)
+,
+\#' @description 
+\#' Return list of descendent nodes.
+\#' @return List of descendent nodes, including self.
+descendantNodes = function() 
+nodes <- list()
+toLeaf <- function(node) 
+\# push current node to path
+nodes[[length(nodes)+1]] <<- node
+\# process child nodes if not leaf
+if (node\$has\_child\_nodes()) 
+for (child in node\$child\_nodes()) 
+toLeaf(child)
+
+
+
+toLeaf(self)
+return(nodes)
+,
+\#' @description
+\#' Is this node the same as the argument? (DOM-style)
+\#' @param otherNode node to compare with this one
+\#' @return TRUE if `otherNode` is also this one
+is\_same\_node = function(otherNode) 
+return(identical(self, otherNode)) 
+,
+\end{SubSubSection}
+
+\end{SubSection}
+
+
+
+\hypertarget{method-type}{}
+%
+\begin{SubSection}{Method \code{type()}}
+node type
+%
+\begin{SubSubSection}{Usage}
+\begin{alltt}Node$type()\end{alltt}
+
+\end{SubSubSection}
+
+
+%
+\begin{SubSubSection}{Returns}
+Node class, as character string
+\#' @description
+\#' Trace and list all pathways ending on leaf nodes which start
+\#' with this node.
+\#' @param choice Name of choice. All pathways are returned if NA.
+\#' @return A list of Path objects. Each member of the list is a
+\#' path from this node to a leaf, limited to those associated
+\#' with choice, if defined.
+getPathways = function(choice=NA) 
+path <- list()
+rc <- list()
+toLeaf <- function(node) 
+\# push current node to path
+path[[length(path)+1]] <<- node
+\# leaf reached; store the path
+if (node\$has\_child\_nodes()) 
+\# process child nodes
+for (child in node\$child\_nodes()) 
+toLeaf(child)
+
+
+else 
+p <- Path\$new(path)
+if (!is.na(choice)) 
+if (p\$getChoice()==choice) 
+rc[[length(rc)+1]] <<- p
+
+
+else 
+rc[[length(rc)+1]] <<- p
+
+
+\# pop current node from path
+path <<- path[1:(length(path)-1)]
+
+toLeaf(self)
+return(rc)
+,
+\#' @description 
+\#' Return label of edge which links to specified child node
+\#' @param childNode child node to which find label of linking edge
+\#' @return label as character string
+get\_edge\_label = function(childNode) 
+rv <- NA
+ie <- private\$whichArrow(childNode)
+if (!is.na(ie))
+edge <- private\$edges[[ie]]
+rv <- edge\$label()
+
+return(rv)
+,
+\#' @description 
+\#' Function to return a list of model variables associated with this node.
+\#' @return 
+\#' List of model variables associated with this node.
+get\_modvars = function() 
+return(list())
+,
+\#' @description
+\#' Tabulate all model variables associated with this node.
+\#' @param include.descendants If TRUE, model variables associated
+\#' with this node and its descendants are tabulated; otherwise only
+\#' the ones that are associated with this node.
+\#' @param include.operands If TRUE, recursively add model variables which are
+\#' included in expressions in ExprModVars. Default is
+\#' FALSE.
+\#' @return Data frame with one row per model variable, as follows:
+\#' \begin{description}
+
+\#' \item[Label] The label given to the variable on creation.
+\#' \item[Description] As given at initialization.
+\#' \item[Units] Units of the variable.
+\#' \item[Distribution] The uncertainty distribution or an expression.
+\#' \item[Mean] Expected value.
+\#' \item[SD] Standard deviation.
+\#' \item[Q2.5] p=0.025 quantile.
+\#' \item[Q97.5] p=0.975 quantile.
+\#' \item[Qhat] Asterisk if the quantiles and SD were estimated by random sampling.
+\#' 
+\end{description}
+
+tabulate\_modvars = function(include.descendants=FALSE, 
+include.operands=FALSE) 
+\# create list of nodes
+if (include.descendants) 
+nodes <- self\$descendantNodes()
+ 
+else 
+nodes <- list(self)
+
+\# list model variables associated with these nodes
+mvlist <- list()
+sapply(nodes, FUN=function(n) 
+mv <- n\$get\_modvars()
+if (length(mv) > 0) 
+mvlist <<- c(mvlist, unlist(mv))
+
+)
+\# tabulate the model variables
+DF <- do.call(
+'rbind', 
+lapply(mvlist, FUN=function(x)x\$tabulate(include.operands))
+)
+DF <- DF[!duplicated(DF),]
+\# order the table
+if (nrow(DF) > 0) 
+DF <- DF[order(DF\$Label),]
+
+\# return the tabulated variables
+return(DF)
+,
+\#' @description 
+\#' Sample the model variables associated with the node.
+\#' @param expected if TRUE, use the expected value of the model variables in
+\#'        the node; otherwise sample from their uncertainty distributions.
+\#' @return Updated Node object
+sample\_modvars = function(expected=FALSE) 
+\# get the model variables associated with this node
+mvlist <- self\$get\_modvars()
+\# sample them
+sapply(mvlist, FUN=function(mv) 
+mv\$sample(expected)
+)
+return(invisible(self))
+
+\end{SubSubSection}
+
+\end{SubSection}
+
+
+
+\hypertarget{method-clone}{}
+%
+\begin{SubSection}{Method \code{clone()}}
+The objects of this class are cloneable with this method.
+%
+\begin{SubSubSection}{Usage}
+\begin{alltt}Node$clone(deep = FALSE)\end{alltt}
+
+\end{SubSubSection}
+
+
+%
+\begin{SubSubSection}{Arguments}
+
+\begin{description}
+
+\item[\code{deep}] Whether to make a deep clone.
+
+\end{description}
+
+
+\end{SubSubSection}
+
+\end{SubSection}
+
+\end{Section}
+%
+\begin{Author}\relax
+Andrew Sims \email{andrew.sims@newcastle.ac.uk}
+\end{Author}
+\inputencoding{utf8}
+\HeaderA{NormModVar}{NormModVar}{NormModVar}
+%
+\begin{Description}\relax
+An R6 class for a model variable with Normal uncertainty
+\end{Description}
+%
+\begin{Details}\relax
+A model variable for which the uncertainty in the point estimate can
+be modelled with a Normal distribution. The hyperparameters of the
+distribution are the mean (`mu`) and the standard deviation (`sd`) of
+the uncertainty distribution. The value of `mu` is the expected value
+of the variable.
+\end{Details}
+%
+\begin{Section}{Super class}
+\code{\LinkA{rdecision::ModVar}{rdecision::ModVar}} -> \code{NormModVar}
+\end{Section}
+%
+\begin{Section}{Methods}
+%
+\begin{SubSection}{Public methods}
+\begin{itemize}
+
+\item{} \Rhref{#method-new}{\code{NormModVar\$new()}}
+\item{} \Rhref{#method-is_probabilistic}{\code{NormModVar\$is\_probabilistic()}}
+\item{} \Rhref{#method-distribution}{\code{NormModVar\$distribution()}}
+\item{} \Rhref{#method-r}{\code{NormModVar\$r()}}
+\item{} \Rhref{#method-mean}{\code{NormModVar\$mean()}}
+\item{} \Rhref{#method-SD}{\code{NormModVar\$SD()}}
+\item{} \Rhref{#method-quantile}{\code{NormModVar\$quantile()}}
+\item{} \Rhref{#method-clone}{\code{NormModVar\$clone()}}
+
+\end{itemize}
+
+\end{SubSection}
+
+
+
+
+\hypertarget{method-new}{}
+%
+\begin{SubSection}{Method \code{new()}}
+Create a model variable with normal uncertainty.
+%
+\begin{SubSubSection}{Usage}
+\begin{alltt}NormModVar$new(description, units, mu, sigma)\end{alltt}
+
+\end{SubSubSection}
+
+
+%
+\begin{SubSubSection}{Arguments}
+
+\begin{description}
+
+\item[\code{description}] A character string describing the variable.
+
+\item[\code{units}] Units of the quantity; character string.
+
+\item[\code{mu}] Hyperparameter with mean of the Normal distribution for 
+the uncertainty of the variable.
+
+\item[\code{sigma}] Hyperparameter equal to the standard deviation of the
+normal distribution for the uncertainty of the variable.
+
+\end{description}
+
+
+\end{SubSubSection}
+
+%
+\begin{SubSubSection}{Returns}
+A NormModVar object.
+\end{SubSubSection}
+
+\end{SubSection}
+
+
+
+\hypertarget{method-is_probabilistic}{}
+%
+\begin{SubSection}{Method \code{is\_probabilistic()}}
+Tests whether the model variable is probabilistic, i.e. a random
+variable that follows a distribution, or an expression involving
+random variables, some of which follow distributions.
+%
+\begin{SubSubSection}{Usage}
+\begin{alltt}NormModVar$is_probabilistic()\end{alltt}
+
+\end{SubSubSection}
+
+
+%
+\begin{SubSubSection}{Returns}
+TRUE if probabilistic
+\end{SubSubSection}
+
+\end{SubSection}
+
+
+
+\hypertarget{method-distribution}{}
+%
+\begin{SubSection}{Method \code{distribution()}}
+Accessor function for the name of the uncertainty distribution.
+%
+\begin{SubSubSection}{Usage}
+\begin{alltt}NormModVar$distribution()\end{alltt}
+
+\end{SubSubSection}
+
+
+%
+\begin{SubSubSection}{Returns}
+Distribution name as character string.
+\end{SubSubSection}
+
+\end{SubSection}
+
+
+
+\hypertarget{method-r}{}
+%
+\begin{SubSection}{Method \code{r()}}
+Draw a random sample from the model variable. Normally accessed by a 
+call to value(what="r").
+%
+\begin{SubSubSection}{Usage}
+\begin{alltt}NormModVar$r(n = 1)\end{alltt}
+
+\end{SubSubSection}
+
+
+%
+\begin{SubSubSection}{Arguments}
+
+\begin{description}
+
+\item[\code{n}] Number of samples to draw.
+
+\end{description}
+
+
+\end{SubSubSection}
+
+%
+\begin{SubSubSection}{Returns}
+A sample drawn at random.
+\end{SubSubSection}
+
+\end{SubSection}
+
+
+
+\hypertarget{method-mean}{}
+%
+\begin{SubSection}{Method \code{mean()}}
+Return the mean value of the distribution.
+%
+\begin{SubSubSection}{Usage}
+\begin{alltt}NormModVar$mean()\end{alltt}
+
+\end{SubSubSection}
+
+
+%
+\begin{SubSubSection}{Returns}
+Expected value as a numeric value.
+\end{SubSubSection}
+
+\end{SubSection}
+
+
+
+\hypertarget{method-SD}{}
+%
+\begin{SubSection}{Method \code{SD()}}
+Return the standard deviation of the distribution.
+%
+\begin{SubSubSection}{Usage}
+\begin{alltt}NormModVar$SD()\end{alltt}
+
+\end{SubSubSection}
+
+
+%
+\begin{SubSubSection}{Returns}
+Standard deviation as a numeric value
+\end{SubSubSection}
+
+\end{SubSection}
+
+
+
+\hypertarget{method-quantile}{}
+%
+\begin{SubSection}{Method \code{quantile()}}
+Return the quantiles of the Normal uncertainty distribution.
+%
+\begin{SubSubSection}{Usage}
+\begin{alltt}NormModVar$quantile(probs)\end{alltt}
+
+\end{SubSubSection}
+
+
+%
+\begin{SubSubSection}{Arguments}
+
+\begin{description}
+
+\item[\code{probs}] Vector of probabilities, in range [0,1].
+
+\end{description}
+
+
+\end{SubSubSection}
+
+%
+\begin{SubSubSection}{Returns}
+Vector of quantiles.
+\end{SubSubSection}
+
+\end{SubSection}
+
+
+
+\hypertarget{method-clone}{}
+%
+\begin{SubSection}{Method \code{clone()}}
+The objects of this class are cloneable with this method.
+%
+\begin{SubSubSection}{Usage}
+\begin{alltt}NormModVar$clone(deep = FALSE)\end{alltt}
+
+\end{SubSubSection}
+
+
+%
+\begin{SubSubSection}{Arguments}
+
+\begin{description}
+
+\item[\code{deep}] Whether to make a deep clone.
+
+\end{description}
+
+
+\end{SubSubSection}
+
+\end{SubSection}
+
+\end{Section}
+%
+\begin{Author}\relax
+Andrew J. Sims \email{andrew.sims@newcastle.ac.uk}
+\end{Author}
+\inputencoding{utf8}
+\HeaderA{rdecision}{rdecision: Decision Analytic Modelling in Health Economics.}{rdecision}
+%
+\begin{Description}\relax
+Classes and functions for modelling healthcare interventions using
+cohort models (decision trees, Markov models and extended Markov models).
+It draws on terminology from Briggs, Claxton and Sculpher, "Decision
+Modelling for Health Economic Evaluation", Oxford University Press, 2006.
+\end{Description}
+\inputencoding{utf8}
+\HeaderA{Reaction}{Reaction}{Reaction}
+%
+\begin{Description}\relax
+An R6 class to represent a reaction (chance) edge in a decision tree.
+\end{Description}
+%
+\begin{Details}\relax
+A specialism of class Arrow which is used in a decision tree to
+represent edges with source nodes joined to \code{ChanceNode}s.
+\end{Details}
+%
+\begin{Section}{Super classes}
+\code{\LinkA{rdecision::Edge}{rdecision::Edge}} -> \code{\LinkA{rdecision::Arrow}{rdecision::Arrow}} -> \code{Reaction}
+\end{Section}
+%
+\begin{Section}{Methods}
+%
+\begin{SubSection}{Public methods}
+\begin{itemize}
+
+\item{} \Rhref{#method-new}{\code{Reaction\$new()}}
+\item{} \Rhref{#method-modvars}{\code{Reaction\$modvars()}}
+\item{} \Rhref{#method-p}{\code{Reaction\$p()}}
+\item{} \Rhref{#method-cost}{\code{Reaction\$cost()}}
+\item{} \Rhref{#method-benefit}{\code{Reaction\$benefit()}}
+\item{} \Rhref{#method-clone}{\code{Reaction\$clone()}}
+
+\end{itemize}
+
+\end{SubSection}
+
+
+
+
+\hypertarget{method-new}{}
+%
+\begin{SubSection}{Method \code{new()}}
+Create an object of type 'Reaction'. A probability must be assigned
+to the edge. Optionally, a cost and a benefit may be associated
+with traversing the edge. A \dfn{payoff} (benefit-cost) is sometimes
+used in edges of decision trees; the parametrization used here is more
+general.
+%
+\begin{SubSubSection}{Usage}
+\begin{alltt}Reaction$new(source, target, p, cost = 0, benefit = 0, label = "")\end{alltt}
+
+\end{SubSubSection}
+
+
+%
+\begin{SubSubSection}{Arguments}
+
+\begin{description}
+
+\item[\code{source}] Chance node from which the arrow leaves.
+
+\item[\code{target}] Node which the arrow enters.
+
+\item[\code{p}] Probability
+
+\item[\code{cost}] Cost associated with traversal of this edge.
+
+\item[\code{benefit}] Benefit associated with traversal of the edge.
+
+\item[\code{label}] Character string containing the arrow label.
+
+\end{description}
+
+
+\end{SubSubSection}
+
+%
+\begin{SubSubSection}{Returns}
+A new \code{Reaction} object.
+\end{SubSubSection}
+
+\end{SubSection}
+
+
+
+\hypertarget{method-modvars}{}
+%
+\begin{SubSection}{Method \code{modvars()}}
+Find all the model variables of type ModVar that have been specified
+as values associated with this Action. Includes operands of these
+\code{ModVar}s, if they are expressions.
+%
+\begin{SubSubSection}{Usage}
+\begin{alltt}Reaction$modvars()\end{alltt}
+
+\end{SubSubSection}
+
+
+%
+\begin{SubSubSection}{Returns}
+A list of \code{ModVar}s.
+\end{SubSubSection}
+
+\end{SubSection}
+
+
+
+\hypertarget{method-p}{}
+%
+\begin{SubSection}{Method \code{p()}}
+Return the current value of the edge probability.
+%
+\begin{SubSubSection}{Usage}
+\begin{alltt}Reaction$p()\end{alltt}
+
+\end{SubSubSection}
+
+
+%
+\begin{SubSubSection}{Returns}
+Numeric value in range [0,1].
+\end{SubSubSection}
+
+\end{SubSection}
+
+
+
+\hypertarget{method-cost}{}
+%
+\begin{SubSection}{Method \code{cost()}}
+Return the cost associated with traversing the edge.
+%
+\begin{SubSubSection}{Usage}
+\begin{alltt}Reaction$cost()\end{alltt}
+
+\end{SubSubSection}
+
+
+%
+\begin{SubSubSection}{Returns}
+Cost.
+\end{SubSubSection}
+
+\end{SubSection}
+
+
+
+\hypertarget{method-benefit}{}
+%
+\begin{SubSection}{Method \code{benefit()}}
+Return the benefit associated with traversing the edge.
+%
+\begin{SubSubSection}{Usage}
+\begin{alltt}Reaction$benefit()\end{alltt}
+
+\end{SubSubSection}
+
+
+%
+\begin{SubSubSection}{Returns}
+Benefit.
+\end{SubSubSection}
+
+\end{SubSection}
+
+
+
+\hypertarget{method-clone}{}
+%
+\begin{SubSection}{Method \code{clone()}}
+The objects of this class are cloneable with this method.
+%
+\begin{SubSubSection}{Usage}
+\begin{alltt}Reaction$clone(deep = FALSE)\end{alltt}
+
+\end{SubSubSection}
+
+
+%
+\begin{SubSubSection}{Arguments}
+
+\begin{description}
+
+\item[\code{deep}] Whether to make a deep clone.
+
+\end{description}
+
+
+\end{SubSubSection}
+
+\end{SubSection}
+
+\end{Section}
+%
+\begin{Author}\relax
+Andrew J. Sims \email{andrew.sims@newcastle.ac.uk}
+\end{Author}
+\inputencoding{utf8}
+\HeaderA{Stack}{A stack class.}{Stack}
+%
+\begin{Description}\relax
+An R6 class to represent a stack of objects of any type.
+\end{Description}
+%
+\begin{Details}\relax
+Conventional implementation of a stack. Used extensively in graph algorithms
+and offered as a separate class for ease of programming and to ensure that
+implementations of stacks are optimized. By intention, there is only minimal
+checking of method arguments. This is to maximize performance and because the
+class is mainly intended for use internally to 'rdecision'.
+\end{Details}
+%
+\begin{Section}{Methods}
+%
+\begin{SubSection}{Public methods}
+\begin{itemize}
+
+\item{} \Rhref{#method-new}{\code{Stack\$new()}}
+\item{} \Rhref{#method-push}{\code{Stack\$push()}}
+\item{} \Rhref{#method-pop}{\code{Stack\$pop()}}
+\item{} \Rhref{#method-size}{\code{Stack\$size()}}
+\item{} \Rhref{#method-as_list}{\code{Stack\$as\_list()}}
+\item{} \Rhref{#method-clone}{\code{Stack\$clone()}}
+
+\end{itemize}
+
+\end{SubSection}
+
+
+
+\hypertarget{method-new}{}
+%
+\begin{SubSection}{Method \code{new()}}
+Create a stack.
+%
+\begin{SubSubSection}{Usage}
+\begin{alltt}Stack$new()\end{alltt}
+
+\end{SubSubSection}
+
+
+%
+\begin{SubSubSection}{Returns}
+A new Stack object.
+\end{SubSubSection}
+
+\end{SubSection}
+
+
+
+\hypertarget{method-push}{}
+%
+\begin{SubSection}{Method \code{push()}}
+Push an item onto the stack.
+%
+\begin{SubSubSection}{Usage}
+\begin{alltt}Stack$push(x)\end{alltt}
+
+\end{SubSubSection}
+
+
+%
+\begin{SubSubSection}{Arguments}
+
+\begin{description}
+
+\item[\code{x}] The item to push onto the top of the stack. It should be
+of the same class as items previously pushed on to the stack. It is not
+checked.
+
+\end{description}
+
+
+\end{SubSubSection}
+
+%
+\begin{SubSubSection}{Returns}
+An updated Stack object
+\end{SubSubSection}
+
+\end{SubSection}
+
+
+
+\hypertarget{method-pop}{}
+%
+\begin{SubSection}{Method \code{pop()}}
+Pop an item from the stack. Note that stack underflow is not checked.
+%
+\begin{SubSubSection}{Usage}
+\begin{alltt}Stack$pop()\end{alltt}
+
+\end{SubSubSection}
+
+
+%
+\begin{SubSubSection}{Returns}
+The item previously at the top of the stack.
+\end{SubSubSection}
+
+\end{SubSection}
+
+
+
+\hypertarget{method-size}{}
+%
+\begin{SubSection}{Method \code{size()}}
+Gets the number of items on the stack.
+%
+\begin{SubSubSection}{Usage}
+\begin{alltt}Stack$size()\end{alltt}
+
+\end{SubSubSection}
+
+
+%
+\begin{SubSubSection}{Returns}
+Number of items.
+\end{SubSubSection}
+
+\end{SubSection}
+
+
+
+\hypertarget{method-as_list}{}
+%
+\begin{SubSection}{Method \code{as\_list()}}
+Inspect items in the stack.
+%
+\begin{SubSubSection}{Usage}
+\begin{alltt}Stack$as_list()\end{alltt}
+
+\end{SubSubSection}
+
+
+%
+\begin{SubSubSection}{Returns}
+A list of items.
+\end{SubSubSection}
+
+\end{SubSection}
+
+
+
+\hypertarget{method-clone}{}
+%
+\begin{SubSection}{Method \code{clone()}}
+The objects of this class are cloneable with this method.
+%
+\begin{SubSubSection}{Usage}
+\begin{alltt}Stack$clone(deep = FALSE)\end{alltt}
+
+\end{SubSubSection}
+
+
+%
+\begin{SubSubSection}{Arguments}
+
+\begin{description}
+
+\item[\code{deep}] Whether to make a deep clone.
+
+\end{description}
+
+
+\end{SubSubSection}
+
+\end{SubSection}
+
+\end{Section}
+%
+\begin{Author}\relax
+Andrew Sims \email{andrew.sims@newcastle.ac.uk}
+\end{Author}
+\printindex{}
+\end{document}

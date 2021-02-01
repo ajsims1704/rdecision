@@ -24,6 +24,8 @@ Andrew Sims \email{andrew.sims@newcastle.ac.uk}
 \item \href{#method-adjacency_matrix}{\code{Digraph$adjacency_matrix()}}
 \item \href{#method-incidence_matrix}{\code{Digraph$incidence_matrix()}}
 \item \href{#method-topological_sort}{\code{Digraph$topological_sort()}}
+\item \href{#method-is_connected}{\code{Digraph$is_connected()}}
+\item \href{#method-is_weakly_connected}{\code{Digraph$is_weakly_connected()}}
 \item \href{#method-is_acyclic}{\code{Digraph$is_acyclic()}}
 \item \href{#method-is_tree}{\code{Digraph$is_tree()}}
 \item \href{#method-is_polytree}{\code{Digraph$is_polytree()}}
@@ -43,7 +45,6 @@ Andrew Sims \email{andrew.sims@newcastle.ac.uk}
 \item \out{<span class="pkg-link" data-pkg="rdecision" data-topic="Graph" data-id="has_edge">}\href{../../rdecision/html/Graph.html#method-has_edge}{\code{rdecision::Graph$has_edge()}}\out{</span>}
 \item \out{<span class="pkg-link" data-pkg="rdecision" data-topic="Graph" data-id="has_element">}\href{../../rdecision/html/Graph.html#method-has_element}{\code{rdecision::Graph$has_element()}}\out{</span>}
 \item \out{<span class="pkg-link" data-pkg="rdecision" data-topic="Graph" data-id="has_vertex">}\href{../../rdecision/html/Graph.html#method-has_vertex}{\code{rdecision::Graph$has_vertex()}}\out{</span>}
-\item \out{<span class="pkg-link" data-pkg="rdecision" data-topic="Graph" data-id="is_connected">}\href{../../rdecision/html/Graph.html#method-is_connected}{\code{rdecision::Graph$is_connected()}}\out{</span>}
 \item \out{<span class="pkg-link" data-pkg="rdecision" data-topic="Graph" data-id="is_simple">}\href{../../rdecision/html/Graph.html#method-is_simple}{\code{rdecision::Graph$is_simple()}}\out{</span>}
 \item \out{<span class="pkg-link" data-pkg="rdecision" data-topic="Graph" data-id="neighbours">}\href{../../rdecision/html/Graph.html#method-neighbours}{\code{rdecision::Graph$neighbours()}}\out{</span>}
 \item \out{<span class="pkg-link" data-pkg="rdecision" data-topic="Graph" data-id="order">}\href{../../rdecision/html/Graph.html#method-order}{\code{rdecision::Graph$order()}}\out{</span>}
@@ -96,7 +97,7 @@ when cells are either FALSE (not adjacent) or TRUE (adjacent).
 \subsection{Returns}{
 A square numeric matrix with the number of rows and columns
 equal to the order of the graph. The rows and columns are in the
-same order as V. If all the nodes have labels the
+same order as V. If the nodes have defined and unique labels the
 dimnames of the matrix are the labels of the nodes.
 }
 }
@@ -106,8 +107,9 @@ dimnames of the matrix are the labels of the nodes.
 \subsection{Method \code{incidence_matrix()}}{
 Compute the incidence matrix for the graph. Each row is a vertex and
 each column is an edge. Edges leaving a vertex have value -1 and edges
-entering have value +1. if all vertexes and edges have labels, the
-dimnames of the matrix are the labels of the vertexes and edges.
+entering have value +1. if all vertexes have defined and unique labels and all
+edges have defined and unique labels, the dimnames of the matrix are the labels of
+the vertexes and edges.
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{Digraph$incidence_matrix()}\if{html}{\out{</div>}}
 }
@@ -130,6 +132,36 @@ Kahn's algorithm (https://doi.org/10.1145%2F368996.369025).
 A list of vertexes, topologically sorted. If the digraph has
 cycles, the returned ordered list will not contain all the vertexes
 in the graph, but no error will be raised.
+}
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-is_connected"></a>}}
+\if{latex}{\out{\hypertarget{method-is_connected}{}}}
+\subsection{Method \code{is_connected()}}{
+Test whether the graph is connected. For digraphs this will
+always return FALSE because "connected" is not defined. Function
+\code{weakly_connected} calculates whether the underlying
+graph is connected.
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{Digraph$is_connected()}\if{html}{\out{</div>}}
+}
+
+\subsection{Returns}{
+TRUE if connected, FALSE if not.
+}
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-is_weakly_connected"></a>}}
+\if{latex}{\out{\hypertarget{method-is_weakly_connected}{}}}
+\subsection{Method \code{is_weakly_connected()}}{
+Test whether the digraph is weakly connected, i.e. if the
+underlying graph is connected.
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{Digraph$is_weakly_connected()}\if{html}{\out{</div>}}
+}
+
+\subsection{Returns}{
+TRUE if connected, FALSE if not.
 }
 }
 \if{html}{\out{<hr>}}
@@ -187,7 +219,7 @@ single root and unique paths from the root).
 }
 
 \subsection{Returns}{
-TRUE if the digraph is an arboresecence; FALSE if not.
+TRUE if the digraph is an arborescence; FALSE if not.
 }
 }
 \if{html}{\out{<hr>}}
@@ -199,6 +231,13 @@ Find the direct successors of a node.
 \if{html}{\out{<div class="r">}}\preformatted{Digraph$direct_successors(v)}\if{html}{\out{</div>}}
 }
 
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{v}}{The index vertex.}
+}
+\if{html}{\out{</div>}}
+}
 \subsection{Returns}{
 A list of nodes or an empty list if the specified
 node has no successors.
@@ -213,6 +252,13 @@ Find the direct predecessors of a node.
 \if{html}{\out{<div class="r">}}\preformatted{Digraph$direct_predecessors(v)}\if{html}{\out{</div>}}
 }
 
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{v}}{The index vertex.}
+}
+\if{html}{\out{</div>}}
+}
 \subsection{Returns}{
 A list of nodes or an empty list if the specified
 node has no predecessors.
@@ -229,6 +275,15 @@ Uses a recursive depth-first search algorithm.
 \if{html}{\out{<div class="r">}}\preformatted{Digraph$paths(s, t)}\if{html}{\out{</div>}}
 }
 
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{s}}{Source node.}
+
+\item{\code{t}}{Target node.}
+}
+\if{html}{\out{</div>}}
+}
 \subsection{Returns}{
 A list of ordered node lists.
 }
@@ -246,7 +301,7 @@ sequence of vertexes in this graph.
 \subsection{Arguments}{
 \if{html}{\out{<div class="arguments">}}
 \describe{
-\item{\code{p}}{A list of Nodes}
+\item{\code{P}}{A list of Nodes}
 }
 \if{html}{\out{</div>}}
 }

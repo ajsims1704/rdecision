@@ -89,13 +89,11 @@ e13 <- Reaction$new(c6, th, p=0.920, label="Endures attack")
 e14 <- Reaction$new(c6, c8, p=0.080, cost=c.ED, label="Emergency Department")
 
 c2 <- ChanceNode$new("c2")
-expect_equal(c2$label(), "c2")
 e15 <- Reaction$new(c2, c5, p=0.379, label="Relief")
 e16 <- Reaction$new(c2, c6, p=0.621, label="No relief")
 
 # decision node
 d1 <- DecisionNode$new("d1")
-expect_equal(d1$label(), "d1")
 e17 <- Action$new(d1, c1, cost=c.sumatriptan, label="Sumatriptan")
 e18 <- Action$new(d1, c2, cost=c.caffeine, label="Caffeine/Ergotamine")
  
