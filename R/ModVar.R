@@ -64,39 +64,6 @@ ModVar <- R6::R6Class(
       return(as.logical(NA))
     },
     
-    #' #' @description
-    #' #' Return the current value of the model variable. This will be the 
-    #' #' expected value if the argument to the most recent call to `sample`
-    #' #' was TRUE or after creation of the object; otherwise it will return
-    #' #' a value sampled from the uncertainty distribution. 
-    #' #' @param what Determines what is returned (a character string). Options
-    #' #' are as follows:
-    #' #' \describe{
-    #' #'   \item{"pe"}{Point estimate}
-    #' #'   \item{"r"}{A single random sample from the uncertainty distribution}
-    #' #'   \item{"mean"}{Mean of the uncertainty distribution}
-    #' #' }
-    #' #' @return Numeric value of the model variable.
-    #' value = function(what="pe") {
-    #'   # check argument
-    #'   if (!is.character(what)) {
-    #'     rlang::abort("Argument 'what' must be a character string", 
-    #'                  class="what_not_string")
-    #'   }
-    #'   # returned requested value
-    #'   v <- as.numeric(NA)
-    #'   if (what=="pe") {
-    #'     v <- self$point_estimate()
-    #'   } else if (what=="mean") {
-    #'     v <- self$mean()
-    #'   } else if (what=="r") {
-    #'     v <- self$r(1)
-    #'   } else {
-    #'     rlang::abort("Argument 'what' must be (pe|r|mean)", class="unknown_what")
-    #'   }
-    #'   return(v)  
-    #' },
-
     #' @description
     #' Accessor function for the description.
     #' @return Description of model variable as character string.

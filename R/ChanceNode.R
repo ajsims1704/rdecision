@@ -18,9 +18,6 @@ ChanceNode <- R6::R6Class(
   classname = "ChanceNode",
   inherit = Node,
   private = list(
-    # private fields
-    # p = NULL,
-    # ptype = "numeric"
   ),
   public = list(
     

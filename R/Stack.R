@@ -17,8 +17,6 @@
 Stack <- R6::R6Class(
   classname = "Stack",
   private = list(
-#    maxsize = integer
-#    top  1,
     items = NULL  
   ),
   public = list(
