@@ -100,7 +100,22 @@ Arborescence <- R6::R6Class(
     #' the Graph::element_index() function.
     position_tree = function() {
       # create the coordinate matrix
-      XY <- matrix(data=NA, nrow=self$order(), ncol=2, dimnames=list(NA,c("x","y")))
+      XY <- matrix(data=NA, nrow=self$order(), ncol=2, 
+                   dimnames=list(NULL,c("x","y")))
+      PREVNODE <- vector(mode="integer", length=self$order())
+      # initialize list of previous nodes at each level
+      INITPREVNODELIST <- function() {
+        for (i in 1:length(PREVNODE)) {
+          PREVNODE[i] <<- 0
+        }  
+      }
+      # function for first postorder walk
+      FIRSTWALK <- function(inode, level) {
+        
+      }
+      # main function
+      INITPREVNODELIST()
+      FIRSTWALK(self$element_index(self$root()),0)
       
       # return the coordinate matrix
       return(XY)

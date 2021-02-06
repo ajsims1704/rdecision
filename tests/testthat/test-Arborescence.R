@@ -60,8 +60,42 @@ test_that("graphs that are not arborescences are rejected", {
 })
 
 test_that("drawing functions are correct", {
-  # create the tree using example from Walker (1989)
-  
-  
-  
+  # create the tree using example from Walker (1989), fig 12
+  O <- Node$new("O")
+  E <- Node$new("E")
+  F <- Node$new("F")
+  N <- Node$new("N")
+  A <- Node$new("A")
+  D <- Node$new("D")
+  G <- Node$new("G")
+  M <- Node$new("M")
+  B <- Node$new("B")
+  C <- Node$new("C")
+  H <- Node$new("H")
+  I <- Node$new("I")
+  J <- Node$new("J")
+  K <- Node$new("K")
+  L <- Node$new("L")
+  eOE <- Arrow$new(O,E)  
+  eOF <- Arrow$new(O,F)  
+  eON <- Arrow$new(O,N)  
+  eEA <- Arrow$new(E,A)  
+  eED <- Arrow$new(E,D)  
+  eDB <- Arrow$new(D,B)  
+  eDC <- Arrow$new(D,C)  
+  eNG <- Arrow$new(N,G)  
+  eNM <- Arrow$new(N,M)  
+  eMH <- Arrow$new(M,H)  
+  eMI <- Arrow$new(M,I)  
+  eMJ <- Arrow$new(M,J)  
+  eMK <- Arrow$new(M,K)  
+  eML <- Arrow$new(M,L)  
+  A <- Arborescence$new(
+    V=list(A,B,C,D,E,F,G,H,I,J,K,L,M,N,O), 
+    A=list(eOE,eOF,eON,eEA,eED,eDB,eDC,eNG,eNM,eMH,eMI,eMJ,eMK,eML)
+  )  
+  expect_equal(A$order(),15)
+  # check the node coordinates
+  XY <- A$position_tree()
+  expect_equal(nrow(XY),A$order())
 })
