@@ -9,6 +9,15 @@
 #' An arboresecence must be a directed tree with exactly one root and the
 #' directed paths from the root must be unique.
 #' 
+#' @references 
+#' \itemize{
+#'   \item Walker, John Q II. A A node-positioning algorithm for general trees.
+#'   University of North Carolina Technical Report TR 89-034, 1989.
+#'   \item Tilford, J and Reingold, E. Tidier Drawings of Trees. IEEE
+#'    Transactions on Software Engineering. 1981;7: 223–228.
+#'     doi:10.1109/TSE.1981.234519
+#' }
+#' 
 #' @docType class
 #' @author Andrew Sims \email{andrew.sims@@newcastle.ac.uk}
 #' @export
@@ -47,7 +56,7 @@ Arborescence <- R6::R6Class(
     },
     
     #' @description 
-    #' Test whether the given vertex is a leaf. In an arborescence,
+    #' Test whether the given node is a leaf. In an arborescence,
     #' \code{is_parent()} and \code{is_leaf()} will be mutually exclusive.
     #' @param v Vertex to test.
     #' @return TRUE if v has no child nodes, FALSE otherwise. 
@@ -81,6 +90,20 @@ Arborescence <- R6::R6Class(
       })
       # return the paths
       return(P)
+    },
+    
+    #' @description
+    #' This function implements function POSITIONTREE (Walker, 1989) to
+    #' determine the coordinates for each node in an arborescence.
+    #' @return A numeric matrix with one row per node and two columns (x and y).
+    #' The row number of each node in the matrix is the value given by
+    #' the Graph::element_index() function.
+    position_tree = function() {
+      # create the coordinate matrix
+      XY <- matrix(data=NA, nrow=self$order(), ncol=2, dimnames=list(NA,c("x","y")))
+      
+      # return the coordinate matrix
+      return(XY)
     }
     
   )

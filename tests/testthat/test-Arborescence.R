@@ -58,3 +58,10 @@ test_that("graphs that are not arborescences are rejected", {
   expect_error(G <- Arborescence$new(V=list(n1,n2,n3), A=list(e1,e2)), 
                class="not_arborescence")
 })
+
+test_that("drawing functions are correct", {
+  # create the tree using example from Walker (1989)
+  
+  
+  
+})

@@ -110,7 +110,7 @@ Graph <- R6::R6Class(
     #' vertices and edges are normally stored internally in the same order they 
     #' were defined in the call to $new(), but this cannot be guaranteed. The index 
     #' returned by this function will be same as the index of a vertex or edge 
-    #' returned by other methods, e.g. adjacancy_matrix.
+    #' returned by other methods, e.g. adjacency_matrix.
     #' @param x The subject element (a Node or Edge).
     #' @return The index of the element (integer).
     element_index = function(x) {
