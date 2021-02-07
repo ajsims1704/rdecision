@@ -76,19 +76,6 @@ Arborescence <- R6::R6Class(
     },
 
     #' @description 
-    #' Find the parent of a vertex in the arborescence.
-    #' @param v Vertex to test.
-    #' @return A list containing the parent vertex, or an empty list if 
-    #' # v is the root. 
-    parent = function(v) {
-      # find direct predecessors
-      C <- self$direct_predecessors(v)
-      # C should have length 0 (root) or 1, due to property of an arboresecence,
-      # which has already been checked
-      return(C)
-    },
-
-    #' @description 
     #' Find the siblings of a vertex in the arborescence.
     #' @param v Vertex to test.
     #' @return A (possibly empty) list of siblings. 
@@ -96,7 +83,7 @@ Arborescence <- R6::R6Class(
       # list of siblings
       S <- list()
       # find parent (also checks if v is in the arborescence)
-      P <- self$parent(v)
+      P <- self$direct_predecessors(v)
       # if v is not the root, it and its siblings are the direct successors of p
       if (length(P)==1) {
         # get all children of the parent
@@ -140,6 +127,7 @@ Arborescence <- R6::R6Class(
       LevelZeroPtr <- 0
       MaxDepth <- Inf
       SiblingSeparation <- 4
+      SubtreeSeparation <- 4
       # create the coordinate matrix
       XY <- matrix(data=NA, nrow=self$order(), ncol=2, 
                    dimnames=list(NULL,c("x","y")))
@@ -147,10 +135,12 @@ Arborescence <- R6::R6Class(
       PREVNODE <- vector(mode="integer", length=self$order())
       # per-node arrays
       LEFTNEIGHBOR <- vector(mode="integer", length=self$order())
-      MODIFIER <- vector(mode="integer", length=self$order())
+      MODIFIER <- vector(mode="numeric", length=self$order())
+      PRELIM <- vector(mode="numeric", length=self$order())
       # initialize list of previous nodes at each level
       INITPREVNODELIST <- function() {
       }
+      # get previous node at this level
       GETPREVNODEATLEVEL <- function(Level) {
         # Level is zero-based
         return(PREVNODE[Level+1])
@@ -180,6 +170,95 @@ Arborescence <- R6::R6Class(
         NodeSize <- NodeSize + LEFTSIZE(RightNode)
         return(NodeSize)
       }
+      # test if a node has a left sibling
+      HASLEFTSIBLING <- function(iNode) {
+        v <- private$V[[iNode]]
+        S <- self$siblings(v)
+        iS <- sapply(S, FUN=function(s){return(self$element_index(s))})
+        rb <- any(iS<iNode)
+        return(rb)
+      }
+      # find the node's closest sibling on the left
+      LEFTSIBLING <- function(iNode) {
+        rn <- NA
+        v <- private$V[[iNode]]
+        S <- self$siblings(v)
+        iS <- sapply(S, FUN=function(s){return(self$element_index(s))})
+        lS <- iS[which(iS<iNode)]
+        if (any(iS<iNode)) {
+          rn <- max(lS)
+        }
+        return(rn)
+      }
+      # test if a node has a right sibling
+      HASRIGHTSIBLING <- function(iNode) {
+        v <- private$V[[iNode]]
+        S <- self$siblings(v)
+        iS <- sapply(S, FUN=function(s){return(self$element_index(s))})
+        rb <- any(iS>iNode)
+        return(rb)
+      }
+      # find the node's closest sibling on the right
+      RIGHTSIBLING <- function(iNode) {
+        rn <- NA
+        v <- private$V[[iNode]]
+        S <- self$siblings(v)
+        iS <- sapply(S, FUN=function(s){return(self$element_index(s))})
+        rS <- iS[which(iS>iNode)]
+        if (any(iS>iNode)) {
+          rn <- min(rS)
+        }
+        return(rn)
+      }
+      # parent of the node
+      PARENT <- function(iNode) {
+        rn <- NA
+        v <- private$V[[iNode]]
+        P <- self$direct_predecessors(v)
+        if (length(P)==1) {
+          rn <- self$element_index(P[[1]])
+        }
+        return(rn)
+      }
+      # find the first child of iNode
+      FIRSTCHILD <- function(iNode) {
+        rn <- NA
+        v <- private$V[[iNode]]
+        C <- self$direct_successors(v)
+        iC <- sapply(C, FUN=function(c){return(self$element_index(c))})
+        if (length(iC) > 0) {
+          rn <- min(iC)
+        }
+        return(rn)
+      }
+      # clean up small sibling subtrees      
+      APPORTION <- function(iNode, Level) {
+        Leftmost <- FIRSTCHILD(iNode)
+        Neighbor <- LEFTNEIGHBOR[Leftmost]
+        CompareDepth <- 1
+        DepthToStop <- MaxDepth - Level
+        while (Leftmost != 0 && Neighbor != 0 && CompareDepth <= DepthToStop) {
+          # Compute the location of Leftmost and where it should 
+          # be with respect to Neighbor.
+          LeftModsum <- 0
+          RightModsum <- 0
+          AncestorLeftmost <- Leftmost
+          AncestorNeighbor <- Neighbor
+          for (i in seq(0,CompareDepth)) {
+            AncestorLeftmost <- PARENT(AncestorLeftmost)
+            AncestorNeighbor <- PARENT(AncestorNeighbor)
+            RightModsum <- RightModsum + MODIFIER[AncestorLeftmost]
+            LeftModsum <- LeftModsum + MODIFIER[AncestorNeighbor]
+          }
+          # Find the MoveDistance, and apply it to Node's subtree.
+          # Add appropriate portions to smaller interior subtrees.
+          MoveDistance <- (PRELIM[Neighbor] +
+                           LeftModsum +
+                           SubtreeSeparation + 
+                           MEANNODESIZE(Leftmost, Neighbor)) -
+                          (PRELIM[Leftmost] + RightModsum)          
+        }
+      }
       # function for first postorder walk
       FIRSTWALK <- function(iNode, Level) {
         # Set the pointer to the previous node at this level.
@@ -192,19 +271,40 @@ Arborescence <- R6::R6Class(
             #   the preliminary x-coordinate of the left sibling, 
             #   the separation between sibling nodes, and 
             #   the mean size of left sibling and current node.
-            PRELIM[iNode] <-  PRELIM[LEFTSIBLING[iNode]] + 
-                              SiblingSeparation +
-                              MEANNODESIZE(LEFTSIBLING[iNode], iNode)
+            PRELIM[iNode] <<-  PRELIM[LEFTSIBLING(iNode)] + 
+                               SiblingSeparation +
+                               MEANNODESIZE(LEFTSIBLING(iNode), iNode)
           } else {
            # No sibling on the left to worry about.
-           PRELIM[Node] <<- 0
+           PRELIM[iNode] <<- 0
           }
+        } else {
+          # This Node is not a leaf, so call this procedure 
+          # recursively for each of its offspring.
+          Leftmost <- FIRSTCHILD(iNode)
+          Rightmost <- FIRSTCHILD(iNode)
+          FIRSTWALK(Leftmost, Level + 1)
+          while (HASRIGHTSIBLING(Rightmost)) {
+            Rightmost <- RIGHTSIBLING(Rightmost)
+            FIRSTWALK(Rightmost, Level + 1 ) 
+          }
+          Midpoint <- (PRELIM[Leftmost] + PRELIM[Rightmost]) / 2
+          if (HASLEFTSIBLING(iNode)) {
+            PRELIM[iNode] <<- PRELIM[LEFTSIBLING(iNode)] + 
+                              SiblingSeparation + 
+                              MEANNODESIZE(LEFTSIBLING(iNode), iNode)
+            MODIFIER[iNode] <<- PRELIM[iNode] - Midpoint
+            APPORTION(iNode, Level) 
+          } else {
+            PRELIM[iNode] <<- Midpoint          
+          } 
         }
         return
       }
       # main function
       INITPREVNODELIST()
-      FIRSTWALK(self$element_index(self$root()),0)
+      iRoot <- self$element_index(self$root())
+      FIRSTWALK(iRoot,0)
       
       # return the coordinate matrix
       return(XY)

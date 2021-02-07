@@ -95,10 +95,6 @@ test_that("parent, sibling and drawing functions are correct", {
     A=list(eOE,eOF,eON,eEA,eED,eDB,eDC,eNG,eNM,eMH,eMI,eMJ,eMK,eML)
   )  
   expect_equal(T$order(),15)
-  # check parent function
-  expect_equal(length(T$parent(O)),0)
-  expect_true(nodesetequal(T$parent(E),list(O)))
-  expect_true(nodesetequal(T$parent(L),list(M)))
   # check siblings
   expect_equal(length(T$siblings(O)),0)
   expect_true(nodesetequal(T$siblings(E), list(F,N)))
