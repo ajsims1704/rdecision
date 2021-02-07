@@ -178,9 +178,9 @@ Arborescence <- R6::R6Class(
         rb <- any(iS<iNode)
         return(rb)
       }
-      # find the node's closest sibling on the left
+      # find the node's closest sibling on the left (0 if none)
       LEFTSIBLING <- function(iNode) {
-        rn <- NA
+        rn <- 0
         v <- private$V[[iNode]]
         S <- self$siblings(v)
         iS <- sapply(S, FUN=function(s){return(self$element_index(s))})
@@ -190,7 +190,7 @@ Arborescence <- R6::R6Class(
         }
         return(rn)
       }
-      # test if a node has a right sibling
+      # test if a node has a right sibling 
       HASRIGHTSIBLING <- function(iNode) {
         v <- private$V[[iNode]]
         S <- self$siblings(v)
@@ -198,9 +198,9 @@ Arborescence <- R6::R6Class(
         rb <- any(iS>iNode)
         return(rb)
       }
-      # find the node's closest sibling on the right
+      # find the node's closest sibling on the right (0 if none)
       RIGHTSIBLING <- function(iNode) {
-        rn <- NA
+        rn <- 0
         v <- private$V[[iNode]]
         S <- self$siblings(v)
         iS <- sapply(S, FUN=function(s){return(self$element_index(s))})
@@ -210,9 +210,9 @@ Arborescence <- R6::R6Class(
         }
         return(rn)
       }
-      # parent of the node
+      # parent of the node (0 if none)
       PARENT <- function(iNode) {
-        rn <- NA
+        rn <- 0
         v <- private$V[[iNode]]
         P <- self$direct_predecessors(v)
         if (length(P)==1) {
@@ -220,9 +220,9 @@ Arborescence <- R6::R6Class(
         }
         return(rn)
       }
-      # find the first child of iNode
+      # find the first child of iNode (0 if none)
       FIRSTCHILD <- function(iNode) {
-        rn <- NA
+        rn <- 0
         v <- private$V[[iNode]]
         C <- self$direct_successors(v)
         iC <- sapply(C, FUN=function(c){return(self$element_index(c))})
@@ -231,12 +231,32 @@ Arborescence <- R6::R6Class(
         }
         return(rn)
       }
+      # Leftmost descendant of a node at a given depth
+      GETLEFTMOST <- function(iNode, Level, Depth) {
+        print(paste("iNode",iNode))
+        print(paste("Level",Level))
+        if (Level >= Depth) {
+          return(iNode)
+        } else if (ISLEAF(iNode)) {
+          return(0)
+        } else {
+          Rightmost <- FIRSTCHILD(iNode)
+          Leftmost <- GETLEFTMOST(Rightmost,Level+1,Depth)
+          # Do a postorder walk of the subtree below Node.
+          while (Leftmost == 0 && HASRIGHTSIBLING(Rightmost)) {
+            Rightmost <- RIGHTSIBLING(Rightmost)
+            Leftmost <- GETLEFTMOST(Rightmost, Level + 1, Depth)
+          }
+          return(Leftmost)
+        }
+      }
       # clean up small sibling subtrees      
       APPORTION <- function(iNode, Level) {
         Leftmost <- FIRSTCHILD(iNode)
         Neighbor <- LEFTNEIGHBOR[Leftmost]
         CompareDepth <- 1
         DepthToStop <- MaxDepth - Level
+        #
         while (Leftmost != 0 && Neighbor != 0 && CompareDepth <= DepthToStop) {
           # Compute the location of Leftmost and where it should 
           # be with respect to Neighbor.
@@ -256,8 +276,44 @@ Arborescence <- R6::R6Class(
                            LeftModsum +
                            SubtreeSeparation + 
                            MEANNODESIZE(Leftmost, Neighbor)) -
-                          (PRELIM[Leftmost] + RightModsum)          
+                          (PRELIM[Leftmost] + RightModsum)  
+          if (MoveDistance > 0) {
+            # Count interior sibling subtrees in LeftSiblings
+            TempPtr <- iNode
+            LeftSiblings <- 0
+            while (TempPtr != 0 && TempPtr != AncestorNeighbor) {
+              LeftSiblings <- LeftSiblings + 1
+              TempPtr <- LEFTSIBLING(TempPtr)
+            } 
+            if (TempPtr != 0) {
+              # Apply portions to appropriate left sibling subtrees.
+              Portion <- MoveDistance / LeftSiblings
+              TempPtr <- iNode
+              while (TempPtr == AncestorNeighbor) {
+                PRELIM[TempPtr] <- PRELIM[TempPtr] + MoveDistance;
+                MODIFIER[TempPtr] <- MODIFIER[TempPtr] + MoveDistance
+                MoveDistance <- MoveDistance - Portion
+                TempPtr <- LEFTSIBLING(TempPtr)
+              }
+            } else {
+              # Don't need to move anything--it needs to 
+              # be done by an ancestor because 
+              # AncestorNeighbor and AncestorLeftmost are 
+              # not siblings of each other.
+              return
+            }
+          }
+          # Determine the leftmost descendant of Node at the next 
+          # lower level to compare its positioning against that of
+          # its Neighbor
+          CompareDepth <- CompareDepth + 1
+          if (ISLEAF(Leftmost)) {
+            Leftmost <- GETLEFTMOST(iNode, 0, CompareDepth)
+          } else {
+            Leftmost <- FIRSTCHILD(Leftmost)        
+          }
         }
+        return
       }
       # function for first postorder walk
       FIRSTWALK <- function(iNode, Level) {
@@ -286,7 +342,7 @@ Arborescence <- R6::R6Class(
           FIRSTWALK(Leftmost, Level + 1)
           while (HASRIGHTSIBLING(Rightmost)) {
             Rightmost <- RIGHTSIBLING(Rightmost)
-            FIRSTWALK(Rightmost, Level + 1 ) 
+            FIRSTWALK(Rightmost, Level + 1) 
           }
           Midpoint <- (PRELIM[Leftmost] + PRELIM[Rightmost]) / 2
           if (HASLEFTSIBLING(iNode)) {
