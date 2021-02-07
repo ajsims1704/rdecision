@@ -59,7 +59,7 @@ test_that("graphs that are not arborescences are rejected", {
                class="not_arborescence")
 })
 
-test_that("drawing functions are correct", {
+test_that("parent, sibling and drawing functions are correct", {
   # create the tree using example from Walker (1989), fig 12
   O <- Node$new("O")
   E <- Node$new("E")
@@ -90,12 +90,21 @@ test_that("drawing functions are correct", {
   eMJ <- Arrow$new(M,J)  
   eMK <- Arrow$new(M,K)  
   eML <- Arrow$new(M,L)  
-  A <- Arborescence$new(
+  T <- Arborescence$new(
     V=list(A,B,C,D,E,F,G,H,I,J,K,L,M,N,O), 
     A=list(eOE,eOF,eON,eEA,eED,eDB,eDC,eNG,eNM,eMH,eMI,eMJ,eMK,eML)
   )  
-  expect_equal(A$order(),15)
+  expect_equal(T$order(),15)
+  # check parent function
+  expect_equal(length(T$parent(O)),0)
+  expect_true(nodesetequal(T$parent(E),list(O)))
+  expect_true(nodesetequal(T$parent(L),list(M)))
+  # check siblings
+  expect_equal(length(T$siblings(O)),0)
+  expect_true(nodesetequal(T$siblings(E), list(F,N)))
+  expect_true(nodesetequal(T$siblings(A), list(D)))
+  expect_true(nodesetequal(T$siblings(J), list(H,I,K,L)))
   # check the node coordinates
-  XY <- A$position_tree()
-  expect_equal(nrow(XY),A$order())
+  XY <- T$position_tree()
+  expect_equal(nrow(XY),T$order())
 })
