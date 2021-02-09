@@ -272,8 +272,19 @@ DecisionTree <- R6::R6Class(
     #' the \link{Arborescence} class help for details).
     #' @return No return value.
     draw = function() {
-      # viewport
+      # find the (x,y) coordinates of nodes using Walker's algorithm
+      XY <- self$postree()
+      # find the X and Y extent of the nodes
+      xmin <- min(XY[,"x"])-1
+      xmax <- max(XY[,"x"])+1
+      ymin <- min(XY[,"y"])-1
+      ymax <- max(XY[,"y"])+1
+      # define viewport in "tree" space
       vp <- grid::viewport(
+        x = grid::unit(0,"snpc"), y = grid::unit(0,"snpc"),
+        width = grid::unit(xmax-xmin, "snpc"), 
+        height=grid::unit(ymax-ymin,"snpc"),
+        just = c("left", "bottom")
       )
       # draw a rectangle
       grid::grid.rect(width=0.4, height=0.4, vp=vp, gp=grid::gpar(col="red"))
