@@ -125,9 +125,9 @@ Arborescence <- R6::R6Class(
     #' distance between neigbouring subtrees.
     #' @param LevelSeparation Distance in arbitrary units for the 
     #' separation between adjacent levels.
-    #' @return A numeric matrix with one row per node and two columns (x and y).
-    #' The row number of each node in the matrix is the value given by
-    #' the Graph::element_index() function.
+    #' @return A numeric matrix with one row per node and three columns (n, x
+    #' and y) where \code{n} gives the node index given by the 
+    #' Graph::element_index() function.
     # There were 3 bugs in the pseudo-code in the report, possibly corrected
     # in the later paper, indicated by ##DEBUG## in the code below. 
     postree = function(SiblingSeparation=4, SubtreeSeparation=4, 
@@ -434,10 +434,11 @@ Arborescence <- R6::R6Class(
       iRoot <- self$element_index(self$root())
       rc <- POSITIONTREE(iRoot)
       # create the coordinate matrix
-      XY <- matrix(data=NA, nrow=self$order(), ncol=2, 
-                   dimnames=list(NULL,c("x","y")))
+      XY <- matrix(data=NA, nrow=self$order(), ncol=3, 
+                   dimnames=list(NULL,c("n","x","y")))
       # populate it
       if (rc) {
+        XY[,"n"] <- seq(1:self$order())
         XY[,"x"] <- XCOORD
         XY[,"y"] <- YCOORD
       }

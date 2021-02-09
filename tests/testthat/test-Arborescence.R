@@ -18,7 +18,8 @@ test_that("incorrect node and edge types are rejected", {
   expect_error(Arborescence$new(n1, list(a1)), class="non-list_vertices")
   expect_error(Arborescence$new(list(n1,n2), a1), class="non-list_arrows")
   expect_error(Arborescence$new(list(n1,42), list(a1)), class="non-Node_vertex")
-  expect_error(Arborescence$new(list(n1,n2), list(a1,42)), class="non-Arrow_edge")
+  expect_error(Arborescence$new(list(n1,n2), list(a1,42)), 
+               class="non-Arrow_edge")
 })
 
 test_that("graphs that are not trees are rejected", {

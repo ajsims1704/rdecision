@@ -16,7 +16,7 @@ knitr::opts_chunk$set(echo = TRUE)
 
 vp <- grid::viewport(
   x = grid::unit(0,"snpc"), y = grid::unit(0,"snpc"),
-  width = grid::unit(4.0, "snpc"), height=grid::unit(1.0,"snpc"),
+  width = grid::unit(28.0, "snpc"), height=grid::unit(4.0,"snpc"),
   just = c("left", "bottom")
 )
 
@@ -29,7 +29,7 @@ grid::grid.circle(
 
 grid::grid.rect(
   x = grid::unit(0.0,"snpc"), y = grid::unit(0.0,"snpc"),
-  width = grid::unit(0.25,"snpc"), height = grid::unit(0.5,"snpc"),
+  width = grid::unit(20,"snpc"), height = grid::unit(3,"snpc"),
   just = c("left", "bottom"),
   gp = grid::gpar(col="blue")
 )

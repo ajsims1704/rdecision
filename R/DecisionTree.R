@@ -275,25 +275,52 @@ DecisionTree <- R6::R6Class(
       # find the (x,y) coordinates of nodes using Walker's algorithm
       XY <- self$postree()
       # find the X and Y extent of the nodes
-      xmin <- min(XY[,"x"])-1
-      xmax <- max(XY[,"x"])+1
-      ymin <- min(XY[,"y"])-1
-      ymax <- max(XY[,"y"])+1
+      xmin <- min(XY[,"x"])
+      xmax <- max(XY[,"x"])
+      ymin <- min(XY[,"y"])
+      ymax <- max(XY[,"y"])
+      # set margin widths (in tree space)
+      lmargin <- 1
+      rmargin <- 1
+      tmargin <- 1
+      bmargin <- 1
+      # calculate scale factor
+      scale <- max((xmax-xmin)+lmargin+rmargin,(ymax-ymin)+bmargin+tmargin)
       # define viewport in "tree" space
       vp <- grid::viewport(
-        x = grid::unit(0,"snpc"), y = grid::unit(0,"snpc"),
-        width = grid::unit(xmax-xmin, "snpc"), 
-        height=grid::unit(ymax-ymin,"snpc"),
+        x = grid::unit(0.0,"snpc"), y = grid::unit(0.0,"snpc"),
+        width = grid::unit(27, "snpc"),
+        height = grid::unit(4,"snpc"),
         just = c("left", "bottom")
       )
-      # draw a rectangle
-      grid::grid.rect(width=0.4, height=0.4, vp=vp, gp=grid::gpar(col="red"))
-      grid::grid.rect(width=0.8, height=0.8, vp=vp, gp=grid::gpar(col="green"))
-      grid::grid.rect(x=0.05, y=0.05, 
-                      width=0.90, height=0.90,
-                      just=c("left","bottom"),
-                      vp=vp, gp=grid::gpar(col="blue"))
-      # display
+      grid::grid.text(
+        format(xmax), 
+        x=grid::unit(0,"snpc"),
+        y= grid::unit(0,"snpc"),
+        just=c("left", "bottom"),
+        vp = vp
+      )
+      # draw a frame
+      grid::grid.rect(
+        x = grid::unit(0.0,"snpc"), y = grid::unit(0.0,"snpc"),
+        width = grid::unit(26.8,"snpc"), height = grid::unit(3.8,"snpc"),
+        just = c("left", "bottom"),
+        gp = grid::gpar(col="red"),
+        vp = vp
+      )
+      # # draw the nodes
+      # for (i in 1:nrow(XY)) {
+      #   grid::grid.rect(
+      #     x = grid::unit(XY[i,"x"]-xmin+lmargin,"snpc"),
+      #     y = grid::unit(XY[i,"y"]-ymin+bmargin,"snpc"),
+      #     width = grid::unit(2,"snpc"),
+      #     height = grid::unit(1,"snpc"),
+      #     just = c("left", "bottom"),
+      #     gp = grid::gpar(col="blue"),
+      #     vp = vp
+      #   )
+      #}
+      # # display the viewport
       grid::pushViewport(vp)
       grid::popViewport()
       # return updated DecisionTree (unchanged)
@@ -310,8 +337,10 @@ DecisionTree <- R6::R6Class(
       D <- self$decision_nodes()
       # check argument
       if (length(strategy)!=length(D)) {
-        rlang::abort("Argument 'strategy' must have as many elements as DecisionNodes",
-                     class="incorrect_strategy_length")
+        rlang::abort(
+          "Argument 'strategy' must have as many elements as DecisionNodes",
+           class="incorrect_strategy_length"
+        )
       }
       sapply(strategy, function(e) {
         if (!inherits(e,what="Action")) {
