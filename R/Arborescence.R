@@ -119,24 +119,32 @@ Arborescence <- R6::R6Class(
     #' @description
     #' Implements function POSITIONTREE (Walker, 1989) to
     #' determine the coordinates for each node in an arborescence.
+    #' @param SiblingSeparation Distance in arbitrary units for the
+    #' distance between siblings.
+    #' @param SubtreeSeparation Distance in arbitrary units for the
+    #' distance between neigbouring subtrees.
+    #' @param LevelSeparation Distance in arbitrary units for the 
+    #' separation between adjacent levels.
     #' @return A numeric matrix with one row per node and two columns (x and y).
     #' The row number of each node in the matrix is the value given by
     #' the Graph::element_index() function.
-    position_tree = function() {
+    # There were 3 bugs in the pseudo-code in the report, possibly corrected
+    # in the later paper, indicated by ##DEBUG## in the code below. 
+    postree = function(SiblingSeparation=4, SubtreeSeparation=4, 
+                       LevelSeparation=1) {
       # globals for the algorithm
       LevelZeroPtr <- 0
       MaxDepth <- Inf
-      SiblingSeparation <- 4
-      SubtreeSeparation <- 4
-      # create the coordinate matrix
-      XY <- matrix(data=NA, nrow=self$order(), ncol=2, 
-                   dimnames=list(NULL,c("x","y")))
+      xTopAdjustment <- 0
+      yTopAdjustment <- 0
       # prevnode list (max 'height' is order of graph)
       PREVNODE <- vector(mode="integer", length=self$order())
       # per-node arrays
       LEFTNEIGHBOR <- vector(mode="integer", length=self$order())
       MODIFIER <- vector(mode="numeric", length=self$order())
       PRELIM <- vector(mode="numeric", length=self$order())
+      XCOORD <- vector(mode="numeric", length=self$order())
+      YCOORD <- vector(mode="numeric", length=self$order())
       # initialize list of previous nodes at each level
       INITPREVNODELIST <- function() {
       }
@@ -220,6 +228,12 @@ Arborescence <- R6::R6Class(
         }
         return(rn)
       }
+      # does the specified node have a child?
+      HASCHILD <- function(iNode) {
+        v <- private$V[[iNode]]
+        C <- self$direct_successors(v)
+        return(length(C)>0)
+      }
       # find the first child of iNode (0 if none)
       FIRSTCHILD <- function(iNode) {
         rn <- 0
@@ -233,8 +247,6 @@ Arborescence <- R6::R6Class(
       }
       # Leftmost descendant of a node at a given depth
       GETLEFTMOST <- function(iNode, Level, Depth) {
-        print(paste("iNode",iNode))
-        print(paste("Level",Level))
         if (Level >= Depth) {
           return(iNode)
         } else if (ISLEAF(iNode)) {
@@ -264,7 +276,7 @@ Arborescence <- R6::R6Class(
           RightModsum <- 0
           AncestorLeftmost <- Leftmost
           AncestorNeighbor <- Neighbor
-          for (i in seq(0,CompareDepth)) {
+          for (i in seq(0,CompareDepth-1)) {
             AncestorLeftmost <- PARENT(AncestorLeftmost)
             AncestorNeighbor <- PARENT(AncestorNeighbor)
             RightModsum <- RightModsum + MODIFIER[AncestorLeftmost]
@@ -289,19 +301,20 @@ Arborescence <- R6::R6Class(
               # Apply portions to appropriate left sibling subtrees.
               Portion <- MoveDistance / LeftSiblings
               TempPtr <- iNode
-              while (TempPtr == AncestorNeighbor) {
-                PRELIM[TempPtr] <- PRELIM[TempPtr] + MoveDistance;
-                MODIFIER[TempPtr] <- MODIFIER[TempPtr] + MoveDistance
+              while (TempPtr != AncestorNeighbor) { ##DEBUG - != not =##
+                PRELIM[TempPtr] <<- PRELIM[TempPtr] + MoveDistance
+                MODIFIER[TempPtr] <<- MODIFIER[TempPtr] + MoveDistance
                 MoveDistance <- MoveDistance - Portion
                 TempPtr <- LEFTSIBLING(TempPtr)
               }
-            } else {
-              # Don't need to move anything--it needs to 
-              # be done by an ancestor because 
-              # AncestorNeighbor and AncestorLeftmost are 
-              # not siblings of each other.
-              return
             }
+          }
+          else {
+            # Don't need to move anything--it needs to 
+            # be done by an ancestor because 
+            # AncestorNeighbor and AncestorLeftmost are 
+            # not siblings of each other.
+            return
           }
           # Determine the leftmost descendant of Node at the next 
           # lower level to compare its positioning against that of
@@ -312,6 +325,8 @@ Arborescence <- R6::R6Class(
           } else {
             Leftmost <- FIRSTCHILD(Leftmost)        
           }
+          Neighbor <- LEFTNEIGHBOR[Leftmost] ##DEBUG - line missing##
+
         }
         return
       }
@@ -321,7 +336,7 @@ Arborescence <- R6::R6Class(
         LEFTNEIGHBOR[iNode] <<- GETPREVNODEATLEVEL(Level) 
         SETPREVNODEATLEVEL(Level, iNode) # This is now the previous.
         MODIFIER[iNode] <<- 0   # Set the default modifier value. 
-        if (ISLEAF(iNode) | Level==MaxDepth) {
+        if (ISLEAF(iNode) || Level==MaxDepth) {
           if (HASLEFTSIBLING(iNode)) {
             # Determine the preliminary x-coordinate based on: 
             #   the preliminary x-coordinate of the left sibling, 
@@ -357,11 +372,75 @@ Arborescence <- R6::R6Class(
         }
         return
       }
-      # main function
-      INITPREVNODELIST()
+      # check that x and y are within extent of display device. It is
+      # assumed that the tree will be scaled to the window, and this
+      # implementation always returns TRUE.
+      CHECKEXTENTSRANGE <- function(xValue, yValue) {
+        return(TRUE)
+      }
+      # second walk
+      SECONDWALK <- function(iNode, Level, Modsum) {
+        if (Level <= MaxDepth) {
+          xTemp <- xTopAdjustment + PRELIM[iNode] + Modsum
+          yTemp <- yTopAdjustment + (Level * LevelSeparation)
+          # Check to see that xTemp and yTemp are of the proper 
+          # size for your application. 
+          if (CHECKEXTENTSRANGE(xTemp, yTemp)) {
+            XCOORD[iNode] <<- xTemp
+            YCOORD[iNode] <<- yTemp
+            Result <- TRUE
+            if (HASCHILD(iNode)) {
+              # Apply the Modifier value for this node to 
+              # all its offspring. 
+              Result <- SECONDWALK(FIRSTCHILD(iNode),
+                                   Level + 1,
+                                   Modsum + MODIFIER[iNode])
+            }
+            if (Result==TRUE && HASRIGHTSIBLING(iNode)) {
+                Result <- SECONDWALK(RIGHTSIBLING(iNode),
+                                     Level,   ##DEBUG - not Level+1##
+                                     Modsum)
+            }
+          } else {
+            # Continuing would put the tree outside of the 
+            # drawable extents range.
+            Result <- FALSE
+          }
+        } else {
+          # We are at a level deeper than that we want to draw. 
+          Result <- TRUE
+        }
+        return(Result)
+      }      
+      # determine coordinates for each node in a tree
+      POSITIONTREE <- function(iNode) {
+        if (iNode != 0) {
+          # Initialize the list of previous nodes at each level.  
+          INITPREVNODELIST()
+          # Do the preliminary positioning with a postorder walk.
+          FIRSTWALK(iNode,0)
+          # Determine how to adjust all the nodes with respect to 
+          # the location of the root. 
+          xTopAdjustment <- XCOORD[iNode] - PRELIM[iNode]
+          yTopAdjustment <- YCOORD[iNode]
+          # Do the final positioning with a preorder walk
+          return(SECONDWALK(iNode, 0, 0))      
+        } else {
+          # Trivial: return TRUE if a null pointer was passed.
+          return(TRUE)         
+        }
+      }
+      # call Walker's main function
       iRoot <- self$element_index(self$root())
-      FIRSTWALK(iRoot,0)
-      
+      rc <- POSITIONTREE(iRoot)
+      # create the coordinate matrix
+      XY <- matrix(data=NA, nrow=self$order(), ncol=2, 
+                   dimnames=list(NULL,c("x","y")))
+      # populate it
+      if (rc) {
+        XY[,"x"] <- XCOORD
+        XY[,"y"] <- YCOORD
+      }
       # return the coordinate matrix
       return(XY)
     }

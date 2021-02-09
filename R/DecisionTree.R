@@ -266,6 +266,28 @@ DecisionTree <- R6::R6Class(
       # Return the table
       return(DF)
     },
+    
+    #' @description Draw the decision tree to the current graphics output. Uses
+    #' the algorithm of Walker (1989) to distribute the nodes compactly (see
+    #' the \link{Arborescence} class help for details).
+    #' @return No return value.
+    draw = function() {
+      # viewport
+      vp <- grid::viewport(
+      )
+      # draw a rectangle
+      grid::grid.rect(width=0.4, height=0.4, vp=vp, gp=grid::gpar(col="red"))
+      grid::grid.rect(width=0.8, height=0.8, vp=vp, gp=grid::gpar(col="green"))
+      grid::grid.rect(x=0.05, y=0.05, 
+                      width=0.90, height=0.90,
+                      just=c("left","bottom"),
+                      vp=vp, gp=grid::gpar(col="blue"))
+      # display
+      grid::pushViewport(vp)
+      grid::popViewport()
+      # return updated DecisionTree (unchanged)
+      return(invisible(self))
+    },
 
     #' @description Find all the root to leaf paths traversable under 
     #' the specified strategy. A strategy is a unanimous prescription 

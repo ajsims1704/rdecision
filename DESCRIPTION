@@ -19,11 +19,11 @@ Imports:
   R6,
   rlang (>= 0.4.2),
   stats,
-  utils
+  utils,
+  grid
 Suggests:
     rmarkdown,
     knitr,
-    grid,
     pander,
     testthat
 License: GPL-3

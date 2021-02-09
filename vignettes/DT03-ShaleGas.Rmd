@@ -95,8 +95,13 @@ or a Reaction object.
   # tree
   V <- list(d1,d2,d3, c1,c2,c3,c4, t1,t2,t3,t4,t5,t6,t7,t8,t9)
   DT<-DecisionTree$new(V,E)
-  
 ```
+
+The decision tree can be drawn using the `draw` method of `DecisionTree`:
+```{r draw, echo=FALSE, results="hide", fig.keep="last", fig.align="center"}
+DT$draw()
+```
+
 
 # Evaluating the strategies
 There are a total of 12 possible strategies (3 choices from node `d1`

@@ -1,5 +1,5 @@
 rm(list=ls())
 devtools::load_all()
-rmarkdown::render("vignettes/GT01-NewScientistPuzzle.Rmd")
+rmarkdown::render("vignettes/DT03-ShaleGas.Rmd")
 rm(list=ls())
 
