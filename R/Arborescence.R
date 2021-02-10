@@ -431,17 +431,17 @@ Arborescence <- R6::R6Class(
       SECONDWALK <- function(iNode, Level, Modsum) {
         if (Level <= MaxDepth) {
           if (RootOrientation == "NORTH") {
-            xTemp <- xTopAdjustment + PRELIM[iNode] + Modsum
+            xTemp <- xTopAdjustment + (PRELIM[iNode] + Modsum)
             yTemp <- yTopAdjustment - (Level * LevelSeparation)
           } else if (RootOrientation == "SOUTH") {
-            xTemp <- xTopAdjustment + PRELIM[iNode] + Modsum
+            xTemp <- xTopAdjustment + (PRELIM[iNode] + Modsum)
             yTemp <- yTopAdjustment + (Level * LevelSeparation)
           } else if (RootOrientation == "EAST") {
             xTemp <- xTopAdjustment + (Level * LevelSeparation)
-            yTemp <- yTopAdjustment - PRELIM[iNode] + Modsum
+            yTemp <- yTopAdjustment - (PRELIM[iNode] + Modsum)
           } else if (RootOrientation == "WEST") {
             xTemp <- xTopAdjustment - (Level * LevelSeparation)
-            yTemp <- yTopAdjustment - PRELIM[iNode] + Modsum
+            yTemp <- yTopAdjustment - (PRELIM[iNode] + Modsum)
           } 
           # Check to see that xTemp and yTemp are of the proper 
           # size for your application. 
