@@ -125,13 +125,49 @@ Arborescence <- R6::R6Class(
     #' distance between neigbouring subtrees.
     #' @param LevelSeparation Distance in arbitrary units for the 
     #' separation between adjacent levels.
-    #' @return A numeric matrix with one row per node and three columns (n, x
+    #' @param RootOrientation Must be one of "NORTH", "SOUTH", "EAST", "WEST".
+    #' Defined as per Walker (1989), but noting that Walker assumed that
+    #' y increased down the page. Thus the meaning of NORTH and SOUTH are
+    #' opposite to his, with the default (SOUTH) having the child nodes at
+    #' positive y value and root at zero, as per his example (figure 12).
+    #' @return A data frame with one row per node and three columns (n, x
     #' and y) where \code{n} gives the node index given by the 
     #' Graph::element_index() function.
     # There were 3 bugs in the pseudo-code in the report, possibly corrected
     # in the later paper, indicated by ##DEBUG## in the code below. 
     postree = function(SiblingSeparation=4, SubtreeSeparation=4, 
-                       LevelSeparation=1) {
+                       LevelSeparation=1, RootOrientation="SOUTH") {
+      # check input parameters
+      if (!is.numeric(SiblingSeparation)) {
+        rlang::abort(
+          message = "'SiblingSeparation' must be numeric",
+          class = "non-numeric_SiblingSeparation"
+        )
+      }
+      if (!is.numeric(SubtreeSeparation)) {
+        rlang::abort(
+          message = "'SubstreeSeparation' must be numeric",
+          class = "non-numeric_SubtreeSeparation"
+        )
+      }
+      if (!is.numeric(LevelSeparation)) {
+        rlang::abort(
+          message = "'LevelSeparation' must be numeric",
+          class = "non-numeric_LevelSeparation"
+        )
+      }
+      if (!is.character(RootOrientation)) {
+        rlang::abort(
+          message = "'RootOrientation' must be numeric",
+          class = "non-character_RootOrientation"
+        )
+      }
+      if (!(RootOrientation %in% c("NORTH", "SOUTH", "EAST", "WEST"))) {
+        rlang::abort(
+          message = "'RootOrientation' must be one of NORTH, SOUTH, EAST, WEST",
+          class = "illegal_RootOrientation"
+        )
+      }
       # globals for the algorithm
       LevelZeroPtr <- 0
       MaxDepth <- Inf
@@ -171,11 +207,24 @@ Arborescence <- R6::R6Class(
       RIGHTSIZE <- function(iNode) {
         return(1)
       }
+      # top size of each node (EAST/WEST trees)
+      TOPSIZE <- function(iNode) {
+        return(1)
+      }
+      # bottom size of each node (EAST/WEST trees)
+      BOTTOMSIZE <- function(iNode) {
+        return(1)
+      }
       # mean node size
       MEANNODESIZE <- function(LeftNode, RightNode) {
         NodeSize <- 0
-        NodeSize <- NodeSize + RIGHTSIZE(LeftNode)
-        NodeSize <- NodeSize + LEFTSIZE(RightNode)
+        if (RootOrientation %in% c("NORTH","SOUTH")) {
+          NodeSize <- NodeSize + RIGHTSIZE(LeftNode)
+          NodeSize <- NodeSize + LEFTSIZE(RightNode)
+        } else {
+          NodeSize <- NodeSize + TOPSIZE(LeftNode)
+          NodeSize <- NodeSize + BOTTOMSIZE(RightNode)
+        }
         return(NodeSize)
       }
       # test if a node has a left sibling
@@ -381,8 +430,19 @@ Arborescence <- R6::R6Class(
       # second walk
       SECONDWALK <- function(iNode, Level, Modsum) {
         if (Level <= MaxDepth) {
-          xTemp <- xTopAdjustment + PRELIM[iNode] + Modsum
-          yTemp <- yTopAdjustment + (Level * LevelSeparation)
+          if (RootOrientation == "NORTH") {
+            xTemp <- xTopAdjustment + PRELIM[iNode] + Modsum
+            yTemp <- yTopAdjustment - (Level * LevelSeparation)
+          } else if (RootOrientation == "SOUTH") {
+            xTemp <- xTopAdjustment + PRELIM[iNode] + Modsum
+            yTemp <- yTopAdjustment + (Level * LevelSeparation)
+          } else if (RootOrientation == "EAST") {
+            xTemp <- xTopAdjustment + (Level * LevelSeparation)
+            yTemp <- yTopAdjustment - PRELIM[iNode] + Modsum
+          } else if (RootOrientation == "WEST") {
+            xTemp <- xTopAdjustment - (Level * LevelSeparation)
+            yTemp <- yTopAdjustment - PRELIM[iNode] + Modsum
+          } 
           # Check to see that xTemp and yTemp are of the proper 
           # size for your application. 
           if (CHECKEXTENTSRANGE(xTemp, yTemp)) {
@@ -421,8 +481,13 @@ Arborescence <- R6::R6Class(
           FIRSTWALK(iNode,0)
           # Determine how to adjust all the nodes with respect to 
           # the location of the root. 
-          xTopAdjustment <- XCOORD[iNode] - PRELIM[iNode]
-          yTopAdjustment <- YCOORD[iNode]
+          if (RootOrientation %in% c("NORTH","SOUTH")) {
+            xTopAdjustment <- XCOORD[iNode] - PRELIM[iNode]
+            yTopAdjustment <- YCOORD[iNode]
+          } else {
+            xTopAdjustment <- XCOORD[iNode] 
+            yTopAdjustment <- YCOORD[iNode] + PRELIM[iNode]
+          }
           # Do the final positioning with a preorder walk
           return(SECONDWALK(iNode, 0, 0))      
         } else {
@@ -433,16 +498,13 @@ Arborescence <- R6::R6Class(
       # call Walker's main function
       iRoot <- self$element_index(self$root())
       rc <- POSITIONTREE(iRoot)
-      # create the coordinate matrix
-      XY <- matrix(data=NA, nrow=self$order(), ncol=3, 
-                   dimnames=list(NULL,c("n","x","y")))
-      # populate it
-      if (rc) {
-        XY[,"n"] <- seq(1:self$order())
-        XY[,"x"] <- XCOORD
-        XY[,"y"] <- YCOORD
-      }
-      # return the coordinate matrix
+      # create and populate the coordinate data frame
+      XY <- data.frame(
+        n = seq(1:self$order()),
+        x = XCOORD,
+        y = YCOORD
+      )
+      # return the coordinate data frame
       return(XY)
     }
     

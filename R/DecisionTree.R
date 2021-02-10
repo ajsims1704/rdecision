@@ -270,11 +270,12 @@ DecisionTree <- R6::R6Class(
     #' @description Draw the decision tree to the current graphics output. Uses
     #' the algorithm of Walker (1989) to distribute the nodes compactly (see
     #' the \link{Arborescence} class help for details).
+    #' @param border If TRUE draw a light gray border around the plot area.
     #' @return No return value.
-    draw = function() {
+    draw = function(border=FALSE) {
       # find the (x,y) coordinates of nodes using Walker's algorithm
-      XY <- self$postree()
-      # find the X and Y extent of the nodes
+      XY <- self$postree(RootOrientation="EAST", LevelSeparation=4)
+      # find the x and y extent of the nodes in tree space
       xmin <- min(XY[,"x"])
       xmax <- max(XY[,"x"])
       ymin <- min(XY[,"y"])
@@ -284,43 +285,120 @@ DecisionTree <- R6::R6Class(
       rmargin <- 1
       tmargin <- 1
       bmargin <- 1
+      # width and height of the diagram in tree space
+      tw <- (xmax+rmargin)-(xmin-lmargin)
+      th <- (ymax+tmargin)-(ymin-bmargin)
       # calculate scale factor
-      scale <- max((xmax-xmin)+lmargin+rmargin,(ymax-ymin)+bmargin+tmargin)
-      # define viewport in "tree" space
+      scale <- max(tw, th)
+      # find centre of drawing in tree space
+      cx <- tw/2 + (xmin-lmargin)
+      cy <- th/2 + (ymin-bmargin)
+      # functions to transform coordinates and distances in tree space 
+      # to grid space (npc)
+      gx <- function(xtree) {
+        xnpc <- 0.5 + (xtree-cx)/scale
+        return(xnpc)
+      }
+      gy <- function(ytree) {
+        ynpc <- 0.5 + (ytree-cy)/scale
+        return(ynpc)
+      }
+      gd <- function(dtree) {
+        dnpc <- dtree/scale
+        return(dnpc)
+      }
+      # define viewport in grid space
       vp <- grid::viewport(
-        x = grid::unit(0.0,"snpc"), y = grid::unit(0.0,"snpc"),
-        width = grid::unit(27, "snpc"),
-        height = grid::unit(4,"snpc"),
-        just = c("left", "bottom")
       )
-      grid::grid.text(
-        format(xmax), 
-        x=grid::unit(0,"snpc"),
-        y= grid::unit(0,"snpc"),
-        just=c("left", "bottom"),
-        vp = vp
-      )
-      # draw a frame
-      grid::grid.rect(
-        x = grid::unit(0.0,"snpc"), y = grid::unit(0.0,"snpc"),
-        width = grid::unit(26.8,"snpc"), height = grid::unit(3.8,"snpc"),
-        just = c("left", "bottom"),
-        gp = grid::gpar(col="red"),
-        vp = vp
-      )
-      # # draw the nodes
-      # for (i in 1:nrow(XY)) {
-      #   grid::grid.rect(
-      #     x = grid::unit(XY[i,"x"]-xmin+lmargin,"snpc"),
-      #     y = grid::unit(XY[i,"y"]-ymin+bmargin,"snpc"),
-      #     width = grid::unit(2,"snpc"),
-      #     height = grid::unit(1,"snpc"),
-      #     just = c("left", "bottom"),
-      #     gp = grid::gpar(col="blue"),
-      #     vp = vp
-      #   )
-      #}
-      # # display the viewport
+      # viewport rectangle (border)
+      if (border) {
+        grid::grid.rect(
+          x=grid::unit(0.5,"npc"), 
+          y=grid::unit(0.5,"npc"), 
+          width = grid::unit(1,"npc"), 
+          height = grid::unit(1,"npc"),
+          gp = grid::gpar(col="lightgray"),
+          vp = vp
+        )
+      }
+      # draw the nodes
+      for (i in 1:nrow(XY)) {
+        # find the node from its index
+        n <- private$V[[XY[i,"n"]]]
+        # show the node centre
+        grid::grid.circle(
+          x = grid::unit(gx(XY[i,"x"]),"npc"),
+          y = grid::unit(gy(XY[i,"y"]),"npc"),
+          r = grid::unit(gd(0.1),"npc"),
+          gp = grid::gpar(col="red"),
+          vp = vp
+        )
+        # switch type
+        if (inherits(n, what="DecisionNode")) {
+          grid::grid.rect(
+            x = grid::unit(gx(XY[i,"x"]),"npc"),
+            y = grid::unit(gy(XY[i,"y"]),"npc"),
+            width = grid::unit(gd(2),"npc"),
+            height = grid::unit(gd(2),"npc"),
+            gp = grid::gpar(col="blue"),
+            vp = vp
+          )
+        } else if (inherits(n, what="ChanceNode")) {
+          grid::grid.circle(
+            x = grid::unit(gx(XY[i,"x"]),"npc"),
+            y = grid::unit(gy(XY[i,"y"]),"npc"),
+            r = grid::unit(gd(1),"npc"),
+            gp = grid::gpar(col="blue"),
+            vp = vp
+          )
+        } else if (inherits(n, what="LeafNode")) {
+          grid::grid.polygon(
+            x = c(
+              grid::unit(gx(XY[i,"x"]-1),"npc"),
+              grid::unit(gx(XY[i,"x"]+1),"npc"),
+              grid::unit(gx(XY[i,"x"]+1),"npc")
+            ),
+            y = c(
+              grid::unit(gy(XY[i,"y"]+0),"npc"),
+              grid::unit(gy(XY[i,"y"]+1),"npc"),
+              grid::unit(gy(XY[i,"y"]-1),"npc")
+            ),
+            gp = grid::gpar(col="blue"),
+            vp = vp
+          )
+        }
+        # add label
+        grid::grid.text(
+          label = n$label(),
+          x = grid::unit(gx(XY[i,"x"]),"npc"),
+          y = grid::unit(gy(XY[i,"y"]+1.2),"npc"),
+          just = c("center", "bottom"),
+          vp = vp
+        )
+      }
+      # draw the edges as straight lines
+      sapply(private$E, FUN=function(e) {
+        # find source and target nodes
+        n.source <- self$element_index(e$source())
+        n.target <- self$element_index(e$target())
+        x.source <- XY$x[XY$n==n.source]
+        y.source <- XY$y[XY$n==n.source]
+        x.target <- XY$x[XY$n==n.target]
+        y.target <- XY$y[XY$n==n.target]
+        # grid::grid.move.to(
+        #   x = grid::unit(gx(x.source),"npc"),
+        #   y = grid::unit(gy(y.source),"npc"),
+        #   draw = FALSE,
+        #   vp = vp
+        # )      
+        # grid::grid.line.to(
+        #   x = grid::unit(gx(x.target),"npc"),
+        #   y = grid::unit(gy(y.target),"npc"),
+        #   draw = TRUE,
+        #   vp = vp
+        # )      
+      })
+      # display the viewport
       grid::pushViewport(vp)
       grid::popViewport()
       # return updated DecisionTree (unchanged)
@@ -355,10 +433,12 @@ DecisionTree <- R6::R6Class(
         rlang::abort("Argument 'strategy' must have one Action per DecisionNode")
       }
       # all non-strategy action edges are forbidden
-      eAction <- which(sapply(private$E, function(e){inherits(e,what="Action")}),arr.ind=TRUE)
+      eAction <- which(sapply(private$E, function(e){
+        inherits(e,what="Action")}),arr.ind=TRUE)
       eAllowed <- sapply(strategy, function(e){self$element_index(e)})
       eForbidden <- setdiff(eAction, eAllowed)
-      # find all root to leaf paths and filter out those traversing forbidden edges
+      # find all root to leaf paths and filter out those traversing 
+      # forbidden edges
       P <- self$root_to_leaf_paths()
       bAllowed <- sapply(P, function(p) {
         w <- self$walk(p)

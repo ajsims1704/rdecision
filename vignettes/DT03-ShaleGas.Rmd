@@ -98,13 +98,8 @@ or a Reaction object.
 ```
 
 The decision tree can be drawn using the `draw` method of `DecisionTree`:
-
-```{r junk, echo=FALSE}
-knitr::kable(DT$postree())
-```
-
-```{r draw, echo=FALSE, results="hide", fig.keep="last", fig.align="center"}
-DT$draw()
+```{r draw, echo=FALSE, results="hide", fig.keep="last", fig.align="center", message=FALSE}
+DT$draw(border=TRUE)
 ```
 
 
