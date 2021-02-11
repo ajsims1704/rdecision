@@ -285,8 +285,8 @@ DecisionTree <- R6::R6Class(
       rmargin <- 2
       tmargin <- 2
       bmargin <- 2
-      # node half size (in tree space)
-      wn <- 1
+      # node area (in tree space)
+      node.area <- 4
       # fraction of edge that slopes after leading parent (range 0,1)
       fs <- 0.3
       # width and height of the diagram in tree space
@@ -325,6 +325,42 @@ DecisionTree <- R6::R6Class(
           vp = vp
         )
       }
+      # draw the edges as articulated lines between node centres
+      sapply(private$E, FUN=function(e) {
+        # find source and target nodes
+        n.source <- self$element_index(e$source())
+        n.target <- self$element_index(e$target())
+        x.source <- XY$x[XY$n==n.source]
+        y.source <- XY$y[XY$n==n.source]
+        x.target <- XY$x[XY$n==n.target]
+        y.target <- XY$y[XY$n==n.target]
+        grid::grid.move.to(
+          x = grid::unit(gx(x.source),"npc"),
+          y = grid::unit(gy(y.source),"npc"),
+          vp = vp
+        )
+        x.joint <- (x.target-x.source)*fs + x.source
+        y.joint <- y.target
+        grid::grid.line.to(
+          x = grid::unit(gx(x.joint),"npc"),
+          y = grid::unit(gy(y.joint),"npc"),
+          vp = vp
+        )
+        grid::grid.line.to(
+          x = grid::unit(gx(x.target),"npc"),
+          y = grid::unit(gy(y.target),"npc"),
+          vp = vp
+        )
+        # add label
+        grid::grid.text(
+          label = e$label(),
+          x = grid::unit(gx(x.joint),"npc")+grid::unit(0.2,"char"),
+          y = grid::unit(gy(y.joint),"npc")+grid::unit(0.2,"char"),
+          just = c("left", "bottom"),
+          gp = grid::gpar(fontsize=8),
+          vp = vp
+        )
+      })
       # draw the nodes
       sapply(private$V, function(v) {
         # find the node from its index
@@ -339,33 +375,36 @@ DecisionTree <- R6::R6Class(
         )
         # switch type
         if (inherits(v, what="DecisionNode")) {
+          a <- sqrt(node.area)
           grid::grid.rect(
             x = grid::unit(gx(XY[i,"x"]),"npc"),
             y = grid::unit(gy(XY[i,"y"]),"npc"),
-            width = grid::unit(gd(2*wn),"npc"),
-            height = grid::unit(gd(2*wn),"npc"),
+            width = grid::unit(gd(2*a),"npc"),
+            height = grid::unit(gd(2*a),"npc"),
             gp = grid::gpar(col="blue"),
             vp = vp
           )
         } else if (inherits(v, what="ChanceNode")) {
+          a <- sqrt(node.area/pi)
           grid::grid.circle(
             x = grid::unit(gx(XY[i,"x"]),"npc"),
             y = grid::unit(gy(XY[i,"y"]),"npc"),
-            r = grid::unit(gd(wn),"npc"),
+            r = grid::unit(gd(a),"npc"),
             gp = grid::gpar(col="blue"),
             vp = vp
           )
         } else if (inherits(v, what="LeafNode")) {
+          a <- sqrt(4*node.area/sqrt(3))
           grid::grid.polygon(
             x = c(
-              grid::unit(gx(XY[i,"x"]-wn),"npc"),
-              grid::unit(gx(XY[i,"x"]+wn),"npc"),
-              grid::unit(gx(XY[i,"x"]+wn),"npc")
+              grid::unit(gx(XY[i,"x"]-a/sqrt(3)),"npc"),
+              grid::unit(gx(XY[i,"x"]+sqrt(3)*a/6),"npc"),
+              grid::unit(gx(XY[i,"x"]+sqrt(3)*a/6),"npc")
             ),
             y = c(
               grid::unit(gy(XY[i,"y"]+0),"npc"),
-              grid::unit(gy(XY[i,"y"]+wn),"npc"),
-              grid::unit(gy(XY[i,"y"]-wn),"npc")
+              grid::unit(gy(XY[i,"y"]+a/2),"npc"),
+              grid::unit(gy(XY[i,"y"]-a/2),"npc")
             ),
             gp = grid::gpar(col="blue"),
             vp = vp
@@ -375,35 +414,9 @@ DecisionTree <- R6::R6Class(
         grid::grid.text(
           label = v$label(),
           x = grid::unit(gx(XY[i,"x"]),"npc"),
-          y = grid::unit(gy(XY[i,"y"]+1.2),"npc"),
-          just = c("center", "bottom"),
-          vp = vp
-        )
-      })
-      # draw the edges as articulated lines
-      sapply(private$E, FUN=function(e) {
-        # find source and target nodes
-        n.source <- self$element_index(e$source())
-        n.target <- self$element_index(e$target())
-        x.source <- XY$x[XY$n==n.source]
-        y.source <- XY$y[XY$n==n.source]
-        x.target <- XY$x[XY$n==n.target]
-        y.target <- XY$y[XY$n==n.target]
-        grid::grid.move.to(
-          x = grid::unit(gx(x.source+wn),"npc"),
-          y = grid::unit(gy(y.source),"npc"),
-          vp = vp
-        )
-        x.joint <- (x.target-x.source-2*wn)*fs + (x.source+wn)
-        y.joint <- y.target
-        grid::grid.line.to(
-          x = grid::unit(gx(x.joint),"npc"),
-          y = grid::unit(gy(y.joint),"npc"),
-          vp = vp
-        )
-        grid::grid.line.to(
-          x = grid::unit(gx(x.target-wn),"npc"),
-          y = grid::unit(gy(y.target),"npc"),
+          y = grid::unit(gy(XY[i,"y"]),"npc")+grid::unit(0.2,"char"),
+          just = c("right", "bottom"),
+          gp = grid::gpar(fontsize=8),
           vp = vp
         )
       })
