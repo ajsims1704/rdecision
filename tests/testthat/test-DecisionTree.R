@@ -22,6 +22,7 @@ test_that("simple decision trees are modelled correctly", {
   # strategy paths
   P <- DT$root_to_leaf_paths()
   expect_equal(length(P),3)
+  expect_error(DT$paths_in_strategy(list(e2)), class="incorrect_strategy_type")
   PS <- DT$paths_in_strategy(list(e1))
   expect_equal(length(PS),2)
   PS <- DT$paths_in_strategy(list(e4))
@@ -175,6 +176,9 @@ test_that("rdecision replacates Kaminski et al, fig 7", {
   # strategies
   S <- DT$strategies("label")
   expect_equal(nrow(S),6)
+  # test incorrect strategy prescription
+  expect_error(DT$paths_in_strategy(list(E[[1]],E[[5]],E[[7]])),
+               class="incorrect_strategy_prescription")
   # evaluate one strategy (test/sell/sell)
   RES <- DT$evaluate_strategy(list(E[[5]],E[[7]],E[[12]]))
   expect_true(is.data.frame(RES))

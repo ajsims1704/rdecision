@@ -55,9 +55,15 @@ DecisionTree <- R6::R6Class(
       # initialize the base class(es); checks that {V,E} form an arboresecence
       super$initialize(V,E)
       # check the V is a disjoint union {D,C,L} nodes
-      D <- which(sapply(V, function(v){inherits(v,what="DecisionNode")}),arr.ind=TRUE)
-      C <- which(sapply(V, function(v){inherits(v,what="ChanceNode")}),arr.ind=TRUE)
-      L <- which(sapply(V, function(v){inherits(v,what="LeafNode")}),arr.ind=TRUE)
+      D <- which(
+        sapply(V, function(v){inherits(v,what="DecisionNode")}),arr.ind=TRUE
+      )
+      C <- which(
+        sapply(V, function(v){inherits(v,what="ChanceNode")}),arr.ind=TRUE
+      )
+      L <- which(
+        sapply(V, function(v){inherits(v,what="LeafNode")}),arr.ind=TRUE
+      )
       W <- union(D,union(C,L))
       if (!setequal(seq_along(V),W)) {
         rlang::abort(
@@ -71,7 +77,8 @@ DecisionTree <- R6::R6Class(
                      class = "leaf_non-child_sets_unequal")
       }  
       # each edge must inherit from action or reaction
-      if (!all(sapply(E,function(e){inherits(e, what=c("Action","Reaction"))}))) {
+      lv <- sapply(E,function(e){inherits(e, what=c("Action","Reaction"))})
+      if (!all(lv)) {
         rlang::abort("Each edge must inherit from Action or Reaction", 
                      class="incorrect_edge_type")
       }
@@ -90,10 +97,13 @@ DecisionTree <- R6::R6Class(
         return(rc)
       })
       if (!all(eok)) {
-        rlang::abort("Actions must start at DecisionNodes; Reactions must start at ChanceNodes",
-                     class = "incorrect_edge_type ")
+        rlang::abort(
+          "Actions must start at DecisionNodes; Reactions at ChanceNodes",
+          class = "incorrect_edge_type"
+        )
       }
-      # DecisionNode labels must be unique and all their Action labels must be unique
+      # DecisionNode labels must be unique and all their Action labels
+      # must be unique
       D.lab <- sapply(D,function(d){
         v <- private$V[[d]]
         K <- self$direct_successors(v)
@@ -103,13 +113,18 @@ DecisionTree <- R6::R6Class(
           return(e$label())
         })
         if (length(choices) != length(unique(choices))) {
-          rlang::abort("Labels of actions with a common source node must be unique",
-                       class="non_unique_labels")
+          rlang::abort(
+            "Labels of actions with a common source node must be unique",
+            class="non_unique_labels"
+          )
         }
         return(v$label())
       })
       if (length(D.lab) != length(unique(D.lab))) {
-        rlang::abort("Labels of DecisionNodes must be unique", class="non_unique_labels")
+        rlang::abort(
+          "Labels of DecisionNodes must be unique", 
+          class="non_unique_labels"
+        )
       }
       # return a new DecisionTree object
       return(invisible(self))
@@ -123,8 +138,10 @@ DecisionTree <- R6::R6Class(
     #' of character strings (for what="label"); or a list of integer indexes of 
     #' the decision nodes (for what="index").
     decision_nodes = function(what="node") {
-      id <- which(sapply(private$V, function(v){inherits(v,what="DecisionNode")}),
-                  arr.ind=TRUE)
+      id <- which(
+        sapply(private$V, function(v){inherits(v,what="DecisionNode")}),
+        arr.ind=TRUE
+      )
       if (what=="node") {
         rc <- private$V[id]
       } else if (what=="label") {
@@ -132,8 +149,10 @@ DecisionTree <- R6::R6Class(
       } else if (what=="index") {
         rc <- id
       } else {
-        rlang::abort("Argument 'what' must be one of 'node', 'label' or 'index'.",
-                     class="unknown_what_value")
+        rlang::abort(
+          "Argument 'what' must be one of 'node', 'label' or 'index'.",
+          class="unknown_what_value"
+        )
       }
       return(rc)      
     },
@@ -163,10 +182,16 @@ DecisionTree <- R6::R6Class(
     actions = function(d) {
       # check argument
       if (!self$has_element(d)) {
-        rlang::abort("Node 'd' is not in the Decision Tree", class="not_in_tree")
+        rlang::abort(
+          "Node 'd' is not in the Decision Tree", 
+          class="not_in_tree"
+        )
       }
       if (!inherits(d, what="DecisionNode")) {
-        rlang::abort("Node 'd' is not a Decision Node", class="not_decision_node")
+        rlang::abort(
+          "Node 'd' is not a Decision Node", 
+          class="not_decision_node"
+        )
       }
       id <- self$element_index(d)
       # find the edges with d as their source 
@@ -251,11 +276,19 @@ DecisionTree <- R6::R6Class(
           return(rv)
         }),
         Q2.5 = sapply(mvlist, FUN=function(x){
-          rv <- ifelse(x$is_expression(), x$q_hat(probs=c(0.025)), x$quantile(probs=c(0.025)))
+          rv <- ifelse(
+            x$is_expression(), 
+            x$q_hat(probs=c(0.025)), 
+            x$quantile(probs=c(0.025))
+          )
           return(rv)
         }),
         Q97.5 = sapply(mvlist, FUN=function(x){
-          rv <- ifelse(x$is_expression(), x$q_hat(probs=c(0.975)), x$quantile(probs=c(0.975)))
+          rv <- ifelse(
+            x$is_expression(), 
+            x$q_hat(probs=c(0.975)), 
+            x$quantile(probs=c(0.975))
+          )
           return(rv)
         }),
         Est = sapply(mvlist, FUN=function(exp){
@@ -285,8 +318,8 @@ DecisionTree <- R6::R6Class(
       rmargin <- 2
       tmargin <- 2
       bmargin <- 2
-      # node area (in tree space)
-      node.area <- 4
+      # node size (in tree space); the radius of a chance node
+      node.size <- 1
       # fraction of edge that slopes after leading parent (range 0,1)
       fs <- 0.3
       # width and height of the diagram in tree space
@@ -355,7 +388,7 @@ DecisionTree <- R6::R6Class(
         grid::grid.text(
           label = e$label(),
           x = grid::unit(gx(x.joint),"npc")+grid::unit(0.2,"char"),
-          y = grid::unit(gy(y.joint),"npc")+grid::unit(0.2,"char"),
+          y = grid::unit(gy(y.joint),"npc")+grid::unit(0.5,"char"),
           just = c("left", "bottom"),
           gp = grid::gpar(fontsize=8),
           vp = vp
@@ -365,36 +398,46 @@ DecisionTree <- R6::R6Class(
       sapply(private$V, function(v) {
         # find the node from its index
         i <- which(XY$n==self$element_index(v))
-        # show the node centre
-        grid::grid.circle(
-          x = grid::unit(gx(XY[i,"x"]),"npc"),
-          y = grid::unit(gy(XY[i,"y"]),"npc"),
-          r = grid::unit(gd(0.1),"npc"),
-          gp = grid::gpar(col="red"),
-          vp = vp
-        )
         # switch type
         if (inherits(v, what="DecisionNode")) {
-          a <- sqrt(node.area)
+          a <- node.size/sqrt(2)
           grid::grid.rect(
             x = grid::unit(gx(XY[i,"x"]),"npc"),
             y = grid::unit(gy(XY[i,"y"]),"npc"),
-            width = grid::unit(gd(2*a),"npc"),
-            height = grid::unit(gd(2*a),"npc"),
-            gp = grid::gpar(col="blue"),
+            width = grid::unit(gd(a*2),"snpc"),
+            height = grid::unit(gd(a*2),"snpc"),
+            gp = grid::gpar(col="black", fill="lightgray"),
+            vp = vp
+          )
+          # add label
+          grid::grid.text(
+            label = v$label(),
+            x = grid::unit(gx(XY[i,"x"]),"npc"),
+            y = grid::unit(gy(XY[i,"y"]+node.size),"npc"),
+            just = c("right", "bottom"),
+            gp = grid::gpar(fontsize=8),
             vp = vp
           )
         } else if (inherits(v, what="ChanceNode")) {
-          a <- sqrt(node.area/pi)
+          a <- node.size
           grid::grid.circle(
             x = grid::unit(gx(XY[i,"x"]),"npc"),
             y = grid::unit(gy(XY[i,"y"]),"npc"),
             r = grid::unit(gd(a),"npc"),
-            gp = grid::gpar(col="blue"),
+            gp = grid::gpar(col="black", fill="lightgray"),
+            vp = vp
+          )
+          # add label
+          grid::grid.text(
+            label = v$label(),
+            x = grid::unit(gx(XY[i,"x"]),"npc"),
+            y = grid::unit(gy(XY[i,"y"]+1.2*node.size),"npc"),
+            just = c("right", "bottom"),
+            gp = grid::gpar(fontsize=8),
             vp = vp
           )
         } else if (inherits(v, what="LeafNode")) {
-          a <- sqrt(4*node.area/sqrt(3))
+          a <- 3*node.size/sqrt(3)
           grid::grid.polygon(
             x = c(
               grid::unit(gx(XY[i,"x"]-a/sqrt(3)),"npc"),
@@ -406,19 +449,19 @@ DecisionTree <- R6::R6Class(
               grid::unit(gy(XY[i,"y"]+a/2),"npc"),
               grid::unit(gy(XY[i,"y"]-a/2),"npc")
             ),
-            gp = grid::gpar(col="blue"),
+            gp = grid::gpar(fill="lightgray", col="black"),
+            vp = vp
+          )
+          # add label
+          grid::grid.text(
+            label = v$label(),
+            x = grid::unit(gx(XY[i,"x"]),"npc"),
+            y = grid::unit(gy(XY[i,"y"]+0.8*node.size),"npc"),
+            just = c("right", "bottom"),
+            gp = grid::gpar(fontsize=8),
             vp = vp
           )
         }
-        # add label
-        grid::grid.text(
-          label = v$label(),
-          x = grid::unit(gx(XY[i,"x"]),"npc"),
-          y = grid::unit(gy(XY[i,"y"]),"npc")+grid::unit(0.2,"char"),
-          just = c("right", "bottom"),
-          gp = grid::gpar(fontsize=8),
-          vp = vp
-        )
       })
       # display the viewport
       grid::pushViewport(vp)
@@ -444,15 +487,18 @@ DecisionTree <- R6::R6Class(
       }
       sapply(strategy, function(e) {
         if (!inherits(e,what="Action")) {
-          rlang::abort("Argument 'strategy' must only contain Action elements",
-                       class="incorrect_strategy_type")
+          rlang::abort(
+            "Argument 'strategy' must only contain Action elements",
+            class="incorrect_strategy_type")
         }
       })
       DS <- sapply(strategy, function(e){e$source()})
       iDS <- sapply(DS, function(v){self$element_index(v)})
       iD <- sapply(D, function(v){self$element_index(v)})
       if (!setequal(iD, iDS)) {
-        rlang::abort("Argument 'strategy' must have one Action per DecisionNode")
+        rlang::abort(
+          "Argument 'strategy' must have one Action per DecisionNode",
+          class = "incorrect_strategy_prescription")
       }
       # all non-strategy action edges are forbidden
       eAction <- which(sapply(private$E, function(e){
@@ -536,14 +582,18 @@ DecisionTree <- R6::R6Class(
     #' \item{Path.Benefit}{The benefit derived from traversing the pathway.}
     #' \item{Path.Utility}{The utility associated with the outcome (leaf node).}
     #' \item{Cost}{Path.Cost \eqn{*} probability of traversing the pathway.}
-    #' \item{Benefit}{Path.Benefit \eqn{*} probability of traversing the pathway.}
-    #' \item{Utility}{Path.Utility \eqn{*} probability of traversing the pathway.}
+    #' \item{Benefit}{Path.Benefit \eqn{*} probability of traversing the 
+    #' pathway.}
+    #' \item{Utility}{Path.Utility \eqn{*} probability of traversing the
+    #' pathway.}
     #' }
     evaluate_strategy = function(strategy) {
       # check argument
       if (length(strategy)!=length(self$decision_nodes())) {
-        rlang::abort("Argument 'strategy' must have as many elements as DecisionNodes",
-                     class="incorrect_strategy_length")
+        rlang::abort(
+          "Argument 'strategy' must have as many elements as DecisionNodes",
+          class="incorrect_strategy_length"
+        )
       }
       sapply(strategy, function(e) {
         if (!inherits(e,what="Action")) {
@@ -611,8 +661,9 @@ DecisionTree <- R6::R6Class(
     
     #' @description 
     #' Evaluate each strategy. Starting with the root, the function
-    #' works though all possible paths to leaf nodes and computes the probability,
-    #' cost, benefit and utility of each, then aggregates by strategy.   
+    #' works though all possible paths to leaf nodes and computes the 
+    #' probability, cost, benefit and utility of each, then aggregates 
+    #' by strategy.   
     #' @param expected If TRUE, evaluate each model variable as its mean value,
     #' otherwise sample each one from their uncertainty distribution.
     #' @param N Number of replicates. Intended for use with PSA (expected=F);

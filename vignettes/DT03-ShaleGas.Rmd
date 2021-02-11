@@ -97,13 +97,8 @@ or a Reaction object.
   DT<-DecisionTree$new(V,E)
 ```
 
-```{r echo=FALSE}
-knitr::kable(DT$postree(RootOrientation="EAST", LevelSeparation=6))
-```
-
-
 The decision tree can be drawn using the `draw` method of `DecisionTree`:
-```{r draw, echo=FALSE, results="hide", fig.keep="last", fig.align="center", message=FALSE}
+```{r draw, echo=FALSE, results="hide", fig.keep="last", fig.align="center"}
 DT$draw(border=TRUE)
 ```
 

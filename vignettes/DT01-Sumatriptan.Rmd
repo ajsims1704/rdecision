@@ -109,6 +109,11 @@ E <- list(
 DT <- DecisionTree$new(V,E)
 ```
 
+```{r draw, echo=FALSE, results="hide", fig.keep="last", fig.align="center"}
+DT$draw(border=TRUE)
+```
+
+
 # Running the model
 The method `evaluate` of decision tree objects computes
 the probability, cost and utility of each *strategy* for the model. A strategy

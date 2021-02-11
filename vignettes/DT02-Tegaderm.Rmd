@@ -257,6 +257,11 @@ E <- list(e01,e02,e03,e04,e05,e06,e11,e12,e13,e14,e15,e16,e21,e22,
           e31,e32,e33,e34,e35,e36,e41,e42,e43,e44,e45,e46,e51,e52,e9,e10)
 DT <- DecisionTree$new(V,E)
 ```
+
+```{r draw, echo=FALSE, results="hide", fig.keep="last", fig.align="center"}
+DT$draw(border=TRUE)
+```
+
 In the manufacturer's model, the uncertainties in the probabilities associated
 with the polytomous chance nodes were modelled as independent variables. This is
 not recommended because there is a chance that a particular run of the PSA will
