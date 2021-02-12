@@ -303,50 +303,75 @@ DecisionTree <- R6::R6Class(
     #' @description Draw the decision tree to the current graphics output. Uses
     #' the algorithm of Walker (1989) to distribute the nodes compactly (see
     #' the \link{Arborescence} class help for details).
-    #' @param border If TRUE draw a light gray border around the plot area.
+    #' @param border If TRUE draw a light grey border around the plot area.
     #' @return No return value.
     draw = function(border=FALSE) {
+      # margin widths (in tree space)
+      lmargin <- 4
+      rmargin <- 2
+      tmargin <- 4
+      bmargin <- 2
+      # node size (in tree space); the radius of a chance node. All node
+      # shapes are scaled to have same area (pi*node.size^2).
+      node.size <- 0.75
+      # fontsize for labels
+      fontsize <- 8
+      # fraction of edge that slopes after leading parent (range 0,1)
+      fs <- 0.20
+      # find the aspect ratio (width/height) of the current figure area
+      fig.size <- dev.size("cm")
+      fig.asp <- fig.size[1]/fig.size[2]
       # find the (x,y) coordinates of nodes using Walker's algorithm
-      XY <- self$postree(RootOrientation="EAST", LevelSeparation=6)
-      # find the x and y extent of the nodes in tree space
+      LevelSeparation <- 1
+      XY <- self$postree(
+        RootOrientation="EAST", 
+        LevelSeparation=LevelSeparation
+      )
+      # adjust level separation to create a tree with an aspect ratio
+      # that approximates the figure aspect ratio
       xmin <- min(XY[,"x"])
       xmax <- max(XY[,"x"])
       ymin <- min(XY[,"y"])
       ymax <- max(XY[,"y"])
-      # margin widths (in tree space)
-      lmargin <- 2
-      rmargin <- 2
-      tmargin <- 2
-      bmargin <- 2
-      # node size (in tree space); the radius of a chance node
-      node.size <- 1
-      # fraction of edge that slopes after leading parent (range 0,1)
-      fs <- 0.3
+      tree.asp <- (xmax-xmin)/(ymax-ymin)
+      LevelSeparation <- fig.asp/tree.asp
+      # find the (x,y) coordinates of the nodes with adjusted level separation
+      XY <- self$postree(
+        RootOrientation="EAST", 
+        LevelSeparation=LevelSeparation
+      )
+      # find the extent of the new tree
+      xmin <- min(XY[,"x"])
+      xmax <- max(XY[,"x"])
+      ymin <- min(XY[,"y"])
+      ymax <- max(XY[,"y"])
       # width and height of the diagram in tree space
-      tw <- (xmax+rmargin)-(xmin-lmargin)
-      th <- (ymax+tmargin)-(ymin-bmargin)
+      tw <- (xmax-xmin)+(lmargin+rmargin)
+      th <- (ymax-ymin)+(bmargin+tmargin)
       # calculate scale factor
-      scale <- max(tw, th)
+      scale <- max(tw/fig.size[1], th/fig.size[2])
       # find centre of drawing in tree space
       cx <- tw/2 + (xmin-lmargin)
       cy <- th/2 + (ymin-bmargin)
+      # centre of the figure space
+      cx.f <- fig.size[1]/2
+      cy.f <- fig.size[2]/2
       # functions to transform coordinates and distances in tree space 
       # to grid space (npc)
       gx <- function(xtree) {
-        xnpc <- 0.5 + (xtree-cx)/scale
+        xnpc <- cx.f + (xtree-cx)/scale
         return(xnpc)
       }
       gy <- function(ytree) {
-        ynpc <- 0.5 + (ytree-cy)/scale
+        ynpc <- cy.f + (ytree-cy)/scale
         return(ynpc)
       }
       gd <- function(dtree) {
         dnpc <- dtree/scale
         return(dnpc)
       }
-      # define viewport in grid space
-      vp <- grid::viewport(
-      )
+      # start new page for drawing
+      grid::grid.newpage()
       # viewport rectangle (border)
       if (border) {
         grid::grid.rect(
@@ -354,8 +379,7 @@ DecisionTree <- R6::R6Class(
           y=grid::unit(0.5,"npc"), 
           width = grid::unit(1,"npc"), 
           height = grid::unit(1,"npc"),
-          gp = grid::gpar(col="lightgray"),
-          vp = vp
+          gp = grid::gpar(col="lightgray")
         )
       }
       # draw the edges as articulated lines between node centres
@@ -368,30 +392,26 @@ DecisionTree <- R6::R6Class(
         x.target <- XY$x[XY$n==n.target]
         y.target <- XY$y[XY$n==n.target]
         grid::grid.move.to(
-          x = grid::unit(gx(x.source),"npc"),
-          y = grid::unit(gy(y.source),"npc"),
-          vp = vp
+          x = grid::unit(gx(x.source),"cm"),
+          y = grid::unit(gy(y.source),"cm")
         )
         x.joint <- (x.target-x.source)*fs + x.source
         y.joint <- y.target
         grid::grid.line.to(
-          x = grid::unit(gx(x.joint),"npc"),
-          y = grid::unit(gy(y.joint),"npc"),
-          vp = vp
+          x = grid::unit(gx(x.joint),"cm"),
+          y = grid::unit(gy(y.joint),"cm")
         )
         grid::grid.line.to(
-          x = grid::unit(gx(x.target),"npc"),
-          y = grid::unit(gy(y.target),"npc"),
-          vp = vp
+          x = grid::unit(gx(x.target),"cm"),
+          y = grid::unit(gy(y.target),"cm")
         )
         # add label
         grid::grid.text(
           label = e$label(),
-          x = grid::unit(gx(x.joint),"npc")+grid::unit(0.2,"char"),
-          y = grid::unit(gy(y.joint),"npc")+grid::unit(0.5,"char"),
+          x = grid::unit(gx(x.joint),"cm")+grid::unit(0.2,"char"),
+          y = grid::unit(gy(y.joint),"cm")+grid::unit(0.4,"char"),
           just = c("left", "bottom"),
-          gp = grid::gpar(fontsize=8),
-          vp = vp
+          gp = grid::gpar(fontsize=fontsize)
         )
       })
       # draw the nodes
@@ -400,72 +420,66 @@ DecisionTree <- R6::R6Class(
         i <- which(XY$n==self$element_index(v))
         # switch type
         if (inherits(v, what="DecisionNode")) {
-          a <- node.size/sqrt(2)
+          a <- sqrt(pi/4)*node.size
           grid::grid.rect(
-            x = grid::unit(gx(XY[i,"x"]),"npc"),
-            y = grid::unit(gy(XY[i,"y"]),"npc"),
-            width = grid::unit(gd(a*2),"snpc"),
-            height = grid::unit(gd(a*2),"snpc"),
-            gp = grid::gpar(col="black", fill="lightgray"),
-            vp = vp
+            x = gx(XY[i,"x"]),
+            y = gy(XY[i,"y"]),
+            width = gd(a*2),
+            height = gd(a*2),
+            default.units = "cm",
+            gp = grid::gpar(col="black", fill="lightgray")
           )
           # add label
           grid::grid.text(
             label = v$label(),
-            x = grid::unit(gx(XY[i,"x"]),"npc"),
-            y = grid::unit(gy(XY[i,"y"]+node.size),"npc"),
+            x = grid::unit(gx(XY[i,"x"]),"cm"),
+            y = grid::unit(gy(XY[i,"y"]+a),"cm")+grid::unit(0.4,"char"),
             just = c("right", "bottom"),
-            gp = grid::gpar(fontsize=8),
-            vp = vp
+            gp = grid::gpar(fontsize=fontsize)
           )
         } else if (inherits(v, what="ChanceNode")) {
           a <- node.size
           grid::grid.circle(
-            x = grid::unit(gx(XY[i,"x"]),"npc"),
-            y = grid::unit(gy(XY[i,"y"]),"npc"),
-            r = grid::unit(gd(a),"npc"),
-            gp = grid::gpar(col="black", fill="lightgray"),
-            vp = vp
+            x = gx(XY[i,"x"]),
+            y = gy(XY[i,"y"]),
+            r = gd(a),
+            default.units = "cm",
+            gp = grid::gpar(col="black", fill="lightgray")
           )
           # add label
           grid::grid.text(
             label = v$label(),
-            x = grid::unit(gx(XY[i,"x"]),"npc"),
-            y = grid::unit(gy(XY[i,"y"]+1.2*node.size),"npc"),
+            x = grid::unit(gx(XY[i,"x"]),"cm"),
+            y = grid::unit(gy(XY[i,"y"]+a),"cm")+grid::unit(0.4,"char"),
             just = c("right", "bottom"),
-            gp = grid::gpar(fontsize=8),
-            vp = vp
+            gp = grid::gpar(fontsize=fontsize)
           )
         } else if (inherits(v, what="LeafNode")) {
-          a <- 3*node.size/sqrt(3)
+          a <- 2*sqrt(pi/sqrt(3))*node.size
           grid::grid.polygon(
             x = c(
-              grid::unit(gx(XY[i,"x"]-a/sqrt(3)),"npc"),
-              grid::unit(gx(XY[i,"x"]+sqrt(3)*a/6),"npc"),
-              grid::unit(gx(XY[i,"x"]+sqrt(3)*a/6),"npc")
+              gx(XY[i,"x"]-a/sqrt(3)),
+              gx(XY[i,"x"]+sqrt(3)*a/6),
+              gx(XY[i,"x"]+sqrt(3)*a/6)
             ),
             y = c(
-              grid::unit(gy(XY[i,"y"]+0),"npc"),
-              grid::unit(gy(XY[i,"y"]+a/2),"npc"),
-              grid::unit(gy(XY[i,"y"]-a/2),"npc")
+              gy(XY[i,"y"]+0),
+              gy(XY[i,"y"]+a/2),
+              gy(XY[i,"y"]-a/2)
             ),
-            gp = grid::gpar(fill="lightgray", col="black"),
-            vp = vp
+            default.units = "cm",
+            gp = grid::gpar(fill="lightgray", col="black")
           )
           # add label
           grid::grid.text(
             label = v$label(),
-            x = grid::unit(gx(XY[i,"x"]),"npc"),
-            y = grid::unit(gy(XY[i,"y"]+0.8*node.size),"npc"),
+            x = grid::unit(gx(XY[i,"x"]),"cm"),
+            y = grid::unit(gy(XY[i,"y"]+a/3),"cm")+grid::unit(0.4,"char"),
             just = c("right", "bottom"),
-            gp = grid::gpar(fontsize=8),
-            vp = vp
+            gp = grid::gpar(fontsize=fontsize)
           )
         }
       })
-      # display the viewport
-      grid::pushViewport(vp)
-      grid::popViewport()
       # return updated DecisionTree (unchanged)
       return(invisible(self))
     },

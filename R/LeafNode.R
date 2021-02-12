@@ -4,8 +4,8 @@
 #' @description 
 #' An R6 class for a leaf node in a decision tree representing a clinical state.
 #'
-#' @details It represents a state of being, and is associated with an incremental
-#' utility. 
+#' @details It represents a state of being, and is associated with an
+#' incremental utility. 
 #' 
 #' @docType class
 #' @author Andrew J. Sims \email{andrew.sims@@newcastle.ac.uk}
@@ -24,27 +24,37 @@ LeafNode <- R6::R6Class(
     #' @description
     #' Create a new \code{LeafNode} object; synonymous with a clinical outcome.
     #' @param label Character string; a label for the state; must be
-    #' defined because it is used in tabulations. The label is automatically converted
-    #' to a syntactically valid (in R) name to ensure it can be used as a column
-    #' name in a data frame.
+    #' defined because it is used in tabulations. The label is automatically
+    #' converted to a syntactically valid (in R) name to ensure it can be used
+    #' as a column name in a data frame.
     #' @param utility The incremental utility that a user associates with
     #' being in the health state (range -Inf to 1) for the interval. Intended
     #' for use with cost benefit analysis.
-    #' @param interval The time interval over which the \code{utility} parameters
-    #' apply, expressed as an R \code{difftime} object; default 1 year.
+    #' @param interval The time interval over which the \code{utility}
+    #' parameters apply, expressed as an R \code{difftime} object; default 
+    #' 1 year.
     #' @return A new \code{LeafNode} object
     initialize = function(label, utility=1,
                           interval=as.difftime(365.25, units="days")) {
       # check there is a label
       if (rlang::is_missing(label)) {
-        rlang::abort("Argument label must not be missing", class="missing_label")
+        rlang::abort(
+          "Argument label must not be missing", 
+          class="missing_label"
+        )
       }
       # check label and make syntactically valid
       if (!is.character(label)) {
-        rlang::abort("Argument label must be a string", class="non-string_label")
+        rlang::abort(
+          "Argument label must be a string", 
+          class="non-string_label"
+        )
       }
       if (nchar(label)==0) {
-        rlang::abort("Argument label must be defined", class="empty_label")
+        rlang::abort(
+          "Argument label must be defined", 
+          class="empty_label"
+        )
       }
       label <- make.names(label)
       # ensure base class is initialized
