@@ -4,18 +4,12 @@ subtitle: "A decision tree example"
 author: "Andrew J. Sims"
 date: "February 2021"
 output: rmarkdown::pdf_document
-vignette: >
-  %\VignetteIndexEntry{Surgical sutures}
-  %\VignetteEngine{knitr::rmarkdown}
-  %\VignetteEncoding{UTF-8}
 bibliography: "references.bib"
 csl: "bmj.csl"
 ---
 ```{r, include = FALSE}
 knitr::opts_chunk$set(
-  echo = FALSE,
-  collapse = TRUE,
-  comment = "#>"
+  echo = FALSE
 )
 ```
 
@@ -34,26 +28,13 @@ The model was evaluated in three scenarios:
 * contaminated and dirty wounds
 
 
+# Scenario 1: clean wounds
 
 
-# The model
-
-## Model variables
-The model had six input variables:
-
-* the probability of an SSI with NCS
-* the risk ratio of an SSI with TCS compared with NCS
-* cost of TCS
-* cost of NCS
-* number of sutures per surgical procedure
-* cost of an admission with diagnosis of infection.
-
-The two probabilities were specific to each model scenario.
-
-```{r modvars}
+```{r s1-modvars}
 # model inputs
-c.pack.TCS <- 3.63    # MIB: VICRYL plus
-c.pack.NCS <- 2.88   # MIB: VICRYL
+c.pack.TCS <- GammaModVar$new("VICRYL plus", "GBP", shape=100, scale=3.63/100)
+c.pack.NCS <- 2.88    # MIB: VICRYL
 n.sutures <- 2        # no data in paper or MIB
 p.SSI.NCS <- 0.10     # Coello, reported by Leaper
 rr.TCS <- 0.67        # Reported by Leaper, from 1 meta analysis
@@ -63,13 +44,13 @@ c.SSI <- 3000.0       # excess cost (direct + LoS of an SSI)
 q.SSI.NCS <- 1 - p.SSI.NCS
 p.SSI.TCS <- p.SSI.NCS * rr.TCS
 q.SSI.TCS  <- 1 - p.SSI.TCS
-c.TCS <- c.pack.TCS * n.sutures
-c.NCS <- c.pack.NCS * n.sutures
+c.TCS <- ExprModVar$new("Cost of TCS per proedure", "GBP", 
+                        rlang::quo(c.pack.TCS * n.sutures))
+c.NCS <- ExprModVar$new("Cost of NCS per procedure", "GBP", 
+                        rlang::quo(c.pack.NCS * n.sutures))
 ```
 
-
-## Model structure
-```{r model}
+```{r s1-model}
 # nodes
 A <- LeafNode$new("A")
 B <- LeafNode$new("B")
@@ -87,19 +68,40 @@ E <- list(
   Reaction$new(c2,D,p=q.SSI.NCS,cost=0,label="No SSI"),
   Action$new(d1,c2,label="Non-antimicrobial",cost=c.NCS,benefit=0)
 )
-DT <- DecisionTree$new(V = list(A,B,c1,C,D,c2,d1),E)
+DT1 <- DecisionTree$new(V = list(A,B,c1,C,D,c2,d1),E)
 ```
+
+## Model structure
 The decision tree defined by Leaper *et al* [-@leaper2017] is shown in the
-figure below. The same tree was used to evaluate the choice of suture type
-for several scenarios.
-```{r draw, fig.keep="last", fig.align="center", fig.width=6}
-DT$draw()
+figure below. 
+```{r draw, fig.keep="last", fig.align="center", fig.width=6, fig.cap="boo"}
+DT1$draw()
 ```
+
+## Model variables
+The model had six input variables:
+
+* the probability of an SSI with NCS
+* the risk ratio of an SSI with TCS compared with NCS
+* cost of TCS
+* cost of NCS
+* number of sutures per surgical procedure
+* cost of an admission with diagnosis of infection.
+
+
+
+
+The model input variables are shown in the following table:
+```{r s1-inputs}
+pander::pander(DT1$modvar_table())
+```
+
+
 
 # Results
 
 ```{r base-case}
-RES <- DT$evaluate()
+RES <- DT1$evaluate()
 pander::pander(RES)
 ```
 

@@ -38,17 +38,29 @@ GammaModVar <- R6::R6Class(
     initialize = function(description, units, shape, scale) {
       super$initialize(description, units)
       if (!is.numeric(shape)) {
-        rlang::abort("Argument 'shape' must be numeric", class="shape_not_numeric")
+        rlang::abort(
+          "Argument 'shape' must be numeric", 
+          class="shape_not_numeric"
+        )
       }
       if (shape <= 0) {
-        rlang::abort("Argument 'shape' must be > 0", class="shape_not_supported")
+        rlang::abort(
+          "Argument 'shape' must be > 0", 
+          class="shape_not_supported"
+        )
       }
       private$shape <- shape
       if (!is.numeric(scale)) {
-        rlang::abort("Argument 'scale' must be numeric", class="scale_not_numeric")
+        rlang::abort(
+          "Argument 'scale' must be numeric", 
+          class="scale_not_numeric"
+        )
       }
       if (scale <= 0) {
-        rlang::abort("Argument 'scale' must be > 0", class="scale_not_supported")
+        rlang::abort(
+          "Argument 'scale' must be > 0", 
+          class="scale_not_supported"
+        )
       }
       private$scale <- scale
       # ensure first call to get() is valid
@@ -70,7 +82,12 @@ GammaModVar <- R6::R6Class(
     #' Accessor function for the name of the uncertainty distribution.
     #' @return Distribution name as character string.
     distribution = function() {
-      rv <- paste('Ga(', round(private$shape,3), ',', round(private$scale,3), ')', sep='')
+      rv <- paste(
+        'Ga(', 
+        round(private$shape,3), ',', 
+        round(private$scale,3), ')', 
+        sep=''
+      )
       return(rv)
     },
 
