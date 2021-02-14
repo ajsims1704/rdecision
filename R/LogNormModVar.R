@@ -8,25 +8,26 @@
 #' A model variable for which the uncertainty in the point estimate can
 #' be modelled with a Log Normal distribution. 
 #' \href{https://sites.google.com/site/probonto/}{ProbOnto}
-#' defines seven parametrizations of the log normal distribution. These are linked,
-#' allowing the parameters of any one to be derived from any other. All
-#' 7 parameterizations require two parameters; their meanings are as follows:
+#' defines seven parametrizations of the log normal distribution. These are 
+#' linked, allowing the parameters of any one to be derived from any other. All
+#' 7 parametrizations require two parameters; their meanings are as follows:
 #' \describe{
-#' \item{LN1}{\eqn{p_1=\mu}, \eqn{p_2=\sigma}, where \eqn{\mu} and \eqn{\sigma} are the mean
-#' and standard deviation, both on the log scale.}
-#' \item{LN2}{\eqn{p_1=\mu}, \eqn{p_2=v}, where \eqn{\mu} and \eqn{v} are the mean
-#' and variance, both on the log scale.}
-#' \item{LN3}{\eqn{p_1=m}, \eqn{p_2=\sigma}, where \eqn{m} is the median on the natural
-#' scale and \eqn{\sigma} is the standard deviation on the log scale.}
-#' \item{LN4}{\eqn{p_1=m}, \eqn{p_2=c_v}, where \eqn{m} is the median on the natural
-#' scale and \eqn{c_v} is the coefficient of variation on the natural scale.}
-#' \item{LN5}{\eqn{p_1=\mu}, \eqn{p_2=\tau}, where \eqn{\mu} is the mean on the log
-#' scale and \eqn{\tau} is the precision on the log scale.}
+#' \item{LN1}{\eqn{p_1=\mu}, \eqn{p_2=\sigma}, where \eqn{\mu} and \eqn{\sigma} 
+#' are the mean and standard deviation, both on the log scale.}
+#' \item{LN2}{\eqn{p_1=\mu}, \eqn{p_2=v}, where \eqn{\mu} and \eqn{v} are the
+#' mean and variance, both on the log scale.}
+#' \item{LN3}{\eqn{p_1=m}, \eqn{p_2=\sigma}, where \eqn{m} is the median on the
+#' natural scale and \eqn{\sigma} is the standard deviation on the log scale.}
+#' \item{LN4}{\eqn{p_1=m}, \eqn{p_2=c_v}, where \eqn{m} is the median on the
+#' natural scale and \eqn{c_v} is the coefficient of variation on the natural
+#' scale.}
+#' \item{LN5}{\eqn{p_1=\mu}, \eqn{p_2=\tau}, where \eqn{\mu} is the mean on the
+#' log scale and \eqn{\tau} is the precision on the log scale.}
 #' \item{LN6}{\eqn{p_1=m}, \eqn{p_2=\sigma_g}, where \eqn{m} is the median on
-#' the natural scale and \eqn{\sigma_g} is the geometric standard deviation on the
-#' natural scale.}
-#' \item{LN7}{\eqn{p_1=\mu_N}, \eqn{p1=\sigma_N}, where \eqn{\mu_N} is the mean on
-#' the natural scale and \eqn{\sigma_N} is the standard deviation on the
+#' the natural scale and \eqn{\sigma_g} is the geometric standard deviation on 
+#' the natural scale.}
+#' \item{LN7}{\eqn{p_1=\mu_N}, \eqn{p2=\sigma_N}, where \eqn{\mu_N} is the mean
+#' on the natural scale and \eqn{\sigma_N} is the standard deviation on the
 #' natural scale.}
 #' }
 #' 
@@ -95,7 +96,10 @@ LogNormModVar <- R6::R6Class(
         private$sdlog <- sqrt(log(1+(p2^2)/(p1^2)))
       }
       else {
-        stop("LogNormModVar::new: parameter 'parametrize must be one of 'LN1' through 'LN7'.")
+        rlang::abort(
+          "'parametrize' must be one of 'LN1' through 'LN7'",
+          class = "parametrization_not_supported"
+        )
       }
       # ensure first call to get() is valid
       self$set(TRUE)
@@ -116,8 +120,8 @@ LogNormModVar <- R6::R6Class(
     #' Accessor function for the name of the uncertainty distribution.
     #' @return Distribution name as character string (LN1, LN2 etc).
     distribution = function() {
-      rv <- paste(private$parametrization, '(', round(private$meanlog,3), ',', 
-                  round(private$sdlog,3), ')', sep='')
+      rv <- paste("LN(", round(private$meanlog,3), ",", 
+                  round(private$sdlog,3), ")", sep="")
       return(rv)
     },
     

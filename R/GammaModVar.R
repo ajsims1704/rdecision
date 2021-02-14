@@ -117,8 +117,7 @@ GammaModVar <- R6::R6Class(
     },
 
     #' @description 
-    #' Draw a random sample from the model variable. Normally accessed by a 
-    #' call to value(what="r").
+    #' Draw a random sample from the model variable. 
     #' @param n Number of samples to draw.
     #' @return Samples drawn at random.
     r = function(n=1) {

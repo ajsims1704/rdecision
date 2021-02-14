@@ -60,6 +60,8 @@ BetaModVar <- R6::R6Class(
         )
       }
       private$beta <- beta
+      # ensure first call to get() is valid
+      self$set(TRUE)
       # return BetaModVar
       return(invisible(self))
     },
@@ -71,25 +73,6 @@ BetaModVar <- R6::R6Class(
     #' @return TRUE if probabilistic
     is_probabilistic = function() {
       return(TRUE)
-    },
-    
-    #' @description
-    #' Set the value of the model variable from its uncertainty distribution.
-    #' Nothing is returned; the sampled value is returned at the next
-    #' call to `value()`.
-    #' @param expected Logical; if TRUE sets the value of the model variable
-    #'        returned at subsequent calls to `value()` to be equal to the 
-    #'        expectation of the variable. Default is FALSE.
-    #' @return Updated BetaModVar object.
-    sample = function(expected=F) {
-      private$val <- NA
-      if (expected) {
-        private$val <- self$getMean()
-      }
-      else {
-        private$val <- rbeta(1, shape1=private$alpha, shape2=private$beta)
-      }
-      return(invisible(self))
     },
     
     #' @description 
@@ -106,26 +89,62 @@ BetaModVar <- R6::R6Class(
     mean = function() {
       return(private$alpha/(private$alpha+private$beta))
     },
+
+    #' @description 
+    #' Return the mode of the distribution (if alpha, beta > 1) 
+    #' @return mode as a numeric value.
+    mode = function() {
+      rv <- as.numeric(NA)
+      if (private$alpha==1 && private$beta==1) {
+        rv <- 0.5
+      } else if (private$alpha<1 && private$beta < 1) {
+        rv <- as.numeric(NA) # bimodal
+      } else if (private$alpha<=1 && private$beta>1) {
+        rv <- 0
+      } else if (private$alpha>1 && private$beta<=1) {
+        rv <- 1
+      } else {
+        rv <- (private$alpha-1)/(private$alpha+private$beta-2) 
+      }
+      return(rv)
+    },
     
     #' @description 
     #' Return the standard deviation of the distribution. 
     #' @return Standard deviation as a numeric value
-    getSD = function() {
+    SD = function() {
       a <- private$alpha
       b <- private$beta
       v <- (a*b) / ( (a+b)^2 * (a+b+1) )
       return(sqrt(v))
     },
-    
+
+    #' Draw a random sample from the model variable. 
+    #' @param n Number of samples to draw.
+    #' @return Samples drawn at random.
+    r = function(n=1) {
+      rv <- rbeta(n, shape1=private$alpha, shape2=private$beta)
+      return(rv)
+    },
+
     #' @description
     #' Return the quantiles of the Gamma uncertainty distribution.
     #' @param probs Vector of probabilities, in range [0,1].    
     #' @return Vector of quantiles.
-    getQuantile = function(probs) {
+    quantile = function(probs) {
+      # test argument
       sapply(probs, FUN=function(x) {
-        if (!is.numeric(probs)) {
-          stop("BetaModVar$getQuantile: argument must be a numeric vector",
-               call.=FALSE)
+        if (is.na(x)) {
+          rlang::abort("All elements of 'probs' must be defined",
+                       class="probs_not_defined")
+        }
+        if (!is.numeric(x)) {
+          rlang::abort("Argument 'probs' must be a numeric vector",
+                       class="probs_not_numeric")
+        }
+        if (x<0 || x>1) {
+          rlang::abort("Elements of 'probs' must be in range[0,1]",
+                       class="probs_out_of_range")
         }
       })
       q <- qbeta(probs, shape1=private$alpha, shape2=private$beta)

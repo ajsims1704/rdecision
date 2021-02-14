@@ -42,8 +42,8 @@ test_that("mean, mode, sd and quantiles are returned correctly", {
   expect_equal(g$mode(), (k-1)*theta)
   probs <- c(0.025, 0.975)
   q <- g$quantile(probs)
-  expect_equal(round(q[1],2), 2.06, tolerance=0.01)
-  expect_equal(round(q[2],2), 7.88, tolerance=0.01)
+  expect_equal(q[1], 2.06, tolerance=0.01)
+  expect_equal(q[2], 7.88, tolerance=0.01)
 })
 
 test_that("random sampling is from a Gamma distribution", {

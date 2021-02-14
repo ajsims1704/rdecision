@@ -5,6 +5,8 @@ test_that("illegal initializations are rejected", {
   expect_error(LogNormModVar$new("lognorm",42,1,1), class="units_not_string")
   expect_error(LogNormModVar$new("lognorm","GBP","1",1), class="p1_not_numeric")
   expect_error(LogNormModVar$new("lognorm","GBP",1,"1"), class="p2_not_numeric")
+  expect_error(LogNormModVar$new("lognorm","GBP",1,1,"LN8"), 
+               class="parametrization_not_supported")
 })
 
 test_that("properties are correct", {
@@ -15,9 +17,9 @@ test_that("properties are correct", {
 
 test_that("modvar has correct distribution name", {
   ln <- LogNormModVar$new("lognorm", "GBP", 1, 1)
-  expect_equal(ln$distribution(), "LN1(1,1)")
+  expect_equal(ln$distribution(), "LN(1,1)")
   ln <- LogNormModVar$new("lognorm", "GBP", 1, 1, "LN2")
-  expect_equal(ln$distribution(), "LN2(1,1)")
+  expect_equal(ln$distribution(), "LN(1,1)")
 })
 
 test_that("mean, mode, sd and quantiles are returned correctly", {
@@ -60,27 +62,28 @@ test_that("parametrizations are linked", {
   ln1 <- LogNormModVar$new("ln1", "GBP", mu, sigma, "LN1")
   # 2
   ln2 <- LogNormModVar$new("ln2", "GBP", mu, sigma^2, "LN2")
-  expect_equal(ln1$mean, ln2$mean, tolerance=0.01)
-  expect_equal(ln1$mode, ln2$mode, tolerance=0.01)
+  expect_equal(ln1$mean(), ln2$mean(), tolerance=0.01)
+  expect_equal(ln1$mode(), ln2$mode(), tolerance=0.01)
   # 3
   ln3 <- LogNormModVar$new("ln3", "GBP", exp(mu), sigma, "LN3")
-  expect_equal(ln1$mean, ln3$mean, tolerance=0.01)
-  expect_equal(ln1$mode, ln3$mode, tolerance=0.01)
+  expect_equal(ln1$mean(), ln3$mean(), tolerance=0.01)
+  expect_equal(ln1$mode(), ln3$mode(), tolerance=0.01)
   # 4
-  ln4 <- LogNormModVar$new("ln4", "GBP", exp(mu), exp(sigma^2-1), "LN4")
-  expect_equal(ln1$mean, ln4$mean, tolerance=0.01)
-  expect_equal(ln1$mode, ln4$mode, tolerance=0.01)
+  ln4 <- LogNormModVar$new("ln4", "GBP", exp(mu), sqrt(exp(sigma^2)-1), "LN4")
+  expect_equal(ln1$mean(), ln4$mean(), tolerance=0.01)
+  expect_equal(ln1$mode(), ln4$mode(), tolerance=0.01)
   # 5
   ln5 <- LogNormModVar$new("ln5", "GBP", mu, 1/sigma^2, "LN5")
-  expect_equal(ln1$mean, ln5$mean, tolerance=0.01)
-  expect_equal(ln1$mode, ln5$mode, tolerance=0.01)
+  expect_equal(ln1$mean(), ln5$mean(), tolerance=0.01)
+  expect_equal(ln1$mode(), ln5$mode(), tolerance=0.01)
   # 6
   ln6 <- LogNormModVar$new("ln6", "GBP", exp(mu), exp(sigma), "LN6")
-  expect_equal(ln1$mean, ln6$mean, tolerance=0.01)
-  expect_equal(ln1$mode, ln6$mode, tolerance=0.01)
+  expect_equal(ln1$mean(), ln6$mean(), tolerance=0.01)
+  expect_equal(ln1$mode(), ln6$mode(), tolerance=0.01)
   # 7
-  ln7 <- LogNormModVar$new("ln7", "GBP", exp(mu+(sigma^2)/2), exp(mu+(sigma^2)/2)*sqrt(exp(sigma^2-1)), "LN7")
-  expect_equal(ln1$mean, ln7$mean, tolerance=0.01)
-  expect_equal(ln1$mode, ln7$mode, tolerance=0.01)
+  ln7 <- LogNormModVar$new("ln7", "GBP", exp(mu+(sigma^2)/2), 
+                           exp(mu+(sigma^2)/2)*sqrt(exp(sigma^2)-1), "LN7")
+  expect_equal(ln1$mean(), ln7$mean(), tolerance=0.01)
+  expect_equal(ln1$mode(), ln7$mode(), tolerance=0.01)
 })
 

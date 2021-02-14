@@ -40,15 +40,39 @@ c.pack.NCS <- GammaModVar$new(
   shape = 100,            # MIB: VICRYL, £2.88, 10% CoV
   scale = 2.88/100
 )
-n.sutures <- 2        # no data in paper or MIB
-p.SSI.NCS <- 0.10     # Coello, reported by Leaper
-rr.TCS <- 0.67        # Reported by Leaper, from 1 meta analysis
+n.sutures <- GammaModVar$new(
+  "Sutures per procedure",
+  "n",                    # Gamma is conjugate prior of Poisson mean
+  shape = 200,            # assumed 200 packs in 100 operations
+  scale = 1/100
+)       
+p.SSI.NCS <- BetaModVar$new(
+  "P(SSI|NCS)",
+  "P",
+  alpha = 653,            # Coello 2005, 653 small bowel SSI in 6528 ops
+  beta = 6528-63
+)     
+rr.TCS <- LogNormModVar$new(
+  "RR(SSI|TCS)", "RR",
+  p1 = 0.67,              # RR reported as 0.67 (95%CI 0.53 to 0.84)
+  p2 = (0.84-0.53)/(2*1.96),
+  "LN7"
+)        
 c.SSI <- 3000.0       # excess cost (direct + LoS of an SSI)
 
 # derived parameters (expressions)
-q.SSI.NCS <- 1 - p.SSI.NCS
-p.SSI.TCS <- p.SSI.NCS * rr.TCS
-q.SSI.TCS  <- 1 - p.SSI.TCS
+q.SSI.NCS <- ExprModVar$new(
+  "1-P(SSI|NCS)", "P",
+  rlang::quo(1 - p.SSI.NCS)
+)
+p.SSI.TCS <- ExprModVar$new(
+  "P(SSI|TCS)", "P",
+  rlang::quo(p.SSI.NCS * rr.TCS)
+)
+q.SSI.TCS <- ExprModVar$new(
+  "1-P(SSI|TCS)", "P",
+  rlang::quo(1 - p.SSI.TCS)
+)
 c.TCS <- ExprModVar$new("Cost of TCS per proedure", "GBP", 
                         rlang::quo(c.pack.TCS * n.sutures))
 c.NCS <- ExprModVar$new("Cost of NCS per procedure", "GBP", 

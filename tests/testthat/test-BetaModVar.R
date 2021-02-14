@@ -33,25 +33,46 @@ test_that("get() is initialized correctly", {
   expect_equal(B$get(), a/(a+b), tolerance=0.01)
 })
 
-# test_that("mean, mode, sd and quantiles are returned correctly", {
-#   k <- 9
-#   theta <- 0.5
-#   g <- GammaModVar$new("gamma", "GBP", k, theta)
-#   expect_equal(g$mean(), k*theta, tolerance=0.01)
-#   expect_equal(g$SD(), sqrt(k)*theta, tolerance=0.01)
-#   expect_equal(g$mode(), (k-1)*theta)
-#   probs <- c(0.025, 0.975)
-#   q <- g$quantile(probs)
-#   expect_equal(round(q[1],2), 2.06, tolerance=0.01)
-#   expect_equal(round(q[2],2), 7.88, tolerance=0.01)
-# })
-# 
-# test_that("random sampling is from a Gamma distribution", {
-#   k <- 9
-#   theta <- 0.5
-#   g <- GammaModVar$new("gamma", "GBP", k, theta)
-#   samp <- g$r(1000)
-#   expect_equal(length(samp), 1000)
-#   expect_equal(mean(samp), 4.5, tolerance=0.1)
-#   expect_equal(sd(samp), 1.5, tolerance=0.1)
-# })
+test_that("mean, mode, sd and quantiles are returned correctly", {
+  alpha <- 2
+  beta <- 5
+  b <- BetaModVar$new("beta", "GBP", alpha, beta)
+  expect_equal(b$mean(), alpha/(alpha+beta), tolerance=0.01)
+  var <- (alpha*beta)/((alpha+beta+1)*(alpha+beta)^2)
+  expect_equal(b$SD(), sqrt(var), tolerance=0.01)
+  expect_equal(b$mode(), (alpha-1)/(alpha+beta-2))
+  probs <- c(0.025, 0.975)
+  q <- b$quantile(probs)
+  expect_equal(q[1], 0.043, tolerance=0.001)
+  expect_equal(q[2], 0.641, tolerance=0.001)
+})
+
+test_that("Extreme node values are defined", {
+  alpha <- 1
+  beta <- 1
+  b <- BetaModVar$new("beta", "GBP", alpha, beta)
+  expect_equal(b$mode(), 0.5)
+  alpha <- 0.5
+  beta <- 0.5
+  b <- BetaModVar$new("beta", "GBP", alpha, beta)
+  expect_true(is.na(b$mode()))
+  alpha <- 0.5
+  beta <- 1.5
+  b <- BetaModVar$new("beta", "GBP", alpha, beta)
+  expect_equal(b$mode(), 0)
+  alpha <- 1.5
+  beta <- 0.5
+  b <- BetaModVar$new("beta", "GBP", alpha, beta)
+  expect_equal(b$mode(), 1)
+})
+
+test_that("random sampling is from a Beta distribution", {
+  alpha <- 2
+  beta <- 5
+  b <- BetaModVar$new("beta", "GBP", alpha, beta)
+  samp <- b$r(1000)
+  expect_equal(length(samp), 1000)
+  expect_equal(mean(samp), alpha/(alpha+beta), tolerance=0.1)
+  var <- (alpha*beta)/((alpha+beta+1)*(alpha+beta)^2)
+  expect_equal(sd(samp), sqrt(var), tolerance=0.1)
+})
