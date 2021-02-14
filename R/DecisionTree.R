@@ -225,9 +225,10 @@ DecisionTree <- R6::R6Class(
     
     #' @description 
     #' Tabulate the model variables.
+    #' @param expressions A logical that defines whether expression model
+    #' variables should be included in the tabulation. 
     #' @return Data frame with one row per model variable, as follows:
     #' \describe{
-    #' \item{Label}{The label given to the variable on creation.}
     #' \item{Description}{As given at initialization.}
     #' \item{Units}{Units of the variable.}
     #' \item{Distribution}{Either the uncertainty distribution, if
@@ -246,9 +247,13 @@ DecisionTree <- R6::R6Class(
     #' \item{Est}{TRUE if the quantiles and SD have been estimated by 
     #' random sampling.}
     #' }
-    modvar_table = function() {
-      # create list of model variables in this decision tree
+    modvar_table = function(expressions=TRUE) {
+      # create list of model variables in this decision tree, excluding
+      # expressions if not wanted
       mvlist <- self$modvars()
+      if (!expressions) {
+        mvlist <- mvlist[sapply(mvlist,FUN=function(v){!v$is_expression()})]
+      }
       # create a data frame of model variables
       DF <- data.frame(
         Description = sapply(mvlist, FUN=function(x){

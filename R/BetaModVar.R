@@ -18,16 +18,13 @@ BetaModVar <- R6::R6Class(
   classname = "BetaModVar",
   inherit = ModVar,
   private = list(
-    alpha = 'numeric',
-    beta = 'numeric'
+    alpha = NULL,
+    beta = NULL
   ),
   public = list(
     
     #' @description 
     #' Create an object of class BetaModVar.
-    #' @param label A character string label for the variable. It is advised
-    #' to make this the same as the variable name which helps when tabulating
-    #' model variables involving ExprModVars.
     #' @param description A character string describing the variable.
     #' @param units Units of the variable, as character string.
     #' @param alpha parameter of the Beta distribution.
@@ -35,9 +32,45 @@ BetaModVar <- R6::R6Class(
     #' @return An object of class BetaModVar. 
     initialize = function(description, units, alpha, beta) {
       super$initialize(description, units)
+      # check alpha parameter
+      if (!is.numeric(alpha)) {
+        rlang::abort(
+          "Argument 'alpha' must be numeric", 
+          class="alpha_not_numeric"
+        )
+      }
+      if (alpha <= 0) {
+        rlang::abort(
+          "Argument 'alpha' must be > 0", 
+          class="alpha_not_supported"
+        )
+      }
       private$alpha <- alpha
+      # check beta parameter
+      if (!is.numeric(beta)) {
+        rlang::abort(
+          "Argument 'beta must be numeric", 
+          class="beta_not_numeric"
+        )
+      }
+      if (beta <= 0) {
+        rlang::abort(
+          "Argument 'beta' must be > 0", 
+          class="beta_not_supported"
+        )
+      }
       private$beta <- beta
-      private$val <- self$getMean()
+      # return BetaModVar
+      return(invisible(self))
+    },
+
+    #' @description 
+    #' Tests whether the model variable is probabilistic, i.e. a random
+    #' variable that follows a distribution, or an expression involving
+    #' random variables, some of which follow distributions. 
+    #' @return TRUE if probabilistic
+    is_probabilistic = function() {
+      return(TRUE)
     },
     
     #' @description
@@ -62,7 +95,7 @@ BetaModVar <- R6::R6Class(
     #' @description 
     #' Accessor function for the name of the uncertainty distribution.
     #' @return Distribution name as character string.
-    getDistribution = function() {
+    distribution = function() {
       rv <- paste('Be(', private$alpha, ',', private$beta, ')', sep='')
       return(rv)
     },
@@ -70,7 +103,7 @@ BetaModVar <- R6::R6Class(
     #' @description 
     #' Return the expected value of the distribution. 
     #' @return Expected value as a numeric value.
-    getMean = function() {
+    mean = function() {
       return(private$alpha/(private$alpha+private$beta))
     },
     

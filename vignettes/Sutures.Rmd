@@ -1,6 +1,5 @@
 ---
 title: "Surgical sutures"
-subtitle: "A decision tree example"
 author: "Andrew J. Sims"
 date: "February 2021"
 output: rmarkdown::pdf_document
@@ -27,14 +26,20 @@ The model was evaluated in three scenarios:
 * clean-contaminated wounds;
 * contaminated and dirty wounds
 
-
 # Scenario 1: clean wounds
-
-
 ```{r s1-modvars}
 # model inputs
-c.pack.TCS <- GammaModVar$new("VICRYL plus", "GBP", shape=100, scale=3.63/100)
-c.pack.NCS <- 2.88    # MIB: VICRYL
+c.pack.TCS <- GammaModVar$new(
+  "VICRYL plus, pack",
+  "GBP", 
+  shape = 100,            # MIB: VICRYL plus, £3.63, 10% CoV 
+  scale=3.63/100
+)
+c.pack.NCS <- GammaModVar$new(
+  "VICRYL, pack", "GBP",
+  shape = 100,            # MIB: VICRYL, £2.88, 10% CoV
+  scale = 2.88/100
+)
 n.sutures <- 2        # no data in paper or MIB
 p.SSI.NCS <- 0.10     # Coello, reported by Leaper
 rr.TCS <- 0.67        # Reported by Leaper, from 1 meta analysis
@@ -72,28 +77,27 @@ DT1 <- DecisionTree$new(V = list(A,B,c1,C,D,c2,d1),E)
 ```
 
 ## Model structure
-The decision tree defined by Leaper *et al* [-@leaper2017] is shown in the
-figure below. 
-```{r draw, fig.keep="last", fig.align="center", fig.width=6, fig.cap="boo"}
+```{r }
+caption <- "Decision tree for all scenarios."
+```
+The decision tree defined by Leaper *et al* [-@leaper2017] is shown in figure 1. 
+```{r draw, fig.keep="last", fig.align="center", fig.width=6, fig.cap=caption}
 DT1$draw()
 ```
 
 ## Model variables
-The model had six input variables:
+The model had six input variables: the probability of an SSI with NCS,
+the risk ratio of an SSI with TCS compared with NCS, cost of TCS, cost of NCS,
+number of sutures per surgical procedure and cost of an admission with
+diagnosis of infection (Table 1).
 
-* the probability of an SSI with NCS
-* the risk ratio of an SSI with TCS compared with NCS
-* cost of TCS
-* cost of NCS
-* number of sutures per surgical procedure
-* cost of an admission with diagnosis of infection.
-
-
-
-
-The model input variables are shown in the following table:
 ```{r s1-inputs}
-pander::pander(DT1$modvar_table())
+keep <- c("Description", "Units", "Distribution", "Mean", "Q2.5", "Q97.5")
+pander::pander(
+  DT1$modvar_table(expressions=FALSE)[,keep],
+  caption = "Model inputs",
+  justify = c("lllrrr")
+)
 ```
 
 
