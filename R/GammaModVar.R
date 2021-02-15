@@ -14,6 +14,17 @@
 #' used in this implementation). Note, however, that although Briggs et al
 #' use the shape/scale formulation, they use `alpha`/`beta` as parameter
 #' names. 
+#' 
+#' @note 
+#' The Gamma model variable class can be used to model the uncertainty of
+#' the mean of a count quantity which follows a Poisson distribution. The Gamma
+#' distribution is the conjugate prior of a Poisson distribution, and the shape
+#' and scale relate directly to the number of intervals from which the mean
+#' count has been estimated. Specifically, the shape ($k$) is equal to the 
+#' total count of events in $1/\theta$ intervals, where $\theta$ is the scale. 
+#' For example, if 200 counts were observed in a sample of 100 intervals, 
+#' setting \code{shape=200} and \code{scale=1/100} gives a Gamma distribution 
+#' with a mean of 2 and a 95% confidence interval from 1.73 to 2.29. 
 #'
 #' @docType class
 #' @author Andrew J. Sims \email{andrew.sims@@newcastle.ac.uk}

@@ -58,8 +58,11 @@ rr.TCS <- LogNormModVar$new(
   p2 = (0.84-0.53)/(2*1.96),
   "LN7"
 )        
-c.SSI <- 3000.0       # excess cost (direct + LoS of an SSI)
-
+c.SSI <- GammaModVar$new(
+  "Excess cost SSI", "GBP",
+  shape = 1,
+  scale = 3000            # assumes standard error equals mean
+)
 # derived parameters (expressions)
 q.SSI.NCS <- ExprModVar$new(
   "1-P(SSI|NCS)", "P",
@@ -100,20 +103,20 @@ E <- list(
 DT1 <- DecisionTree$new(V = list(A,B,c1,C,D,c2,d1),E)
 ```
 
-## Model structure
 ```{r }
 caption <- "Decision tree for all scenarios."
 ```
-The decision tree defined by Leaper *et al* [-@leaper2017] is shown in figure 1. 
 ```{r draw, fig.keep="last", fig.align="center", fig.width=6, fig.cap=caption}
 DT1$draw()
 ```
 
-## Model variables
+## The model
+The decision tree defined by Leaper *et al* [-@leaper2017] is shown in figure 1. 
 The model had six input variables: the probability of an SSI with NCS,
 the risk ratio of an SSI with TCS compared with NCS, cost of TCS, cost of NCS,
 number of sutures per surgical procedure and cost of an admission with
-diagnosis of infection (Table 1).
+diagnosis of infection. The uncertainties in the estimates of the variables
+were described by distributions with hyperparameters (Table 1).
 
 ```{r s1-inputs}
 keep <- c("Description", "Units", "Distribution", "Mean", "Q2.5", "Q97.5")
@@ -124,9 +127,7 @@ pander::pander(
 )
 ```
 
-
-
-# Results
+## Results
 
 ```{r base-case}
 RES <- DT1$evaluate()
