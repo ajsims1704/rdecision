@@ -677,7 +677,39 @@ DecisionTree <- R6::R6Class(
       # return the payoff table      
       return(PAYOFF)
     },
-    
+ 
+    #' @description 
+    #' Create a "tornado" diagram to compare two strategies for traversing
+    #' the decision tree. A strategy is a unanimous prescription of the actions
+    #' at each decision node. 
+    #' @param index The index strategy (option) to be evaluated.
+    #' @param ref The reference strategy (option) with which the index strategy
+    #' will be compared.
+    #' @param outcome One of "cost" or "ICER". For "cost" (e.g. in cost 
+    #' consequence analysis), the x axis is cost saved (cost of reference minus
+    #' cost of index), on the presumption that the new technology will be cost
+    #' saving at the point estimate. For "ICER" the x axis is
+    #' $\Delta C/\Delta E$ and is expected to be positive at the point estimate
+    #' (i.e. in the NE or SW quadrants of the cost-effectiveness plane).
+    #' @param draw TRUE if the graph is to be drawn; otherwise return the
+    #' data frame silently.
+    #' @return A data frame with one row per input model variable and columns
+    #' for: minimum value of the variable, maximum value of the variable,
+    #' minimum value of the outcome and maximum value of the outcome. 
+    #' @note The extreme values of each input variable are the upper and lower
+    #' 95% confidence limits of the uncertainty distributions of each variable.
+    #' This ensures that the range of each input is defensible (Briggs 2012).
+    tornado = function(index, ref, outcome="cost", draw=TRUE) {
+      # check the parameters
+      
+      # 
+      
+      # evaluate each strategy
+      #NDX <- self$evaluate_strategy(index)
+      #REF <- self$evaluate_strategy(ref)
+      
+    },
+
     #' @description 
     #' Evaluate each strategy. Starting with the root, the function
     #' works though all possible paths to leaf nodes and computes the 

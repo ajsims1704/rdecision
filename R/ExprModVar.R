@@ -239,7 +239,10 @@ ExprModVar <- R6::R6Class(
         rlang::abort("Argument nest must be numeric", class="nest_not_numeric")
       }
       if (nest < 1000) {
-        rlang::abort("Argument nest must not be less than 1000", class="nest_too_small")
+        rlang::abort(
+          "Argument nest must not be less than 1000", 
+          class="nest_too_small"
+        )
       }
       # sample values from the variable
       S <- self$r(n=nest)
@@ -260,7 +263,10 @@ ExprModVar <- R6::R6Class(
         rlang::abort("Argument nest must be numeric", class="nest_not_numeric")
       }
       if (nest < 1000) {
-        rlang::abort("Argument nest must not be less than 1000", class="nest_too_small")
+        rlang::abort(
+          "Argument nest must not be less than 1000", 
+          class="nest_too_small"
+        )
       }
       # sample values from the variable
       S <- self$r(nest)
@@ -288,7 +294,10 @@ ExprModVar <- R6::R6Class(
         rlang::abort("Argument nest must be numeric", class="nest_not_numeric")
       }
       if (nest < 1000) {
-        rlang::abort("Argument nest must not be less than 1000", class="nest_too_small")
+        rlang::abort(
+          "Argument nest must not be less than 1000", 
+          class="nest_too_small"
+        )
       }
       # sample the distribution
       S <- self$r(nest)
@@ -304,15 +313,22 @@ ExprModVar <- R6::R6Class(
     #' is meaningless, and calls to this method have no effect. To affect the
     #' value returned by the next call to \code{get}, call \code{set} for each
     #' of the operands of this expression.
-    #' @param expected Logical; for compatibility with non-expression ModVars
+    #' @param expected Character; for compatibility with non-expression ModVars
     #' only; not used.
     #' @return Updated ExprModVar.
-    set = function(expected=FALSE) {
+    set = function(what="random") {
       # check argument
-      if (!is.logical(expected)) {
-        rlang::abort("Argument expected must be a logical", 
-                     class="expected_not_logical")
-
+      if (!is.character(what)) {
+        rlang::abort(
+          "Argument expected must be a logical", 
+          class = "expected_not_logical"
+        )
+      }
+      if (!(what %in% c("random", "expected", "q2.5", "q50", "q97.5"))) {
+        rlang::abort(
+          "'what' must be one of 'random', 'expected', 'q2.5', 'q50', '97.5'", 
+          class ="what_not_supported"
+        )
       }
       return(invisible(self))
     },

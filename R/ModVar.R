@@ -143,17 +143,38 @@ ModVar <- R6::R6Class(
     #' @description
     #' Sets the value of the ModVar that will be returned by subsequent
     #' calls to get() until set() is called again. 
-    #' @param expected Logical; TRUE to set the value to the mean of the model
-    #' variable.
+    #' @param what Character: one of "random" (samples from the uncertainty
+    #' distribution), expected" (mean), "q2.5" (lower 95% confidence limit),
+    #' "q50" (median), "q97.5" (upper 95% confidence limit).
     #' @return Updated ModVar.
-    set = function(expected=FALSE) {
+    set = function(what="random") {
       # check argument
-      if (!is.logical(expected)) {
-        rlang::abort("Argument expected must be a logical", 
-                     class="expected_not_logical")
-
+      if (!is.character(what)) {
+        rlang::abort(
+          "'what' must be a a character string", 
+          class="what_not_character"
+        )
       }
-      private$.val <- ifelse(expected, self$mean(), self$r())
+      # options
+      v <- NA
+      if (what == "random") {
+        v <- self$r()
+      } else if (what == "expected") {
+        v <- self$mean()
+      } else if (what == "q2.5") {
+        v <- self$quantile(c(0.025))
+      } else if (what == "q50") {
+        v <- self$quantile(c(0.5))
+      } else if (what == "q97.5") {
+        v <- self$quantile(c(0.975))
+      } else {
+        rlang::abort(
+          "'what' must be one of 'random', 'expected', 'q2.5', 'q50', '97.5'", 
+          class ="what_not_supported"
+        )
+      }
+      private$.val <- v
+      # silently return updated object
       return(invisible(self))
     },
     
