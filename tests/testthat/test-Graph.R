@@ -92,15 +92,15 @@ test_that("vertex and edge properties are set and got", {
 test_that("adjacency matrix has correct properties", {
   # empty graph
   G <- Graph$new(V=list(),E=list())
-  expect_error(G$adjacency_matrix(42), class="non-logical_boolean")
-  A <- G$adjacency_matrix()
+  expect_error(G$graph_adjacency_matrix(42), class="non-logical_boolean")
+  A <- G$graph_adjacency_matrix()
   expect_true(is.matrix(A))
   expect_equal(nrow(A),0)
   expect_equal(ncol(A),0)
   # trivial graph
   n1 <- Node$new()
   G <- Graph$new(V=list(n1),E=list())
-  A <- G$adjacency_matrix()
+  A <- G$graph_adjacency_matrix()
   expect_true(is.matrix(A))
   expect_equal(nrow(A),1)
   expect_equal(ncol(A),1)
@@ -110,13 +110,13 @@ test_that("adjacency matrix has correct properties", {
   n2 <- Node$new()
   e1 <- Edge$new(n1,n2)
   G <- Graph$new(V=list(n1,n2),E=list(e1))
-  A <- G$adjacency_matrix()
+  A <- G$graph_adjacency_matrix()
   expect_true(is.null(dimnames(A))) 
   n1 <- Node$new("n1")
   n2 <- Node$new("n2")
   e1 <- Edge$new(n1,n2)
   G <- Graph$new(V=list(n1,n2),E=list(e1))
-  A <- G$adjacency_matrix()
+  A <- G$graph_adjacency_matrix()
   dn <- dimnames(A)
   expect_equal(names(dn), c("out.node", "in.node"))  
   expect_equal(dn$out.node, c("n1", "n2"))
@@ -128,9 +128,9 @@ test_that("adjacency matrix has correct properties", {
   e1 <- Edge$new(n1,n2)
   e2 <- Edge$new(n1,n1)
   G <- Graph$new(V=list(n1,n2),E=list(e1,e2))
-  A <- G$adjacency_matrix(boolean=FALSE)
+  A <- G$graph_adjacency_matrix(boolean=FALSE)
   expect_equal(A["n1","n1"],2)
-  A <- G$adjacency_matrix(boolean=TRUE)
+  A <- G$graph_adjacency_matrix(boolean=TRUE)
   expect_true(A["n1","n1"])
 })
 
@@ -234,7 +234,7 @@ test_that("Fig 1.1.1 from Gross & Yellen (2003, ISBN 9780203490204) is replicate
   expect_equal(G$degree(w), 2)
   expect_equal(G$degree(x), 4)
   # adjacency
-  A <- G$adjacency_matrix()
+  A <- G$graph_adjacency_matrix()
   EA <- matrix(c(0,2,0,0, 2,0,1,1, 0,1,0,1, 0,1,1,2), nrow=4, byrow=TRUE,
                dimnames=list(out.node=c("u","v","w","x"),
                              in.node=c("u","v","w","x")))

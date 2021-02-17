@@ -71,7 +71,8 @@ Arborescence <- R6::R6Class(
     #' @return The root vertex.
     root = function() {
       # vertex with no incoming edges (only one, checked in initialize)
-      u <- which(apply(private$B, MARGIN=1, function(r){!any(r>0)}),arr.ind=TRUE)
+      B <- self$digraph_incidence_matrix()
+      u <- which(apply(B, MARGIN=1, function(r){!any(r>0)}),arr.ind=TRUE)
       return(private$V[[u]])
     },
 
@@ -106,11 +107,12 @@ Arborescence <- R6::R6Class(
       # Find the root
       r <- self$root()
       P <- list()
-      sapply(private$V, function(v){
+      vapply(X=private$V, FUN.VALUE=TRUE, FUN=function(v){
         if (self$is_leaf(v)) {
           pp <- self$paths(r,v)
           P[[length(P)+1]] <<- pp[[1]]    
         }
+        return(TRUE)
       })
       # return the paths
       return(P)

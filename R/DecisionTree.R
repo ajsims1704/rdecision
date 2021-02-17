@@ -195,7 +195,7 @@ DecisionTree <- R6::R6Class(
       }
       id <- self$element_index(d)
       # find the edges with d as their source 
-      B <- self$incidence_matrix()
+      B <- self$digraph_incidence_matrix()
       ie <- which(B[id,]==-1,arr.ind=TRUE)
       return(private$E[ie])
     },

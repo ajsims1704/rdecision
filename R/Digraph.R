@@ -16,7 +16,8 @@ Digraph <- R6::R6Class(
   classname = "Digraph",
   inherit = Graph,
   private = list(
-    B = NULL     # incidence matrix
+    AD = NULL,    # adjacency matrix for digraph
+    BD = NULL     # incidence matrix for digraph
   ),
   public = list(
     
@@ -37,8 +38,10 @@ Digraph <- R6::R6Class(
       })
       # initialize the base Graph class (also checks V)
       super$initialize(V, A)
+      # compute and save the adjacency matrix
+      private$AD <- self$digraph_adjacency_matrix(FALSE)
       # compute and save the incidence matrix
-      private$B <- self$incidence_matrix()
+      private$BD <- self$digraph_incidence_matrix()
       # return new Digraph object
       return(invisible(self))
     },
@@ -54,30 +57,38 @@ Digraph <- R6::R6Class(
     #' equal to the order of the graph. The rows and columns are in the
     #' same order as V. If the nodes have defined and unique labels the
     #' dimnames of the matrix are the labels of the nodes. 
-    adjacency_matrix = function(boolean=FALSE) {
+    digraph_adjacency_matrix = function(boolean=FALSE) {
       # check argument
       if (!is.logical(boolean)) {
         rlang::abort("Argument 'boolean' must be 'logical'.", class="non-logical_boolean")
       }
-      # create matrix
-      L <- vapply(X=private$V,FUN.VALUE="x",FUN=function(v){v$label()})
-      n <- self$order()
-      if (length(unique(L))==length(L) && all(nchar(L)>0)) {
-        A <- matrix(
-          rep(0,times=n*n), 
-          nrow=n, 
-          dimnames=list(out.node=L,in.node=L)
-        )
+      # create if not saved
+      if (is.null(private$AD)) {
+        # create matrix
+        L <- vapply(X=private$V,FUN.VALUE="x",FUN=function(v){v$label()})
+        n <- self$order()
+        if (length(unique(L))==length(L) && all(nchar(L)>0)) {
+          A <- matrix(
+            rep(0,times=n*n), 
+            nrow=n, 
+            dimnames=list(out.node=L,in.node=L)
+          )
+        } else {
+          A <- matrix(rep(0,times=n*n), nrow=n)
+        }
+        # populate it
+        vapply(X=private$E, FUN.VALUE=TRUE, FUN=function(e) {
+          s <- self$element_index(e$source())
+          t <- self$element_index(e$target())
+          A[s,t] <<- A[s,t]+1
+          return(TRUE)
+        })
+        # save it 
+        private$AD <- A
       } else {
-        A <- matrix(rep(0,times=n*n), nrow=n)
+        # read it
+        A <- private$AD
       }
-      # populate it
-      vapply(X=private$E, FUN.VALUE=TRUE, FUN=function(e) {
-        s <- self$element_index(e$source())
-        t <- self$element_index(e$target())
-        A[s,t] <<- A[s,t]+1
-        return(TRUE)
-      })
       # convert to logical, if required
       if (boolean) {
         A <- apply(A, MARGIN=c(1,2), FUN=function(c){ifelse(c>=1,TRUE,FALSE)})
@@ -88,32 +99,38 @@ Digraph <- R6::R6Class(
     #' @description 
     #' Compute the incidence matrix for the graph. Each row is a vertex and
     #' each column is an edge. Edges leaving a vertex have value -1 and edges
-    #' entering have value +1. if all vertexes have defined and unique labels and all
-    #' edges have defined and unique labels, the dimnames of the matrix are the labels of
-    #' the vertexes and edges.
+    #' entering have value +1. if all vertexes have defined and unique labels
+    #' and all edges have defined and unique labels, the dimnames of the matrix
+    #' are the labels of the vertexes and edges.
     #' @return The incidence matrix.
-    incidence_matrix = function() {
-      # create matrix
-      LV <- sapply(private$V,function(v){v$label()})
-      LE <- sapply(private$E,function(e){e$label()})
-      nv <- self$order()
-      ne <- self$size()
-      if ((length(unique(LV))==length(LV)) && (length(unique(LE))==length(LE)) &&
-          all(nchar(LV)>0) && all(nchar(LE)>0)) {
-        B <- matrix(rep(0,times=nv*ne), nrow=nv, dimnames=list(vertex=LV,edge=LE))
+    digraph_incidence_matrix = function() {
+      # create, if NULL
+      if (is.null(private$BD)) {
+        # create matrix
+        LV <- sapply(private$V,function(v){v$label()})
+        LE <- sapply(private$E,function(e){e$label()})
+        nv <- self$order()
+        ne <- self$size()
+        if ((length(unique(LV))==length(LV)) && (length(unique(LE))==length(LE)) &&
+            all(nchar(LV)>0) && all(nchar(LE)>0)) {
+          B <- matrix(rep(0,times=nv*ne), nrow=nv, dimnames=list(vertex=LV,edge=LE))
+        } else {
+          B <- matrix(rep(0,times=nv*ne), nrow=nv)
+        }
+        # populate it
+        sapply(private$E, function(e) {
+          s <- self$element_index(e$source())
+          t <- self$element_index(e$target())
+          e <- self$element_index(e)
+          B[s,e] <<- -1
+          B[t,e] <<- 1
+        })
+        # save it
+        private$BD <- B
       } else {
-        B <- matrix(rep(0,times=nv*ne), nrow=nv)
+        # read it
+        B <- private$BD
       }
-      # populate it
-      sapply(private$E, function(e) {
-        s <- self$element_index(e$source())
-        t <- self$element_index(e$target())
-        e <- self$element_index(e)
-        B[s,e] <<- -1
-        B[t,e] <<- 1
-      })
-      # save a local copy
-      private$B <- B
       # return matrix
       return(B)
     },
@@ -126,7 +143,7 @@ Digraph <- R6::R6Class(
     #' in the graph, but no error will be raised.
     topological_sort = function() {
       # get the adjacency matrix (note: only vertex indexes are needed)
-      AA <- self$adjacency_matrix()
+      AA <- self$digraph_adjacency_matrix()
       # L is an empty list that will contain the sorted vertexes
       L <- Stack$new()
       # S is a stack of all vertexes with no incoming edge
@@ -172,37 +189,7 @@ Digraph <- R6::R6Class(
     #' underlying graph is connected.
     #' @return TRUE if connected, FALSE if not.
     is_weakly_connected = function() {
-      connected <- FALSE
-      if (self$order()==0) {
-        connected <- FALSE
-      } else if (self$order()==1) {
-        connected <- TRUE
-      } else {
-        # get the adjacency matrix
-        A <- super$adjacency_matrix(boolean=TRUE)
-        # D marks nodes as discovered
-        D <- vector(mode="logical", length=self$order())
-        # S is a stack of nodes being processed
-        S <- Stack$new()
-        # start with first vertex
-        S$push(1)
-        # while S is not empty, do
-        while (S$size()>0) {
-          s <- S$pop()
-          # if s is not labelled as discovered then
-          if (!D[s]) {
-            # label s as discovered
-            D[s] <- TRUE
-            # for all edges from s to n
-            for (n in which(A[s,], arr.ind=TRUE)) {
-              S$push(n)
-            }
-          }
-        }
-        if (all(D)) {
-          connected <- TRUE
-        }
-      }
+      connected <- super$is_connected()
       return(connected)
     },
 
@@ -239,7 +226,8 @@ Digraph <- R6::R6Class(
     #' @return TRUE if the digraph is an arborescence; FALSE if not.
     is_arborescence = function() {
       # there must be one and only one root vertex
-      u <- which(apply(private$B, MARGIN=1, function(r){!any(r>0)}),arr.ind=TRUE)
+      B <- self$digraph_incidence_matrix()
+      u <- which(apply(B, MARGIN=1, function(r){!any(r>0)}),arr.ind=TRUE)
       if (length(u) != 1) {
         return(FALSE)
       }
@@ -263,8 +251,8 @@ Digraph <- R6::R6Class(
     direct_successors = function(v) {
       successors <- list()
       if (self$has_vertex(v)) {
-        AA <- self$adjacency_matrix(boolean=TRUE)
-        iv <- self$element_index(v)
+        AA <- self$digraph_adjacency_matrix(boolean=TRUE)
+        iv <- self$vertex_index(v)
         iw <- which(AA[iv,],arr.ind=TRUE)
         successors <- private$V[iw]
       } else {
@@ -281,7 +269,7 @@ Digraph <- R6::R6Class(
     direct_predecessors = function(v) {
       pred <- list()
       if (self$has_vertex(v)) {
-        AA <- self$adjacency_matrix(boolean=TRUE)
+        AA <- self$digraph_adjacency_matrix(boolean=TRUE)
         iv <- self$element_index(v)
         iw <- which(AA[,iv],arr.ind=TRUE)
         pred <- private$V[iw]
@@ -309,7 +297,7 @@ Digraph <- R6::R6Class(
       }
       t <- self$element_index(t)
       # AA is the adjacency matrix
-      AA <- self$adjacency_matrix(boolean=TRUE)
+      AA <- self$digraph_adjacency_matrix(boolean=TRUE)
       # D marks nodes as discovered
       D <- vector(length=self$order())
       # P is current path
@@ -362,7 +350,8 @@ Digraph <- R6::R6Class(
         )
         W <- apply(pairs, MARGIN=1, function(r) {
           # look for edges leaving s and entering t
-          e <- which((private$B[r[1],]==-1) & (private$B[r[2],]==1), arr.ind=TRUE)
+          B <- self$digraph_incidence_matrix()
+          e <- which((B[r[1],]==-1) & (B[r[2],]==1), arr.ind=TRUE)
           if (length(e)>=1) {
             return(e[1])
           } else {
