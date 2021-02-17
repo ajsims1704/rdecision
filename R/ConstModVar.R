@@ -27,21 +27,23 @@ ConstModVar <- R6::R6Class(
     #' @description 
     #' Create a new constant model variable
     #' @param description A character string description of the variable
-    #'        and its role in the
-    #'        model. This description will be used in a tabulation of the
-    #'        variables linked to a model.
-    #' @param units A character string description of the units, e.g. 'GBP',
-    #'        'per year'.
+    #' and its role in the model. This description will be used in a tabulation
+    #' of the variables linked to a model.
+    #' @param units A character string description of the units, e.g. "GBP",
+    #' "per year".
     #' @param const The constant numerical value of the object.
     #' @return A new ConstModVar object.
     initialize = function(description, units, const) {
       super$initialize(description, units)
       if (!is.numeric(const)) {
-        rlang::abort("Argument 'const' must be numeric", class="const_not_numeric")
+        rlang::abort(
+          "Argument 'const' must be numeric", 
+          class="const_not_numeric"
+        )
       }
       private$val <- const
       # initialize next get() call
-      self$set(TRUE)
+      self$set("expected")
       # return object
       return(invisible(self))
     },
@@ -100,10 +102,19 @@ ConstModVar <- R6::R6Class(
     #' @param probs Numeric vector of probabilities, each in range [0,1].
     #' @return Vector of numeric values of the same length as `probs`.
     quantile = function(probs) {
+      # test argument
       sapply(probs, FUN=function(x) {
-        if (!is.numeric(probs)) {
-          stop("ConstModVar$getQuantile: argument must be a numeric vector",
-               call. = FALSE)
+        if (is.na(x)) {
+          rlang::abort("All elements of 'probs' must be defined",
+                       class="probs_not_defined")
+        }
+        if (!is.numeric(x)) {
+          rlang::abort("Argument 'probs' must be a numeric vector",
+                       class="probs_not_numeric")
+        }
+        if (x<0 || x>1) {
+          rlang::abort("Elements of 'probs' must be in range[0,1]",
+                       class="probs_out_of_range")
         }
       })
       q <- rep(private$val, times=length(probs))

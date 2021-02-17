@@ -60,18 +60,23 @@ Digraph <- R6::R6Class(
         rlang::abort("Argument 'boolean' must be 'logical'.", class="non-logical_boolean")
       }
       # create matrix
-      L <- sapply(private$V,function(v){v$label()})
+      L <- vapply(X=private$V,FUN.VALUE="x",FUN=function(v){v$label()})
       n <- self$order()
       if (length(unique(L))==length(L) && all(nchar(L)>0)) {
-        A <- matrix(rep(0,times=n*n), nrow=n, dimnames=list(out.node=L,in.node=L))
+        A <- matrix(
+          rep(0,times=n*n), 
+          nrow=n, 
+          dimnames=list(out.node=L,in.node=L)
+        )
       } else {
         A <- matrix(rep(0,times=n*n), nrow=n)
       }
       # populate it
-      sapply(private$E, function(e) {
+      vapply(X=private$E, FUN.VALUE=TRUE, FUN=function(e) {
         s <- self$element_index(e$source())
         t <- self$element_index(e$target())
         A[s,t] <<- A[s,t]+1
+        return(TRUE)
       })
       # convert to logical, if required
       if (boolean) {

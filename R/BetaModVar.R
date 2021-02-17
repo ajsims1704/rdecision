@@ -61,7 +61,7 @@ BetaModVar <- R6::R6Class(
       }
       private$beta <- beta
       # ensure first call to get() is valid
-      self$set(TRUE)
+      self$set("expected")
       # return BetaModVar
       return(invisible(self))
     },

@@ -3,12 +3,18 @@ test_that("illegal initializations are rejected", {
   k <- 9
   theta <- 0.5
   expect_silent(GammaModVar$new("gamma","GBP",k,theta))
-  expect_error(GammaModVar$new(42,42,k,theta), class="description_not_string")
-  expect_error(GammaModVar$new("gamma",42,k,theta), class="units_not_string")
-  expect_error(GammaModVar$new("gamma","GBP","9",theta), class="shape_not_numeric")
-  expect_error(GammaModVar$new("gamma","GBP",k,"0.5"), class="scale_not_numeric")
-  expect_error(GammaModVar$new("gamma","GBP",-1,theta), class="shape_not_supported")
-  expect_error(GammaModVar$new("gamma","GBP",k,0), class="scale_not_supported")
+  expect_error(GammaModVar$new(42,42,k,theta), 
+               class="description_not_string")
+  expect_error(GammaModVar$new("gamma",42,k,theta), 
+               class="units_not_string")
+  expect_error(GammaModVar$new("gamma","GBP","9",theta), 
+               class="shape_not_numeric")
+  expect_error(GammaModVar$new("gamma","GBP",k,"0.5"), 
+               class="scale_not_numeric")
+  expect_error(GammaModVar$new("gamma","GBP",-1,theta), 
+               class="shape_not_supported")
+  expect_error(GammaModVar$new("gamma","GBP",k,0), 
+               class="scale_not_supported")
 })
 
 test_that("properties are correct", {

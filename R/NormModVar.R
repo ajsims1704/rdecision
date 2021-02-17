@@ -36,15 +36,21 @@ NormModVar <- R6::R6Class(
     initialize = function(description, units, mu, sigma) {
       super$initialize(description, units)
       if (!is.numeric(mu)) {
-        rlang::abort("Argument 'mu' must be numeric", class="mu_not_numeric")
+        rlang::abort(
+          "Argument 'mu' must be numeric", 
+          class="mu_not_numeric"
+        )
       }
       private$mu <- mu
       if (!is.numeric(sigma)) {
-        rlang::abort("Argument 'sigma' must be numeric", class="sigma_not_numeric")
+        rlang::abort(
+          "Argument 'sigma' must be numeric", 
+          class="sigma_not_numeric"
+        )
       }
       private$sigma <- sigma
       # initialize next get() call
-      self$set(TRUE)
+      self$set("expected")
       # return
       return(invisible(self))
     },

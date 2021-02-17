@@ -47,6 +47,7 @@ test_that("stub quantile function checks inputs and has correct output", {
 test_that("set checks its argument", {
   x <- ModVar$new("x", "GBP")
   expect_error(x$set(42), class="what_not_character")
+  expect_error(x$set(TRUE), class="what_not_character")
   expect_error(x$set("arodnm"), class="what_not_supported")
   expect_silent(x$set("expected"))
   expect_silent(x$set())

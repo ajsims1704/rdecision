@@ -28,9 +28,10 @@ test_that("const values are returned", {
 test_that("set and get function as expected", {
   x <- ConstModVar$new("y", "GBP", 42)
   expect_equal(x$get(), 42, tolerance=0.01)
-  expect_error(x$set("red"), class="expected_not_logical")
+  expect_error(x$set(TRUE), class="what_not_character")
+  expect_error(x$set("red"), class="what_not_supported")
   expect_silent(x$set())
-  expect_silent(x$set(TRUE))
+  expect_silent(x$set("expected"))
   expect_equal(x$get(), 42, tolerance=0.01)
   S <- vector(mode="numeric", length=1000)
   for (i in 1:1000) {

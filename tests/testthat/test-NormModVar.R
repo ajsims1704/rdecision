@@ -46,7 +46,7 @@ test_that("First call to get() returns mean", {
 test_that("variable passing and persistency of get/set are correct", {
   f <- function(mv) {
     expect_equal(mv$get(), 0)
-    mv$set(FALSE)
+    mv$set("q2.5")
   }
   g <- function(mv) {
     expect_equal(mv$get(), 0)
@@ -54,6 +54,6 @@ test_that("variable passing and persistency of get/set are correct", {
   sn <- NormModVar$new("sn", "GBP", 0, 1)
   f(sn)
   expect_false(sn$get()==0)
-  sn$set(TRUE)
+  sn$set("expected")
   g(sn)
 })

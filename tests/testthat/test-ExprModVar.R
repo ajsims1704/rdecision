@@ -77,12 +77,13 @@ test_that("set and get function as expected", {
   z <- ExprModVar$new("z", "GBP", quo=rlang::quo(x*y))
   expect_false(is.na(z$get()))
   # check illegal input
-  expect_error(z$set("red"), class="expected_not_logical")
+  expect_error(z$set(TRUE), class="what_not_character")
+  expect_error(z$set("red"), class="what_not_supported")
   # check that set() is ignored for ExprModVar
   expect_silent(z$set())
   expect_equal(z$get(),0)
   # check that set() for operands affects get() for the expression
-  y$set(TRUE)
+  y$set("expected")
   expect_equal(z$get(), 0, tolerance=0.01)
   S <- vector(mode="numeric", length=1000)
   for (i in 1:1000) {

@@ -309,7 +309,7 @@ ExprModVar <- R6::R6Class(
     #' @description
     #' Sets the value of the ExprModVar that will be returned by subsequent
     #' calls to get() until set() is called again. Because an ExprModVar can be 
-    #' considered the LHS of an equation, the idea of \code{set}ting a value
+    #' considered as a dependent variable, the idea of \code{set}ting a value
     #' is meaningless, and calls to this method have no effect. To affect the
     #' value returned by the next call to \code{get}, call \code{set} for each
     #' of the operands of this expression.
@@ -320,8 +320,8 @@ ExprModVar <- R6::R6Class(
       # check argument
       if (!is.character(what)) {
         rlang::abort(
-          "Argument expected must be a logical", 
-          class = "expected_not_logical"
+          "Argument 'what' must be a character", 
+          class = "what_not_character"
         )
       }
       if (!(what %in% c("random", "expected", "q2.5", "q50", "q97.5"))) {

@@ -51,7 +51,8 @@ test_that("rdecision replicates Evans et al, Sumatriptan base case", {
   tb <- LeafNode$new("B", utility=0.9, interval=th)
   c3 <- ChanceNode$new("c3")
   e1 <- Reaction$new(c3, ta, p=0.594, label="No recurrence")
-  e2 <- Reaction$new(c3, tb, p=0.406, cost=c.sumatriptan, label="Recurrence relieved with 2nd dose")
+  e2 <- Reaction$new(c3, tb, p=0.406, cost=c.sumatriptan, 
+                     label="Recurrence relieved with 2nd dose")
   #
   td <- LeafNode$new("D", utility=0.1, interval=th)
   te <- LeafNode$new("E", utility=-0.3, interval=th)
@@ -74,13 +75,15 @@ test_that("rdecision replicates Evans et al, Sumatriptan base case", {
   tg <- LeafNode$new("G", utility=0.9, interval=th)
   c5 <- ChanceNode$new("c5")
   e9 <- Reaction$new(c5, tf, p=0.703, label="No recurrence")
-  e10 <- Reaction$new(c5, tg, p=0.297, cost=c.caffeine, label="Recurrence relieved with 2nd dose")
+  e10 <- Reaction$new(c5, tg, p=0.297, cost=c.caffeine, 
+                      label="Recurrence relieved with 2nd dose")
   #
   ti <- LeafNode$new("I", utility=0.1, interval=th)
   tj <- LeafNode$new("J", utility=-0.3, interval=th)
   c8 <- ChanceNode$new("c8")
   e11 <- Reaction$new(c8, ti, p=0.998, label="Relief")
-  e12 <- Reaction$new(c8, tj, p=0.002, cost=c.admission, label="Hospitalization")
+  e12 <- Reaction$new(c8, tj, p=0.002, cost=c.admission, 
+                      label="Hospitalization")
   # 
   th <- LeafNode$new("H", utility=-0.3, interval=th)
   c6 <- ChanceNode$new("c6")
@@ -104,7 +107,8 @@ test_that("rdecision replicates Evans et al, Sumatriptan base case", {
     ta, tb, tc, td, te, tf, tg, th, ti, tj
   )
   E <- list(
-    e1, e2, e3, e4, e5, e6, e7, e8, e9, e10, e11, e12, e13, e14, e15, e16, e17, e18
+    e1, e2, e3, e4, e5, e6, e7, e8, e9, e10, e11, e12, e13, e14, e15, e16, 
+    e17, e18
   )
   # tree
   expect_silent(dt <- DecisionTree$new(V,E))
@@ -118,7 +122,8 @@ test_that("rdecision replicates Evans et al, Sumatriptan base case", {
   expect_equal(c.Caffeine, 4.71)
   u.Sumatriptan <- round(RES[RES$Run==1 & RES$d1=="Sumatriptan", "Utility"],2)
   expect_equal(u.Sumatriptan, 0.42)
-  u.Caffeine <- round(RES[RES$Run==1 & RES$d1=="Caffeine/Ergotamine", "Utility"],2)
+  u.Caffeine <- round(RES[RES$Run==1 & 
+                          RES$d1=="Caffeine/Ergotamine", "Utility"],2)
   expect_equal(u.Caffeine, 0.20)
 })
 
@@ -207,12 +212,15 @@ test_that("redecision replicates Jenks et al, 2016", {
   r.CRBSI <- NormModVar$new(
     'Baseline CRBSI rate', '/1000 catheter days', mu=1.48, sigma=0.074
   )
-  hr.CRBSI <- ExprModVar$new("Tegaderm CRBSI HR", "HR", rlang::quo(exp(-0.911-0.393*n1)))
-  hr.LSI <- ExprModVar$new("Tegaderm LSI HR", "HR", rlang::quo(exp(-0.911-0.393*n2)))
+  hr.CRBSI <- ExprModVar$new("Tegaderm CRBSI HR", "HR", 
+                             rlang::quo(exp(-0.911-0.393*n1)))
+  hr.LSI <- ExprModVar$new("Tegaderm LSI HR", "HR", 
+                           rlang::quo(exp(-0.911-0.393*n2)))
   r.Dermatitis <- NormModVar$new(
     'Baseline dermatitis risk', '/catheter', mu=0.0026, sigma=0.00026
   )
-  rr.Dermatitis <- ExprModVar$new("Tegaderm LSI HR", "HR", rlang::quo(exp(1.482-0.490*n3)))
+  rr.Dermatitis <- ExprModVar$new("Tegaderm LSI HR", "HR", 
+                                  rlang::quo(exp(1.482-0.490*n3)))
 
   # cost variables
   c.CRBSI <- GammaModVar$new(
@@ -398,7 +406,9 @@ test_that("redecision replicates Jenks et al, 2016", {
   expect_equal(E$Cost[E$d1=="Tegaderm"], c.teg, tolerance=2.00)
   
   # PSA
-  PSA <- DT$evaluate(expected=FALSE,N=100)
+  Rprof("junk.txt", line.profiling=TRUE)
+  PSA <- DT$evaluate(expected=FALSE,N=10)
+  Rprof(NULL)
   RES <<- reshape(PSA, idvar='Run', timevar='d1', direction='wide')
   RES$Difference <<- RES$Cost.Standard - RES$Cost.Tegaderm
   expect_equal(mean(RES$Difference), 77.76, tolerance=5.00)

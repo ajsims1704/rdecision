@@ -75,7 +75,7 @@ GammaModVar <- R6::R6Class(
       }
       private$scale <- scale
       # ensure first call to get() is valid
-      self$set(TRUE)
+      self$set("expected")
       # return object
       return(invisible(self))
     },

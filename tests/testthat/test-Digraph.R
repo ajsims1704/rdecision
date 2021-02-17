@@ -253,7 +253,11 @@ test_that("rdecision solves New Scientist Puzzle 62", {
   E <- list()
   for (i in 1:5) {
     for (j in 1:4) {
-      E <- c(E, Arrow$new(V[[5*(i-1)+j]], V[[5*(i-1)+j+1]], paste("H",i,j,sep="")))
+      E <- c(E, Arrow$new(V[[5*(i-1)+j]], 
+                          V[[5*(i-1)+j+1]], 
+                          paste("H",i,j,sep="")
+                          )
+             )
     }
   } 
   for (i in 1:4) {

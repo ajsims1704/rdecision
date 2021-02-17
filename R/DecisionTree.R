@@ -737,7 +737,7 @@ DecisionTree <- R6::R6Class(
       DF <- do.call('rbind', sapply(1:N, FUN=function(n){
         # set the ModVar values (either mean or sampled)
         for (v in self$modvars()) {
-          v$set(expected)
+          v$set(ifelse(expected,"expected","random"))
         }
         # evaluate each strategy
         ALL <- apply(TT, MARGIN=1, function(row) {
