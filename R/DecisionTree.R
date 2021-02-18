@@ -609,12 +609,12 @@ DecisionTree <- R6::R6Class(
     #' decision tree. For each path, probability, cost, benefit and utility are
     #' calculated.
     #' @param P A list of root-to-leaf paths. Each path must start with the
-    #' root node and end with a leaf node.
-    #' @return A data frame (payoff table) with one row per path and columns
+    #' root node and end with a leaf node. Normally this is all the root to leaf
+    #' paths in a tree.
+    #' @return A matrix (payoff table) with one row per path and columns
     #' organized as follows:
     #' \describe{
-    #' \item{Leaf}{The label of the leaf node on which the pathway ends; 
-    #' normally the clinical outcome.}
+    #' \item{PID}{The index number of the path, in same order as argument.}
     #' \item{Probability}{The probability of traversing the pathway. }
     #' \item{Path.Cost}{The cost of traversing the pathway.}
     #' \item{Path.Benefit}{The benefit derived from traversing the pathway.}
@@ -639,19 +639,22 @@ DecisionTree <- R6::R6Class(
           )
         }
       })
-      # create a data frame
-      PAYOFF <- data.frame(PID=seq_along(P), stringsAsFactors=FALSE)
-      PAYOFF$Probability <- rep(as.numeric(NA), length(P))
-      PAYOFF$Path.Cost <- rep(as.numeric(NA), length(P))
-      PAYOFF$Path.Benefit <- rep(as.numeric(NA), length(P))
-      PAYOFF$Path.Utility <- rep(as.numeric(NA), length(P))
+      # create a return matrix
+      PAYOFF <- matrix(
+        data = NA,
+        nrow = length(P),
+        ncol = 8,
+        dimnames = list(
+          NULL, 
+          c("PID", "Probability", "Path.Cost", "Path.Benefit", "Path.Utility",
+            "Cost", "Benefit", "Utility")
+        )
+      )
       # evaluate each path
-      for (i in seq_along(P)) {
+      for (i in 1:length(P)) {
+        PAYOFF[i,"PID"] <- i
         # get path
         path <- P[[i]]
-        # leaf node
-        leaf.label <- path[[length(path)]]$label()
-        PAYOFF[PAYOFF$PID==i,"Leaf"] <- leaf.label
         # walk the path and accumulate p, cost and benefit
         pr <- 1
         cost <- 0
@@ -668,18 +671,16 @@ DecisionTree <- R6::R6Class(
           # return
           return(TRUE)
         })
-        PAYOFF[PAYOFF$PID==i,"Probability"] <- pr
-        PAYOFF[PAYOFF$PID==i,"Path.Cost"] <- cost
-        PAYOFF[PAYOFF$PID==i,"Path.Benefit"] <- benefit
+        PAYOFF[i,"Probability"] <- pr
+        PAYOFF[i,"Path.Cost"] <- cost
+        PAYOFF[i,"Path.Benefit"] <- benefit
         # utility of the leaf node at end of the path
-        PAYOFF[PAYOFF$PID==i, "Path.Utility"] <- path[[length(path)]]$utility()
+        PAYOFF[i, "Path.Utility"] <- path[[length(path)]]$utility()
       }
       # add expected cost and utility     
-      PAYOFF$Cost <- PAYOFF$Probability*PAYOFF$Path.Cost
-      PAYOFF$Benefit <- PAYOFF$Probability*PAYOFF$Path.Benefit
-      PAYOFF$Utility <- PAYOFF$Probability*PAYOFF$Path.Utility
-      # remove path ID
-      PAYOFF$PID <- NULL
+      PAYOFF[,"Cost"] <- PAYOFF[,"Probability"]*PAYOFF[,"Path.Cost"]
+      PAYOFF[,"Benefit"] <- PAYOFF[,"Probability"]*PAYOFF[,"Path.Benefit"]
+      PAYOFF[,"Utility"] <- PAYOFF[,"Probability"]*PAYOFF[,"Path.Utility"]
       # return the payoff table      
       return(PAYOFF)
     },
@@ -854,6 +855,27 @@ DecisionTree <- R6::R6Class(
         })
         return(ALL)
       }))
+      return(DF)
+    },
+
+    evaluate2 = function(expected=TRUE, N=1) {
+      # check arguments
+      
+      # find the root-to-leaf paths
+      P <- self$root_to_leaf_paths()
+      # evaluate the tree repeatedly
+      DF <- do.call("rbind", lapply(1:N, FUN=function(n){
+        # set the ModVar values (either mean or sampled)
+        for (v in self$modvars()) {
+          v$set(ifelse(expected,"expected","random"))
+        }
+        # evaluate the tree
+        M <- self$evaluate_paths(P)
+        M <- cbind(M,"Run"=rep(n,length(P)))
+        # return M to be appended
+        return(M)
+      }))
+      # return the raw data frame     
       return(DF)
     }
 

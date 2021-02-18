@@ -190,6 +190,13 @@ test_that("rdecision replacates Kaminski et al, fig 7", {
   # test incorrect strategy prescription
   expect_error(DT$paths_in_strategy(list(E[[1]],E[[5]],E[[7]])),
                class="invalid_strategy")
+  # evaluate all root-to-leaf paths
+  P <- DT$root_to_leaf_paths()
+  expect_equal(length(P),9)
+  M <- DT$evaluate_paths(P)
+  expect_equal(nrow(M),9)
+  expect_equal(ncol(M),8)
+  expect_equal(unname(M[8,"Cost"]),220.5,tolerance=1)
   # evaluate one strategy (test/sell/sell)
   RES <- DT$evaluate_strategy(list(E[[5]],E[[7]],E[[12]]))
   expect_true(is.data.frame(RES))
@@ -421,4 +428,7 @@ test_that("redecision replicates Jenks et al, 2016", {
   expect_equal(mean(RES$Cost.Standard), 176.89, tolerance=5.00)
   expect_equal(mean(RES$Cost.Tegaderm), 99.63, tolerance=5.00)
 
+  RES <- DT$evaluate2(expected=FALSE, N=2)
+  print(" ")
+  print(RES)
 })
