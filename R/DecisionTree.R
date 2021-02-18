@@ -496,33 +496,43 @@ DecisionTree <- R6::R6Class(
     #' @return A list of root to leaf paths.
     paths_in_strategy = function(strategy) {
       # get decision nodes
-      D <- self$decision_nodes()
+      iD <- self$decision_nodes("index")
       # check argument
-      if (length(strategy)!=length(D)) {
+      if (length(strategy)!=length(iD)) {
         rlang::abort(
           "Argument 'strategy' must have as many elements as DecisionNodes",
            class="incorrect_strategy_length"
         )
       }
-      sapply(strategy, function(e) {
+      vapply(X=strategy, FUN.VALUE=TRUE, FUN=function(e) {
         if (!inherits(e,what="Action")) {
           rlang::abort(
             "Argument 'strategy' must only contain Action elements",
             class="incorrect_strategy_type")
         }
+        return(TRUE)
       })
-      DS <- sapply(strategy, function(e){e$source()})
-      iDS <- sapply(DS, function(v){self$element_index(v)})
-      iD <- sapply(D, function(v){self$element_index(v)})
+      iDS <- vapply(X=strategy, FUN.VALUE=1, FUN=function(e){
+        return(self$vertex_index(e$source()))
+      })
+      # iD <- vapply(X=D, FUN.VALUE=1, FUN=function(v){
+      #   self$vertex_index(v)
+      # })
       if (!setequal(iD, iDS)) {
         rlang::abort(
           "Argument 'strategy' must have one Action per DecisionNode",
           class = "incorrect_strategy_prescription")
       }
       # all non-strategy action edges are forbidden
-      eAction <- which(sapply(private$E, function(e){
-        inherits(e,what="Action")}),arr.ind=TRUE)
-      eAllowed <- sapply(strategy, function(e){self$element_index(e)})
+      eAction <- which(
+        vapply(X=private$E, FUN.VALUE=TRUE, FUN=function(e){
+          return(inherits(e,what="Action"))
+        }),
+        arr.ind=TRUE
+      )
+      eAllowed <- vapply(X=strategy, FUN.VALUE=1, FUN=function(e){
+        return(self$edge_index(e))
+      })
       eForbidden <- setdiff(eAction, eAllowed)
       # find all root to leaf paths and filter out those traversing 
       # forbidden edges
@@ -645,25 +655,24 @@ DecisionTree <- R6::R6Class(
         # leaf node
         leaf.label <- path[[length(path)]]$label()
         PAYOFF[PAYOFF$PID==i,"Leaf"] <- leaf.label
-        # probability
+        # walk the path and accumulate p, cost and benefit
         pr <- 1
-        sapply(self$walk(path), function(e) {
+        cost <- 0
+        benefit <- 0
+        vapply(X=self$walk(path), FUN.VALUE=TRUE, FUN=function(e){
+          # probability 
           if (inherits(e, what="Reaction")) {
-            pr <<- pr * e$p()
+             pr <<- pr * e$p()
           }
+          # cost
+          cost <<- cost + e$cost()
+          # benefit
+          benefit <<- benefit + e$benefit()
+          # return
+          return(TRUE)
         })
         PAYOFF[PAYOFF$PID==i,"Probability"] <- pr
-        # cost
-        cost <- 0
-        sapply(self$walk(path), function(e) {
-          cost <<- cost + e$cost()
-        })
         PAYOFF[PAYOFF$PID==i,"Path.Cost"] <- cost
-        # benefit
-        benefit <- 0
-        sapply(self$walk(path), function(e) {
-          benefit <<- benefit + e$benefit()
-        })
         PAYOFF[PAYOFF$PID==i,"Path.Benefit"] <- benefit
         # utility of the leaf node at end of the path
         PAYOFF[PAYOFF$PID==i, "Path.Utility"] <- path[[length(path)]]$utility()
@@ -731,8 +740,17 @@ DecisionTree <- R6::R6Class(
     evaluate = function(expected=TRUE, N=1) {
       # find unique strategies
       TT <- self$strategies()
-      ## names of columns to copy to identify each strategy
+      # names of columns to copy to identify each strategy
       dn <- self$decision_nodes("label")
+      # create formula for use in aggregation of results from evaluating each
+      # strategy separately
+      f <- as.formula(
+        paste(
+          "cbind(Probability, Cost, Benefit, Utility)",
+          paste(dn, collapse="+"),
+          sep = "~"
+        ) 
+      )
       # make repeated calls 
       DF <- do.call('rbind', sapply(1:N, FUN=function(n){
         # set the ModVar values (either mean or sampled)
@@ -743,13 +761,6 @@ DecisionTree <- R6::R6Class(
         ALL <- apply(TT, MARGIN=1, function(row) {
           strategy <- private$E[row]
           RES <- self$evaluate_strategy(strategy)
-          f <- as.formula(
-            paste(
-              "cbind(Probability, Cost, Benefit, Utility)",
-              paste(dn, collapse="+"),
-              sep = "~"
-            ) 
-          )
           PAYOFF <- aggregate(f, data=RES, FUN=sum)
           PAYOFF <- cbind(Run=n, PAYOFF)
           return(PAYOFF)

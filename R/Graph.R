@@ -231,7 +231,7 @@ Graph <- R6::R6Class(
       }
       # convert to boolean, if required
       if (boolean) {
-        A <- apply(A, MARGIN=c(1,2), FUN=function(c){ifelse(c>=1,TRUE,FALSE)})
+        A <- A>=1
       }
       return(A)
     },

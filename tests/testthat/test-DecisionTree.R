@@ -407,7 +407,7 @@ test_that("redecision replicates Jenks et al, 2016", {
   
   # PSA
   Rprof("junk.txt", line.profiling=TRUE)
-  PSA <- DT$evaluate(expected=FALSE,N=10)
+  PSA <- DT$evaluate(expected=FALSE,N=1000)
   Rprof(NULL)
   RES <<- reshape(PSA, idvar='Run', timevar='d1', direction='wide')
   RES$Difference <<- RES$Cost.Standard - RES$Cost.Tegaderm

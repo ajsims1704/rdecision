@@ -78,8 +78,8 @@ Digraph <- R6::R6Class(
         }
         # populate it
         vapply(X=private$E, FUN.VALUE=TRUE, FUN=function(e) {
-          s <- self$element_index(e$source())
-          t <- self$element_index(e$target())
+          s <- self$vertex_index(e$source())
+          t <- self$vertex_index(e$target())
           A[s,t] <<- A[s,t]+1
           return(TRUE)
         })
@@ -91,7 +91,7 @@ Digraph <- R6::R6Class(
       }
       # convert to logical, if required
       if (boolean) {
-        A <- apply(A, MARGIN=c(1,2), FUN=function(c){ifelse(c>=1,TRUE,FALSE)})
+        A <- A>=1
       }
       return(A)
     },
@@ -288,14 +288,14 @@ Digraph <- R6::R6Class(
     #' @return A list of ordered node lists. 
     paths = function(s,t) {
       # check arguments
-      if (!self$has_vertex(s)) {
+      is <- self$vertex_index(s)
+      if (is.na(is)) {
         rlang::abort("Argument 's' is not in graph", class="not_in_graph")
       }
-      s <- self$element_index(s)
-      if (!self$has_vertex(t)) {
+      it <- self$vertex_index(t)
+      if (is.na(it)) {
         rlang::abort("Argument 't' is not in graph", class="not_in_graph")
       }
-      t <- self$element_index(t)
       # AA is the adjacency matrix
       AA <- self$digraph_adjacency_matrix(boolean=TRUE)
       # D marks nodes as discovered
@@ -308,7 +308,7 @@ Digraph <- R6::R6Class(
       dfs <- function(v) {
         D[v] <<- TRUE
         P$push(v)
-        if (v==t) {
+        if (v==it) {
           PL[[length(PL)+1]] <<- P$as_list()
         } else {
           for (w in which(AA[v,],arr.ind=TRUE)) {
@@ -320,7 +320,7 @@ Digraph <- R6::R6Class(
         P$pop()
         D[v] <<- FALSE
       }
-      dfs(s)
+      dfs(is)
       # convert vertex indices into vertices before returning
       VPL <- lapply(PL, function(p){
         vp <- lapply(p, function(v) {private$V[[v]]})
@@ -335,12 +335,17 @@ Digraph <- R6::R6Class(
     #' @return A list of Edges
     walk = function(P) {
       # check vertexes and get index of each
-      p <- sapply(P, function(n) {
+      p <- vapply(X=P, FUN.VALUE=1, FUN=function(n) {
+        # get the vertex indexes
+        index <- self$vertex_index(n)
         # reject if vertex is not in the graph
-        if (!self$has_vertex(n)) {
-          rlang::abort("At least one Node is not in graph", class="not_in_graph")
+        if (is.na(index)) {
+          rlang::abort(
+            "At least one Node is not in graph", 
+            class="not_in_graph"
+          )
         }
-        return(self$element_index(n))
+        return(index)
       })
       # loop through the ordered vertexes
       if (length(P) > 1) {
@@ -348,9 +353,9 @@ Digraph <- R6::R6Class(
           s = p[1:(length(P)-1)],
           t = p[2:length(P)]
         )
+        B <- self$digraph_incidence_matrix()
         W <- apply(pairs, MARGIN=1, function(r) {
           # look for edges leaving s and entering t
-          B <- self$digraph_incidence_matrix()
           e <- which((B[r[1],]==-1) & (B[r[2],]==1), arr.ind=TRUE)
           if (length(e)>=1) {
             return(e[1])
