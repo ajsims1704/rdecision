@@ -19,10 +19,16 @@ test_that("simple decision trees are modelled correctly", {
   A <- DT$actions(d1)
   expect_true(setequal(sapply(A,function(a){a$label()}),c("e1","e4")))
   expect_equal(DT$decision_nodes("label"), "d1")
+  # strategy validity
+  expect_error(DT$is_strategy(list(e2,e3)), class = "incorrect_strategy_type")
+  expect_false(DT$is_strategy(list()))
+  expect_false(DT$is_strategy(list(e1,e4)))
   # strategy paths
   P <- DT$root_to_leaf_paths()
   expect_equal(length(P),3)
   expect_error(DT$paths_in_strategy(list(e2)), class="incorrect_strategy_type")
+  expect_error(DT$paths_in_strategy(list(e1,e4)), 
+               class = "invalid_strategy")
   PS <- DT$paths_in_strategy(list(e1))
   expect_equal(length(PS),2)
   PS <- DT$paths_in_strategy(list(e4))
@@ -183,7 +189,7 @@ test_that("rdecision replacates Kaminski et al, fig 7", {
   expect_equal(nrow(S),6)
   # test incorrect strategy prescription
   expect_error(DT$paths_in_strategy(list(E[[1]],E[[5]],E[[7]])),
-               class="incorrect_strategy_prescription")
+               class="invalid_strategy")
   # evaluate one strategy (test/sell/sell)
   RES <- DT$evaluate_strategy(list(E[[5]],E[[7]],E[[12]]))
   expect_true(is.data.frame(RES))
@@ -407,7 +413,7 @@ test_that("redecision replicates Jenks et al, 2016", {
   
   # PSA
   Rprof("junk.txt", line.profiling=TRUE)
-  PSA <- DT$evaluate(expected=FALSE,N=1000)
+  PSA <- DT$evaluate(expected=FALSE,N=10)
   Rprof(NULL)
   RES <<- reshape(PSA, idvar='Run', timevar='d1', direction='wide')
   RES$Difference <<- RES$Cost.Standard - RES$Cost.Tegaderm

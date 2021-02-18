@@ -488,6 +488,40 @@ DecisionTree <- R6::R6Class(
       # return updated DecisionTree (unchanged)
       return(invisible(self))
     },
+    
+    #' @decription Tests whether a strategy (a unanimous prescription of an
+    #' action in each decision node, specified as a list of nodes) is a valid
+    #' strategy for this decision tree.
+    #' @param strategy A list of Action edges.
+    #' @return TRUE if the strategy is valid for this tree. Throws an
+    #' exception if the argument is not a list of Action edges. Returns
+    #' FALSE if the list of Action edges are not a valid strategy.
+    is_strategy = function(strategy) {
+      # check that the argument is a list of Action edges
+      vapply(X=strategy, FUN.VALUE=TRUE, FUN=function(e) {
+        if (!inherits(e,what="Action")) {
+          rlang::abort(
+            "Argument 'strategy' must only contain Action elements",
+            class = "incorrect_strategy_type")
+        }
+        return(TRUE)
+      })
+      # there must be as many Actions as Decision nodes
+      iD <- self$decision_nodes("index")
+      if (length(strategy) != length(iD)) {
+        return(FALSE)
+      }
+      # the set of source nodes must be the same as the set of decision nodes
+      iS <- vapply(X=strategy, FUN.VALUE=1, FUN=function(e){
+        i <- self$vertex_index(e$source())
+        return(self$vertex_index(e$source()))
+      })
+      if (!setequal(iS,iD)) {
+        return(FALSE)
+      }
+      # return validity
+      return(TRUE)
+    },
 
     #' @description Find all the root to leaf paths traversable under 
     #' the specified strategy. A strategy is a unanimous prescription 
@@ -495,33 +529,12 @@ DecisionTree <- R6::R6Class(
     #' @param strategy A list of Actions, with one action per decision node.
     #' @return A list of root to leaf paths.
     paths_in_strategy = function(strategy) {
-      # get decision nodes
-      iD <- self$decision_nodes("index")
       # check argument
-      if (length(strategy)!=length(iD)) {
+      if (!self$is_strategy(strategy)) {
         rlang::abort(
-          "Argument 'strategy' must have as many elements as DecisionNodes",
-           class="incorrect_strategy_length"
+          "Argument 'strategy' is not a valid strategy for the decision tree",
+          class = "invalid_strategy"
         )
-      }
-      vapply(X=strategy, FUN.VALUE=TRUE, FUN=function(e) {
-        if (!inherits(e,what="Action")) {
-          rlang::abort(
-            "Argument 'strategy' must only contain Action elements",
-            class="incorrect_strategy_type")
-        }
-        return(TRUE)
-      })
-      iDS <- vapply(X=strategy, FUN.VALUE=1, FUN=function(e){
-        return(self$vertex_index(e$source()))
-      })
-      # iD <- vapply(X=D, FUN.VALUE=1, FUN=function(v){
-      #   self$vertex_index(v)
-      # })
-      if (!setequal(iD, iDS)) {
-        rlang::abort(
-          "Argument 'strategy' must have one Action per DecisionNode",
-          class = "incorrect_strategy_prescription")
       }
       # all non-strategy action edges are forbidden
       eAction <- which(
@@ -537,7 +550,7 @@ DecisionTree <- R6::R6Class(
       # find all root to leaf paths and filter out those traversing 
       # forbidden edges
       P <- self$root_to_leaf_paths()
-      bAllowed <- sapply(P, function(p) {
+      bAllowed <- vapply(X=P, FUN.VALUE=TRUE, FUN=function(p) {
         w <- self$walk(p)
         eWalk <- sapply(w, function(e){self$element_index(e)})
         return(length(intersect(eWalk,eForbidden))==0)
@@ -592,6 +605,86 @@ DecisionTree <- R6::R6Class(
     },
 
     #' @description 
+    #' Evaluate the components of payoff associated with a set of paths in the
+    #' decision tree. For each path, probability, cost, benefit and utility are
+    #' calculated.
+    #' @param P A list of root-to-leaf paths. Each path must start with the
+    #' root node and end with a leaf node.
+    #' @return A data frame (payoff table) with one row per path and columns
+    #' organized as follows:
+    #' \describe{
+    #' \item{Leaf}{The label of the leaf node on which the pathway ends; 
+    #' normally the clinical outcome.}
+    #' \item{Probability}{The probability of traversing the pathway. }
+    #' \item{Path.Cost}{The cost of traversing the pathway.}
+    #' \item{Path.Benefit}{The benefit derived from traversing the pathway.}
+    #' \item{Path.Utility}{The utility associated with the outcome (leaf node).}
+    #' \item{Cost}{Path.Cost \eqn{*} probability of traversing the pathway.}
+    #' \item{Benefit}{Path.Benefit \eqn{*} probability of traversing the 
+    #' pathway.}
+    #' \item{Utility}{Path.Utility \eqn{*} probability of traversing the
+    #' pathway.}
+    #' }
+    #' @note There is minimal checking of the argument because this function 
+    #' is intended to be called repeatedly during tree evaluation, including
+    #' PSA. The argument P is expected to be obtained from 
+    #' \code{paths_in_strategy}.
+    evaluate_paths = function(P) {
+      # check each path ends with a leaf (walk checks all elements are nodes)
+      lapply(P, FUN=function(p) {
+        if (!inherits(p[[length(p)]], what="LeafNode")) {
+          rlang::abort(
+            "Each path must end with a leaf node",
+            class = "invalid_path"
+          )
+        }
+      })
+      # create a data frame
+      PAYOFF <- data.frame(PID=seq_along(P), stringsAsFactors=FALSE)
+      PAYOFF$Probability <- rep(as.numeric(NA), length(P))
+      PAYOFF$Path.Cost <- rep(as.numeric(NA), length(P))
+      PAYOFF$Path.Benefit <- rep(as.numeric(NA), length(P))
+      PAYOFF$Path.Utility <- rep(as.numeric(NA), length(P))
+      # evaluate each path
+      for (i in seq_along(P)) {
+        # get path
+        path <- P[[i]]
+        # leaf node
+        leaf.label <- path[[length(path)]]$label()
+        PAYOFF[PAYOFF$PID==i,"Leaf"] <- leaf.label
+        # walk the path and accumulate p, cost and benefit
+        pr <- 1
+        cost <- 0
+        benefit <- 0
+        vapply(X=self$walk(path), FUN.VALUE=TRUE, FUN=function(e){
+          # probability 
+          if (inherits(e, what="Reaction")) {
+            pr <<- pr * e$p()
+          }
+          # cost
+          cost <<- cost + e$cost()
+          # benefit
+          benefit <<- benefit + e$benefit()
+          # return
+          return(TRUE)
+        })
+        PAYOFF[PAYOFF$PID==i,"Probability"] <- pr
+        PAYOFF[PAYOFF$PID==i,"Path.Cost"] <- cost
+        PAYOFF[PAYOFF$PID==i,"Path.Benefit"] <- benefit
+        # utility of the leaf node at end of the path
+        PAYOFF[PAYOFF$PID==i, "Path.Utility"] <- path[[length(path)]]$utility()
+      }
+      # add expected cost and utility     
+      PAYOFF$Cost <- PAYOFF$Probability*PAYOFF$Path.Cost
+      PAYOFF$Benefit <- PAYOFF$Probability*PAYOFF$Path.Benefit
+      PAYOFF$Utility <- PAYOFF$Probability*PAYOFF$Path.Utility
+      # remove path ID
+      PAYOFF$PID <- NULL
+      # return the payoff table      
+      return(PAYOFF)
+    },
+
+    #' @description 
     #' Evaluate the components of payoff associated with the paths in the
     #' decision tree. For each path, the strategy, probability, cost,
     #' benefit and utility are calculated.
@@ -618,18 +711,12 @@ DecisionTree <- R6::R6Class(
     #' }
     evaluate_strategy = function(strategy) {
       # check argument
-      if (length(strategy)!=length(self$decision_nodes())) {
+      if (!self$is_strategy(strategy)) {
         rlang::abort(
-          "Argument 'strategy' must have as many elements as DecisionNodes",
-          class="incorrect_strategy_length"
+          "Argument 'strategy' is not a valid strategy for the decision tree",
+          class = "invalid_strategy"
         )
       }
-      sapply(strategy, function(e) {
-        if (!inherits(e,what="Action")) {
-          rlang::abort("Argument 'strategy' must only contain Action elements",
-                       class="incorrect_strategy_type")
-        }
-      })
       # find all root to leaf paths for the specified strategy
       P <- self$paths_in_strategy(strategy)
       # create a matrix of strategies
