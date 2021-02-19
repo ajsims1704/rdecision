@@ -23,14 +23,14 @@ library(rdecision)
 ```
 
 # Introduction
-Kamiński *et al* [-@kaminski:2018a, Fig 7] provide an example of a decision tree
+Kamiński *et al* [-@kaminski2018, Fig 7] provide an example of a decision tree
 with multiple decision nodes, including some that are descendants of another
 decision node. This vignette illustrates how `rdecision` can be used to model
 a complex decision tree, using the example from Figure 7 of Kamiński 
-*et al* [-@kaminski:2018a]. 
+*et al* [-@kaminski2018]. 
 
 # The problem
-Kamiński *et al* [-@kaminski:2018a] state the problem as follows:
+Kamiński *et al* [-@kaminski2018] state the problem as follows:
 
 > Consider an investor owning a plot of land, possibly (*a priori* probability
 > amounting to 70%) hiding shale gas layers. The plot can be sold immediately
@@ -109,18 +109,8 @@ There are a total of 12 possible strategies (3 choices from node `d1`
 $\times$ 2 choices at node `d2` $\times$ 2 choices at node `d3`). But 
 some of these are not unique. For example if the choice at node `d1` is
 "sell", the choices at nodes `d2` and `d3` (4 possible combinations) are
-unimportant; all four such strategies are identical. In identifying
-strategies, `rdecision` discards non-unique strategies, and uses the 
-labels of an arbitrarily chosen strategy within each identical
-group as the identifier for the strategy; i.e. "sell/sell/sell" also
-represents the identical "sell/sell/dig", "sell/dig/sell" and 
-"sell/dig/dig".
+unimportant; all four such strategies are identical. 
 
-Similarly, four strategies with choice "dig" at node `d1` are
-identical. Removing the six repeated strategies leaves a total
-of six possible strategies to evaluate.
-
-Unique strategies are identified by `rdecision` automatically.
 Method `evaluate` calculates the expected cost, benefit and
 utility of each traversable path for each strategy, and aggregates
 by strategy. The results for the gas problem are computed
@@ -132,7 +122,7 @@ RES <- DT$evaluate()
 RES$Payoff <- RES$Benefit-RES$Cost
 ```
 
-This gives the following payoff for each unique strategy:
+This gives the following payoff for each strategy:
 
 ```{r results, echo=FALSE, results='asis'}
 RES$Run <- NULL

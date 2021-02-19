@@ -255,14 +255,13 @@ node. In this example there is a single decision node with two actions,
 and the strategies are simply the two forms of treatment to be compared.
 More complex decision trees are also possible.
 
-The paths traversable for a particular strategy can be evaluated
-individually using the method \texttt{evaluate\_strategy}. In
-\texttt{rdecision} a strategy is defined as a set of action edges with
-one action edge per decision node. It is necessary to call the method
-\texttt{evaluate\_strategy} only if information about each pathway is
-required; normally it is sufficient to call \texttt{evaluate} which will
-automatically identify all possible strategies in a decision tree and
-evaluate them.
+The paths traversable in each strategy can be evaluated individually
+using the method \texttt{evaluate(by="path")}. In \texttt{rdecision} a
+strategy is defined as a set of action edges with one action edge per
+decision node. It is necessary to use the option \texttt{by="path"} only
+if information about each pathway is required; normally it is sufficient
+to call \texttt{evaluate} which will automatically aggregate the
+evaluation by strategy.
 
 \hypertarget{model-results}{%
 \section{Model results}\label{model-results}}
@@ -270,43 +269,38 @@ evaluate them.
 The evaluation of each pathway, for each strategy, yields the following
 table:
 
-\begin{longtable}[]{@{}lrrrlrr@{}}
+\begin{longtable}[]{@{}llrrr@{}}
 \toprule
-d1 & Probability & Path.Cost & Path.Utility & Leaf & Cost &
-Utility\tabularnewline
+Leaf & d1 & Probability & Cost & Utility\tabularnewline
 \midrule
 \endhead
-Sumatriptan & 0.3315 & 16.10 & 1.0 & A & 5.34 & 0.3315\tabularnewline
-Sumatriptan & 0.2265 & 32.20 & 0.9 & B & 7.29 & 0.2039\tabularnewline
-Sumatriptan & 0.4066 & 16.10 & -0.3 & C & 6.55 & -0.1220\tabularnewline
-Sumatriptan & 0.0353 & 79.26 & 0.1 & D & 2.80 & 0.0035\tabularnewline
-Sumatriptan & 0.0001 & 1172.26 & -0.3 & E & 0.08 & 0.0000\tabularnewline
-Caffeine/Ergotamine & 0.2664 & 1.32 & 1.0 & F & 0.35 &
-0.2664\tabularnewline
-Caffeine/Ergotamine & 0.1126 & 2.64 & 0.9 & G & 0.30 &
-0.1013\tabularnewline
-Caffeine/Ergotamine & 0.5713 & 1.32 & -0.3 & H & 0.75 &
--0.1714\tabularnewline
-Caffeine/Ergotamine & 0.0496 & 64.48 & 0.1 & I & 3.20 &
-0.0050\tabularnewline
-Caffeine/Ergotamine & 0.0001 & 1157.48 & -0.3 & J & 0.12 &
-0.0000\tabularnewline
+A & Sumatriptan & 0.33 & 5.34 & 0.33\tabularnewline
+B & Sumatriptan & 0.23 & 7.29 & 0.20\tabularnewline
+C & Sumatriptan & 0.41 & 6.55 & -0.12\tabularnewline
+D & Sumatriptan & 0.04 & 2.80 & 0.00\tabularnewline
+E & Sumatriptan & 0.00 & 0.08 & 0.00\tabularnewline
+F & Caffeine/Ergotamine & 0.27 & 0.35 & 0.27\tabularnewline
+G & Caffeine/Ergotamine & 0.11 & 0.30 & 0.10\tabularnewline
+H & Caffeine/Ergotamine & 0.57 & 0.75 & -0.17\tabularnewline
+I & Caffeine/Ergotamine & 0.05 & 3.20 & 0.00\tabularnewline
+J & Caffeine/Ergotamine & 0.00 & 0.12 & 0.00\tabularnewline
 \bottomrule
 \end{longtable}
 
 There are, as expected, ten pathways (5 per strategy). The expected cost
 and expected utility for each choice can be calculated from the table
 above, or by invoking the \texttt{evaluate} method of a decision tree
-object. This gives the following result, consistent with that reported
-by Evans \emph{et al} {[}2{]}.
+object with the default parameter \texttt{by="strategy"}. This gives the
+following result, consistent with that reported by Evans \emph{et al}
+{[}2{]}.
 
 \begin{longtable}[]{@{}lrr@{}}
 \toprule
 d1 & Cost & Utility\tabularnewline
 \midrule
 \endhead
-Sumatriptan & 22.06 & 0.41686\tabularnewline
 Caffeine/Ergotamine & 4.71 & 0.20128\tabularnewline
+Sumatriptan & 22.06 & 0.41686\tabularnewline
 \bottomrule
 \end{longtable}
 
@@ -316,13 +310,13 @@ Caffeine/Ergotamine & 4.71 & 0.20128\tabularnewline
 
 \hypertarget{refs}{}
 \begin{CSLReferences}{0}{0}
-\leavevmode\hypertarget{ref-briggs:2002a}{}%
+\leavevmode\hypertarget{ref-briggs2006}{}%
 \CSLLeftMargin{1 }
 \CSLRightInline{Briggs A, Claxton K, Sculpher M. \emph{Decision
-modelling for health economic evaluation}. Oxford, UK: : Oxford
+modelling for health economic evaluation}. Oxford, {UK}: : Oxford
 University Press 2006. }
 
-\leavevmode\hypertarget{ref-evans:1997a}{}%
+\leavevmode\hypertarget{ref-evans1997}{}%
 \CSLLeftMargin{2 }
 \CSLRightInline{Evans KW, Boan JA, Evans JL, \emph{et al.} Economic
 evaluation of oral sumatriptan compared with oral caffeine/ergotamine

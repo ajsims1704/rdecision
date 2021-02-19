@@ -248,18 +248,8 @@ There are a total of 12 possible strategies (3 choices from node
 choices at node \texttt{d3}). But some of these are not unique. For
 example if the choice at node \texttt{d1} is ``sell'', the choices at
 nodes \texttt{d2} and \texttt{d3} (4 possible combinations) are
-unimportant; all four such strategies are identical. In identifying
-strategies, \texttt{rdecision} discards non-unique strategies, and uses
-the labels of an arbitrarily chosen strategy within each identical group
-as the identifier for the strategy; i.e.~``sell/sell/sell'' also
-represents the identical ``sell/sell/dig'', ``sell/dig/sell'' and
-``sell/dig/dig''.
+unimportant; all four such strategies are identical.
 
-Similarly, four strategies with choice ``dig'' at node \texttt{d1} are
-identical. Removing the six repeated strategies leaves a total of six
-possible strategies to evaluate.
-
-Unique strategies are identified by \texttt{rdecision} automatically.
 Method \texttt{evaluate} calculates the expected cost, benefit and
 utility of each traversable path for each strategy, and aggregates by
 strategy. The results for the gas problem are computed as follows.
@@ -273,19 +263,25 @@ Payoff is defined as benefit minus cost.
 \end{Highlighting}
 \end{Shaded}
 
-This gives the following payoff for each unique strategy:
+This gives the following payoff for each strategy:
 
 \begin{longtable}[]{@{}lllrrr@{}}
 \toprule
 d1 & d2 & d3 & Cost & Benefit & Payoff\tabularnewline
 \midrule
 \endhead
-sell & sell & sell & 0 & 800 & 800\tabularnewline
-dig & sell & sell & 300 & 1750 & 1450\tabularnewline
-test & sell & sell & 50 & 888 & 838\tabularnewline
-test & dig & sell & 134 & 895 & 761\tabularnewline
-test & sell & dig & 266 & 1743 & 1477\tabularnewline
+dig & dig & dig & 300 & 1750 & 1450\tabularnewline
+sell & dig & dig & 0 & 800 & 800\tabularnewline
 test & dig & dig & 350 & 1750 & 1400\tabularnewline
+dig & sell & dig & 300 & 1750 & 1450\tabularnewline
+sell & sell & dig & 0 & 800 & 800\tabularnewline
+test & sell & dig & 266 & 1743 & 1477\tabularnewline
+dig & dig & sell & 300 & 1750 & 1450\tabularnewline
+sell & dig & sell & 0 & 800 & 800\tabularnewline
+test & dig & sell & 134 & 895 & 761\tabularnewline
+dig & sell & sell & 300 & 1750 & 1450\tabularnewline
+sell & sell & sell & 0 & 800 & 800\tabularnewline
+test & sell & sell & 50 & 888 & 838\tabularnewline
 \bottomrule
 \end{longtable}
 
@@ -299,7 +295,7 @@ negative and dig otherwise. The expected payoff from this strategy is
 
 \hypertarget{refs}{}
 \begin{CSLReferences}{0}{0}
-\leavevmode\hypertarget{ref-kaminski:2018a}{}%
+\leavevmode\hypertarget{ref-kaminski2018}{}%
 \CSLLeftMargin{1 }
 \CSLRightInline{Kamiński B, Jakubczyk M, Szufel P. A framework for
 sensitivity analysis of decision trees. \emph{Central European Journal

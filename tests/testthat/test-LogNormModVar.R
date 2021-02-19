@@ -51,7 +51,7 @@ test_that("random sampling is from a log normal distribution", {
   ln <- LogNormModVar$new("ln", "GBP", mu, sigma)
   samp <- ln$r(1000)
   expect_equal(length(samp), 1000)
-  expect_equal(round(mean(samp),1), 1)
+  expect_equal(mean(samp), 1, tolerance=0.2)
   sd <- sqrt( (exp(sigma^2)-1)*(exp(2*mu+sigma^2)) )
   expect_equal(sd(samp), sd, tolerance=0.2)
 })

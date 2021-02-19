@@ -28,14 +28,14 @@ library("pander")
 # Introduction
 This vignette is an example of modelling a decision tree using the `rdecision`
 package, with probabilistic sensitivity analysis. It is based on the model 
-reported by Jenks *et al* [-@jenks:2016a] in which a transparent dressing used 
+reported by Jenks *et al* [-@jenks2016] in which a transparent dressing used 
 to secure vascular catheters (Tegaderm CHG) was compared with a 
 standard dressing.
 
 # Model variables
 Thirteen variables were used in the model. The choice of
 variables, their distributions and their parameters are taken from table 3 
-of Jenks *et al* [-@jenks:2016a], with the following additional information:
+of Jenks *et al* [-@jenks2016], with the following additional information:
 
 * For variables with lognormal uncertainty, the manufacturer synthesized a log
   normal distribution as $\exp(\alpha + \beta r())$ where $r()$ is a random
@@ -167,11 +167,11 @@ q.CRBSI.T <- ExprModVar$new(
 
 # The decision tree
 The following code constructs the decision tree based on figure 2
-of Jenks *et al* [-@jenks:2016a]. In the formulation used by `rdecision`, 
+of Jenks *et al* [-@jenks2016]. In the formulation used by `rdecision`, 
 the decision tree is constructed from sets of decision, chance and 
 leaf nodes and from edges (actions and reactions).
 Leaf nodes are synonymous with
-pathways in Briggs' terminology [-@briggs:2002a]. The time horizon is
+pathways in Briggs' terminology [-@briggs2006]. The time horizon is
 not stated explicitly in the model, and is assumed to be 7 days. It was implied
 that the time horizon was ICU stay plus some follow-up, and the costs reflect
 those incurred in that period, so the assumption of 7 days does not affect
@@ -343,7 +343,7 @@ Probabilistic sensitivity analysis is supported through the use of sampling
 model variables. The same call, with extra parameters is used to run the PSA:
 
 ```{r PSA, echo=TRUE}
-PSA <- DT$evaluate(expected=F, N=10)
+PSA <- DT$evaluate(expected=F, N=100)
 ```
 
 The first few runs of PSA are as follows (after reshaping the table to give

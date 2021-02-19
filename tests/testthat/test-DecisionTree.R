@@ -37,7 +37,8 @@ test_that("simple decision trees are modelled correctly", {
   S <- DT$strategies()
   expect_equal(nrow(S),2)
   # evaluations
-  RES <- DT$evaluate_strategy(list(e1))
+  RES <- DT$evaluate(by="path")
+  expect_equal(RES[RES$Leaf=="t1","Benefit"],22.5,tolearance=0.05)
 })
 
 # Evans et al, Pharmacoeconomics, 1997;12:565-577, Sumatriptan for migraine
@@ -186,7 +187,7 @@ test_that("rdecision replacates Kaminski et al, fig 7", {
   expect_silent(DT<-DecisionTree$new(V,E))
   # strategies
   S <- DT$strategies("label")
-  expect_equal(nrow(S),6)
+  expect_equal(nrow(S),12)
   # test incorrect strategy prescription
   expect_error(DT$paths_in_strategy(list(E[[1]],E[[5]],E[[7]])),
                class="invalid_strategy")
@@ -198,17 +199,51 @@ test_that("rdecision replacates Kaminski et al, fig 7", {
   expect_equal(ncol(M),8)
   expect_equal(unname(M[8,"Cost"]),220.5,tolerance=1)
   # evaluate one strategy (test/sell/sell)
-  RES <- DT$evaluate_strategy(list(E[[5]],E[[7]],E[[12]]))
+  RES <- DT$evaluate()
   expect_true(is.data.frame(RES))
-  expect_equal(sum(RES$Probability),1)
-  expect_equal(sum(RES$Cost),50)
-  expect_equal(sum(RES$Benefit),888)
+  itss <- which(RES$d1=="test" & RES$d2=="sell" & RES$d3=="sell")
+  expect_equal(sum(RES$Probability[itss]),1)
+  expect_equal(sum(RES$Cost[itss]),50)
+  expect_equal(sum(RES$Benefit[itss]),888)
   # find optimal strategies
   RES <- DT$evaluate()
-  expect_equal(nrow(RES),6)
+  expect_equal(nrow(RES),12)
   imax <- which.max(RES$Benefit-RES$Cost)
   popt <- paste(RES$d1[imax], RES$d2[imax], RES$d3[imax], sep="/")
   expect_equal(popt, "test/sell/dig")
+})
+
+# ----------------------------------------------------------------------------
+# A decision tree with paths common to >1 strategy
+# ----------------------------------------------------------------------------
+test_that("paths common to >1 strategy are analyzed", {
+  # variables
+  p.disease <- BetaModVar$new("P(Test+ve)","P",alpha=10,beta=40)
+  q.disease <- ExprModVar$new("1-P(Test+ve)","P",rlang::quo(1-p.disease))
+  # create tree
+  c1 <- ChanceNode$new("c1")
+  d1 <- DecisionNode$new("d1")
+  t1 <- LeafNode$new("expensive drug")
+  d2 <- DecisionNode$new("d2")
+  t2 <- LeafNode$new("conventional management")
+  t3 <- LeafNode$new("watchful waiting")
+  t4 <- LeafNode$new("discharge")
+  e1 <- Reaction$new(c1,d1,p=p.disease,cost=0,label="test +ve")
+  e2 <- Reaction$new(c1,t4,p=q.disease,cost=0,label="test -ve")
+  e3 <- Action$new(d1,t1,label="treat",cost=1000)
+  e4 <- Action$new(d1,d2,label="manage",cost=0)
+  e5 <- Action$new(d2,t2,label="conservatively",cost=200)
+  e6 <- Action$new(d2,t3,label="watchful wait",cost=50)
+  expect_silent(
+    DT<-DecisionTree$new(V=list(c1,d1,d2,t1,t2,t3,t4),E=list(e1,e2,e3,e4,e5,e6))
+  )
+  # there are 8 paths walked by the strategies (two end on leaf t1, one each on
+  # t2 and t3 and four on t4) out of 16 possible (4 paths and 4 strategies); 
+  # each strategy walks 2 paths
+  expect_silent(SP <- DT$strategy_paths())
+  expect_equal(nrow(SP),8)
+  # evaluate it
+  RES <- DT$evaluate(N=2)
 })
 
 # ------------------------------------------------------------
@@ -428,7 +463,7 @@ test_that("redecision replicates Jenks et al, 2016", {
   expect_equal(mean(RES$Cost.Standard), 176.89, tolerance=5.00)
   expect_equal(mean(RES$Cost.Tegaderm), 99.63, tolerance=5.00)
 
-  RES <- DT$evaluate2(expected=FALSE, N=2)
-  print(" ")
-  print(RES)
+  #RES <- DT$evaluate2(expected=FALSE, N=2)
+  #print(" ")
+  #print(RES)
 })

@@ -27,7 +27,7 @@ library("grid")
 ```
 
 # Introduction
-This puzzle was published in *New Scientist* in June 2020 [@bodycombe:2020a].
+This puzzle was published in *New Scientist* in June 2020 [@bodycombe2020].
 It is a practical example of a problem in graph theory. This vignette explains 
 how the puzzle can be solved with `redecison`.
 

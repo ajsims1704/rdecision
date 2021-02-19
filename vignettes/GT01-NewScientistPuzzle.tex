@@ -5,12 +5,13 @@
 \documentclass[
 ]{article}
 \usepackage{lmodern}
-\usepackage{amssymb,amsmath}
+\usepackage{amsmath}
 \usepackage{ifxetex,ifluatex}
 \ifnum 0\ifxetex 1\fi\ifluatex 1\fi=0 % if pdftex
   \usepackage[T1]{fontenc}
   \usepackage[utf8]{inputenc}
   \usepackage{textcomp} % provide euro and other symbols
+  \usepackage{amssymb}
 \else % if luatex or xetex
   \usepackage{unicode-math}
   \defaultfontfeatures{Scale=MatchLowercase}
@@ -83,6 +84,7 @@
 \newcommand{\VerbatimStringTok}[1]{\textcolor[rgb]{0.31,0.60,0.02}{#1}}
 \newcommand{\WarningTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
 \usepackage{longtable,booktabs}
+\usepackage{calc} % for calculating minipage widths
 % Correct order of tables after \paragraph or \subparagraph
 \usepackage{etoolbox}
 \makeatletter
@@ -91,7 +93,7 @@
 % Allow footnotes in longtable head/foot
 \IfFileExists{footnotehyper.sty}{\usepackage{footnotehyper}}{\usepackage{footnote}}
 \makesavenoteenv{longtable}
-\usepackage{graphicx,grffile}
+\usepackage{graphicx}
 \makeatletter
 \def\maxwidth{\ifdim\Gin@nat@width>\linewidth\linewidth\else\Gin@nat@width\fi}
 \def\maxheight{\ifdim\Gin@nat@height>\textheight\textheight\else\Gin@nat@height\fi}
@@ -108,6 +110,29 @@
 \providecommand{\tightlist}{%
   \setlength{\itemsep}{0pt}\setlength{\parskip}{0pt}}
 \setcounter{secnumdepth}{-\maxdimen} % remove section numbering
+\ifluatex
+  \usepackage{selnolig}  % disable illegal ligatures
+\fi
+\newlength{\cslhangindent}
+\setlength{\cslhangindent}{1.5em}
+\newlength{\csllabelwidth}
+\setlength{\csllabelwidth}{3em}
+\newenvironment{CSLReferences}[2] % #1 hanging-ident, #2 entry spacing
+ {% don't indent paragraphs
+  \setlength{\parindent}{0pt}
+  % turn on hanging indent if param 1 is 1
+  \ifodd #1 \everypar{\setlength{\hangindent}{\cslhangindent}}\ignorespaces\fi
+  % set entry spacing
+  \ifnum #2 > 0
+  \setlength{\parskip}{#2\baselineskip}
+  \fi
+ }%
+ {}
+\usepackage{calc}
+\newcommand{\CSLBlock}[1]{#1\hfill\break}
+\newcommand{\CSLLeftMargin}[1]{\parbox[t]{\csllabelwidth}{#1}}
+\newcommand{\CSLRightInline}[1]{\parbox[t]{\linewidth - \csllabelwidth}{#1}\break}
+\newcommand{\CSLIndent}[1]{\hspace{\cslhangindent}#1}
 
 \title{A directed graph solution to a \emph{New Scientist} puzzle}
 \usepackage{etoolbox}
@@ -166,27 +191,27 @@ edges similarly as \(V_{i,j}\).
 
 \begin{Shaded}
 \begin{Highlighting}[]
-\CommentTok{# create vertices}
-\NormalTok{V <-}\StringTok{ }\KeywordTok{list}\NormalTok{()}
-\ControlFlowTok{for}\NormalTok{ (i }\ControlFlowTok{in} \DecValTok{1}\OperatorTok{:}\DecValTok{5}\NormalTok{) \{}
-  \ControlFlowTok{for}\NormalTok{ (j }\ControlFlowTok{in} \DecValTok{1}\OperatorTok{:}\DecValTok{5}\NormalTok{) \{}
-\NormalTok{    V <-}\StringTok{ }\KeywordTok{c}\NormalTok{(V, Node}\OperatorTok{$}\KeywordTok{new}\NormalTok{(}\KeywordTok{paste}\NormalTok{(}\StringTok{"N"}\NormalTok{,i,j,}\DataTypeTok{sep=}\StringTok{""}\NormalTok{)))}
+\CommentTok{\# create vertices}
+\NormalTok{V }\OtherTok{\textless{}{-}} \FunctionTok{list}\NormalTok{()}
+\ControlFlowTok{for}\NormalTok{ (i }\ControlFlowTok{in} \DecValTok{1}\SpecialCharTok{:}\DecValTok{5}\NormalTok{) \{}
+  \ControlFlowTok{for}\NormalTok{ (j }\ControlFlowTok{in} \DecValTok{1}\SpecialCharTok{:}\DecValTok{5}\NormalTok{) \{}
+\NormalTok{    V }\OtherTok{\textless{}{-}} \FunctionTok{c}\NormalTok{(V, Node}\SpecialCharTok{$}\FunctionTok{new}\NormalTok{(}\FunctionTok{paste}\NormalTok{(}\StringTok{"N"}\NormalTok{,i,j,}\AttributeTok{sep=}\StringTok{""}\NormalTok{)))}
 \NormalTok{  \}}
 \NormalTok{\}}
-\CommentTok{# create edges}
-\NormalTok{E <-}\StringTok{ }\KeywordTok{list}\NormalTok{()}
-\ControlFlowTok{for}\NormalTok{ (i }\ControlFlowTok{in} \DecValTok{1}\OperatorTok{:}\DecValTok{5}\NormalTok{) \{}
-  \ControlFlowTok{for}\NormalTok{ (j }\ControlFlowTok{in} \DecValTok{1}\OperatorTok{:}\DecValTok{4}\NormalTok{) \{}
-\NormalTok{    E <-}\StringTok{ }\KeywordTok{c}\NormalTok{(E, Arrow}\OperatorTok{$}\KeywordTok{new}\NormalTok{(V[[}\DecValTok{5}\OperatorTok{*}\NormalTok{(i}\DecValTok{-1}\NormalTok{)}\OperatorTok{+}\NormalTok{j]], V[[}\DecValTok{5}\OperatorTok{*}\NormalTok{(i}\DecValTok{-1}\NormalTok{)}\OperatorTok{+}\NormalTok{j}\OperatorTok{+}\DecValTok{1}\NormalTok{]], }\KeywordTok{paste}\NormalTok{(}\StringTok{"H"}\NormalTok{,i,j,}\DataTypeTok{sep=}\StringTok{""}\NormalTok{)))}
+\CommentTok{\# create edges}
+\NormalTok{E }\OtherTok{\textless{}{-}} \FunctionTok{list}\NormalTok{()}
+\ControlFlowTok{for}\NormalTok{ (i }\ControlFlowTok{in} \DecValTok{1}\SpecialCharTok{:}\DecValTok{5}\NormalTok{) \{}
+  \ControlFlowTok{for}\NormalTok{ (j }\ControlFlowTok{in} \DecValTok{1}\SpecialCharTok{:}\DecValTok{4}\NormalTok{) \{}
+\NormalTok{    E }\OtherTok{\textless{}{-}} \FunctionTok{c}\NormalTok{(E, Arrow}\SpecialCharTok{$}\FunctionTok{new}\NormalTok{(V[[}\DecValTok{5}\SpecialCharTok{*}\NormalTok{(i}\DecValTok{{-}1}\NormalTok{)}\SpecialCharTok{+}\NormalTok{j]], V[[}\DecValTok{5}\SpecialCharTok{*}\NormalTok{(i}\DecValTok{{-}1}\NormalTok{)}\SpecialCharTok{+}\NormalTok{j}\SpecialCharTok{+}\DecValTok{1}\NormalTok{]], }\FunctionTok{paste}\NormalTok{(}\StringTok{"H"}\NormalTok{,i,j,}\AttributeTok{sep=}\StringTok{""}\NormalTok{)))}
 \NormalTok{  \}}
 \NormalTok{\} }
-\ControlFlowTok{for}\NormalTok{ (i }\ControlFlowTok{in} \DecValTok{1}\OperatorTok{:}\DecValTok{4}\NormalTok{) \{}
-  \ControlFlowTok{for}\NormalTok{ (j }\ControlFlowTok{in} \DecValTok{1}\OperatorTok{:}\DecValTok{5}\NormalTok{) \{}
-\NormalTok{    E <-}\StringTok{ }\KeywordTok{c}\NormalTok{(E, Arrow}\OperatorTok{$}\KeywordTok{new}\NormalTok{(V[[}\DecValTok{5}\OperatorTok{*}\NormalTok{(i}\DecValTok{-1}\NormalTok{)}\OperatorTok{+}\NormalTok{j]], V[[}\DecValTok{5}\OperatorTok{*}\NormalTok{i}\OperatorTok{+}\NormalTok{j]], }\KeywordTok{paste}\NormalTok{(}\StringTok{"V"}\NormalTok{,i,j,}\DataTypeTok{sep=}\StringTok{""}\NormalTok{)))}
+\ControlFlowTok{for}\NormalTok{ (i }\ControlFlowTok{in} \DecValTok{1}\SpecialCharTok{:}\DecValTok{4}\NormalTok{) \{}
+  \ControlFlowTok{for}\NormalTok{ (j }\ControlFlowTok{in} \DecValTok{1}\SpecialCharTok{:}\DecValTok{5}\NormalTok{) \{}
+\NormalTok{    E }\OtherTok{\textless{}{-}} \FunctionTok{c}\NormalTok{(E, Arrow}\SpecialCharTok{$}\FunctionTok{new}\NormalTok{(V[[}\DecValTok{5}\SpecialCharTok{*}\NormalTok{(i}\DecValTok{{-}1}\NormalTok{)}\SpecialCharTok{+}\NormalTok{j]], V[[}\DecValTok{5}\SpecialCharTok{*}\NormalTok{i}\SpecialCharTok{+}\NormalTok{j]], }\FunctionTok{paste}\NormalTok{(}\StringTok{"V"}\NormalTok{,i,j,}\AttributeTok{sep=}\StringTok{""}\NormalTok{)))}
 \NormalTok{  \}}
 \NormalTok{\} }
-\CommentTok{# create graph}
-\NormalTok{G <-}\StringTok{ }\NormalTok{Digraph}\OperatorTok{$}\KeywordTok{new}\NormalTok{(V,E)}
+\CommentTok{\# create graph}
+\NormalTok{G }\OtherTok{\textless{}{-}}\NormalTok{ Digraph}\SpecialCharTok{$}\FunctionTok{new}\NormalTok{(V,E)}
 \end{Highlighting}
 \end{Shaded}
 
@@ -205,20 +230,20 @@ with the labels of the edges which contain a restaurant.
 
 \begin{Shaded}
 \begin{Highlighting}[]
-\CommentTok{# get all paths from A to B}
-\NormalTok{A <-}\StringTok{ }\NormalTok{V[[}\DecValTok{1}\NormalTok{]]}
-\NormalTok{B <-}\StringTok{ }\NormalTok{V[[}\DecValTok{25}\NormalTok{]]}
-\NormalTok{P <-}\StringTok{ }\NormalTok{G}\OperatorTok{$}\KeywordTok{paths}\NormalTok{(A,B)}
-\CommentTok{# convert paths to walks}
-\NormalTok{W <-}\StringTok{ }\KeywordTok{lapply}\NormalTok{(P,}\ControlFlowTok{function}\NormalTok{(p)\{G}\OperatorTok{$}\KeywordTok{walk}\NormalTok{(p)\})}
-\CommentTok{# count and tabulate how many special edges each walk traverses}
-\NormalTok{BB <-}\StringTok{ }\KeywordTok{c}\NormalTok{(}\StringTok{"V11"}\NormalTok{, }\StringTok{"H22"}\NormalTok{, }\StringTok{"V25"}\NormalTok{, }\StringTok{"H33"}\NormalTok{, }\StringTok{"V32"}\NormalTok{, }\StringTok{"H44"}\NormalTok{, }\StringTok{"V43"}\NormalTok{)}
-\NormalTok{nw <-}\StringTok{ }\KeywordTok{sapply}\NormalTok{(W, }\ControlFlowTok{function}\NormalTok{(w) \{}
-\NormalTok{  lv <-}\StringTok{ }\KeywordTok{sapply}\NormalTok{(w, }\ControlFlowTok{function}\NormalTok{(e) \{e}\OperatorTok{$}\KeywordTok{label}\NormalTok{() }\OperatorTok{%in%}\StringTok{ }\NormalTok{BB\}) }
-  \KeywordTok{return}\NormalTok{(}\KeywordTok{sum}\NormalTok{(lv))}
+\CommentTok{\# get all paths from A to B}
+\NormalTok{A }\OtherTok{\textless{}{-}}\NormalTok{ V[[}\DecValTok{1}\NormalTok{]]}
+\NormalTok{B }\OtherTok{\textless{}{-}}\NormalTok{ V[[}\DecValTok{25}\NormalTok{]]}
+\NormalTok{P }\OtherTok{\textless{}{-}}\NormalTok{ G}\SpecialCharTok{$}\FunctionTok{paths}\NormalTok{(A,B)}
+\CommentTok{\# convert paths to walks}
+\NormalTok{W }\OtherTok{\textless{}{-}} \FunctionTok{lapply}\NormalTok{(P,}\ControlFlowTok{function}\NormalTok{(p)\{G}\SpecialCharTok{$}\FunctionTok{walk}\NormalTok{(p)\})}
+\CommentTok{\# count and tabulate how many special edges each walk traverses}
+\NormalTok{BB }\OtherTok{\textless{}{-}} \FunctionTok{c}\NormalTok{(}\StringTok{"V11"}\NormalTok{, }\StringTok{"H22"}\NormalTok{, }\StringTok{"V25"}\NormalTok{, }\StringTok{"H33"}\NormalTok{, }\StringTok{"V32"}\NormalTok{, }\StringTok{"H44"}\NormalTok{, }\StringTok{"V43"}\NormalTok{)}
+\NormalTok{nw }\OtherTok{\textless{}{-}} \FunctionTok{sapply}\NormalTok{(W, }\ControlFlowTok{function}\NormalTok{(w) \{}
+\NormalTok{  lv }\OtherTok{\textless{}{-}} \FunctionTok{sapply}\NormalTok{(w, }\ControlFlowTok{function}\NormalTok{(e) \{e}\SpecialCharTok{$}\FunctionTok{label}\NormalTok{() }\SpecialCharTok{\%in\%}\NormalTok{ BB\}) }
+  \FunctionTok{return}\NormalTok{(}\FunctionTok{sum}\NormalTok{(lv))}
 \NormalTok{\})}
-\CommentTok{# tabulate }
-\NormalTok{ct <-}\StringTok{ }\KeywordTok{as.data.frame}\NormalTok{(}\KeywordTok{table}\NormalTok{(nw))}
+\CommentTok{\# tabulate }
+\NormalTok{ct }\OtherTok{\textless{}{-}} \FunctionTok{as.data.frame}\NormalTok{(}\FunctionTok{table}\NormalTok{(nw))}
 \end{Highlighting}
 \end{Shaded}
 
@@ -260,8 +285,12 @@ old value for (b) effectively discarded.
 \addcontentsline{toc}{section}{References}
 
 \hypertarget{refs}{}
-\leavevmode\hypertarget{ref-bodycombe:2020a}{}%
-1 Bodycombe D. Burger run (puzzle 62). \emph{New Scientist}
-2020;\textbf{246}:54.
+\begin{CSLReferences}{0}{0}
+\leavevmode\hypertarget{ref-bodycombe2020}{}%
+\CSLLeftMargin{1 }
+\CSLRightInline{Bodycombe D. Burger run. \emph{New Scientist}
+2020;\textbf{246}:54.}
+
+\end{CSLReferences}
 
 \end{document}

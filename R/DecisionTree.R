@@ -169,10 +169,29 @@ DecisionTree <- R6::R6Class(
     #' @description 
     #' Find the leaf nodes in the tree.
     #' @return A list of \code{LeafNode} objects.
-    leaf_nodes = function() {
-      il <- which(sapply(private$V, function(v){inherits(v,what="LeafNode")}),
-                  arr.ind=TRUE)
-      return(private$V[il])      
+    #' @return A list of \code{LeafNode} objects (for what="node"); a list
+    #' of character strings (for what="label"); or a list of integer indexes of 
+    #' the decision nodes (for what="index").
+    leaf_nodes = function(what="node") {
+      il <- which(
+        vapply(X=private$V, FUN.VALUE=TRUE, FUN=function(v){
+          inherits(v,what="LeafNode")
+        }),
+        arr.ind = TRUE
+      )
+      if (what=="node") {
+        rc <- private$V[il]
+      } else if (what=="label") {
+        rc <- sapply(id, function(il) {private$V[[il]]$label()})
+      } else if (what=="index") {
+        rc <- il
+      } else {
+        rlang::abort(
+          "Argument 'what' must be one of 'node', 'label' or 'index'.",
+          class="unknown_what_value"
+        )
+      }
+      return(rc)      
     },
 
     #' @description 
@@ -523,6 +542,14 @@ DecisionTree <- R6::R6Class(
       return(TRUE)
     },
 
+#    #' In trees where there are decision nodes that are descendants
+#    #' of other decision nodes, not all decision nodes are reachable in 
+#    #' each strategy. Equivalently, different strategies involve the
+#    #' traversal of an identical set of paths and are considered non-
+#    #' unique. Only unique strategies are returned.    
+    
+    
+    
     #' @description Find all the root to leaf paths traversable under 
     #' the specified strategy. A strategy is a unanimous prescription 
     #' of an action in each decision node. 
@@ -558,50 +585,127 @@ DecisionTree <- R6::R6Class(
       return(P[bAllowed])
     },
 
-    #' @description Find all unique strategies for the decision tree. A
+    #' @description Find all potential strategies for the decision tree. A
     #' strategy is a unanimous prescription of the actions at each decision 
-    #' node. In trees where there are decision nodes that are descendants
-    #' of other decision nodes, not all decision nodes are reachable in 
-    #' each strategy. Equivalently, different strategies involve the
-    #' traversal of an identical set of paths and are considered non-
-    #' unique. Only unique strategies are returned.
+    #' node. If there are decision nodes that are descendants of other nodes
+    #' in the tree, the strategies returned will not necessarily be unique.
     #' @param what A character string defining what to return. Must be one
     #' of "label" or "index".
-    #' @return A table (data frame) where each row is a strategy traversed by
-    #' a unique set of paths, and each column is a Decision Node. Values are
-    #' either the index of each action edge, or their label.
+    #' @return A data frame where each row is a potential strategy 
+    #' and each column is a Decision Node. Values are either the index of each
+    #' action edge, or their label.
     strategies = function(what="index") {
       if ((what != "index") & (what != "label")) {
         rlang::abort("Argument 'what' must be one of 'index' or 'label'",
                      class="unknown_what_value")
       }
       # names of columns to copy to identify each strategy
-      dn <- self$decision_nodes("label")
+      #dn <- self$decision_nodes("label")
       # build a table with indexes of the action edges
-      f <- lapply(self$decision_nodes("node"), function(d) {
-        a <- sapply(self$actions(d), function(a){self$element_index(a)})
-        return(a)
-      }) 
-      names(f) <- dn
+      f <- list()
+      lapply(self$decision_nodes("node"), function(d) {
+        a <- vapply(X=self$actions(d), FUN.VALUE=1, FUN=function(a){
+          self$edge_index(a)
+        })
+        f[[d$label()]] <<- a
+      })
+#      f <- lapply(self$decision_nodes("node"), function(d) {
+#        a <- sapply(self$actions(d), function(a){self$element_index(a)})
+#        return(a)
+#      }) 
+#      names(f) <- dn
       TT <- expand.grid(f, KEEP.OUT.ATTRS=FALSE, stringsAsFactors=FALSE)
       # find the paths which are traversed by each strategy
-      TT$paths <- apply(TT, MARGIN=1, function(row) {
-        strategy <- private$E[row]
-        P <- self$paths_in_strategy(strategy)      
-        leaf <- sapply(P, function(p){self$element_index(p[[length(p)]])})
-        return(paste(leaf,collapse="."))
-      })
-      # remove non-unique paths
-      TT <- TT[!duplicated(TT$paths),]
-      TT$paths <- NULL
-      # convert indexes to labels if required
-      if (what == "label") {
-        TT <- apply(TT, MARGIN=c(1,2), function(ie) {
-          private$E[[ie]]$label()
-        })
-      }
+#      TT$paths <- apply(TT, MARGIN=1, function(row) {
+#        strategy <- private$E[row]
+#        P <- self$paths_in_strategy(strategy)      
+#        leaf <- sapply(P, function(p){self$element_index(p[[length(p)]])})
+#        return(paste(leaf,collapse="."))
+#      })
+#      # remove non-unique paths
+#      TT <- TT[!duplicated(TT$paths),]
+#      TT$paths <- NULL
+#      # convert indexes to labels if required
+#      if (what == "label") {
+#        TT <- apply(TT, MARGIN=c(1,2), function(ie) {
+#          private$E[[ie]]$label()
+#        })
+#      }
+      
+      # (test)
+      # create a table with all possible strategies and leaf node combos
+#      f <- list()
+#      lapply(self$decision_nodes("node"), function(d) {
+#        a <- vapply(X=self$actions(d), FUN.VALUE=1, FUN=function(a){
+#          self$edge_index(a)
+#        })
+#        f[[d$label()]] <<- a
+#      })
+#      f[["Leaf"]] <- self$leaf_nodes("index")
+#      SL <- expand.grid(f, KEEP.OUT.ATTRS=FALSE, stringsAsFactors=FALSE)
+#      print(SL)
+#      # find table of unique strategies
+#      keep <- self$decision_nodes("label")
+#      lv <- duplicated(SL[,keep])
+#      US <- SL[!lv,]
+#      US$Leaf <- NULL
+#      print(US)
+#      # iterate unique strategies and mark disallowed combos in SL
+#      vapply(X=US, FUN.VAL=TRUE, FUN=function(row){
+#        s <- private$E[row]
+#        P <- self$paths_in_strategy()
+#        
+#      })
       # return the table
       return(TT)
+    },
+
+    #' @description Find all paths walked in each possible strategy. A strategy 
+    #' is a unanimous prescription of an action in each decision node. Some 
+    #' paths can be walked in more than one strategy, if there exist paths
+    #' that do not pass a decision node.
+    #' @return A data frame, where each row is a path walked in a strategy. The
+    #' structure is similar to that returned by \code{strategies} but includes
+    #' an extra column, 'Leaf' which gives the leaf node index of each path,
+    #' and there is one row for each path in each strategy.
+    strategy_paths = function() {
+      # find possible strategies (and add a dummy column to stop R stripping
+      # the node name, if there is only 1 decision node)
+      S <- self$strategies()
+      S$TMP <- NA
+      # find the set of action edges in the tree
+      eA <- which(
+        vapply(X=private$E, FUN.VALUE=TRUE, FUN=function(e){
+          return(inherits(e,what="Action"))
+        }),
+        arr.ind=TRUE
+      )
+      # iterate all paths and create data frame with action nodes visited and
+      # terminating leaf node
+      dn <- self$decision_nodes("label")
+      P <- do.call("rbind", lapply(self$root_to_leaf_paths(), function(p){
+        # find the set of action edges in this walk
+        eW <- vapply(X = self$walk(p), FUN.VALUE=1, FUN=function(e){
+          return(self$edge_index(e))
+        })
+        eW <- intersect(eA,eW)
+        # iterate the strategies and find those consistent with the path
+        lv <- apply(S, MARGIN=1, FUN=function(row){
+          # the set of action edges which define the strategy
+          eS <- row
+          eS <- setdiff(eW,eS)
+          return(length(eS)==0)
+        })        
+        # Append to the strategy data frame
+        SL <- cbind(
+          S[lv,], 
+          Leaf=self$vertex_index(p[[length(p)]])
+        )
+        return(SL)
+      }))
+      # remove the temporary column and return
+      P$TMP <- NULL
+      return(P)
     },
 
     #' @description 
@@ -614,7 +718,8 @@ DecisionTree <- R6::R6Class(
     #' @return A matrix (payoff table) with one row per path and columns
     #' organized as follows:
     #' \describe{
-    #' \item{PID}{The index number of the path, in same order as argument.}
+    #' \item{Leaf}{The unique identifier of the path, taken to be the index 
+    #' of the terminal (leaf) node.}
     #' \item{Probability}{The probability of traversing the pathway. }
     #' \item{Path.Cost}{The cost of traversing the pathway.}
     #' \item{Path.Benefit}{The benefit derived from traversing the pathway.}
@@ -646,15 +751,18 @@ DecisionTree <- R6::R6Class(
         ncol = 8,
         dimnames = list(
           NULL, 
-          c("PID", "Probability", "Path.Cost", "Path.Benefit", "Path.Utility",
+          c("Leaf", "Probability", "Path.Cost", "Path.Benefit", "Path.Utility",
             "Cost", "Benefit", "Utility")
         )
       )
       # evaluate each path
       for (i in 1:length(P)) {
-        PAYOFF[i,"PID"] <- i
         # get path
         path <- P[[i]]
+        # get terminal node
+        leaf <- path[[length(path)]]
+        # set the ID as the index of the leaf node
+        PAYOFF[i,"Leaf"] <- self$vertex_index(leaf)
         # walk the path and accumulate p, cost and benefit
         pr <- 1
         cost <- 0
@@ -675,7 +783,7 @@ DecisionTree <- R6::R6Class(
         PAYOFF[i,"Path.Cost"] <- cost
         PAYOFF[i,"Path.Benefit"] <- benefit
         # utility of the leaf node at end of the path
-        PAYOFF[i, "Path.Utility"] <- path[[length(path)]]$utility()
+        PAYOFF[i, "Path.Utility"] <- leaf$utility()
       }
       # add expected cost and utility     
       PAYOFF[,"Cost"] <- PAYOFF[,"Probability"]*PAYOFF[,"Path.Cost"]
@@ -685,95 +793,95 @@ DecisionTree <- R6::R6Class(
       return(PAYOFF)
     },
 
-    #' @description 
-    #' Evaluate the components of payoff associated with the paths in the
-    #' decision tree. For each path, the strategy, probability, cost,
-    #' benefit and utility are calculated.
-    #' @param strategy A list of Actions, with one action per decision node.
-    #' @return A data frame (payoff table) with one row per path and columns
-    #' organized as follows:
-    #' \describe{
-    #' \item{<label of decision node>}{One column for each decision node
-    #' in the mode. Each column is named with the label of the node. For each
-    #' row (path) the value is the label of the Action edge taken from the
-    #' decision node.}
-    #' \item{Leaf}{The label of the leaf node on which the pathway ends; 
-    #' normally the clinical outcome.}
-    #' \item{Probability}{The probability of traversing the pathway. The total
-    #' probability of each strategy should sum to unity.}
-    #' \item{Path.Cost}{The cost of traversing the pathway.}
-    #' \item{Path.Benefit}{The benefit derived from traversing the pathway.}
-    #' \item{Path.Utility}{The utility associated with the outcome (leaf node).}
-    #' \item{Cost}{Path.Cost \eqn{*} probability of traversing the pathway.}
-    #' \item{Benefit}{Path.Benefit \eqn{*} probability of traversing the 
-    #' pathway.}
-    #' \item{Utility}{Path.Utility \eqn{*} probability of traversing the
-    #' pathway.}
-    #' }
-    evaluate_strategy = function(strategy) {
-      # check argument
-      if (!self$is_strategy(strategy)) {
-        rlang::abort(
-          "Argument 'strategy' is not a valid strategy for the decision tree",
-          class = "invalid_strategy"
-        )
-      }
-      # find all root to leaf paths for the specified strategy
-      P <- self$paths_in_strategy(strategy)
-      # create a matrix of strategies
-      dn <- sapply(strategy, function(e){e$source()$label()})
-      DM <- matrix(
-        rep(sapply(strategy,function(e){e$label()}),times=length(P)),
-        nrow=length(P),
-        ncol=length(dn),
-        byrow=TRUE,
-        dimnames=list(list(),dn)
-      )
-      # create a data frame
-      PAYOFF <- data.frame(PID=seq_along(P), stringsAsFactors=FALSE)
-      PAYOFF <- cbind(PAYOFF, DM, deparse.level=1, stringsAsFactors=FALSE)
-      PAYOFF$Probability <- rep(as.numeric(NA), length(P))
-      PAYOFF$Path.Cost <- rep(as.numeric(NA), length(P))
-      PAYOFF$Path.Benefit <- rep(as.numeric(NA), length(P))
-      PAYOFF$Path.Utility <- rep(as.numeric(NA), length(P))
-      # evaluate each path
-      for (i in seq_along(P)) {
-        # get path
-        path <- P[[i]]
-        # leaf node
-        leaf.label <- path[[length(path)]]$label()
-        PAYOFF[PAYOFF$PID==i,"Leaf"] <- leaf.label
-        # walk the path and accumulate p, cost and benefit
-        pr <- 1
-        cost <- 0
-        benefit <- 0
-        vapply(X=self$walk(path), FUN.VALUE=TRUE, FUN=function(e){
-          # probability 
-          if (inherits(e, what="Reaction")) {
-             pr <<- pr * e$p()
-          }
-          # cost
-          cost <<- cost + e$cost()
-          # benefit
-          benefit <<- benefit + e$benefit()
-          # return
-          return(TRUE)
-        })
-        PAYOFF[PAYOFF$PID==i,"Probability"] <- pr
-        PAYOFF[PAYOFF$PID==i,"Path.Cost"] <- cost
-        PAYOFF[PAYOFF$PID==i,"Path.Benefit"] <- benefit
-        # utility of the leaf node at end of the path
-        PAYOFF[PAYOFF$PID==i, "Path.Utility"] <- path[[length(path)]]$utility()
-      }
-      # add expected cost and utility     
-      PAYOFF$Cost <- PAYOFF$Probability*PAYOFF$Path.Cost
-      PAYOFF$Benefit <- PAYOFF$Probability*PAYOFF$Path.Benefit
-      PAYOFF$Utility <- PAYOFF$Probability*PAYOFF$Path.Utility
-      # remove path ID
-      PAYOFF$PID <- NULL
-      # return the payoff table      
-      return(PAYOFF)
-    },
+    #' #' @description 
+    #' #' Evaluate the components of payoff associated with the paths in the
+    #' #' decision tree. For each path, the strategy, probability, cost,
+    #' #' benefit and utility are calculated.
+    #' #' @param strategy A list of Actions, with one action per decision node.
+    #' #' @return A data frame (payoff table) with one row per path and columns
+    #' #' organized as follows:
+    #' #' \describe{
+    #' #' \item{<label of decision node>}{One column for each decision node
+    #' #' in the mode. Each column is named with the label of the node. For each
+    #' #' row (path) the value is the label of the Action edge taken from the
+    #' #' decision node.}
+    #' #' \item{Leaf}{The label of the leaf node on which the pathway ends; 
+    #' #' normally the clinical outcome.}
+    #' #' \item{Probability}{The probability of traversing the pathway. The total
+    #' #' probability of each strategy should sum to unity.}
+    #' #' \item{Path.Cost}{The cost of traversing the pathway.}
+    #' #' \item{Path.Benefit}{The benefit derived from traversing the pathway.}
+    #' #' \item{Path.Utility}{The utility associated with the outcome (leaf node).}
+    #' #' \item{Cost}{Path.Cost \eqn{*} probability of traversing the pathway.}
+    #' #' \item{Benefit}{Path.Benefit \eqn{*} probability of traversing the 
+    #' #' pathway.}
+    #' #' \item{Utility}{Path.Utility \eqn{*} probability of traversing the
+    #' #' pathway.}
+    #' #' }
+    #' evaluate_strategy = function(strategy) {
+    #'   # check argument
+    #'   if (!self$is_strategy(strategy)) {
+    #'     rlang::abort(
+    #'       "Argument 'strategy' is not a valid strategy for the decision tree",
+    #'       class = "invalid_strategy"
+    #'     )
+    #'   }
+    #'   # find all root to leaf paths for the specified strategy
+    #'   P <- self$paths_in_strategy(strategy)
+    #'   # create a matrix of strategies
+    #'   dn <- sapply(strategy, function(e){e$source()$label()})
+    #'   DM <- matrix(
+    #'     rep(sapply(strategy,function(e){e$label()}),times=length(P)),
+    #'     nrow=length(P),
+    #'     ncol=length(dn),
+    #'     byrow=TRUE,
+    #'     dimnames=list(list(),dn)
+    #'   )
+    #'   # create a data frame
+    #'   PAYOFF <- data.frame(PID=seq_along(P), stringsAsFactors=FALSE)
+    #'   PAYOFF <- cbind(PAYOFF, DM, deparse.level=1, stringsAsFactors=FALSE)
+    #'   PAYOFF$Probability <- rep(as.numeric(NA), length(P))
+    #'   PAYOFF$Path.Cost <- rep(as.numeric(NA), length(P))
+    #'   PAYOFF$Path.Benefit <- rep(as.numeric(NA), length(P))
+    #'   PAYOFF$Path.Utility <- rep(as.numeric(NA), length(P))
+    #'   # evaluate each path
+    #'   for (i in seq_along(P)) {
+    #'     # get path
+    #'     path <- P[[i]]
+    #'     # leaf node
+    #'     leaf.label <- path[[length(path)]]$label()
+    #'     PAYOFF[PAYOFF$PID==i,"Leaf"] <- leaf.label
+    #'     # walk the path and accumulate p, cost and benefit
+    #'     pr <- 1
+    #'     cost <- 0
+    #'     benefit <- 0
+    #'     vapply(X=self$walk(path), FUN.VALUE=TRUE, FUN=function(e){
+    #'       # probability 
+    #'       if (inherits(e, what="Reaction")) {
+    #'          pr <<- pr * e$p()
+    #'       }
+    #'       # cost
+    #'       cost <<- cost + e$cost()
+    #'       # benefit
+    #'       benefit <<- benefit + e$benefit()
+    #'       # return
+    #'       return(TRUE)
+    #'     })
+    #'     PAYOFF[PAYOFF$PID==i,"Probability"] <- pr
+    #'     PAYOFF[PAYOFF$PID==i,"Path.Cost"] <- cost
+    #'     PAYOFF[PAYOFF$PID==i,"Path.Benefit"] <- benefit
+    #'     # utility of the leaf node at end of the path
+    #'     PAYOFF[PAYOFF$PID==i, "Path.Utility"] <- path[[length(path)]]$utility()
+    #'   }
+    #'   # add expected cost and utility     
+    #'   PAYOFF$Cost <- PAYOFF$Probability*PAYOFF$Path.Cost
+    #'   PAYOFF$Benefit <- PAYOFF$Probability*PAYOFF$Path.Benefit
+    #'   PAYOFF$Utility <- PAYOFF$Probability*PAYOFF$Path.Utility
+    #'   # remove path ID
+    #'   PAYOFF$PID <- NULL
+    #'   # return the payoff table      
+    #'   return(PAYOFF)
+    #' },
  
     #' @description 
     #' Create a "tornado" diagram to compare two strategies for traversing
@@ -807,6 +915,57 @@ DecisionTree <- R6::R6Class(
       
     },
 
+    #' #' @description 
+    #' #' Evaluate each strategy. Starting with the root, the function
+    #' #' works though all possible paths to leaf nodes and computes the 
+    #' #' probability, cost, benefit and utility of each, then aggregates 
+    #' #' by strategy.   
+    #' #' @param expected If TRUE, evaluate each model variable as its mean value,
+    #' #' otherwise sample each one from their uncertainty distribution.
+    #' #' @param N Number of replicates. Intended for use with PSA (expected=F);
+    #' #' use with expected=T will be repetitive and uninformative. 
+    #' #' @return A data frame with one row per strategy per run and columns
+    #' #' organized as follows:
+    #' #' \describe{
+    #' #' \item{Run}{The run number}
+    #' #' \item{Strategy}{The strategy.}
+    #' #' \item{Cost}{Aggregate cost of the strategy.}
+    #' #' \item{Benefit}{Aggregate benefit of the strategy.}
+    #' #' \item{Utility}{Aggregate utility of the strategy.}
+    #' #' }
+    #' evaluateXX = function(expected=TRUE, N=1) {
+    #'   # find unique strategies
+    #'   TT <- self$strategies()
+    #'   # names of columns to copy to identify each strategy
+    #'   dn <- self$decision_nodes("label")
+    #'   # create formula for use in aggregation of results from evaluating each
+    #'   # strategy separately
+    #'   f <- as.formula(
+    #'     paste(
+    #'       "cbind(Probability, Cost, Benefit, Utility)",
+    #'       paste(dn, collapse="+"),
+    #'       sep = "~"
+    #'     ) 
+    #'   )
+    #'   # make repeated calls 
+    #'   DF <- do.call('rbind', sapply(1:N, FUN=function(n){
+    #'     # set the ModVar values (either mean or sampled)
+    #'     for (v in self$modvars()) {
+    #'       v$set(ifelse(expected,"expected","random"))
+    #'     }
+    #'     # evaluate each strategy
+    #'     ALL <- apply(TT, MARGIN=1, function(row) {
+    #'       strategy <- private$E[row]
+    #'       RES <- self$evaluate_strategy(strategy)
+    #'       PAYOFF <- aggregate(f, data=RES, FUN=sum)
+    #'       PAYOFF <- cbind(Run=n, PAYOFF)
+    #'       return(PAYOFF)
+    #'     })
+    #'     return(ALL)
+    #'   }))
+    #'   return(DF)
+    #' },
+
     #' @description 
     #' Evaluate each strategy. Starting with the root, the function
     #' works though all possible paths to leaf nodes and computes the 
@@ -816,55 +975,45 @@ DecisionTree <- R6::R6Class(
     #' otherwise sample each one from their uncertainty distribution.
     #' @param N Number of replicates. Intended for use with PSA (expected=F);
     #' use with expected=T will be repetitive and uninformative. 
+    #' @param by One of {"path", "strategy"}. If "path", the table has one row
+    #' per path walked per strategy, per run, and includes the label of the
+    #' terminating leaf node to identify each path. if "strategy" (the default),
+    #' the table is aggregated by strategy, i.e. there is one row per strategy,
+    #' per run and there is no "Leaf" column. 
     #' @return A data frame with one row per strategy per run and columns
     #' organized as follows:
     #' \describe{
+    #' \item{Leaf}{The label of the leaf that terminates the path, 
+    #' for by='path'.}
+    #' \item{Strategy}{The strategy expressed as the values of the action edges
+    #' emanating from each decision node.}
     #' \item{Run}{The run number}
-    #' \item{Strategy}{The strategy.}
+    #' \item{Probability}{Probability (1 if by='strategy')}
     #' \item{Cost}{Aggregate cost of the strategy.}
     #' \item{Benefit}{Aggregate benefit of the strategy.}
     #' \item{Utility}{Aggregate utility of the strategy.}
     #' }
-    evaluate = function(expected=TRUE, N=1) {
-      # find unique strategies
-      TT <- self$strategies()
-      # names of columns to copy to identify each strategy
-      dn <- self$decision_nodes("label")
-      # create formula for use in aggregation of results from evaluating each
-      # strategy separately
-      f <- as.formula(
-        paste(
-          "cbind(Probability, Cost, Benefit, Utility)",
-          paste(dn, collapse="+"),
-          sep = "~"
-        ) 
-      )
-      # make repeated calls 
-      DF <- do.call('rbind', sapply(1:N, FUN=function(n){
-        # set the ModVar values (either mean or sampled)
-        for (v in self$modvars()) {
-          v$set(ifelse(expected,"expected","random"))
-        }
-        # evaluate each strategy
-        ALL <- apply(TT, MARGIN=1, function(row) {
-          strategy <- private$E[row]
-          RES <- self$evaluate_strategy(strategy)
-          PAYOFF <- aggregate(f, data=RES, FUN=sum)
-          PAYOFF <- cbind(Run=n, PAYOFF)
-          return(PAYOFF)
-        })
-        return(ALL)
-      }))
-      return(DF)
-    },
-
-    evaluate2 = function(expected=TRUE, N=1) {
+    evaluate = function(expected=TRUE, N=1, by="strategy") {
       # check arguments
-      
+      if (!is.logical(expected)) {
+        rlang::abort("'expected' must be boolean", class="expected_not_boolean")
+      }
+      if (!is.numeric(N)) {
+        rlang::abort("'N' must be numeric", class="N_not_numeric")
+      }
+      if (!is.character(by)) {
+        rlang::abort("'by' must be character", class="by_not_character")
+      }
+      if (!(by %in% c("path", "strategy"))) {
+        rlang::abort(
+          "'by' must be one of {path|strategy}.",
+          class = "by_invalid"
+        )
+      }
       # find the root-to-leaf paths
       P <- self$root_to_leaf_paths()
       # evaluate the tree repeatedly
-      DF <- do.call("rbind", lapply(1:N, FUN=function(n){
+      RES <- do.call("rbind", lapply(1:N, FUN=function(n){
         # set the ModVar values (either mean or sampled)
         for (v in self$modvars()) {
           v$set(ifelse(expected,"expected","random"))
@@ -872,11 +1021,49 @@ DecisionTree <- R6::R6Class(
         # evaluate the tree
         M <- self$evaluate_paths(P)
         M <- cbind(M,"Run"=rep(n,length(P)))
-        # return M to be appended
+        # return matrix to be appended
         return(M)
       }))
-      # return the raw data frame     
-      return(DF)
+      # remove intermediate columns
+      # find all paths walked for each strategy
+      SW <- self$strategy_paths()
+      # merge with results to get one row per path walked per strategy
+      RES <- merge(SW, RES, all.x=TRUE, by="Leaf")
+      # Replace the edge indexes of the strategy with their edge labels
+      dn <- self$decision_nodes("label")
+      for (d in dn) {
+        RES[,d] <- vapply(X=RES[,d], FUN.VALUE="x", FUN=function(ie){
+          e <- private$E[[ie]]$label()
+          return(e)
+        })
+      }
+      # exclude unnecessary columns
+      RES$Path.Cost <- NULL
+      RES$Path.Utility <- NULL
+      RES$Path.Benefit <- NULL
+      # modify output as required
+      if (by == "path") {
+        # replace Leaf node indexes by their label
+        RES$Leaf <- vapply(X=RES$Leaf, FUN.VALUE="x", FUN=function(iv){
+          l <- private$V[[iv]]$label()
+          return(l)
+        })
+        PAYOFF <- RES
+      } else if (by == "strategy") {
+        # create formula for use in aggregation of results from evaluating each
+        # strategy separately
+        dn <- self$decision_nodes("label")
+        f <- as.formula(
+          paste(
+            "cbind(Probability, Cost, Benefit, Utility)",
+            paste(paste(dn, collapse="+"), "Run", sep = "+"),
+            sep = "~"
+          ) 
+        )
+        PAYOFF <- aggregate(f, data=RES, FUN=sum)
+      }
+      # return the data frame     
+      return(PAYOFF)
     }
 
   )

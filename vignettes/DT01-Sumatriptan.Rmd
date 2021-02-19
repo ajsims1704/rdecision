@@ -24,9 +24,9 @@ library(rdecision)
 
 # Introduction
 This vignette is an example of modelling a decision tree using the `rdecision`
-package. It is based on the example given by Briggs [-@briggs:2002a, Box 2.3] 
+package. It is based on the example given by Briggs [-@briggs2006, Box 2.3] 
 which itself is based on a decision tree which compared oral Sumatriptan versus
-oral caffeine/Ergotamine for migraine [@evans:1997a].
+oral caffeine/Ergotamine for migraine [@evans1997].
 
 # Creating the model
 The following code constructs the decision tree. In the
@@ -124,31 +124,33 @@ example there is a single decision node with two actions, and the strategies
 are simply the two forms of treatment to be compared. More complex decision
 trees are also possible.
 
-The paths traversable for a particular strategy can be evaluated individually
-using the method `evaluate_strategy`. In `rdecision` a strategy is defined as
+The paths traversable in each strategy can be evaluated individually
+using the method `evaluate(by="path")`. In `rdecision` a strategy is defined as
 a set of action edges with one action edge per decision node. It is necessary to 
-call the method `evaluate_strategy` only if information about each pathway is
+use the option `by="path"` only if information about each pathway is
 required; normally it is sufficient to call `evaluate` which will automatically
-identify all possible strategies in a decision tree and evaluate them.
+aggregate the evaluation by strategy.
 
 # Model results
 The evaluation of each pathway, for each strategy, yields the following table:
 ```{r echo=FALSE}
 local({
-  R.S <- DT$evaluate_strategy(list(e17))
-  R.C <- DT$evaluate_strategy(list(e18))
-  RES <- rbind(R.S, R.C)
-  RES$Path.Benefit <- NULL
+#  R.S <- DT$evaluate_strategy(list(e17))
+#  R.C <- DT$evaluate_strategy(list(e18))
+#  RES <- rbind(R.S, R.C)
+  RES <- DT$evaluate(by="path")
+#  RES$Path.Benefit <- NULL
   RES$Benefit <- NULL
-  knitr::kable(RES, row.names=FALSE, digits=c(NA,4,2,1,NA,2,4))
+  RES$Run <- NULL
+  knitr::kable(RES, row.names=FALSE, digits=c(NA,NA,2,2,2))
 })
 ```
 
 There are, as expected, ten pathways (5 per strategy). The expected
 cost and expected utility for each choice can be calculated from the table 
-above, or by invoking the `evaluate` method of a decision tree object. This 
-gives the following result, consistent with that reported by
-Evans *et al* [-@evans:1997a].
+above, or by invoking the `evaluate` method of a decision tree object with the
+default parameter `by="strategy"`. This gives the following result, consistent
+with that reported by Evans *et al* [-@evans1997].
 
 ```{r echo=F}
 local({
