@@ -26,13 +26,10 @@ test_that("simple decision trees are modelled correctly", {
   # strategy paths
   P <- DT$root_to_leaf_paths()
   expect_equal(length(P),3)
-  expect_error(DT$paths_in_strategy(list(e2)), class="incorrect_strategy_type")
-  expect_error(DT$paths_in_strategy(list(e1,e4)), 
-               class = "invalid_strategy")
-  PS <- DT$paths_in_strategy(list(e1))
-  expect_equal(length(PS),2)
-  PS <- DT$paths_in_strategy(list(e4))
-  expect_equal(length(PS),1)
+  expect_error(DT$is_strategy(list(e2)),class="incorrect_strategy_type")
+  expect_false(DT$is_strategy(list(e1,e4)))
+  PS <- DT$strategy_paths()
+  expect_equal(nrow(PS),3)
   # strategies
   S <- DT$strategies()
   expect_equal(nrow(S),2)
@@ -137,7 +134,7 @@ test_that("rdecision replicates Evans et al, Sumatriptan base case", {
 # -----------------------------------------------------------------------------
 # Kaminski et al CEJOR 2018;26:135-139, fig 7 (gas problem)
 # -----------------------------------------------------------------------------
-test_that("rdecision replacates Kaminski et al, fig 7", {
+test_that("rdecision replicates Kaminski et al, fig 7", {
   # nodes
   d1 <- DecisionNode$new("d1")
   d2 <- DecisionNode$new("d2")
@@ -189,8 +186,7 @@ test_that("rdecision replacates Kaminski et al, fig 7", {
   S <- DT$strategies("label")
   expect_equal(nrow(S),12)
   # test incorrect strategy prescription
-  expect_error(DT$paths_in_strategy(list(E[[1]],E[[5]],E[[7]])),
-               class="invalid_strategy")
+  expect_false(DT$is_strategy(list(E[[1]],E[[5]],E[[7]])))
   # evaluate all root-to-leaf paths
   P <- DT$root_to_leaf_paths()
   expect_equal(length(P),9)
@@ -242,8 +238,9 @@ test_that("paths common to >1 strategy are analyzed", {
   # each strategy walks 2 paths
   expect_silent(SP <- DT$strategy_paths())
   expect_equal(nrow(SP),8)
-  # evaluate it
+  # evaluate it (4 strategies x 2 runs)
   RES <- DT$evaluate(N=2)
+  expect_equal(nrow(RES),8)
 })
 
 # ------------------------------------------------------------
@@ -455,7 +452,7 @@ test_that("redecision replicates Jenks et al, 2016", {
   
   # PSA
   Rprof("junk.txt", line.profiling=TRUE)
-  PSA <- DT$evaluate(expected=FALSE,N=10)
+  PSA <- DT$evaluate(expected=FALSE,N=1000)
   Rprof(NULL)
   RES <<- reshape(PSA, idvar='Run', timevar='d1', direction='wide')
   RES$Difference <<- RES$Cost.Standard - RES$Cost.Tegaderm
@@ -463,7 +460,4 @@ test_that("redecision replicates Jenks et al, 2016", {
   expect_equal(mean(RES$Cost.Standard), 176.89, tolerance=5.00)
   expect_equal(mean(RES$Cost.Tegaderm), 99.63, tolerance=5.00)
 
-  #RES <- DT$evaluate2(expected=FALSE, N=2)
-  #print(" ")
-  #print(RES)
 })
