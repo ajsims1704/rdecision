@@ -94,6 +94,17 @@ test_that("set and get function as expected", {
   expect_equal(sd(S), 2, tolerance=0.2)
 })
 
+test_that("modified expressions are created correctly", {
+  p <- BetaModVar$new("P(success)", "P", alpha=1, beta=9)
+  q <- ExprModVar$new("P(failure)", "P", rlang::quo(1-p))
+  q.mean <- q$add_method("mean()")
+  expect_equal(
+    eval(rlang::quo_get_expr(q.mean), envir=rlang::quo_get_env(q.mean)),
+    0.9
+  )
+  expect_equal(q$mean(),0.9)
+})
+
 test_that("illegal sample sizes for estimating parameters are rejected", {
   x <- 3
   y <- NormModVar$new("y", "GBP", mu=0, sigma=1)

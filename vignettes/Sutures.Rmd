@@ -134,6 +134,11 @@ RES <- DT1$evaluate()
 pander::pander(RES)
 ```
 
+### Tornado diagram
+```{r tornado}
+TO <- DT1$tornado()
+pander::pander(TO)
+```
 
 
 # References

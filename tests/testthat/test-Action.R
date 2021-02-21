@@ -8,6 +8,13 @@ test_that("unlabelled actions are rejected", {
   expect_silent(Action$new(n1,n2,"mychoice"))
 })
 
+test_that("conditional probability is 1", {
+  n1 <- DecisionNode$new("d")
+  n2 <- LeafNode$new("n2")
+  e1 <- Action$new(n1,n2,"mychoice")
+  expect_equal(e1$p(),1)
+})
+
 test_that("modvars are identified", {
   n1 <- DecisionNode$new("d")
   n2 <- LeafNode$new("n2")

@@ -134,7 +134,7 @@ Arborescence <- R6::R6Class(
     #' positive y value and root at zero, as per his example (figure 12).
     #' @return A data frame with one row per node and three columns (n, x
     #' and y) where \code{n} gives the node index given by the 
-    #' Graph::element_index() function.
+    #' Graph::vertex_index() function.
     # There were 3 bugs in the pseudo-code in the report, possibly corrected
     # in the later paper, indicated by ##DEBUG## in the code below. 
     postree = function(SiblingSeparation=4, SubtreeSeparation=4, 
@@ -233,7 +233,7 @@ Arborescence <- R6::R6Class(
       HASLEFTSIBLING <- function(iNode) {
         v <- private$V[[iNode]]
         S <- self$siblings(v)
-        iS <- sapply(S, FUN=function(s){return(self$element_index(s))})
+        iS <- sapply(S, FUN=function(s){return(self$vertex_index(s))})
         rb <- any(iS<iNode)
         return(rb)
       }
@@ -242,7 +242,7 @@ Arborescence <- R6::R6Class(
         rn <- 0
         v <- private$V[[iNode]]
         S <- self$siblings(v)
-        iS <- sapply(S, FUN=function(s){return(self$element_index(s))})
+        iS <- sapply(S, FUN=function(s){return(self$vertex_index(s))})
         lS <- iS[which(iS<iNode)]
         if (any(iS<iNode)) {
           rn <- max(lS)
@@ -253,7 +253,7 @@ Arborescence <- R6::R6Class(
       HASRIGHTSIBLING <- function(iNode) {
         v <- private$V[[iNode]]
         S <- self$siblings(v)
-        iS <- sapply(S, FUN=function(s){return(self$element_index(s))})
+        iS <- sapply(S, FUN=function(s){return(self$vertex_index(s))})
         rb <- any(iS>iNode)
         return(rb)
       }
@@ -262,7 +262,7 @@ Arborescence <- R6::R6Class(
         rn <- 0
         v <- private$V[[iNode]]
         S <- self$siblings(v)
-        iS <- sapply(S, FUN=function(s){return(self$element_index(s))})
+        iS <- sapply(S, FUN=function(s){return(self$vertex_index(s))})
         rS <- iS[which(iS>iNode)]
         if (any(iS>iNode)) {
           rn <- min(rS)
@@ -275,7 +275,7 @@ Arborescence <- R6::R6Class(
         v <- private$V[[iNode]]
         P <- self$direct_predecessors(v)
         if (length(P)==1) {
-          rn <- self$element_index(P[[1]])
+          rn <- self$vertex_index(P[[1]])
         }
         return(rn)
       }
@@ -290,7 +290,7 @@ Arborescence <- R6::R6Class(
         rn <- 0
         v <- private$V[[iNode]]
         C <- self$direct_successors(v)
-        iC <- sapply(C, FUN=function(c){return(self$element_index(c))})
+        iC <- sapply(C, FUN=function(c){return(self$vertex_index(c))})
         if (length(iC) > 0) {
           rn <- min(iC)
         }
@@ -498,7 +498,7 @@ Arborescence <- R6::R6Class(
         }
       }
       # call Walker's main function
-      iRoot <- self$element_index(self$root())
+      iRoot <- self$vertex_index(self$root())
       rc <- POSITIONTREE(iRoot)
       # create and populate the coordinate data frame
       XY <- data.frame(

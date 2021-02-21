@@ -137,41 +137,6 @@ Graph <- R6::R6Class(
     },
 
     #' @description 
-    #' Find the index of element x in the vertices or edges of the graph. The
-    #' vertices and edges are normally stored internally in the same order they 
-    #' were defined in the call to $new(), but this cannot be guaranteed. The 
-    #' index returned by this function will be same as the index of a vertex or
-    #' edge returned by other methods, e.g. adjacency_matrix.
-    #' @param x The subject element (a Node or Edge).
-    #' @return The index of the element (integer), or NA if not in graph.
-    element_index = function(x) {
-      index <- NA
-      # check (has_element will check type)
-      if (inherits(x, what="Node")) {
-        index <- self$vertex_index(x)      
-      } else if (inherits(x, what="Edge")) {
-        index <- self$edge_index(x)
-      } else {
-        rlang::abort(
-          "Argument 'x' must be a Node or an Edge", 
-          class = "incorrect_element_type"
-        )
-      }
-      return(index)
-    },
-
-    #' @description 
-    #' Test whether an edge is an element of the graph.
-    #' @param x Subject vertex or edge
-    #' @return TRUE if x is an element of V(G), the vertex set,
-    #' or x is an element of E(G), the edge set.
-    has_element = function(x) {
-      # element_index checks argument
-      index <- self$element_index(x)
-      return(!is.na(index))
-    },
-
-    #' @description 
     #' Return the order of the graph (number of vertices).
     #' @return Order of the graph (integer).
     order = function() {
@@ -362,7 +327,7 @@ Graph <- R6::R6Class(
       d <- NA
       if (self$has_vertex(v)) {
         A <- self$graph_adjacency_matrix()
-        iv <- self$element_index(v)
+        iv <- self$vertex_index(v)
         d <- sum(A[iv,])
       } else {
         rlang::abort("Argument 'v' is not in graph", class="not_in_graph")
@@ -380,7 +345,7 @@ Graph <- R6::R6Class(
       if (self$has_vertex(v)) {
         A <- self$graph_adjacency_matrix()
         diag(A) <- 0
-        iv <- self$element_index(v)
+        iv <- self$vertex_index(v)
         ni <- which(A[iv,]>0, arr.ind=TRUE)
         n <- private$V[ni]
       } else {

@@ -200,7 +200,7 @@ DecisionTree <- R6::R6Class(
     #' @return A list of Action edges.
     actions = function(d) {
       # check argument
-      if (!self$has_element(d)) {
+      if (!self$has_vertex(d)) {
         rlang::abort(
           "Node 'd' is not in the Decision Tree", 
           class="not_in_tree"
@@ -212,7 +212,7 @@ DecisionTree <- R6::R6Class(
           class="not_decision_node"
         )
       }
-      id <- self$element_index(d)
+      id <- self$vertex_index(d)
       # find the edges with d as their source 
       B <- self$digraph_incidence_matrix()
       ie <- which(B[id,]==-1,arr.ind=TRUE)
@@ -409,8 +409,8 @@ DecisionTree <- R6::R6Class(
       # draw the edges as articulated lines between node centres
       sapply(private$E, FUN=function(e) {
         # find source and target nodes
-        n.source <- self$element_index(e$source())
-        n.target <- self$element_index(e$target())
+        n.source <- self$vertex_index(e$source())
+        n.target <- self$vertex_index(e$target())
         x.source <- XY$x[XY$n==n.source]
         y.source <- XY$y[XY$n==n.source]
         x.target <- XY$x[XY$n==n.target]
@@ -441,7 +441,7 @@ DecisionTree <- R6::R6Class(
       # draw the nodes
       sapply(private$V, function(v) {
         # find the node from its index
-        i <- which(XY$n==self$element_index(v))
+        i <- which(XY$n==self$vertex_index(v))
         # switch type
         if (inherits(v, what="DecisionNode")) {
           a <- sqrt(pi/4)*node.size
@@ -644,19 +644,10 @@ DecisionTree <- R6::R6Class(
     #' PSA. The argument P is expected to be obtained from 
     #' \code{root_to_leaf_paths}.
     evaluate_walks = function(W) {
-      # check each path ends with a leaf (walk checks all elements are nodes)
-      # lapply(P, FUN=function(p) {
-      #   if (!inherits(p[[length(p)]], what="LeafNode")) {
-      #     rlang::abort(
-      #       "Each path must end with a leaf node",
-      #       class = "invalid_path"
-      #     )
-      #   }
-      # })
       # create a return matrix
       PAYOFF <- matrix(
         data = NA,
-        nrow = length(P),
+        nrow = length(W),
         ncol = 8,
         dimnames = list(
           NULL, 
@@ -668,20 +659,22 @@ DecisionTree <- R6::R6Class(
       for (i in 1:length(W)) {
         # get walk
         walk <- W[[i]]
-        # get terminal node
-        step <- walk[[length(walk)]] 
-        leaf <- step$target()
+        # terminal node
+        last_step <- walk[[length(walk)]] 
+        leaf <- last_step$target()
+        # check
+        if (!inherits(leaf, what="LeafNode")) {
+          rlang::abort("Walk must end on a LeafNode", class = "not_to_leaf")
+        }
         # set the ID as the index of the leaf node
         PAYOFF[i,"Leaf"] <- self$vertex_index(leaf)
         # walk the path and accumulate p, cost and benefit
         pr <- 1
         cost <- 0
         benefit <- 0
-        vapply(X=self$walk(path), FUN.VALUE=TRUE, FUN=function(e){
+        vapply(X=walk, FUN.VALUE=TRUE, FUN=function(e){
           # probability 
-          if (inherits(e, what="Reaction")) {
-            pr <<- pr * e$p()
-          }
+          pr <<- pr * e$p()
           # cost
           cost <<- cost + e$cost()
           # benefit
@@ -749,17 +742,21 @@ DecisionTree <- R6::R6Class(
       }
       # find the root-to-leaf paths
       P <- self$root_to_leaf_paths()
+      # find the walk for each root-to-leaf path
+      W <- lapply(P, FUN=function(p){self$walk(p)})
       # create template matrix for vapply
-      TM <- cbind(self$evaluate_paths(P),Run=rep(NA,length(P)))
+      TM <- cbind(self$evaluate_walks(W),Run=rep(NA,length(W)))
+      # create list of modvars
+      MV <- self$modvars()
       # N tree evaluations, stacked as a 3d array
       RES <- vapply(X=1:N, FUN.VALUE=TM, FUN=function(n){
         # set the ModVar values (either mean or sampled)
-        for (v in self$modvars()) {
+        for (v in MV) {
           v$set(ifelse(expected,"expected","random"))
         }
         # evaluate the tree
-        M <- self$evaluate_paths(P)
-        M <- cbind(M,"Run"=rep(n,length(P)))
+        M <- self$evaluate_walks(W)
+        M <- cbind(M,"Run"=rep(n,length(W)))
         # return matrix to be appended
         return(M)
       })
@@ -819,6 +816,9 @@ DecisionTree <- R6::R6Class(
     #' saving at the point estimate. For "ICER" the x axis is
     #' $\Delta C/\Delta E$ and is expected to be positive at the point estimate
     #' (i.e. in the NE or SW quadrants of the cost-effectiveness plane).
+    #' @param exclude A list of descriptions of model variables to be excluded
+    #' from the tornado. 
+    #' 
     #' @param draw TRUE if the graph is to be drawn; otherwise return the
     #' data frame silently.
     #' @return A data frame with one row per input model variable and columns
@@ -827,15 +827,88 @@ DecisionTree <- R6::R6Class(
     #' @note The extreme values of each input variable are the upper and lower
     #' 95% confidence limits of the uncertainty distributions of each variable.
     #' This ensures that the range of each input is defensible (Briggs 2012).
-    tornado = function(index, ref, outcome="cost", draw=TRUE) {
+    tornado = function(index, ref, outcome="cost", exclude=NULL, draw=TRUE) {
       # check the parameters
+      if (!self$is_strategy(index) || !self$is_strategy(ref)) {
+        rlang::abort(
+          "'index' and 'ref' must be valid strategies for the decision tree",
+          class = "invalid_strategy"
+        )
+      }
+      if (!(outcome %in% c("cost", "ICER"))) {
+        rlang::abort(
+          "'outcome' must be one of {cost|ICER}",
+          class = "invalid_outcome"
+        )
+      }
+      if (!is.null(exclude)) {
+        if (!is.list(exclude)) {
+          rlang::abort(
+            "'exclude must be a list of model variable descriptions",
+            class = "exclude_not_list"
+          )
+        }
+        isc <- vapply(X=exclude, FUN.VALUE=TRUE, FUN=function(d) {
+          return(is.character(d))
+        })
+        if (!all(isc)) {
+          rlang::abort(
+            "'exclude' must be a character list of model variable descriptions",
+            class = "exclude_element_not_character"
+          )
+        }
+      }
+      if (!is.logical(draw)) {
+        rlang::abort(
+          "'draw' must be boolean",
+          class = "invalid_outcome"
+        )
+      }
+      # find all input modvars, excluding expressions and those stated
+      mvlist <- self$modvars()
+      lv <- vapply(X=mvlist, FUN.VALUE=TRUE, FUN=function(v) {
+        return(!v$is_expression())
+      })
+      mvlist <- mvlist[lv]
+      if (!is.null(exclude)) {
+        lv <- vapply(X=mvlist, FUN.VALUE=TRUE, FUN=function(v) {
+          return(v$description() %in% exclude)
+        })
+        mvlist <- mvlist[!lv]
+      }
+      # create data frame with limits of CIs
+      TO <- data.frame(
+        Description = vapply(
+          X = mvlist, 
+          FUN.VALUE = "x",
+          FUN=function(v){v$description()
+        }),
+        Units = vapply(
+          X = mvlist, 
+          FUN.VALUE = "x",
+          FUN=function(v){v$units()
+          }),
+        Q2.5 = vapply(
+          X = mvlist,
+          FUN.VALUE = 1.5,
+          FUN = function(v){v$quantile(c(0.025))}
+        ),
+        Q97.5 = vapply(
+          X = mvlist,
+          FUN.VALUE = 1.5,
+          FUN = function(v){v$quantile(c(0.975))}
+        ),
+        stringsAsFactors = FALSE
+      )
       
-      # 
       
       # evaluate each strategy
       #NDX <- self$evaluate_strategy(index)
       #REF <- self$evaluate_strategy(ref)
-      
+
+      # return tornado data frame
+      return(TO)
+            
     }
     
     

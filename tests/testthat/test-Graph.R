@@ -71,16 +71,15 @@ test_that("vertex and edge properties are set and got", {
   e1 <- Edge$new(n1, n2)
   G <- Graph$new(V=list(n1,n2), E=list(e1))
   #
-  expect_error(G$has_element(42), class="incorrect_element_type")
-  expect_true(G$has_element(n1))
+  expect_error(G$has_vertex(42), class="incorrect_element_type")
+  expect_true(G$has_vertex(n1))
   expect_true(G$has_vertex(n2))
-  expect_true(G$has_element(e1))
   expect_true(G$has_edge(e1))
-  expect_false(G$has_element(n3))
+  expect_false(G$has_vertex(n3))
   #
-  expect_equal(G$element_index(n1),1)
-  expect_equal(G$element_index(n2),2)
-  expect_equal(G$element_index(e1),1)
+  expect_equal(G$vertex_index(n1),1)
+  expect_equal(G$vertex_index(n2),2)
+  expect_equal(G$edge_index(e1),1)
   #
   expect_error(G$degree(42), class="incorrect_element_type")
   expect_error(G$degree(n3), class="not_in_graph")

@@ -39,7 +39,10 @@ Reaction <- R6::R6Class(
       super$initialize(source=source, target=target, label=label)
       # check that source inherits from ChanceNode
       if (!inherits(source, what="ChanceNode")) {
-        rlang::abort("Node 'source' must be a ChanceNode", class="non-Chance_source")
+        rlang::abort(
+          "Node 'source' must be a ChanceNode", 
+          class="non-Chance_source"
+        )
       }
       # check and set p, ensuring initialization
       if (inherits(p, what="numeric")) {
@@ -94,7 +97,8 @@ Reaction <- R6::R6Class(
     },
 
     #' @description
-    #' Return the current value of the edge probability.
+    #' Return the current value of the edge probability, i.e. the conditional
+    #' probability of traversing the edge.
     #' @return Numeric value in range [0,1].
     p = function() {
       prob <- 0

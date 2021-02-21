@@ -90,6 +90,14 @@ Action <- R6::R6Class(
       return(unique(ov))
     },
     
+    #' @description
+    #' Return the current value of the edge probability, i.e. the conditional
+    #' probability of traversing the edge.
+    #' @return Numeric value equal to 1.
+    p = function() {
+      return(1)
+    },
+    
     #' @description 
     #' Return the cost associated with traversing the edge.
     #' @return Cost.

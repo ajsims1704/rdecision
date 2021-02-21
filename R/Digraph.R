@@ -119,9 +119,9 @@ Digraph <- R6::R6Class(
         }
         # populate it
         sapply(private$E, function(e) {
-          s <- self$element_index(e$source())
-          t <- self$element_index(e$target())
-          e <- self$element_index(e)
+          s <- self$vertex_index(e$source())
+          t <- self$vertex_index(e$target())
+          e <- self$edge_index(e)
           B[s,e] <<- -1
           B[t,e] <<- 1
         })
@@ -270,7 +270,7 @@ Digraph <- R6::R6Class(
       pred <- list()
       if (self$has_vertex(v)) {
         AA <- self$digraph_adjacency_matrix(boolean=TRUE)
-        iv <- self$element_index(v)
+        iv <- self$vertex_index(v)
         iw <- which(AA[,iv],arr.ind=TRUE)
         pred <- private$V[iw]
       } else {

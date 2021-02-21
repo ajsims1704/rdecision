@@ -189,8 +189,9 @@ test_that("rdecision replicates Kaminski et al, fig 7", {
   expect_false(DT$is_strategy(list(E[[1]],E[[5]],E[[7]])))
   # evaluate all root-to-leaf paths
   P <- DT$root_to_leaf_paths()
-  expect_equal(length(P),9)
-  M <- DT$evaluate_paths(P)
+  W <- sapply(P,function(p){DT$walk(p)})
+  expect_equal(length(W),9)
+  M <- DT$evaluate_walks(W)
   expect_equal(nrow(M),9)
   expect_equal(ncol(M),8)
   expect_equal(unname(M[8,"Cost"]),220.5,tolerance=1)
@@ -249,9 +250,9 @@ test_that("paths common to >1 strategy are analyzed", {
 test_that("redecision replicates Jenks et al, 2016", {
   
   # standard normals
-  n1 <- NormModVar$new("SN","", 0, 1)
-  n2 <- NormModVar$new("SN","", 0, 1)
-  n3 <- NormModVar$new("SN","", 0, 1)
+  n1 <- NormModVar$new("SN1","", 0, 1)
+  n2 <- NormModVar$new("SN2","", 0, 1)
+  n3 <- NormModVar$new("SN3","", 0, 1)
   
   # clinical variables
   r.CRBSI <- NormModVar$new(
@@ -449,11 +450,18 @@ test_that("redecision replicates Jenks et al, 2016", {
   E <- DT$evaluate()
   expect_equal(E$Cost[E$d1=="Standard"], c.std, tolerance=2.00)
   expect_equal(E$Cost[E$d1=="Tegaderm"], c.teg, tolerance=2.00)
-  
+
+  # tornado (diagram)
+  TO <- DT$tornado(
+    index=list(e10), ref=list(e10), exclude=list("SN1", "SN2", "SN3"),
+    draw = FALSE
+  )
+  expect_equal(nrow(TO),8)
+  print("..")
+  print(TO)
+    
   # PSA
-  Rprof("junk.txt", line.profiling=TRUE)
-  PSA <- DT$evaluate(expected=FALSE,N=1000)
-  Rprof(NULL)
+  PSA <- DT$evaluate(expected=FALSE,N=100)
   RES <<- reshape(PSA, idvar='Run', timevar='d1', direction='wide')
   RES$Difference <<- RES$Cost.Standard - RES$Cost.Tegaderm
   expect_equal(mean(RES$Difference), 77.76, tolerance=5.00)
