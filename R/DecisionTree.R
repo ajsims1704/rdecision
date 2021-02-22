@@ -548,13 +548,26 @@ DecisionTree <- R6::R6Class(
     #' in the tree, the strategies returned will not necessarily be unique.
     #' @param what A character string defining what to return. Must be one
     #' of "label" or "index".
+    #' @param select A single strategy (given as a list of action edges, with
+    #' one action edge per decision node). If provided, only that strategy
+    #' is selected from the returned table. Intended for tabulating a
+    #' single strategy into a readable form.
     #' @return A data frame where each row is a potential strategy 
     #' and each column is a Decision Node. Values are either the index of each
     #' action edge, or their label.
-    strategies = function(what="index") {
+    strategy_table = function(what="index", select=NULL) {
+      # check arguments
       if ((what != "index") & (what != "label")) {
         rlang::abort("Argument 'what' must be one of 'index' or 'label'",
                      class="unknown_what_value")
+      }
+      if (!is.null(select)) {
+        if (!self$is_strategy(select)) {
+          rlang::abort(
+            "'s' must be a valid strategy for this decision tree",
+            class = "invalid_strategy"
+          )
+        }
       }
       # build a table with indexes of the action edges
       f <- list()
@@ -565,6 +578,30 @@ DecisionTree <- R6::R6Class(
         f[[d$label()]] <<- a
       })
       TT <- expand.grid(f, KEEP.OUT.ATTRS=FALSE, stringsAsFactors=FALSE)
+      # select a single strategy, if required
+      if (!is.null(select)) {
+        lv <- apply(X=TT, MARGIN=1, FUN=function(row) {
+          # indexes of action edges from the table
+          st <- row
+          # indexes of action edges in 'select' argument
+          ss <- vapply(X=select, FUN.VALUE=1, FUN=function(e){
+            self$edge_index(e)
+          })
+          # test whether the table row is the same as 'select'
+          return(setequal(st,ss))
+        })
+        TT <- TT[lv,,drop=FALSE]
+      }
+      # replace edge indexes with strategy names, if required
+      if (what == "label") {
+        dn <- self$decision_nodes("label")
+        for (d in dn) {
+          TT[,d] <- vapply(X=TT[,d], FUN.VALUE="x", FUN=function(ie){
+            e <- private$E[[ie]]$label()
+            return(e)
+          })
+        }
+      }
       # return the table
       return(TT)
     },
@@ -574,14 +611,12 @@ DecisionTree <- R6::R6Class(
     #' paths can be walked in more than one strategy, if there exist paths
     #' that do not pass a decision node.
     #' @return A data frame, where each row is a path walked in a strategy. The
-    #' structure is similar to that returned by \code{strategies} but includes
-    #' an extra column, 'Leaf' which gives the leaf node index of each path,
-    #' and there is one row for each path in each strategy.
+    #' structure is similar to that returned by \code{strategy_table} but 
+    #' includes an extra column, 'Leaf' which gives the leaf node index of each
+    #' path, and there is one row for each path in each strategy.
     strategy_paths = function() {
-      # find possible strategies (and add a dummy column to stop R stripping
-      # the node name, if there is only 1 decision node)
-      S <- self$strategies()
-      S$TMP <- NA
+      # find possible strategies 
+      S <- self$strategy_table()
       # find the set of action edges in the tree
       eA <- which(
         vapply(X=private$E, FUN.VALUE=TRUE, FUN=function(e){
@@ -607,13 +642,12 @@ DecisionTree <- R6::R6Class(
         })        
         # Append to the strategy data frame
         SL <- cbind(
-          S[lv,], 
+          S[lv,,drop=FALSE], 
           Leaf=self$vertex_index(p[[length(p)]])
         )
         return(SL)
       }))
-      # remove the temporary column and return
-      P$TMP <- NULL
+      # return the paths
       return(P)
     },
 
@@ -701,10 +735,15 @@ DecisionTree <- R6::R6Class(
     #' works though all possible paths to leaf nodes and computes the 
     #' probability, cost, benefit and utility of each, then aggregates 
     #' by strategy.   
-    #' @param expected If TRUE, evaluate each model variable as its mean value,
-    #' otherwise sample each one from their uncertainty distribution.
-    #' @param N Number of replicates. Intended for use with PSA (expected=F);
-    #' use with expected=T will be repetitive and uninformative. 
+    #' @param setvars One of "expected" (evaluate with each model variable at
+    #' its mean value), "random" (sample each variable from its uncertainty 
+    #' distribution and evaluate the model), "q2.5", "q50", "q97.5" (set each
+    #' model variable to its 2.5%, 50% or 97.5% quantile, respectively, and
+    #' evaluate the model), "current" (leave each model variable at its current
+    #' value prior to calling the function and evaluate the model).
+    #' @param N Number of replicates. Intended for use with PSA 
+    #' (\code{modvars="random"}); use with \code{modvars="expected"}
+    #' will be repetitive and uninformative. 
     #' @param by One of {"path", "strategy"}. If "path", the table has one row
     #' per path walked per strategy, per run, and includes the label of the
     #' terminating leaf node to identify each path. if "strategy" (the default),
@@ -723,10 +762,24 @@ DecisionTree <- R6::R6Class(
     #' \item{Benefit}{Aggregate benefit of the strategy.}
     #' \item{Utility}{Aggregate utility of the strategy.}
     #' }
-    evaluate = function(expected=TRUE, N=1, by="strategy") {
+    evaluate = function(setvars="expected", N=1, by="strategy") {
       # check arguments
-      if (!is.logical(expected)) {
-        rlang::abort("'expected' must be boolean", class="expected_not_boolean")
+      if (!is.character(setvars)) {
+        rlang::abort(
+          "'setvars' must be a character", 
+          class="setvars_not_character"
+        )
+      }
+      valids <- c("expected","random","q2.5","q50","q97.5","current")
+      if (!(setvars %in% valids)) {
+        rlang::abort(
+          paste(
+            "'setvars' must be one of", 
+            paste(valids, collapse=" "), 
+            collapse=" "
+          ), 
+          class="setvars_invalid"
+        )
       }
       if (!is.numeric(N)) {
         rlang::abort("'N' must be numeric", class="N_not_numeric")
@@ -750,9 +803,9 @@ DecisionTree <- R6::R6Class(
       MV <- self$modvars()
       # N tree evaluations, stacked as a 3d array
       RES <- vapply(X=1:N, FUN.VALUE=TM, FUN=function(n){
-        # set the ModVar values (either mean or sampled)
+        # set the ModVar values (to chosen option)
         for (v in MV) {
-          v$set(ifelse(expected,"expected","random"))
+          v$set(setvars)
         }
         # evaluate the tree
         M <- self$evaluate_walks(W)
@@ -787,8 +840,7 @@ DecisionTree <- R6::R6Class(
         })
         PAYOFF <- RES
       } else if (by == "strategy") {
-        # create formula for use in aggregation of results from evaluating each
-        # strategy separately
+        # aggregate by strategy
         dn <- self$decision_nodes("label")
         f <- as.formula(
           paste(
@@ -803,32 +855,39 @@ DecisionTree <- R6::R6Class(
       return(PAYOFF)
     },
 
-    #' @description 
+    #' @description
     #' Create a "tornado" diagram to compare two strategies for traversing
     #' the decision tree. A strategy is a unanimous prescription of the actions
-    #' at each decision node. 
+    #' at each decision node.
     #' @param index The index strategy (option) to be evaluated.
     #' @param ref The reference strategy (option) with which the index strategy
     #' will be compared.
-    #' @param outcome One of "cost" or "ICER". For "cost" (e.g. in cost 
+    #' @param outcome One of "cost" or "ICER". For "cost" (e.g. in cost
     #' consequence analysis), the x axis is cost saved (cost of reference minus
     #' cost of index), on the presumption that the new technology will be cost
     #' saving at the point estimate. For "ICER" the x axis is
     #' $\Delta C/\Delta E$ and is expected to be positive at the point estimate
-    #' (i.e. in the NE or SW quadrants of the cost-effectiveness plane).
+    #' (i.e. in the NE or SW quadrants of the cost-effectiveness plane), i.e.
+    #' $\Delta C$ is cost of index minus cost of reference, and $\Delta E$ is
+    #' utility of index minus utility of reference.
     #' @param exclude A list of descriptions of model variables to be excluded
-    #' from the tornado. 
-    #' 
+    #' from the tornado.
     #' @param draw TRUE if the graph is to be drawn; otherwise return the
     #' data frame silently.
     #' @return A data frame with one row per input model variable and columns
     #' for: minimum value of the variable, maximum value of the variable,
-    #' minimum value of the outcome and maximum value of the outcome. 
+    #' minimum value of the outcome and maximum value of the outcome.
     #' @note The extreme values of each input variable are the upper and lower
     #' 95% confidence limits of the uncertainty distributions of each variable.
     #' This ensures that the range of each input is defensible (Briggs 2012).
     tornado = function(index, ref, outcome="cost", exclude=NULL, draw=TRUE) {
       # check the parameters
+      if (missing(index) || missing(ref)) {
+        rlang::abort(
+          "'index' and 'ref' must be defined",
+          class = "missing_strategy"
+        )
+      }
       if (!self$is_strategy(index) || !self$is_strategy(ref)) {
         rlang::abort(
           "'index' and 'ref' must be valid strategies for the decision tree",
@@ -879,12 +938,12 @@ DecisionTree <- R6::R6Class(
       # create data frame with limits of CIs
       TO <- data.frame(
         Description = vapply(
-          X = mvlist, 
+          X = mvlist,
           FUN.VALUE = "x",
           FUN=function(v){v$description()
         }),
         Units = vapply(
-          X = mvlist, 
+          X = mvlist,
           FUN.VALUE = "x",
           FUN=function(v){v$units()
           }),
@@ -900,15 +959,151 @@ DecisionTree <- R6::R6Class(
         ),
         stringsAsFactors = FALSE
       )
+      # find all modvars in the model, not only those in the tornado
+      all.mv <- self$modvars()
+      # build strategy tables for index and ref
+      st.index <- self$strategy_table("label", select=index)
+      st.ref <- self$strategy_table("label", select=ref)
+      # find univariate outcome limits
+      template <- vector(mode="numeric", length=2)
+      names(template) <- c("outcome.min","outcome.max")
+      O <- vapply(X=mvlist, FUN.VALUE=template, FUN=function(this.mv) {
+        # result template
+        res <- template
+        # set all modvars to their mean (including those excluded)
+        for (v in all.mv) {
+          v$set("expected")
+        }
+        #
+        # set this modvar to its minimum
+        this.mv$set("q2.5")
+        # evaluate the tree
+        RES <- self$evaluate(setvars="current")
+        # get outcome for index strategy
+        ORES <- merge(st.index, RES, all.x=TRUE)
+        index.cost <- ORES$Cost[1]
+        index.utility <- ORES$Utility[1]
+        # get outcome for reference strategy
+        ORES <- merge(st.ref, RES, all.x=TRUE)
+        ref.cost <- ORES$Cost[1]
+        ref.utility <- ORES$Utility[1]
+        # outcome
+        if (outcome == "cost") {
+          outcome.min <- ref.cost - index.cost
+        } else if (outcome == "ICER") {
+          outcome.min = (index.cost-ref.cost)/(index.utility-ref.utility)
+        } else {
+          outcome.min = NA
+        }
+        res["outcome.min"] <- outcome.min
+        #
+        # set this modvar to its maximum
+        this.mv$set("q97.5")
+        # evaluate the tree
+        RES <- self$evaluate(setvars="current")
+        # get outcome for index strategy
+        ORES <- merge(st.index, RES, all.x=TRUE)
+        index.cost <- ORES$Cost[1]
+        index.utility <- ORES$Utility[1]
+        # get outcome for reference strategy
+        ORES <- merge(st.ref, RES, all.x=TRUE)
+        ref.cost <- ORES$Cost[1]
+        ref.utility <- ORES$Utility[1]
+        # outcome
+        if (outcome == "cost") {
+          outcome.max <- ref.cost - index.cost
+        } else if (outcome=="ICER") {
+          outcome.max = (index.cost-ref.cost)/(index.utility-ref.utility)
+        } else {
+          outcome.max = NA
+        }
+        res["outcome.max"] <- outcome.max
+        # return row of results
+        return(res)
+      })
+      # transpose the outcome
+      O <- t(O)
+      # append to the data frame
+      TO <- cbind(TO,O)
       
+      # re-order it with least variation first
+      TO$range <- abs(TO$outcome.max - TO$outcome.min)
+      TO <- TO[order(TO$range, decreasing=FALSE),]
+      TO$range <- NULL
       
-      # evaluate each strategy
-      #NDX <- self$evaluate_strategy(index)
-      #REF <- self$evaluate_strategy(ref)
-
+      # plot the graph, if required
+      if (draw) {
+        # controllable parameters
+        cex = 0.75
+        # x axis label
+        xlab <- ifelse(
+          outcome == "cost",
+          "Mean cost saving",
+          "Mean ICER"
+        )
+        # set up the plot margins and defaults
+        par(mar = c(4.1,4.1,1.1,1.1))
+        dw <- vapply(X=TO$Description, FUN.VAL=0.5, FUN=function(s){
+          return(strwidth(paste0(s,"MM"), cex=cex, units="inches"))
+        })
+        mai <- par("mai")
+        mai[2] <- max(dw)
+        par(mai = mai)
+        mgp <- par("mgp")
+        mgp <- mgp*cex
+        par(mgp = mgp)
+        par(oma = c())
+        # create the plot frame
+        plot(
+          x = NULL,
+          y = NULL,
+          xlim = c(
+            min(min(TO$outcome.min),min(TO$outcome.min)),
+            max(max(TO$outcome.max),min(TO$outcome.max))
+          ),
+          ylim = c(0.5,nrow(TO)+0.5),
+          xlab = xlab,
+          ylab = "",
+          yaxt = "n",
+          cex.axis = cex,
+          cex.lab = cex,
+          cex.main = cex,
+          cex.sub = cex,
+          xpd = TRUE,
+          frame.plot = FALSE
+        )
+        # label the y axis
+        axis(
+          side = 2,
+          at = 1:nrow(TO),
+          labels = TO$Description,
+          lty = 0,
+          lwd.ticks = 0,
+          las = 2,
+          cex.axis = cex,
+          outer = TRUE
+        )
+        # add bars and limits
+        for (i in 1:nrow(TO)) {
+          rect(
+            xleft = min(TO[i,"outcome.min"], TO[i,"outcome.max"]),
+            xright = max(TO[i,"outcome.min"], TO[i,"outcome.max"]),
+            ybottom = i - 0.25,
+            ytop = i + 0.25
+          )
+        }
+        box(which="figure")
+        
+        
+      }
+      
+      # re-order it with greatest variation first
+      TO$range <- abs(TO$outcome.max - TO$outcome.min)
+      TO <- TO[order(TO$range, decreasing=TRUE),]
+      TO$range <- NULL
+      
       # return tornado data frame
       return(TO)
-            
     }
     
     

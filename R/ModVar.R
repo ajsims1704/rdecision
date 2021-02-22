@@ -144,8 +144,11 @@ ModVar <- R6::R6Class(
     #' Sets the value of the ModVar that will be returned by subsequent
     #' calls to get() until set() is called again. 
     #' @param what Character: one of "random" (samples from the uncertainty
-    #' distribution), expected" (mean), "q2.5" (lower 95% confidence limit),
-    #' "q50" (median), "q97.5" (upper 95% confidence limit).
+    #' distribution), "expected" (mean), "q2.5" (lower 95% confidence limit),
+    #' "q50" (median), "q97.5" (upper 95% confidence limit), "current" (leaves
+    #' the value unchanged). The "current" option is provided to support having
+    #' common functions to set (or leave alone) sets of model variables, 
+    #' depending on their use case.
     #' @return Updated ModVar.
     set = function(what="random") {
       # check argument
@@ -167,7 +170,10 @@ ModVar <- R6::R6Class(
         v <- self$quantile(c(0.5))
       } else if (what == "q97.5") {
         v <- self$quantile(c(0.975))
-      } else {
+      } else if (what == "current") {
+        v <- private$.val
+      }
+      else {
         rlang::abort(
           "'what' must be one of 'random', 'expected', 'q2.5', 'q50', '97.5'", 
           class ="what_not_supported"

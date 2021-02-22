@@ -31,8 +31,10 @@ test_that("simple decision trees are modelled correctly", {
   PS <- DT$strategy_paths()
   expect_equal(nrow(PS),3)
   # strategies
-  S <- DT$strategies()
+  S <- DT$strategy_table()
   expect_equal(nrow(S),2)
+  S <- DT$strategy_table("label", select=list(e1))
+  expect_equal(S$d1[1],"e1")
   # evaluations
   RES <- DT$evaluate(by="path")
   expect_equal(RES[RES$Leaf=="t1","Benefit"],22.5,tolearance=0.05)
@@ -183,8 +185,19 @@ test_that("rdecision replicates Kaminski et al, fig 7", {
   V <- list(d1,d2,d3, c1,c2,c3,c4, t1,t2,t3,t4,t5,t6,t7,t8,t9)
   expect_silent(DT<-DecisionTree$new(V,E))
   # strategies
-  S <- DT$strategies("label")
+  S <- DT$strategy_table("label")
   expect_equal(nrow(S),12)
+  expect_equal(sum(S$d1=="sell"),4)
+  expect_equal(sum(S$d2=="sell"),6)
+  expect_equal(sum(S$d3=="sell"),6)
+  # single strategy
+  s <- list(E[[1]], E[[7]], E[[12]]) # sell/seell/sell
+  expect_true(DT$is_strategy(s))
+  S <- DT$strategy_table("label", select=s)
+  expect_equal(nrow(S),1)
+  expect_equal(S$d1[1],"sell")
+  expect_equal(S$d2[1],"sell")
+  expect_equal(S$d3[1],"sell")
   # test incorrect strategy prescription
   expect_false(DT$is_strategy(list(E[[1]],E[[5]],E[[7]])))
   # evaluate all root-to-leaf paths
@@ -451,17 +464,23 @@ test_that("redecision replicates Jenks et al, 2016", {
   expect_equal(E$Cost[E$d1=="Standard"], c.std, tolerance=2.00)
   expect_equal(E$Cost[E$d1=="Tegaderm"], c.teg, tolerance=2.00)
 
+  # check that illegal arguments to evaluate are rejected
+  expect_error(DT$evaluate(setvars=42), class="setvars_not_character")
+  expect_error(DT$evaluate(setvars="mode"), class="setvars_invalid")
+  expect_silent(DT$evaluate(setvars="q2.5"))
+  expect_silent(DT$evaluate(setvars="q50"))
+  expect_silent(DT$evaluate(setvars="q97.5"))
+  expect_silent(DT$evaluate(setvars="current"))
+  
   # tornado (diagram)
   TO <- DT$tornado(
-    index=list(e10), ref=list(e10), exclude=list("SN1", "SN2", "SN3"),
+    index=list(e10), ref=list(e9), exclude=list("SN1", "SN2", "SN3"),
     draw = FALSE
   )
   expect_equal(nrow(TO),8)
-  print("..")
-  print(TO)
-    
+  
   # PSA
-  PSA <- DT$evaluate(expected=FALSE,N=100)
+  PSA <- DT$evaluate(setvars="expected",N=100)
   RES <<- reshape(PSA, idvar='Run', timevar='d1', direction='wide')
   RES$Difference <<- RES$Cost.Standard - RES$Cost.Tegaderm
   expect_equal(mean(RES$Difference), 77.76, tolerance=5.00)

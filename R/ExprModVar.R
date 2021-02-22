@@ -359,7 +359,7 @@ ExprModVar <- R6::R6Class(
           class = "what_not_character"
         )
       }
-      if (!(what %in% c("random", "expected", "q2.5", "q50", "q97.5"))) {
+      if (!(what %in% c("random","expected","q2.5","q50","q97.5","current"))) {
         rlang::abort(
           "'what' must be one of 'random', 'expected', 'q2.5', 'q50', '97.5'", 
           class ="what_not_supported"

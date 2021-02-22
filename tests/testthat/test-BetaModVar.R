@@ -33,6 +33,16 @@ test_that("get() is initialized correctly", {
   expect_equal(B$get(), a/(a+b), tolerance=0.01)
 })
 
+test_that("set(current) works as intended", {
+  a <- 2
+  b <- 5
+  B <- BetaModVar$new("beta", "GBP", a, b)
+  B$set("random")
+  x <- B$get()
+  B$set("current")
+  expect_equal(x, B$get())
+})
+
 test_that("mean, mode, sd and quantiles are returned correctly", {
   alpha <- 2
   beta <- 5
