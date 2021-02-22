@@ -30,30 +30,30 @@ The model was evaluated in three scenarios:
 ```{r s1-modvars}
 # model inputs
 c.pack.TCS <- GammaModVar$new(
-  "VICRYL plus, pack",
+  "VICRYL plus pack",
   "GBP", 
   shape = 100,            # MIB: VICRYL plus, £3.63, 10% CoV 
   scale=3.63/100
 )
 c.pack.NCS <- GammaModVar$new(
-  "VICRYL, pack", "GBP",
+  "VICRYL pack", "GBP",
   shape = 100,            # MIB: VICRYL, £2.88, 10% CoV
   scale = 2.88/100
 )
 n.sutures <- GammaModVar$new(
-  "Sutures per procedure",
-  "n",                    # Gamma is conjugate prior of Poisson mean
+  "Sutures per procedure", # Gamma is conjugate prior of Poisson mean
+  "n",
   shape = 200,            # assumed 200 packs in 100 operations
   scale = 1/100
 )       
 p.SSI.NCS <- BetaModVar$new(
-  "P(SSI|NCS)",
+  "P(SSI | NCS)",
   "P",
   alpha = 653,            # Coello 2005, 653 small bowel SSI in 6528 ops
   beta = 6528-63
 )     
 rr.TCS <- LogNormModVar$new(
-  "RR(SSI|TCS)", "RR",
+  "RR(SSI | TCS)", "RR",
   p1 = 0.67,              # RR reported as 0.67 (95%CI 0.53 to 0.84)
   p2 = (0.84-0.53)/(2*1.96),
   "LN7"
@@ -97,7 +97,7 @@ e2 <- Reaction$new(c1,B,p=q.SSI.TCS,cost=0,label="No SSI")
 e3 <- Action$new(d1,c1,label="Antimicrobial",cost=c.TCS,benefit=0)
 e4 <- Reaction$new(c2,C,p=p.SSI.NCS,cost=c.SSI,label="SSI")
 e5 <- Reaction$new(c2,D,p=q.SSI.NCS,cost=0,label="No SSI")
-e6 <- Action$new(d1,c2,label="Non-antimicrobial",cost=c.NCS,benefit=0)
+e6 <- Action$new(d1,c2,label="Standard",cost=c.NCS,benefit=0)
 # tree
 DT1 <- DecisionTree$new(V=list(A,B,c1,C,D,c2,d1), E=list(e1,e2,e3,e4,e5,e6))
 ```
@@ -128,23 +128,42 @@ pander::pander(
 
 ## Results
 
-```{r base-case}
+### Base case
+Base case is shown in the table below.
+```{r clean_base}
 RES <- DT1$evaluate()
-pander::pander(RES)
+keep <- c("Suture", "Cost")
+pander::pander(RES[,keep])
 ```
 
-### Tornado diagram
-```{r tornado_tab}
-TO <- DT1$tornado(index=list(e3), ref=list(e6), draw=FALSE)
-pander::pander(TO)
-```
+### Univariate sensitivity
+Tornado chart is shown in figure 2.
 
-```{r }
+```{r clean_dsa}
 caption <- "Tornado chart showing mean cost savings per procedure."
 ```
 ```{r tornado, fig.keep="last", fig.align="center", fig.width=6, fig.cap=caption}
 TO <- DT1$tornado(index=list(e3), ref=list(e6))
 ```
+
+### PSA
+PSA results are shown in Figure 3.
+
+```{r clean_psa}
+caption <- "PSA results."
+```
+```{r fig.keep="last", fig.align="center", fig.width=6, fig.cap=caption}
+local({
+  PSA <- DT1$evaluate(setvars="random", N=1000)
+  RES <<- reshape(PSA, idvar='Run', timevar="Suture", direction='wide')
+  RES$Difference <<- RES$Cost.Standard - RES$Cost.Antimicrobial
+  keep<- c('Run', 'Cost.Standard', 'Cost.Antimicrobial', 'Difference')
+  hist(RES$Difference, freq=FALSE, xlab="Cost saving", ylab="Probability",
+       main="", cex.axis=0.75, cex.lab=0.75)
+  
+})
+```
+
 
 
 # References

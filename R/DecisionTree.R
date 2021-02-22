@@ -947,12 +947,12 @@ DecisionTree <- R6::R6Class(
           FUN.VALUE = "x",
           FUN=function(v){v$units()
           }),
-        Q2.5 = vapply(
+        LL = vapply(
           X = mvlist,
           FUN.VALUE = 1.5,
           FUN = function(v){v$quantile(c(0.025))}
         ),
-        Q97.5 = vapply(
+        UL = vapply(
           X = mvlist,
           FUN.VALUE = 1.5,
           FUN = function(v){v$quantile(c(0.975))}
@@ -965,8 +965,8 @@ DecisionTree <- R6::R6Class(
       st.index <- self$strategy_table("label", select=index)
       st.ref <- self$strategy_table("label", select=ref)
       # find univariate outcome limits
-      template <- vector(mode="numeric", length=2)
-      names(template) <- c("outcome.min","outcome.max")
+      template <- vector(mode="numeric", length=3)
+      names(template) <- c("outcome.min","outcome.mean","outcome.max")
       O <- vapply(X=mvlist, FUN.VALUE=template, FUN=function(this.mv) {
         # result template
         res <- template
@@ -974,50 +974,33 @@ DecisionTree <- R6::R6Class(
         for (v in all.mv) {
           v$set("expected")
         }
-        #
-        # set this modvar to its minimum
-        this.mv$set("q2.5")
-        # evaluate the tree
-        RES <- self$evaluate(setvars="current")
-        # get outcome for index strategy
-        ORES <- merge(st.index, RES, all.x=TRUE)
-        index.cost <- ORES$Cost[1]
-        index.utility <- ORES$Utility[1]
-        # get outcome for reference strategy
-        ORES <- merge(st.ref, RES, all.x=TRUE)
-        ref.cost <- ORES$Cost[1]
-        ref.utility <- ORES$Utility[1]
-        # outcome
-        if (outcome == "cost") {
-          outcome.min <- ref.cost - index.cost
-        } else if (outcome == "ICER") {
-          outcome.min = (index.cost-ref.cost)/(index.utility-ref.utility)
-        } else {
-          outcome.min = NA
+        # function to evaluate outcome for levels of this.mv
+        ce <- function(what) {
+          # set this modvar to its minimum
+          this.mv$set(what)
+          # evaluate the tree
+          RES <- self$evaluate(setvars="current")
+          # get outcome for index strategy
+          ORES <- merge(st.index, RES, all.x=TRUE)
+          index.cost <- ORES$Cost[1]
+          index.utility <- ORES$Utility[1]
+          # get outcome for reference strategy
+          ORES <- merge(st.ref, RES, all.x=TRUE)
+          ref.cost <- ORES$Cost[1]
+          ref.utility <- ORES$Utility[1]
+          # outcome
+          if (outcome == "cost") {
+            rv <- ref.cost - index.cost
+          } else if (outcome == "ICER") {
+            rv <- (index.cost-ref.cost)/(index.utility-ref.utility)
+          } else {
+            rv <- NA
+          }
+          return(rv)          
         }
-        res["outcome.min"] <- outcome.min
-        #
-        # set this modvar to its maximum
-        this.mv$set("q97.5")
-        # evaluate the tree
-        RES <- self$evaluate(setvars="current")
-        # get outcome for index strategy
-        ORES <- merge(st.index, RES, all.x=TRUE)
-        index.cost <- ORES$Cost[1]
-        index.utility <- ORES$Utility[1]
-        # get outcome for reference strategy
-        ORES <- merge(st.ref, RES, all.x=TRUE)
-        ref.cost <- ORES$Cost[1]
-        ref.utility <- ORES$Utility[1]
-        # outcome
-        if (outcome == "cost") {
-          outcome.max <- ref.cost - index.cost
-        } else if (outcome=="ICER") {
-          outcome.max = (index.cost-ref.cost)/(index.utility-ref.utility)
-        } else {
-          outcome.max = NA
-        }
-        res["outcome.max"] <- outcome.max
+        res["outcome.min"] <- ce("q2.5")
+        res["outcome.mean"] <- ce("expected")
+        res["outcome.max"] <- ce("q97.5")
         # return row of results
         return(res)
       })
@@ -1036,23 +1019,28 @@ DecisionTree <- R6::R6Class(
         # controllable parameters
         cex = 0.75
         # x axis label
-        xlab <- ifelse(
-          outcome == "cost",
-          "Mean cost saving",
-          "Mean ICER"
-        )
-        # set up the plot margins and defaults
-        par(mar = c(4.1,4.1,1.1,1.1))
-        dw <- vapply(X=TO$Description, FUN.VAL=0.5, FUN=function(s){
+        xlab <- ifelse(outcome=="cost", "Mean cost saving", "Mean ICER")
+        # make labels (description + units)
+        TO$Label <- paste(TO$Description, TO$Units, sep=", ")
+        # set up the outer margins; bar labels are in the outer margin,
+        dw <- vapply(X=TO$Label, FUN.VAL=0.5, FUN=function(s){
           return(strwidth(paste0(s,"MM"), cex=cex, units="inches"))
         })
-        mai <- par("mai")
-        mai[2] <- max(dw)
-        par(mai = mai)
+        par(omi=c(0,max(dw),0,0))
+        # create sufficient space in the inner margin to write the variable
+        # limits to the left and right of each bar
+        lw <- vapply(X=TO$LL, FUN.VAL=0.5, FUN=function(v){
+          return(strwidth(signif(v,4), cex=cex, units="inches"))
+        })
+        uw <- vapply(X=TO$UL, FUN.VAL=0.5, FUN=function(v){
+          return(strwidth(signif(v,4), cex=cex, units="inches"))
+        })
+        par(mar = c(4.1,4.1,1.1,1.1))
+        mai = par("mai")
+        par(mai=c(mai[1],max(max(lw),max(uw)),mai[3],max(max(lw),max(uw))))
         mgp <- par("mgp")
         mgp <- mgp*cex
         par(mgp = mgp)
-        par(oma = c())
         # create the plot frame
         plot(
           x = NULL,
@@ -1076,7 +1064,7 @@ DecisionTree <- R6::R6Class(
         axis(
           side = 2,
           at = 1:nrow(TO),
-          labels = TO$Description,
+          labels = TO$Label,
           lty = 0,
           lwd.ticks = 0,
           las = 2,
@@ -1085,22 +1073,44 @@ DecisionTree <- R6::R6Class(
         )
         # add bars and limits
         for (i in 1:nrow(TO)) {
+          xleft = min(TO[i,"outcome.min"], TO[i,"outcome.max"])
+          xright = max(TO[i,"outcome.min"], TO[i,"outcome.max"])
           rect(
-            xleft = min(TO[i,"outcome.min"], TO[i,"outcome.max"]),
-            xright = max(TO[i,"outcome.min"], TO[i,"outcome.max"]),
+            xleft,
+            xright,
             ybottom = i - 0.25,
-            ytop = i + 0.25
+            ytop = i + 0.25,
+            border = "black",
+            col = "lightgray"
+          )
+          LL <- TO[i,"LL"]
+          UL <- TO[i,"UL"]
+          if (TO[i,"outcome.max"] > TO[i,"outcome.min"]) {
+            labels = c(signif(LL,3), signif(UL,3))
+          } else {
+            labels = c(signif(UL,3), signif(LL,3))
+          }
+          text(
+            x = c(xleft, xright),
+            y = c(i, i),
+            labels = labels,
+            pos = c(2, 4), 
+            cex = cex, 
+            xpd = TRUE
           )
         }
-        box(which="figure")
-        
-        
+        # add mean (base case)
+        abline(v = TO[1,"outcome.mean"], lty = "dashed")
+        # remove label column
+        TO$Label <- NULL
       }
       
       # re-order it with greatest variation first
       TO$range <- abs(TO$outcome.max - TO$outcome.min)
       TO <- TO[order(TO$range, decreasing=TRUE),]
       TO$range <- NULL
+      # remove mean column
+      TO$outcome.mean <- NULL
       
       # return tornado data frame
       return(TO)

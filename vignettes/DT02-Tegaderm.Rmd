@@ -343,7 +343,8 @@ Probabilistic sensitivity analysis is supported through the use of sampling
 model variables. The same call, with extra parameters is used to run the PSA:
 
 ```{r PSA, echo=TRUE}
-PSA <- DT$evaluate(expected=F, N=100)
+N <- 1000
+PSA <- DT$evaluate(setvars="random", N=N)
 ```
 
 The first few runs of PSA are as follows (after reshaping the table to give
@@ -358,7 +359,7 @@ local({
 })
 ```
 
-From PSA (100 runs), the mean cost of treatment with Tegaderm 
+From PSA (`r N` runs), the mean cost of treatment with Tegaderm 
 was `r round(mean(RES$Cost.Tegaderm),2)`,
 the mean cost of treatment with standard dressings was 
 `r round(mean(RES$Cost.Standard),2)`
