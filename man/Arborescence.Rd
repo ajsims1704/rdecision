@@ -12,6 +12,15 @@ Class to encapsulate a directed rooted tree specialization of a digraph.
 An arboresecence must be a directed tree with exactly one root and the
 directed paths from the root must be unique.
 }
+\references{
+\itemize{
+  \item Walker, John Q II. A A node-positioning algorithm for general trees.
+  University of North Carolina Technical Report TR 89-034, 1989.
+  \item Tilford, J and Reingold, E. Tidier Drawings of Trees. IEEE
+   Transactions on Software Engineering. 1981;7: 223–228.
+    doi:10.1109/TSE.1981.234519
+}
+}
 \author{
 Andrew Sims \email{andrew.sims@newcastle.ac.uk}
 }
@@ -25,7 +34,9 @@ Andrew Sims \email{andrew.sims@newcastle.ac.uk}
 \item \href{#method-is_parent}{\code{Arborescence$is_parent()}}
 \item \href{#method-is_leaf}{\code{Arborescence$is_leaf()}}
 \item \href{#method-root}{\code{Arborescence$root()}}
+\item \href{#method-siblings}{\code{Arborescence$siblings()}}
 \item \href{#method-root_to_leaf_paths}{\code{Arborescence$root_to_leaf_paths()}}
+\item \href{#method-postree}{\code{Arborescence$postree()}}
 \item \href{#method-clone}{\code{Arborescence$clone()}}
 }
 }
@@ -33,18 +44,19 @@ Andrew Sims \email{andrew.sims@newcastle.ac.uk}
 \out{<details ><summary>Inherited methods</summary>}
 \itemize{
 \item \out{<span class="pkg-link" data-pkg="rdecision" data-topic="Graph" data-id="degree">}\href{../../rdecision/html/Graph.html#method-degree}{\code{rdecision::Graph$degree()}}\out{</span>}
-\item \out{<span class="pkg-link" data-pkg="rdecision" data-topic="Graph" data-id="element_index">}\href{../../rdecision/html/Graph.html#method-element_index}{\code{rdecision::Graph$element_index()}}\out{</span>}
+\item \out{<span class="pkg-link" data-pkg="rdecision" data-topic="Graph" data-id="edge_index">}\href{../../rdecision/html/Graph.html#method-edge_index}{\code{rdecision::Graph$edge_index()}}\out{</span>}
+\item \out{<span class="pkg-link" data-pkg="rdecision" data-topic="Graph" data-id="graph_adjacency_matrix">}\href{../../rdecision/html/Graph.html#method-graph_adjacency_matrix}{\code{rdecision::Graph$graph_adjacency_matrix()}}\out{</span>}
 \item \out{<span class="pkg-link" data-pkg="rdecision" data-topic="Graph" data-id="has_edge">}\href{../../rdecision/html/Graph.html#method-has_edge}{\code{rdecision::Graph$has_edge()}}\out{</span>}
-\item \out{<span class="pkg-link" data-pkg="rdecision" data-topic="Graph" data-id="has_element">}\href{../../rdecision/html/Graph.html#method-has_element}{\code{rdecision::Graph$has_element()}}\out{</span>}
 \item \out{<span class="pkg-link" data-pkg="rdecision" data-topic="Graph" data-id="has_vertex">}\href{../../rdecision/html/Graph.html#method-has_vertex}{\code{rdecision::Graph$has_vertex()}}\out{</span>}
 \item \out{<span class="pkg-link" data-pkg="rdecision" data-topic="Graph" data-id="is_simple">}\href{../../rdecision/html/Graph.html#method-is_simple}{\code{rdecision::Graph$is_simple()}}\out{</span>}
 \item \out{<span class="pkg-link" data-pkg="rdecision" data-topic="Graph" data-id="neighbours">}\href{../../rdecision/html/Graph.html#method-neighbours}{\code{rdecision::Graph$neighbours()}}\out{</span>}
 \item \out{<span class="pkg-link" data-pkg="rdecision" data-topic="Graph" data-id="order">}\href{../../rdecision/html/Graph.html#method-order}{\code{rdecision::Graph$order()}}\out{</span>}
 \item \out{<span class="pkg-link" data-pkg="rdecision" data-topic="Graph" data-id="size">}\href{../../rdecision/html/Graph.html#method-size}{\code{rdecision::Graph$size()}}\out{</span>}
-\item \out{<span class="pkg-link" data-pkg="rdecision" data-topic="Digraph" data-id="adjacency_matrix">}\href{../../rdecision/html/Digraph.html#method-adjacency_matrix}{\code{rdecision::Digraph$adjacency_matrix()}}\out{</span>}
+\item \out{<span class="pkg-link" data-pkg="rdecision" data-topic="Graph" data-id="vertex_index">}\href{../../rdecision/html/Graph.html#method-vertex_index}{\code{rdecision::Graph$vertex_index()}}\out{</span>}
+\item \out{<span class="pkg-link" data-pkg="rdecision" data-topic="Digraph" data-id="digraph_adjacency_matrix">}\href{../../rdecision/html/Digraph.html#method-digraph_adjacency_matrix}{\code{rdecision::Digraph$digraph_adjacency_matrix()}}\out{</span>}
+\item \out{<span class="pkg-link" data-pkg="rdecision" data-topic="Digraph" data-id="digraph_incidence_matrix">}\href{../../rdecision/html/Digraph.html#method-digraph_incidence_matrix}{\code{rdecision::Digraph$digraph_incidence_matrix()}}\out{</span>}
 \item \out{<span class="pkg-link" data-pkg="rdecision" data-topic="Digraph" data-id="direct_predecessors">}\href{../../rdecision/html/Digraph.html#method-direct_predecessors}{\code{rdecision::Digraph$direct_predecessors()}}\out{</span>}
 \item \out{<span class="pkg-link" data-pkg="rdecision" data-topic="Digraph" data-id="direct_successors">}\href{../../rdecision/html/Digraph.html#method-direct_successors}{\code{rdecision::Digraph$direct_successors()}}\out{</span>}
-\item \out{<span class="pkg-link" data-pkg="rdecision" data-topic="Digraph" data-id="incidence_matrix">}\href{../../rdecision/html/Digraph.html#method-incidence_matrix}{\code{rdecision::Digraph$incidence_matrix()}}\out{</span>}
 \item \out{<span class="pkg-link" data-pkg="rdecision" data-topic="Digraph" data-id="is_acyclic">}\href{../../rdecision/html/Digraph.html#method-is_acyclic}{\code{rdecision::Digraph$is_acyclic()}}\out{</span>}
 \item \out{<span class="pkg-link" data-pkg="rdecision" data-topic="Digraph" data-id="is_arborescence">}\href{../../rdecision/html/Digraph.html#method-is_arborescence}{\code{rdecision::Digraph$is_arborescence()}}\out{</span>}
 \item \out{<span class="pkg-link" data-pkg="rdecision" data-topic="Digraph" data-id="is_connected">}\href{../../rdecision/html/Digraph.html#method-is_connected}{\code{rdecision::Digraph$is_connected()}}\out{</span>}
@@ -103,7 +115,7 @@ TRUE if v has one or more child nodes, FALSE otherwise.
 \if{html}{\out{<a id="method-is_leaf"></a>}}
 \if{latex}{\out{\hypertarget{method-is_leaf}{}}}
 \subsection{Method \code{is_leaf()}}{
-Test whether the given vertex is a leaf. In an arborescence,
+Test whether the given node is a leaf. In an arborescence,
 \code{is_parent()} and \code{is_leaf()} will be mutually exclusive.
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{Arborescence$is_leaf(v)}\if{html}{\out{</div>}}
@@ -134,6 +146,26 @@ The root vertex.
 }
 }
 \if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-siblings"></a>}}
+\if{latex}{\out{\hypertarget{method-siblings}{}}}
+\subsection{Method \code{siblings()}}{
+Find the siblings of a vertex in the arborescence.
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{Arborescence$siblings(v)}\if{html}{\out{</div>}}
+}
+
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{v}}{Vertex to test.}
+}
+\if{html}{\out{</div>}}
+}
+\subsection{Returns}{
+A (possibly empty) list of siblings.
+}
+}
+\if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-root_to_leaf_paths"></a>}}
 \if{latex}{\out{\hypertarget{method-root_to_leaf_paths}{}}}
 \subsection{Method \code{root_to_leaf_paths()}}{
@@ -144,6 +176,47 @@ Find all directed paths from the root of the tree to the leaves.
 
 \subsection{Returns}{
 A list of ordered node lists.
+}
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-postree"></a>}}
+\if{latex}{\out{\hypertarget{method-postree}{}}}
+\subsection{Method \code{postree()}}{
+Implements function POSITIONTREE (Walker, 1989) to
+determine the coordinates for each node in an arborescence.
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{Arborescence$postree(
+  SiblingSeparation = 4,
+  SubtreeSeparation = 4,
+  LevelSeparation = 1,
+  RootOrientation = "SOUTH"
+)}\if{html}{\out{</div>}}
+}
+
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{SiblingSeparation}}{Distance in arbitrary units for the
+distance between siblings.}
+
+\item{\code{SubtreeSeparation}}{Distance in arbitrary units for the
+distance between neigbouring subtrees.}
+
+\item{\code{LevelSeparation}}{Distance in arbitrary units for the 
+separation between adjacent levels.}
+
+\item{\code{RootOrientation}}{Must be one of "NORTH", "SOUTH", "EAST", "WEST".
+Defined as per Walker (1989), but noting that Walker assumed that
+y increased down the page. Thus the meaning of NORTH and SOUTH are
+opposite to his, with the default (SOUTH) having the child nodes at
+positive y value and root at zero, as per his example (figure 12).}
+}
+\if{html}{\out{</div>}}
+}
+\subsection{Returns}{
+A data frame with one row per node and three columns (n, x
+and y) where \code{n} gives the node index given by the 
+Graph::vertex_index() function.
 }
 }
 \if{html}{\out{<hr>}}

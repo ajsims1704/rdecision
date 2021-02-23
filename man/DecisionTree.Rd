@@ -36,6 +36,16 @@ with a common source endpoint must be 1.}
 \code{Action}s that share a common source endpoint must be unique.}
 }
 }
+\note{
+There is minimal checking of the argument because this function 
+is intended to be called repeatedly during tree evaluation, including
+PSA. The argument P is expected to be obtained from 
+\code{root_to_leaf_paths}.
+
+The extreme values of each input variable are the upper and lower
+95% confidence limits of the uncertainty distributions of each variable.
+This ensures that the range of each input is defensible (Briggs 2012).
+}
 \author{
 Andrew J. Sims \email{andrew.sims@newcastle.ac.uk}
 }
@@ -52,10 +62,13 @@ Andrew J. Sims \email{andrew.sims@newcastle.ac.uk}
 \item \href{#method-actions}{\code{DecisionTree$actions()}}
 \item \href{#method-modvars}{\code{DecisionTree$modvars()}}
 \item \href{#method-modvar_table}{\code{DecisionTree$modvar_table()}}
-\item \href{#method-paths_in_strategy}{\code{DecisionTree$paths_in_strategy()}}
-\item \href{#method-strategies}{\code{DecisionTree$strategies()}}
-\item \href{#method-evaluate_strategy}{\code{DecisionTree$evaluate_strategy()}}
+\item \href{#method-draw}{\code{DecisionTree$draw()}}
+\item \href{#method-is_strategy}{\code{DecisionTree$is_strategy()}}
+\item \href{#method-strategy_table}{\code{DecisionTree$strategy_table()}}
+\item \href{#method-strategy_paths}{\code{DecisionTree$strategy_paths()}}
+\item \href{#method-evaluate_walks}{\code{DecisionTree$evaluate_walks()}}
 \item \href{#method-evaluate}{\code{DecisionTree$evaluate()}}
+\item \href{#method-tornado}{\code{DecisionTree$tornado()}}
 \item \href{#method-clone}{\code{DecisionTree$clone()}}
 }
 }
@@ -63,18 +76,19 @@ Andrew J. Sims \email{andrew.sims@newcastle.ac.uk}
 \out{<details ><summary>Inherited methods</summary>}
 \itemize{
 \item \out{<span class="pkg-link" data-pkg="rdecision" data-topic="Graph" data-id="degree">}\href{../../rdecision/html/Graph.html#method-degree}{\code{rdecision::Graph$degree()}}\out{</span>}
-\item \out{<span class="pkg-link" data-pkg="rdecision" data-topic="Graph" data-id="element_index">}\href{../../rdecision/html/Graph.html#method-element_index}{\code{rdecision::Graph$element_index()}}\out{</span>}
+\item \out{<span class="pkg-link" data-pkg="rdecision" data-topic="Graph" data-id="edge_index">}\href{../../rdecision/html/Graph.html#method-edge_index}{\code{rdecision::Graph$edge_index()}}\out{</span>}
+\item \out{<span class="pkg-link" data-pkg="rdecision" data-topic="Graph" data-id="graph_adjacency_matrix">}\href{../../rdecision/html/Graph.html#method-graph_adjacency_matrix}{\code{rdecision::Graph$graph_adjacency_matrix()}}\out{</span>}
 \item \out{<span class="pkg-link" data-pkg="rdecision" data-topic="Graph" data-id="has_edge">}\href{../../rdecision/html/Graph.html#method-has_edge}{\code{rdecision::Graph$has_edge()}}\out{</span>}
-\item \out{<span class="pkg-link" data-pkg="rdecision" data-topic="Graph" data-id="has_element">}\href{../../rdecision/html/Graph.html#method-has_element}{\code{rdecision::Graph$has_element()}}\out{</span>}
 \item \out{<span class="pkg-link" data-pkg="rdecision" data-topic="Graph" data-id="has_vertex">}\href{../../rdecision/html/Graph.html#method-has_vertex}{\code{rdecision::Graph$has_vertex()}}\out{</span>}
 \item \out{<span class="pkg-link" data-pkg="rdecision" data-topic="Graph" data-id="is_simple">}\href{../../rdecision/html/Graph.html#method-is_simple}{\code{rdecision::Graph$is_simple()}}\out{</span>}
 \item \out{<span class="pkg-link" data-pkg="rdecision" data-topic="Graph" data-id="neighbours">}\href{../../rdecision/html/Graph.html#method-neighbours}{\code{rdecision::Graph$neighbours()}}\out{</span>}
 \item \out{<span class="pkg-link" data-pkg="rdecision" data-topic="Graph" data-id="order">}\href{../../rdecision/html/Graph.html#method-order}{\code{rdecision::Graph$order()}}\out{</span>}
 \item \out{<span class="pkg-link" data-pkg="rdecision" data-topic="Graph" data-id="size">}\href{../../rdecision/html/Graph.html#method-size}{\code{rdecision::Graph$size()}}\out{</span>}
-\item \out{<span class="pkg-link" data-pkg="rdecision" data-topic="Digraph" data-id="adjacency_matrix">}\href{../../rdecision/html/Digraph.html#method-adjacency_matrix}{\code{rdecision::Digraph$adjacency_matrix()}}\out{</span>}
+\item \out{<span class="pkg-link" data-pkg="rdecision" data-topic="Graph" data-id="vertex_index">}\href{../../rdecision/html/Graph.html#method-vertex_index}{\code{rdecision::Graph$vertex_index()}}\out{</span>}
+\item \out{<span class="pkg-link" data-pkg="rdecision" data-topic="Digraph" data-id="digraph_adjacency_matrix">}\href{../../rdecision/html/Digraph.html#method-digraph_adjacency_matrix}{\code{rdecision::Digraph$digraph_adjacency_matrix()}}\out{</span>}
+\item \out{<span class="pkg-link" data-pkg="rdecision" data-topic="Digraph" data-id="digraph_incidence_matrix">}\href{../../rdecision/html/Digraph.html#method-digraph_incidence_matrix}{\code{rdecision::Digraph$digraph_incidence_matrix()}}\out{</span>}
 \item \out{<span class="pkg-link" data-pkg="rdecision" data-topic="Digraph" data-id="direct_predecessors">}\href{../../rdecision/html/Digraph.html#method-direct_predecessors}{\code{rdecision::Digraph$direct_predecessors()}}\out{</span>}
 \item \out{<span class="pkg-link" data-pkg="rdecision" data-topic="Digraph" data-id="direct_successors">}\href{../../rdecision/html/Digraph.html#method-direct_successors}{\code{rdecision::Digraph$direct_successors()}}\out{</span>}
-\item \out{<span class="pkg-link" data-pkg="rdecision" data-topic="Digraph" data-id="incidence_matrix">}\href{../../rdecision/html/Digraph.html#method-incidence_matrix}{\code{rdecision::Digraph$incidence_matrix()}}\out{</span>}
 \item \out{<span class="pkg-link" data-pkg="rdecision" data-topic="Digraph" data-id="is_acyclic">}\href{../../rdecision/html/Digraph.html#method-is_acyclic}{\code{rdecision::Digraph$is_acyclic()}}\out{</span>}
 \item \out{<span class="pkg-link" data-pkg="rdecision" data-topic="Digraph" data-id="is_arborescence">}\href{../../rdecision/html/Digraph.html#method-is_arborescence}{\code{rdecision::Digraph$is_arborescence()}}\out{</span>}
 \item \out{<span class="pkg-link" data-pkg="rdecision" data-topic="Digraph" data-id="is_connected">}\href{../../rdecision/html/Digraph.html#method-is_connected}{\code{rdecision::Digraph$is_connected()}}\out{</span>}
@@ -86,8 +100,10 @@ Andrew J. Sims \email{andrew.sims@newcastle.ac.uk}
 \item \out{<span class="pkg-link" data-pkg="rdecision" data-topic="Digraph" data-id="walk">}\href{../../rdecision/html/Digraph.html#method-walk}{\code{rdecision::Digraph$walk()}}\out{</span>}
 \item \out{<span class="pkg-link" data-pkg="rdecision" data-topic="Arborescence" data-id="is_leaf">}\href{../../rdecision/html/Arborescence.html#method-is_leaf}{\code{rdecision::Arborescence$is_leaf()}}\out{</span>}
 \item \out{<span class="pkg-link" data-pkg="rdecision" data-topic="Arborescence" data-id="is_parent">}\href{../../rdecision/html/Arborescence.html#method-is_parent}{\code{rdecision::Arborescence$is_parent()}}\out{</span>}
+\item \out{<span class="pkg-link" data-pkg="rdecision" data-topic="Arborescence" data-id="postree">}\href{../../rdecision/html/Arborescence.html#method-postree}{\code{rdecision::Arborescence$postree()}}\out{</span>}
 \item \out{<span class="pkg-link" data-pkg="rdecision" data-topic="Arborescence" data-id="root">}\href{../../rdecision/html/Arborescence.html#method-root}{\code{rdecision::Arborescence$root()}}\out{</span>}
 \item \out{<span class="pkg-link" data-pkg="rdecision" data-topic="Arborescence" data-id="root_to_leaf_paths">}\href{../../rdecision/html/Arborescence.html#method-root_to_leaf_paths}{\code{rdecision::Arborescence$root_to_leaf_paths()}}\out{</span>}
+\item \out{<span class="pkg-link" data-pkg="rdecision" data-topic="Arborescence" data-id="siblings">}\href{../../rdecision/html/Arborescence.html#method-siblings}{\code{rdecision::Arborescence$siblings()}}\out{</span>}
 }
 \out{</details>}
 }
@@ -157,11 +173,22 @@ A list of \code{ChanceNode} objects.
 \subsection{Method \code{leaf_nodes()}}{
 Find the leaf nodes in the tree.
 \subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{DecisionTree$leaf_nodes()}\if{html}{\out{</div>}}
+\if{html}{\out{<div class="r">}}\preformatted{DecisionTree$leaf_nodes(what = "node")}\if{html}{\out{</div>}}
 }
 
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{what}}{One of "node" (returns Node objects), "label" (returns the
+leaf node labels) or "index" (returns the vertex index of the leaf
+nodes).}
+}
+\if{html}{\out{</div>}}
+}
 \subsection{Returns}{
-A list of \code{LeafNode} objects.
+A list of \code{LeafNode} objects (for what="node"); a list
+of character strings (for what="label"); or a list of integer indexes of 
+the decision nodes (for what="index").
 }
 }
 \if{html}{\out{<hr>}}
@@ -204,13 +231,20 @@ A list of \code{ModVar}s.
 \subsection{Method \code{modvar_table()}}{
 Tabulate the model variables.
 \subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{DecisionTree$modvar_table()}\if{html}{\out{</div>}}
+\if{html}{\out{<div class="r">}}\preformatted{DecisionTree$modvar_table(expressions = TRUE)}\if{html}{\out{</div>}}
 }
 
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{expressions}}{A logical that defines whether expression model
+variables should be included in the tabulation.}
+}
+\if{html}{\out{</div>}}
+}
 \subsection{Returns}{
 Data frame with one row per model variable, as follows:
 \describe{
-\item{Label}{The label given to the variable on creation.}
 \item{Description}{As given at initialization.}
 \item{Units}{Units of the variable.}
 \item{Distribution}{Either the uncertainty distribution, if
@@ -232,40 +266,61 @@ random sampling.}
 }
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-paths_in_strategy"></a>}}
-\if{latex}{\out{\hypertarget{method-paths_in_strategy}{}}}
-\subsection{Method \code{paths_in_strategy()}}{
-Find all the root to leaf paths traversable under 
-the specified strategy. A strategy is a unanimous prescription 
-of an action in each decision node.
+\if{html}{\out{<a id="method-draw"></a>}}
+\if{latex}{\out{\hypertarget{method-draw}{}}}
+\subsection{Method \code{draw()}}{
+Draw the decision tree to the current graphics output. Uses
+the algorithm of Walker (1989) to distribute the nodes compactly (see
+the \link{Arborescence} class help for details).
 \subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{DecisionTree$paths_in_strategy(strategy)}\if{html}{\out{</div>}}
+\if{html}{\out{<div class="r">}}\preformatted{DecisionTree$draw(border = FALSE)}\if{html}{\out{</div>}}
 }
 
 \subsection{Arguments}{
 \if{html}{\out{<div class="arguments">}}
 \describe{
-\item{\code{strategy}}{A list of Actions, with one action per decision node.}
+\item{\code{border}}{If TRUE draw a light grey border around the plot area.}
 }
 \if{html}{\out{</div>}}
 }
 \subsection{Returns}{
-A list of root to leaf paths.
+No return value.
 }
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-strategies"></a>}}
-\if{latex}{\out{\hypertarget{method-strategies}{}}}
-\subsection{Method \code{strategies()}}{
-Find all unique strategies for the decision tree. A
-strategy is a unanimous prescription of the actions at each decision 
-node. In trees where there are decision nodes that are descendants
-of other decision nodes, not all decision nodes are reachable in 
-each strategy. Equivalently, different strategies involve the
-traversal of an identical set of paths and are considered non-
-unique. Only unique strategies are returned.
+\if{html}{\out{<a id="method-is_strategy"></a>}}
+\if{latex}{\out{\hypertarget{method-is_strategy}{}}}
+\subsection{Method \code{is_strategy()}}{
+Tests whether a strategy (a unanimous prescription of an
+action in each decision node, specified as a list of nodes) is a valid
+strategy for this decision tree.
 \subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{DecisionTree$strategies(what = "index")}\if{html}{\out{</div>}}
+\if{html}{\out{<div class="r">}}\preformatted{DecisionTree$is_strategy(strategy)}\if{html}{\out{</div>}}
+}
+
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{strategy}}{A list of Action edges.}
+}
+\if{html}{\out{</div>}}
+}
+\subsection{Returns}{
+TRUE if the strategy is valid for this tree. Throws an
+exception if the argument is not a list of Action edges. Returns
+FALSE if the list of Action edges are not a valid strategy.
+}
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-strategy_table"></a>}}
+\if{latex}{\out{\hypertarget{method-strategy_table}{}}}
+\subsection{Method \code{strategy_table()}}{
+Find all potential strategies for the decision tree. A
+strategy is a unanimous prescription of the actions at each decision 
+node. If there are decision nodes that are descendants of other nodes
+in the tree, the strategies returned will not necessarily be unique.
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{DecisionTree$strategy_table(what = "index", select = NULL)}\if{html}{\out{</div>}}
 }
 
 \subsection{Arguments}{
@@ -273,51 +328,74 @@ unique. Only unique strategies are returned.
 \describe{
 \item{\code{what}}{A character string defining what to return. Must be one
 of "label" or "index".}
+
+\item{\code{select}}{A single strategy (given as a list of action edges, with
+one action edge per decision node). If provided, only that strategy
+is selected from the returned table. Intended for tabulating a
+single strategy into a readable form.}
 }
 \if{html}{\out{</div>}}
 }
 \subsection{Returns}{
-A table (data frame) where each row is a strategy traversed by
-a unique set of paths, and each column is a Decision Node. Values are
-either the index of each action edge, or their label.
+A data frame where each row is a potential strategy 
+and each column is a Decision Node. Values are either the index of each
+action edge, or their label.
 }
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-evaluate_strategy"></a>}}
-\if{latex}{\out{\hypertarget{method-evaluate_strategy}{}}}
-\subsection{Method \code{evaluate_strategy()}}{
-Evaluate the components of payoff associated with the paths in the
-decision tree. For each path, the strategy, probability, cost,
-benefit and utility are calculated.
+\if{html}{\out{<a id="method-strategy_paths"></a>}}
+\if{latex}{\out{\hypertarget{method-strategy_paths}{}}}
+\subsection{Method \code{strategy_paths()}}{
+Find all paths walked in each possible strategy. A strategy 
+is a unanimous prescription of an action in each decision node. Some 
+paths can be walked in more than one strategy, if there exist paths
+that do not pass a decision node.
 \subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{DecisionTree$evaluate_strategy(strategy)}\if{html}{\out{</div>}}
+\if{html}{\out{<div class="r">}}\preformatted{DecisionTree$strategy_paths()}\if{html}{\out{</div>}}
+}
+
+\subsection{Returns}{
+A data frame, where each row is a path walked in a strategy. The
+structure is similar to that returned by \code{strategy_table} but 
+includes an extra column, 'Leaf' which gives the leaf node index of each
+path, and there is one row for each path in each strategy.
+}
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-evaluate_walks"></a>}}
+\if{latex}{\out{\hypertarget{method-evaluate_walks}{}}}
+\subsection{Method \code{evaluate_walks()}}{
+Evaluate the components of payoff associated with a set of walks in the
+decision tree. For each walk, probability, cost, benefit and utility are
+calculated.
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{DecisionTree$evaluate_walks(W)}\if{html}{\out{</div>}}
 }
 
 \subsection{Arguments}{
 \if{html}{\out{<div class="arguments">}}
 \describe{
-\item{\code{strategy}}{A list of Actions, with one action per decision node.}
+\item{\code{W}}{A list of root-to-leaf walks. Each walk must start with the
+root node and end with a leaf node. Normally this is all the root to leaf
+paths in a tree.}
 }
 \if{html}{\out{</div>}}
 }
 \subsection{Returns}{
-A data frame (payoff table) with one row per path and columns
+A matrix (payoff table) with one row per path and columns
 organized as follows:
 \describe{
-\item{<label of decision node>}{One column for each decision node
-in the mode. Each column is named with the label of the node. For each
-row (path) the value is the label of the Action edge taken from the
-decision node.}
-\item{Leaf}{The label of the leaf node on which the pathway ends; 
-normally the clinical outcome.}
-\item{Probability}{The probability of traversing the pathway. The total
-probability of each strategy should sum to unity.}
+\item{Leaf}{The unique identifier of the path, taken to be the index 
+of the terminal (leaf) node.}
+\item{Probability}{The probability of traversing the pathway. }
 \item{Path.Cost}{The cost of traversing the pathway.}
 \item{Path.Benefit}{The benefit derived from traversing the pathway.}
 \item{Path.Utility}{The utility associated with the outcome (leaf node).}
 \item{Cost}{Path.Cost \eqn{*} probability of traversing the pathway.}
-\item{Benefit}{Path.Benefit \eqn{*} probability of traversing the pathway.}
-\item{Utility}{Path.Utility \eqn{*} probability of traversing the pathway.}
+\item{Benefit}{Path.Benefit \eqn{*} probability of traversing the 
+pathway.}
+\item{Utility}{Path.Utility \eqn{*} probability of traversing the
+pathway.}
 }
 }
 }
@@ -326,20 +404,32 @@ probability of each strategy should sum to unity.}
 \if{latex}{\out{\hypertarget{method-evaluate}{}}}
 \subsection{Method \code{evaluate()}}{
 Evaluate each strategy. Starting with the root, the function
-works though all possible paths to leaf nodes and computes the probability,
-cost, benefit and utility of each, then aggregates by strategy.
+works though all possible paths to leaf nodes and computes the 
+probability, cost, benefit and utility of each, then aggregates 
+by strategy.
 \subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{DecisionTree$evaluate(expected = TRUE, N = 1)}\if{html}{\out{</div>}}
+\if{html}{\out{<div class="r">}}\preformatted{DecisionTree$evaluate(setvars = "expected", N = 1, by = "strategy")}\if{html}{\out{</div>}}
 }
 
 \subsection{Arguments}{
 \if{html}{\out{<div class="arguments">}}
 \describe{
-\item{\code{expected}}{If TRUE, evaluate each model variable as its mean value,
-otherwise sample each one from their uncertainty distribution.}
+\item{\code{setvars}}{One of "expected" (evaluate with each model variable at
+its mean value), "random" (sample each variable from its uncertainty 
+distribution and evaluate the model), "q2.5", "q50", "q97.5" (set each
+model variable to its 2.5%, 50% or 97.5% quantile, respectively, and
+evaluate the model), "current" (leave each model variable at its current
+value prior to calling the function and evaluate the model).}
 
-\item{\code{N}}{Number of replicates. Intended for use with PSA (expected=F);
-use with expected=T will be repetitive and uninformative.}
+\item{\code{N}}{Number of replicates. Intended for use with PSA 
+(\code{modvars="random"}); use with \code{modvars="expected"}
+will be repetitive and uninformative.}
+
+\item{\code{by}}{One of {"path", "strategy"}. If "path", the table has one row
+per path walked per strategy, per run, and includes the label of the
+terminating leaf node to identify each path. if "strategy" (the default),
+the table is aggregated by strategy, i.e. there is one row per strategy,
+per run and there is no "Leaf" column.}
 }
 \if{html}{\out{</div>}}
 }
@@ -347,12 +437,58 @@ use with expected=T will be repetitive and uninformative.}
 A data frame with one row per strategy per run and columns
 organized as follows:
 \describe{
+\item{Leaf}{The label of the leaf that terminates the path, 
+for by='path'.}
+\item{Strategy}{The strategy expressed as the values of the action edges
+emanating from each decision node.}
 \item{Run}{The run number}
-\item{Strategy}{The strategy.}
+\item{Probability}{Probability (1 if by='strategy')}
 \item{Cost}{Aggregate cost of the strategy.}
 \item{Benefit}{Aggregate benefit of the strategy.}
 \item{Utility}{Aggregate utility of the strategy.}
 }
+}
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-tornado"></a>}}
+\if{latex}{\out{\hypertarget{method-tornado}{}}}
+\subsection{Method \code{tornado()}}{
+Create a "tornado" diagram to compare two strategies for traversing
+the decision tree. A strategy is a unanimous prescription of the actions
+at each decision node.
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{DecisionTree$tornado(index, ref, outcome = "cost", exclude = NULL, draw = TRUE)}\if{html}{\out{</div>}}
+}
+
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{index}}{The index strategy (option) to be evaluated.}
+
+\item{\code{ref}}{The reference strategy (option) with which the index strategy
+will be compared.}
+
+\item{\code{outcome}}{One of "cost" or "ICER". For "cost" (e.g. in cost
+consequence analysis), the x axis is cost saved (cost of reference minus
+cost of index), on the presumption that the new technology will be cost
+saving at the point estimate. For "ICER" the x axis is
+\eqn{\Delta C/\Delta E} and is expected to be positive at the point 
+estimate (i.e. in the NE or SW quadrants of the cost-effectiveness 
+plane), where \eqn{\Delta C} is cost of index minus cost of reference, 
+and \eqn{\Delta E} is utility of index minus utility of reference.}
+
+\item{\code{exclude}}{A list of descriptions of model variables to be excluded
+from the tornado.}
+
+\item{\code{draw}}{TRUE if the graph is to be drawn; otherwise return the
+data frame silently.}
+}
+\if{html}{\out{</div>}}
+}
+\subsection{Returns}{
+A data frame with one row per input model variable and columns
+for: minimum value of the variable, maximum value of the variable,
+minimum value of the outcome and maximum value of the outcome.
 }
 }
 \if{html}{\out{<hr>}}

@@ -22,6 +22,7 @@ Andrew J. Sims \email{andrew.sims@newcastle.ac.uk}
 \itemize{
 \item \href{#method-new}{\code{Action$new()}}
 \item \href{#method-modvars}{\code{Action$modvars()}}
+\item \href{#method-p}{\code{Action$p()}}
 \item \href{#method-cost}{\code{Action$cost()}}
 \item \href{#method-benefit}{\code{Action$benefit()}}
 \item \href{#method-clone}{\code{Action$clone()}}
@@ -84,6 +85,20 @@ as values associated with this Action. Includes operands of these
 
 \subsection{Returns}{
 A list of \code{ModVar}s.
+}
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-p"></a>}}
+\if{latex}{\out{\hypertarget{method-p}{}}}
+\subsection{Method \code{p()}}{
+Return the current value of the edge probability, i.e. the conditional
+probability of traversing the edge.
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{Action$p()}\if{html}{\out{</div>}}
+}
+
+\subsection{Returns}{
+Numeric value equal to 1.
 }
 }
 \if{html}{\out{<hr>}}

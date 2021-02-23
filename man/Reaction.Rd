@@ -92,7 +92,8 @@ A list of \code{ModVar}s.
 \if{html}{\out{<a id="method-p"></a>}}
 \if{latex}{\out{\hypertarget{method-p}{}}}
 \subsection{Method \code{p()}}{
-Return the current value of the edge probability.
+Return the current value of the edge probability, i.e. the conditional
+probability of traversing the edge.
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{Reaction$p()}\if{html}{\out{</div>}}
 }

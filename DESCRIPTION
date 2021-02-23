@@ -12,8 +12,9 @@ Authors@R: c(
          comment = c(ORCID="0000-0001-5108-6279")))
 Description: Classes and functions for modelling healthcare interventions using
   cohort models (decision trees, Markov models and extended Markov models).
-  It draws on terminology and examples from Briggs, Claxton and Sculpher, "Decision
-  Modelling for Health Economic Evaluation", Oxford University Press, 2006.
+  It draws on terminology and examples from Briggs, Claxton and Sculpher, 
+  "Decision Modelling for Health Economic Evaluation", Oxford University Press, 
+  2006.
 Depends: R (>= 3.1.0)
 Imports:
   R6,

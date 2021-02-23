@@ -18,13 +18,13 @@ Andrew Sims \email{andrew.sims@newcastle.ac.uk}
 \subsection{Public methods}{
 \itemize{
 \item \href{#method-new}{\code{Graph$new()}}
+\item \href{#method-vertex_index}{\code{Graph$vertex_index()}}
 \item \href{#method-has_vertex}{\code{Graph$has_vertex()}}
+\item \href{#method-edge_index}{\code{Graph$edge_index()}}
 \item \href{#method-has_edge}{\code{Graph$has_edge()}}
-\item \href{#method-has_element}{\code{Graph$has_element()}}
-\item \href{#method-element_index}{\code{Graph$element_index()}}
 \item \href{#method-order}{\code{Graph$order()}}
 \item \href{#method-size}{\code{Graph$size()}}
-\item \href{#method-adjacency_matrix}{\code{Graph$adjacency_matrix()}}
+\item \href{#method-graph_adjacency_matrix}{\code{Graph$graph_adjacency_matrix()}}
 \item \href{#method-is_simple}{\code{Graph$is_simple()}}
 \item \href{#method-is_connected}{\code{Graph$is_connected()}}
 \item \href{#method-is_acyclic}{\code{Graph$is_acyclic()}}
@@ -57,10 +57,33 @@ A Graph object.
 }
 }
 \if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-vertex_index"></a>}}
+\if{latex}{\out{\hypertarget{method-vertex_index}{}}}
+\subsection{Method \code{vertex_index()}}{
+Find the index of a vertex in the graph.
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{Graph$vertex_index(v)}\if{html}{\out{</div>}}
+}
+
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{v}}{Subject vertex}
+}
+\if{html}{\out{</div>}}
+}
+\subsection{Returns}{
+Index of v. The vertexes are normally stored in the same order
+they are specified in \code{new}, but this cannot be guaranteed. This
+function returns the same index as used in the adjacency matrix and NA 
+if the vertex is not in the graph.
+}
+}
+\if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-has_vertex"></a>}}
 \if{latex}{\out{\hypertarget{method-has_vertex}{}}}
 \subsection{Method \code{has_vertex()}}{
-Test whether a vertex an element of the graph.
+Test whether a vertex is an element of the graph.
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{Graph$has_vertex(v)}\if{html}{\out{</div>}}
 }
@@ -74,6 +97,29 @@ Test whether a vertex an element of the graph.
 }
 \subsection{Returns}{
 TRUE if v is an element of V(G).
+}
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-edge_index"></a>}}
+\if{latex}{\out{\hypertarget{method-edge_index}{}}}
+\subsection{Method \code{edge_index()}}{
+Find the index of an edge in a graph.
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{Graph$edge_index(e)}\if{html}{\out{</div>}}
+}
+
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{e}}{Subject edge.}
+}
+\if{html}{\out{</div>}}
+}
+\subsection{Returns}{
+Index of e. The edges are normally stored in the same order
+they are specified in \code{new}, but this cannot be guaranteed. This
+function returns the same index returned in other functions and NA
+if the edge is not in the graph.
 }
 }
 \if{html}{\out{<hr>}}
@@ -94,51 +140,6 @@ Test whether an edge is element of the graph.
 }
 \subsection{Returns}{
 TRUE if e is an element of E(G).
-}
-}
-\if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-has_element"></a>}}
-\if{latex}{\out{\hypertarget{method-has_element}{}}}
-\subsection{Method \code{has_element()}}{
-Test whether an edge is an element of the graph.
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{Graph$has_element(x)}\if{html}{\out{</div>}}
-}
-
-\subsection{Arguments}{
-\if{html}{\out{<div class="arguments">}}
-\describe{
-\item{\code{x}}{Subject vertex or edge}
-}
-\if{html}{\out{</div>}}
-}
-\subsection{Returns}{
-TRUE if x is an element of V(G), the vertex set,
-or x is an element of E(G), the edge set.
-}
-}
-\if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-element_index"></a>}}
-\if{latex}{\out{\hypertarget{method-element_index}{}}}
-\subsection{Method \code{element_index()}}{
-Find the index of element x in the vertices or edges of the graph. The
-vertices and edges are normally stored internally in the same order they 
-were defined in the call to $new(), but this cannot be guaranteed. The index 
-returned by this function will be same as the index of a vertex or edge 
-returned by other methods, e.g. adjacancy_matrix.
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{Graph$element_index(x)}\if{html}{\out{</div>}}
-}
-
-\subsection{Arguments}{
-\if{html}{\out{<div class="arguments">}}
-\describe{
-\item{\code{x}}{The subject element (a Node or Edge).}
-}
-\if{html}{\out{</div>}}
-}
-\subsection{Returns}{
-The index of the element (integer).
 }
 }
 \if{html}{\out{<hr>}}
@@ -168,15 +169,15 @@ Size of the graph (integer).
 }
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-adjacency_matrix"></a>}}
-\if{latex}{\out{\hypertarget{method-adjacency_matrix}{}}}
-\subsection{Method \code{adjacency_matrix()}}{
+\if{html}{\out{<a id="method-graph_adjacency_matrix"></a>}}
+\if{latex}{\out{\hypertarget{method-graph_adjacency_matrix}{}}}
+\subsection{Method \code{graph_adjacency_matrix()}}{
 Compute the adjacency matrix for the graph. Each cell contains the
 number of edges joining the two vertexes, with the convention of
 self loops being counted twice, unless 'binary' is TRUE when cells are
 either 0 (not adjacent) or 1 (adjacent).
 \subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{Graph$adjacency_matrix(boolean = FALSE)}\if{html}{\out{</div>}}
+\if{html}{\out{<div class="r">}}\preformatted{Graph$graph_adjacency_matrix(boolean = FALSE)}\if{html}{\out{</div>}}
 }
 
 \subsection{Arguments}{

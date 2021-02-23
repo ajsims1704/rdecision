@@ -168,7 +168,9 @@ DecisionTree <- R6::R6Class(
     
     #' @description 
     #' Find the leaf nodes in the tree.
-    #' @return A list of \code{LeafNode} objects.
+    #' @param what One of "node" (returns Node objects), "label" (returns the
+    #' leaf node labels) or "index" (returns the vertex index of the leaf
+    #' nodes).
     #' @return A list of \code{LeafNode} objects (for what="node"); a list
     #' of character strings (for what="label"); or a list of integer indexes of 
     #' the decision nodes (for what="index").
@@ -508,7 +510,7 @@ DecisionTree <- R6::R6Class(
       return(invisible(self))
     },
     
-    #' @decription Tests whether a strategy (a unanimous prescription of an
+    #' @description Tests whether a strategy (a unanimous prescription of an
     #' action in each decision node, specified as a list of nodes) is a valid
     #' strategy for this decision tree.
     #' @param strategy A list of Action edges.
@@ -866,10 +868,10 @@ DecisionTree <- R6::R6Class(
     #' consequence analysis), the x axis is cost saved (cost of reference minus
     #' cost of index), on the presumption that the new technology will be cost
     #' saving at the point estimate. For "ICER" the x axis is
-    #' $\Delta C/\Delta E$ and is expected to be positive at the point estimate
-    #' (i.e. in the NE or SW quadrants of the cost-effectiveness plane), i.e.
-    #' $\Delta C$ is cost of index minus cost of reference, and $\Delta E$ is
-    #' utility of index minus utility of reference.
+    #' \eqn{\Delta C/\Delta E} and is expected to be positive at the point 
+    #' estimate (i.e. in the NE or SW quadrants of the cost-effectiveness 
+    #' plane), where \eqn{\Delta C} is cost of index minus cost of reference, 
+    #' and \eqn{\Delta E} is utility of index minus utility of reference.
     #' @param exclude A list of descriptions of model variables to be excluded
     #' from the tornado.
     #' @param draw TRUE if the graph is to be drawn; otherwise return the

@@ -217,14 +217,18 @@ Vector of numeric values of the same length as `probs`.
 Sets the value of the ModVar that will be returned by subsequent
 calls to get() until set() is called again.
 \subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{ModVar$set(expected = FALSE)}\if{html}{\out{</div>}}
+\if{html}{\out{<div class="r">}}\preformatted{ModVar$set(what = "random")}\if{html}{\out{</div>}}
 }
 
 \subsection{Arguments}{
 \if{html}{\out{<div class="arguments">}}
 \describe{
-\item{\code{expected}}{Logical; TRUE to set the value to the mean of the model
-variable.}
+\item{\code{what}}{Character: one of "random" (samples from the uncertainty
+distribution), "expected" (mean), "q2.5" (lower 95% confidence limit),
+"q50" (median), "q97.5" (upper 95% confidence limit), "current" (leaves
+the value unchanged). The "current" option is provided to support having
+common functions to set (or leave alone) sets of model variables, 
+depending on their use case.}
 }
 \if{html}{\out{</div>}}
 }

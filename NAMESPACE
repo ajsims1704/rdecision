@@ -3,6 +3,7 @@
 export(Action)
 export(Arborescence)
 export(Arrow)
+export(BetaModVar)
 export(ChanceNode)
 export(ConstModVar)
 export(DecisionNode)

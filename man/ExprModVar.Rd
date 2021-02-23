@@ -45,6 +45,11 @@ guaranteed, there is no estimator provided for the mode.
 
 Method \code{distribution} returns the string representation 
 of the expression used to create the model variable.
+
+This method is mostly intended for internal use within the
+class and will not generally be needed for normal use of ExprModVar
+objects. The returned expression is *not* syntactically checked or 
+evaluated before it is returned.
 }
 \author{
 Andrew J. Sims \email{andrew.sims@newcastle.ac.uk}
@@ -56,6 +61,7 @@ Andrew J. Sims \email{andrew.sims@newcastle.ac.uk}
 \subsection{Public methods}{
 \itemize{
 \item \href{#method-new}{\code{ExprModVar$new()}}
+\item \href{#method-add_method}{\code{ExprModVar$add_method()}}
 \item \href{#method-is_probabilistic}{\code{ExprModVar$is_probabilistic()}}
 \item \href{#method-operands}{\code{ExprModVar$operands()}}
 \item \href{#method-distribution}{\code{ExprModVar$distribution()}}
@@ -94,9 +100,9 @@ model variables.
 \subsection{Arguments}{
 \if{html}{\out{<div class="arguments">}}
 \describe{
-\item{\code{description}}{Name for the model variable expresssion. In 
+\item{\code{description}}{Name for the model variable expression. In 
 a complex model it may help to tabulate how model variables are
-combined into costs, probablities and rates.}
+combined into costs, probabilities and rates.}
 
 \item{\code{units}}{Units in which the variable is expressed.}
 
@@ -107,6 +113,30 @@ and its environment. The usage is `quo(x+y)` or `rlang::quo(x+y)`.}
 }
 \subsection{Returns}{
 An object of type ExprModVar
+}
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-add_method"></a>}}
+\if{latex}{\out{\hypertarget{method-add_method}{}}}
+\subsection{Method \code{add_method()}}{
+Create a new quosure from that supplied in new() but with each ModVar
+operand appended with \code{$x} where \code{x} is the argument to this
+function.
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{ExprModVar$add_method(method = "mean()")}\if{html}{\out{</div>}}
+}
+
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{method}}{A character string with the method, e.g. "mean()".}
+}
+\if{html}{\out{</div>}}
+}
+\subsection{Returns}{
+A quosure whose expression is each ModVar \code{v} in the  
+expression replaced with \code{v$method} and the same environment as
+specified in the quosure supplied in new().
 }
 }
 \if{html}{\out{<hr>}}
@@ -318,19 +348,19 @@ Vector of quantiles.
 \subsection{Method \code{set()}}{
 Sets the value of the ExprModVar that will be returned by subsequent
 calls to get() until set() is called again. Because an ExprModVar can be 
-considered the LHS of an equation, the idea of \code{set}ting a value
+considered as a dependent variable, the idea of \code{set}ting a value
 is meaningless, and calls to this method have no effect. To affect the
 value returned by the next call to \code{get}, call \code{set} for each
 of the operands of this expression.
 \subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{ExprModVar$set(expected = FALSE)}\if{html}{\out{</div>}}
+\if{html}{\out{<div class="r">}}\preformatted{ExprModVar$set(what = "random")}\if{html}{\out{</div>}}
 }
 
 \subsection{Arguments}{
 \if{html}{\out{<div class="arguments">}}
 \describe{
-\item{\code{expected}}{Logical; for compatibility with non-expression ModVars
-only; not used.}
+\item{\code{what}}{Character string; for compatibility with non-expression
+ModVars only; not used.}
 }
 \if{html}{\out{</div>}}
 }

@@ -1,3 +1,10 @@
+# rdecision 1.0.1
+
+* Added draw() method to DecisionTree.
+* Added tornado() method to DecisionTree for univariate sensitivity analysis.
+* Optimized probabilistic sensitivity analysis loop in DecisionTree 
+  (1000 evaluations) of a typical HTA tree takes < 5s on a typical PC.
+
 # rdecision 1.0.0
 
 * First full release of the package.

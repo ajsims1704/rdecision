@@ -59,12 +59,11 @@ Create a new constant model variable
 \if{html}{\out{<div class="arguments">}}
 \describe{
 \item{\code{description}}{A character string description of the variable
-and its role in the
-model. This description will be used in a tabulation of the
-variables linked to a model.}
+and its role in the model. This description will be used in a tabulation
+of the variables linked to a model.}
 
-\item{\code{units}}{A character string description of the units, e.g. 'GBP',
-'per year'.}
+\item{\code{units}}{A character string description of the units, e.g. "GBP",
+"per year".}
 
 \item{\code{const}}{The constant numerical value of the object.}
 }

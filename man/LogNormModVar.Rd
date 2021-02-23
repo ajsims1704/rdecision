@@ -10,27 +10,49 @@ An R6 class for a model variable with Log Normal uncertainty
 \details{
 A model variable for which the uncertainty in the point estimate can
 be modelled with a Log Normal distribution. 
-\href{https://sites.google.com/site/probonto/}{ProbOnto}
-defines seven parametrizations of the log normal distribution. These are linked,
-allowing the parameters of any one to be derived from any other. All
-7 parameterizations require two parameters; their meanings are as follows:
+\href{https://sites.google.com/site/probonto/}{ProbOnto (2017)}
+defines seven parametrizations of the log normal distribution. These are 
+linked, allowing the parameters of any one to be derived from any other. All
+7 parametrizations require two parameters; their meanings are as follows:
 \describe{
-\item{LN1}{\eqn{p_1=\mu}, \eqn{p_2=\sigma}, where \eqn{\mu} and \eqn{\sigma} are the mean
-and standard deviation, both on the log scale.}
-\item{LN2}{\eqn{p_1=\mu}, \eqn{p_2=v}, where \eqn{\mu} and \eqn{v} are the mean
-and variance, both on the log scale.}
-\item{LN3}{\eqn{p_1=m}, \eqn{p_2=\sigma}, where \eqn{m} is the median on the natural
-scale and \eqn{\sigma} is the standard deviation on the log scale.}
-\item{LN4}{\eqn{p_1=m}, \eqn{p_2=c_v}, where \eqn{m} is the median on the natural
-scale and \eqn{c_v} is the coefficient of variation on the natural scale.}
-\item{LN5}{\eqn{p_1=\mu}, \eqn{p_2=\tau}, where \eqn{\mu} is the mean on the log
-scale and \eqn{\tau} is the precision on the log scale.}
+\item{LN1}{\eqn{p_1=\mu}, \eqn{p_2=\sigma}, where \eqn{\mu} and \eqn{\sigma} 
+are the mean and standard deviation, both on the log scale.}
+\item{LN2}{\eqn{p_1=\mu}, \eqn{p_2=v}, where \eqn{\mu} and \eqn{v} are the
+mean and variance, both on the log scale.}
+\item{LN3}{\eqn{p_1=m}, \eqn{p_2=\sigma}, where \eqn{m} is the median on the
+natural scale and \eqn{\sigma} is the standard deviation on the log scale.}
+\item{LN4}{\eqn{p_1=m}, \eqn{p_2=c_v}, where \eqn{m} is the median on the
+natural scale and \eqn{c_v} is the coefficient of variation on the natural
+scale.}
+\item{LN5}{\eqn{p_1=\mu}, \eqn{p_2=\tau}, where \eqn{\mu} is the mean on the
+log scale and \eqn{\tau} is the precision on the log scale.}
 \item{LN6}{\eqn{p_1=m}, \eqn{p_2=\sigma_g}, where \eqn{m} is the median on
-the natural scale and \eqn{\sigma_g} is the geometric standard deviation on the
+the natural scale and \eqn{\sigma_g} is the geometric standard deviation on 
+the natural scale.}
+\item{LN7}{\eqn{p_1=\mu_N}, \eqn{p2=\sigma_N}, where \eqn{\mu_N} is the mean
+on the natural scale and \eqn{\sigma_N} is the standard deviation on the
 natural scale.}
-\item{LN7}{\eqn{p_1=\mu_N}, \eqn{p1=\sigma_N}, where \eqn{\mu_N} is the mean on
-the natural scale and \eqn{\sigma_N} is the standard deviation on the
-natural scale.}
+}
+}
+\note{
+The log normal distribution may be used to model the uncertainty in 
+an estimate of relative risk (Briggs 2006, p90). If a relative risk 
+estimate is available with a 95% confidence interval, the LN7 parametrization
+allows the uncertainty distribution to be specified directly. For example, 
+if RR = 0.67 with 95% confidence interval 0.53 to 0.84 (Leaper, 2016), it 
+can be modelled with
+\code{LogNormModVar$new("rr","RR",p1=0.67,p2=(0.84-0.53)/(2*1.96)),"LN7"}.
+}
+\references{
+\itemize{
+  \item Briggs A, Claxton K and Sculpher M. Decision Modelling for Health
+    Economic Evaluation. Oxford 2006, ISBN 978-0-19-852662-9.
+  \item Leaper DJ, Edmiston CE and Holy CE. Meta-analysis of the potential
+    economic impact following introduction of absorbable antimicrobial 
+    sutures. British Journal of Surgery 2017;104:e134-e144.
+  \item Swat MJ, Grenon P and Wimalaratne S. Ontology and Knowledge Base of
+    Probability Distributions. EMBL-EBI Technical Report (ProbOnto 2.5), 
+    13th January 2017, https://sites.google.com/site/probonto/download.
 }
 }
 \author{

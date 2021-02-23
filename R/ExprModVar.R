@@ -348,8 +348,8 @@ ExprModVar <- R6::R6Class(
     #' is meaningless, and calls to this method have no effect. To affect the
     #' value returned by the next call to \code{get}, call \code{set} for each
     #' of the operands of this expression.
-    #' @param expected Character; for compatibility with non-expression ModVars
-    #' only; not used.
+    #' @param what Character string; for compatibility with non-expression
+    #' ModVars only; not used.
     #' @return Updated ExprModVar.
     set = function(what="random") {
       # check argument

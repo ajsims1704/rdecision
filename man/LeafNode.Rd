@@ -8,8 +8,8 @@
 An R6 class for a leaf node in a decision tree representing a clinical state.
 }
 \details{
-It represents a state of being, and is associated with an incremental
-utility.
+It represents a state of being, and is associated with an
+incremental utility.
 }
 \author{
 Andrew J. Sims \email{andrew.sims@newcastle.ac.uk}
@@ -51,16 +51,17 @@ Create a new \code{LeafNode} object; synonymous with a clinical outcome.
 \if{html}{\out{<div class="arguments">}}
 \describe{
 \item{\code{label}}{Character string; a label for the state; must be
-defined because it is used in tabulations. The label is automatically converted
-to a syntactically valid (in R) name to ensure it can be used as a column
-name in a data frame.}
+defined because it is used in tabulations. The label is automatically
+converted to a syntactically valid (in R) name to ensure it can be used
+as a column name in a data frame.}
 
 \item{\code{utility}}{The incremental utility that a user associates with
 being in the health state (range -Inf to 1) for the interval. Intended
 for use with cost benefit analysis.}
 
-\item{\code{interval}}{The time interval over which the \code{utility} parameters
-apply, expressed as an R \code{difftime} object; default 1 year.}
+\item{\code{interval}}{The time interval over which the \code{utility}
+parameters apply, expressed as an R \code{difftime} object; default 
+1 year.}
 }
 \if{html}{\out{</div>}}
 }

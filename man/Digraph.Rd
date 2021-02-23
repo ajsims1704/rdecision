@@ -21,8 +21,8 @@ Andrew Sims \email{andrew.sims@newcastle.ac.uk}
 \subsection{Public methods}{
 \itemize{
 \item \href{#method-new}{\code{Digraph$new()}}
-\item \href{#method-adjacency_matrix}{\code{Digraph$adjacency_matrix()}}
-\item \href{#method-incidence_matrix}{\code{Digraph$incidence_matrix()}}
+\item \href{#method-digraph_adjacency_matrix}{\code{Digraph$digraph_adjacency_matrix()}}
+\item \href{#method-digraph_incidence_matrix}{\code{Digraph$digraph_incidence_matrix()}}
 \item \href{#method-topological_sort}{\code{Digraph$topological_sort()}}
 \item \href{#method-is_connected}{\code{Digraph$is_connected()}}
 \item \href{#method-is_weakly_connected}{\code{Digraph$is_weakly_connected()}}
@@ -41,14 +41,15 @@ Andrew Sims \email{andrew.sims@newcastle.ac.uk}
 \out{<details ><summary>Inherited methods</summary>}
 \itemize{
 \item \out{<span class="pkg-link" data-pkg="rdecision" data-topic="Graph" data-id="degree">}\href{../../rdecision/html/Graph.html#method-degree}{\code{rdecision::Graph$degree()}}\out{</span>}
-\item \out{<span class="pkg-link" data-pkg="rdecision" data-topic="Graph" data-id="element_index">}\href{../../rdecision/html/Graph.html#method-element_index}{\code{rdecision::Graph$element_index()}}\out{</span>}
+\item \out{<span class="pkg-link" data-pkg="rdecision" data-topic="Graph" data-id="edge_index">}\href{../../rdecision/html/Graph.html#method-edge_index}{\code{rdecision::Graph$edge_index()}}\out{</span>}
+\item \out{<span class="pkg-link" data-pkg="rdecision" data-topic="Graph" data-id="graph_adjacency_matrix">}\href{../../rdecision/html/Graph.html#method-graph_adjacency_matrix}{\code{rdecision::Graph$graph_adjacency_matrix()}}\out{</span>}
 \item \out{<span class="pkg-link" data-pkg="rdecision" data-topic="Graph" data-id="has_edge">}\href{../../rdecision/html/Graph.html#method-has_edge}{\code{rdecision::Graph$has_edge()}}\out{</span>}
-\item \out{<span class="pkg-link" data-pkg="rdecision" data-topic="Graph" data-id="has_element">}\href{../../rdecision/html/Graph.html#method-has_element}{\code{rdecision::Graph$has_element()}}\out{</span>}
 \item \out{<span class="pkg-link" data-pkg="rdecision" data-topic="Graph" data-id="has_vertex">}\href{../../rdecision/html/Graph.html#method-has_vertex}{\code{rdecision::Graph$has_vertex()}}\out{</span>}
 \item \out{<span class="pkg-link" data-pkg="rdecision" data-topic="Graph" data-id="is_simple">}\href{../../rdecision/html/Graph.html#method-is_simple}{\code{rdecision::Graph$is_simple()}}\out{</span>}
 \item \out{<span class="pkg-link" data-pkg="rdecision" data-topic="Graph" data-id="neighbours">}\href{../../rdecision/html/Graph.html#method-neighbours}{\code{rdecision::Graph$neighbours()}}\out{</span>}
 \item \out{<span class="pkg-link" data-pkg="rdecision" data-topic="Graph" data-id="order">}\href{../../rdecision/html/Graph.html#method-order}{\code{rdecision::Graph$order()}}\out{</span>}
 \item \out{<span class="pkg-link" data-pkg="rdecision" data-topic="Graph" data-id="size">}\href{../../rdecision/html/Graph.html#method-size}{\code{rdecision::Graph$size()}}\out{</span>}
+\item \out{<span class="pkg-link" data-pkg="rdecision" data-topic="Graph" data-id="vertex_index">}\href{../../rdecision/html/Graph.html#method-vertex_index}{\code{rdecision::Graph$vertex_index()}}\out{</span>}
 }
 \out{</details>}
 }
@@ -75,15 +76,15 @@ A Digraph object.
 }
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-adjacency_matrix"></a>}}
-\if{latex}{\out{\hypertarget{method-adjacency_matrix}{}}}
-\subsection{Method \code{adjacency_matrix()}}{
+\if{html}{\out{<a id="method-digraph_adjacency_matrix"></a>}}
+\if{latex}{\out{\hypertarget{method-digraph_adjacency_matrix}{}}}
+\subsection{Method \code{digraph_adjacency_matrix()}}{
 Compute the adjacency matrix for the digraph. Each cell contains the
 number of edges from the row vertex to the column vertex, with the 
 convention of self loops being counted once, unless 'boolean' is TRUE
 when cells are either FALSE (not adjacent) or TRUE (adjacent).
 \subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{Digraph$adjacency_matrix(boolean = FALSE)}\if{html}{\out{</div>}}
+\if{html}{\out{<div class="r">}}\preformatted{Digraph$digraph_adjacency_matrix(boolean = FALSE)}\if{html}{\out{</div>}}
 }
 
 \subsection{Arguments}{
@@ -102,16 +103,16 @@ dimnames of the matrix are the labels of the nodes.
 }
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-incidence_matrix"></a>}}
-\if{latex}{\out{\hypertarget{method-incidence_matrix}{}}}
-\subsection{Method \code{incidence_matrix()}}{
+\if{html}{\out{<a id="method-digraph_incidence_matrix"></a>}}
+\if{latex}{\out{\hypertarget{method-digraph_incidence_matrix}{}}}
+\subsection{Method \code{digraph_incidence_matrix()}}{
 Compute the incidence matrix for the graph. Each row is a vertex and
 each column is an edge. Edges leaving a vertex have value -1 and edges
-entering have value +1. if all vertexes have defined and unique labels and all
-edges have defined and unique labels, the dimnames of the matrix are the labels of
-the vertexes and edges.
+entering have value +1. if all vertexes have defined and unique labels
+and all edges have defined and unique labels, the dimnames of the matrix
+are the labels of the vertexes and edges.
 \subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{Digraph$incidence_matrix()}\if{html}{\out{</div>}}
+\if{html}{\out{<div class="r">}}\preformatted{Digraph$digraph_incidence_matrix()}\if{html}{\out{</div>}}
 }
 
 \subsection{Returns}{
