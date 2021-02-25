@@ -1,11 +1,17 @@
 
 
 test_that("unlabelled actions are rejected", {
-  n1 <- DecisionNode$new("d")
-  n2 <- LeafNode$new("n2")
-  expect_error(Action$new(n1,n2,42), class="non-string_label")
-  expect_error(Action$new(n1,n2,""), class="empty_label")
-  expect_silent(Action$new(n1,n2,"mychoice"))
+  d1 <- DecisionNode$new("d1")
+  t1 <- LeafNode$new("t1")
+  expect_error(Action$new(t1,d1,cost="200",label="e"), class="invalid_source")
+  expect_error(Action$new(d1,t1,42), class="invalid_label")
+  expect_error(Action$new(d1,t1,""), class="empty_label")
+  expect_error(Action$new(d1,t1,cost="200",label="e"), class="invalid_cost")
+  expect_error(
+    Action$new(d1,t1,benefit="200",label="e"), 
+    class="invalid_benefit"
+  )
+  expect_silent(Action$new(d1,t1,"mychoice"))
 })
 
 test_that("conditional probability is 1", {
@@ -32,4 +38,5 @@ test_that("modvars are identified", {
     return(v$description())
   })
   expect_equal(d[order(d)], c("fortytwo", "free"))
+  expect_equal(e$benefit(),42)
 })

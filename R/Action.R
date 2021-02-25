@@ -38,7 +38,7 @@ Action <- R6::R6Class(
       if (!is.character(label)) {
         rlang::abort(
           "Argument label must be a string", 
-          class="non-string_label"
+          class="invalid_label"
         )
       }
       if (nchar(label)==0) {
@@ -50,7 +50,7 @@ Action <- R6::R6Class(
       if (!inherits(source, what="DecisionNode")) {
         rlang::abort(
           "Node 'source' must be a DecisionNode", 
-          class="non-Decision_source"
+          class="invalid_source"
         )
       }
       # check and set cost, ensuring initialization
@@ -59,8 +59,10 @@ Action <- R6::R6Class(
       } else if (inherits(cost, "ModVar")) {
         private$edge.cost <- cost
       } else {
-        rlang::abort("Argument 'cost' must be of type 'numeric' or 'ModVar'.",
-                     class = "incorrect_type")
+        rlang::abort(
+          "Argument 'cost' must be of type 'numeric' or 'ModVar'.",
+          class = "invalid_cost"
+        )
       }
       # check and set benefit, ensuring initialization
       if (inherits(benefit, what="numeric")) {
@@ -70,7 +72,7 @@ Action <- R6::R6Class(
       } else {
         rlang::abort(
           "Argument 'benefit' must be of type 'numeric' or 'ModVar'.",
-          class = "incorrect_type"
+          class = "invalid_benefit"
         )
       }
       # Return Action node

@@ -41,7 +41,7 @@ Reaction <- R6::R6Class(
       if (!inherits(source, what="ChanceNode")) {
         rlang::abort(
           "Node 'source' must be a ChanceNode", 
-          class="non-Chance_source"
+          class="invalid_source"
         )
       }
       # check and set p, ensuring initialization
@@ -51,7 +51,7 @@ Reaction <- R6::R6Class(
         private$edge.p <- p
       } else {
         rlang::abort("Argument 'p' must be of type 'numeric' or 'ModVar'.",
-                     class = "incorrect_type")
+                     class = "invalid_p")
       }
       # check and set cost, ensuring initialization
       if (inherits(cost, what="numeric")) {
@@ -60,7 +60,7 @@ Reaction <- R6::R6Class(
         private$edge.cost <- cost
       } else {
         rlang::abort("Argument 'cost' must be of type 'numeric' or 'ModVar'.",
-                     class = "incorrect_type")
+                     class = "invalid_cost")
       }
       # check and set benefit, ensuring initialization
       if (inherits(benefit, what="numeric")) {
@@ -68,8 +68,10 @@ Reaction <- R6::R6Class(
       } else if (inherits(benefit, "ModVar")) {
         private$edge.benefit <- benefit
       } else {
-        rlang::abort("Argument 'benefit' must be of type 'numeric' or 'ModVar'.",
-                     class = "incorrect_type")
+        rlang::abort(
+          "Argument 'benefit' must be of type 'numeric' or 'ModVar'.",
+          class = "invalid_benefit"
+        )
       }
       # Return reaction node
       return(invisible(self))

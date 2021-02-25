@@ -1,12 +1,16 @@
 
-test_that("unlabelled reactions are accepted", {
-  n1 <- ChanceNode$new("c")
-  n2 <- LeafNode$new("n2")
+test_that("initialize parameters are checked", {
+  c1 <- ChanceNode$new("c1")
+  t1 <- LeafNode$new("t1")
   p <- 0.5
-  expect_error(Reaction$new(n1,n2,p,label=42), class="non-string_label")
-  expect_silent(Reaction$new(n1,n2,p))
-  expect_silent(Reaction$new(n1,n2,p,label=""))
-  expect_silent(Reaction$new(n1,n2,p,label="mychance"))
+  expect_error(Reaction$new(c1,t1,p,label=42), class="non-string_label")
+  expect_error(Reaction$new(t1,c1,p), class="invalid_source")
+  expect_silent(Reaction$new(c1,t1,p))
+  expect_error(Reaction$new(c1,t1,"0.5"), class="invalid_p")
+  expect_error(Reaction$new(c1,t1,p,cost="200"), class="invalid_cost")
+  expect_error(Reaction$new(c1,t1,p,benefit="200"), class="invalid_benefit")
+  expect_silent(Reaction$new(c1,t1,p,label=""))
+  expect_silent(Reaction$new(c1,t1,p,label="mychance"))
 })
 
 test_that("modvars are identified", {
@@ -35,4 +39,5 @@ test_that("modvars are identified", {
     return(v$description())
   })
   expect_equal(d[order(d)], c("evens", "fortytwo", "free"))
+  expect_equal(e$benefit(),42)
 })

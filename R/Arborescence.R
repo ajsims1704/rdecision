@@ -6,17 +6,13 @@
 #' 
 #' @details 
 #' Class to encapsulate a directed rooted tree specialization of a digraph.
-#' An arboresecence must be a directed tree with exactly one root and the
+#' An arborescence must be a directed tree with exactly one root and the
 #' directed paths from the root must be unique.
 #' 
 #' @references 
-#' \itemize{
-#'   \item Walker, John Q II. A A node-positioning algorithm for general trees.
+#'   \cite{Walker, John Q II. A A node-positioning algorithm for general trees.
 #'   University of North Carolina Technical Report TR 89-034, 1989.
-#'   \item Tilford, J and Reingold, E. Tidier Drawings of Trees. IEEE
-#'    Transactions on Software Engineering. 1981;7: 223–228.
-#'     doi:10.1109/TSE.1981.234519
-#' }
+#'  }
 #' 
 #' @docType class
 #' @author Andrew Sims \email{andrew.sims@@newcastle.ac.uk}

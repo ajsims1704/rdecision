@@ -19,6 +19,10 @@ test_that("simple decision trees are modelled correctly", {
   A <- DT$actions(d1)
   expect_true(setequal(sapply(A,function(a){a$label()}),c("e1","e4")))
   expect_equal(DT$decision_nodes("label"), "d1")
+  # draw it
+  pdf(NULL)
+  expect_silent(DT$draw())
+  dev.off()
   # strategy validity
   expect_error(DT$is_strategy(list(e2,e3)), class = "incorrect_strategy_type")
   expect_false(DT$is_strategy(list()))
@@ -473,10 +477,14 @@ test_that("redecision replicates Jenks et al, 2016", {
   expect_silent(DT$evaluate(setvars="current"))
   
   # tornado (diagram)
-  TO <- DT$tornado(
-    index=list(e10), ref=list(e9), exclude=list("SN1", "SN2", "SN3"),
-    draw = FALSE
+  pdf(NULL)
+  expect_silent(
+    TO <- DT$tornado(
+      index=list(e10), ref=list(e9), exclude=list("SN1", "SN2", "SN3"),
+      draw = TRUE
+    )
   )
+  dev.off()
   expect_equal(nrow(TO),8)
   
   # PSA

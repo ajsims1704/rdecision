@@ -4,20 +4,18 @@
 #' @description 
 #' An R6 class for a leaf node in a decision tree representing a clinical state.
 #'
-#' @details It represents a state of being, and is associated with an
+#' @details Represents a state of being, and is associated with an
 #' incremental utility. 
 #' 
 #' @docType class
 #' @author Andrew J. Sims \email{andrew.sims@@newcastle.ac.uk}
 #' 
-#' @export
-#' 
 LeafNode <- R6::R6Class(
   classname = "LeafNode",
   inherit = Node,
   private = list(
-    node.utility = 1,
-    node.interval = as.difftime(tim=365.25, units="days")
+    node.utility = NULL,
+    node.interval = NULL
   ),
   public = list(
     
@@ -34,8 +32,9 @@ LeafNode <- R6::R6Class(
     #' parameters apply, expressed as an R \code{difftime} object; default 
     #' 1 year.
     #' @return A new \code{LeafNode} object
-    initialize = function(label, utility=1,
-                          interval=as.difftime(365.25, units="days")) {
+    initialize = function(
+      label, utility=1, interval=as.difftime(365.25, units="days")
+    ) {
       # check there is a label
       if (rlang::is_missing(label)) {
         rlang::abort(
@@ -60,18 +59,34 @@ LeafNode <- R6::R6Class(
       # ensure base class is initialized
       super$initialize(label)
       # check and set utility
-      if (!is.numeric(utility)) {
-        rlang::abort("Argument 'utility' must be a numeric value.")
+      if (is.numeric(utility)) {
+        if (utility > 1) {
+          rlang::abort(
+            "Argument 'utility' must be in the range [-Inf,1].",
+            class = "invalid_utility"
+          )
+        } else {
+          private$node.utility <- utility
+        }
+      } else if (inherits(utility, what="ModVar")) {
+        # TODO: consider checking distribution is appropriate
+        private$node.utility <- utility
+      } else {
+        rlang::abort(
+          "Argument 'utility' must be numeric or ModVar",
+          class = "invalid_utility"
+        )
       }
-      if (utility > 1) {
-        rlang.abort("Argument 'utility' must be in the range [-Inf,1].")
-      }
-      private$node.utility <- utility
       # check and set the interval
-      if (class(interval) != 'difftime') {
-        rlang::abort("Argument 'interval' must be of class 'difftime'.")
+      if (class(interval) != "difftime") {
+        rlang::abort(
+          "Argument 'interval' must be of class 'difftime'.",
+          class = "invalid_interval"
+        )
       }
       private$node.interval <- interval
+      # return updated node object
+      return(invisible(self))
     },
 
     #' @description 
@@ -101,13 +116,32 @@ LeafNode <- R6::R6Class(
     #' @param expected Parameter passed to the \code{value} method of the model
     #' variable used to define utility; ignored otherwise.
     #' @return Incremental utility (numeric value).
-    utility = function(expected) {
-      rv <- private$node.utility
-      if (inherits(rv, what="ModVar")) {
-        rv <- rv$value(expected)
-      } 
+    utility = function() {
+      if (inherits(private$node.utility, what="ModVar")) {
+        rv <- private$node.utility$get()
+      } else {
+        rv <- private$node.utility
+      }
       return(rv)
+    },
+
+    #' @description 
+    #' Return the interval associated with being in the state.
+    #' @return Interval (as a difftime).
+    interval = function() {
+      return(private$node.interval)
+    },
+    
+    #' @description 
+    #' Return the quality adjusted life years associated with being in 
+    #' the state.
+    #' @return QALY.
+    QALY = function() {
+      dt <- as.numeric(private$node.interval, units="days")
+      Q <- dt * self$utility() / 365.25
+      return(Q)
     }
     
+    
   )
- )
+)
