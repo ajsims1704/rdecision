@@ -39,7 +39,10 @@ Arborescence <- R6::R6Class(
       super$initialize(V,A)
       # check that the graph is an arborescence
       if (!self$is_arborescence()) {
-        rlang::abort("The graph must be an arborescence", class="not_arborescence")
+        rlang::abort(
+          "The graph must be an arborescence", 
+          class="not_arborescence"
+        )
       }
       # return new Arborescence object
       return(invisible(self))

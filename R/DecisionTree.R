@@ -656,7 +656,11 @@ DecisionTree <- R6::R6Class(
     #' @description 
     #' Evaluate the components of payoff associated with a set of walks in the
     #' decision tree. For each walk, probability, cost, benefit and utility are
-    #' calculated.
+    #' calculated. 
+    #' @details There is minimal checking of the argument because this function 
+    #' is intended to be called repeatedly during tree evaluation, including
+    #' PSA. The argument P is expected to be obtained from 
+    #' \code{root_to_leaf_paths}.
     #' @param W A list of root-to-leaf walks. Each walk must start with the
     #' root node and end with a leaf node. Normally this is all the root to leaf
     #' paths in a tree.
@@ -675,10 +679,6 @@ DecisionTree <- R6::R6Class(
     #' \item{Utility}{Path.Utility \eqn{*} probability of traversing the
     #' pathway.}
     #' }
-    #' @note There is minimal checking of the argument because this function 
-    #' is intended to be called repeatedly during tree evaluation, including
-    #' PSA. The argument P is expected to be obtained from 
-    #' \code{root_to_leaf_paths}.
     evaluate_walks = function(W) {
       # create a return matrix
       PAYOFF <- matrix(
@@ -740,7 +740,7 @@ DecisionTree <- R6::R6Class(
     #' @param setvars One of "expected" (evaluate with each model variable at
     #' its mean value), "random" (sample each variable from its uncertainty 
     #' distribution and evaluate the model), "q2.5", "q50", "q97.5" (set each
-    #' model variable to its 2.5%, 50% or 97.5% quantile, respectively, and
+    #' model variable to its 2.5\%, 50\% or 97.5\% quantile, respectively, and
     #' evaluate the model), "current" (leave each model variable at its current
     #' value prior to calling the function and evaluate the model).
     #' @param N Number of replicates. Intended for use with PSA 
@@ -879,9 +879,10 @@ DecisionTree <- R6::R6Class(
     #' @return A data frame with one row per input model variable and columns
     #' for: minimum value of the variable, maximum value of the variable,
     #' minimum value of the outcome and maximum value of the outcome.
-    #' @note The extreme values of each input variable are the upper and lower
-    #' 95% confidence limits of the uncertainty distributions of each variable.
-    #' This ensures that the range of each input is defensible (Briggs 2012).
+    #' @details The extreme values of each input variable are the upper and 
+    #' lower 95\% confidence limits of the uncertainty distributions of each 
+    #' variable. This ensures that the range of each input is defensible 
+    #' (Briggs 2012).
     tornado = function(index, ref, outcome="cost", exclude=NULL, draw=TRUE) {
       # check the parameters
       if (missing(index) || missing(ref)) {

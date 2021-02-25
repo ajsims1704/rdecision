@@ -7,10 +7,10 @@
 #' @details 
 #' A model variable for which the uncertainty in the point estimate can
 #' be modelled with a Log Normal distribution. 
-#' \href{https://sites.google.com/site/probonto/}{ProbOnto (2017)}
-#' defines seven parametrizations of the log normal distribution. These are 
-#' linked, allowing the parameters of any one to be derived from any other. All
-#' 7 parametrizations require two parameters; their meanings are as follows:
+#' Swat (2017) defined seven parametrizations of the log normal distribution. 
+#' These are linked, allowing the parameters of any one to be derived from any 
+#' other. All 7 parametrizations require two parameters; their meanings are as 
+#' follows:
 #' \describe{
 #' \item{LN1}{\eqn{p_1=\mu}, \eqn{p_2=\sigma}, where \eqn{\mu} and \eqn{\sigma} 
 #' are the mean and standard deviation, both on the log scale.}
@@ -26,7 +26,7 @@
 #' \item{LN6}{\eqn{p_1=m}, \eqn{p_2=\sigma_g}, where \eqn{m} is the median on
 #' the natural scale and \eqn{\sigma_g} is the geometric standard deviation on 
 #' the natural scale.}
-#' \item{LN7}{\eqn{p_1=\mu_N}, \eqn{p2=\sigma_N}, where \eqn{\mu_N} is the mean
+#' \item{LN7}{\eqn{p_1=\mu_N}, \eqn{p_2=\sigma_N}, where \eqn{\mu_N} is the mean
 #' on the natural scale and \eqn{\sigma_N} is the standard deviation on the
 #' natural scale.}
 #' }
@@ -50,7 +50,8 @@
 #' allows the uncertainty distribution to be specified directly. For example, 
 #' if RR = 0.67 with 95% confidence interval 0.53 to 0.84 (Leaper, 2016), it 
 #' can be modelled with
-#' \code{LogNormModVar$new("rr","RR",p1=0.67,p2=(0.84-0.53)/(2*1.96)),"LN7"}.
+#' \code{LogNormModVar$new("rr", "RR", p1=0.67, 
+#' p2=(0.84-0.53)/(2*1.96)), "LN7"}.
 #' 
 #' @docType class
 #' @author Andrew J. Sims \email{andrew.sims@@newcastle.ac.uk}

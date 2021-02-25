@@ -7,6 +7,11 @@
 #' @details 
 #' Encapulates, and provides methods for computation and checking of directed
 #' graphs (digraphs). Inherits from class Graph. 
+#' @references 
+#' \itemize{
+#'   \item Kahn AB, Topological Sorting of Large Networks, \emph{Commun. ACM},
+#'   1962;\strong{5}:558-562, doi:10.1145/368996.369025.
+#' }
 #' 
 #' @docType class
 #' @author Andrew Sims \email{andrew.sims@@newcastle.ac.uk}
@@ -60,7 +65,10 @@ Digraph <- R6::R6Class(
     digraph_adjacency_matrix = function(boolean=FALSE) {
       # check argument
       if (!is.logical(boolean)) {
-        rlang::abort("Argument 'boolean' must be 'logical'.", class="non-logical_boolean")
+        rlang::abort(
+          "Argument 'boolean' must be 'logical'.", 
+          class="non-logical_boolean"
+        )
       }
       # create if not saved
       if (is.null(private$AD)) {
@@ -111,9 +119,16 @@ Digraph <- R6::R6Class(
         LE <- sapply(private$E,function(e){e$label()})
         nv <- self$order()
         ne <- self$size()
-        if ((length(unique(LV))==length(LV)) && (length(unique(LE))==length(LE)) &&
-            all(nchar(LV)>0) && all(nchar(LE)>0)) {
-          B <- matrix(rep(0,times=nv*ne), nrow=nv, dimnames=list(vertex=LV,edge=LE))
+        if (
+          (length(unique(LV))==length(LV)) && 
+          (length(unique(LE))==length(LE)) &&
+          all(nchar(LV)>0) && all(nchar(LE)>0)
+        ) {
+          B <- matrix(
+            rep(0,times=nv*ne), 
+            nrow=nv, 
+            dimnames=list(vertex=LV,edge=LE)
+          )
         } else {
           B <- matrix(rep(0,times=nv*ne), nrow=nv)
         }
@@ -137,7 +152,7 @@ Digraph <- R6::R6Class(
     
     #' @description 
     #' Attempt to topologically sort the vertexes in the directed graph using
-    #' Kahn's algorithm (https://doi.org/10.1145%2F368996.369025).
+    #' Kahn's algorithm (Kahn, 1962).
     #' @return A list of vertexes, topologically sorted. If the digraph has
     #' cycles, the returned ordered list will not contain all the vertexes
     #' in the graph, but no error will be raised.

@@ -16,6 +16,12 @@
 #' But such forms of expression may be desirable in constructing a
 #' model and this class provides a mechanism for doing so.
 #' 
+#' @references 
+#' \itemize{
+#'   \item Briggs A, Claxton K, Sculpher M. Decision modelling for health
+#'   economic evaluation. Oxford, UK: Oxford University Press; 2006. 
+#' }
+#' 
 #' @note For many expressions involving model variables there will 
 #' be no closed form expressions for the mean, standard deviation and
 #' the quantiles. Therefore they are obtained by simulation, via
@@ -66,7 +72,8 @@ ExprModVar <- R6::R6Class(
     #' combined into costs, probabilities and rates.
     #' @param units Units in which the variable is expressed.
     #' @param quo A quosure (see package rlang), which contains an expression
-    #' and its environment. The usage is `quo(x+y)` or `rlang::quo(x+y)`.
+    #' and its environment. The usage is \code{quo(x+y)} or 
+    #' \code{rlang::quo(x+y)}.
     #' @return An object of type ExprModVar
     initialize = function(description, units, quo) {
       # initialize the base class
@@ -93,9 +100,9 @@ ExprModVar <- R6::R6Class(
     #' @return A quosure whose expression is each ModVar \code{v} in the  
     #' expression replaced with \code{v$method} and the same environment as
     #' specified in the quosure supplied in new().
-    #' @note This method is mostly intended for internal use within the
+    #' @details This method is mostly intended for internal use within the
     #' class and will not generally be needed for normal use of ExprModVar
-    #' objects. The returned expression is *not* syntactically checked or 
+    #' objects. The returned expression is \emph{not} syntactically checked or 
     #' evaluated before it is returned.
     add_method = function(method="mean()") {
       # check argument

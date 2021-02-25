@@ -22,9 +22,9 @@ Action <- R6::R6Class(
     
     #' @description
     #' Create an object of type 'Action'. Optionally, a cost and a benefit may 
-    #' be associated with traversing the edge. A \dfn{payoff} (benefit-cost) 
-    #' is sometimes used in edges of decision trees; the parametrization used 
-    #' here is more general.
+    #' be associated with traversing the edge. A \dfn{payoff} (benefit minus 
+    #' cost)  is sometimes used in edges of decision trees; the parametrization
+    #' used here is more general.
     #' @param source Decision node from which the arrow leaves.
     #' @param target Node which the arrow enters.
     #' @param label Character string containing the arrow label. This
@@ -36,7 +36,10 @@ Action <- R6::R6Class(
     initialize = function(source, target, label, cost=0, benefit=0) {
       # check label
       if (!is.character(label)) {
-        rlang::abort("Argument label must be a string", class="non-string_label")
+        rlang::abort(
+          "Argument label must be a string", 
+          class="non-string_label"
+        )
       }
       if (nchar(label)==0) {
         rlang::abort("Argument label must be defined", class="empty_label")
@@ -45,7 +48,10 @@ Action <- R6::R6Class(
       super$initialize(source=source, target=target, label=label)
       # check that source inherits from DecisionNode
       if (!inherits(source, what="DecisionNode")) {
-        rlang::abort("Node 'source' must be a DecisionNode", class="non-Decision_source")
+        rlang::abort(
+          "Node 'source' must be a DecisionNode", 
+          class="non-Decision_source"
+        )
       }
       # check and set cost, ensuring initialization
       if (inherits(cost, what="numeric")) {
@@ -62,8 +68,10 @@ Action <- R6::R6Class(
       } else if (inherits(benefit, "ModVar")) {
         private$edge.benefit <- benefit
       } else {
-        rlang::abort("Argument 'benefit' must be of type 'numeric' or 'ModVar'.",
-                     class = "incorrect_type")
+        rlang::abort(
+          "Argument 'benefit' must be of type 'numeric' or 'ModVar'.",
+          class = "incorrect_type"
+        )
       }
       # Return Action node
       return(invisible(self))
