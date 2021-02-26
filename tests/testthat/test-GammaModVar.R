@@ -52,6 +52,22 @@ test_that("mean, mode, sd and quantiles are returned correctly", {
   expect_equal(q[2], 7.88, tolerance=0.01)
 })
 
+test_that("stub quantile function checks inputs and has correct output", {
+  k <- 9
+  theta <- 0.5
+  g <- GammaModVar$new("gamma", "GBP", k, theta)
+  probs <- c(0.1, 0.2, 0.5)
+  expect_silent(g$quantile(probs))
+  probs <- c(0.1, NA, 0.5)
+  expect_error(g$quantile(probs), class="probs_not_defined")
+  probs <- c(0.1, "boo", 0.5)
+  expect_error(g$quantile(probs), class="probs_not_numeric")
+  probs <- c(0.1, 0.4, 1.5)
+  expect_error(g$quantile(probs), class="probs_out_of_range")
+  probs <- c(0.1, 0.2, 0.5)
+  expect_equal(length(g$quantile(probs)),3)
+})
+
 test_that("random sampling is from a Gamma distribution", {
   k <- 9
   theta <- 0.5

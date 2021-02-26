@@ -109,7 +109,7 @@ ExprModVar <- R6::R6Class(
       if (!is.character(method)) {
         rlang::abort(
           "Argument 'method' must be a character string",
-          class = "method_is_not_character"
+          class = "method_not_character"
         )
       }
       # substitute model variable names with call to method
@@ -325,10 +325,19 @@ ExprModVar <- R6::R6Class(
     #' be rejected.
     #' @return Vector of quantiles.
     q_hat = function(probs, nest=1000) {
-      # check probs
+      # test probs
       sapply(probs, FUN=function(x) {
-        if (!is.numeric(probs)) {
-          stop("ExprModVar$getQuantile: argument must be a numeric vector")
+        if (is.na(x)) {
+          rlang::abort("All elements of 'probs' must be defined",
+                       class="probs_not_defined")
+        }
+        if (!is.numeric(x)) {
+          rlang::abort("Argument 'probs' must be a numeric vector",
+                       class="probs_not_numeric")
+        }
+        if (x<0 || x>1) {
+          rlang::abort("Elements of 'probs' must be in range[0,1]",
+                       class="probs_out_of_range")
         }
       })
       # check and process the sample estimation size

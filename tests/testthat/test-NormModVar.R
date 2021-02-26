@@ -20,6 +20,20 @@ test_that("modvar has correct distribution name", {
   expect_equal(n$distribution(), "N(42,1)")  
 })
 
+test_that("quantile function checks inputs", {
+  x <- NormModVar$new("x", "GBP", 0, 1)
+  probs <- c(0.1, 0.2, 0.5)
+  expect_silent(x$quantile(probs))
+  probs <- c(0.1, NA, 0.5)
+  expect_error(x$quantile(probs), class="probs_not_defined")
+  probs <- c(0.1, "boo", 0.5)
+  expect_error(x$quantile(probs), class="probs_not_numeric")
+  probs <- c(0.1, 0.4, 1.5)
+  expect_error(x$quantile(probs), class="probs_out_of_range")
+  probs <- c(0.1, 0.2, 0.5)
+  expect_equal(length(x$quantile(probs)),3)
+})
+
 test_that("pe, mean, sd and quantiles are returned correctly", {
   sn <- NormModVar$new("sn", "GBP", 0, 1)
   expect_equal(sn$mean(), 0)

@@ -2,6 +2,7 @@
 test_that("properties are set correctly", {
   x <- 2
   y <- 3
+  expect_error(ExprModVar$new("z", "GBP", x+y), class = "quo_not_quosure")
   z <- ExprModVar$new("z", "GBP", quo=rlang::quo(x+y))
   expect_true(z$is_expression())
   expect_equal(z$distribution(), "x + y")
@@ -44,6 +45,22 @@ test_that("ExprModVar obeys scoping rules" , {
     expect_equal(mv$mean(),50)
   }
   g(z)
+})
+
+test_that("stub quantile function checks inputs and has correct output", {
+  x <- 2
+  y <- 3
+  z <- ExprModVar$new("z", "GBP", quo=rlang::quo(x+y))
+  probs <- c(0.1, 0.2, 0.5)
+  expect_silent(z$quantile(probs))
+  probs <- c(0.1, NA, 0.5)
+  expect_error(z$quantile(probs), class="probs_not_defined")
+  probs <- c(0.1, "boo", 0.5)
+  expect_error(z$quantile(probs), class="probs_not_numeric")
+  probs <- c(0.1, 0.4, 1.5)
+  expect_error(z$quantile(probs), class="probs_out_of_range")
+  probs <- c(0.1, 0.2, 0.5)
+  expect_equal(length(z$quantile(probs)),3)
 })
 
 test_that("operands are identified correctly", {
@@ -97,12 +114,23 @@ test_that("set and get function as expected", {
 test_that("modified expressions are created correctly", {
   p <- BetaModVar$new("P(success)", "P", alpha=1, beta=9)
   q <- ExprModVar$new("P(failure)", "P", rlang::quo(1-p))
+  # check externally added method
+  expect_error(q$add_method(42), class="method_not_character")
   q.mean <- q$add_method("mean()")
   expect_equal(
     eval(rlang::quo_get_expr(q.mean), envir=rlang::quo_get_env(q.mean)),
     0.9
   )
   expect_equal(q$mean(),0.9)
+  # check internally added methods
+  N <- 1000
+  samp <- vector(mode="numeric", length=N)
+  for (i in 1:N) {
+    samp[i] <- q$r(1)
+  }
+  expect_equal(mean(samp), 0.9, tolerance=0.1)
+  samp <- q$r(N)
+  expect_equal(mean(samp), 0.9, tolerance=0.1)
 })
 
 test_that("illegal sample sizes for estimating parameters are rejected", {
@@ -119,6 +147,25 @@ test_that("illegal sample sizes for estimating parameters are rejected", {
   expect_error(z$sigma_hat(999.5), class="nest_too_small")
   expect_silent(z$sigma_hat(10000))
 })
+
+test_that("quantile estimation checks inputs and has correct output", {
+  p <- BetaModVar$new("P(success)", "P", alpha=1, beta=9)
+  q <- ExprModVar$new("P(failure)", "P", rlang::quo(1-p))
+  probs <- c(0.1, 0.2, 0.5)
+  expect_silent(q$q_hat(probs))
+  probs <- c(0.1, NA, 0.5)
+  expect_error(q$q_hat(probs), class="probs_not_defined")
+  probs <- c(0.1, "boo", 0.5)
+  expect_error(q$q_hat(probs), class="probs_not_numeric")
+  probs <- c(0.1, 0.4, 1.5)
+  expect_error(q$q_hat(probs), class="probs_out_of_range")
+  probs <- c(0.1, 0.2, 0.5)
+  expect_equal(length(q$q_hat(probs)),3)
+  expect_error(q$q_hat(probs,"1000"), class="nest_not_numeric")
+  expect_error(q$q_hat(probs,42), class="nest_too_small")
+  
+})
+
 
 test_that("scoping rules for mu_hat in nested expressions are obeyed", {
   x <- NormModVar$new("SN", "m", mu=0, sigma=1)

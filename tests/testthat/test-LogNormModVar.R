@@ -38,6 +38,22 @@ test_that("mean, mode, sd and quantiles are returned correctly", {
   expect_equal(ln$quantile(c(0.75)), ln.quant(mu,sigma,0.75))
 })
 
+test_that("quantile function checks inputs and has correct output", {
+  mu <- 0
+  sigma <- 0.25
+  ln <- LogNormModVar$new("ln", "GBP", p1=mu, p2=sigma, "LN1")
+  probs <- c(0.1, 0.2, 0.5)
+  expect_silent(ln$quantile(probs))
+  probs <- c(0.1, NA, 0.5)
+  expect_error(ln$quantile(probs), class="probs_not_defined")
+  probs <- c(0.1, "boo", 0.5)
+  expect_error(ln$quantile(probs), class="probs_not_numeric")
+  probs <- c(0.1, 0.4, 1.5)
+  expect_error(ln$quantile(probs), class="probs_out_of_range")
+  probs <- c(0.1, 0.2, 0.5)
+  expect_equal(length(ln$quantile(probs)),3)
+})
+
 test_that("get() is initialized correctly", {
   mu <- 0
   sigma <- 0.25

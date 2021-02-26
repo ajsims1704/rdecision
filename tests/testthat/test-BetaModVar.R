@@ -57,7 +57,23 @@ test_that("mean, mode, sd and quantiles are returned correctly", {
   expect_equal(q[2], 0.641, tolerance=0.001)
 })
 
-test_that("Extreme node values are defined", {
+test_that("quantile function checks inputs and has correct output", {
+  alpha <- 2
+  beta <- 5
+  b <- BetaModVar$new("beta", "GBP", alpha, beta)
+  probs <- c(0.1, 0.2, 0.5)
+  expect_silent(b$quantile(probs))
+  probs <- c(0.1, NA, 0.5)
+  expect_error(b$quantile(probs), class="probs_not_defined")
+  probs <- c(0.1, "boo", 0.5)
+  expect_error(b$quantile(probs), class="probs_not_numeric")
+  probs <- c(0.1, 0.4, 1.5)
+  expect_error(b$quantile(probs), class="probs_out_of_range")
+  probs <- c(0.1, 0.2, 0.5)
+  expect_equal(length(b$quantile(probs)),3)
+})
+
+test_that("Extreme mode values are defined", {
   alpha <- 1
   beta <- 1
   b <- BetaModVar$new("beta", "GBP", alpha, beta)
