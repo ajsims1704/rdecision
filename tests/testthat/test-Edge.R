@@ -20,3 +20,10 @@ test_that("edge is defined correctly", {
   expect_identical(n2, V[[2]])
   expect_equal(e$label(), "e1")
 })
+
+test_that("an edge identifies itself", {
+  n1 <- Node$new()
+  n2 <- Node$new()
+  e <- Edge$new(n1, n2, "e1")
+  expect_true(e$is_same_edge(e))
+})

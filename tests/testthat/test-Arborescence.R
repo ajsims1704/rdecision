@@ -101,6 +101,36 @@ test_that("parent, sibling and drawing functions are correct", {
   expect_true(nodesetequal(T$siblings(E), list(F,N)))
   expect_true(nodesetequal(T$siblings(A), list(D)))
   expect_true(nodesetequal(T$siblings(J), list(H,I,K,L)))
+  # check postree arguments
+  expect_error(
+    T$postree(SiblingSeparation="x"), 
+    class="non-numeric_SiblingSeparation"
+  )
+  expect_error(
+    T$postree(SubtreeSeparation="x"), 
+    class="non-numeric_SubtreeSeparation"
+  )
+  expect_error(
+    T$postree(LevelSeparation="x"), 
+    class="non-numeric_LevelSeparation"
+  )
+  expect_error(
+    T$postree(RootOrientation=90), 
+    class="non-character_RootOrientation"
+  )
+  expect_error(
+    T$postree(RootOrientation="SOUTHWEST"), 
+    class="invalid_RootOrientation"
+  )
+  expect_error(
+    T$postree(MaxDepth=FALSE),
+    class = "invalid_MaxDepth"
+  )
+  # check for coverage
+  expect_silent(T$postree(RootOrientation="NORTH"))
+  expect_silent(T$postree(RootOrientation="WEST"))
+  # check max depth exceeded is detected
+  expect_error(T$postree(MaxDepth=2), class="POSITIONTREE_error")
   # check the node coordinates
   XY <- T$postree()
   expect_equal(nrow(XY),T$order())

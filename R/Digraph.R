@@ -8,8 +8,8 @@
 #' Encapulates, and provides methods for computation and checking of directed
 #' graphs (digraphs). Inherits from class Graph. 
 #' @references 
-#' \itemize{
-#'   \item Kahn AB, Topological Sorting of Large Networks, \emph{Commun. ACM},
+#' \cite{
+#'   Kahn AB, Topological Sorting of Large Networks, \emph{Commun. ACM},
 #'   1962;\strong{5}:558-562, doi:10.1145/368996.369025.
 #' }
 #' 

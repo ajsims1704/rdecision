@@ -82,7 +82,7 @@ ModVar <- R6::R6Class(
     #' Accessor function for the name of the uncertainty distribution.
     #' @return Distribution name as character string.
     distribution = function() {
-      return(NA)
+      return(as.character(NA))
     },
     
     #' @description 

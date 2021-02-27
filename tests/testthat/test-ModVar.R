@@ -44,6 +44,13 @@ test_that("stub quantile function checks inputs and has correct output", {
   expect_equal(length(x$quantile(probs)),3)
 })
 
+test_that("stub functions return NA", {
+  x <- ModVar$new("x", "GBP")
+  expect_true(is.na(x$distribution()))
+  expect_true(is.na(x$mode()))
+  expect_true(is.na(x$SD()))
+})
+
 test_that("set checks its argument", {
   x <- ModVar$new("x", "GBP")
   expect_error(x$set(42), class="what_not_character")

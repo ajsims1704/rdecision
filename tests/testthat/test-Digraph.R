@@ -202,6 +202,15 @@ test_that("all paths in a 4-node graph with cycle are discovered", {
   ef <- Arrow$new(n1,n3)
   G <- Digraph$new(V=list(n0,n1,n2,n3),A=list(ea,eb,ec,ed,ee,ef))
   #
+  nX <- Node$new("X")
+  expect_error(G$paths(nX,n3), class="not_in_graph")
+  expect_error(G$paths(n2,nX), class="not_in_graph")
+  P <- list(n0,n1,nX)
+  expect_error(G$walk(P), class="not_in_graph")
+  P <- list(n2,n3)
+  expect_error(G$walk(P), class="missing_edge")
+  expect_silent(G$walk(list()))
+  #
   P <- G$paths(n2,n3)
   expect_equal(length(P),3)
 })

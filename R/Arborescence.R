@@ -137,7 +137,8 @@ Arborescence <- R6::R6Class(
     # There were 3 bugs in the pseudo-code in the report, possibly corrected
     # in the later paper, indicated by ##DEBUG## in the code below. 
     postree = function(SiblingSeparation=4, SubtreeSeparation=4, 
-                       LevelSeparation=1, RootOrientation="SOUTH") {
+                       LevelSeparation=1, RootOrientation="SOUTH",
+                       MaxDepth=Inf) {
       # check input parameters
       if (!is.numeric(SiblingSeparation)) {
         rlang::abort(
@@ -159,19 +160,24 @@ Arborescence <- R6::R6Class(
       }
       if (!is.character(RootOrientation)) {
         rlang::abort(
-          message = "'RootOrientation' must be numeric",
+          message = "'RootOrientation' must be character",
           class = "non-character_RootOrientation"
         )
       }
       if (!(RootOrientation %in% c("NORTH", "SOUTH", "EAST", "WEST"))) {
         rlang::abort(
           message = "'RootOrientation' must be one of NORTH, SOUTH, EAST, WEST",
-          class = "illegal_RootOrientation"
+          class = "invalid_RootOrientation"
+        )
+      }
+      if (!is.numeric(MaxDepth)) {
+        rlang::abort(
+          message = "'MaxDepth' must be numeric",
+          class = "invalid_MaxDepth"
         )
       }
       # globals for the algorithm
       LevelZeroPtr <- 0
-      MaxDepth <- Inf
       xTopAdjustment <- 0
       yTopAdjustment <- 0
       # prevnode list (max 'height' is order of graph)
@@ -464,12 +470,12 @@ Arborescence <- R6::R6Class(
             }
           } else {
             # Continuing would put the tree outside of the 
-            # drawable extents range.
+            # drawable extent's range.
             Result <- FALSE
           }
         } else {
           # We are at a level deeper than that we want to draw. 
-          Result <- TRUE
+          Result <- FALSE
         }
         return(Result)
       }      
@@ -499,6 +505,12 @@ Arborescence <- R6::R6Class(
       # call Walker's main function
       iRoot <- self$vertex_index(self$root())
       rc <- POSITIONTREE(iRoot)
+      if (!rc) {
+        rlang::abort(
+          "Error in POSITIONTREE",
+          class = "POSITIONTREE_error"
+        )
+      }
       # create and populate the coordinate data frame
       XY <- data.frame(
         n = seq(1:self$order()),
