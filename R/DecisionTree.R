@@ -99,6 +99,8 @@ DecisionTree <- R6::R6Class(
         rlang::abort("Each edge must inherit from Action or Reaction", 
                      class="incorrect_edge_type")
       }
+# nocov start
+# Action and Reaction already check for correct source node type
       # Action (reaction) edges must emerge from DecisionNodes (ChanceNodes)
       eok <- sapply(E,function(e){
         rc <- TRUE
@@ -114,13 +116,12 @@ DecisionTree <- R6::R6Class(
         return(rc)
       })
       if (!all(eok)) {
-# nocov start
         rlang::abort( 
           "Actions must start at DecisionNodes; Reactions at ChanceNodes", 
           class = "incorrect_edge_type" 
         )
-# nocov end
       }
+# nocov end
       # DecisionNode labels must be unique and all their Action labels
       # must be unique
       D.lab <- sapply(D,function(d){
@@ -142,7 +143,7 @@ DecisionTree <- R6::R6Class(
       if (length(D.lab) != length(unique(D.lab))) {
         rlang::abort(
           "Labels of DecisionNodes must be unique", 
-          class="non_unique_labels"
+          class = "non_unique_labels"
         )
       }
       # return a new DecisionTree object
@@ -157,6 +158,7 @@ DecisionTree <- R6::R6Class(
     #' of character strings (for what="label"); or a list of integer indexes of 
     #' the decision nodes (for what="index").
     decision_nodes = function(what="node") {
+      # find the vertex IDs
       id <- which(
         sapply(private$V, function(v){inherits(v,what="DecisionNode")}),
         arr.ind=TRUE
@@ -203,7 +205,7 @@ DecisionTree <- R6::R6Class(
       if (what=="node") {
         rc <- private$V[il]
       } else if (what=="label") {
-        rc <- sapply(id, function(il) {private$V[[il]]$label()})
+        rc <- sapply(il, function(iv) {private$V[[iv]]$label()})
       } else if (what=="index") {
         rc <- il
       } else {
@@ -221,6 +223,12 @@ DecisionTree <- R6::R6Class(
     #' @return A list of Action edges.
     actions = function(d) {
       # check argument
+      if (missing(d)) {
+        rlang::abort(
+          "Node 'd' must be defined", 
+          class="decision_node_not_defined"
+        )
+      }
       if (!self$has_vertex(d)) {
         rlang::abort(
           "Node 'd' is not in the Decision Tree", 
@@ -692,10 +700,13 @@ DecisionTree <- R6::R6Class(
     #' \item{Path.Cost}{The cost of traversing the pathway.}
     #' \item{Path.Benefit}{The benefit derived from traversing the pathway.}
     #' \item{Path.Utility}{The utility associated with the outcome (leaf node).}
+    #' \item{Path.QALY}{The QALYs associated with the outcome (leaf node).}
     #' \item{Cost}{Path.Cost \eqn{*} probability of traversing the pathway.}
     #' \item{Benefit}{Path.Benefit \eqn{*} probability of traversing the 
     #' pathway.}
     #' \item{Utility}{Path.Utility \eqn{*} probability of traversing the
+    #' pathway.}
+    #' \item{QALY}{Path.QALY \eqn{*} probability of traversing the
     #' pathway.}
     #' }
     evaluate_walks = function(W) {
@@ -703,11 +714,11 @@ DecisionTree <- R6::R6Class(
       PAYOFF <- matrix(
         data = NA,
         nrow = length(W),
-        ncol = 8,
+        ncol = 10,
         dimnames = list(
           NULL, 
           c("Leaf", "Probability", "Path.Cost", "Path.Benefit", "Path.Utility",
-            "Cost", "Benefit", "Utility")
+            "Path.QALY", "Cost", "Benefit", "Utility", "QALY")
         )
       )
       # evaluate each path
@@ -742,11 +753,13 @@ DecisionTree <- R6::R6Class(
         PAYOFF[i,"Path.Benefit"] <- benefit
         # utility of the leaf node at end of the path
         PAYOFF[i, "Path.Utility"] <- leaf$utility()
+        PAYOFF[i, "Path.QALY"] <- leaf$QALY()
       }
       # add expected cost and utility     
       PAYOFF[,"Cost"] <- PAYOFF[,"Probability"]*PAYOFF[,"Path.Cost"]
       PAYOFF[,"Benefit"] <- PAYOFF[,"Probability"]*PAYOFF[,"Path.Benefit"]
       PAYOFF[,"Utility"] <- PAYOFF[,"Probability"]*PAYOFF[,"Path.Utility"]
+      PAYOFF[,"QALY"] <- PAYOFF[,"Probability"]*PAYOFF[,"Path.QALY"]
       # return the payoff table      
       return(PAYOFF)
     },
@@ -773,15 +786,16 @@ DecisionTree <- R6::R6Class(
     #' @return A data frame with one row per strategy per run and columns
     #' organized as follows:
     #' \describe{
-    #' \item{Leaf}{The label of the leaf that terminates the path, 
-    #' for by='path'.}
-    #' \item{Strategy}{The strategy expressed as the values of the action edges
-    #' emanating from each decision node.}
-    #' \item{Run}{The run number}
-    #' \item{Probability}{Probability (1 if by='strategy')}
-    #' \item{Cost}{Aggregate cost of the strategy.}
-    #' \item{Benefit}{Aggregate benefit of the strategy.}
-    #' \item{Utility}{Aggregate utility of the strategy.}
+    #'   \item{Leaf}{The label of the leaf that terminates the path, 
+    #'   for by='path'.}
+    #'   \item{Strategy}{The strategy expressed as the values of the action 
+    #'   edges emanating from each decision node.}
+    #'   \item{Run}{The run number}
+    #'   \item{Probability}{Probability (1 if by='strategy')}
+    #'   \item{Cost}{Aggregate cost of the strategy.}
+    #'   \item{Benefit}{Aggregate benefit of the strategy.}
+    #'   \item{Utility}{Aggregate utility of the strategy.}
+    #'   \item{QALY}{Aggregate QALY of the strategy.}
     #' }
     evaluate = function(setvars="expected", N=1, by="strategy") {
       # check arguments
@@ -851,6 +865,7 @@ DecisionTree <- R6::R6Class(
       # exclude unnecessary columns
       RES$Path.Cost <- NULL
       RES$Path.Utility <- NULL
+      RES$Path.QALY <- NULL
       RES$Path.Benefit <- NULL
       # modify output as required
       if (by == "path") {
@@ -865,7 +880,7 @@ DecisionTree <- R6::R6Class(
         dn <- self$decision_nodes("label")
         f <- as.formula(
           paste(
-            "cbind(Probability, Cost, Benefit, Utility)",
+            "cbind(Probability, Cost, Benefit, Utility, QALY)",
             paste(paste(dn, collapse="+"), "Run", sep = "+"),
             sep = "~"
           ) 
@@ -897,12 +912,22 @@ DecisionTree <- R6::R6Class(
     #' data frame silently.
     #' @return A data frame with one row per input model variable and columns
     #' for: minimum value of the variable, maximum value of the variable,
-    #' minimum value of the outcome and maximum value of the outcome.
+    #' minimum value of the outcome and maximum value of the outcome. NULL
+    #' if there are no modvars.
     #' @details The extreme values of each input variable are the upper and 
     #' lower 95\% confidence limits of the uncertainty distributions of each 
     #' variable. This ensures that the range of each input is defensible 
     #' (Briggs 2012).
     tornado = function(index, ref, outcome="cost", exclude=NULL, draw=TRUE) {
+      # find all input modvars, excluding expressions and those stated
+      mvlist <- self$modvars()
+      lv <- vapply(X=mvlist, FUN.VALUE=TRUE, FUN=function(v) {
+        return(!v$is_expression())
+      })
+      mvlist <- mvlist[lv]
+      if (length(mvlist)==0) {
+        return(NULL)
+      }
       # check the parameters
       if (missing(index) || missing(ref)) {
         rlang::abort(
@@ -911,10 +936,12 @@ DecisionTree <- R6::R6Class(
         )
       }
       if (!self$is_strategy(index) || !self$is_strategy(ref)) {
+# nocov start
         rlang::abort(
           "'index' and 'ref' must be valid strategies for the decision tree",
           class = "invalid_strategy"
         )
+# nocov end
       }
       if (!(outcome %in% c("cost", "ICER"))) {
         rlang::abort(
@@ -929,28 +956,24 @@ DecisionTree <- R6::R6Class(
             class = "exclude_not_list"
           )
         }
+        mvd <- vapply(mvlist, FUN.VALUE="x", FUN=function(v){v$description()})
         isc <- vapply(X=exclude, FUN.VALUE=TRUE, FUN=function(d) {
-          return(is.character(d))
+          rv <- (is.character(d) && (d %in% mvd))
+          return(rv)
         })
         if (!all(isc)) {
           rlang::abort(
             "'exclude' must be a character list of model variable descriptions",
-            class = "exclude_element_not_character"
+            class = "exclude_element_not_modvar"
           )
         }
       }
       if (!is.logical(draw)) {
         rlang::abort(
           "'draw' must be boolean",
-          class = "invalid_outcome"
+          class = "invalid_draw"
         )
       }
-      # find all input modvars, excluding expressions and those stated
-      mvlist <- self$modvars()
-      lv <- vapply(X=mvlist, FUN.VALUE=TRUE, FUN=function(v) {
-        return(!v$is_expression())
-      })
-      mvlist <- mvlist[lv]
       if (!is.null(exclude)) {
         lv <- vapply(X=mvlist, FUN.VALUE=TRUE, FUN=function(v) {
           return(v$description() %in% exclude)
@@ -1006,17 +1029,21 @@ DecisionTree <- R6::R6Class(
           ORES <- merge(st.index, RES, all.x=TRUE)
           index.cost <- ORES$Cost[1]
           index.utility <- ORES$Utility[1]
+          index.QALY <- ORES$QALY[1]
           # get outcome for reference strategy
           ORES <- merge(st.ref, RES, all.x=TRUE)
           ref.cost <- ORES$Cost[1]
           ref.utility <- ORES$Utility[1]
+          ref.QALY <- ORES$QALY[1]
           # outcome
           if (outcome == "cost") {
             rv <- ref.cost - index.cost
           } else if (outcome == "ICER") {
-            rv <- (index.cost-ref.cost)/(index.utility-ref.utility)
+            rv <- (index.cost-ref.cost)/(index.QALY-ref.QALY)
           } else {
+# nocov start
             rv <- NA
+# nocov end
           }
           return(rv)          
         }

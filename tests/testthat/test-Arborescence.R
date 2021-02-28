@@ -165,5 +165,5 @@ test_that("parent, sibling and drawing functions are correct", {
   expect_equal(XY["J","y"],3)
   expect_equal(XY["K","y"],3)
   expect_equal(XY["L","y"],3)
-  
 })
+

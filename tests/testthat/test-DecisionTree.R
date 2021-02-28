@@ -1,4 +1,15 @@
 
+# setequal function for Nodes
+nodesetequal <- function(A,B) {
+  AinB <- all(sapply(A, function(a) {
+    return(any(sapply(B, function(b){identical(a,b)})))
+  }))  
+  BinA <- all(sapply(B, function(b) {
+    return(any(sapply(A, function(a){identical(a,b)})))
+  }))
+  return(AinB & BinA)
+}
+
 # arborescences that are not decision trees are rejected
 test_that("arborescences that are not decision trees are rejected", {
   # some nodes not {D,C,L}
@@ -41,11 +52,52 @@ test_that("arborescences that are not decision trees are rejected", {
     DecisionTree$new(V=list(d1,c1,t1,t2,t3), E=list(e1,e2,e3,e4)),
     class = "incorrect_edge_type"
   )
-
-  
-  
+  # labels of actions from a common DecisionNode must be unique
+  e4 <- Action$new(d1,t3,label="e1")
+  expect_error(
+    DecisionTree$new(V=list(d1,c1,t1,t2,t3), E=list(e1,e2,e3,e4)),
+    class = "non_unique_labels"
+  )
+  # decision node labels must be unique
+  d2 <- DecisionNode$new("d1")
+  e4 <- Action$new(d1,d2,label="e4")
+  e5 <- Action$new(d2,t3,label="e5")
+  expect_error(
+    DecisionTree$new(V=list(d1,d2,c1,t1,t2,t3), E=list(e1,e2,e3,e4,e5)),
+    class = "non_unique_labels"
+  )
+  # construct a legal tree
+  e4 <- Action$new(d1,t3,label="e4")
+  expect_silent(
+    DT <- DecisionTree$new(V=list(d1,c1,t1,t2,t3), E=list(e1,e2,e3,e4))
+  )
+  # queries
+  expect_error(DT$decision_nodes(42),class="unknown_what_value")
+  expect_true(nodesetequal(DT$decision_nodes(),list(d1)))
+  expect_true(nodesetequal(DT$chance_nodes(),list(c1)))
+  expect_error(DT$leaf_nodes(42),class="unknown_what_value")
+  expect_true(nodesetequal(DT$leaf_nodes(),list(t1,t2,t3)))
+  expect_true(nodesetequal(DT$leaf_nodes("label"),list("t1","t2","t3")))
+  expect_true(
+    nodesetequal(
+      DT$leaf_nodes("index"),
+      list(DT$vertex_index(t1),DT$vertex_index(t2),DT$vertex_index(t3))
+    )
+  )
+  expect_error(DT$actions(d2), class="not_in_tree")
+  expect_error(DT$actions(c1), class="not_decision_node")
+  expect_error(
+    nodesetequal(DT$actions(),list(e1,e4)), 
+    class="decision_node_not_defined"
+  )
+  expect_equal(DT$actions(d1), list(e1,e4))
+  # evaluate
+  expect_error(DT$evaluate(N="forty two"), class = "N_not_numeric")
+  expect_error(DT$evaluate(by=42), class = "by_not_character")
+  expect_error(DT$evaluate(by="run"), class = "by_invalid")
+  # tornado
+  expect_true(is.null(DT$tornado(index=list(e1),ref=list(e4))))
 })
-
 
 # tests of basic tree properties (Kaminski et al CEJOR 2018;26:135-139, fig 1)
 test_that("simple decision trees are modelled correctly", {
@@ -69,7 +121,7 @@ test_that("simple decision trees are modelled correctly", {
   expect_equal(DT$decision_nodes("label"), "d1")
   # draw it
   pdf(NULL)
-  expect_silent(DT$draw())
+  expect_silent(DT$draw(border=TRUE))
   dev.off()
   # strategy validity
   expect_error(DT$is_strategy(list(e2,e3)), class = "incorrect_strategy_type")
@@ -83,6 +135,11 @@ test_that("simple decision trees are modelled correctly", {
   PS <- DT$strategy_paths()
   expect_equal(nrow(PS),3)
   # strategies
+  expect_error(DT$strategy_table(42), class="unknown_what_value")
+  expect_error(
+    DT$strategy_table(select=list(e2,e3)), 
+    class = "incorrect_strategy_type"
+  )
   S <- DT$strategy_table()
   expect_equal(nrow(S),2)
   S <- DT$strategy_table("label", select=list(e1))
@@ -98,8 +155,8 @@ test_that("rdecision replicates Evans et al, Sumatriptan base case", {
   # Time horizon
   th <- as.difftime(48, units="hours")
   # model variables
-  c.sumatriptan <- 16.10
-  c.caffeine <- 1.32
+  c.sumatriptan <- ConstModVar$new("Sumatriptan","CAD",16.10)
+  c.caffeine <- ConstModVar$new("Caffeine", "CAD", 1.32)
   c.ED <- 63.16
   c.admission <- 1093
   #
@@ -183,6 +240,13 @@ test_that("rdecision replicates Evans et al, Sumatriptan base case", {
   u.Caffeine <- round(RES[RES$Run==1 & 
                           RES$d1=="Caffeine/Ergotamine", "Utility"],2)
   expect_equal(u.Caffeine, 0.20)
+  # tornado (only drug costs are modvars)
+  TO <- dt$tornado(index=list(e17),ref=list(e18),outcome="ICER",draw=FALSE)
+  expect_equal(
+    TO[TO$Description=="Sumatriptan","outcome.min"],
+    14692,
+    tolerance=2
+  )
 })
 
 # -----------------------------------------------------------------------------
@@ -237,13 +301,17 @@ test_that("rdecision replicates Kaminski et al, fig 7", {
   V <- list(d1,d2,d3, c1,c2,c3,c4, t1,t2,t3,t4,t5,t6,t7,t8,t9)
   expect_silent(DT<-DecisionTree$new(V,E))
   # strategies
+  expect_error(
+    DT$strategy_table(select=list(E[[1]],E[[2]])), 
+    class = "invalid_strategy"
+  )
   S <- DT$strategy_table("label")
   expect_equal(nrow(S),12)
   expect_equal(sum(S$d1=="sell"),4)
   expect_equal(sum(S$d2=="sell"),6)
   expect_equal(sum(S$d3=="sell"),6)
   # single strategy
-  s <- list(E[[1]], E[[7]], E[[12]]) # sell/seell/sell
+  s <- list(E[[1]], E[[7]], E[[12]]) # sell/sell/sell
   expect_true(DT$is_strategy(s))
   S <- DT$strategy_table("label", select=s)
   expect_equal(nrow(S),1)
@@ -256,9 +324,17 @@ test_that("rdecision replicates Kaminski et al, fig 7", {
   P <- DT$root_to_leaf_paths()
   W <- sapply(P,function(p){DT$walk(p)})
   expect_equal(length(W),9)
+  WX <- sapply(P,function(p){
+    pp <- p
+    if (length(pp)>2) {
+      pp[[length(pp)]] <- NULL
+    }
+    DT$walk(pp)
+  })
+  expect_error(DT$evaluate_walks(WX), class="not_to_leaf")
   M <- DT$evaluate_walks(W)
   expect_equal(nrow(M),9)
-  expect_equal(ncol(M),8)
+  expect_equal(ncol(M),10)
   expect_equal(unname(M[8,"Cost"]),220.5,tolerance=1)
   # evaluate one strategy (test/sell/sell)
   RES <- DT$evaluate()
@@ -510,6 +586,8 @@ test_that("redecision replicates Jenks et al, 2016", {
   MVT <- DT$modvar_table()
   expect_equal(nrow(MVT), 27)
   expect_equal(sum(MVT$Est),16)
+  MVT <- DT$modvar_table(FALSE)
+  expect_equal(nrow(MVT),11)
 
   # evaluate the tree (base case, no PSA)
   E <- DT$evaluate()
@@ -526,6 +604,30 @@ test_that("redecision replicates Jenks et al, 2016", {
   
   # tornado (diagram)
   pdf(NULL)
+  # tornado
+  expect_error(DT$tornado(), class="missing_strategy")
+  expect_error(
+    DT$tornado(index=list(e10),ref=list(e9),outcome="survival"),
+    class = "invalid_outcome"
+  )
+  expect_error(
+    DT$tornado(index=list(e10),ref=list(e9),draw=42),
+    class = "invalid_draw"
+  )
+  expect_error(
+    TO <- DT$tornado(
+      index=list(e10), ref=list(e9), exclude=42,
+      draw = TRUE
+    ),
+    class = "exclude_not_list"
+  )
+  expect_error(
+    TO <- DT$tornado(
+      index=list(e10), ref=list(e9), exclude=list("SN1", "SN2", "SNX"),
+      draw = TRUE
+    ),
+    class = "exclude_element_not_modvar"
+  )
   expect_silent(
     TO <- DT$tornado(
       index=list(e10), ref=list(e9), exclude=list("SN1", "SN2", "SN3"),

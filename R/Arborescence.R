@@ -381,10 +381,12 @@ Arborescence <- R6::R6Class(
           if (ISLEAF(Leftmost)) {
             Leftmost <- GETLEFTMOST(iNode, 0, CompareDepth)
           } else {
-            Leftmost <- FIRSTCHILD(Leftmost)        
+# nocov start
+# in an arborescence the leftmost node in a subtree is always a leaf
+            Leftmost <- FIRSTCHILD(Leftmost)
+# nocov end
           }
           Neighbor <- LEFTNEIGHBOR[Leftmost] ##DEBUG - line missing##
-
         }
         return
       }
@@ -473,7 +475,10 @@ Arborescence <- R6::R6Class(
           } else {
             # Continuing would put the tree outside of the 
             # drawable extent's range.
+# nocov start
+# there are no limits on the drawable extent, so will never reach here
             Result <- FALSE
+# nocov end
           }
         } else {
           # We are at a level deeper than that we want to draw. 
@@ -501,7 +506,10 @@ Arborescence <- R6::R6Class(
           return(SECONDWALK(iNode, 0, 0))      
         } else {
           # Trivial: return TRUE if a null pointer was passed.
+# nocov start
+# an arborescence must have a root node, so never reach here
           return(TRUE)         
+# nocov end
         }
       }
       # call Walker's main function

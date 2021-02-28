@@ -56,7 +56,10 @@ Graph <- R6::R6Class(
         }
         sapply(e$endpoints(), function(w){
           if (!self$has_vertex(w)) {
-            rlang::abort("Edge vertices must be in graph", class="not_in_graph")
+            rlang::abort(
+              "All edge vertexes must be in graph", 
+              class = "not_in_graph"
+            )
           }  
         })
       })
