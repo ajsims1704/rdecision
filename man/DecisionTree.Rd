@@ -36,15 +36,22 @@ with a common source endpoint must be 1.}
 \code{Action}s that share a common source endpoint must be unique.}
 }
 }
-\note{
-There is minimal checking of the argument because this function 
-is intended to be called repeatedly during tree evaluation, including
-PSA. The argument P is expected to be obtained from 
-\code{root_to_leaf_paths}.
-
-The extreme values of each input variable are the upper and lower
-95% confidence limits of the uncertainty distributions of each variable.
-This ensures that the range of each input is defensible (Briggs 2012).
+\references{
+\cite{
+  Briggs A, Claxton K, Sculpher M. Decision modelling for health economic
+  evaluation. Oxford, UK: Oxford University Press; 2006. 
+}
+\cite{
+  Briggs AH, Weinstein MC, Fenwick EAL, Karnon J, Sculpher MJ, Paltiel AD.
+  Model Parameter Estimation and Uncertainty: A Report of the ISPOR-SMDM 
+  Modeling Good Research Practices Task Force-6. \emph{Value in Health}.
+  2012;\strong{15}:835–842. doi:10.1016/j.jval.2012.04.014.
+}
+\cite{
+  Kamiński B, Jakubczyk M, Szufel P. A framework for sensitivity analysis
+  of decision trees. \emph{Central European Journal of Operational Research}.
+  2018;\strong{26}:135–159. doi:10.007/s10100-017-0479-6.
+}
 }
 \author{
 Andrew J. Sims \email{andrew.sims@newcastle.ac.uk}
@@ -381,6 +388,13 @@ paths in a tree.}
 }
 \if{html}{\out{</div>}}
 }
+\subsection{Details}{
+There is minimal checking of the argument because this function 
+is intended to be called repeatedly during tree evaluation, including
+PSA. The argument P is expected to be obtained from 
+\code{root_to_leaf_paths}.
+}
+
 \subsection{Returns}{
 A matrix (payoff table) with one row per path and columns
 organized as follows:
@@ -417,7 +431,7 @@ by strategy.
 \item{\code{setvars}}{One of "expected" (evaluate with each model variable at
 its mean value), "random" (sample each variable from its uncertainty 
 distribution and evaluate the model), "q2.5", "q50", "q97.5" (set each
-model variable to its 2.5%, 50% or 97.5% quantile, respectively, and
+model variable to its 2.5\%, 50\% or 97.5\% quantile, respectively, and
 evaluate the model), "current" (leave each model variable at its current
 value prior to calling the function and evaluate the model).}
 
@@ -485,6 +499,13 @@ data frame silently.}
 }
 \if{html}{\out{</div>}}
 }
+\subsection{Details}{
+The extreme values of each input variable are the upper and 
+lower 95\% confidence limits of the uncertainty distributions of each 
+variable. This ensures that the range of each input is defensible 
+(Briggs 2012).
+}
+
 \subsection{Returns}{
 A data frame with one row per input model variable and columns
 for: minimum value of the variable, maximum value of the variable,

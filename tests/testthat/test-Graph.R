@@ -71,7 +71,7 @@ test_that("vertex and edge properties are set and got", {
   e1 <- Edge$new(n1, n2)
   G <- Graph$new(V=list(n1,n2), E=list(e1))
   #
-  expect_error(G$has_vertex(42), class="incorrect_element_type")
+  expect_error(G$has_vertex(42), class="invalid_vertex")
   expect_true(G$has_vertex(n1))
   expect_true(G$has_vertex(n2))
   expect_true(G$has_edge(e1))
@@ -81,9 +81,11 @@ test_that("vertex and edge properties are set and got", {
   expect_equal(G$vertex_index(n2),2)
   expect_equal(G$edge_index(e1),1)
   #
-  expect_error(G$degree(42), class="incorrect_element_type")
+  expect_error(G$edge_index(42), class="invalid_edge")
+  #
+  expect_error(G$degree(42), class="invalid_vertex")
   expect_error(G$degree(n3), class="not_in_graph")
-  expect_error(G$degree(e1), class="incorrect_element_type")
+  expect_error(G$degree(e1), class="invalid_vertex")
   expect_equal(G$degree(n1), 1)
 })
 
@@ -212,7 +214,7 @@ test_that("cyclic and acyclic graphs are identified", {
 })
 
 # Published examples
-test_that("Fig 1.1.1 from Gross & Yellen (2003, ISBN 9780203490204) is replicated", {
+test_that("Fig 1.1.1 from Gross & Yellen (2013)", {
   # the graph
   u <- Node$new("u")
   v <- Node$new("v")
@@ -239,6 +241,8 @@ test_that("Fig 1.1.1 from Gross & Yellen (2003, ISBN 9780203490204) is replicate
                              in.node=c("u","v","w","x")))
   expect_identical(A, EA)
   # neighbours
+  XX <- Node$new("XX")
+  expect_error(G$neighbours(XX), class="not_in_graph")
   expect_true(nodesetequal(G$neighbours(u),list(v)))
   expect_true(nodesetequal(G$neighbours(v),list(u,w,x)))
   expect_true(nodesetequal(G$neighbours(w),list(v,x)))

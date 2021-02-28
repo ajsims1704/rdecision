@@ -44,9 +44,9 @@ Andrew J. Sims \email{andrew.sims@newcastle.ac.uk}
 \if{latex}{\out{\hypertarget{method-new}{}}}
 \subsection{Method \code{new()}}{
 Create an object of type 'Action'. Optionally, a cost and a benefit may 
-be associated with traversing the edge. A \dfn{payoff} (benefit-cost) 
-is sometimes used in edges of decision trees; the parametrization used 
-here is more general.
+be associated with traversing the edge. A \dfn{payoff} (benefit minus 
+cost)  is sometimes used in edges of decision trees; the parametrization
+used here is more general.
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{Action$new(source, target, label, cost = 0, benefit = 0)}\if{html}{\out{</div>}}
 }

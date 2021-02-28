@@ -8,7 +8,7 @@
 An R6 class for a leaf node in a decision tree representing a clinical state.
 }
 \details{
-It represents a state of being, and is associated with an
+Represents a state of being, and is associated with an
 incremental utility.
 }
 \author{
@@ -23,6 +23,8 @@ Andrew J. Sims \email{andrew.sims@newcastle.ac.uk}
 \item \href{#method-new}{\code{LeafNode$new()}}
 \item \href{#method-modvars}{\code{LeafNode$modvars()}}
 \item \href{#method-utility}{\code{LeafNode$utility()}}
+\item \href{#method-interval}{\code{LeafNode$interval()}}
+\item \href{#method-QALY}{\code{LeafNode$QALY()}}
 \item \href{#method-clone}{\code{LeafNode$clone()}}
 }
 }
@@ -91,7 +93,7 @@ A list of \code{ModVar}s.
 Return the incremental utility associated with being in the state for
 the interval.
 \subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{LeafNode$utility(expected)}\if{html}{\out{</div>}}
+\if{html}{\out{<div class="r">}}\preformatted{LeafNode$utility()}\if{html}{\out{</div>}}
 }
 
 \subsection{Arguments}{
@@ -104,6 +106,33 @@ variable used to define utility; ignored otherwise.}
 }
 \subsection{Returns}{
 Incremental utility (numeric value).
+}
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-interval"></a>}}
+\if{latex}{\out{\hypertarget{method-interval}{}}}
+\subsection{Method \code{interval()}}{
+Return the interval associated with being in the state.
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{LeafNode$interval()}\if{html}{\out{</div>}}
+}
+
+\subsection{Returns}{
+Interval (as a difftime).
+}
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-QALY"></a>}}
+\if{latex}{\out{\hypertarget{method-QALY}{}}}
+\subsection{Method \code{QALY()}}{
+Return the quality adjusted life years associated with being in 
+the state.
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{LeafNode$QALY()}\if{html}{\out{</div>}}
+}
+
+\subsection{Returns}{
+QALY.
 }
 }
 \if{html}{\out{<hr>}}

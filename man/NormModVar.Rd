@@ -10,8 +10,8 @@ An R6 class for a model variable with Normal uncertainty
 \details{
 A model variable for which the uncertainty in the point estimate can
 be modelled with a Normal distribution. The hyperparameters of the
-distribution are the mean (`mu`) and the standard deviation (`sd`) of
-the uncertainty distribution. The value of `mu` is the expected value
+distribution are the mean (\code{mu}) and the standard deviation (\code{sd})
+of the uncertainty distribution. The value of \code{mu} is the expected value
 of the variable.
 }
 \author{

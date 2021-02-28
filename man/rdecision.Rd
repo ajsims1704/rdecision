@@ -6,7 +6,7 @@
 \title{rdecision: Decision Analytic Modelling in Health Economics.}
 \description{
 Classes and functions for modelling healthcare interventions using
-cohort models (decision trees, Markov models and extended Markov models).
+cohort models (decision trees).
 It draws on terminology from Briggs, Claxton and Sculpher, "Decision
 Modelling for Health Economic Evaluation", Oxford University Press, 2006.
 }

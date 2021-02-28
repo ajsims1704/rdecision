@@ -5,9 +5,15 @@
 #' An R6 class to represent a graph (from discrete mathematics).
 #' 
 #' @details 
-#' Encapulates and provides methods for computation and checking of undirected
+#' Encapsulates and provides methods for computation and checking of undirected
 #' graphs. Graphs are systems of vertices connected in pairs by edges.
-#' 
+#'
+#' @references 
+#' \cite{
+#'   Gross JL, Yellen J, Zhang P. Handbook of Graph Theory. 2nd ed. 
+#'   Chapman and Hall/CRC.; 2013. Available: https://doi.org/10.1201/b16132
+#' }
+#'  
 #' @docType class
 #' @author Andrew Sims \email{andrew.sims@@newcastle.ac.uk}
 #' @export
@@ -76,7 +82,7 @@ Graph <- R6::R6Class(
       if (!inherits(v, what="Node")) {
         rlang::abort(
           "Argument 'v' must be a Node", 
-          class="incorrect_element_type"
+          class="invalid_vertex"
         )
       }
       # find v in V
@@ -112,7 +118,7 @@ Graph <- R6::R6Class(
       if (!inherits(e, what="Edge")) {
         rlang::abort(
           "Argument 'e' must be an edge", 
-          class="incorrect_element_type"
+          class="invalid_edge"
         )
       } 
       # find e in E

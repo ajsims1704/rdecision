@@ -11,6 +11,16 @@ An R6 class to represent a digraph (a directed graph).
 Encapulates, and provides methods for computation and checking of directed
 graphs (digraphs). Inherits from class Graph.
 }
+\references{
+\cite{
+  Gross JL, Yellen J, Zhang P. Handbook of Graph Theory. 2nd ed. 
+  Chapman and Hall/CRC.; 2013. Available: https://doi.org/10.1201/b16132
+}
+\cite{
+  Kahn AB, Topological Sorting of Large Networks, \emph{Commun. ACM},
+  1962;\strong{5}:558-562, doi:10.1145/368996.369025.
+}
+}
 \author{
 Andrew Sims \email{andrew.sims@newcastle.ac.uk}
 }
@@ -124,7 +134,7 @@ The incidence matrix.
 \if{latex}{\out{\hypertarget{method-topological_sort}{}}}
 \subsection{Method \code{topological_sort()}}{
 Attempt to topologically sort the vertexes in the directed graph using
-Kahn's algorithm (https://doi.org/10.1145%2F368996.369025).
+Kahn's algorithm (Kahn, 1962).
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{Digraph$topological_sort()}\if{html}{\out{</div>}}
 }

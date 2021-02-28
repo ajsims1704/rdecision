@@ -1,4 +1,52 @@
 
+# arborescences that are not decision trees are rejected
+test_that("arborescences that are not decision trees are rejected", {
+  # some nodes not {D,C,L}
+  d1 <- Node$new("d1")
+  c1 <- ChanceNode$new()
+  t1 <- LeafNode$new("t1")
+  t2 <- LeafNode$new("t2")
+  t3 <- LeafNode$new("t3")
+  e1 <- Arrow$new(d1,c1,label="e1")  
+  e2 <- Arrow$new(c1,t1,label="e2")
+  e3 <- Arrow$new(c1,t2,label="e3")
+  e4 <- Arrow$new(d1,t3,label="e4")  
+  expect_error(
+    DecisionTree$new(V=list(d1,c1,t1,t2,t3), E=list(e1,e2,e3,e4)),
+    class = "incorrect_node_type"
+  )
+  # terminal nodes are not Leaf
+  d1 <- DecisionNode$new("d1")
+  e1 <- Arrow$new(d1,c1,label="e1")  
+  e4 <- Arrow$new(d1,t3,label="e4")  
+  expect_error(
+    DecisionTree$new(V=list(d1,c1,t3), E=list(e1,e4)),
+    class = "leaf_non-child_sets_unequal"
+  )
+  # some leafs are not terminal
+  e2 <- Arrow$new(c1,t1,label="e2")
+  e3 <- Arrow$new(c1,t2,label="e3")
+  t4 <- LeafNode$new("t4")
+  e5 <- Arrow$new(t3,t4,label="e5")
+  expect_error(
+    DecisionTree$new(V=list(d1,c1,t1,t2,t3,t4), E=list(e1,e2,e3,e4,e5)),
+    class = "leaf_non-child_sets_unequal"
+  )
+  # edge (arrow) types must be Action or Reaction
+  e1 <- Action$new(d1,c1,label="e1")  
+  e2 <- Reaction$new(c1,t1,p=0.5,label="e2")
+  e3 <- Reaction$new(c1,t2,p=0.5,label="e3")
+  e4 <- Arrow$new(d1,t3,label="e4")  
+  expect_error(
+    DecisionTree$new(V=list(d1,c1,t1,t2,t3), E=list(e1,e2,e3,e4)),
+    class = "incorrect_edge_type"
+  )
+
+  
+  
+})
+
+
 # tests of basic tree properties (Kaminski et al CEJOR 2018;26:135-139, fig 1)
 test_that("simple decision trees are modelled correctly", {
   # nodes & edges

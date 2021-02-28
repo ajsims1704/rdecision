@@ -10,9 +10,9 @@
 #' directed paths from the root must be unique.
 #' 
 #' @references 
-#'   \cite{Walker, John Q II. A A node-positioning algorithm for general trees.
+#' \cite{Walker, John Q II. A A node-positioning algorithm for general trees.
 #'   University of North Carolina Technical Report TR 89-034, 1989.
-#'  }
+#' }
 #' 
 #' @docType class
 #' @author Andrew Sims \email{andrew.sims@@newcastle.ac.uk}
@@ -131,6 +131,8 @@ Arborescence <- R6::R6Class(
     #' y increased down the page. Thus the meaning of NORTH and SOUTH are
     #' opposite to his, with the default (SOUTH) having the child nodes at
     #' positive y value and root at zero, as per his example (figure 12).
+    #' @param MaxDepth The maximum depth (number of levels) to be drawn; if
+    #' the tree exceeds this, an error will be raised.
     #' @return A data frame with one row per node and three columns (n, x
     #' and y) where \code{n} gives the node index given by the 
     #' Graph::vertex_index() function.

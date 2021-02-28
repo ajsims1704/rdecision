@@ -45,11 +45,12 @@ guaranteed, there is no estimator provided for the mode.
 
 Method \code{distribution} returns the string representation 
 of the expression used to create the model variable.
-
-This method is mostly intended for internal use within the
-class and will not generally be needed for normal use of ExprModVar
-objects. The returned expression is *not* syntactically checked or 
-evaluated before it is returned.
+}
+\references{
+\itemize{
+  \item Briggs A, Claxton K, Sculpher M. Decision modelling for health
+  economic evaluation. Oxford, UK: Oxford University Press; 2006. 
+}
 }
 \author{
 Andrew J. Sims \email{andrew.sims@newcastle.ac.uk}
@@ -107,7 +108,8 @@ combined into costs, probabilities and rates.}
 \item{\code{units}}{Units in which the variable is expressed.}
 
 \item{\code{quo}}{A quosure (see package rlang), which contains an expression
-and its environment. The usage is `quo(x+y)` or `rlang::quo(x+y)`.}
+and its environment. The usage is \code{quo(x+y)} or 
+\code{rlang::quo(x+y)}.}
 }
 \if{html}{\out{</div>}}
 }
@@ -133,6 +135,13 @@ function.
 }
 \if{html}{\out{</div>}}
 }
+\subsection{Details}{
+This method is mostly intended for internal use within the
+class and will not generally be needed for normal use of ExprModVar
+objects. The returned expression is \emph{not} syntactically checked or 
+evaluated before it is returned.
+}
+
 \subsection{Returns}{
 A quosure whose expression is each ModVar \code{v} in the  
 expression replaced with \code{v$method} and the same environment as

@@ -8,8 +8,14 @@
 An R6 class to represent a graph (from discrete mathematics).
 }
 \details{
-Encapulates and provides methods for computation and checking of undirected
+Encapsulates and provides methods for computation and checking of undirected
 graphs. Graphs are systems of vertices connected in pairs by edges.
+}
+\references{
+\cite{
+  Gross JL, Yellen J, Zhang P. Handbook of Graph Theory. 2nd ed. 
+  Chapman and Hall/CRC.; 2013. Available: https://doi.org/10.1201/b16132
+}
 }
 \author{
 Andrew Sims \email{andrew.sims@newcastle.ac.uk}
