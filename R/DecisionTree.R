@@ -32,24 +32,19 @@
 #' \item{Each \code{Action} must have a label, and the labels of  
 #' \code{Action}s that share a common source endpoint must be unique.}
 #' }
+#' @references{
+#'   Briggs A, Claxton K, Sculpher M. Decision modelling for health economic 
+#'   evaluation. Oxford, UK: Oxford University Press; 2006.
 #' 
-#' @references 
-#' \cite{
-#'   Briggs A, Claxton K, Sculpher M. Decision modelling for health economic
-#'   evaluation. Oxford, UK: Oxford University Press; 2006. 
-#' }
-#' \cite{
 #'   Briggs AH, Weinstein MC, Fenwick EAL, Karnon J, Sculpher MJ, Paltiel AD.
 #'   Model Parameter Estimation and Uncertainty: A Report of the ISPOR-SMDM 
-#'   Modeling Good Research Practices Task Force-6. \emph{Value in Health}.
-#'   2012;\strong{15}:835–842. doi:10.1016/j.jval.2012.04.014.
-#' }
-#' \cite{
-#'   Kamiński B, Jakubczyk M, Szufel P. A framework for sensitivity analysis
-#'   of decision trees. \emph{Central European Journal of Operational Research}.
-#'   2018;\strong{26}:135–159. doi:10.007/s10100-017-0479-6.
-#' }
-#' 
+#'   Modeling Good Research Practices Task Force-6. \emph{Value in Health} 
+#'   2012;\strong{15}:835–42. \url{https://doi.org/10.1016/j.jval.2012.04.014}.
+#'
+#'   Kamiński B, Jakubczyk M, Szufel P. A framework for sensitivity analysis of
+#'   decision trees. \emph{Central European Journal of Operational Research}
+#'   2018;\strong{26}:135–59. \url{https://doi.org/10.1007/s10100-017-0479-6}.
+#' } 
 #' @docType class
 #' @author Andrew J. Sims \email{andrew.sims@@newcastle.ac.uk}
 #' @export

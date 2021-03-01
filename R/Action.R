@@ -28,10 +28,10 @@ Action <- R6::R6Class(
     #' @param source Decision node from which the arrow leaves.
     #' @param target Node which the arrow enters.
     #' @param label Character string containing the arrow label. This
-    #' @param cost Cost associated with traversal of this edge.
-    #' @param benefit Benefit associated with traversal of the edge.
     #' must be defined for an action because the label is used in
     #' tabulation of strategies.
+    #' @param cost Cost associated with traversal of this edge.
+    #' @param benefit Benefit associated with traversal of the edge.
     #' @return A new \code{Action} object.
     initialize = function(source, target, label, cost=0, benefit=0) {
       # check label

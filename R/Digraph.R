@@ -7,14 +7,13 @@
 #' @details 
 #' Encapulates, and provides methods for computation and checking of directed
 #' graphs (digraphs). Inherits from class Graph. 
-#' @references 
-#' \cite{
+#'
+#' @references{ 
 #'   Gross JL, Yellen J, Zhang P. Handbook of Graph Theory. 2nd ed. 
-#'   Chapman and Hall/CRC.; 2013. Available: https://doi.org/10.1201/b16132
-#' }
-#' \cite{
+#'   Chapman and Hall/CRC.; 2013 \url{https://doi.org/10.1201/b16132}.
+#'
 #'   Kahn AB, Topological Sorting of Large Networks, \emph{Commun. ACM},
-#'   1962;\strong{5}:558-562, doi:10.1145/368996.369025.
+#'   1962;\strong{5}:558-562, \url{https://doi.org/10.1145/368996.369025}.
 #' }
 #' 
 #' @docType class

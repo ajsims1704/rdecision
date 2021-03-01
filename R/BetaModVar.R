@@ -128,7 +128,7 @@ BetaModVar <- R6::R6Class(
     },
 
     #' @description
-    #' Return the quantiles of the Gamma uncertainty distribution.
+    #' Return the quantiles of the Beta uncertainty distribution.
     #' @param probs Vector of probabilities, in range [0,1].    
     #' @return Vector of quantiles.
     quantile = function(probs) {
