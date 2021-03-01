@@ -47,8 +47,8 @@ Method \code{distribution} returns the string representation
 of the expression used to create the model variable.
 }
 \references{
-\itemize{
-  \item Briggs A, Claxton K, Sculpher M. Decision modelling for health
+{
+  Briggs A, Claxton K, Sculpher M. Decision modelling for health
   economic evaluation. Oxford, UK: Oxford University Press; 2006. 
 }
 }

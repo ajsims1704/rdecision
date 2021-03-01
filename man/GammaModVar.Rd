@@ -30,8 +30,8 @@ setting \code{shape=200} and \code{scale=1/100} gives a Gamma distribution
 with a mean of 2 and a 95\% confidence interval from 1.73 to 2.29.
 }
 \references{
-\itemize{
-  \item Briggs A, Claxton K, Sculpher M. Decision modelling for health
+{
+  Briggs A, Claxton K, Sculpher M. Decision modelling for health
   economic evaluation. Oxford, UK: Oxford University Press; 2006. 
 }
 }

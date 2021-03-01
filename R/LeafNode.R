@@ -9,6 +9,7 @@
 #' 
 #' @docType class
 #' @author Andrew J. Sims \email{andrew.sims@@newcastle.ac.uk}
+#' @export
 #' 
 LeafNode <- R6::R6Class(
   classname = "LeafNode",

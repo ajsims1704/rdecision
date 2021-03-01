@@ -13,9 +13,10 @@ An arborescence must be a directed tree with exactly one root and the
 directed paths from the root must be unique.
 }
 \references{
-\cite{Walker, John Q II. A A node-positioning algorithm for general trees.
+{
+  Walker, John Q II. A A node-positioning algorithm for general trees.
   University of North Carolina Technical Report TR 89-034, 1989.
- }
+}
 }
 \author{
 Andrew Sims \email{andrew.sims@newcastle.ac.uk}
@@ -207,6 +208,9 @@ Defined as per Walker (1989), but noting that Walker assumed that
 y increased down the page. Thus the meaning of NORTH and SOUTH are
 opposite to his, with the default (SOUTH) having the child nodes at
 positive y value and root at zero, as per his example (figure 12).}
+
+\item{\code{MaxDepth}}{The maximum depth (number of levels) to be drawn; if
+the tree exceeds this, an error will be raised.}
 }
 \if{html}{\out{</div>}}
 }

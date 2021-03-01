@@ -3,16 +3,15 @@ title: "Tegaderm CHG IV Securement Dressing for Central Venous and Arterial Cath
 subtitle: "A decision tree example with probabilistic sensitivity analysis"
 author: "Andrew J. Sims"
 date: "July 2020"
+bibliography: "references.bib"
+csl: "national-institute-of-health-research.csl"
 output: rmarkdown::pdf_document
 vignette: >
   %\VignetteIndexEntry{Tegaderm CHG IV Securement Dressing}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
-bibliography: "references.bib"
-csl: "bmj.csl"
 ---
 ```{r, include = FALSE}
-rm(list=ls())
 knitr::opts_chunk$set(
   collapse = TRUE,
   comment = "#>"
@@ -34,7 +33,7 @@ standard dressing.
 
 # Model variables
 Thirteen variables were used in the model. The choice of
-variables, their distributions and their parameters are taken from table 3 
+variables, their distributions and their parameters are taken from Table 3 
 of Jenks *et al* [-@jenks2016], with the following additional information:
 
 * For variables with lognormal uncertainty, the manufacturer synthesized a log
@@ -166,7 +165,7 @@ q.CRBSI.T <- ExprModVar$new(
 ```
 
 # The decision tree
-The following code constructs the decision tree based on figure 2
+The following code constructs the decision tree based on Figure 2
 of Jenks *et al* [-@jenks2016]. In the formulation used by `rdecision`, 
 the decision tree is constructed from sets of decision, chance and 
 leaf nodes and from edges (actions and reactions).
@@ -177,10 +176,11 @@ that the time horizon was ICU stay plus some follow-up, and the costs reflect
 those incurred in that period, so the assumption of 7 days does not affect
 the `rdecision` implementation of the model.
 
-The tree is somewhat more complex than figure 2 of Jenks *et al* because it
+The tree is somewhat more complex than Figure 2 of Jenks *et al* because it
 allows for patients to have more than one adverse event (AE) during their stay
-(whereas figure 2 implies that only one event per patient is possible). The
-rates of AE were estimated independently, and allow for multiple events.
+(whereas their Figure 2 implies that only one event per patient is possible). 
+The rates of AE were estimated independently, and allow for multiple events,
+Figure 1.
 
 ```{r tree, echo=T}
 # create decision tree
@@ -282,15 +282,17 @@ E <- list(e01,e02,e03,e04,e05,e06,e11,e12,e13,e14,e15,e16,e21,e22,
 DT <- DecisionTree$new(V,E)
 ```
 
-```{r draw, echo=FALSE, results="hide", fig.keep="last", fig.align="center"}
+```{r fig1.caption}
+f1c <- "Decision tree for the Tegaderm model"
+```
+```{r draw, results="hide", fig.keep="last", fig.align="center", fig.cap=f1c}
 DT$draw(border=TRUE)
 ```
 
 In the manufacturer's model, the uncertainties in the probabilities associated
 with the polytomous chance nodes were modelled as independent variables. This is
 not recommended because there is a chance that a particular run of the PSA will
-yield probabilities that are outside the range [0,1]. Representing the 
-uncertain probabilities with draws from a Dirichlet distribution is preferred. 
+yield probabilities that are outside the range [0,1]. 
 
 # Summary of the model
 The model variables associated with actions, reactions and leaf nodes
@@ -298,12 +300,13 @@ can be tabulated using the method `modvar_table`. This returns a data
 frame describing each variable, its description, units and uncertainty
 distribution. Variables inheriting from type `ModVar` will be included in the
 tabulation; regular numeric values will not be listed. In the Tegaderm 
-model, the complete structure
-is as follows:
+model, the input model variable are in the following table. Variables SN1, 
+SN2 and SN3 were introduced to model the uncertainties of the hazard and risk 
+ratios.
 
 ```{r modelinputs-structure, echo=FALSE}
 local({
-  DF <- DT$modvar_table()
+  DF <- DT$modvar_table(expressions=FALSE)
   keep <- c("Description", "Distribution")
   pander::pander(DF[,keep], row.names=F, digits=3, justify="left")
 })
@@ -315,9 +318,10 @@ same call, in the remaining columns.
 
 ```{r modelinputs-pe, echo=FALSE}
 local({
-  DF <- DT$modvar_table()
-  keep <- c("Description", "Units", "Mean", "Q2.5", "Q97.5")
-  pander::pander(DF[,keep], row.names=F, digits=3, justify="left")
+  DF <- DT$modvar_table(expressions=FALSE)
+  DF$Variable <- paste(DF$Description, DF$Units, sep=", ")
+  keep <- c("Variable", "Mean", "Q2.5", "Q97.5")
+  pander::pander(DF[,keep], row.names=F, digits=3, justify="lrrr")
 })
 ```
 

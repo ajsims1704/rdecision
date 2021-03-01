@@ -58,13 +58,13 @@ used here is more general.
 
 \item{\code{target}}{Node which the arrow enters.}
 
-\item{\code{label}}{Character string containing the arrow label. This}
+\item{\code{label}}{Character string containing the arrow label. This
+must be defined for an action because the label is used in
+tabulation of strategies.}
 
 \item{\code{cost}}{Cost associated with traversal of this edge.}
 
-\item{\code{benefit}}{Benefit associated with traversal of the edge.
-must be defined for an action because the label is used in
-tabulation of strategies.}
+\item{\code{benefit}}{Benefit associated with traversal of the edge.}
 }
 \if{html}{\out{</div>}}
 }

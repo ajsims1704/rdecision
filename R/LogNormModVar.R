@@ -31,16 +31,17 @@
 #' natural scale.}
 #' }
 #' 
-#' @references 
-#' \itemize{
-#'   \item Briggs A, Claxton K and Sculpher M. Decision Modelling for Health
-#'     Economic Evaluation. Oxford 2006, ISBN 978-0-19-852662-9.
-#'   \item Leaper DJ, Edmiston CE and Holy CE. Meta-analysis of the potential
-#'     economic impact following introduction of absorbable antimicrobial 
-#'     sutures. British Journal of Surgery 2017;104:e134-e144.
-#'   \item Swat MJ, Grenon P and Wimalaratne S. Ontology and Knowledge Base of
-#'     Probability Distributions. EMBL-EBI Technical Report (ProbOnto 2.5), 
-#'     13th January 2017, https://sites.google.com/site/probonto/download.
+#' @references{ 
+#'  Briggs A, Claxton K and Sculpher M. Decision Modelling for Health
+#'  Economic Evaluation. Oxford 2006, ISBN 978-0-19-852662-9.
+#'
+#'  Leaper DJ, Edmiston CE and Holy CE. Meta-analysis of the potential
+#'  economic impact following introduction of absorbable antimicrobial 
+#'  sutures. \emph{British Journal of Surgery} 2017;\strong{104}:e134-e144.
+#'
+#'  Swat MJ, Grenon P and Wimalaratne S. Ontology and Knowledge Base of
+#'  Probability Distributions. EMBL-EBI Technical Report (ProbOnto 2.5), 
+#'  13th January 2017, \url{https://sites.google.com/site/probonto/download}.
 #' }
 #' 
 #' @note 

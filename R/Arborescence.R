@@ -9,7 +9,7 @@
 #' An arborescence must be a directed tree with exactly one root and the
 #' directed paths from the root must be unique.
 #' 
-#' \references{
+#' @references{
 #'   Walker, John Q II. A A node-positioning algorithm for general trees.
 #'   University of North Carolina Technical Report TR 89-034, 1989.
 #' }

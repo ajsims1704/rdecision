@@ -161,7 +161,7 @@ Samples drawn at random.
 \if{html}{\out{<a id="method-quantile"></a>}}
 \if{latex}{\out{\hypertarget{method-quantile}{}}}
 \subsection{Method \code{quantile()}}{
-Return the quantiles of the Gamma uncertainty distribution.
+Return the quantiles of the Beta uncertainty distribution.
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{BetaModVar$quantile(probs)}\if{html}{\out{</div>}}
 }

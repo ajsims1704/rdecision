@@ -15,9 +15,8 @@
 #' \emph{et al} (2006) use the shape/scale formulation, they use `alpha`/`beta`
 #' as parameter names.
 #'  
-#' @references 
-#' \itemize{
-#'   \item Briggs A, Claxton K, Sculpher M. Decision modelling for health
+#' @references{
+#'   Briggs A, Claxton K, Sculpher M. Decision modelling for health
 #'   economic evaluation. Oxford, UK: Oxford University Press; 2006. 
 #' }
 #' 

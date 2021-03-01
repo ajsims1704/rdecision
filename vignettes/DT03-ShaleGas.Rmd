@@ -3,16 +3,17 @@ title: "Shale gas"
 subtitle: "A decision tree example"
 author: "Andrew J. Sims"
 date: "July 2020"
+bibliography: "references.bib"
+csl: "national-institute-of-health-research.csl"
 output: rmarkdown::pdf_document
 vignette: >
   %\VignetteIndexEntry{Shale gas}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
-bibliography: "references.bib"
-csl: "bmj.csl"
 ---
 ```{r, include = FALSE}
 knitr::opts_chunk$set(
+  echo = FALSE,
   collapse = TRUE,
   comment = "#>"
 )
@@ -46,7 +47,7 @@ Kamiński *et al* [-@kaminski2018] state the problem as follows:
 The model, comprising three decision nodes, four chance nodes, nine leaf
 nodes and 15 edges, is constructed as follows. Costs, benefits and 
 probabilities are associated with each edge, which must be an Action
-or a Reaction object.
+or a Reaction object, Figure 1.
 
 ```{r create-model, echo=TRUE}
   # nodes
@@ -98,8 +99,10 @@ or a Reaction object.
   DT<-DecisionTree$new(V,E)
 ```
 
-The decision tree can be drawn using the `draw` method of `DecisionTree`:
-```{r draw, echo=FALSE, results="hide", fig.keep="last", fig.align="center"}
+```{r fig1c}
+f1c <- "Decision tree used in the shale gas problem"
+```
+```{r draw, results="hide", fig.keep="last", fig.align="center", fig.cap=f1c}
 DT$draw(border=TRUE)
 ```
 
@@ -128,6 +131,7 @@ This gives the following payoff for each strategy:
 RES$Run <- NULL
 RES$Probability <- NULL
 RES$Utility <- NULL
+RES$QALY <- NULL
 knitr::kable(RES, row.names=FALSE)
 ```
 

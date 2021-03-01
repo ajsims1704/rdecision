@@ -16,9 +16,8 @@
 #' But such forms of expression may be desirable in constructing a
 #' model and this class provides a mechanism for doing so.
 #' 
-#' @references 
-#' \itemize{
-#'   \item Briggs A, Claxton K, Sculpher M. Decision modelling for health
+#' @references{
+#'   Briggs A, Claxton K, Sculpher M. Decision modelling for health
 #'   economic evaluation. Oxford, UK: Oxford University Press; 2006. 
 #' }
 #' 

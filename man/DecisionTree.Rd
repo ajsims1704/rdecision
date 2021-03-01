@@ -37,20 +37,18 @@ with a common source endpoint must be 1.}
 }
 }
 \references{
-\cite{
-  Briggs A, Claxton K, Sculpher M. Decision modelling for health economic
-  evaluation. Oxford, UK: Oxford University Press; 2006. 
-}
-\cite{
+{
+  Briggs A, Claxton K, Sculpher M. Decision modelling for health economic 
+  evaluation. Oxford, UK: Oxford University Press; 2006.
+
   Briggs AH, Weinstein MC, Fenwick EAL, Karnon J, Sculpher MJ, Paltiel AD.
   Model Parameter Estimation and Uncertainty: A Report of the ISPOR-SMDM 
-  Modeling Good Research Practices Task Force-6. \emph{Value in Health}.
-  2012;\strong{15}:835–842. doi:10.1016/j.jval.2012.04.014.
-}
-\cite{
-  Kamiński B, Jakubczyk M, Szufel P. A framework for sensitivity analysis
-  of decision trees. \emph{Central European Journal of Operational Research}.
-  2018;\strong{26}:135–159. doi:10.007/s10100-017-0479-6.
+  Modeling Good Research Practices Task Force-6. \emph{Value in Health} 
+  2012;\strong{15}:835–42. \url{https://doi.org/10.1016/j.jval.2012.04.014}.
+
+  Kamiński B, Jakubczyk M, Szufel P. A framework for sensitivity analysis of
+  decision trees. \emph{Central European Journal of Operational Research}
+  2018;\strong{26}:135–59. \url{https://doi.org/10.1007/s10100-017-0479-6}.
 }
 }
 \author{
@@ -405,10 +403,13 @@ of the terminal (leaf) node.}
 \item{Path.Cost}{The cost of traversing the pathway.}
 \item{Path.Benefit}{The benefit derived from traversing the pathway.}
 \item{Path.Utility}{The utility associated with the outcome (leaf node).}
+\item{Path.QALY}{The QALYs associated with the outcome (leaf node).}
 \item{Cost}{Path.Cost \eqn{*} probability of traversing the pathway.}
 \item{Benefit}{Path.Benefit \eqn{*} probability of traversing the 
 pathway.}
 \item{Utility}{Path.Utility \eqn{*} probability of traversing the
+pathway.}
+\item{QALY}{Path.QALY \eqn{*} probability of traversing the
 pathway.}
 }
 }
@@ -451,15 +452,16 @@ per run and there is no "Leaf" column.}
 A data frame with one row per strategy per run and columns
 organized as follows:
 \describe{
-\item{Leaf}{The label of the leaf that terminates the path, 
-for by='path'.}
-\item{Strategy}{The strategy expressed as the values of the action edges
-emanating from each decision node.}
-\item{Run}{The run number}
-\item{Probability}{Probability (1 if by='strategy')}
-\item{Cost}{Aggregate cost of the strategy.}
-\item{Benefit}{Aggregate benefit of the strategy.}
-\item{Utility}{Aggregate utility of the strategy.}
+  \item{Leaf}{The label of the leaf that terminates the path, 
+  for by='path'.}
+  \item{Strategy}{The strategy expressed as the values of the action 
+  edges emanating from each decision node.}
+  \item{Run}{The run number}
+  \item{Probability}{Probability (1 if by='strategy')}
+  \item{Cost}{Aggregate cost of the strategy.}
+  \item{Benefit}{Aggregate benefit of the strategy.}
+  \item{Utility}{Aggregate utility of the strategy.}
+  \item{QALY}{Aggregate QALY of the strategy.}
 }
 }
 }
@@ -509,7 +511,8 @@ variable. This ensures that the range of each input is defensible
 \subsection{Returns}{
 A data frame with one row per input model variable and columns
 for: minimum value of the variable, maximum value of the variable,
-minimum value of the outcome and maximum value of the outcome.
+minimum value of the outcome and maximum value of the outcome. NULL
+if there are no modvars.
 }
 }
 \if{html}{\out{<hr>}}
