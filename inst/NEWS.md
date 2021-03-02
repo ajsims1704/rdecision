@@ -1,3 +1,10 @@
+# rdecision 1.0.2
+
+* Added tests to give 100% coverage.
+* Further description for documentation.
+* Converted vignettes to HTML.
+* Added WORDLIST file and sundry administrative changes for clean package build.
+
 # rdecision 1.0.1
 
 * Added draw() method to DecisionTree.
