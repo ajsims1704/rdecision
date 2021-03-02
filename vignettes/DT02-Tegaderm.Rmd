@@ -1,11 +1,17 @@
 ---
-title: "Tegaderm CHG IV Securement Dressing for Central Venous and Arterial Catheter Insertion Sites"
+title: "Tegaderm CHG IV Securement Dressing"
 subtitle: "A decision tree example with probabilistic sensitivity analysis"
 author: "Andrew J. Sims"
 date: "July 2020"
 bibliography: "references.bib"
 csl: "national-institute-of-health-research.csl"
-output: rmarkdown::pdf_document
+output: 
+  rmarkdown::html_vignette:
+    fig_width: 7
+    fig_height: 5
+    fig_caption: true
+  rmarkdown::pdf_document:
+    fig_crop: false
 vignette: >
   %\VignetteIndexEntry{Tegaderm CHG IV Securement Dressing}
   %\VignetteEngine{knitr::rmarkdown}
@@ -39,7 +45,7 @@ of Jenks *et al* [-@jenks2016], with the following additional information:
 * For variables with lognormal uncertainty, the manufacturer synthesized a log
   normal distribution as $\exp(\alpha + \beta r())$ where $r()$ is a random
   draw from a standard normal distribution. This does not follow the 
-  parametrizations of the LogNormModVar provided in `rdecision`, but can
+  parametrizations of the `LogNormModVar` provided in `rdecision`, but can
   be reproduced using expression model variables. Three standard normal
   model variables were introduced for this purpose.
 * The values for
@@ -111,12 +117,11 @@ n.cathdays <- NormModVar$new(
 # Model variable expressions
 Variables in the model may be included in the decision tree via mathematical 
 expressions, which involve model variables and are themselves
-model variables. Forms of expression involving R's numerical functions and
+model variables. Forms of expression involving R functions and
 multiple model variables are supported, provided they conform to R syntax.
 The following code creates the model variable expressions to be used as values
 in the decision tree edges. For probabilities, the convention $q = 1-p$ is 
-used to ensure that the sum of probabilities leaving each chance node sums
-to one.
+used to ensure that the sum of probabilities leaving each chance is one.
 
 ```{r expressions, echo=TRUE}
 # probabilities
@@ -165,6 +170,8 @@ q.CRBSI.T <- ExprModVar$new(
 ```
 
 # The decision tree
+
+## Constructing the tree
 The following code constructs the decision tree based on Figure 2
 of Jenks *et al* [-@jenks2016]. In the formulation used by `rdecision`, 
 the decision tree is constructed from sets of decision, chance and 
@@ -180,7 +187,7 @@ The tree is somewhat more complex than Figure 2 of Jenks *et al* because it
 allows for patients to have more than one adverse event (AE) during their stay
 (whereas their Figure 2 implies that only one event per patient is possible). 
 The rates of AE were estimated independently, and allow for multiple events,
-Figure 1.
+[see figure](#tree-diagram).
 
 ```{r tree, echo=T}
 # create decision tree
@@ -282,10 +289,11 @@ E <- list(e01,e02,e03,e04,e05,e06,e11,e12,e13,e14,e15,e16,e21,e22,
 DT <- DecisionTree$new(V,E)
 ```
 
-```{r fig1.caption}
+## Tree diagram
+```{r fig1.caption, echo=FALSE}
 f1c <- "Decision tree for the Tegaderm model"
 ```
-```{r draw, results="hide", fig.keep="last", fig.align="center", fig.cap=f1c}
+```{r draw,echo=FALSE,results="hide",fig.keep="last",fig.align="center",fig.cap=f1c}
 DT$draw(border=TRUE)
 ```
 
@@ -331,7 +339,7 @@ method of a decision node to evaluate each pathway from the decision node,
 shown in the table. This model did not consider utility, and the columns 
 associated with utility are removed. 
 
-```{r basecase, echo=TRUE}
+```{r basecase, echo=FALSE}
 RES <- DT$evaluate()
 ```
 

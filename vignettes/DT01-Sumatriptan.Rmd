@@ -5,7 +5,13 @@ author: "Andrew J. Sims"
 date: "April 2020"
 bibliography: "references.bib"
 csl: "national-institute-of-health-research.csl"
-output: rmarkdown::pdf_document
+output: 
+  rmarkdown::html_vignette:
+    fig_width: 7
+    fig_height: 5
+    fig_caption: true
+  rmarkdown::pdf_document:
+    fig_crop: false
 vignette: >
   %\VignetteIndexEntry{Sumatriptan versus caffeine for migraine}
   %\VignetteEngine{knitr::rmarkdown}
@@ -18,24 +24,26 @@ knitr::opts_chunk$set(
 )
 ```
 
-```{r setup, echo=F}
+```{r setup, echo=FALSE}
 library(rdecision)
 ```
 
 # Introduction
 This vignette is an example of modelling a decision tree using the `rdecision`
-package. It is based on the example given by Briggs [-@briggs2006, Box 2.3] 
+package. It is based on the example given by Briggs [-@briggs2006] (Box 2.3) 
 which itself is based on a decision tree which compared oral Sumatriptan versus
 oral caffeine/Ergotamine for migraine [@evans1997].
 
 # Creating the model
+
+## Constructing the tree
 The following code constructs the decision tree. In the
 formulation used by `rdecision`, a decision tree is a form of
 *arborescence*, a directed graph of nodes and edges, with a single
 root and a unique path from the root to each leaf node. Decision trees
 comprise three types of node: decision, chance and leaf nodes and two
 types of edge: actions (whose sources are decision nodes) and reactions
-(whose sources are chance nodes), Figure 1.
+(whose sources are chance nodes), [see figure](#tree-diagram).
 
 ```{r echo=TRUE}
 # Time horizon
@@ -111,7 +119,8 @@ E <- list(
 DT <- DecisionTree$new(V,E)
 ```
 
-```{r caption}
+## Tree diagram
+```{r caption, echo=FALSE}
 f1c  <- "Decision tree for the Sumatriptan model"
 ```
 ```{r draw,echo=FALSE,results="hide",fig.keep="last",fig.align="center",fig.cap=f1c}

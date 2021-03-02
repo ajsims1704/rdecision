@@ -5,7 +5,13 @@ author: "Andrew J. Sims"
 date: "July 2020"
 bibliography: "references.bib"
 csl: "national-institute-of-health-research.csl"
-output: rmarkdown::pdf_document
+output: 
+  rmarkdown::html_vignette:
+    fig_width: 7
+    fig_height: 5
+    fig_caption: true
+  rmarkdown::pdf_document:
+    fig_crop: false
 vignette: >
   %\VignetteIndexEntry{Shale gas}
   %\VignetteEngine{knitr::rmarkdown}
@@ -13,7 +19,6 @@ vignette: >
 ---
 ```{r, include = FALSE}
 knitr::opts_chunk$set(
-  echo = FALSE,
   collapse = TRUE,
   comment = "#>"
 )
@@ -24,7 +29,7 @@ library(rdecision)
 ```
 
 # Introduction
-Kamiński *et al* [-@kaminski2018, Fig 7] provide an example of a decision tree
+Kamiński *et al* [-@kaminski2018] (Fig 7) provide an example of a decision tree
 with multiple decision nodes, including some that are descendants of another
 decision node. This vignette illustrates how `rdecision` can be used to model
 a complex decision tree, using the example from Figure 7 of Kamiński 
@@ -44,10 +49,12 @@ Kamiński *et al* [-@kaminski2018] state the problem as follows:
 > for 1000 (600) after a positive (negative) test result.
 
 # Creating the model
+
+## Constructing the tree
 The model, comprising three decision nodes, four chance nodes, nine leaf
 nodes and 15 edges, is constructed as follows. Costs, benefits and 
 probabilities are associated with each edge, which must be an Action
-or a Reaction object, Figure 1.
+or a Reaction object, [see figure](#tree-diagram).
 
 ```{r create-model, echo=TRUE}
   # nodes
@@ -99,10 +106,12 @@ or a Reaction object, Figure 1.
   DT<-DecisionTree$new(V,E)
 ```
 
-```{r fig1c}
+## Tree diagram
+
+```{r fig1c, echo=FALSE}
 f1c <- "Decision tree used in the shale gas problem"
 ```
-```{r draw, results="hide", fig.keep="last", fig.align="center", fig.cap=f1c}
+```{r draw,echo=FALSE,results="hide",fig.keep="last",fig.align="center",fig.cap=f1c}
 DT$draw(border=TRUE)
 ```
 
@@ -117,7 +126,7 @@ unimportant; all four such strategies are identical.
 Method `evaluate` calculates the expected cost, benefit and
 utility of each traversable path for each strategy, and aggregates
 by strategy. The results for the gas problem are computed
-as follows. Payoff is defined as benefit minus cost. 
+as follows. Pay-off is defined as benefit minus cost. 
 
 ```{r evaluate, echo=TRUE}
 # find optimal strategies
@@ -125,7 +134,7 @@ RES <- DT$evaluate()
 RES$Payoff <- RES$Benefit-RES$Cost
 ```
 
-This gives the following payoff for each strategy:
+This gives the following pay-off for each strategy:
 
 ```{r results, echo=FALSE, results='asis'}
 RES$Run <- NULL
@@ -140,7 +149,7 @@ imax <- which.max(RES$Payoff)
 popt <- paste(RES$d1[imax], RES$d2[imax], RES$d3[imax], sep="/")
 ```
 The optimal strategy is `r popt`, *i.e.* test, sell if negative and
-dig otherwise. The expected payoff from this strategy is
+dig otherwise. The expected pay-off from this strategy is
 `r RES$Payoff[imax]`.
 
 # References

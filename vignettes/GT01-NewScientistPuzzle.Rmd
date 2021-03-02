@@ -4,24 +4,27 @@ subtitle: "Burger run"
 author: "Andrew J. Sims"
 date: "18th June 2020"
 output: 
+  rmarkdown::html_vignette:
+    fig_width: 7
+    fig_height: 5
+    fig_caption: true
   rmarkdown::pdf_document:
     fig_crop: false
 vignette: >
-  %\VignetteIndexEntry{GT00 - A directed graph solution to a *New Scientist* puzzle}
+  %\VignetteIndexEntry{A directed graph solution to a *New Scientist* puzzle}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 bibliography: "references.bib"
 csl: "national-institute-of-health-research.csl"
 ---
 ```{r, include = FALSE}
-rm(list=ls())
 knitr::opts_chunk$set(
   collapse = TRUE,
   comment = "#>"
 )
 ```
 
-```{r setup, echo=F}
+```{r setup, echo=FALSE}
 library("rdecision")
 library("grid")
 ```
@@ -39,24 +42,38 @@ shortest routes will pass through exactly one Big Burger. Xenia: "I reckon there
 are 10." Yolanda: "I'd say more like 20." Zara: "No you're both wrong, I bet 
 there are more than 50." Who is right, or closest to right?
 
-```{r diagram, echo=FALSE, results='hide', fig.keep='last', out.width="8cm", fig.width=12, fig.height=12, fig.align='center'}
-# viewport
-vp <- viewport(
-  width = 300,
-  height = 300,
-  default.units = "mm"
-)
+```{r diagram, echo=FALSE, results='hide', fig.keep='last', fig.align='center'}
+# new page
+grid.newpage()
+# functions to transform coordinates and distances in graph space (0:300) 
+# to grid space (cm)
+fig.size <- dev.size("cm")
+scale <- max(300/fig.size[1], 300/fig.size[2])
+gx <- function(x) {
+  xcm <- fig.size[1]/2 + (x-150)/scale
+  return(xcm)
+}
+gy <- function(y) {
+  ycm <- fig.size[2]/2 + (y-150)/scale
+  return(ycm)
+}
+gd <- function(d) {
+  dcm <- d/scale
+  return(dcm)
+}
 # grid
 for (x in seq(50,250,50)) {
-  grid.move.to(x=unit(x,"mm"), y=unit(50,"mm"), vp=vp)
-  grid.line.to(x=unit(x,"mm"), y=unit(250,"mm"), gp=gpar(lwd=2), vp=vp)
+  grid.move.to(x=unit(gx(x),"cm"), y=unit(gy(50),"cm"))
+  grid.line.to(x=unit(gx(x),"cm"), y=unit(gy(250),"cm"), gp=gpar(lwd=2))
 }
 for (y in seq(50,250,50)) {
-  grid.move.to(x=unit(50,"mm"), y=unit(y,"mm"), vp=vp)
-  grid.line.to(x=unit(250,"mm"), y=unit(y,"mm"), gp=gpar(lwd=2), vp=vp)
+  grid.move.to(x=unit(gx(50),"cm"), y=unit(gy(y),"cm"))
+  grid.line.to(x=unit(gx(250),"cm"), y=unit(gy(y),"cm"), gp=gpar(lwd=2))
 }
-grid.text(label="A", x=unit(45,"mm"), y=unit(255,"mm"), gp=gpar(fontsize=40))
-grid.text(label="B", x=unit(255,"mm"), y=unit(45,"mm"), gp=gpar(fontsize=40))
+grid.text(label="A", x=unit(gx(45),"cm"), y=unit(gy(255),"cm"), 
+          gp=gpar(fontsize=14))
+grid.text(label="B", x=unit(gx(255),"cm"), y=unit(gy(45),"cm"),
+          gp=gpar(fontsize=14))
 # restaurants
 BB <- data.frame(
   x0 = c(150,100,210,160,250,110,50),
@@ -65,13 +82,10 @@ BB <- data.frame(
   y1 = c(90,140,100,150,190,200,240)
 )
 apply(BB, MARGIN=1, function(r){
-  grid.move.to(x=unit(r["x0"],"mm"), y=unit(r["y0"],"mm"), vp=vp)
-  grid.line.to(x=unit(r["x1"],"mm"), y=unit(r["y1"],"mm"), 
-               gp=gpar(col="red", lwd=6, lend="square"), vp=vp)
+  grid.move.to(x=unit(gx(r["x0"]),"cm"), y=unit(gy(r["y0"]),"cm"))
+  grid.line.to(x=unit(gx(r["x1"]),"cm"), y=unit(gy(r["y1"]),"cm"), 
+               gp=gpar(col="red", lwd=6, lend="square"))
 })
-# display
-pushViewport(vp)
-popViewport()
 ```
 
 # Constructing the graph
