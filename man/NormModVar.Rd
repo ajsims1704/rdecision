@@ -3,7 +3,7 @@
 \docType{class}
 \name{NormModVar}
 \alias{NormModVar}
-\title{NormModVar}
+\title{\verb{NormModVar}}
 \description{
 An R6 class for a model variable with Normal uncertainty
 }
@@ -70,7 +70,7 @@ normal distribution for the uncertainty of the variable.}
 \if{html}{\out{</div>}}
 }
 \subsection{Returns}{
-A NormModVar object.
+A \verb{NormModVar} object.
 }
 }
 \if{html}{\out{<hr>}}
@@ -85,7 +85,7 @@ random variables, some of which follow distributions.
 }
 
 \subsection{Returns}{
-TRUE if probabilistic
+\verb{TRUE} if probabilistic
 }
 }
 \if{html}{\out{<hr>}}

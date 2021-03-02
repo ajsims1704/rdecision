@@ -3,7 +3,7 @@
 \docType{class}
 \name{Graph}
 \alias{Graph}
-\title{Graph}
+\title{\verb{Graph} class}
 \description{
 An R6 class to represent a graph (from discrete mathematics).
 }
@@ -13,8 +13,8 @@ graphs. Graphs are systems of vertices connected in pairs by edges.
 }
 \references{
 { 
-  Gross JL, Yellen J, Zhang P. Handbook of Graph Theory. 2nd ed. 
-  Chapman and Hall/CRC.; 2013 \url{https://doi.org/10.1201/b16132}
+  Gross JL, Yellen J, Zhang P. Handbook of Graph Theory. Second edition, 
+  Chapman and Hall/CRC.; 2013, \doi{doi.org/10.1201/b16132}
 }
 }
 \author{
@@ -44,7 +44,7 @@ Andrew Sims \email{andrew.sims@newcastle.ac.uk}
 \if{html}{\out{<a id="method-new"></a>}}
 \if{latex}{\out{\hypertarget{method-new}{}}}
 \subsection{Method \code{new()}}{
-Create a new Graph object from sets of nodes and edges.
+Create a new \verb{Graph} object from sets of nodes and edges.
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{Graph$new(V, E)}\if{html}{\out{</div>}}
 }
@@ -59,7 +59,7 @@ Create a new Graph object from sets of nodes and edges.
 \if{html}{\out{</div>}}
 }
 \subsection{Returns}{
-A Graph object.
+A \verb{Graph} object.
 }
 }
 \if{html}{\out{<hr>}}
@@ -81,8 +81,8 @@ Find the index of a vertex in the graph.
 \subsection{Returns}{
 Index of v. The vertexes are normally stored in the same order
 they are specified in \code{new}, but this cannot be guaranteed. This
-function returns the same index as used in the adjacency matrix and NA 
-if the vertex is not in the graph.
+function returns the same index as used in the adjacency matrix and 
+\verb{NA} if the vertex is not in the graph.
 }
 }
 \if{html}{\out{<hr>}}
@@ -124,7 +124,7 @@ Find the index of an edge in a graph.
 \subsection{Returns}{
 Index of e. The edges are normally stored in the same order
 they are specified in \code{new}, but this cannot be guaranteed. This
-function returns the same index returned in other functions and NA
+function returns the same index returned in other functions and \verb{NA}
 if the edge is not in the graph.
 }
 }
@@ -180,8 +180,8 @@ Size of the graph (integer).
 \subsection{Method \code{graph_adjacency_matrix()}}{
 Compute the adjacency matrix for the graph. Each cell contains the
 number of edges joining the two vertexes, with the convention of
-self loops being counted twice, unless 'binary' is TRUE when cells are
-either 0 (not adjacent) or 1 (adjacent).
+self loops being counted twice, unless \verb{binary} is \verb{TRUE} when
+cells are either 0 (not adjacent) or 1 (adjacent).
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{Graph$graph_adjacency_matrix(boolean = FALSE)}\if{html}{\out{</div>}}
 }
@@ -198,7 +198,7 @@ either 0 (not adjacent) or 1 (adjacent).
 A square numeric matrix with the number of rows and columns
 equal to the order of the graph. The rows and columns are in the
 same order as V. If the nodes have defined and unique labels the
-dimnames of the matrix are the labels of the nodes.
+\verb{dimnames} of the matrix are the labels of the nodes.
 }
 }
 \if{html}{\out{<hr>}}

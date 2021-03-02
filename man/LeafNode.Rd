@@ -3,7 +3,7 @@
 \docType{class}
 \name{LeafNode}
 \alias{LeafNode}
-\title{LeafNode}
+\title{\verb{LeafNode} class}
 \description{
 An R6 class for a leaf node in a decision tree representing a clinical state.
 }
@@ -40,7 +40,7 @@ Andrew J. Sims \email{andrew.sims@newcastle.ac.uk}
 \if{html}{\out{<a id="method-new"></a>}}
 \if{latex}{\out{\hypertarget{method-new}{}}}
 \subsection{Method \code{new()}}{
-Create a new \code{LeafNode} object; synonymous with a clinical outcome.
+Create a new \verb{LeafNode} object; synonymous with a clinical outcome.
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{LeafNode$new(
   label,
@@ -58,32 +58,32 @@ converted to a syntactically valid (in R) name to ensure it can be used
 as a column name in a data frame.}
 
 \item{\code{utility}}{The incremental utility that a user associates with
-being in the health state (range -Inf to 1) for the interval. Intended
-for use with cost benefit analysis.}
+being in the health state (range \verb{-Inf} to 1) for the interval.
+Intended for use with cost benefit analysis.}
 
-\item{\code{interval}}{The time interval over which the \code{utility}
-parameters apply, expressed as an R \code{difftime} object; default 
+\item{\code{interval}}{The time interval over which the \verb{utility}
+parameter applies, expressed as an R \verb{difftime} object; default 
 1 year.}
 }
 \if{html}{\out{</div>}}
 }
 \subsection{Returns}{
-A new \code{LeafNode} object
+A new \verb{LeafNode} object
 }
 }
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-modvars"></a>}}
 \if{latex}{\out{\hypertarget{method-modvars}{}}}
 \subsection{Method \code{modvars()}}{
-Find all the model variables of type ModVar that have been specified
-as values associated with this LeafNode. Includes operands of these
-\code{ModVar}s, if they are expressions.
+Find all the model variables of type \verb{ModVar} that have been 
+specified as values associated with this \verb{LeafNode}. Includes 
+operands of these \verb{ModVar}s, if they are expressions.
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{LeafNode$modvars()}\if{html}{\out{</div>}}
 }
 
 \subsection{Returns}{
-A list of \code{ModVar}s.
+A list of \verb{ModVar}s.
 }
 }
 \if{html}{\out{<hr>}}
@@ -96,14 +96,6 @@ the interval.
 \if{html}{\out{<div class="r">}}\preformatted{LeafNode$utility()}\if{html}{\out{</div>}}
 }
 
-\subsection{Arguments}{
-\if{html}{\out{<div class="arguments">}}
-\describe{
-\item{\code{expected}}{Parameter passed to the \code{value} method of the model
-variable used to define utility; ignored otherwise.}
-}
-\if{html}{\out{</div>}}
-}
 \subsection{Returns}{
 Incremental utility (numeric value).
 }
@@ -118,7 +110,7 @@ Return the interval associated with being in the state.
 }
 
 \subsection{Returns}{
-Interval (as a difftime).
+Interval (as a \verb{difftime}).
 }
 }
 \if{html}{\out{<hr>}}
@@ -132,7 +124,7 @@ the state.
 }
 
 \subsection{Returns}{
-QALY.
+\acronym{QALY}.
 }
 }
 \if{html}{\out{<hr>}}

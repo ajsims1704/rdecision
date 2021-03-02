@@ -3,13 +3,13 @@
 \docType{class}
 \name{Action}
 \alias{Action}
-\title{Action}
+\title{\verb{Action} class}
 \description{
 An R6 class to represent an action (choice) edge in a decision tree.
 }
 \details{
 A specialism of class Arrow which is used in a decision tree to
-represent edges with source nodes joined to \code{DecisionNode}s.
+represent edges with source nodes joined to \verb{DecisionNode}s.
 }
 \author{
 Andrew J. Sims \email{andrew.sims@newcastle.ac.uk}
@@ -44,7 +44,7 @@ Andrew J. Sims \email{andrew.sims@newcastle.ac.uk}
 \if{latex}{\out{\hypertarget{method-new}{}}}
 \subsection{Method \code{new()}}{
 Create an object of type 'Action'. Optionally, a cost and a benefit may 
-be associated with traversing the edge. A \dfn{payoff} (benefit minus 
+be associated with traversing the edge. A \dfn{pay-off} (benefit minus 
 cost)  is sometimes used in edges of decision trees; the parametrization
 used here is more general.
 \subsection{Usage}{
@@ -69,22 +69,23 @@ tabulation of strategies.}
 \if{html}{\out{</div>}}
 }
 \subsection{Returns}{
-A new \code{Action} object.
+A new \verb{Action} object.
 }
 }
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-modvars"></a>}}
 \if{latex}{\out{\hypertarget{method-modvars}{}}}
 \subsection{Method \code{modvars()}}{
-Find all the model variables of type ModVar that have been specified
+Find all the model variables of type \verb{ModVar} that have been 
+specified
 as values associated with this Action. Includes operands of these
-\code{ModVar}s, if they are expressions.
+\verb{ModVar}s, if they are expressions.
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{Action$modvars()}\if{html}{\out{</div>}}
 }
 
 \subsection{Returns}{
-A list of \code{ModVar}s.
+A list of \verb{ModVar}s.
 }
 }
 \if{html}{\out{<hr>}}

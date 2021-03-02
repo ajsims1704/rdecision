@@ -25,10 +25,11 @@ Suggests:
     rmarkdown,
     knitr,
     pander,
-    testthat
+    testthat (>= 3.0.0)
 License: GPL-3
 LazyData: true
 Language: en-GB
 Encoding: UTF-8
 RoxygenNote: 7.1.1
 VignetteBuilder: knitr
+Config/testthat/edition: 3

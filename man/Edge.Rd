@@ -3,7 +3,7 @@
 \docType{class}
 \name{Edge}
 \alias{Edge}
-\title{Edge}
+\title{\verb{Edge} class}
 \description{
 An R6 class to represent an edge in a graph.
 }
@@ -28,7 +28,7 @@ Andrew J. Sims \email{andrew.sims@newcastle.ac.uk}
 \if{html}{\out{<a id="method-new"></a>}}
 \if{latex}{\out{\hypertarget{method-new}{}}}
 \subsection{Method \code{new()}}{
-Create an object of type 'Edge'.
+Create an object of type \verb{Edge}.
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{Edge$new(v1, v2, label = "")}\if{html}{\out{</div>}}
 }
@@ -45,7 +45,7 @@ Create an object of type 'Edge'.
 \if{html}{\out{</div>}}
 }
 \subsection{Returns}{
-A new `Edge` object.
+A new \verb{Edge} object.
 }
 }
 \if{html}{\out{<hr>}}

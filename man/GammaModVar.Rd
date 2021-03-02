@@ -3,20 +3,20 @@
 \docType{class}
 \name{GammaModVar}
 \alias{GammaModVar}
-\title{GammaModVar}
+\title{\verb{GammaModVar} class}
 \description{
 An R6 class for a model variable with Gamma function uncertainty
 }
 \details{
 A model variable for which the uncertainty in the point estimate can
 be modelled with a Gamma distribution. The hyperparameters of the
-distribution are the shape (`alpha`) and the rate (`beta`) of
+distribution are the shape (\verb{alpha}) and the rate (\verb{beta}) of
 the uncertainty distribution. Note that this is the conventional
 parametrization used in Bayesian statistics; in econometrics the
-shape/scale (`k`/`theta`) parametrization is more common (and the one
-used in this implementation). Note, however, that although Briggs 
-\emph{et al} (2006) use the shape/scale formulation, they use `alpha`/`beta`
-as parameter names.
+shape/scale (\code{k}/\code{theta}) parametrization is more common (and the
+one used in this implementation). Note, however, that although Briggs 
+\emph{et al} (2006) use the shape/scale formulation, they use 
+\code{alpha}/\code{beta} as parameter names.
 }
 \note{
 The Gamma model variable class can be used to model the uncertainty of
@@ -70,7 +70,7 @@ Andrew J. Sims \email{andrew.sims@newcastle.ac.uk}
 \if{html}{\out{<a id="method-new"></a>}}
 \if{latex}{\out{\hypertarget{method-new}{}}}
 \subsection{Method \code{new()}}{
-Create an object of class GammaModVar.
+Create an object of class \verb{GammaModVar}.
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{GammaModVar$new(description, units, shape, scale)}\if{html}{\out{</div>}}
 }
@@ -89,7 +89,7 @@ Create an object of class GammaModVar.
 \if{html}{\out{</div>}}
 }
 \subsection{Returns}{
-An object of class GammaModVar.
+An object of class \verb{GammaModVar}.
 }
 }
 \if{html}{\out{<hr>}}

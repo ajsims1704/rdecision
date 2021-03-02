@@ -3,21 +3,22 @@
 \docType{class}
 \name{Digraph}
 \alias{Digraph}
-\title{Digraph}
+\title{\verb{Digraph} class}
 \description{
 An R6 class to represent a digraph (a directed graph).
 }
 \details{
-Encapulates, and provides methods for computation and checking of directed
+Encapsulates, and provides methods for computation and checking of directed
 graphs (digraphs). Inherits from class Graph.
 }
 \references{
 { 
-  Gross JL, Yellen J, Zhang P. Handbook of Graph Theory. 2nd ed. 
-  Chapman and Hall/CRC.; 2013 \url{https://doi.org/10.1201/b16132}.
+  Gross JL, Yellen J, Zhang P. Handbook of Graph Theory. Second edition, 
+  Chapman and Hall/CRC.; 2013, \doi{10.1201/b16132}.
 
-  Kahn AB, Topological Sorting of Large Networks, \emph{Commun. ACM},
-  1962;\strong{5}:558-562, \url{https://doi.org/10.1145/368996.369025}.
+  Kahn AB, Topological Sorting of Large Networks, 
+  \emph{Communications of the \acronym{ACM}},
+  1962;\strong{5}:558-562, \doi{10.1145/368996.369025}.
 }
 }
 \author{

@@ -3,14 +3,14 @@
 \docType{class}
 \name{BetaModVar}
 \alias{BetaModVar}
-\title{BetaModVar}
+\title{\verb{BetaModVar} class}
 \description{
 An R6 class for a model variable with Beta function uncertainty
 }
 \details{
 A model variable for which the uncertainty in the point estimate can
 be modelled with a Beta distribution. The hyperparameters of the
-distribution are the shape (`alpha`) and the shape (`beta`) of
+distribution are the shape (\verb{alpha}) and the shape (\verb{beta}) of
 the uncertainty distribution.
 }
 \author{
@@ -48,7 +48,7 @@ Andrew J. Sims \email{andrew.sims@newcastle.ac.uk}
 \if{html}{\out{<a id="method-new"></a>}}
 \if{latex}{\out{\hypertarget{method-new}{}}}
 \subsection{Method \code{new()}}{
-Create an object of class BetaModVar.
+Create an object of class \verb{BetaModVar}.
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{BetaModVar$new(description, units, alpha, beta)}\if{html}{\out{</div>}}
 }
@@ -67,7 +67,7 @@ Create an object of class BetaModVar.
 \if{html}{\out{</div>}}
 }
 \subsection{Returns}{
-An object of class BetaModVar.
+An object of class \verb{BetaModVar}.
 }
 }
 \if{html}{\out{<hr>}}
@@ -115,7 +115,7 @@ Expected value as a numeric value.
 \if{html}{\out{<a id="method-mode"></a>}}
 \if{latex}{\out{\hypertarget{method-mode}{}}}
 \subsection{Method \code{mode()}}{
-Return the mode of the distribution (if alpha, beta > 1)
+Return the mode of the distribution (if \verb{alpha}, \verb{beta} > 1)
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{BetaModVar$mode()}\if{html}{\out{</div>}}
 }

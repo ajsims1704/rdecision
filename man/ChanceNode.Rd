@@ -3,7 +3,7 @@
 \docType{class}
 \name{ChanceNode}
 \alias{ChanceNode}
-\title{ChanceNode}
+\title{\verb{ChanceNode} class}
 \description{
 An R6 class to represent a chance node in a decision tree.
 }
@@ -38,7 +38,7 @@ Andrew Sims \email{andrew.sims@newcastle.ac.uk}
 \if{html}{\out{<a id="method-new"></a>}}
 \if{latex}{\out{\hypertarget{method-new}{}}}
 \subsection{Method \code{new()}}{
-Create a new ChanceNode object
+Create a new \verb{ChanceNode} object
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{ChanceNode$new(label = "")}\if{html}{\out{</div>}}
 }
@@ -51,7 +51,7 @@ Create a new ChanceNode object
 \if{html}{\out{</div>}}
 }
 \subsection{Returns}{
-A new `ChanceNode` object
+A new \verb{ChanceNode} object
 }
 }
 \if{html}{\out{<hr>}}

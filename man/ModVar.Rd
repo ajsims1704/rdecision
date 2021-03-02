@@ -3,7 +3,7 @@
 \docType{class}
 \name{ModVar}
 \alias{ModVar}
-\title{ModVar}
+\title{\verb{ModVar} class}
 \description{
 An R6 class for a variable in an health economic model
 }
@@ -41,7 +41,7 @@ Andrew Sims \email{andrew.sims@newcastle.ac.uk}
 \if{html}{\out{<a id="method-new"></a>}}
 \if{latex}{\out{\hypertarget{method-new}{}}}
 \subsection{Method \code{new()}}{
-Create an object of type `ModVar`
+Create an object of type \verb{ModVar}
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{ModVar$new(description, units)}\if{html}{\out{</div>}}
 }
@@ -53,26 +53,27 @@ Create an object of type `ModVar`
 and its role in the model. This description will be used in a
 tabulation of the variables linked to a model.}
 
-\item{\code{units}}{A character string description of the units, e.g. 'GBP',
-'per year'.}
+\item{\code{units}}{A character string description of the units, e.g. 
+\code{GBP}, \code{per year}.}
 }
 \if{html}{\out{</div>}}
 }
 \subsection{Returns}{
-A new ModVar object.
+A new \verb{ModVar} object.
 }
 }
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-is_expression"></a>}}
 \if{latex}{\out{\hypertarget{method-is_expression}{}}}
 \subsection{Method \code{is_expression()}}{
-Is this ModVar an expression?
+Is this \verb{ModVar} an expression?
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{ModVar$is_expression()}\if{html}{\out{</div>}}
 }
 
 \subsection{Returns}{
-TRUE if it inherits from ExprModVar, FALSE otherwise.
+TRUE if it inherits from \verb{ExprModVar}, \verb{FALSE}
+otherwise.
 }
 }
 \if{html}{\out{<hr>}}
@@ -167,8 +168,8 @@ Mean value as a numeric value.
 \if{latex}{\out{\hypertarget{method-mode}{}}}
 \subsection{Method \code{mode()}}{
 Return the mode of the variable. By default returns NA, which will be
-the case for most ExprModVar variables, because an arbitrary expression
-is not guaranteed to be unimodel.
+the case for most \verb{ExprModVar} variables, because an arbitrary
+expression is not guaranteed to be unimodal.
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{ModVar$mode()}\if{html}{\out{</div>}}
 }
@@ -207,15 +208,15 @@ Find quantiles of the uncertainty distribution.
 \if{html}{\out{</div>}}
 }
 \subsection{Returns}{
-Vector of numeric values of the same length as `probs`.
+Vector of numeric values of the same length as \verb{probs}.
 }
 }
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-set"></a>}}
 \if{latex}{\out{\hypertarget{method-set}{}}}
 \subsection{Method \code{set()}}{
-Sets the value of the ModVar that will be returned by subsequent
-calls to get() until set() is called again.
+Sets the value of the \verb{ModVar} that will be returned by subsequent
+calls to \code{get()} until \code{set()} is called again.
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{ModVar$set(what = "random")}\if{html}{\out{</div>}}
 }
@@ -233,21 +234,21 @@ depending on their use case.}
 \if{html}{\out{</div>}}
 }
 \subsection{Returns}{
-Updated ModVar.
+Updated \verb{ModVar}.
 }
 }
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-get"></a>}}
 \if{latex}{\out{\hypertarget{method-get}{}}}
 \subsection{Method \code{get()}}{
-Gets the value of the ExprModVar that was set by the most recent call
-to set().
+Gets the value of the \verb{ModVar} that was set by the most recent call
+to \code{set()}.
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{ModVar$get()}\if{html}{\out{</div>}}
 }
 
 \subsection{Returns}{
-Value determined by last set().
+Value determined by last \code{set()}.
 }
 }
 \if{html}{\out{<hr>}}

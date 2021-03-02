@@ -3,7 +3,7 @@
 \docType{class}
 \name{DecisionTree}
 \alias{DecisionTree}
-\title{DecisionTree}
+\title{\verb{DecisionTree} class}
 \description{
 An R6 class to represent a decision tree
 }
@@ -17,22 +17,22 @@ conditions:
 there must be a unique path from the root to each node.
 In graph theory terminology, the directed graph formed by the nodes
 and edges must be an \dfn{arborescence}.}
-\item{Each node must inherit from one of \code{DecisionNode},
-\code{ChanceNode} or \code{LeafNode}. Formally the set of vertices
+\item{Each node must inherit from one of \verb{DecisionNode},
+\code{ChanceNode} or \verb{LeafNode}. Formally the set of vertices
 must be a disjoint union of sets of decision nodes, chance nodes
 and leaf nodes.}
 \item{All and only leaf nodes must have no children.}
-\item{Each edge must inherit from either \code{Action} or
+\item{Each edge must inherit from either \verb{Action} or
 \code{Reaction}.}
 \item{All and only edges that have source endpoints joined to 
-decision nodes must inherit from \code{Action}.}
+decision nodes must inherit from \verb{Action}.}
 \item{All and only edges that have source endpoints joined to 
-chance nodes must inherit from \code{Reaction}.}
+chance nodes must inherit from \verb{Reaction}.}
 \item{The sum of probabilities of each set of reaction edges 
 with a common source endpoint must be 1.}
-\item{Each \code{DecisionNode} must have a label, and the labels of all
+\item{Each \verb{DecisionNode} must have a label, and the labels of all
 \code{DecisionNodes} must be unique within the model.}
-\item{Each \code{Action} must have a label, and the labels of  
+\item{Each \verb{Action} must have a label, and the labels of  
 \code{Action}s that share a common source endpoint must be unique.}
 }
 }
@@ -42,13 +42,14 @@ with a common source endpoint must be 1.}
   evaluation. Oxford, UK: Oxford University Press; 2006.
 
   Briggs AH, Weinstein MC, Fenwick EAL, Karnon J, Sculpher MJ, Paltiel AD.
-  Model Parameter Estimation and Uncertainty: A Report of the ISPOR-SMDM 
-  Modeling Good Research Practices Task Force-6. \emph{Value in Health} 
-  2012;\strong{15}:835–42. \url{https://doi.org/10.1016/j.jval.2012.04.014}.
+  Model Parameter Estimation and Uncertainty: A Report of the 
+  \acronym{ISPOR-SMDM} Modeling Good Research Practices Task Force-6. 
+  \emph{Value in Health} 2012;\bold{15}:835–42, 
+  \doi{10.1016/j.jval.2012.04.014}.
 
   Kamiński B, Jakubczyk M, Szufel P. A framework for sensitivity analysis of
   decision trees. \emph{Central European Journal of Operational Research}
-  2018;\strong{26}:135–59. \url{https://doi.org/10.1007/s10100-017-0479-6}.
+  2018;\bold{26}:135–59, \doi{10.1007/s10100-017-0479-6}.
 }
 }
 \author{
@@ -133,7 +134,7 @@ in the details section of this class.
 \if{html}{\out{</div>}}
 }
 \subsection{Returns}{
-A DecisionTree object
+A \verb{DecisionTree} object
 }
 }
 \if{html}{\out{<hr>}}
@@ -154,7 +155,7 @@ of "node", "label" or "index".}
 \if{html}{\out{</div>}}
 }
 \subsection{Returns}{
-A list of \code{DecisionNode} objects (for what="node"); a list
+A list of \verb{DecisionNode} objects (for what="node"); a list
 of character strings (for what="label"); or a list of integer indexes of 
 the decision nodes (for what="index").
 }
@@ -169,7 +170,7 @@ Find the chance nodes in the tree.
 }
 
 \subsection{Returns}{
-A list of \code{ChanceNode} objects.
+A list of \verb{ChanceNode} objects.
 }
 }
 \if{html}{\out{<hr>}}
@@ -191,7 +192,7 @@ nodes).}
 \if{html}{\out{</div>}}
 }
 \subsection{Returns}{
-A list of \code{LeafNode} objects (for what="node"); a list
+A list of \verb{LeafNode} objects (for what="node"); a list
 of character strings (for what="label"); or a list of integer indexes of 
 the decision nodes (for what="index").
 }
@@ -213,21 +214,21 @@ Return the edges that have the specified decision node as their source.
 \if{html}{\out{</div>}}
 }
 \subsection{Returns}{
-A list of Action edges.
+A list of \verb{Action} edges.
 }
 }
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-modvars"></a>}}
 \if{latex}{\out{\hypertarget{method-modvars}{}}}
 \subsection{Method \code{modvars()}}{
-Find all the model variables of type ModVar that have been specified
-as values associated with the nodes and edges of the tree.
+Find all the model variables of type \verb{ModVar} that have been 
+specified as values associated with the nodes and edges of the tree.
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{DecisionTree$modvars()}\if{html}{\out{</div>}}
 }
 
 \subsection{Returns}{
-A list of \code{ModVar}s.
+A list of \verb{ModVar}s.
 }
 }
 \if{html}{\out{<hr>}}
@@ -254,7 +255,7 @@ Data frame with one row per model variable, as follows:
 \item{Units}{Units of the variable.}
 \item{Distribution}{Either the uncertainty distribution, if
 it is a regular model variable, or the expression used to create it,
-if it is an ExprModVar.}
+if it is an \verb{ExprModVar}.}
 \item{Mean}{Mean; calculated from means of operands if
 an expression.}
 \item{E}{Expectation; estimated from random sample if expression, 
@@ -370,7 +371,7 @@ path, and there is one row for each path in each strategy.
 \if{html}{\out{<a id="method-evaluate_walks"></a>}}
 \if{latex}{\out{\hypertarget{method-evaluate_walks}{}}}
 \subsection{Method \code{evaluate_walks()}}{
-Evaluate the components of payoff associated with a set of walks in the
+Evaluate the components of pay-off associated with a set of walks in the
 decision tree. For each walk, probability, cost, benefit and utility are
 calculated.
 \subsection{Usage}{
@@ -394,7 +395,7 @@ PSA. The argument P is expected to be obtained from
 }
 
 \subsection{Returns}{
-A matrix (payoff table) with one row per path and columns
+A matrix (pay-off table) with one row per path and columns
 organized as follows:
 \describe{
 \item{Leaf}{The unique identifier of the path, taken to be the index 
@@ -484,10 +485,11 @@ at each decision node.
 \item{\code{ref}}{The reference strategy (option) with which the index strategy
 will be compared.}
 
-\item{\code{outcome}}{One of "cost" or "ICER". For "cost" (e.g. in cost
+\item{\code{outcome}}{One of \verb{"cost"} or \verb{"ICER"}. For \verb{"cost"}
+(e.g. in cost
 consequence analysis), the x axis is cost saved (cost of reference minus
 cost of index), on the presumption that the new technology will be cost
-saving at the point estimate. For "ICER" the x axis is
+saving at the point estimate. For \verb{"ICER"} the x axis is
 \eqn{\Delta C/\Delta E} and is expected to be positive at the point 
 estimate (i.e. in the NE or SW quadrants of the cost-effectiveness 
 plane), where \eqn{\Delta C} is cost of index minus cost of reference, 
@@ -512,7 +514,7 @@ variable. This ensures that the range of each input is defensible
 A data frame with one row per input model variable and columns
 for: minimum value of the variable, maximum value of the variable,
 minimum value of the outcome and maximum value of the outcome. NULL
-if there are no modvars.
+if there are no \verb{ModVar}s.
 }
 }
 \if{html}{\out{<hr>}}

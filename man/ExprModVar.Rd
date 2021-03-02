@@ -3,16 +3,16 @@
 \docType{class}
 \name{ExprModVar}
 \alias{ExprModVar}
-\title{ExprModVar}
+\title{\verb{ExprModVar} class}
 \description{
 An R6 class for a model variable constructed from an expression
 involving other model variables.
 }
 \details{
 A class to support expressions involving objects
-of base class ModVar, which itself behaves like a 
+of base class \verb{ModVar}, which itself behaves like a 
 model variable. For example, if \code{A} and
-\code{B} are variables with base class \code{ModVar}
+\code{B} are variables with base class \verb{ModVar}
 and \code{c} is a variable of type \code{numeric}, then
 it is not possible to write, for example, 
 \code{x <- 42*A/B + c}, because R cannot manipulate class
@@ -26,13 +26,13 @@ be no closed form expressions for the mean, standard deviation and
 the quantiles. Therefore they are obtained by simulation, via
 functions \code{mu_hat}, \code{sigma_hat} and \code{q_hat}.
 
-For consistency with \code{ModVar}s which are not expressions, the
+For consistency with \verb{ModVar}s which are not expressions, the
 function \code{mean} returns the value of the expression when all
 its operands take their mean values. This will, in general, not
 be the mean of the expression distribution (which can be obtained
 via \code{mu_hat}), but is the value normally used in the base
 case of a model as the point estimate. As Briggs \emph{et al} note 
-(section 4.1.1) "in all but the most nonlinear models, the 
+(section 4.1.1) "in all but the most non-linear models, the 
 difference between the expectation over the output of a 
 probabilistic model and that model evaluated at the mean values
 of the input parameters, is likely to be modest."
@@ -107,21 +107,23 @@ combined into costs, probabilities and rates.}
 
 \item{\code{units}}{Units in which the variable is expressed.}
 
-\item{\code{quo}}{A quosure (see package rlang), which contains an expression
+\item{\code{quo}}{A \verb{quosure} (see package \pkg{rlang}), which contains an 
+expression
 and its environment. The usage is \code{quo(x+y)} or 
 \code{rlang::quo(x+y)}.}
 }
 \if{html}{\out{</div>}}
 }
 \subsection{Returns}{
-An object of type ExprModVar
+An object of type \verb{ExprModVar}
 }
 }
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-add_method"></a>}}
 \if{latex}{\out{\hypertarget{method-add_method}{}}}
 \subsection{Method \code{add_method()}}{
-Create a new quosure from that supplied in new() but with each ModVar
+Create a new \verb{quosure} from that supplied in \code{new()} but with
+each \verb{ModVar}
 operand appended with \code{$x} where \code{x} is the argument to this
 function.
 \subsection{Usage}{
@@ -137,15 +139,16 @@ function.
 }
 \subsection{Details}{
 This method is mostly intended for internal use within the
-class and will not generally be needed for normal use of ExprModVar
-objects. The returned expression is \emph{not} syntactically checked or 
-evaluated before it is returned.
+class and will not generally be needed for normal use of
+\verb{ExprModVar} objects. The returned expression is \emph{not} 
+syntactically checked or evaluated before it is returned.
 }
 
 \subsection{Returns}{
-A quosure whose expression is each ModVar \code{v} in the  
+A \verb{quosure} whose expression is each \verb{ModVar} \code{v}
+in the  
 expression replaced with \code{v$method} and the same environment as
-specified in the quosure supplied in new().
+specified in the \verb{quosure} supplied in new().
 }
 }
 \if{html}{\out{<hr>}}
@@ -167,7 +170,7 @@ TRUE if probabilistic
 \if{html}{\out{<a id="method-operands"></a>}}
 \if{latex}{\out{\hypertarget{method-operands}{}}}
 \subsection{Method \code{operands()}}{
-Return a list of operands that are themselves ModVars given
+Return a list of operands that are themselves \verb{ModVar}s given
 in the expression.
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{ExprModVar$operands()}\if{html}{\out{</div>}}
@@ -231,8 +234,8 @@ Mean value as a numeric value.
 \if{latex}{\out{\hypertarget{method-mode}{}}}
 \subsection{Method \code{mode()}}{
 Return the mode of the variable. By default returns NA, which will be
-the case for most ExprModVar variables, because an arbitrary expression
-is not guaranteed to be unimodel.
+the case for most \verb{ExprModVar} variables, because an arbitrary
+expression is not guaranteed to be unimodal.
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{ExprModVar$mode()}\if{html}{\out{</div>}}
 }
@@ -245,8 +248,8 @@ Mode as a numeric value.
 \if{html}{\out{<a id="method-SD"></a>}}
 \if{latex}{\out{\hypertarget{method-SD}{}}}
 \subsection{Method \code{SD()}}{
-Return the standard deviation of the distribution as NA because the
-variance is not available as a closed form for all functions of
+Return the standard deviation of the distribution as \verb{NA} because 
+the variance is not available as a closed form for all functions of
 distributions.
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{ExprModVar$SD()}\if{html}{\out{</div>}}
@@ -261,7 +264,7 @@ Standard deviation as a numeric value
 \if{latex}{\out{\hypertarget{method-quantile}{}}}
 \subsection{Method \code{quantile()}}{
 Find quantiles of the uncertainty distribution.  Not available
-as a closed form, and returned as NA.
+as a closed form, and returned as \verb{NA}.
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{ExprModVar$quantile(probs)}\if{html}{\out{</div>}}
 }
@@ -274,7 +277,7 @@ as a closed form, and returned as NA.
 \if{html}{\out{</div>}}
 }
 \subsection{Returns}{
-Vector of numeric values of the same length as `probs`.
+Vector of numeric values of the same length as\code{probs}.
 }
 }
 \if{html}{\out{<hr>}}
@@ -355,10 +358,11 @@ Vector of quantiles.
 \if{html}{\out{<a id="method-set"></a>}}
 \if{latex}{\out{\hypertarget{method-set}{}}}
 \subsection{Method \code{set()}}{
-Sets the value of the ExprModVar that will be returned by subsequent
-calls to get() until set() is called again. Because an ExprModVar can be 
-considered as a dependent variable, the idea of \code{set}ting a value
-is meaningless, and calls to this method have no effect. To affect the
+Sets the value of the \verb{ExprModVar} that will be returned by 
+subsequent calls to \code{get()} until \code{set()} is called again. 
+Because an \verb{ExprModVar} can be considered as a dependent variable,
+the idea of \code{set}ting a value is meaningless, and calls to this
+method have no effect. To affect the
 value returned by the next call to \code{get}, call \code{set} for each
 of the operands of this expression.
 \subsection{Usage}{
@@ -369,26 +373,26 @@ of the operands of this expression.
 \if{html}{\out{<div class="arguments">}}
 \describe{
 \item{\code{what}}{Character string; for compatibility with non-expression
-ModVars only; not used.}
+\verb{ModVar}s only; not used.}
 }
 \if{html}{\out{</div>}}
 }
 \subsection{Returns}{
-Updated ExprModVar.
+Updated \verb{ExprModVar}.
 }
 }
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-get"></a>}}
 \if{latex}{\out{\hypertarget{method-get}{}}}
 \subsection{Method \code{get()}}{
-Gets the value of the ExprModVar that was set by the most recent call
-to set() to each operand of the expression.
+Gets the value of the \verb{ExprModVar} that was set by the most recent
+call to \code{set()} to each operand of the expression.
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{ExprModVar$get()}\if{html}{\out{</div>}}
 }
 
 \subsection{Returns}{
-Value determined by last set().
+Value determined by last \code{set()}.
 }
 }
 \if{html}{\out{<hr>}}

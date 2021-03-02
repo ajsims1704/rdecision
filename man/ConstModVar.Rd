@@ -3,14 +3,14 @@
 \docType{class}
 \name{ConstModVar}
 \alias{ConstModVar}
-\title{ConstModVar}
+\title{\verb{ConstModVar} class}
 \description{
 An R6 class for a constant in a model
 }
 \details{
-A ModVar with no uncertainty in its value. It has no
+A \verb{ModVar} with no uncertainty in its value. It has no
 distribution and there are no hyperparameters. Its 
-benefit over using a regular 'numeric' variable in a model is that
+benefit over using a regular numeric variable in a model is that
 it will appear in automatic tabulations of the model variables
 associated with a model and therefore be explicitly documented
 as a model input.
@@ -70,7 +70,7 @@ of the variables linked to a model.}
 \if{html}{\out{</div>}}
 }
 \subsection{Returns}{
-A new ConstModVar object.
+A new \verb{ConstModVar} object.
 }
 }
 \if{html}{\out{<hr>}}
@@ -178,7 +178,7 @@ quantiles are returned as the value of the constant.
 \if{html}{\out{</div>}}
 }
 \subsection{Returns}{
-Vector of numeric values of the same length as `probs`.
+Vector of numeric values of the same length as \verb{probs}.
 }
 }
 \if{html}{\out{<hr>}}

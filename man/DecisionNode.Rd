@@ -3,7 +3,7 @@
 \docType{class}
 \name{DecisionNode}
 \alias{DecisionNode}
-\title{DecisionNode}
+\title{\verb{DecisionNode} class}
 \description{
 An R6 class for a decision node in a decision tree
 }
@@ -52,7 +52,7 @@ name in a data frame.}
 \if{html}{\out{</div>}}
 }
 \subsection{Returns}{
-A new DecisionNode object
+A new \verb{DecisionNode} object
 }
 }
 \if{html}{\out{<hr>}}

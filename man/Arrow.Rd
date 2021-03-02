@@ -3,13 +3,13 @@
 \docType{class}
 \name{Arrow}
 \alias{Arrow}
-\title{Arrow}
+\title{\verb{Arrow} class}
 \description{
 An R6 class to represent an directed edge in a digraph.
 }
 \details{
 Arrows are the formal term for links between pairs of nodes in a
-directed graph. Inherits from class Edge.
+directed graph. Inherits from class \verb{Edge}.
 }
 \author{
 Andrew J. Sims \email{andrew.sims@newcastle.ac.uk}
@@ -39,7 +39,7 @@ Andrew J. Sims \email{andrew.sims@newcastle.ac.uk}
 \if{html}{\out{<a id="method-new"></a>}}
 \if{latex}{\out{\hypertarget{method-new}{}}}
 \subsection{Method \code{new()}}{
-Create an object of type 'Arrow'.
+Create an object of type \verb{Arrow}.
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{Arrow$new(source, target, label = "")}\if{html}{\out{</div>}}
 }
@@ -56,7 +56,7 @@ Create an object of type 'Arrow'.
 \if{html}{\out{</div>}}
 }
 \subsection{Returns}{
-A new `Arrow` object.
+A new \verb{Arrow} object.
 }
 }
 \if{html}{\out{<hr>}}
@@ -69,7 +69,7 @@ Access source node.
 }
 
 \subsection{Returns}{
-`Node` from which the arrow leads.
+Node from which the arrow leads.
 }
 }
 \if{html}{\out{<hr>}}
@@ -82,7 +82,7 @@ Access target node.
 }
 
 \subsection{Returns}{
-`Node` to which the arrow points.
+Node to which the arrow points.
 }
 }
 \if{html}{\out{<hr>}}

@@ -3,7 +3,7 @@
 \docType{class}
 \name{LogNormModVar}
 \alias{LogNormModVar}
-\title{LogNormModVar}
+\title{\verb{LogNormModVar} class}
 \description{
 An R6 class for a model variable with Log Normal uncertainty
 }
@@ -37,7 +37,8 @@ natural scale.}
 \note{
 The log normal distribution may be used to model the uncertainty in 
 an estimate of relative risk (Briggs 2006, p90). If a relative risk 
-estimate is available with a 95% confidence interval, the LN7 parametrization
+estimate is available with a 95% confidence interval, the \verb{"LN7"} 
+parametrization
 allows the uncertainty distribution to be specified directly. For example, 
 if RR = 0.67 with 95% confidence interval 0.53 to 0.84 (Leaper, 2016), it 
 can be modelled with
@@ -51,11 +52,13 @@ p2=(0.84-0.53)/(2*1.96)), "LN7"}.
 
  Leaper DJ, Edmiston CE and Holy CE. Meta-analysis of the potential
  economic impact following introduction of absorbable antimicrobial 
- sutures. \emph{British Journal of Surgery} 2017;\strong{104}:e134-e144.
+ sutures. \emph{British Journal of Surgery} 2017;\bold{104}:e134-e144,
+ \doi{10.1002/bjs.10443}.
 
  Swat MJ, Grenon P and Wimalaratne S. Ontology and Knowledge Base of
- Probability Distributions. EMBL-EBI Technical Report (ProbOnto 2.5), 
- 13th January 2017, \url{https://sites.google.com/site/probonto/download}.
+ Probability Distributions. \acronym{EMBL-EBI} Technical Report
+ (ProbOnto 2.5), 13 January 2017, 
+ \url{https://sites.google.com/site/probonto/download}.
 }
 }
 \author{
@@ -112,12 +115,12 @@ See 'Details'.}
 See 'Details'.}
 
 \item{\code{parametrization}}{A character string taking one of the values
-'LN1' (default) through 'LN7' (see 'Details').}
+\verb{"LN1"} (default) through \verb{"LN7"} (see 'Details').}
 }
 \if{html}{\out{</div>}}
 }
 \subsection{Returns}{
-A LogNormModVar object.
+A \verb{LogNormModVar} object.
 }
 }
 \if{html}{\out{<hr>}}
@@ -145,7 +148,8 @@ Accessor function for the name of the uncertainty distribution.
 }
 
 \subsection{Returns}{
-Distribution name as character string (LN1, LN2 etc).
+Distribution name as character string (\verb{"LN1"}, \verb{"LN2"}
+etc.).
 }
 }
 \if{html}{\out{<hr>}}
@@ -191,7 +195,7 @@ Return the point estimate of the variable.
 }
 
 \subsection{Returns}{
-Point estimate (mode) of the LN distribution.
+Point estimate (mode) of the log normal distribution.
 }
 }
 \if{html}{\out{<hr>}}
@@ -211,7 +215,7 @@ Standard deviation as a numeric value
 \if{html}{\out{<a id="method-quantile"></a>}}
 \if{latex}{\out{\hypertarget{method-quantile}{}}}
 \subsection{Method \code{quantile()}}{
-Return the quantiles of the logNormal uncertainty distribution.
+Return the quantiles of the log normal uncertainty distribution.
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{LogNormModVar$quantile(probs)}\if{html}{\out{</div>}}
 }

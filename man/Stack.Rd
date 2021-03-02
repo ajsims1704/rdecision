@@ -12,7 +12,7 @@ Conventional implementation of a stack. Used extensively in graph algorithms
 and offered as a separate class for ease of programming and to ensure that
 implementations of stacks are optimized. By intention, there is only minimal
 checking of method arguments. This is to maximize performance and because the
-class is mainly intended for use internally to 'rdecision'.
+class is mainly intended for use internally to \pkg{rdecision}.
 }
 \author{
 Andrew Sims \email{andrew.sims@newcastle.ac.uk}
@@ -38,7 +38,7 @@ Create a stack.
 }
 
 \subsection{Returns}{
-A new Stack object.
+A new \verb{Stack} object.
 }
 }
 \if{html}{\out{<hr>}}
@@ -60,7 +60,7 @@ checked.}
 \if{html}{\out{</div>}}
 }
 \subsection{Returns}{
-An updated Stack object
+An updated \verb{Stack} object
 }
 }
 \if{html}{\out{<hr>}}

@@ -3,7 +3,7 @@
 \docType{class}
 \name{Node}
 \alias{Node}
-\title{Node}
+\title{\verb{Node} class}
 \description{
 An R6 class to represent a node in a decision tree
 }
@@ -40,7 +40,7 @@ Create new Node object.
 \if{html}{\out{</div>}}
 }
 \subsection{Returns}{
-A new Node object.
+A new \verb{Node} object.
 }
 }
 \if{html}{\out{<hr>}}

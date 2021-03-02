@@ -3,7 +3,7 @@
 \docType{class}
 \name{Arborescence}
 \alias{Arborescence}
-\title{Arborescence}
+\title{\verb{Arborescence} class}
 \description{
 An R6 class to represent an arborescence (rooted directed tree).
 }
@@ -15,7 +15,7 @@ directed paths from the root must be unique.
 \references{
 {
   Walker, John Q II. A A node-positioning algorithm for general trees.
-  University of North Carolina Technical Report TR 89-034, 1989.
+  University of North Carolina Technical Report \acronym{TR} 89-034, 1989.
 }
 }
 \author{
@@ -70,7 +70,7 @@ Andrew Sims \email{andrew.sims@newcastle.ac.uk}
 \if{html}{\out{<a id="method-new"></a>}}
 \if{latex}{\out{\hypertarget{method-new}{}}}
 \subsection{Method \code{new()}}{
-Create a new Arborescence object from sets of nodes and edges.
+Create a new \verb{Arborescence} object from sets of nodes and edges.
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{Arborescence$new(V, A)}\if{html}{\out{</div>}}
 }
@@ -85,7 +85,7 @@ Create a new Arborescence object from sets of nodes and edges.
 \if{html}{\out{</div>}}
 }
 \subsection{Returns}{
-An Arborescence object.
+An \verb{Arborescence} object.
 }
 }
 \if{html}{\out{<hr>}}
@@ -179,7 +179,7 @@ A list of ordered node lists.
 \if{html}{\out{<a id="method-postree"></a>}}
 \if{latex}{\out{\hypertarget{method-postree}{}}}
 \subsection{Method \code{postree()}}{
-Implements function POSITIONTREE (Walker, 1989) to
+Implements function \verb{POSITIONTREE} (Walker, 1989) to
 determine the coordinates for each node in an arborescence.
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{Arborescence$postree(
@@ -198,7 +198,7 @@ determine the coordinates for each node in an arborescence.
 distance between siblings.}
 
 \item{\code{SubtreeSeparation}}{Distance in arbitrary units for the
-distance between neigbouring subtrees.}
+distance between neighbouring subtrees.}
 
 \item{\code{LevelSeparation}}{Distance in arbitrary units for the 
 separation between adjacent levels.}
@@ -217,7 +217,7 @@ the tree exceeds this, an error will be raised.}
 \subsection{Returns}{
 A data frame with one row per node and three columns (n, x
 and y) where \code{n} gives the node index given by the 
-Graph::vertex_index() function.
+\code{Graph::vertex_index()} function.
 }
 }
 \if{html}{\out{<hr>}}

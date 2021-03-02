@@ -146,7 +146,7 @@ test_that("simple decision trees are modelled correctly", {
   expect_equal(S$d1[1],"e1")
   # evaluations
   RES <- DT$evaluate(by="path")
-  expect_equal(RES[RES$Leaf=="t1","Benefit"],22.5,tolearance=0.05)
+  expect_equal(RES[RES$Leaf=="t1","Benefit"],22.5,tolerance=0.05)
 })
 
 # Evans et al, Pharmacoeconomics, 1997;12:565-577, Sumatriptan for migraine
