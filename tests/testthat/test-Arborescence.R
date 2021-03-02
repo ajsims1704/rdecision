@@ -141,7 +141,7 @@ test_that("parent, sibling and drawing functions are correct", {
   expect_equal(XY["D","x"],6)
   expect_equal(XY["B","x"],3)
   expect_equal(XY["C","x"],9)
-  expect_equal(XY["F","x"],13.5,tolerance=0.1)
+  expect_true(abs(XY["F","x"]-13.5)<=0.1)
   expect_equal(XY["N","x"],24)
   expect_equal(XY["G","x"],21)
   expect_equal(XY["M","x"],27)

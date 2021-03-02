@@ -36,20 +36,20 @@ test_that("get() is initialized correctly", {
   k <- 9
   theta <- 0.5
   g <- GammaModVar$new("gamma", "GBP", k, theta)
-  expect_equal(g$get(), k*theta, tolerance=0.01)
+  expect_true(abs(g$get()-(k*theta))<0.01)
 })
 
 test_that("mean, mode, sd and quantiles are returned correctly", {
   k <- 9
   theta <- 0.5
   g <- GammaModVar$new("gamma", "GBP", k, theta)
-  expect_equal(g$mean(), k*theta, tolerance=0.01)
-  expect_equal(g$SD(), sqrt(k)*theta, tolerance=0.01)
-  expect_equal(g$mode(), (k-1)*theta)
+  expect_true(abs(g$mean()-k*theta)<0.01)
+  expect_true(abs(g$SD()-sqrt(k)*theta)<0.01)
+  expect_true(abs(g$mode()-(k-1)*theta)<0.01)
   probs <- c(0.025, 0.975)
   q <- g$quantile(probs)
-  expect_equal(q[1], 2.06, tolerance=0.01)
-  expect_equal(q[2], 7.88, tolerance=0.01)
+  expect_true(abs(q[1]-2.06)<0.01)
+  expect_true(abs(q[2]-7.88)<0.01)
 })
 
 test_that("stub quantile function checks inputs and has correct output", {
@@ -74,6 +74,6 @@ test_that("random sampling is from a Gamma distribution", {
   g <- GammaModVar$new("gamma", "GBP", k, theta)
   samp <- g$r(1000)
   expect_equal(length(samp), 1000)
-  expect_equal(mean(samp), 4.5, tolerance=0.1)
-  expect_equal(sd(samp), 1.5, tolerance=0.1)
+  expect_true(abs(mean(samp)-4.5)<0.1)
+  expect_true(abs(sd(samp)-1.5)<0.1)
 })

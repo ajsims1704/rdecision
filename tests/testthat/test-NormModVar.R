@@ -40,16 +40,16 @@ test_that("pe, mean, sd and quantiles are returned correctly", {
   expect_equal(sn$SD(), 1)
   probs <- c(0.025, 0.975)
   q <- sn$quantile(probs)
-  expect_equal(q[1], -1.96, tolerance=0.05)
-  expect_equal(q[2], 1.96, tolerance=0.05)
+  expect_true(abs(q[1]-(-1.96))<0.05)
+  expect_true(abs(q[2]-1.96)<0.05)
 })
 
 test_that("random sampling is from a Normal distribution", {
   sn <- NormModVar$new("sn", "GBP", 0, 1)
   samp <- sn$r(1000)
   expect_equal(length(samp), 1000)
-  expect_equal(mean(samp), 0, tolerance=0.1)
-  expect_equal(sd(samp), 1, tolerance=0.1)
+  expect_true(abs(mean(samp)-0)<0.1)
+  expect_true(abs(sd(samp)-1)<0.1)
 })
 
 test_that("First call to get() returns mean", {

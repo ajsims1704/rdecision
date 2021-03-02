@@ -1,6 +1,7 @@
 # rdecision 1.0.2
 
-* Added tests to give 100% coverage.
+* Added tests to give 100% coverage and replaced `tolerance` in
+  `expect_equal` with `abs` in expect_true for approximate equality tests.
 * Further description for documentation.
 * Converted vignettes to HTML.
 * Added WORDLIST file and sundry administrative changes for clean package build.

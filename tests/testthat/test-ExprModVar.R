@@ -101,14 +101,14 @@ test_that("set and get function as expected", {
   expect_equal(z$get(),0)
   # check that set() for operands affects get() for the expression
   y$set("expected")
-  expect_equal(z$get(), 0, tolerance=0.01)
+  expect_true(abs(z$get())<0.01)
   S <- vector(mode="numeric", length=1000)
   for (i in 1:1000) {
     y$set()
     S[i] <- z$get() 
   } 
-  expect_equal(mean(S), 0, tolerance=0.2)
-  expect_equal(sd(S), 2, tolerance=0.2)
+  expect_true(abs(mean(S))<0.2)
+  expect_true(abs(sd(S)-2)<0.2)
 })
 
 test_that("modified expressions are created correctly", {
@@ -128,9 +128,9 @@ test_that("modified expressions are created correctly", {
   for (i in 1:N) {
     samp[i] <- q$r(1)
   }
-  expect_equal(mean(samp), 0.9, tolerance=0.1)
+  expect_true(abs(mean(samp)-0.9)<0.1)
   samp <- q$r(N)
-  expect_equal(mean(samp), 0.9, tolerance=0.1)
+  expect_true(abs(mean(samp)-0.9)<0.1)
 })
 
 test_that("illegal sample sizes for estimating parameters are rejected", {
@@ -180,9 +180,9 @@ test_that("expression chi square from SN is correct", {
   x <- NormModVar$new("SN", "m", mu=0, sigma=1)
   y <- ExprModVar$new("z","m^2",rlang::quo(x^2))
   expect_equal(y$mean(), 0)  # true mean is k=1, expression at mean inputs is 0
-  expect_equal(y$mu_hat(), 1, tolerance=0.2)  # true mean is k=1
+  expect_true(abs(y$mu_hat()-1)<0.2)  # true mean is k=1
   expect_true(is.na(y$mode()))  # mode is undefined for ExprModVar
   expect_true(is.na(y$SD()))  # SD is undefined for ExprModVar
-  expect_equal(y$sigma_hat(), sqrt(2), tolerance=0.2) # variance is 2k
+  expect_true(abs(y$sigma_hat()-sqrt(2))<0.2) # variance is 2k
 })
 

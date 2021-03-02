@@ -33,6 +33,6 @@ test_that("QALYs are calculated correctly", {
   t1 <- LeafNode$new(
     "QALY", utility=0.5, interval=as.difftime(365.25/2,units="days")
   )
-  expect_equal(t1$QALY(),0.25,tolerance=0.01)
+  expect_true(abs(t1$QALY()-0.25)<0.01)
   
 })

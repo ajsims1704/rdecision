@@ -146,7 +146,7 @@ test_that("simple decision trees are modelled correctly", {
   expect_equal(S$d1[1],"e1")
   # evaluations
   RES <- DT$evaluate(by="path")
-  expect_equal(RES[RES$Leaf=="t1","Benefit"],22.5,tolerance=0.05)
+  expect_true(abs(RES[RES$Leaf=="t1","Benefit"]-22.5)<0.05)
 })
 
 # Evans et al, Pharmacoeconomics, 1997;12:565-577, Sumatriptan for migraine
@@ -242,10 +242,8 @@ test_that("rdecision replicates Evans et al, Sumatriptan base case", {
   expect_equal(u.Caffeine, 0.20)
   # tornado (only drug costs are modvars)
   TO <- dt$tornado(index=list(e17),ref=list(e18),outcome="ICER",draw=FALSE)
-  expect_equal(
-    TO[TO$Description=="Sumatriptan","outcome.min"],
-    14692,
-    tolerance=2
+  expect_true(
+    abs(TO[TO$Description=="Sumatriptan","outcome.min"]-14692)<2
   )
 })
 
@@ -335,7 +333,7 @@ test_that("rdecision replicates Kaminski et al, fig 7", {
   M <- DT$evaluate_walks(W)
   expect_equal(nrow(M),9)
   expect_equal(ncol(M),10)
-  expect_equal(unname(M[8,"Cost"]),220.5,tolerance=1)
+  expect_true(abs(M[8,"Cost"]-220.5)<1)
   # evaluate one strategy (test/sell/sell)
   RES <- DT$evaluate()
   expect_true(is.data.frame(RES))
@@ -591,8 +589,8 @@ test_that("redecision replicates Jenks et al, 2016", {
 
   # evaluate the tree (base case, no PSA)
   E <- DT$evaluate()
-  expect_equal(E$Cost[E$d1=="Standard"], c.std, tolerance=2.00)
-  expect_equal(E$Cost[E$d1=="Tegaderm"], c.teg, tolerance=2.00)
+  expect_true(abs(E$Cost[E$d1=="Standard"]-c.std)<2.00)
+  expect_true(abs(E$Cost[E$d1=="Tegaderm"]-c.teg)<2.00)
 
   # check that illegal arguments to evaluate are rejected
   expect_error(DT$evaluate(setvars=42), class="setvars_not_character")
@@ -638,11 +636,11 @@ test_that("redecision replicates Jenks et al, 2016", {
   expect_equal(nrow(TO),8)
   
   # PSA
-  PSA <- DT$evaluate(setvars="expected",N=100)
-  RES <<- reshape(PSA, idvar='Run', timevar='d1', direction='wide')
-  RES$Difference <<- RES$Cost.Standard - RES$Cost.Tegaderm
-  expect_equal(mean(RES$Difference), 77.76, tolerance=5.00)
-  expect_equal(mean(RES$Cost.Standard), 176.89, tolerance=5.00)
-  expect_equal(mean(RES$Cost.Tegaderm), 99.63, tolerance=5.00)
+  PSA <- DT$evaluate(setvars="random",N=200)
+  RES <- reshape(PSA, idvar='Run', timevar="d1", direction="wide")
+  RES$Difference <- RES$Cost.Standard - RES$Cost.Tegaderm
+  expect_true(abs(mean(RES$Difference)-77.76)<10.00)
+  expect_true(abs(mean(RES$Cost.Standard)-176.89)<10.00)
+  expect_true(abs(mean(RES$Cost.Tegaderm)-99.63)<10.00)
 
 })

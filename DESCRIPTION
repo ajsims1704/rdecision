@@ -10,10 +10,8 @@ Authors@R: c(
          email="kim.fairbairn@nhs.net", 
          role=c("aut"),
          comment = c(ORCID="0000-0001-5108-6279")))
-Description: Classes and functions for modelling healthcare interventions using
-  cohort models (decision trees). It draws on terminology and examples from
-  Briggs, Claxton and Sculpher, "Decision Modelling for Health Economic
-  Evaluation", Oxford University Press, 2006.
+Description: Classes and functions for modelling health care interventions 
+  using cohort models (decision trees). 
 Depends: R (>= 3.1.0)
 Imports:
   R6,

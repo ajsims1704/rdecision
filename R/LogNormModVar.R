@@ -36,8 +36,7 @@
 #'
 #'  Leaper DJ, Edmiston CE and Holy CE. Meta-analysis of the potential
 #'  economic impact following introduction of absorbable antimicrobial 
-#'  sutures. \emph{British Journal of Surgery} 2017;\bold{104}:e134-e144,
-#'  \doi{10.1002/bjs.10443}.
+#'  sutures. \emph{British Journal of Surgery} 2017;\bold{104}:e134-e144.
 #'
 #'  Swat MJ, Grenon P and Wimalaratne S. Ontology and Knowledge Base of
 #'  Probability Distributions. \acronym{EMBL-EBI} Technical Report

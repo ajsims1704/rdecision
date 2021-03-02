@@ -9,7 +9,7 @@
 #'
 #' @references{ 
 #'   Gross JL, Yellen J, Zhang P. Handbook of Graph Theory. Second edition, 
-#'   Chapman and Hall/CRC.; 2013, \doi{doi.org/10.1201/b16132}
+#'   Chapman and Hall/CRC.; 2013, \doi{10.1201/b16132}
 #' }
 #'  
 #' @docType class
