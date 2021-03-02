@@ -1,5 +1,4 @@
-#' @title 
-#' DecisionNode
+#' @title \verb{DecisionNode} class
 #' 
 #' @description 
 #' An R6 class for a decision node in a decision tree
@@ -25,15 +24,21 @@ DecisionNode <- R6::R6Class(
     #' used in tabulation of strategies. The label is automatically converted
     #' to a syntactically valid (in R) name to ensure it can be used as a column
     #' name in a data frame.
-    #' @return A new DecisionNode object
+    #' @return A new \verb{DecisionNode} object
     initialize = function(label) {
       # check there is a label
       if (rlang::is_missing(label)) {
-        rlang::abort("Argument label must not be missing", class="missing_label")
+        rlang::abort(
+          "Argument label must not be missing", 
+          class = "missing_label"
+        )
       }
       # check label and make syntactically valid
       if (!is.character(label)) {
-        rlang::abort("Argument label must be a string", class="non-string_label")
+        rlang::abort(
+          "Argument label must be a string", 
+          class="non-string_label"
+        )
       }
       if (nchar(label)==0) {
         rlang::abort("Argument label must be defined", class="empty_label")

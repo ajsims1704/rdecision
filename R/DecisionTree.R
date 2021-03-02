@@ -1,5 +1,4 @@
-#' @title 
-#' DecisionTree
+#' @title \verb{DecisionTree} class
 #' 
 #' @description 
 #' An R6 class to represent a decision tree
@@ -14,22 +13,22 @@
 #' there must be a unique path from the root to each node.
 #' In graph theory terminology, the directed graph formed by the nodes
 #' and edges must be an \dfn{arborescence}.}
-#' \item{Each node must inherit from one of \code{DecisionNode},
-#' \code{ChanceNode} or \code{LeafNode}. Formally the set of vertices
+#' \item{Each node must inherit from one of \verb{DecisionNode},
+#' \code{ChanceNode} or \verb{LeafNode}. Formally the set of vertices
 #' must be a disjoint union of sets of decision nodes, chance nodes
 #' and leaf nodes.}
 #' \item{All and only leaf nodes must have no children.}
-#' \item{Each edge must inherit from either \code{Action} or
+#' \item{Each edge must inherit from either \verb{Action} or
 #' \code{Reaction}.}
 #' \item{All and only edges that have source endpoints joined to 
-#' decision nodes must inherit from \code{Action}.}
+#' decision nodes must inherit from \verb{Action}.}
 #' \item{All and only edges that have source endpoints joined to 
-#' chance nodes must inherit from \code{Reaction}.}
+#' chance nodes must inherit from \verb{Reaction}.}
 #' \item{The sum of probabilities of each set of reaction edges 
 #' with a common source endpoint must be 1.}
-#' \item{Each \code{DecisionNode} must have a label, and the labels of all
+#' \item{Each \verb{DecisionNode} must have a label, and the labels of all
 #' \code{DecisionNodes} must be unique within the model.}
-#' \item{Each \code{Action} must have a label, and the labels of  
+#' \item{Each \verb{Action} must have a label, and the labels of  
 #' \code{Action}s that share a common source endpoint must be unique.}
 #' }
 #' @references{
@@ -37,13 +36,14 @@
 #'   evaluation. Oxford, UK: Oxford University Press; 2006.
 #' 
 #'   Briggs AH, Weinstein MC, Fenwick EAL, Karnon J, Sculpher MJ, Paltiel AD.
-#'   Model Parameter Estimation and Uncertainty: A Report of the ISPOR-SMDM 
-#'   Modeling Good Research Practices Task Force-6. \emph{Value in Health} 
-#'   2012;\strong{15}:835–42. \url{https://doi.org/10.1016/j.jval.2012.04.014}.
+#'   Model Parameter Estimation and Uncertainty: A Report of the 
+#'   \acronym{ISPOR-SMDM} Modeling Good Research Practices Task Force-6. 
+#'   \emph{Value in Health} 2012;\bold{15}:835–42, 
+#'   \doi{10.1016/j.jval.2012.04.014}.
 #'
 #'   Kamiński B, Jakubczyk M, Szufel P. A framework for sensitivity analysis of
 #'   decision trees. \emph{Central European Journal of Operational Research}
-#'   2018;\strong{26}:135–59. \url{https://doi.org/10.1007/s10100-017-0479-6}.
+#'   2018;\bold{26}:135–59, \doi{10.1007/s10100-017-0479-6}.
 #' } 
 #' @docType class
 #' @author Andrew J. Sims \email{andrew.sims@@newcastle.ac.uk}
@@ -62,9 +62,9 @@ DecisionTree <- R6::R6Class(
     #' in the details section of this class.
     #' @param V A list of nodes.
     #' @param E A list of edges.
-    #' @return A DecisionTree object
+    #' @return A \verb{DecisionTree} object
     initialize = function(V,E) {
-      # initialize the base class(es); checks that {V,E} form an arboresecence
+      # initialize the base class(es); checks that {V,E} form an arborescence
       super$initialize(V,E)
       # check the V is a disjoint union {D,C,L} nodes
       D <- which(
@@ -149,7 +149,7 @@ DecisionTree <- R6::R6Class(
     #' Find the decision nodes in the tree.
     #' @param what A character string defining what to return. Must be one
     #' of "node", "label" or "index".
-    #' @return A list of \code{DecisionNode} objects (for what="node"); a list
+    #' @return A list of \verb{DecisionNode} objects (for what="node"); a list
     #' of character strings (for what="label"); or a list of integer indexes of 
     #' the decision nodes (for what="index").
     decision_nodes = function(what="node") {
@@ -175,7 +175,7 @@ DecisionTree <- R6::R6Class(
 
     #' @description 
     #' Find the chance nodes in the tree.
-    #' @return A list of \code{ChanceNode} objects.
+    #' @return A list of \verb{ChanceNode} objects.
     chance_nodes = function() {
       ic <- which(sapply(private$V, function(v){inherits(v,what="ChanceNode")}),
                   arr.ind=TRUE)
@@ -187,7 +187,7 @@ DecisionTree <- R6::R6Class(
     #' @param what One of "node" (returns Node objects), "label" (returns the
     #' leaf node labels) or "index" (returns the vertex index of the leaf
     #' nodes).
-    #' @return A list of \code{LeafNode} objects (for what="node"); a list
+    #' @return A list of \verb{LeafNode} objects (for what="node"); a list
     #' of character strings (for what="label"); or a list of integer indexes of 
     #' the decision nodes (for what="index").
     leaf_nodes = function(what="node") {
@@ -215,7 +215,7 @@ DecisionTree <- R6::R6Class(
     #' @description 
     #' Return the edges that have the specified decision node as their source.
     #' @param d A decision node.
-    #' @return A list of Action edges.
+    #' @return A list of \verb{Action} edges.
     actions = function(d) {
       # check argument
       if (missing(d)) {
@@ -244,13 +244,13 @@ DecisionTree <- R6::R6Class(
     },
     
     #' @description 
-    #' Find all the model variables of type ModVar that have been specified
-    #' as values associated with the nodes and edges of the tree.
-    #' @return A list of \code{ModVar}s.
+    #' Find all the model variables of type \verb{ModVar} that have been 
+    #' specified as values associated with the nodes and edges of the tree.
+    #' @return A list of \verb{ModVar}s.
     modvars = function() {
       # create list
       mv <- list()
-      # find the ModVars in Actions and Reactions
+      # find the \verb{ModVar}s in Actions and Reactions
       sapply(private$E, function(e){
         if (inherits(e, what=c("Action", "Reaction"))) {
           mv <<- c(mv, e$modvars())
@@ -276,7 +276,7 @@ DecisionTree <- R6::R6Class(
     #' \item{Units}{Units of the variable.}
     #' \item{Distribution}{Either the uncertainty distribution, if
     #' it is a regular model variable, or the expression used to create it,
-    #' if it is an ExprModVar.}
+    #' if it is an \verb{ExprModVar}.}
     #' \item{Mean}{Mean; calculated from means of operands if
     #' an expression.}
     #' \item{E}{Expectation; estimated from random sample if expression, 
@@ -405,18 +405,18 @@ DecisionTree <- R6::R6Class(
       cx.f <- fig.size[1]/2
       cy.f <- fig.size[2]/2
       # functions to transform coordinates and distances in tree space 
-      # to grid space (npc)
+      # to grid space (cm)
       gx <- function(xtree) {
-        xnpc <- cx.f + (xtree-cx)/scale
-        return(xnpc)
+        xcm <- cx.f + (xtree-cx)/scale
+        return(xcm)
       }
       gy <- function(ytree) {
-        ynpc <- cy.f + (ytree-cy)/scale
-        return(ynpc)
+        ycm <- cy.f + (ytree-cy)/scale
+        return(ycm)
       }
       gd <- function(dtree) {
-        dnpc <- dtree/scale
-        return(dnpc)
+        dcm <- dtree/scale
+        return(dcm)
       }
       # start new page for drawing
       grid::grid.newpage()
@@ -676,7 +676,7 @@ DecisionTree <- R6::R6Class(
     },
 
     #' @description 
-    #' Evaluate the components of payoff associated with a set of walks in the
+    #' Evaluate the components of pay-off associated with a set of walks in the
     #' decision tree. For each walk, probability, cost, benefit and utility are
     #' calculated. 
     #' @details There is minimal checking of the argument because this function 
@@ -686,7 +686,7 @@ DecisionTree <- R6::R6Class(
     #' @param W A list of root-to-leaf walks. Each walk must start with the
     #' root node and end with a leaf node. Normally this is all the root to leaf
     #' paths in a tree.
-    #' @return A matrix (payoff table) with one row per path and columns
+    #' @return A matrix (pay-off table) with one row per path and columns
     #' organized as follows:
     #' \describe{
     #' \item{Leaf}{The unique identifier of the path, taken to be the index 
@@ -893,10 +893,11 @@ DecisionTree <- R6::R6Class(
     #' @param index The index strategy (option) to be evaluated.
     #' @param ref The reference strategy (option) with which the index strategy
     #' will be compared.
-    #' @param outcome One of "cost" or "ICER". For "cost" (e.g. in cost
+    #' @param outcome One of \verb{"cost"} or \verb{"ICER"}. For \verb{"cost"}
+    #' (e.g. in cost
     #' consequence analysis), the x axis is cost saved (cost of reference minus
     #' cost of index), on the presumption that the new technology will be cost
-    #' saving at the point estimate. For "ICER" the x axis is
+    #' saving at the point estimate. For \verb{"ICER"} the x axis is
     #' \eqn{\Delta C/\Delta E} and is expected to be positive at the point 
     #' estimate (i.e. in the NE or SW quadrants of the cost-effectiveness 
     #' plane), where \eqn{\Delta C} is cost of index minus cost of reference, 
@@ -908,7 +909,7 @@ DecisionTree <- R6::R6Class(
     #' @return A data frame with one row per input model variable and columns
     #' for: minimum value of the variable, maximum value of the variable,
     #' minimum value of the outcome and maximum value of the outcome. NULL
-    #' if there are no modvars.
+    #' if there are no \verb{ModVar}s.
     #' @details The extreme values of each input variable are the upper and 
     #' lower 95\% confidence limits of the uncertainty distributions of each 
     #' variable. This ensures that the range of each input is defensible 

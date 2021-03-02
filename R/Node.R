@@ -1,5 +1,4 @@
-#' @title 
-#' Node
+#' @title \verb{Node} class
 #' 
 #' @description
 #' An R6 class to represent a node in a decision tree
@@ -23,7 +22,7 @@ Node <- R6::R6Class(
     #' @description
     #' Create new Node object.
     #' @param label An optional label for the node.
-    #' @return A new Node object.
+    #' @return A new \verb{Node} object.
     initialize = function(label="") {
       if (!is.character(label)) {
         rlang::abort("Argument label is not a string", class="non-string_label")

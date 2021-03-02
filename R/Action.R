@@ -1,11 +1,10 @@
-#' @title 
-#' Action
+#' @title \verb{Action} class
 #' 
 #' @description
 #' An R6 class to represent an action (choice) edge in a decision tree.
 #' 
 #' @details A specialism of class Arrow which is used in a decision tree to
-#' represent edges with source nodes joined to \code{DecisionNode}s.
+#' represent edges with source nodes joined to \verb{DecisionNode}s.
 #' 
 #' @docType class
 #' @author Andrew J. Sims \email{andrew.sims@@newcastle.ac.uk}
@@ -22,7 +21,7 @@ Action <- R6::R6Class(
     
     #' @description
     #' Create an object of type 'Action'. Optionally, a cost and a benefit may 
-    #' be associated with traversing the edge. A \dfn{payoff} (benefit minus 
+    #' be associated with traversing the edge. A \dfn{pay-off} (benefit minus 
     #' cost)  is sometimes used in edges of decision trees; the parametrization
     #' used here is more general.
     #' @param source Decision node from which the arrow leaves.
@@ -32,7 +31,7 @@ Action <- R6::R6Class(
     #' tabulation of strategies.
     #' @param cost Cost associated with traversal of this edge.
     #' @param benefit Benefit associated with traversal of the edge.
-    #' @return A new \code{Action} object.
+    #' @return A new \verb{Action} object.
     initialize = function(source, target, label, cost=0, benefit=0) {
       # check label
       if (!is.character(label)) {
@@ -80,10 +79,11 @@ Action <- R6::R6Class(
     },
     
     #' @description 
-    #' Find all the model variables of type ModVar that have been specified
+    #' Find all the model variables of type \verb{ModVar} that have been 
+    #' specified
     #' as values associated with this Action. Includes operands of these
-    #' \code{ModVar}s, if they are expressions.
-    #' @return A list of \code{ModVar}s.
+    #' \verb{ModVar}s, if they are expressions.
+    #' @return A list of \verb{ModVar}s.
     modvars = function() {
       # create lists of input variables and output ModVars
       iv <- c(private$edge.cost, private$edge.benefit)

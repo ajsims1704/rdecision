@@ -1,5 +1,4 @@
-#' @title
-#' ChanceNode
+#' @title \verb{ChanceNode} class
 #'
 #' @description 
 #' An R6 class to represent a chance node in a decision tree.
@@ -22,9 +21,9 @@ ChanceNode <- R6::R6Class(
   public = list(
     
     #' @description
-    #' Create a new ChanceNode object
+    #' Create a new \verb{ChanceNode} object
     #' @param label An optional label for the chance node.
-    #' @return A new `ChanceNode` object
+    #' @return A new \verb{ChanceNode} object
     initialize = function(label="") {
       # ensure base class fields are initialized
       super$initialize(label)

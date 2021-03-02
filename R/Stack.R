@@ -9,7 +9,7 @@
 #' and offered as a separate class for ease of programming and to ensure that
 #' implementations of stacks are optimized. By intention, there is only minimal
 #' checking of method arguments. This is to maximize performance and because the
-#' class is mainly intended for use internally to 'rdecision'.
+#' class is mainly intended for use internally to \pkg{rdecision}.
 #' 
 #' @docType class
 #' @author Andrew Sims \email{andrew.sims@@newcastle.ac.uk}
@@ -23,7 +23,7 @@ Stack <- R6::R6Class(
 
     #' @description 
     #' Create a stack.
-    #' @return A new Stack object.
+    #' @return A new \verb{Stack} object.
     initialize = function() {
       private$items <- list()
       return(invisible(self))
@@ -34,7 +34,7 @@ Stack <- R6::R6Class(
     #' @param x The item to push onto the top of the stack. It should be
     #' of the same class as items previously pushed on to the stack. It is not
     #' checked.
-    #' @return An updated Stack object
+    #' @return An updated \verb{Stack} object
     push = function(x) {
       private$items <- c(private$items, x)
       return(invisible(self))

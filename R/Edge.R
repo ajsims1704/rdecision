@@ -1,5 +1,4 @@
-#' @title 
-#' Edge
+#' @title \verb{Edge} class
 #' 
 #' @description
 #' An R6 class to represent an edge in a graph.
@@ -21,11 +20,11 @@ Edge <- R6::R6Class(
   public = list(
     
     #' @description
-    #' Create an object of type 'Edge'.
+    #' Create an object of type \verb{Edge}.
     #' @param v1 Node at one endpoint of the edge.
     #' @param v2 Node at the other endpoint of the edge.
     #' @param label Character string containing the edge label.
-    #' @return A new `Edge` object.
+    #' @return A new \verb{Edge} object.
     initialize = function(v1, v2, label="") {
       # check and set v1
       if (!inherits(v1, what="Node")) {

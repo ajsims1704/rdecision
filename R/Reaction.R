@@ -1,11 +1,10 @@
-#' @title 
-#' Reaction
+#' @title \verb{Reaction} class
 #' 
 #' @description
 #' An R6 class to represent a reaction (chance) edge in a decision tree.
 #' 
 #' @details A specialism of class Arrow which is used in a decision tree to
-#' represent edges with source nodes joined to \code{ChanceNode}s.
+#' represent edges with source nodes joined to \verb{ChanceNode}s.
 #' 
 #' @docType class
 #' @author Andrew J. Sims \email{andrew.sims@@newcastle.ac.uk}
@@ -22,9 +21,9 @@ Reaction <- R6::R6Class(
   public = list(
     
     #' @description
-    #' Create an object of type 'Reaction'. A probability must be assigned
+    #' Create an object of type \verb{Reaction}. A probability must be assigned
     #' to the edge. Optionally, a cost and a benefit may be associated
-    #' with traversing the edge. A \dfn{payoff} (benefit-cost) is sometimes
+    #' with traversing the edge. A \dfn{pay-off} (benefit-cost) is sometimes
     #' used in edges of decision trees; the parametrization used here is more
     #' general.
     #' @param source Chance node from which the arrow leaves.
@@ -33,7 +32,7 @@ Reaction <- R6::R6Class(
     #' @param cost Cost associated with traversal of this edge.
     #' @param benefit Benefit associated with traversal of the edge.
     #' @param label Character string containing the arrow label.
-    #' @return A new \code{Reaction} object.
+    #' @return A new \verb{Reaction} object.
     initialize = function(source, target, p, cost=0, benefit=0, label="") {
       # initialize base class
       super$initialize(source=source, target=target, label=label)
@@ -78,12 +77,13 @@ Reaction <- R6::R6Class(
     },
 
     #' @description 
-    #' Find all the model variables of type ModVar that have been specified
+    #' Find all the model variables of type \verb{ModVar} that have been 
+    #' specified
     #' as values associated with this Action. Includes operands of these
-    #' \code{ModVar}s, if they are expressions.
-    #' @return A list of \code{ModVar}s.
+    #' \verb{ModVar}s, if they are expressions.
+    #' @return A list of \verb{ModVar}s.
     modvars = function() {
-      # create lists of input variables and output ModVars
+      # create lists of input variables and output Modvars
       iv <- c(private$edge.cost, private$edge.benefit, private$edge.p)
       ov <- list()
       sapply(iv, function(v) {

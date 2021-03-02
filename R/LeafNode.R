@@ -1,5 +1,4 @@
-#' @title
-#' LeafNode
+#' @title \verb{LeafNode} class
 #' 
 #' @description 
 #' An R6 class for a leaf node in a decision tree representing a clinical state.
@@ -21,18 +20,18 @@ LeafNode <- R6::R6Class(
   public = list(
     
     #' @description
-    #' Create a new \code{LeafNode} object; synonymous with a clinical outcome.
+    #' Create a new \verb{LeafNode} object; synonymous with a clinical outcome.
     #' @param label Character string; a label for the state; must be
     #' defined because it is used in tabulations. The label is automatically
     #' converted to a syntactically valid (in R) name to ensure it can be used
     #' as a column name in a data frame.
     #' @param utility The incremental utility that a user associates with
-    #' being in the health state (range -Inf to 1) for the interval. Intended
-    #' for use with cost benefit analysis.
-    #' @param interval The time interval over which the \code{utility}
-    #' parameters apply, expressed as an R \code{difftime} object; default 
+    #' being in the health state (range \verb{-Inf} to 1) for the interval.
+    #' Intended for use with cost benefit analysis.
+    #' @param interval The time interval over which the \verb{utility}
+    #' parameter applies, expressed as an R \verb{difftime} object; default 
     #' 1 year.
-    #' @return A new \code{LeafNode} object
+    #' @return A new \verb{LeafNode} object
     initialize = function(
       label, utility=1, interval=as.difftime(365.25, units="days")
     ) {
@@ -91,10 +90,10 @@ LeafNode <- R6::R6Class(
     },
 
     #' @description 
-    #' Find all the model variables of type ModVar that have been specified
-    #' as values associated with this LeafNode. Includes operands of these
-    #' \code{ModVar}s, if they are expressions.
-    #' @return A list of \code{ModVar}s.
+    #' Find all the model variables of type \verb{ModVar} that have been 
+    #' specified as values associated with this \verb{LeafNode}. Includes 
+    #' operands of these \verb{ModVar}s, if they are expressions.
+    #' @return A list of \verb{ModVar}s.
     modvars = function() {
       # create lists of input variables and output ModVars
       iv <- c(private$node.utility)
@@ -114,8 +113,6 @@ LeafNode <- R6::R6Class(
     #' @description 
     #' Return the incremental utility associated with being in the state for
     #' the interval.
-    #' @param expected Parameter passed to the \code{value} method of the model
-    #' variable used to define utility; ignored otherwise.
     #' @return Incremental utility (numeric value).
     utility = function() {
       if (inherits(private$node.utility, what="ModVar")) {
@@ -128,7 +125,7 @@ LeafNode <- R6::R6Class(
 
     #' @description 
     #' Return the interval associated with being in the state.
-    #' @return Interval (as a difftime).
+    #' @return Interval (as a \verb{difftime}).
     interval = function() {
       return(private$node.interval)
     },
@@ -136,7 +133,7 @@ LeafNode <- R6::R6Class(
     #' @description 
     #' Return the quality adjusted life years associated with being in 
     #' the state.
-    #' @return QALY.
+    #' @return \acronym{QALY}.
     QALY = function() {
       dt <- as.numeric(private$node.interval, units="days")
       Q <- dt * self$utility() / 365.25

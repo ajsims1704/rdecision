@@ -1,5 +1,4 @@
-#' @title 
-#' BetaModVar
+#' @title \verb{BetaModVar} class
 #' 
 #' @description
 #' An R6 class for a model variable with Beta function uncertainty
@@ -7,7 +6,7 @@
 #' @details 
 #' A model variable for which the uncertainty in the point estimate can
 #' be modelled with a Beta distribution. The hyperparameters of the
-#' distribution are the shape (`alpha`) and the shape (`beta`) of
+#' distribution are the shape (\verb{alpha}) and the shape (\verb{beta}) of
 #' the uncertainty distribution. 
 #'
 #' @docType class
@@ -24,12 +23,12 @@ BetaModVar <- R6::R6Class(
   public = list(
     
     #' @description 
-    #' Create an object of class BetaModVar.
+    #' Create an object of class \verb{BetaModVar}.
     #' @param description A character string describing the variable.
     #' @param units Units of the variable, as character string.
     #' @param alpha parameter of the Beta distribution.
     #' @param beta parameter of the Beta distribution.
-    #' @return An object of class BetaModVar. 
+    #' @return An object of class \verb{BetaModVar}. 
     initialize = function(description, units, alpha, beta) {
       super$initialize(description, units)
       # check alpha parameter
@@ -91,7 +90,7 @@ BetaModVar <- R6::R6Class(
     },
 
     #' @description 
-    #' Return the mode of the distribution (if alpha, beta > 1) 
+    #' Return the mode of the distribution (if \verb{alpha}, \verb{beta} > 1) 
     #' @return mode as a numeric value.
     mode = function() {
       rv <- as.numeric(NA)

@@ -1,5 +1,4 @@
-#' @title 
-#' Graph
+#' @title \verb{Graph} class
 #' 
 #' @description
 #' An R6 class to represent a graph (from discrete mathematics).
@@ -9,8 +8,8 @@
 #' graphs. Graphs are systems of vertices connected in pairs by edges.
 #'
 #' @references{ 
-#'   Gross JL, Yellen J, Zhang P. Handbook of Graph Theory. 2nd ed. 
-#'   Chapman and Hall/CRC.; 2013 \url{https://doi.org/10.1201/b16132}
+#'   Gross JL, Yellen J, Zhang P. Handbook of Graph Theory. Second edition, 
+#'   Chapman and Hall/CRC.; 2013, \doi{doi.org/10.1201/b16132}
 #' }
 #'  
 #' @docType class
@@ -27,10 +26,10 @@ Graph <- R6::R6Class(
   public = list(
     
     #' @description 
-    #' Create a new Graph object from sets of nodes and edges. 
+    #' Create a new \verb{Graph} object from sets of nodes and edges. 
     #' @param V A list of Nodes.
     #' @param E A list of Edges.
-    #' @return A Graph object.
+    #' @return A \verb{Graph} object.
     initialize = function(V, E) {
       # check and set nodes
       if (!is.list(V)) {
@@ -77,8 +76,8 @@ Graph <- R6::R6Class(
     #' @param v Subject vertex
     #' @return Index of v. The vertexes are normally stored in the same order
     #' they are specified in \code{new}, but this cannot be guaranteed. This
-    #' function returns the same index as used in the adjacency matrix and NA 
-    #' if the vertex is not in the graph.
+    #' function returns the same index as used in the adjacency matrix and 
+    #' \verb{NA} if the vertex is not in the graph.
     vertex_index = function(v) {
       # check argument
       if (!inherits(v, what="Node")) {
@@ -113,7 +112,7 @@ Graph <- R6::R6Class(
     #' @param e Subject edge.
     #' @return Index of e. The edges are normally stored in the same order
     #' they are specified in \code{new}, but this cannot be guaranteed. This
-    #' function returns the same index returned in other functions and NA
+    #' function returns the same index returned in other functions and \verb{NA}
     #' if the edge is not in the graph.
     edge_index = function(e) {
       # check argument
@@ -161,14 +160,14 @@ Graph <- R6::R6Class(
     #' @description 
     #' Compute the adjacency matrix for the graph. Each cell contains the
     #' number of edges joining the two vertexes, with the convention of
-    #' self loops being counted twice, unless 'binary' is TRUE when cells are
-    #' either 0 (not adjacent) or 1 (adjacent).
+    #' self loops being counted twice, unless \verb{binary} is \verb{TRUE} when
+    #' cells are either 0 (not adjacent) or 1 (adjacent).
     #' @param boolean If TRUE, the adjacency matrix is logical, each cell is
     #' {FALSE,TRUE}.
     #' @return A square numeric matrix with the number of rows and columns
     #' equal to the order of the graph. The rows and columns are in the
     #' same order as V. If the nodes have defined and unique labels the
-    #' dimnames of the matrix are the labels of the nodes. 
+    #' \verb{dimnames} of the matrix are the labels of the nodes. 
     graph_adjacency_matrix = function(boolean=FALSE) {
       # check argument
       if (!is.logical(boolean)) {

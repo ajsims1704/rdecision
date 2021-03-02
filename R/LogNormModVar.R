@@ -1,5 +1,4 @@
-#' @title 
-#' LogNormModVar
+#' @title \verb{LogNormModVar} class
 #' 
 #' @description 
 #' An R6 class for a model variable with Log Normal uncertainty
@@ -37,17 +36,20 @@
 #'
 #'  Leaper DJ, Edmiston CE and Holy CE. Meta-analysis of the potential
 #'  economic impact following introduction of absorbable antimicrobial 
-#'  sutures. \emph{British Journal of Surgery} 2017;\strong{104}:e134-e144.
+#'  sutures. \emph{British Journal of Surgery} 2017;\bold{104}:e134-e144,
+#'  \doi{10.1002/bjs.10443}.
 #'
 #'  Swat MJ, Grenon P and Wimalaratne S. Ontology and Knowledge Base of
-#'  Probability Distributions. EMBL-EBI Technical Report (ProbOnto 2.5), 
-#'  13th January 2017, \url{https://sites.google.com/site/probonto/download}.
+#'  Probability Distributions. \acronym{EMBL-EBI} Technical Report
+#'  (ProbOnto 2.5), 13 January 2017, 
+#'  \url{https://sites.google.com/site/probonto/download}.
 #' }
 #' 
 #' @note 
 #' The log normal distribution may be used to model the uncertainty in 
 #' an estimate of relative risk (Briggs 2006, p90). If a relative risk 
-#' estimate is available with a 95% confidence interval, the LN7 parametrization
+#' estimate is available with a 95% confidence interval, the \verb{"LN7"} 
+#' parametrization
 #' allows the uncertainty distribution to be specified directly. For example, 
 #' if RR = 0.67 with 95% confidence interval 0.53 to 0.84 (Leaper, 2016), it 
 #' can be modelled with
@@ -77,8 +79,8 @@ LogNormModVar <- R6::R6Class(
     #' @param p2 Second hyperparameter, a measure of spread.
     #'        See 'Details'.
     #' @param parametrization A character string taking one of the values
-    #'        'LN1' (default) through 'LN7' (see 'Details').
-    #' @return A LogNormModVar object.
+    #'        \verb{"LN1"} (default) through \verb{"LN7"} (see 'Details').
+    #' @return A \verb{LogNormModVar} object.
     initialize = function(description, units, p1, p2, parametrization='LN1') {
       super$initialize(description, units)
       # check that p1 and p2 are numeric
@@ -141,7 +143,8 @@ LogNormModVar <- R6::R6Class(
 
     #' @description 
     #' Accessor function for the name of the uncertainty distribution.
-    #' @return Distribution name as character string (LN1, LN2 etc).
+    #' @return Distribution name as character string (\verb{"LN1"}, \verb{"LN2"}
+    #' etc.).
     distribution = function() {
       rv <- paste("LN(", round(private$meanlog,3), ",", 
                   round(private$sdlog,3), ")", sep="")
@@ -167,7 +170,7 @@ LogNormModVar <- R6::R6Class(
 
     #' @description 
     #' Return the point estimate of the variable. 
-    #' @return Point estimate (mode) of the LN distribution.
+    #' @return Point estimate (mode) of the log normal distribution.
     mode = function() {
       return(exp(private$meanlog-private$sdlog^2))
     },
@@ -182,7 +185,7 @@ LogNormModVar <- R6::R6Class(
     },
 
     #' @description
-    #' Return the quantiles of the logNormal uncertainty distribution.
+    #' Return the quantiles of the log normal uncertainty distribution.
     #' @param probs Vector of probabilities, in range [0,1].    
     #' @return Vector of quantiles.
     quantile = function(probs) {

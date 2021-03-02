@@ -1,5 +1,4 @@
-#' @title 
-#' Arborescence
+#' @title \verb{Arborescence} class
 #' 
 #' @description
 #' An R6 class to represent an arborescence (rooted directed tree).
@@ -11,7 +10,7 @@
 #' 
 #' @references{
 #'   Walker, John Q II. A A node-positioning algorithm for general trees.
-#'   University of North Carolina Technical Report TR 89-034, 1989.
+#'   University of North Carolina Technical Report \acronym{TR} 89-034, 1989.
 #' }
 #' 
 #' @docType class
@@ -26,10 +25,10 @@ Arborescence <- R6::R6Class(
   public = list(
     
     #' @description 
-    #' Create a new Arborescence object from sets of nodes and edges. 
+    #' Create a new \verb{Arborescence} object from sets of nodes and edges. 
     #' @param V A list of Nodes.
     #' @param A A list of Arrows.
-    #' @return An Arborescence object.
+    #' @return An \verb{Arborescence} object.
     initialize = function(V,A) {
       # initialize the base Digraph class (checks V, A)
       super$initialize(V,A)
@@ -118,12 +117,12 @@ Arborescence <- R6::R6Class(
     },
     
     #' @description
-    #' Implements function POSITIONTREE (Walker, 1989) to
+    #' Implements function \verb{POSITIONTREE} (Walker, 1989) to
     #' determine the coordinates for each node in an arborescence.
     #' @param SiblingSeparation Distance in arbitrary units for the
     #' distance between siblings.
     #' @param SubtreeSeparation Distance in arbitrary units for the
-    #' distance between neigbouring subtrees.
+    #' distance between neighbouring subtrees.
     #' @param LevelSeparation Distance in arbitrary units for the 
     #' separation between adjacent levels.
     #' @param RootOrientation Must be one of "NORTH", "SOUTH", "EAST", "WEST".
@@ -135,7 +134,7 @@ Arborescence <- R6::R6Class(
     #' the tree exceeds this, an error will be raised.
     #' @return A data frame with one row per node and three columns (n, x
     #' and y) where \code{n} gives the node index given by the 
-    #' Graph::vertex_index() function.
+    #' \code{Graph::vertex_index()} function.
     # There were 3 bugs in the pseudo-code in the report, possibly corrected
     # in the later paper, indicated by ##DEBUG## in the code below. 
     postree = function(SiblingSeparation=4, SubtreeSeparation=4, 

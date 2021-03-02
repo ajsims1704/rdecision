@@ -1,5 +1,4 @@
-#' @title 
-#' GammaModVar
+#' @title \verb{GammaModVar} class
 #' 
 #' @description
 #' An R6 class for a model variable with Gamma function uncertainty
@@ -7,13 +6,13 @@
 #' @details 
 #' A model variable for which the uncertainty in the point estimate can
 #' be modelled with a Gamma distribution. The hyperparameters of the
-#' distribution are the shape (`alpha`) and the rate (`beta`) of
+#' distribution are the shape (\verb{alpha}) and the rate (\verb{beta}) of
 #' the uncertainty distribution. Note that this is the conventional
 #' parametrization used in Bayesian statistics; in econometrics the
-#' shape/scale (`k`/`theta`) parametrization is more common (and the one
-#' used in this implementation). Note, however, that although Briggs 
-#' \emph{et al} (2006) use the shape/scale formulation, they use `alpha`/`beta`
-#' as parameter names.
+#' shape/scale (\code{k}/\code{theta}) parametrization is more common (and the
+#' one used in this implementation). Note, however, that although Briggs 
+#' \emph{et al} (2006) use the shape/scale formulation, they use 
+#' \code{alpha}/\code{beta} as parameter names.
 #'  
 #' @references{
 #'   Briggs A, Claxton K, Sculpher M. Decision modelling for health
@@ -45,12 +44,12 @@ GammaModVar <- R6::R6Class(
   public = list(
     
     #' @description 
-    #' Create an object of class GammaModVar.
+    #' Create an object of class \verb{GammaModVar}.
     #' @param description A character string describing the variable.
     #' @param units Units of the variable, as character string.
     #' @param shape shape parameter of the Gamma distribution.
     #' @param scale scale parameter of the Gamma distribution.
-    #' @return An object of class GammaModVar. 
+    #' @return An object of class \verb{GammaModVar}. 
     initialize = function(description, units, shape, scale) {
       super$initialize(description, units)
       if (!is.numeric(shape)) {

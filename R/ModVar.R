@@ -1,5 +1,4 @@
-#' @title
-#' ModVar
+#' @title \verb{ModVar} class
 #' 
 #' @description
 #' An R6 class for a variable in an health economic model
@@ -26,13 +25,13 @@ ModVar <- R6::R6Class(
   public = list(
     
     #' @description 
-    #' Create an object of type `ModVar`
+    #' Create an object of type \verb{ModVar}
     #' @param description A character string description of the variable
     #' and its role in the model. This description will be used in a
     #' tabulation of the variables linked to a model.
-    #' @param units A character string description of the units, e.g. 'GBP',
-    #' 'per year'.
-    #' @return A new ModVar object.
+    #' @param units A character string description of the units, e.g. 
+    #' \code{GBP}, \code{per year}.
+    #' @return A new \verb{ModVar} object.
     initialize = function(description, units) {
       # test and set description
       if (!is.character(description)) {
@@ -49,8 +48,9 @@ ModVar <- R6::R6Class(
     },
 
     #' @description 
-    #' Is this ModVar an expression?
-    #' @return TRUE if it inherits from ExprModVar, FALSE otherwise.
+    #' Is this \verb{ModVar} an expression?
+    #' @return TRUE if it inherits from \verb{ExprModVar}, \verb{FALSE}
+    #' otherwise.
     is_expression = function() {
       return(inherits(self, what="ExprModVar"))
     },
@@ -103,8 +103,8 @@ ModVar <- R6::R6Class(
     
     #' @description 
     #' Return the mode of the variable. By default returns NA, which will be
-    #' the case for most ExprModVar variables, because an arbitrary expression
-    #' is not guaranteed to be unimodel.
+    #' the case for most \verb{ExprModVar} variables, because an arbitrary
+    #' expression is not guaranteed to be unimodal.
     #' @return Mode as a numeric value.
     mode = function() {
       return(as.numeric(NA))
@@ -120,7 +120,7 @@ ModVar <- R6::R6Class(
     #' @description 
     #' Find quantiles of the uncertainty distribution. 
     #' @param probs Numeric vector of probabilities, each in range [0,1].
-    #' @return Vector of numeric values of the same length as `probs`.
+    #' @return Vector of numeric values of the same length as \verb{probs}.
     quantile = function(probs) {
       # test argument
       sapply(probs, FUN=function(x) {
@@ -141,15 +141,15 @@ ModVar <- R6::R6Class(
     },
 
     #' @description
-    #' Sets the value of the ModVar that will be returned by subsequent
-    #' calls to get() until set() is called again. 
+    #' Sets the value of the \verb{ModVar} that will be returned by subsequent
+    #' calls to \code{get()} until \code{set()} is called again. 
     #' @param what Character: one of "random" (samples from the uncertainty
     #' distribution), "expected" (mean), "q2.5" (lower 95% confidence limit),
     #' "q50" (median), "q97.5" (upper 95% confidence limit), "current" (leaves
     #' the value unchanged). The "current" option is provided to support having
     #' common functions to set (or leave alone) sets of model variables, 
     #' depending on their use case.
-    #' @return Updated ModVar.
+    #' @return Updated \verb{ModVar}.
     set = function(what="random") {
       # check argument
       if (!is.character(what)) {
@@ -185,9 +185,9 @@ ModVar <- R6::R6Class(
     },
     
     #' @description
-    #' Gets the value of the ExprModVar that was set by the most recent call
-    #' to set().
-    #' @return Value determined by last set().
+    #' Gets the value of the \verb{ModVar} that was set by the most recent call
+    #' to \code{set()}.
+    #' @return Value determined by last \code{set()}.
     get = function() {
       return(private$.val)
     }
