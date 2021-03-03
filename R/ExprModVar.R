@@ -70,20 +70,20 @@ ExprModVar <- R6::R6Class(
     #' combined into costs, probabilities and rates.
     #' @param units Units in which the variable is expressed.
     #' @param quo A \verb{quosure} (see package \pkg{rlang}), which contains an 
-    #' expression
-    #' and its environment. The usage is \code{quo(x+y)} or 
-    #' \code{rlang::quo(x+y)}.
+    #' expression and its environment. The usage is \code{quo(x+y)} or 
+    #' \code{rlang::quo(x+y)}.\code{quo} cannot be evaluated directly, unless
+    #' it contains no \verb{ModVar}s.
     #' @return An object of type \verb{ExprModVar}
     initialize = function(description, units, quo) {
       # initialize the base class
       super$initialize(description, units)
-      # check and process the quosure
+      # check,split and save the quosure
       if (!rlang::is_quosure(quo)) {
         rlang::abort("Argument quo must be a quosure", class="quo_not_quosure")
       }
       private$expr <- rlang::quo_get_expr(quo)
       private$env <- rlang::quo_get_env(quo)
-      # create pre-packaged expressions to optimize calculations
+      # create pre-packaged evaluable quosures to optimize calculations
       private$q.mean <- self$add_method("mean()")
       private$q.r1 <- self$add_method("r(1)")
       private$q.get <- self$add_method("get()")
@@ -116,18 +116,19 @@ ExprModVar <- R6::R6Class(
       # substitute model variable names with call to method
       mv <- list()
       for (v in all.vars(private$expr)) {
-        # v is a string containing a variable name
+        # build replacement string if necessary
         if (inherits(eval(str2lang(v), envir=private$env), what='ModVar')) {
           rep <- gsub(v, paste(v, method, sep='$'), v)
         }
         else {
           rep <- v
         }
+        # create symbol from the modified string
         mv[[v]] <- str2lang(rep)
       }
       emod <- eval(substitute(substitute(e, env=mv), env=list(e=private$expr)))
       # create new quosure
-      q <- rlang::as_quosure(emod, private$env)
+      q <- rlang::new_quosure(expr=emod, env=private$env)
       # return the quosure
       return(q)
     },
@@ -139,9 +140,9 @@ ExprModVar <- R6::R6Class(
     #' @return TRUE if probabilistic
     is_probabilistic = function() {
       # test each operand for whether it is probabilistic
-      lv <- sapply(all.vars(private$expr), FUN=function(v) {
+      lv <- sapply(base::all.vars(private$expr), FUN=function(v) {
         rv <- as.logical(NA)
-        vv <- eval(str2lang(v), envir=private$env)
+        vv <- rlang::eval_bare(expr=rlang::sym(v), env=private$env) 
         if (inherits(vv, what="ModVar")) {
           rv <- vv$is_probabilistic()
         } else if (inherits(vv, what="numeric")) {
@@ -160,7 +161,7 @@ ExprModVar <- R6::R6Class(
       # filter the expression variables that are \verb{ModVar}s
       mvlist <- list()
       sapply(all.vars(private$expr), FUN=function(v) {
-        vv <- eval(str2lang(v), envir=private$env)
+        vv <- rlang::eval_bare(expr=rlang::sym(v), env=private$env) 
         if (inherits(vv, what="ModVar")) {
           # add the variable to the list
           mvlist <<- c(mvlist, vv)
@@ -180,7 +181,9 @@ ExprModVar <- R6::R6Class(
     #' @return Expression as a character string with all control characters
     #' having been removed.
     distribution = function() {
-      estr <- rlang::expr_text(private$expr)
+      estr <- rlang::as_label(
+        rlang::new_quosure(expr = private$expr, env = private$env)
+      )
       estr <- gsub("[[:cntrl:]]", "", estr)
       return(estr)
     },
@@ -193,21 +196,15 @@ ExprModVar <- R6::R6Class(
       rv <- NA
       # if n=1 use the pre-packed expression
       if (n==1) {
-        rv <- eval(
-          rlang::quo_get_expr(private$q.r1), 
-          envir=rlang::quo_get_env(private$q.r1)
-        )
+        rv <- rlang::eval_tidy(private$q.r1)
       } else {
         # build expression with each variable replaced with $r(n)
         method <- paste0("r(", n, ")")
         q.r <- self$add_method(method)
-        # evaluate the pre-packaged expression
-        rv <- eval(
-          rlang::quo_get_expr(q.r), 
-          envir=rlang::quo_get_env(q.r)
-        )
+        # evaluate the expression
+        rv <- rlang::eval_tidy(q.r)
       }
-      # return it
+      # return result
       return(rv)
     },
 
@@ -218,10 +215,7 @@ ExprModVar <- R6::R6Class(
     #' @return Mean value as a numeric value.
     mean = function() {
       # evaluate the pre-packaged expression
-      rv <- eval(
-        rlang::quo_get_expr(private$q.mean), 
-        envir=rlang::quo_get_env(private$q.mean)
-      )
+      rv <- rlang::eval_tidy(private$q.mean)
       # return it
       return(rv)
     },
@@ -392,10 +386,7 @@ ExprModVar <- R6::R6Class(
     #' @return Value determined by last \code{set()}.
     get = function() {
       # evaluate the pre-packaged expression
-      rv <- eval(
-        rlang::quo_get_expr(private$q.get), 
-        envir=rlang::quo_get_env(private$q.get)
-      )
+      rv <- rlang::eval_tidy(private$q.get)
       # return it
       return(rv)
     }
