@@ -14,7 +14,7 @@
 Node <- R6::R6Class(
   classname = "Node",
   private = list(
-    .label = ""
+    .label = NULL
   ),
   
   public = list(

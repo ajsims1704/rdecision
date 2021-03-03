@@ -108,9 +108,9 @@ combined into costs, probabilities and rates.}
 \item{\code{units}}{Units in which the variable is expressed.}
 
 \item{\code{quo}}{A \verb{quosure} (see package \pkg{rlang}), which contains an 
-expression
-and its environment. The usage is \code{quo(x+y)} or 
-\code{rlang::quo(x+y)}.}
+expression and its environment. The usage is \code{quo(x+y)} or 
+\code{rlang::quo(x+y)}.\code{quo} cannot be evaluated directly, unless
+it contains no \verb{ModVar}s.}
 }
 \if{html}{\out{</div>}}
 }

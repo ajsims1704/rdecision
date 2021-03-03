@@ -14,11 +14,12 @@ test_that("incorrect labels are rejected", {
 test_that("edge is defined correctly", {
   n1 <- Node$new()
   n2 <- Node$new()
-  expect_silent(e <- Edge$new(n1, n2, "e1"))
+  e <- Edge$new(n1, n2, "e1")
   V <- e$endpoints()
   expect_identical(n1, V[[1]])
   expect_identical(n2, V[[2]])
-  expect_equal(e$label(), "e1")
+  lab <- e$label()
+  expect_identical(lab, "e1")   ######
 })
 
 test_that("an edge identifies itself", {

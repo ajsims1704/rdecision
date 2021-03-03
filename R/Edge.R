@@ -15,7 +15,7 @@ Edge <- R6::R6Class(
   private = list(
     v1 = NULL,
     v2 = NULL,
-    edgelabel = ""
+    edgelabel = NULL
   ),
   public = list(
     
@@ -47,6 +47,8 @@ Edge <- R6::R6Class(
       else {
         private$edgelabel <- label
       }
+      # return Edge object
+      return(invisible(self))
     },
     
     #' @description
