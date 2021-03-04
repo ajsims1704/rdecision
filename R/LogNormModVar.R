@@ -61,6 +61,7 @@
 #' 
 LogNormModVar <- R6::R6Class(
   classname = "LogNormModVar",
+  lock_class = TRUE,
   inherit = ModVar,
   private = list(
     meanlog = NULL,

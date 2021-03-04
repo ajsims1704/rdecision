@@ -12,6 +12,7 @@
 #' 
 LeafNode <- R6::R6Class(
   classname = "LeafNode",
+  lock_class = TRUE,
   inherit = Node,
   private = list(
     node.utility = NULL,

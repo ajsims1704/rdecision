@@ -12,6 +12,7 @@
 #'  
 Reaction <- R6::R6Class(
   classname = "Reaction",
+  lock_class = TRUE,
   inherit = Arrow,
   private = list(
     edge.cost = NULL,

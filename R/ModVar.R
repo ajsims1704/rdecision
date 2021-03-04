@@ -17,6 +17,7 @@
 #' 
 ModVar <- R6::R6Class(
   classname = "ModVar",
+  lock_class = TRUE,
   private = list(
     .description = NULL,
     .units = NULL,

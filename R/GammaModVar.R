@@ -36,6 +36,7 @@
 #' 
 GammaModVar <- R6::R6Class(
   classname = "GammaModVar",
+  lock_class = TRUE,
   inherit = ModVar,
   private = list(
     shape = NULL,

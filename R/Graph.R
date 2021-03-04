@@ -18,6 +18,7 @@
 #' 
 Graph <- R6::R6Class(
   classname = "Graph",
+  lock_class = TRUE,
   private = list(
     V = NULL,
     E = NULL,

@@ -16,6 +16,7 @@
 #' 
 NormModVar <- R6::R6Class(
   classname = "NormModVar",
+  lock_class = TRUE,
   inherit = ModVar,
   private = list(
     mu = NULL,

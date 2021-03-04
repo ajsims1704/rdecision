@@ -15,6 +15,7 @@
 #' 
 ChanceNode <- R6::R6Class(
   classname = "ChanceNode",
+  lock_class = TRUE,
   inherit = Node,
   private = list(
   ),

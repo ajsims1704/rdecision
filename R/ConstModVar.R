@@ -17,6 +17,7 @@
 #' 
 ConstModVar <- R6::R6Class(
   classname = "ConstModVar",
+  lock_class = TRUE,
   inherit = ModVar,
   private = list(
     val = NULL

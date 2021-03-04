@@ -13,6 +13,7 @@
 #' 
 Node <- R6::R6Class(
   classname = "Node",
+  lock_class = TRUE,
   private = list(
     .label = NULL
   ),

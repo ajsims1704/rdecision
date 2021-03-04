@@ -22,6 +22,7 @@
 #' 
 Digraph <- R6::R6Class(
   classname = "Digraph",
+  lock_class = TRUE,
   inherit = Graph,
   private = list(
     AD = NULL,    # adjacency matrix for digraph

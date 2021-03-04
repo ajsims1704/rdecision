@@ -9,9 +9,9 @@
 #' @docType class
 #' @author Andrew J. Sims \email{andrew.sims@@newcastle.ac.uk}
 #' @export
-#'  
 Edge <- R6::R6Class(
   classname = "Edge",
+  lock_class = TRUE,
   private = list(
     v1 = NULL,
     v2 = NULL,

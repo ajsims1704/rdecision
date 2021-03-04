@@ -16,6 +16,7 @@
 #' @export
 Stack <- R6::R6Class(
   classname = "Stack",
+  lock_class = TRUE,
   private = list(
     items = NULL  
   ),

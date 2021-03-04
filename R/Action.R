@@ -12,6 +12,7 @@
 #'  
 Action <- R6::R6Class(
   classname = "Action",
+  lock_class = TRUE,
   inherit = Arrow,
   private = list(
     edge.cost = NULL,

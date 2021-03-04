@@ -13,6 +13,7 @@
 #' 
 DecisionNode <- R6::R6Class(
   classname = "DecisionNode",
+  lock_class = TRUE,
   inherit = Node,
   private = list(
   ),

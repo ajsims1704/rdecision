@@ -51,6 +51,7 @@
 #' 
 DecisionTree <- R6::R6Class(
   classname = "DecisionTree",
+  lock_class = TRUE,
   inherit = Arborescence,
   private = list(
   ),

@@ -15,6 +15,7 @@
 #' 
 BetaModVar <- R6::R6Class(
   classname = "BetaModVar",
+  lock_class = TRUE,
   inherit = ModVar,
   private = list(
     alpha = NULL,

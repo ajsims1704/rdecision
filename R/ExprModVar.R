@@ -51,6 +51,7 @@
 #' 
 ExprModVar <- R6::R6Class(
   classname = "ExprModVar",
+  lock_class = TRUE,
   inherit =  ModVar,
   private = list(
     # fields

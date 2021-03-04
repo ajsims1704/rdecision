@@ -23,7 +23,8 @@ Suggests:
     rmarkdown,
     knitr,
     pander,
-    testthat (>= 3.0.0)
+    testthat (>= 3.0.0),
+    utf8
 License: GPL-3
 LazyData: true
 Language: en-GB
