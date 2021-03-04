@@ -18,8 +18,7 @@ test_that("edge is defined correctly", {
   V <- e$endpoints()
   expect_identical(n1, V[[1]])
   expect_identical(n2, V[[2]])
-#  b <- grepl("^e1$", e$label())
-#  expect_true(b)
+  expect_identical(e$label(), "e1")
 })
 
 test_that("an edge identifies itself", {
