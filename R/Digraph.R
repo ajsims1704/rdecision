@@ -89,12 +89,11 @@ Digraph <- R6::R6Class(
           A <- matrix(rep(0,times=n*n), nrow=n)
         }
         # populate it
-        vapply(X=private$E, FUN.VALUE=TRUE, FUN=function(e) {
+        for (e in private$E) {
           s <- self$vertex_index(e$source())
           t <- self$vertex_index(e$target())
-          A[s,t] <<- A[s,t]+1
-          return(TRUE)
-        })
+          A[s,t] <- A[s,t]+1
+        }
         # save it 
         private$AD <- A
       } else {
@@ -137,13 +136,13 @@ Digraph <- R6::R6Class(
           B <- matrix(rep(0,times=nv*ne), nrow=nv)
         }
         # populate it
-        sapply(private$E, function(e) {
+        for (e in private$E) {
           s <- self$vertex_index(e$source())
           t <- self$vertex_index(e$target())
-          e <- self$edge_index(e)
-          B[s,e] <<- -1
-          B[t,e] <<- 1
-        })
+          ei <- self$edge_index(e)
+          B[s,ei] <- -1
+          B[t,ei] <- 1
+        }
         # save it
         private$BD <- B
       } else {
@@ -317,29 +316,66 @@ Digraph <- R6::R6Class(
       }
       # AA is the adjacency matrix
       AA <- self$digraph_adjacency_matrix(boolean=TRUE)
-      # D marks nodes as discovered
-      D <- vector(length=self$order())
+#      # D marks nodes as discovered
+#      D <- vector(length=self$order())
       # P is current path
       P <- Stack$new()
       # PL is list of paths
       PL <- list()
-      # recurse
-      dfs <- function(v) {
-        D[v] <<- TRUE
-        P$push(v)
-        if (v==it) {
-          PL[[length(PL)+1]] <<- P$as_list()
-        } else {
-          for (w in which(AA[v,],arr.ind=TRUE)) {
-            if (!D[w]) {
-              dfs(w)
-            }
+      
+      # S is a node stack for the DFS
+      S <- Stack$new()
+      # do a non-recursive DFS and keep track of paths
+      S$push(is)
+      print("PATH")
+      while (S$size()>0) {
+        s <- S$pop()
+        print(paste("s", s))
+#        # if s is not labelled as discovered then
+#        if (!D[s]) {
+          # label s as discovered and add to current path
+          #D[s] <- TRUE
+          P$push(s)
+          print(paste("P",paste(P$as_list())))
+          # if this is target node, save the current path and mark as
+          # unvisited
+          if (s == it) {
+            PL[[length(PL)+1]] <- P$as_list()
+            print("Found")
           }
-        }
-        P$pop()
-        D[v] <<- FALSE
+          # push all edges from s to n to the node stack without revisiting
+          # any nodes already on this path
+          successors <- which(AA[s,], arr.ind=TRUE)
+          successors <- setdiff(successors, P$as_list())
+          for (n in successors) {
+            S$push(n)
+          }
+          print(paste("S",paste(S$as_list())))
+          # if there are no unvisited successors, remove this node from the path
+          if (length(successors) == 0) {
+            P$pop()
+          }
+          
+#        }
       }
-      dfs(is)
+      
+      # recurse
+      # dfs <- function(v) {
+      #   D[v] <<- TRUE
+      #   P$push(v)
+      #   if (v==it) {
+      #     PL[[length(PL)+1]] <<- P$as_list()
+      #   } else {
+      #     for (w in which(AA[v,],arr.ind=TRUE)) {
+      #       if (!D[w]) {
+      #         dfs(w)
+      #       }
+      #     }
+      #   }
+      #   P$pop()
+      #   D[v] <<- FALSE
+      # }
+      # dfs(is)
       # convert vertex indices into vertices before returning
       VPL <- lapply(PL, function(p){
         vp <- lapply(p, function(v) {private$V[[v]]})

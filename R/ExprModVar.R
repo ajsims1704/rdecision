@@ -159,21 +159,21 @@ ExprModVar <- R6::R6Class(
     #' in the expression.
     #' @return A list of model variables.
     operands = function() {
-      # filter the expression variables that are \verb{ModVar}s
+      # filter the expression variables that are ModVars
       mvlist <- list()
-      sapply(all.vars(private$expr), FUN=function(v) {
+      for (v in all.vars(private$expr)) {
         vv <- rlang::eval_bare(expr=rlang::sym(v), env=private$env) 
         if (inherits(vv, what="ModVar")) {
           # add the variable to the list
-          mvlist <<- c(mvlist, vv)
+          mvlist <- c(mvlist, vv)
           # and add its operands, if any
           if (inherits(vv, what="ExprModVar")) {
-            sapply(vv$operands(), FUN=function(o) {
-              mvlist <<- c(mvlist, o)
-            })
+            for (o in vv$operands()) {
+              mvlist <- c(mvlist, o)
+            }
           }
         }
-      })
+      }
       return(unique(mvlist))
     },
     

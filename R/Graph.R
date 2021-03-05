@@ -189,14 +189,13 @@ Graph <- R6::R6Class(
           A <- matrix(rep(0,times=n*n), nrow=n)
         }
         # populate it
-        vapply(X = private$E, FUN.VALUE=TRUE, FUN = function(e) {
+        for (e in private$E) {
           W <- e$endpoints()
           iv1 <- self$vertex_index(W[[1]])
           iv2 <- self$vertex_index(W[[2]])
-          A[iv1,iv2] <<- A[iv1,iv2]+1
-          A[iv2,iv1] <<- A[iv2,iv1]+1
-          return(TRUE)
-        })
+          A[iv1,iv2] <- A[iv1,iv2]+1
+          A[iv2,iv1] <- A[iv2,iv1]+1
+        }
         # save it
         private$AG <- A
       } else {
