@@ -37,16 +37,20 @@ Stack <- R6::R6Class(
     #' checked.
     #' @return An updated \verb{Stack} object
     push = function(x) {
-      private$items <- c(private$items, x)
+      private$items[[length(private$items)+1]] <- x
       return(invisible(self))
     },
     
     #' @description
-    #' Pop an item from the stack. Note that stack underflow is not checked.
+    #' Pop an item from the stack. Stack underflow and raises error.
     #' @return The item previously at the top of the stack.
     pop = function() {
-      x <- private$items[[length(private$items)]]  
-      private$items[[length(private$items)]] <- NULL
+      if (length(private$items)>0) {
+        x <- private$items[[length(private$items)]]  
+        private$items[[length(private$items)]] <- NULL
+      } else {
+        rlang::abort("Stack underflow", class="underflow")
+      }
       return(x)
     },
 

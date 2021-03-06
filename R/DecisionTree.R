@@ -252,17 +252,17 @@ DecisionTree <- R6::R6Class(
       # create list
       mv <- list()
       # find the \verb{ModVar}s in Actions and Reactions
-      sapply(private$E, function(e){
+      for (e in private$E) {
         if (inherits(e, what=c("Action", "Reaction"))) {
-          mv <<- c(mv, e$modvars())
+          mv <- c(mv, e$modvars())
         }
-      })
+      }
       # find the modvars in leaf nodes
-      sapply(private$V, function(v){
+      for (v in private$V){
         if (inherits(v, what=c("LeafNode"))) {
-          mv <<- c(mv, v$modvars())
+          mv <- c(mv, v$modvars())
         }
-      })
+      }
       # return a unique list
       return(unique(mv))
     },
@@ -596,12 +596,12 @@ DecisionTree <- R6::R6Class(
       }
       # build a table with indexes of the action edges
       f <- list()
-      lapply(self$decision_nodes("node"), function(d) {
+      for (d in self$decision_nodes("node")) {
         a <- vapply(X=self$actions(d), FUN.VALUE=1, FUN=function(a){
           self$edge_index(a)
         })
-        f[[d$label()]] <<- a
-      })
+        f[[d$label()]] <- a
+      }
       TT <- expand.grid(f, KEEP.OUT.ATTRS=FALSE, stringsAsFactors=FALSE)
       # select a single strategy, if required
       if (!is.null(select)) {
@@ -734,16 +734,14 @@ DecisionTree <- R6::R6Class(
         pr <- 1
         cost <- 0
         benefit <- 0
-        vapply(X=walk, FUN.VALUE=TRUE, FUN=function(e){
+        for (e in walk) {
           # probability 
-          pr <<- pr * e$p()
+          pr <- pr * e$p()
           # cost
-          cost <<- cost + e$cost()
+          cost <- cost + e$cost()
           # benefit
-          benefit <<- benefit + e$benefit()
-          # return
-          return(TRUE)
-        })
+          benefit <- benefit + e$benefit()
+        }
         PAYOFF[i,"Probability"] <- pr
         PAYOFF[i,"Path.Cost"] <- cost
         PAYOFF[i,"Path.Benefit"] <- benefit

@@ -21,6 +21,13 @@ Arborescence <- R6::R6Class(
   classname = "Arborescence",
   inherit = Digraph,
   private = list(
+    # arrays needed by postree
+    PREVNODE = NULL,
+    PRELIM = NULL,
+    MODIFIER = NULL,
+    LEFTNEIGHBOR = NULL,
+    XCOORD = NULL,
+    YCOORD = NULL
   ),
   public = list(
     
@@ -105,13 +112,12 @@ Arborescence <- R6::R6Class(
       # Find the root
       r <- self$root()
       P <- list()
-      vapply(X=private$V, FUN.VALUE=TRUE, FUN=function(v){
+      for (v in private$V) {
         if (self$is_leaf(v)) {
           pp <- self$paths(r,v)
-          P[[length(P)+1]] <<- pp[[1]]    
+          P[[length(P)+1]] <- pp[[1]]    
         }
-        return(TRUE)
-      })
+      }
       # return the paths
       return(P)
     },
@@ -182,25 +188,25 @@ Arborescence <- R6::R6Class(
       xTopAdjustment <- 0
       yTopAdjustment <- 0
       # prevnode list (max 'height' is order of graph)
-      PREVNODE <- vector(mode="integer", length=self$order())
+      private$PREVNODE <- vector(mode="integer", length=self$order())
       # per-node arrays
-      LEFTNEIGHBOR <- vector(mode="integer", length=self$order())
-      MODIFIER <- vector(mode="numeric", length=self$order())
-      PRELIM <- vector(mode="numeric", length=self$order())
-      XCOORD <- vector(mode="numeric", length=self$order())
-      YCOORD <- vector(mode="numeric", length=self$order())
+      private$LEFTNEIGHBOR <- vector(mode="integer", length=self$order())
+      private$MODIFIER <- vector(mode="numeric", length=self$order())
+      private$PRELIM <- vector(mode="numeric", length=self$order())
+      private$XCOORD <- vector(mode="numeric", length=self$order())
+      private$YCOORD <- vector(mode="numeric", length=self$order())
       # initialize list of previous nodes at each level
       INITPREVNODELIST <- function() {
       }
       # get previous node at this level
       GETPREVNODEATLEVEL <- function(Level) {
         # Level is zero-based
-        return(PREVNODE[Level+1])
+        return(private$PREVNODE[Level+1])
       }
       # set an element in the list
       SETPREVNODEATLEVEL <- function(Level, iNode) {
         # Level is zero-based
-        PREVNODE[Level+1] <<- iNode
+        private$PREVNODE[Level+1] <- iNode
       }
       # test if node is a leaf
       ISLEAF <- function(iNode) {
@@ -322,7 +328,7 @@ Arborescence <- R6::R6Class(
       # clean up small sibling subtrees      
       APPORTION <- function(iNode, Level) {
         Leftmost <- FIRSTCHILD(iNode)
-        Neighbor <- LEFTNEIGHBOR[Leftmost]
+        Neighbor <- private$LEFTNEIGHBOR[Leftmost]
         CompareDepth <- 1
         DepthToStop <- MaxDepth - Level
         #
@@ -336,16 +342,16 @@ Arborescence <- R6::R6Class(
           for (i in seq(0,CompareDepth-1)) {
             AncestorLeftmost <- PARENT(AncestorLeftmost)
             AncestorNeighbor <- PARENT(AncestorNeighbor)
-            RightModsum <- RightModsum + MODIFIER[AncestorLeftmost]
-            LeftModsum <- LeftModsum + MODIFIER[AncestorNeighbor]
+            RightModsum <- RightModsum + private$MODIFIER[AncestorLeftmost]
+            LeftModsum <- LeftModsum + private$MODIFIER[AncestorNeighbor]
           }
           # Find the MoveDistance, and apply it to Node's subtree.
           # Add appropriate portions to smaller interior subtrees.
-          MoveDistance <- (PRELIM[Neighbor] +
+          MoveDistance <- (private$PRELIM[Neighbor] +
                            LeftModsum +
                            SubtreeSeparation + 
                            MEANNODESIZE(Leftmost, Neighbor)) -
-                          (PRELIM[Leftmost] + RightModsum)  
+                           (private$PRELIM[Leftmost] + RightModsum)  
           if (MoveDistance > 0) {
             # Count interior sibling subtrees in LeftSiblings
             TempPtr <- iNode
@@ -359,8 +365,10 @@ Arborescence <- R6::R6Class(
               Portion <- MoveDistance / LeftSiblings
               TempPtr <- iNode
               while (TempPtr != AncestorNeighbor) { ##DEBUG - != not =##
-                PRELIM[TempPtr] <<- PRELIM[TempPtr] + MoveDistance
-                MODIFIER[TempPtr] <<- MODIFIER[TempPtr] + MoveDistance
+                private$PRELIM[TempPtr] <- private$PRELIM[TempPtr] + 
+                                           MoveDistance
+                private$MODIFIER[TempPtr] <- private$MODIFIER[TempPtr] + 
+                                             MoveDistance
                 MoveDistance <- MoveDistance - Portion
                 TempPtr <- LEFTSIBLING(TempPtr)
               }
@@ -385,28 +393,28 @@ Arborescence <- R6::R6Class(
             Leftmost <- FIRSTCHILD(Leftmost)
 # nocov end
           }
-          Neighbor <- LEFTNEIGHBOR[Leftmost] ##DEBUG - line missing##
+          Neighbor <- private$LEFTNEIGHBOR[Leftmost] ##DEBUG - line missing##
         }
         return
       }
       # function for first postorder walk
       FIRSTWALK <- function(iNode, Level) {
         # Set the pointer to the previous node at this level.
-        LEFTNEIGHBOR[iNode] <<- GETPREVNODEATLEVEL(Level) 
+        private$LEFTNEIGHBOR[iNode] <- GETPREVNODEATLEVEL(Level) 
         SETPREVNODEATLEVEL(Level, iNode) # This is now the previous.
-        MODIFIER[iNode] <<- 0   # Set the default modifier value. 
+        private$MODIFIER[iNode] <- 0   # Set the default modifier value. 
         if (ISLEAF(iNode) || Level==MaxDepth) {
           if (HASLEFTSIBLING(iNode)) {
             # Determine the preliminary x-coordinate based on: 
             #   the preliminary x-coordinate of the left sibling, 
             #   the separation between sibling nodes, and 
             #   the mean size of left sibling and current node.
-            PRELIM[iNode] <<-  PRELIM[LEFTSIBLING(iNode)] + 
-                               SiblingSeparation +
-                               MEANNODESIZE(LEFTSIBLING(iNode), iNode)
+            private$PRELIM[iNode] <- private$PRELIM[LEFTSIBLING(iNode)] + 
+                                     SiblingSeparation +
+                                     MEANNODESIZE(LEFTSIBLING(iNode), iNode)
           } else {
            # No sibling on the left to worry about.
-           PRELIM[iNode] <<- 0
+           private$PRELIM[iNode] <- 0
           }
         } else {
           # This Node is not a leaf, so call this procedure 
@@ -418,15 +426,15 @@ Arborescence <- R6::R6Class(
             Rightmost <- RIGHTSIBLING(Rightmost)
             FIRSTWALK(Rightmost, Level + 1) 
           }
-          Midpoint <- (PRELIM[Leftmost] + PRELIM[Rightmost]) / 2
+          Midpoint <- (private$PRELIM[Leftmost] + private$PRELIM[Rightmost]) / 2
           if (HASLEFTSIBLING(iNode)) {
-            PRELIM[iNode] <<- PRELIM[LEFTSIBLING(iNode)] + 
-                              SiblingSeparation + 
-                              MEANNODESIZE(LEFTSIBLING(iNode), iNode)
-            MODIFIER[iNode] <<- PRELIM[iNode] - Midpoint
+            private$PRELIM[iNode] <- private$PRELIM[LEFTSIBLING(iNode)] + 
+                                     SiblingSeparation + 
+                                     MEANNODESIZE(LEFTSIBLING(iNode), iNode)
+            private$MODIFIER[iNode] <- private$PRELIM[iNode] - Midpoint
             APPORTION(iNode, Level) 
           } else {
-            PRELIM[iNode] <<- Midpoint          
+            private$PRELIM[iNode] <- Midpoint          
           } 
         }
         return
@@ -441,30 +449,30 @@ Arborescence <- R6::R6Class(
       SECONDWALK <- function(iNode, Level, Modsum) {
         if (Level <= MaxDepth) {
           if (RootOrientation == "NORTH") {
-            xTemp <- xTopAdjustment + (PRELIM[iNode] + Modsum)
+            xTemp <- xTopAdjustment + (private$PRELIM[iNode] + Modsum)
             yTemp <- yTopAdjustment - (Level * LevelSeparation)
           } else if (RootOrientation == "SOUTH") {
-            xTemp <- xTopAdjustment + (PRELIM[iNode] + Modsum)
+            xTemp <- xTopAdjustment + (private$PRELIM[iNode] + Modsum)
             yTemp <- yTopAdjustment + (Level * LevelSeparation)
           } else if (RootOrientation == "EAST") {
             xTemp <- xTopAdjustment + (Level * LevelSeparation)
-            yTemp <- yTopAdjustment - (PRELIM[iNode] + Modsum)
+            yTemp <- yTopAdjustment - (private$PRELIM[iNode] + Modsum)
           } else if (RootOrientation == "WEST") {
             xTemp <- xTopAdjustment - (Level * LevelSeparation)
-            yTemp <- yTopAdjustment - (PRELIM[iNode] + Modsum)
+            yTemp <- yTopAdjustment - (private$PRELIM[iNode] + Modsum)
           } 
           # Check to see that xTemp and yTemp are of the proper 
           # size for your application. 
           if (CHECKEXTENTSRANGE(xTemp, yTemp)) {
-            XCOORD[iNode] <<- xTemp
-            YCOORD[iNode] <<- yTemp
+            private$XCOORD[iNode] <- xTemp
+            private$YCOORD[iNode] <- yTemp
             Result <- TRUE
             if (HASCHILD(iNode)) {
               # Apply the Modifier value for this node to 
               # all its offspring. 
               Result <- SECONDWALK(FIRSTCHILD(iNode),
                                    Level + 1,
-                                   Modsum + MODIFIER[iNode])
+                                   Modsum + private$MODIFIER[iNode])
             }
             if (Result==TRUE && HASRIGHTSIBLING(iNode)) {
                 Result <- SECONDWALK(RIGHTSIBLING(iNode),
@@ -495,11 +503,11 @@ Arborescence <- R6::R6Class(
           # Determine how to adjust all the nodes with respect to 
           # the location of the root. 
           if (RootOrientation %in% c("NORTH","SOUTH")) {
-            xTopAdjustment <- XCOORD[iNode] - PRELIM[iNode]
-            yTopAdjustment <- YCOORD[iNode]
+            xTopAdjustment <- private$XCOORD[iNode] - private$PRELIM[iNode]
+            yTopAdjustment <- private$YCOORD[iNode]
           } else {
-            xTopAdjustment <- XCOORD[iNode] 
-            yTopAdjustment <- YCOORD[iNode] + PRELIM[iNode]
+            xTopAdjustment <- private$XCOORD[iNode] 
+            yTopAdjustment <- private$YCOORD[iNode] + private$PRELIM[iNode]
           }
           # Do the final positioning with a preorder walk
           return(SECONDWALK(iNode, 0, 0))      
@@ -523,8 +531,8 @@ Arborescence <- R6::R6Class(
       # create and populate the coordinate data frame
       XY <- data.frame(
         n = seq(1:self$order()),
-        x = XCOORD,
-        y = YCOORD
+        x = private$XCOORD,
+        y = private$YCOORD
       )
       # return the coordinate data frame
       return(XY)

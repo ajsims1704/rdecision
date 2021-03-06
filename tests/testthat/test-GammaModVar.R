@@ -74,6 +74,6 @@ test_that("random sampling is from a Gamma distribution", {
   g <- GammaModVar$new("gamma", "GBP", k, theta)
   samp <- g$r(1000)
   expect_equal(length(samp), 1000)
-  expect_true(abs(mean(samp)-4.5)<0.1)
-  expect_true(abs(sd(samp)-1.5)<0.1)
+  expect_true(abs(mean(samp)-4.5)<0.5)
+  expect_true(abs(sd(samp)-1.5)<0.5)
 })

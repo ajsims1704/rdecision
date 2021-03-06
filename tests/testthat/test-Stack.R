@@ -9,6 +9,7 @@ test_that("Essential stack operations are supported", {
   expect_equal(S$size(),1)
   expect_equal(S$pop(),3)
   expect_equal(S$size(),0)
+  expect_error(S$pop(), class="underflow")
 })
 
 test_that("stacks of exotic objects are supported", {
@@ -20,6 +21,13 @@ test_that("stacks of exotic objects are supported", {
   expect_equal(S$size(),1)
   expect_equal(S$pop()$label(),"n1")
   expect_equal(S$size(),0)
+})
+
+test_that("stacks of lists are supported", {
+  S <- Stack$new()
+  S$push(list("A", "B", "C"))
+  S$push(list("1",2,"3"))
+  expect_equal(S$size(),2)
 })
 
 test_that("the stack can be extracted as a list", {
