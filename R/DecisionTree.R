@@ -1060,6 +1060,9 @@ DecisionTree <- R6::R6Class(
       
       # plot the graph, if required
       if (draw) {
+        # save current graphical parameters and ensure they are restored on exit
+        oldpar <- par(no.readonly = TRUE)
+        on.exit(par(oldpar))
         # controllable parameters
         cex = 0.75
         # x axis label
@@ -1081,10 +1084,10 @@ DecisionTree <- R6::R6Class(
         })
         par(mar = c(4.1,4.1,1.1,1.1))
         mai = par("mai")
-        par(mai=c(mai[1],max(max(lw),max(uw)),mai[3],max(max(lw),max(uw))))
+        par(mai = c(mai[1],max(max(lw),max(uw)),mai[3],max(max(lw),max(uw))))
         mgp <- par("mgp")
         mgp <- mgp*cex
-        par(mgp = mgp)
+#        par(mgp = mgp)
         # create the plot frame
         plot(
           x = NULL,
@@ -1101,6 +1104,7 @@ DecisionTree <- R6::R6Class(
           cex.lab = cex,
           cex.main = cex,
           cex.sub = cex,
+          mgp = mgp,
           xpd = TRUE,
           frame.plot = FALSE
         )
@@ -1113,6 +1117,7 @@ DecisionTree <- R6::R6Class(
           lwd.ticks = 0,
           las = 2,
           cex.axis = cex,
+          mgp = mgp,
           outer = TRUE
         )
         # add bars and limits

@@ -3,8 +3,8 @@ title: "Shale gas"
 subtitle: "A decision tree example"
 author: "Andrew J. Sims"
 date: "July 2020"
-bibliography: "references.bib"
-csl: "national-institute-of-health-research.csl"
+bibliography: "../inst/REFERENCES.bib"
+csl: "../inst/national-institute-of-health-research.csl"
 output: 
   rmarkdown::html_vignette:
     fig_width: 7

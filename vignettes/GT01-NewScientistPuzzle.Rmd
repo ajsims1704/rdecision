@@ -12,8 +12,8 @@ vignette: >
   %\VignetteIndexEntry{A directed graph solution to a *New Scientist* puzzle}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
-bibliography: "references.bib"
-csl: "national-institute-of-health-research.csl"
+bibliography: "../inst/REFERENCES.bib"
+csl: "../inst/national-institute-of-health-research.csl"
 ---
 ```{r, include = FALSE}
 knitr::opts_chunk$set(

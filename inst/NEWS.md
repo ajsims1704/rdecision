@@ -5,6 +5,7 @@
 * Further description for documentation.
 * Converted vignettes to HTML.
 * Added WORDLIST file and sundry administrative changes for clean package build.
+* Added README file, with an example and acknowledgements.
 
 # rdecision 1.0.1
 

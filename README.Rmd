@@ -1,0 +1,152 @@
+---
+output: github_document
+bibliography: "inst/REFERENCES.bib"
+csl: "inst/national-institute-of-health-research.csl"
+---
+
+<!-- README.md is generated from README.Rmd. Please edit that file -->
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>",
+  fig.path = "man/figures/README-",
+  out.width = "75%"
+)
+```
+
+# rdecision
+
+<!-- badges: start -->
+<!-- badges: end -->
+
+The goal of `rdecision` is to provide methods for assessing health care 
+interventions using cohort models (decision trees). Mechanisms are provided for 
+associating an uncertainty distribution with each source variable and for
+ensuring transparency of the mathematical relationships between variables.
+The package terminology follows Briggs *et al* "Decision Modelling for Health
+Economic Evaluation" [@briggs2006].
+
+
+## Installation
+
+You can install the released version of rdecision from 
+[CRAN](https://CRAN.R-project.org) with:
+
+``` r
+install.packages("rdecision")
+```
+
+## Example
+
+Consider the fictitious and idealized decision problem of choosing between
+providing two 
+forms of lifestyle advice, offered to people with vascular disease, which reduce
+the risk of needing an interventional procedure. The model has a time horizon of 
+1 year. The cost to a healthcare provider of the interventional procedure 
+(e.g. inserting a stent) is 3000 GBP; the cost of providing the current form of
+lifestyle advice, an appointment with a dietician ("diet"), is 50 GBP and the
+cost of providing an alternative form, attendance at an exercise
+programme ("exercise"), is 500 GBP. If the advice programme is successful, there
+is no need for an interventional procedure. In a small trial of the "diet" 
+programme, 12 out of 68 patients avoided having a procedure, and in a separate 
+small trial of the "exercise" programme 18 out of 58 patients avoided the
+procedure. It is assumed that the baseline characteristics in the two trials
+were comparable, that the model is from the perspective of the healthcare
+provider and that the utility is the same for all patients.
+
+A decision tree can be constructed to estimate the uncertainty of the cost 
+difference between the two types of advice programme, due to the finite sample 
+sizes of each trial. The proportions of each advice programme being successful
+(i.e. avoiding intervention) are represented by model variables with 
+uncertainties which follow Beta distributions. Probabilities of the failure
+of the programmes are calculated using expression model variables to ensure
+that the total probability associated with each chance node is one.
+
+```{r pvars, echo=TRUE}
+library("rdecision")
+p.diet <- BetaModVar$new("P(diet)", "", alpha=12, beta=68-12)
+p.exercise <- BetaModVar$new("P(exercise)", "", alpha=18, beta=58-18)
+q.diet <- ExprModVar$new("1-P(diet)", "", rlang::quo(1-p.diet))
+q.exercise <- ExprModVar$new("1-P(exercise)", "", rlang::quo(1-p.exercise))
+```
+
+The decision tree is constructed from nodes and edges as follows:
+```{r tree, echo=TRUE}
+t.ds <- LeafNode$new("no stent")
+t.df <- LeafNode$new("stent")
+t.es <- LeafNode$new("no stent")
+t.ef <- LeafNode$new("stent")
+c.d <- ChanceNode$new("Outcome")
+c.e <- ChanceNode$new("Outcome")
+d <- DecisionNode$new("Programme")
+
+e.d <- Action$new(d, c.d, cost = 50, label = "Diet")
+e.e <- Action$new(d, c.e, cost = 500, label = "Exercise")
+e.ds <- Reaction$new(c.d, t.ds, p = p.diet, cost = 0, label = "success")
+e.df <- Reaction$new(c.d, t.df, p = q.diet, cost = 5000, label = "failure")
+e.es <- Reaction$new(c.e, t.es, p = p.exercise, cost = 0, label = "success")
+e.ef <- Reaction$new(c.e, t.ef, p = q.exercise, cost = 5000, label = "failure")
+
+DT <- DecisionTree$new(
+  V = list(d, c.d, c.e, t.ds, t.df, t.es, t.ef),
+  E = list(e.d, e.e, e.ds, e.df, e.es, e.ef)
+)
+```
+
+```{r treedraw,echo=FALSE,results="hide",fig.keep="last",fig.align="center"}
+DT$draw(border = TRUE)
+```
+
+```{r pointestimate, echo=FALSE}
+RES <- DT$evaluate()
+```
+The expected per-patient cost of each option is obtained by evaluating the
+tree with expected values of all variables using `DT$evaluate()`. Examination
+of the data frame from this call shows that the expected per-patient cost of
+the diet advice programme is `r round(RES$Cost[RES$Programme=="Diet"],2)` GBP 
+and the per-patient cost of the exercise programme 
+is `r round(RES$Cost[RES$Programme=="Exercise"],2)` GBP, a point estimate saving
+of
+`r round(RES$Cost[RES$Programme=="Diet"]-RES$Cost[RES$Programme=="Exercise"],2)`
+per patient if the exercise advice programme is adopted. 
+
+```{r psa, echo=FALSE}
+RES <- DT$evaluate(setvars="random", N=1000)
+RES <- reshape(RES, idvar="Run", timevar="Programme", direction="wide")
+RES$Difference <- RES$Cost.Diet - RES$Cost.Exercise
+```
+
+The confidence interval of the
+cost saving is estimated by repeated evaluation of the tree, each time sampling
+from the uncertainty distribution of the two probabilities using, for example, 
+`DT$evaluate(setvars="random", N=1000)` and inspecting the resulting data frame.
+From 1000 runs, the 95% confidence interval of the per patient cost saving 
+is `r round(quantile(RES$Difference, probs=c(0.025)),2)` GBP 
+to `r round(quantile(RES$Difference, probs=c(0.975)),2)` GBP and it can be
+concluded that there is no evidence for there being a cost difference between
+the choices.
+
+# Acknowledgements
+In addition to using base R [@rcoreteam2020], `redecision` relies heavily on
+the `R6` implementation of classes [@chang2020] and the `rlang` package for
+error handling and non-standard evaluation used in expression model variables
+[@henry2020]. Building the package vignettes and documentation rely on the
+`testthat` package [@wickham2011], the `devtools` package [@wickham2020] and
+`rmarkdown` [@xie2018a,@allaire2020,@xie2020].
+
+Underpinning graph theory is based on terminology, definitions and
+algorithms from Gross *et al* [-@gross2013], the Wikipedia 
+glossary [@wikipedia2021] and links therein. Topological sorting of graphs
+is based on Kahn's algorithm [-@kahn1962]. Some of the terminology for decision
+trees was based on the work of Kamiński *et al* [-@kaminski2018] and an 
+efficient tree drawing algorithm was based on the work of Walker [-@walker1989]. 
+Terminology for decision trees in health economic evaluation was based on
+the book by Briggs *et al* [-@briggs2006] and the output format and terminology 
+follows ISPOR recommendations [@briggs2012a]. 
+
+Citations for examples used in vignettes are given in applicable vignette
+files. 
+
+# References
+

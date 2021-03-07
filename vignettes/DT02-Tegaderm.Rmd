@@ -3,8 +3,8 @@ title: "Tegaderm CHG IV Securement Dressing"
 subtitle: "A decision tree example with probabilistic sensitivity analysis"
 author: "Andrew J. Sims"
 date: "July 2020"
-bibliography: "references.bib"
-csl: "national-institute-of-health-research.csl"
+bibliography: "../inst/REFERENCES.bib"
+csl: "../inst/national-institute-of-health-research.csl"
 output: 
   rmarkdown::html_vignette:
     fig_width: 7
@@ -36,7 +36,9 @@ to secure vascular catheters (Tegaderm CHG) was compared with a
 standard dressing.
 
 # Model variables
-Thirteen variables were used in the model. The choice of
+
+## Source variables
+Thirteen source variables were used in the model. The choice of
 variables, their distributions and their parameters are taken from Table 3 
 of Jenks *et al* [-@jenks2016], with the following additional information:
 
@@ -112,7 +114,7 @@ n.cathdays <- NormModVar$new(
 )  
 ```
 
-# Model variable expressions
+## Model variable expressions
 Variables in the model may be included in the decision tree via mathematical 
 expressions, which involve model variables and are themselves
 model variables. Forms of expression involving R functions and
@@ -166,6 +168,8 @@ q.CRBSI.T <- ExprModVar$new(
   'Q(CRBSI|Tegaderm)', '1-P', rlang::quo(1-p.CRBSI.T)
 )
 ```
+
+
 
 # The decision tree
 
@@ -300,13 +304,15 @@ with the polytomous chance nodes were modelled as independent variables. This is
 not recommended because there is a chance that a particular run of the PSA will
 yield probabilities that are outside the range [0,1]. 
 
-# Summary of the model
-The model variables associated with actions, reactions and leaf nodes
+## Summary of model variables in the tree
+The model variables which will be associated with actions, reactions and leaf 
+nodes
 can be tabulated using the method `modvar_table`. This returns a data
 frame describing each variable, its description, units and uncertainty
 distribution. Variables inheriting from type `ModVar` will be included in the
-tabulation; regular numeric values will not be listed. In the Tegaderm 
-model, the input model variable are in the following table. Variables SN1, 
+tabulation unless explicitly excluded, regular numeric values will not be
+listed. In the Tegaderm model, the input model variables are in the following
+table, with expression model variables excluded. Variables SN1, 
 SN2 and SN3 were introduced to model the uncertainties of the hazard and risk 
 ratios.
 
@@ -318,7 +324,7 @@ local({
 })
 ```
 
-# Point estimates and distributions of model variables
+## Point estimates and distributions of model variables
 The point estimates, units and distributional properties are obtained from the
 same call, in the remaining columns. 
 
@@ -331,7 +337,10 @@ local({
 })
 ```
 
-# Running the model: base case
+
+# Running the model
+
+## Base case
 The following code runs a single model scenario, using the `evaluate`
 method of a decision node to evaluate each pathway from the decision node,
 shown in the table. This model did not consider utility, and the columns 
@@ -348,9 +357,27 @@ local({
 })
 ```
 
-# Running the model: probabilistic sensitivity analysis
-Probabilistic sensitivity analysis is supported through the use of sampling 
-model variables. The same call, with extra parameters is used to run the PSA:
+## Univariate sensitivity analysis
+The sensitivity of the decision tree results to each source model variable,
+varied independently of the others, is demonstrated by a tornado diagram. The
+method `tornado` can be used to generate such a plot (and also provides a
+tabulated version of the values used in the plot). Source variables are
+varied over their 95% confidence limits, 
+[see figure](#univariate-sensitivity-analysis).
+
+```{r fig2.caption, echo=FALSE}
+f2c <- "Tornado diagram for the Tegaderm model"
+```
+```{r tornado,echo=FALSE,results="hide",fig.keep="last",fig.align="center",fig.cap=f2c}
+DT$tornado(
+  index=list(e10), ref=list(e9), exclude=list("SN1","SN2","SN3"), draw=TRUE
+)
+```
+
+## Probabilistic sensitivity analysis
+Multivariate probabilistic sensitivity analysis is supported through the use of
+sampling model variables. The same call, with extra parameters, is used to run 
+the PSA:
 
 ```{r PSA, echo=TRUE}
 N <- 1000
@@ -361,12 +388,10 @@ The first few runs of PSA are as follows (after reshaping the table to give
 one row per simulation, rather than one row per run, per strategy):
 
 ```{r PSA_table, echo=FALSE}
-local({
-  RES <<- reshape(PSA, idvar='Run', timevar='d1', direction='wide')
-  RES$Difference <<- RES$Cost.Tegaderm - RES$Cost.Standard
-  keep<- c('Run', 'Cost.Tegaderm', 'Cost.Standard', 'Difference')
-  pander::pander(head(RES[,keep], n=10), round=2, row.names=F, justify="lrrr")
-})
+RES <- reshape(PSA, idvar="Run", timevar="d1", direction="wide")
+RES$Difference <- RES$Cost.Tegaderm - RES$Cost.Standard
+keep<- c("Run", "Cost.Tegaderm", "Cost.Standard", "Difference")
+pander::pander(head(RES[,keep], n=10), round=2, row.names=F, justify="lrrr")
 ```
 
 From PSA (`r N` runs), the mean cost of treatment with Tegaderm 
