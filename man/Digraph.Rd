@@ -279,8 +279,8 @@ node has no predecessors.
 \if{html}{\out{<a id="method-paths"></a>}}
 \if{latex}{\out{\hypertarget{method-paths}{}}}
 \subsection{Method \code{paths()}}{
-Find all directed paths from source node 's' to target node 't'. In this
-definition, 'path' is a simple path, i.e. all vertexes are unique.
+Find all directed simple paths from source node \code{s} to target node
+\code{t}. In "simple" paths all vertexes are unique.
 Uses a recursive depth-first search algorithm.
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{Digraph$paths(s, t)}\if{html}{\out{</div>}}
