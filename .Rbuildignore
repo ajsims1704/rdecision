@@ -3,6 +3,7 @@
 ^archive$
 ^literature$
 ^branch$
+^DMHEE$
 ^tools$
 
 ^.*\.Rproj$

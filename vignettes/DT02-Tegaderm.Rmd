@@ -1,6 +1,6 @@
 ---
-title: "Tegaderm CHG IV Securement Dressing"
-subtitle: "A decision tree example with probabilistic sensitivity analysis"
+title: "Decision tree with PSA (Jenks 2016)"
+subtitle: "Tegaderm CHG IV Securement Dressing"
 author: "Andrew J. Sims"
 date: "July 2020"
 bibliography: "../inst/REFERENCES.bib"
@@ -11,7 +11,7 @@ output:
     fig_height: 5
     fig_caption: true
 vignette: >
-  %\VignetteIndexEntry{Tegaderm CHG IV Securement Dressing}
+  %\VignetteIndexEntry{Decision tree with PSA (Jenks 2016)}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---

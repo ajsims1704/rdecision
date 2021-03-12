@@ -1,6 +1,6 @@
 ---
-title: "Sumatriptan versus caffeine for migraine"
-subtitle: "A decision tree example"
+title: "Elementary decision tree (Evans 1997)"
+subtitle: "Sumatriptan versus caffeine for migraine"
 author: "Andrew J. Sims"
 date: "April 2020"
 bibliography: "../inst/REFERENCES.bib"
@@ -11,7 +11,7 @@ output:
     fig_height: 5
     fig_caption: true
 vignette: >
-  %\VignetteIndexEntry{Sumatriptan versus caffeine for migraine}
+  %\VignetteIndexEntry{Elementary decision tree (Evans 1997)}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---

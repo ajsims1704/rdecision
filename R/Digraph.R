@@ -25,8 +25,16 @@ Digraph <- R6::R6Class(
   lock_class = TRUE,
   inherit = Graph,
   private = list(
+    # class variables
     AD = NULL,    # adjacency matrix for digraph
-    BD = NULL     # incidence matrix for digraph
+    BD = NULL,   # incidence matrix for digraph
+    # init_rank (dot)
+    
+    # feasible_tree (dot)
+    feasible_tree = function() {
+      
+    }
+    
   ),
   public = list(
     

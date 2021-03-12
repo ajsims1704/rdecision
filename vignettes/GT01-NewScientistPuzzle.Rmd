@@ -1,5 +1,5 @@
 ---
-title: "A directed graph solution to a *New Scientist* puzzle"
+title: "A directed graph puzzle (Bodycombe 2020)"
 subtitle: "Burger run"
 author: "Andrew J. Sims"
 date: "18th June 2020"
@@ -9,7 +9,7 @@ output:
     fig_height: 5
     fig_caption: true
 vignette: >
-  %\VignetteIndexEntry{A directed graph solution to a *New Scientist* puzzle}
+  %\VignetteIndexEntry{A directed graph puzzle (Bodycombe 2020)}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 bibliography: "../inst/REFERENCES.bib"

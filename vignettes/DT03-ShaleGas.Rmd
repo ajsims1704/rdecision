@@ -1,6 +1,6 @@
 ---
-title: "Shale gas"
-subtitle: "A decision tree example"
+title: "Decision tree with three decision nodes (Kaminski 2018)"
+subtitle: "Shale gas"
 author: "Andrew J. Sims"
 date: "July 2020"
 bibliography: "../inst/REFERENCES.bib"
@@ -11,7 +11,7 @@ output:
     fig_height: 5
     fig_caption: true
 vignette: >
-  %\VignetteIndexEntry{Shale gas}
+  %\VignetteIndexEntry{Decision tree with three decision nodes (Kaminski 2018)}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---

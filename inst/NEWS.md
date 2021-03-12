@@ -1,11 +1,20 @@
+# rdecision 1.0.2.9000
+
+* Some package tests that involve sampling randomly from a distribution and
+  comparing the results with an expected value have been excluded when running
+  them on CRAN.
+* Changed vignette titles to reflect what kind of problem they illustrate,
+  rather than the problems themselves. Makes things clearer on CRAN.
+
 # rdecision 1.0.2
 
 * Added tests to give 100% coverage and replaced `tolerance` in
   `expect_equal` with `abs` in expect_true for approximate equality tests.
 * Further description for documentation.
 * Converted vignettes to HTML.
-* Added WORDLIST file and sundry administrative changes for clean package build.
-* Added README file, with an example and acknowledgements.
+* Added `WORDLIST` file and sundry administrative changes for clean package
+  build.
+* Added `README` file, with an example and acknowledgements.
 
 # rdecision 1.0.1
 

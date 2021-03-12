@@ -123,6 +123,7 @@ test_that("modified expressions are created correctly", {
   )
   expect_equal(q$mean(),0.9)
   # check internally added methods
+  skip_on_cran()
   N <- 1000
   samp <- vector(mode="numeric", length=N)
   for (i in 1:N) {
@@ -163,9 +164,7 @@ test_that("quantile estimation checks inputs and has correct output", {
   expect_equal(length(q$q_hat(probs)),3)
   expect_error(q$q_hat(probs,"1000"), class="nest_not_numeric")
   expect_error(q$q_hat(probs,42), class="nest_too_small")
-  
 })
-
 
 test_that("scoping rules for mu_hat in nested expressions are obeyed", {
   x <- NormModVar$new("SN", "m", mu=0, sigma=1)
@@ -180,9 +179,10 @@ test_that("expression chi square from SN is correct", {
   x <- NormModVar$new("SN", "m", mu=0, sigma=1)
   y <- ExprModVar$new("z","m^2",rlang::quo(x^2))
   expect_equal(y$mean(), 0)  # true mean is k=1, expression at mean inputs is 0
-  expect_true(abs(y$mu_hat()-1)<0.2)  # true mean is k=1
   expect_true(is.na(y$mode()))  # mode is undefined for ExprModVar
   expect_true(is.na(y$SD()))  # SD is undefined for ExprModVar
-  expect_true(abs(y$sigma_hat()-sqrt(2))<0.2) # variance is 2k
+  skip_on_cran()
+  expect_true(abs(y$mu_hat()-1)<0.25)  # true mean is k=1
+  expect_true(abs(y$sigma_hat()-sqrt(2))<0.25) # variance is 2k
 })
 
