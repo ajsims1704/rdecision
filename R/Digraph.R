@@ -27,14 +27,7 @@ Digraph <- R6::R6Class(
   private = list(
     # class variables
     AD = NULL,    # adjacency matrix for digraph
-    BD = NULL,   # incidence matrix for digraph
-    # init_rank (dot)
-    
-    # feasible_tree (dot)
-    feasible_tree = function() {
-      
-    }
-    
+    BD = NULL     # incidence matrix for digraph
   ),
   public = list(
     

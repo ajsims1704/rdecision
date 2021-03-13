@@ -1,15 +1,4 @@
 
-# setequal function for Nodes
-nodesetequal <- function(A,B) {
-  AinB <- all(sapply(A, function(a) {
-    return(any(sapply(B, function(b){identical(a,b)})))
-  }))  
-  BinA <- all(sapply(B, function(b) {
-    return(any(sapply(A, function(a){identical(a,b)})))
-  }))
-  return(AinB & BinA)
-}
-
 # tests of graph creation
 test_that("incorrect node and edge types are rejected", {
   n1 <- Node$new()
@@ -243,10 +232,10 @@ test_that("Fig 1.1.1 from Gross & Yellen (2013)", {
   # neighbours
   XX <- Node$new("XX")
   expect_error(G$neighbours(XX), class="not_in_graph")
-  expect_true(nodesetequal(G$neighbours(u),list(v)))
-  expect_true(nodesetequal(G$neighbours(v),list(u,w,x)))
-  expect_true(nodesetequal(G$neighbours(w),list(v,x)))
-  expect_true(nodesetequal(G$neighbours(x),list(v,w)))
+  expect_R6setequal(G$neighbours(u),list(v))
+  expect_R6setequal(G$neighbours(v),list(u,w,x))
+  expect_R6setequal(G$neighbours(w),list(v,x))
+  expect_R6setequal(G$neighbours(x),list(v,w))
   # connected
   expect_true(G$is_connected())
   # cycle

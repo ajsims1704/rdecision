@@ -3,6 +3,7 @@
 * Some package tests that involve sampling randomly from a distribution and
   comparing the results with an expected value have been excluded when running
   them on CRAN.
+* Added common test helpers and bespoke expectations to `testthat/setup.R`.
 * Changed vignette titles to reflect what kind of problem they illustrate,
   rather than the problems themselves. Makes things clearer on CRAN.
 

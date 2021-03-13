@@ -30,17 +30,17 @@ test_that("const values are returned", {
 
 test_that("set and get function as expected", {
   x <- ConstModVar$new("y", "GBP", 42)
-  expect_true(abs(x$get()-42)<0.01)
+  expect_intol(x$get(), 42, 0.01)
   expect_error(x$set(TRUE), class="what_not_character")
   expect_error(x$set("red"), class="what_not_supported")
   expect_silent(x$set())
   expect_silent(x$set("expected"))
-  expect_true(abs(x$get()-42)<0.01)
+  expect_intol(x$get(), 42, 0.01)
   S <- vector(mode="numeric", length=1000)
   for (i in 1:1000) {
     x$set()
     S[i] <- x$get() 
   }  
-  expect_true(abs(mean(S)-42)<0.001)
-  expect_true(sd(S)<0.001)
+  expect_intol(mean(S), 42, 0.1)
+  expect_true(sd(S)<0.01)
 })

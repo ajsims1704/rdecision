@@ -60,7 +60,7 @@ test_that("stub quantile function checks inputs and has correct output", {
   probs <- c(0.1, 0.4, 1.5)
   expect_error(z$quantile(probs), class="probs_out_of_range")
   probs <- c(0.1, 0.2, 0.5)
-  expect_equal(length(z$quantile(probs)),3)
+  expect_length(z$quantile(probs),3)
 })
 
 test_that("operands are identified correctly", {
@@ -70,21 +70,21 @@ test_that("operands are identified correctly", {
   z <- ConstModVar$new("z", "GPB", 42)
   e <- ExprModVar$new("e", "GBP", quo=rlang::quo(x*y + z))
   mv <- e$operands()
-  expect_equal(length(mv), 2)  # y and z
+  expect_length(mv, 2)  # y and z
   d <- sapply(mv, function(v) {
     return(v$description())
   })
-  expect_equal(d[order(d)], c("y", "z"))
+  expect_setequal(d, c("y", "z"))
   # nested case, with repeats
   e1 <- ExprModVar$new("e1", "GBP", quo=rlang::quo(x*y + z))
   e2 <- ExprModVar$new("e2", "GBP", quo=rlang::quo(z+3))
   e3 <- ExprModVar$new("e3", "GBP", quo=rlang::quo(e1+e2))
   mv <- e3$operands()
-  expect_equal(length(mv), 4)  # y, z, e1, e2
+  expect_length(mv, 4)  # y, z, e1, e2
   d <- sapply(mv, function(v) {
     return(v$description())
   })
-  expect_equal(d[order(d)], c("e1", "e2", "y", "z"))
+  expect_setequal(d, c("e1", "e2", "y", "z"))
 })
 
 test_that("set and get function as expected", {
@@ -101,14 +101,16 @@ test_that("set and get function as expected", {
   expect_equal(z$get(),0)
   # check that set() for operands affects get() for the expression
   y$set("expected")
-  expect_true(abs(z$get())<0.01)
+  expect_intol(z$get(), 0, 0.01)
   S <- vector(mode="numeric", length=1000)
   for (i in 1:1000) {
     y$set()
     S[i] <- z$get() 
   } 
-  expect_true(abs(mean(S))<0.2)
-  expect_true(abs(sd(S)-2)<0.2)
+  # 99% confidence limits; expected 1% test failure rate; skip for CRAN
+  skip_on_cran()
+  expect_inrange(mean(S), -0.1626212, 0.1632365)
+  expect_inrange(sd(S), 1.885586, 2.116044)
 })
 
 test_that("modified expressions are created correctly", {
@@ -117,21 +119,23 @@ test_that("modified expressions are created correctly", {
   # check externally added method
   expect_error(q$add_method(42), class="method_not_character")
   q.mean <- q$add_method("mean()")
-  expect_equal(
+  expect_intol(
     eval(rlang::quo_get_expr(q.mean), envir=rlang::quo_get_env(q.mean)),
-    0.9
+    0.9,
+    0.05
   )
-  expect_equal(q$mean(),0.9)
-  # check internally added methods
+  expect_intol(q$mean(), 0.9, 0.05)
+  # check internally added methods; 99% confidence limits; expect 1% test
+  # error rate; skip for CRAN
   skip_on_cran()
   N <- 1000
   samp <- vector(mode="numeric", length=N)
   for (i in 1:N) {
     samp[i] <- q$r(1)
   }
-  expect_true(abs(mean(samp)-0.9)<0.1)
+  expect_inrange(mean(samp), 0.8925559, 0.9072267)
   samp <- q$r(N)
-  expect_true(abs(mean(samp)-0.9)<0.1)
+  expect_inrange(mean(samp), 0.8925559, 0.9072267)
 })
 
 test_that("illegal sample sizes for estimating parameters are rejected", {

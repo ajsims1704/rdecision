@@ -1,15 +1,4 @@
 
-# setequal function for Nodes
-nodesetequal <- function(A,B) {
-  AinB <- all(sapply(A, function(a) {
-    return(any(sapply(B, function(b){identical(a,b)})))
-  }))  
-  BinA <- all(sapply(B, function(b) {
-    return(any(sapply(A, function(a){identical(a,b)})))
-  }))
-  return(AinB & BinA)
-}
-
 # arborescences that are not decision trees are rejected
 test_that("arborescences that are not decision trees are rejected", {
   # some nodes not {D,C,L}
@@ -73,24 +62,19 @@ test_that("arborescences that are not decision trees are rejected", {
   )
   # queries
   expect_error(DT$decision_nodes(42),class="unknown_what_value")
-  expect_true(nodesetequal(DT$decision_nodes(),list(d1)))
-  expect_true(nodesetequal(DT$chance_nodes(),list(c1)))
+  expect_R6setequal(DT$decision_nodes(),list(d1))
+  expect_R6setequal(DT$chance_nodes(),list(c1))
   expect_error(DT$leaf_nodes(42),class="unknown_what_value")
-  expect_true(nodesetequal(DT$leaf_nodes(),list(t1,t2,t3)))
-  expect_true(nodesetequal(DT$leaf_nodes("label"),list("t1","t2","t3")))
-  expect_true(
-    nodesetequal(
-      DT$leaf_nodes("index"),
-      list(DT$vertex_index(t1),DT$vertex_index(t2),DT$vertex_index(t3))
-    )
+  expect_R6setequal(DT$leaf_nodes(),list(t1,t2,t3))
+  expect_setequal(DT$leaf_nodes("label"),list("t1","t2","t3"))
+  expect_setequal(
+    DT$leaf_nodes("index"),
+    list(DT$vertex_index(t1),DT$vertex_index(t2),DT$vertex_index(t3))
   )
   expect_error(DT$actions(d2), class="not_in_tree")
   expect_error(DT$actions(c1), class="not_decision_node")
-  expect_error(
-    nodesetequal(DT$actions(),list(e1,e4)), 
-    class="decision_node_not_defined"
-  )
-  expect_equal(DT$actions(d1), list(e1,e4))
+  expect_error(DT$actions(),  class="decision_node_not_defined")
+  expect_R6setequal(DT$actions(d1), list(e1,e4))
   # evaluate
   expect_error(DT$evaluate(N="forty two"), class = "N_not_numeric")
   expect_error(DT$evaluate(by=42), class = "by_not_character")

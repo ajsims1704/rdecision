@@ -1,15 +1,4 @@
 
-# setequal function for Nodes
-nodesetequal <- function(A,B) {
-  AinB <- all(sapply(A, function(a) {
-    return(any(sapply(B, function(b){identical(a,b)})))
-  }))  
-  BinA <- all(sapply(B, function(b) {
-    return(any(sapply(A, function(a){identical(a,b)})))
-  }))
-  return(AinB & BinA)
-}
-
 # tests of arborescence creation
 test_that("incorrect node and edge types are rejected", {
   n1 <- Node$new()
@@ -98,9 +87,9 @@ test_that("parent, sibling and drawing functions are correct", {
   expect_equal(T$order(),15)
   # check siblings
   expect_equal(length(T$siblings(O)),0)
-  expect_true(nodesetequal(T$siblings(E), list(F,N)))
-  expect_true(nodesetequal(T$siblings(A), list(D)))
-  expect_true(nodesetequal(T$siblings(J), list(H,I,K,L)))
+  expect_R6setequal(T$siblings(E), list(F,N))
+  expect_R6setequal(T$siblings(A), list(D))
+  expect_R6setequal(T$siblings(J), list(H,I,K,L))
   # check postree arguments
   expect_error(
     T$postree(SiblingSeparation="x"), 
@@ -141,7 +130,7 @@ test_that("parent, sibling and drawing functions are correct", {
   expect_equal(XY["D","x"],6)
   expect_equal(XY["B","x"],3)
   expect_equal(XY["C","x"],9)
-  expect_true(abs(XY["F","x"]-13.5)<=0.1)
+  expect_intol(XY["F","x"], 13.5, 0.1)
   expect_equal(XY["N","x"],24)
   expect_equal(XY["G","x"],21)
   expect_equal(XY["M","x"],27)
