@@ -97,11 +97,17 @@ test_that("Extreme mode values are defined", {
 test_that("random sampling is from a Beta distribution", {
   alpha <- 2
   beta <- 5
+  n <- 1000
   b <- BetaModVar$new("beta", "GBP", alpha, beta)
-  samp <- b$r(1000)
-  expect_equal(length(samp), 1000)
-  # 99% confidence limits; expected test failure rate is 1%, skip for CRAN
+  samp <- b$r(n)
+  expect_equal(length(samp), n)
+  # 99.9% confidence limits by CLT; expected test failure rate is 1%, 
+  # skip for CRAN
   skip_on_cran()
+  sigma <- sqrt(alpha*beta / ((alpha+beta)^2 * (alpha+beta+1)))
+  mu <- alpha / (alpha+beta)
+  mu.l <- qnorm(p=0.999)*sigma/sqrt(n)
+  
   expect_inrange(mean(samp), 0.2726977, 0.2988489)
   expect_inrange(sd(samp), 0.1507992, 0.1685882) 
 })

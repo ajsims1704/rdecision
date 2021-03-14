@@ -36,7 +36,7 @@ expect_R6setequal <- function(object, eset) {
   invisible(act$val)    
 }
 
-# test if numeric object is within a range; includes limits
+# expectation that a numeric object is within a range
 expect_inrange <- function(object, lower, upper) {
   # capture object and label
   act <- quasi_label(rlang::enquo(object), arg = "object")
@@ -58,7 +58,7 @@ expect_inrange <- function(object, lower, upper) {
   invisible(act$val)    
 }
 
-# check if a numeric value is equal within tolerance
+# expectation that a numeric value is equal within tolerance
 expect_intol <- function(object, E, tolerance) {
   # capture object and label
   act <- quasi_label(rlang::enquo(object), arg = "object")
