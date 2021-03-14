@@ -76,9 +76,9 @@ test_that("adjacency matrix has correct properties", {
   G <- Digraph$new(V=list(n1,n2),A=list(e1))
   A <- G$digraph_adjacency_matrix()
   dn <- dimnames(A)
-  expect_equal(names(dn), c("out.node", "in.node"))
-  expect_equal(dn$out.node, c("n1", "n2"))
-  expect_equal(dn$in.node, c("n1", "n2"))
+  expect_setequal(names(dn), c("out.node", "in.node"))
+  expect_setequal(dn$out.node, c("n1", "n2"))
+  expect_setequal(dn$in.node, c("n1", "n2"))
   expect_equal(sum(A-matrix(c(0,1,0,0),nrow=2,byrow=TRUE)),0)
   # boolean
   n1 <- Node$new("n1")
@@ -110,9 +110,9 @@ test_that("incidence matrix has correct properties", {
   G <- Digraph$new(V=list(n1,n2),A=list(ea,eb))
   B <- G$digraph_incidence_matrix()
   dn <- dimnames(B)
-  expect_equal(names(dn), c("vertex", "edge"))
-  expect_equal(dn$vertex, c("n1", "n2"))
-  expect_equal(dn$edge, c("a", "b"))
+  expect_setequal(names(dn), c("vertex", "edge"))
+  expect_setequal(dn$vertex, c("n1", "n2"))
+  expect_setequal(dn$edge, c("a", "b"))
   expect_equal(sum(B-matrix(c(-1,1,1,-1),nrow=2,byrow=TRUE)),0)
 })
 
@@ -201,7 +201,7 @@ test_that("all paths in a 4-node graph with cycle are discovered", {
   expect_silent(G$walk(list()))
   # test that all paths are found
   P <- G$paths(n2,n3)
-  expect_equal(length(P),3)
+  expect_length(P,3)
   PE <- list(c(n2,n1,n3), c(n2,n0,n3), c(n2,n0,n1,n3))
   nmatch <- 0
   for (p in P) {
@@ -295,5 +295,5 @@ test_that("rdecision solves New Scientist Puzzle 62", {
   })
   ct <- as.data.frame(table(nw))
   # check that 23 paths traverse one special edge
-  expect_equal(ct$Freq[ct$nw==1],23)
+  expect_intol(ct$Freq[ct$nw==1],23,0.1)
 })

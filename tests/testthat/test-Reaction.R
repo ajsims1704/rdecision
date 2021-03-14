@@ -26,18 +26,18 @@ test_that("modvars are identified", {
   # two modvars
   e <- Reaction$new(n1,n2,p=0.5,cost=free,benefit=fortytwo,label="label")
   mv <- e$modvars()
-  expect_equal(length(mv),2)
+  expect_length(mv,2)
   d <- sapply(mv, function(v) {
     return(v$description())
   })
-  expect_equal(d[order(d)], c("fortytwo", "free"))
+  expect_setequal(d, c("fortytwo", "free"))
   # three modvars
   e <- Reaction$new(n1,n2,p=evens,cost=free,benefit=fortytwo,label="label")
   mv <- e$modvars()
-  expect_equal(length(mv),3)
+  expect_length(mv,3)
   d <- sapply(mv, function(v) {
     return(v$description())
   })
-  expect_equal(d[order(d)], c("evens", "fortytwo", "free"))
+  expect_setequal(d, c("evens", "fortytwo", "free"))
   expect_equal(e$benefit(),42)
 })

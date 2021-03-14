@@ -5,19 +5,19 @@ test_that("properties are set correctly", {
   expect_error(ExprModVar$new("z", "GBP", x+y), class = "quo_not_quosure")
   z <- ExprModVar$new("z", "GBP", quo=rlang::quo(x+y))
   expect_true(z$is_expression())
-  expect_equal(z$distribution(), "x + y")
+  expect_identical(z$distribution(), "x + y")
   expect_false(z$is_probabilistic())
   #
   y <- ConstModVar$new("y", "GBP", 42)
   z <- ExprModVar$new("z", "GBP", quo=rlang::quo(x+y))
   expect_true(z$is_expression())
-  expect_equal(z$distribution(), "x + y")
+  expect_identical(z$distribution(), "x + y")
   expect_false(z$is_probabilistic())
   #
   y <- NormModVar$new("y", "GBP", mu=0, sigma=1)
   z <- ExprModVar$new("z", "GBP", quo=rlang::quo(x+y))
   expect_true(z$is_expression())
-  expect_equal(z$distribution(), "x + y")
+  expect_identical(z$distribution(), "x + y")
   expect_true(z$is_probabilistic())
 })
 
@@ -26,13 +26,13 @@ test_that("ExprModVar obeys scoping rules" , {
   x <- 2
   y <- 3
   z <- ExprModVar$new("z", "Z", quo=rlang::quo(x+y))
-  expect_equal(z$distribution(), "x + y")
-  expect_equal(z$mean(), 5)
+  expect_identical(z$distribution(), "x + y")
+  expect_intol(z$mean(), 5, 0.1)
   # operands in different function environments
   f = function() {
     y <- 4
     z <- ExprModVar$new("z", "Z", quo=rlang::quo(x+y))
-    expect_equal(z$mean(), 6)
+    expect_intol(z$mean(), 6, 0.1)
   }
   f()
   # ExprModVar can be passed as an object
@@ -42,7 +42,7 @@ test_that("ExprModVar obeys scoping rules" , {
   g <- function(mv) {
     x <- 200
     y <- 300
-    expect_equal(mv$mean(),50)
+    expect_intol(mv$mean(),50,1)
   }
   g(z)
 })
@@ -102,19 +102,21 @@ test_that("set and get function as expected", {
   # check that set() for operands affects get() for the expression
   y$set("expected")
   expect_intol(z$get(), 0, 0.01)
-  S <- vector(mode="numeric", length=1000)
-  for (i in 1:1000) {
+  n <- 1000
+  S <- vector(mode="numeric", length=n)
+  for (i in 1:n) {
     y$set()
     S[i] <- z$get() 
   } 
-  # 99% confidence limits; expected 1% test failure rate; skip for CRAN
+  # 99.9% confidence limits; expected 0.1% test failure rate; skip for CRAN
   skip_on_cran()
-  expect_inrange(mean(S), -0.1626212, 0.1632365)
-  expect_inrange(sd(S), 1.885586, 2.116044)
+  expect_normsample(S, mu=0, sigma=2)
 })
 
 test_that("modified expressions are created correctly", {
-  p <- BetaModVar$new("P(success)", "P", alpha=1, beta=9)
+  alpha <- 1
+  beta <- 9
+  p <- BetaModVar$new("P(success)", "P", alpha=alpha, beta=beta)
   q <- ExprModVar$new("P(failure)", "P", rlang::quo(1-p))
   # check externally added method
   expect_error(q$add_method(42), class="method_not_character")
@@ -125,17 +127,15 @@ test_that("modified expressions are created correctly", {
     0.05
   )
   expect_intol(q$mean(), 0.9, 0.05)
-  # check internally added methods; 99% confidence limits; expect 1% test
-  # error rate; skip for CRAN
+  # check internally added methods; 99.9% confidence limits assuming CLT; expect
+  # 0.1% test failure rate; skip for CRAN
+  n <- 1000
+  samp <- q$r(n)
+  expect_length(samp, n)
   skip_on_cran()
-  N <- 1000
-  samp <- vector(mode="numeric", length=N)
-  for (i in 1:N) {
-    samp[i] <- q$r(1)
-  }
-  expect_inrange(mean(samp), 0.8925559, 0.9072267)
-  samp <- q$r(N)
-  expect_inrange(mean(samp), 0.8925559, 0.9072267)
+  mu <- 1-(alpha / (alpha+beta))
+  sigma <- sqrt(alpha*beta / ((alpha+beta)^2 * (alpha+beta+1)))
+  expect_normsample(samp, mu, sigma)
 })
 
 test_that("illegal sample sizes for estimating parameters are rejected", {
@@ -174,7 +174,6 @@ test_that("scoping rules for mu_hat in nested expressions are obeyed", {
   x <- NormModVar$new("SN", "m", mu=0, sigma=1)
   y <- ExprModVar$new("SN2","m", rlang::quo(2*x))
   b <- ExprModVar$new("z","m^2",rlang::quo(x*y))
-  b$mu_hat()
   expect_silent(b$mu_hat())
 })
 
@@ -186,7 +185,7 @@ test_that("expression chi square from SN is correct", {
   expect_true(is.na(y$mode()))  # mode is undefined for ExprModVar
   expect_true(is.na(y$SD()))  # SD is undefined for ExprModVar
   skip_on_cran()
-  expect_true(abs(y$mu_hat()-1)<0.25)  # true mean is k=1
-  expect_true(abs(y$sigma_hat()-sqrt(2))<0.25) # variance is 2k
+  expect_intol(y$mu_hat(), 1, 0.25)  # true mean is k=1
+  expect_intol(y$sigma_hat(), sqrt(2), 0.25) # variance is 2k
 })
 

@@ -29,27 +29,27 @@ test_that("modvar has correct distribution name", {
   k <- 9
   theta <- 0.5
   g <- GammaModVar$new("gamma", "GBP", k, theta)
-  expect_equal(g$distribution(), "Ga(9,0.5)")
+  expect_identical(g$distribution(), "Ga(9,0.5)")
 })
 
 test_that("get() is initialized correctly", {
   k <- 9
   theta <- 0.5
   g <- GammaModVar$new("gamma", "GBP", k, theta)
-  expect_true(abs(g$get()-(k*theta))<0.01)
+  expect_intol(g$get(), k*theta, 0.01)
 })
 
 test_that("mean, mode, sd and quantiles are returned correctly", {
   k <- 9
   theta <- 0.5
   g <- GammaModVar$new("gamma", "GBP", k, theta)
-  expect_true(abs(g$mean()-k*theta)<0.01)
-  expect_true(abs(g$SD()-sqrt(k)*theta)<0.01)
-  expect_true(abs(g$mode()-(k-1)*theta)<0.01)
+  expect_intol(g$mean(), k*theta, 0.01)
+  expect_intol(g$SD(), sqrt(k)*theta, 0.01)
+  expect_intol(g$mode(), (k-1)*theta, 0.01)
   probs <- c(0.025, 0.975)
   q <- g$quantile(probs)
-  expect_true(abs(q[1]-2.06)<0.01)
-  expect_true(abs(q[2]-7.88)<0.01)
+  expect_intol(q[1], 2.06, 0.01)
+  expect_intol(q[2], 7.88, 0.01)
 })
 
 test_that("stub quantile function checks inputs and has correct output", {
@@ -65,15 +65,21 @@ test_that("stub quantile function checks inputs and has correct output", {
   probs <- c(0.1, 0.4, 1.5)
   expect_error(g$quantile(probs), class="probs_out_of_range")
   probs <- c(0.1, 0.2, 0.5)
-  expect_equal(length(g$quantile(probs)),3)
+  expect_length(g$quantile(probs),3)
 })
 
 test_that("random sampling is from a Gamma distribution", {
   k <- 9
   theta <- 0.5
+  n <- 1000
   g <- GammaModVar$new("gamma", "GBP", k, theta)
-  samp <- g$r(1000)
-  expect_equal(length(samp), 1000)
-  expect_true(abs(mean(samp)-4.5)<0.5)
-  expect_true(abs(sd(samp)-1.5)<0.5)
+  samp <- g$r(n)
+  expect_length(samp, n)
+  # 99.9% confidence limits assuming CLT applies; expected test failure rate 
+  # is 0.1%, skip for CRAN
+  skip_on_cran()
+  # population mean and standard deviation
+  sigma <- sqrt(k)*theta
+  mu <- k * theta
+  expect_normsample(samp, mu, sigma)
 })

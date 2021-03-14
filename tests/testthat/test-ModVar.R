@@ -15,10 +15,10 @@ test_that("properties are set correctly", {
 test_that("ModVar description is saved", {
   # same environment
   x <- ModVar$new("x", "GBP")
-  expect_equal(x$description(), "x")
+  expect_identical(x$description(), "x")
   # child environment
   f <- function(){
-    expect_equal(x$description(), "x")
+    expect_identical(x$description(), "x")
   }
   f()
   # parent environment
@@ -27,7 +27,7 @@ test_that("ModVar description is saved", {
     return(y)
   }
   yy <- g()
-  expect_equal(yy$description(), "y")
+  expect_identical(yy$description(), "y")
 })
 
 test_that("stub quantile function checks inputs and has correct output", {
@@ -41,7 +41,7 @@ test_that("stub quantile function checks inputs and has correct output", {
   probs <- c(0.1, 0.4, 1.5)
   expect_error(x$quantile(probs), class="probs_out_of_range")
   probs <- c(0.1, 0.2, 0.5)
-  expect_equal(length(x$quantile(probs)),3)
+  expect_length(x$quantile(probs),3)
 })
 
 test_that("stub functions return NA", {

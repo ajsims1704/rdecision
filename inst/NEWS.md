@@ -1,11 +1,12 @@
 # rdecision 1.0.2.9000
 
-* Some package tests that involve sampling randomly from a distribution and
-  comparing the results with an expected value have been excluded when running
-  them on CRAN.
+* Package tests that involve sampling randomly from a distribution and
+  comparing the results with an expected distribution have been excluded when 
+  running CRAN tests. Otherwise the central limit theorem is used to set 99.9%
+  confidence limits on expected sample mean and SD.
 * Added common test helpers and bespoke expectations to `testthat/setup.R`.
 * Changed vignette titles to reflect what kind of problem they illustrate,
-  rather than the problems themselves. Makes things clearer on CRAN.
+  rather than the problems themselves, to makes it clearer on the CRAN page.
 
 # rdecision 1.0.2
 
@@ -97,7 +98,7 @@
     
 # rdecision 0.1.1
 
-* First release of rdecision as a package.
+* First local release of rdecision as a package.
 * Added classes for solving decision trees (Node, LeafNode, ChanceNode,
   DecisionNode) and pathway detection and traversal functions.
 * Incorporated our discrete event solver, originally written in Matlab

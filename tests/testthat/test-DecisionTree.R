@@ -80,7 +80,7 @@ test_that("arborescences that are not decision trees are rejected", {
   expect_error(DT$evaluate(by=42), class = "by_not_character")
   expect_error(DT$evaluate(by="run"), class = "by_invalid")
   # tornado
-  expect_true(is.null(DT$tornado(index=list(e1),ref=list(e4))))
+  expect_null(DT$tornado(index=list(e1),ref=list(e4)))
 })
 
 # tests of basic tree properties (Kaminski et al CEJOR 2018;26:135-139, fig 1)
@@ -101,8 +101,8 @@ test_that("simple decision trees are modelled correctly", {
   expect_silent(DT <- DecisionTree$new(V,E))
   # properties
   A <- DT$actions(d1)
-  expect_true(setequal(sapply(A,function(a){a$label()}),c("e1","e4")))
-  expect_equal(DT$decision_nodes("label"), "d1")
+  expect_setequal(sapply(A,function(a){a$label()}),c("e1","e4"))
+  expect_setequal(DT$decision_nodes("label"), c("d1"))
   # draw it
   pdf(NULL)
   expect_silent(DT$draw(border=TRUE))
@@ -113,7 +113,7 @@ test_that("simple decision trees are modelled correctly", {
   expect_false(DT$is_strategy(list(e1,e4)))
   # strategy paths
   P <- DT$root_to_leaf_paths()
-  expect_equal(length(P),3)
+  expect_length(P,3)
   expect_error(DT$is_strategy(list(e2)),class="incorrect_strategy_type")
   expect_false(DT$is_strategy(list(e1,e4)))
   PS <- DT$strategy_paths()
@@ -127,10 +127,10 @@ test_that("simple decision trees are modelled correctly", {
   S <- DT$strategy_table()
   expect_equal(nrow(S),2)
   S <- DT$strategy_table("label", select=list(e1))
-  expect_equal(S$d1[1],"e1")
+  expect_identical(S$d1[1],"e1")
   # evaluations
   RES <- DT$evaluate(by="path")
-  expect_true(abs(RES[RES$Leaf=="t1","Benefit"]-22.5)<0.05)
+  expect_intol(RES[RES$Leaf=="t1","Benefit"], 22.5, 0.05)
 })
 
 # Evans et al, Pharmacoeconomics, 1997;12:565-577, Sumatriptan for migraine
@@ -190,13 +190,13 @@ test_that("rdecision replicates Evans et al, Sumatriptan base case", {
   e14 <- Reaction$new(c6, c8, p=0.080, cost=c.ED, label="Emergency Department")
   #
   c2 <- ChanceNode$new("c2")
-  expect_equal(c2$label(), "c2")
+  expect_identical(c2$label(), "c2")
   e15 <- Reaction$new(c2, c5, p=0.379, label="Relief")
   e16 <- Reaction$new(c2, c6, p=0.621, label="No relief")
   #
   # decision node
   d1 <- DecisionNode$new("d1")
-  expect_equal(d1$label(), "d1")
+  expect_identical(d1$label(), "d1")
   e17 <- Action$new(d1, c1, cost=c.sumatriptan, label="Sumatriptan")
   e18 <- Action$new(d1, c2, cost=c.caffeine, label="Caffeine/Ergotamine")
   # 
@@ -216,19 +216,17 @@ test_that("rdecision replicates Evans et al, Sumatriptan base case", {
   # check
   expect_true(is.data.frame(RES))
   c.Sumatriptan <- round(RES[RES$Run==1 & RES$d1=="Sumatriptan", "Cost"],2)
-  expect_equal(c.Sumatriptan, 22.06)
+  expect_intol(c.Sumatriptan, 22.06, 0.1)
   c.Caffeine <- round(RES[RES$Run==1 & RES$d1=="Caffeine/Ergotamine", "Cost"],2)
-  expect_equal(c.Caffeine, 4.71)
+  expect_intol(c.Caffeine, 4.71, 0.1)
   u.Sumatriptan <- round(RES[RES$Run==1 & RES$d1=="Sumatriptan", "Utility"],2)
-  expect_equal(u.Sumatriptan, 0.42)
+  expect_intol(u.Sumatriptan, 0.42, 0.1)
   u.Caffeine <- round(RES[RES$Run==1 & 
                           RES$d1=="Caffeine/Ergotamine", "Utility"],2)
-  expect_equal(u.Caffeine, 0.20)
+  expect_intol(u.Caffeine, 0.20, 0.05)
   # tornado (only drug costs are modvars)
   TO <- dt$tornado(index=list(e17),ref=list(e18),outcome="ICER",draw=FALSE)
-  expect_true(
-    abs(TO[TO$Description=="Sumatriptan","outcome.min"]-14692)<2
-  )
+  expect_intol(TO[TO$Description=="Sumatriptan","outcome.min"],14692,2)
 })
 
 # -----------------------------------------------------------------------------
@@ -297,15 +295,15 @@ test_that("rdecision replicates Kaminski et al, fig 7", {
   expect_true(DT$is_strategy(s))
   S <- DT$strategy_table("label", select=s)
   expect_equal(nrow(S),1)
-  expect_equal(S$d1[1],"sell")
-  expect_equal(S$d2[1],"sell")
-  expect_equal(S$d3[1],"sell")
+  expect_identical(S$d1[1],"sell")
+  expect_identical(S$d2[1],"sell")
+  expect_identical(S$d3[1],"sell")
   # test incorrect strategy prescription
   expect_false(DT$is_strategy(list(E[[1]],E[[5]],E[[7]])))
   # evaluate all root-to-leaf paths
   P <- DT$root_to_leaf_paths()
   W <- sapply(P,function(p){DT$walk(p)})
-  expect_equal(length(W),9)
+  expect_length(W,9)
   WX <- sapply(P,function(p){
     pp <- p
     if (length(pp)>2) {
@@ -317,20 +315,20 @@ test_that("rdecision replicates Kaminski et al, fig 7", {
   M <- DT$evaluate_walks(W)
   expect_equal(nrow(M),9)
   expect_equal(ncol(M),10)
-  expect_true(abs(M[8,"Cost"]-220.5)<1)
+  expect_intol(M[8,"Cost"], 220.5, 1)
   # evaluate one strategy (test/sell/sell)
   RES <- DT$evaluate()
   expect_true(is.data.frame(RES))
   itss <- which(RES$d1=="test" & RES$d2=="sell" & RES$d3=="sell")
-  expect_equal(sum(RES$Probability[itss]),1)
-  expect_equal(sum(RES$Cost[itss]),50)
-  expect_equal(sum(RES$Benefit[itss]),888)
+  expect_intol(sum(RES$Probability[itss]),1,0.01)
+  expect_intol(sum(RES$Cost[itss]),50,5)
+  expect_intol(sum(RES$Benefit[itss]),888,5)
   # find optimal strategies
   RES <- DT$evaluate()
   expect_equal(nrow(RES),12)
   imax <- which.max(RES$Benefit-RES$Cost)
   popt <- paste(RES$d1[imax], RES$d2[imax], RES$d3[imax], sep="/")
-  expect_equal(popt, "test/sell/dig")
+  expect_identical(popt, "test/sell/dig")
 })
 
 # ----------------------------------------------------------------------------
@@ -564,7 +562,7 @@ test_that("redecision replicates Jenks et al, 2016", {
 
   # check the model variables
   mv <- DT$modvars()
-  expect_equal(length(mv), 27)
+  expect_length(mv, 27)
   MVT <- DT$modvar_table()
   expect_equal(nrow(MVT), 27)
   expect_equal(sum(MVT$Est),16)
@@ -573,8 +571,8 @@ test_that("redecision replicates Jenks et al, 2016", {
 
   # evaluate the tree (base case, no PSA)
   E <- DT$evaluate()
-  expect_true(abs(E$Cost[E$d1=="Standard"]-c.std)<2.00)
-  expect_true(abs(E$Cost[E$d1=="Tegaderm"]-c.teg)<2.00)
+  expect_intol(E$Cost[E$d1=="Standard"], c.std, 2.00)
+  expect_intol(E$Cost[E$d1=="Tegaderm"], c.teg, 2.00)
 
   # check that illegal arguments to evaluate are rejected
   expect_error(DT$evaluate(setvars=42), class="setvars_not_character")
@@ -619,12 +617,13 @@ test_that("redecision replicates Jenks et al, 2016", {
   dev.off()
   expect_equal(nrow(TO),8)
   
-  # PSA
+  # PSA (skip on CRAN)
+  skip_on_cran()
   PSA <- DT$evaluate(setvars="random",N=200)
   RES <- reshape(PSA, idvar='Run', timevar="d1", direction="wide")
   RES$Difference <- RES$Cost.Standard - RES$Cost.Tegaderm
-  expect_true(abs(mean(RES$Difference)-77.76)<10.00)
-  expect_true(abs(mean(RES$Cost.Standard)-176.89)<10.00)
-  expect_true(abs(mean(RES$Cost.Tegaderm)-99.63)<10.00)
+  expect_intol(mean(RES$Difference), 77.76, 10.00)
+  expect_intol(mean(RES$Cost.Standard), 176.89, 10.00)
+  expect_intol(mean(RES$Cost.Tegaderm), 99.63, 10.00)
 
 })

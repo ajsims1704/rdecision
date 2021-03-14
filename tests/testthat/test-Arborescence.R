@@ -20,8 +20,10 @@ test_that("graphs that are not trees are rejected", {
   expect_silent(Arborescence$new(V=list(n1,n2,n3), A=list(e1,e2)))
   #
   e3 <- Arrow$new(n2,n3)
-  expect_error(Arborescence$new(V=list(n1,n2,n3), A=list(e1,e2,e3)),
-               class="not_arborescence")
+  expect_error(
+    Arborescence$new(V=list(n1,n2,n3), A=list(e1,e2,e3)),
+    class = "not_arborescence"
+  )
 })
 
 test_that("graphs that are not arborescences are rejected", {

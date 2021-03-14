@@ -100,9 +100,11 @@ test_that("random sampling is from a Beta distribution", {
   n <- 1000
   b <- BetaModVar$new("beta", "GBP", alpha, beta)
   samp <- b$r(n)
-  expect_equal(length(samp), n)
+  expect_length(samp, n)
   # 99.9% confidence limits by CLT; expected test failure rate is 0.1%, 
   # skip for CRAN
   skip_on_cran()
-  expect_betasample(samp, alpha, beta)
+  mu <- alpha / (alpha+beta)
+  sigma <- sqrt(alpha*beta / ((alpha+beta)^2 * (alpha+beta+1)))
+  expect_normsample(samp, mu, sigma)
 })

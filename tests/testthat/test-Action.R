@@ -29,14 +29,14 @@ test_that("modvars are identified", {
   # one modvar
   e <- Action$new(n1,n2,"label",cost=42,benefit=fortytwo)
   mv <- e$modvars()
-  expect_equal(length(mv),1)
+  expect_length(mv,1)
   # two modvars
   e <- Action$new(n1,n2,"label",cost=free,benefit=fortytwo)
   mv <- e$modvars()
-  expect_equal(length(mv),2)
+  expect_length(mv,2)
   d <- sapply(mv, function(v) {
     return(v$description())
   })
-  expect_equal(d[order(d)], c("fortytwo", "free"))
+  expect_setequal(d, c("fortytwo", "free"))
   expect_equal(e$benefit(),42)
 })

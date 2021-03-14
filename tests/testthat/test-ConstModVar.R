@@ -14,7 +14,7 @@ test_that("properties are correct", {
 
 test_that("it has correct distribution name", {
   lue <- ConstModVar$new("lue", "GBP", 42)
-  expect_equal(lue$distribution(), "Const(42)")  
+  expect_identical(lue$distribution(), "Const(42)")  
 })
 
 test_that("const values are returned", {
@@ -42,5 +42,5 @@ test_that("set and get function as expected", {
     S[i] <- x$get() 
   }  
   expect_intol(mean(S), 42, 0.1)
-  expect_true(sd(S)<0.01)
+  expect_intol(sd(S), 0, 0.01)
 })
