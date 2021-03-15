@@ -26,8 +26,14 @@ DigraphLayout <- R6::R6Class(
     G = NULL,
     
     # network simplex algorithm
+    init_rank = function() {
+      print("boo")
+    },
+    feasible_tree = function() {
+      private$init_rank()
+    },
     rank = function() {
-      
+      private$feasible_tree()
     }
     
   ),
@@ -38,6 +44,12 @@ DigraphLayout <- R6::R6Class(
     #' @return A \code{DigraphLayout} object.
     initialize = function(G) {
       # check argument
+      if (missing(G)) {
+        rlang::abort(
+          "Argument 'g' is missing",
+          class = "missing_G"
+        )
+      }
       if (!inherits(G, what="Digraph")) {
         rlang::abort(
           "Argument is not of class 'Digraph'",
