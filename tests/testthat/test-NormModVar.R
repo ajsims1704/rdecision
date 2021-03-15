@@ -54,7 +54,8 @@ test_that("random sampling is from a Normal distribution", {
   # check sample mean and sd are within 99.9% CI based on CLT; this is exact
   # for a normal, and is expected to fail for 0.1% of tests; skip for CRAN
   skip_on_cran()
-  expect_normsample(samp, mu, sigma)
+  expect_samplemean(samp, mu, sigma)
+  expect_sampleSD(samp, sigma)
 })
 
 test_that("First call to get() returns mean", {

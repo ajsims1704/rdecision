@@ -81,5 +81,6 @@ test_that("random sampling is from a Gamma distribution", {
   # population mean and standard deviation
   sigma <- sqrt(k)*theta
   mu <- k * theta
-  expect_normsample(samp, mu, sigma)
+  expect_samplemean(samp, mu, sigma)
+  expect_sampleSD(samp, sigma)
 })

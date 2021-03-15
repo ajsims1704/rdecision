@@ -106,5 +106,6 @@ test_that("random sampling is from a Beta distribution", {
   skip_on_cran()
   mu <- alpha / (alpha+beta)
   sigma <- sqrt(alpha*beta / ((alpha+beta)^2 * (alpha+beta+1)))
-  expect_normsample(samp, mu, sigma)
+  expect_samplemean(samp, mu, sigma)
+  expect_sampleSD(samp, sigma)
 })

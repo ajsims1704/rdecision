@@ -110,7 +110,8 @@ test_that("set and get function as expected", {
   } 
   # 99.9% confidence limits; expected 0.1% test failure rate; skip for CRAN
   skip_on_cran()
-  expect_normsample(S, mu=0, sigma=2)
+  expect_samplemean(S, mu=0, sigma=2)
+  expect_sampleSD(S, sigma=2)
 })
 
 test_that("modified expressions are created correctly", {
@@ -135,7 +136,8 @@ test_that("modified expressions are created correctly", {
   skip_on_cran()
   mu <- 1-(alpha / (alpha+beta))
   sigma <- sqrt(alpha*beta / ((alpha+beta)^2 * (alpha+beta+1)))
-  expect_normsample(samp, mu, sigma)
+  expect_samplemean(samp, mu, sigma)
+  expect_sampleSD(samp, sigma)
 })
 
 test_that("illegal sample sizes for estimating parameters are rejected", {

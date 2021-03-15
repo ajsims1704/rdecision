@@ -73,7 +73,8 @@ test_that("random sampling is from a log normal distribution", {
   skip_on_cran()
   m.pop <- exp(mu + 0.5*sigma^2)
   sd.pop <- sqrt( (exp(sigma^2)-1)*(exp(2*mu+sigma^2)) )
-  expect_normsample(samp, m.pop, sd.pop)
+  expect_samplemean(samp, m.pop, sd.pop)
+  expect_sampleSD(samp, sd.pop)
 })
 
 test_that("parametrizations are linked", {
