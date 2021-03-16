@@ -389,6 +389,21 @@ Digraph <- R6::R6Class(
       E <- lapply(W, function(e){private$E[[e]]})
       # return the walk 
       return(E)
+    },
+    
+    #' @description Writes a representation of the digraph in the 
+    #' \code{graphviz} DOT language
+    #' (\url{http://graphviz.org/doc/info/lang.html}) for drawing with one
+    #' of the \code{graphviz} tools (usually \code{dot}).
+    #' @returns A character vector. Intended for passing to \code{writeLines}
+    #' for saving as a text file.
+    to_DOT = function() {
+      # create stream vector (header+edges+footer)
+      nheader <- 4
+      o <- vector(mode = "character", length = nheader + self$size() + 1)
+      
+      
+      
     }
   ) 
 )
