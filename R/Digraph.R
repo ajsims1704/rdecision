@@ -397,13 +397,35 @@ Digraph <- R6::R6Class(
     #' of the \code{graphviz} tools (usually \code{dot}).
     #' @returns A character vector. Intended for passing to \code{writeLines}
     #' for saving as a text file.
-    to_DOT = function() {
+    as_DOT = function() {
+      # check whether all nodes have labels
+      nodelab <- all(sapply(private$V, function(v){nchar(v$label())>0}))
       # create stream vector (header+edges+footer)
-      nheader <- 4
-      o <- vector(mode = "character", length = nheader + self$size() + 1)
-      
-      
-      
+      nheader <- 1
+      o <- vector(mode = "character", length = 0)
+      # write header
+      o[length(o)+1] <- "strict digraph rdecision {"
+      # write edges
+      for (e in private$E) {
+        s <- e$source()
+        t <- e$target()
+        o[length(o)+1] <- paste(
+          "  ",
+          ifelse(nodelab, paste0('"',s$label(),'"'), self$vertex_index(s)),
+          "->",
+          ifelse(nodelab, paste0('"',t$label(),'"'), self$vertex_index(t)),
+          ifelse(
+            nchar(e$label())>0, 
+            paste("[", "label = ", paste0('"', e$label(), '"'), "]"),
+            ""
+          ), 
+          ";" 
+        )  
+      }
+      # footer
+      o[length(o)+1] <- "}"
+      # return the stream
+      return(o)
     }
   ) 
 )

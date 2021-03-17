@@ -297,3 +297,23 @@ test_that("rdecision solves New Scientist Puzzle 62", {
   # check that 23 paths traverse one special edge
   expect_intol(ct$Freq[ct$nw==1],23,0.1)
 })
+
+# create DOT representation of a graph (Sonnenberg & Beck, 1993, Fig 3)
+test_that("DOT file of S&B fig 3 is as expected", {
+  s1 <- Node$new("Well")
+  s2 <- Node$new("Disabled")
+  s3 <- Node$new("Dead")
+  e1 <- Arrow$new(s1, s1)
+  e2 <- Arrow$new(s1, s2, "ill")
+  e3 <- Arrow$new(s1, s3)
+  e4 <- Arrow$new(s2, s2)
+  e5 <- Arrow$new(s2, s3)
+  e6 <- Arrow$new(s3, s3)
+  G <- Digraph$new(V=list(s1, s2, s3), A=list(e1,e2,e3,e4,e5,e6))
+  expect_silent(DOT <- G$as_DOT())
+  con <- file("sb.gv", open="wt")
+  writeLines(DOT, con)
+  close(con)
+  print(" ")
+  print(DOT)
+})
