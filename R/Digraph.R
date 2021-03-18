@@ -8,6 +8,10 @@
 #' graphs (digraphs). Inherits from class Graph. 
 #'
 #' @references{ 
+#'   Gansner ER, Koutsofios E, North SC, Vo K-P. A technique for drawing
+#'   directed graphs. \emph{IEEE Transactions on Software Engineering},
+#'   1993;\bold{19}:214–30, \doi{doi.org/10.1109/32.221135}.
+#' 
 #'   Gross JL, Yellen J, Zhang P. Handbook of Graph Theory. Second edition, 
 #'   Chapman and Hall/CRC.; 2013, \doi{10.1201/b16132}.
 #'
@@ -394,23 +398,30 @@ Digraph <- R6::R6Class(
     #' @description Writes a representation of the digraph in the 
     #' \code{graphviz} DOT language
     #' (\url{http://graphviz.org/doc/info/lang.html}) for drawing with one
-    #' of the \code{graphviz} tools (usually \code{dot}).
+    #' of the \code{graphviz} tools including \code{dot} (Gansner, 1993). 
     #' @returns A character vector. Intended for passing to \code{writeLines}
     #' for saving as a text file.
+    #' @examples
+    #' DOT <- G$as_DOT()) # G is a Digraph object
+    #' writeLines(DOT, "zz.gv")
+    #' system2(command="dot", args=c("-Tpdf", "-o zz.pdf", "zz.gv"))
     as_DOT = function() {
       # check whether all nodes have labels
       nodelab <- all(sapply(private$V, function(v){nchar(v$label())>0}))
       # create stream vector (header+edges+footer)
       nheader <- 1
+      indent <- "  "
       o <- vector(mode = "character", length = 0)
       # write header
       o[length(o)+1] <- "strict digraph rdecision {"
+      o[length(o)+1] <- paste0(indent, 'size="7,7" ;')
+      o[length(o)+1] <- paste0(indent, 'rankdir=LR ;')
       # write edges
       for (e in private$E) {
         s <- e$source()
         t <- e$target()
         o[length(o)+1] <- paste(
-          "  ",
+          indent,
           ifelse(nodelab, paste0('"',s$label(),'"'), self$vertex_index(s)),
           "->",
           ifelse(nodelab, paste0('"',t$label(),'"'), self$vertex_index(t)),

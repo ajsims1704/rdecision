@@ -91,6 +91,7 @@ Andrew J. Sims \email{andrew.sims@newcastle.ac.uk}
 \item \out{<span class="pkg-link" data-pkg="rdecision" data-topic="Graph" data-id="order">}\href{../../rdecision/html/Graph.html#method-order}{\code{rdecision::Graph$order()}}\out{</span>}
 \item \out{<span class="pkg-link" data-pkg="rdecision" data-topic="Graph" data-id="size">}\href{../../rdecision/html/Graph.html#method-size}{\code{rdecision::Graph$size()}}\out{</span>}
 \item \out{<span class="pkg-link" data-pkg="rdecision" data-topic="Graph" data-id="vertex_index">}\href{../../rdecision/html/Graph.html#method-vertex_index}{\code{rdecision::Graph$vertex_index()}}\out{</span>}
+\item \out{<span class="pkg-link" data-pkg="rdecision" data-topic="Digraph" data-id="as_DOT">}\href{../../rdecision/html/Digraph.html#method-as_DOT}{\code{rdecision::Digraph$as_DOT()}}\out{</span>}
 \item \out{<span class="pkg-link" data-pkg="rdecision" data-topic="Digraph" data-id="digraph_adjacency_matrix">}\href{../../rdecision/html/Digraph.html#method-digraph_adjacency_matrix}{\code{rdecision::Digraph$digraph_adjacency_matrix()}}\out{</span>}
 \item \out{<span class="pkg-link" data-pkg="rdecision" data-topic="Digraph" data-id="digraph_incidence_matrix">}\href{../../rdecision/html/Digraph.html#method-digraph_incidence_matrix}{\code{rdecision::Digraph$digraph_incidence_matrix()}}\out{</span>}
 \item \out{<span class="pkg-link" data-pkg="rdecision" data-topic="Digraph" data-id="direct_predecessors">}\href{../../rdecision/html/Digraph.html#method-direct_predecessors}{\code{rdecision::Digraph$direct_predecessors()}}\out{</span>}

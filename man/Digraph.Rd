@@ -4,6 +4,10 @@
 \name{Digraph}
 \alias{Digraph}
 \title{\verb{Digraph} class}
+\value{
+A character vector. Intended for passing to \code{writeLines}
+for saving as a text file.
+}
 \description{
 An R6 class to represent a digraph (a directed graph).
 }
@@ -11,8 +15,22 @@ An R6 class to represent a digraph (a directed graph).
 Encapsulates, and provides methods for computation and checking of directed
 graphs (digraphs). Inherits from class Graph.
 }
+\examples{
+
+## ------------------------------------------------
+## Method `Digraph$as_DOT`
+## ------------------------------------------------
+
+DOT <- G$as_DOT()) # G is a Digraph object
+writeLines(DOT, "zz.gv")
+system2(command="dot", args=c("-Tpdf", "-o zz.pdf", "zz.gv"))
+}
 \references{
 { 
+  Gansner ER, Koutsofios E, North SC, Vo K-P. A technique for drawing
+  directed graphs. \emph{IEEE Transactions on Software Engineering},
+  1993;\bold{19}:214–30, \doi{doi.org/10.1109/32.221135}.
+
   Gross JL, Yellen J, Zhang P. Handbook of Graph Theory. Second edition, 
   Chapman and Hall/CRC.; 2013, \doi{10.1201/b16132}.
 
@@ -44,6 +62,7 @@ Andrew Sims \email{andrew.sims@newcastle.ac.uk}
 \item \href{#method-direct_predecessors}{\code{Digraph$direct_predecessors()}}
 \item \href{#method-paths}{\code{Digraph$paths()}}
 \item \href{#method-walk}{\code{Digraph$walk()}}
+\item \href{#method-as_DOT}{\code{Digraph$as_DOT()}}
 \item \href{#method-clone}{\code{Digraph$clone()}}
 }
 }
@@ -319,6 +338,29 @@ sequence of vertexes in this graph.
 \subsection{Returns}{
 A list of Edges
 }
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-as_DOT"></a>}}
+\if{latex}{\out{\hypertarget{method-as_DOT}{}}}
+\subsection{Method \code{as_DOT()}}{
+Writes a representation of the digraph in the 
+\code{graphviz} DOT language
+(\url{http://graphviz.org/doc/info/lang.html}) for drawing with one
+of the \code{graphviz} tools including \code{dot} (Gansner, 1993).
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{Digraph$as_DOT()}\if{html}{\out{</div>}}
+}
+
+\subsection{Examples}{
+\if{html}{\out{<div class="r example copy">}}
+\preformatted{DOT <- G$as_DOT()) # G is a Digraph object
+writeLines(DOT, "zz.gv")
+system2(command="dot", args=c("-Tpdf", "-o zz.pdf", "zz.gv"))
+}
+\if{html}{\out{</div>}}
+
+}
+
 }
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-clone"></a>}}
