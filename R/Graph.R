@@ -359,8 +359,52 @@ Graph <- R6::R6Class(
         rlang::abort("Argument 'v' is not in graph", class="not_in_graph")
       }     
       return(n)
+    },
+
+    #' @description Writes a representation of the graph in the 
+    #' \code{graphviz} DOT language
+    #' (\url{http://graphviz.org/doc/info/lang.html}) for drawing with one
+    #' of the \code{graphviz} tools including \code{dot} (Gansner, 1993). 
+    #' @return A character vector. Intended for passing to \code{writeLines}
+    #' for saving as a text file.
+    #' @examples
+    #' DOT <- G$as_DOT()) # G is a Graph object
+    #' writeLines(DOT, "zz.gv")
+    #' system2(command="dot", args=c("-Tpdf", "-o zz.pdf", "zz.gv"))
+    as_DOT = function() {
+      # check whether all nodes have labels
+      nodelab <- all(sapply(private$V, function(v){nchar(v$label())>0}))
+      # create stream vector (header+edges+footer)
+      indent <- "  "
+      o <- vector(mode = "character", length = 0)
+      # write header
+      o[length(o)+1] <- "graph rdecision {"
+      o[length(o)+1] <- paste0(indent, 'size="7,7" ;')
+      o[length(o)+1] <- paste0(indent, 'rankdir=LR ;')
+      # write edges
+      for (e in private$E) {
+        ep <- e$endpoints()
+        s <- ep[[1]]
+        t <- ep[[2]]
+        o[length(o)+1] <- paste(
+          indent,
+          ifelse(nodelab, paste0('"',s$label(),'"'), self$vertex_index(s)),
+          "--",
+          ifelse(nodelab, paste0('"',t$label(),'"'), self$vertex_index(t)),
+          ifelse(
+            nchar(e$label())>0,
+            paste("[", "label = ", paste0('"', e$label(), '"'), "]"),
+            ""
+          ),
+          ";"
+        )
+      }
+      # footer
+      o[length(o)+1] <- "}"
+      # return the stream
+      return(o)
     }
-  
+
   )
 )
 

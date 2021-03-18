@@ -399,7 +399,7 @@ Digraph <- R6::R6Class(
     #' \code{graphviz} DOT language
     #' (\url{http://graphviz.org/doc/info/lang.html}) for drawing with one
     #' of the \code{graphviz} tools including \code{dot} (Gansner, 1993). 
-    #' @returns A character vector. Intended for passing to \code{writeLines}
+    #' @return A character vector. Intended for passing to \code{writeLines}
     #' for saving as a text file.
     #' @examples
     #' DOT <- G$as_DOT()) # G is a Digraph object
@@ -409,11 +409,10 @@ Digraph <- R6::R6Class(
       # check whether all nodes have labels
       nodelab <- all(sapply(private$V, function(v){nchar(v$label())>0}))
       # create stream vector (header+edges+footer)
-      nheader <- 1
       indent <- "  "
       o <- vector(mode = "character", length = 0)
       # write header
-      o[length(o)+1] <- "strict digraph rdecision {"
+      o[length(o)+1] <- "digraph rdecision {"
       o[length(o)+1] <- paste0(indent, 'size="7,7" ;')
       o[length(o)+1] <- paste0(indent, 'rankdir=LR ;')
       # write edges

@@ -4,10 +4,6 @@
 \name{Digraph}
 \alias{Digraph}
 \title{\verb{Digraph} class}
-\value{
-A character vector. Intended for passing to \code{writeLines}
-for saving as a text file.
-}
 \description{
 An R6 class to represent a digraph (a directed graph).
 }
@@ -351,6 +347,10 @@ of the \code{graphviz} tools including \code{dot} (Gansner, 1993).
 \if{html}{\out{<div class="r">}}\preformatted{Digraph$as_DOT()}\if{html}{\out{</div>}}
 }
 
+\subsection{Returns}{
+A character vector. Intended for passing to \code{writeLines}
+for saving as a text file.
+}
 \subsection{Examples}{
 \if{html}{\out{<div class="r example copy">}}
 \preformatted{DOT <- G$as_DOT()) # G is a Digraph object

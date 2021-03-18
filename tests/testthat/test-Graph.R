@@ -244,3 +244,19 @@ test_that("Fig 1.1.1 from Gross & Yellen (2013)", {
   expect_false(G$is_tree())
 })
 
+test_that("Fig 1.1.1 from Gross & Yellen (2013) is drawn correctly", {
+  # the graph
+  u <- Node$new("u")
+  v <- Node$new("v")
+  w <- Node$new("w")
+  x <- Node$new("x")
+  a <- Edge$new(u,v,"a")
+  b <- Edge$new(v,u,"b")
+  c <- Edge$new(x,x,"c")
+  d <- Edge$new(x,w,"d")
+  e <- Edge$new(x,v,"e")
+  f <- Edge$new(w,v,"f")
+  G <- Graph$new(V=list(u,v,w,x), E=list(a,b,c,d,e,f))
+  # draw it
+  expect_silent(DOT <- G$as_DOT())
+})

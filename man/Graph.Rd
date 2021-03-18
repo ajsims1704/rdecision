@@ -11,6 +11,16 @@ An R6 class to represent a graph (from discrete mathematics).
 Encapsulates and provides methods for computation and checking of undirected
 graphs. Graphs are systems of vertices connected in pairs by edges.
 }
+\examples{
+
+## ------------------------------------------------
+## Method `Graph$as_DOT`
+## ------------------------------------------------
+
+DOT <- G$as_DOT()) # G is a Graph object
+writeLines(DOT, "zz.gv")
+system2(command="dot", args=c("-Tpdf", "-o zz.pdf", "zz.gv"))
+}
 \references{
 { 
   Gross JL, Yellen J, Zhang P. Handbook of Graph Theory. Second edition, 
@@ -37,6 +47,7 @@ Andrew Sims \email{andrew.sims@newcastle.ac.uk}
 \item \href{#method-is_tree}{\code{Graph$is_tree()}}
 \item \href{#method-degree}{\code{Graph$degree()}}
 \item \href{#method-neighbours}{\code{Graph$neighbours()}}
+\item \href{#method-as_DOT}{\code{Graph$as_DOT()}}
 \item \href{#method-clone}{\code{Graph$clone()}}
 }
 }
@@ -300,6 +311,33 @@ Does not include self, even in the case of a loop to self.
 \subsection{Returns}{
 A list of nodes which are joined to the subject.
 }
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-as_DOT"></a>}}
+\if{latex}{\out{\hypertarget{method-as_DOT}{}}}
+\subsection{Method \code{as_DOT()}}{
+Writes a representation of the graph in the 
+\code{graphviz} DOT language
+(\url{http://graphviz.org/doc/info/lang.html}) for drawing with one
+of the \code{graphviz} tools including \code{dot} (Gansner, 1993).
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{Graph$as_DOT()}\if{html}{\out{</div>}}
+}
+
+\subsection{Returns}{
+A character vector. Intended for passing to \code{writeLines}
+for saving as a text file.
+}
+\subsection{Examples}{
+\if{html}{\out{<div class="r example copy">}}
+\preformatted{DOT <- G$as_DOT()) # G is a Graph object
+writeLines(DOT, "zz.gv")
+system2(command="dot", args=c("-Tpdf", "-o zz.pdf", "zz.gv"))
+}
+\if{html}{\out{</div>}}
+
+}
+
 }
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-clone"></a>}}
