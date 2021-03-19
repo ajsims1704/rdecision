@@ -27,7 +27,7 @@ system2(command="dot", args=c("-Tpdf", "-o zz.pdf", "zz.gv"))
 { 
   Gansner ER, Koutsofios E, North SC, Vo K-P. A technique for drawing
   directed graphs. \emph{IEEE Transactions on Software Engineering},
-  1993;\bold{19}:214–30, \doi{doi.org/10.1109/32.221135}.
+  1993;\bold{19}:214–30, \doi{10.1109/32.221135}.
 
   Gross JL, Yellen J, Zhang P. Handbook of Graph Theory. Second edition, 
   Chapman and Hall/CRC.; 2013, \doi{10.1201/b16132}.

@@ -371,12 +371,6 @@ Graph <- R6::R6Class(
     #' of the \code{graphviz} tools including \code{dot} (Gansner, 1993). 
     #' @return A character vector. Intended for passing to \code{writeLines}
     #' for saving as a text file.
-    #' @examples
-    #' \dontrun{
-    #' DOT <- G$as_DOT() # G is a Graph object
-    #' writeLines(DOT, "zz.gv")
-    #' system2(command="dot", args=c("-Tpdf", "-o zz.pdf", "zz.gv"))
-    #' }
     as_DOT = function() {
       # check whether all nodes have labels
       nodelab <- all(sapply(private$V, function(v){nchar(v$label())>0}))
