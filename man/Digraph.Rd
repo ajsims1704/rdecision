@@ -17,9 +17,11 @@ graphs (digraphs). Inherits from class Graph.
 ## Method `Digraph$as_DOT`
 ## ------------------------------------------------
 
-DOT <- G$as_DOT()) # G is a Digraph object
+\dontrun{
+DOT <- G$as_DOT() # G is a Digraph object
 writeLines(DOT, "zz.gv")
 system2(command="dot", args=c("-Tpdf", "-o zz.pdf", "zz.gv"))
+}
 }
 \references{
 { 
@@ -353,9 +355,11 @@ for saving as a text file.
 }
 \subsection{Examples}{
 \if{html}{\out{<div class="r example copy">}}
-\preformatted{DOT <- G$as_DOT()) # G is a Digraph object
+\preformatted{\dontrun{
+DOT <- G$as_DOT() # G is a Digraph object
 writeLines(DOT, "zz.gv")
 system2(command="dot", args=c("-Tpdf", "-o zz.pdf", "zz.gv"))
+}
 }
 \if{html}{\out{</div>}}
 

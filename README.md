@@ -4,6 +4,11 @@
 # rdecision
 
 <!-- badges: start -->
+
+[![CRAN
+status](https://www.r-pkg.org/badges/version/rdecision)](https://CRAN.R-project.org/package=rdecision)
+[![Codecov test
+coverage](https://codecov.io/gh/ajsims1704/rdecision/branch/master/graph/badge.svg)](https://codecov.io/gh/ajsims1704/rdecision?branch=master)
 <!-- badges: end -->
 
 The goal of `rdecision` is to provide methods for assessing health care
@@ -97,9 +102,9 @@ evaluation of the tree, each time sampling from the uncertainty
 distribution of the two probabilities using, for example,
 `DT$evaluate(setvars="random", N=1000)` and inspecting the resulting
 data frame. From 1000 runs, the 95% confidence interval of the per
-patient cost saving is -567.46 GBP to 978.76 GBP and it can be concluded
-that there is no evidence for there being a cost difference between the
-choices.
+patient cost saving is -516.67 GBP to 1017.04 GBP and it can be
+concluded that there is no evidence for there being a cost difference
+between the choices.
 
 # Acknowledgements
 

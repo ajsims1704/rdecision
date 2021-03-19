@@ -1,6 +1,6 @@
 ## Test environments
-* local R installation, R 4.0.3
-* ubuntu 16.04 (on travis-ci), R 4.0.3
+* local R installation, R 4.0.4
+* ubuntu 16.04 (on travis-ci), R 4.0.4
 * win-builder (devel)
 
 ## R CMD check results
@@ -9,48 +9,27 @@
 
 * This is a new release.
 
-## CRAN policies
+There was 1 NOTE:
 
-> If there are references describing the methods in your package, please
-> add these in the description field of your DESCRIPTION file in the form
-> authors (year) <doi:...>
-> authors (year) <arXiv:...>
-> authors (year, ISBN:...)
-> or if those are not available: <https:...>
-> with no space after 'doi:', 'arXiv:', 'https:' and angle brackets for
-> auto-linking.
-> (If you want to add a title as well please put it in quotes: "Title") 
+Namespaces in Imports field not imported from:
+  ‘R6’ ‘grid’ ‘rlang’ ‘stats’ ‘utils’
+   All declared Imports should be used. 
 
-I have expanded the description field and added a citation, with an ISBN
-number. Specific methods used in the package have been cited in the applicable
-Rd files. Further acknowledgements and citations are in the README file.
+* R6 is a build-time dependency.
+  
+## Random test failures
 
-> Please make sure that you do not change the user's options, par or
-> working directory. If you really have to do so within functions, please
-> ensure with an *immediate* call of on.exit() that the settings are reset
-> when the function is exited. e.g.:
-> ...
-> oldpar <- par(no.readonly = TRUE)    # code line i
-> on.exit(par(oldpar))            # code line i + 1
-> ...
-> par(mfrow=c(2,2))            # somewhere after
-> ...
-> e.g.: DecisionTree.R
-> If you're not familiar with the function, please check ?on.exit. This
-> function makes it possible to restore options before exiting a function
-> even if the function breaks. Therefore it needs to be called immediately
-> after the option change within a function. 
+Dear maintainer,
 
-I have now used the `on.exit()` approach described in the comments, ensuring
-that the `on.exit` is immediately after reading the default `par` parameters, 
-as per instructions. One type of plot created by the package, a "tornado" plot, 
-requires adjustment of the plot margin parameters (`mar` and `mai`). These must
-be set before the first call to `plot` and I could see no way to avoid using 
-a call to `par` altogether in this situation.
+Please see the problems shown on
+<https://eur03.safelinks.protection.outlook.com/?url=https%3A%2F%2Fcran.r-project.org%2Fweb%2Fchecks%2Fcheck_results_rdecision.html&amp;data=04%7C01%7Candrew.sims%40newcastle.ac.uk%7C196c828d42c8415cae5008d8e5f19dde%7C9c5012c9b61644c2a91766814fbe3e87%7C1%7C0%7C637512173473338530%7CUnknown%7CTWFpbGZsb3d8eyJWIjoiMC4wLjAwMDAiLCJQIjoiV2luMzIiLCJBTiI6Ik1haWwiLCJXVCI6Mn0%3D%7C2000&amp;sdata=caH4ZlxfYb%2Bb1x6fRql6vil%2Biz%2BEftoNFeCXsAQ4bU8%3D&amp;reserved=0>.
 
-> Please do not modify the global environment (e.g. by using <<-) in your
-> functions. This is not allowed by the CRAN policies.
+Please correct before 2021-03-27 to safely retain your package on CRAN.
 
-All instances of `<<-` have been replaced. There are no other changes to the
-global environment.
+The CRAN Team
 
+* Package tests that involve sampling randomly from a distribution and
+  comparing the results with an expected distribution have been excluded when 
+  running CRAN tests because they fail at a type I error rate of about 0.1%.
+  
+  

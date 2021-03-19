@@ -128,6 +128,9 @@ test_that("modified expressions are created correctly", {
     0.05
   )
   expect_intol(q$mean(), 0.9, 0.05)
+  # check that pre-prepared r() method is present
+  rbeta <- q$r(1)
+  expect_true((rbeta>=0) && (rbeta <= 1))
   # check internally added methods; 99.9% confidence limits assuming CLT; expect
   # 0.1% test failure rate; skip for CRAN
   n <- 1000
@@ -187,7 +190,10 @@ test_that("expression chi square from SN is correct", {
   expect_true(is.na(y$mode()))  # mode is undefined for ExprModVar
   expect_true(is.na(y$SD()))  # SD is undefined for ExprModVar
   skip_on_cran()
-  expect_intol(y$mu_hat(), 1, 0.25)  # true mean is k=1
-  expect_intol(y$sigma_hat(), sqrt(2), 0.25) # variance is 2k
+  mu <- 1 # true mean is k=1
+  sigma <- sqrt(2) # variance is 2k
+  samp <- y$r(1000)
+  expect_samplemean(samp, mu, sigma)  
+  expect_sampleSD(samp, sigma) 
 })
 

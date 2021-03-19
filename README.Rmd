@@ -18,6 +18,8 @@ knitr::opts_chunk$set(
 # rdecision
 
 <!-- badges: start -->
+[![CRAN status](https://www.r-pkg.org/badges/version/rdecision)](https://CRAN.R-project.org/package=rdecision)
+[![Codecov test coverage](https://codecov.io/gh/ajsims1704/rdecision/branch/master/graph/badge.svg)](https://codecov.io/gh/ajsims1704/rdecision?branch=master)
 <!-- badges: end -->
 
 The goal of `rdecision` is to provide methods for assessing health care 
