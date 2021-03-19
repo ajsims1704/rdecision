@@ -11,18 +11,6 @@ An R6 class to represent a graph (from discrete mathematics).
 Encapsulates and provides methods for computation and checking of undirected
 graphs. Graphs are systems of vertices connected in pairs by edges.
 }
-\examples{
-
-## ------------------------------------------------
-## Method `Graph$as_DOT`
-## ------------------------------------------------
-
-\dontrun{
-DOT <- G$as_DOT() # G is a Graph object
-writeLines(DOT, "zz.gv")
-system2(command="dot", args=c("-Tpdf", "-o zz.pdf", "zz.gv"))
-}
-}
 \references{
 { 
   Gansner ER, Koutsofios E, North SC, Vo K-P. A technique for drawing
@@ -334,18 +322,6 @@ of the \code{graphviz} tools including \code{dot} (Gansner, 1993).
 A character vector. Intended for passing to \code{writeLines}
 for saving as a text file.
 }
-\subsection{Examples}{
-\if{html}{\out{<div class="r example copy">}}
-\preformatted{\dontrun{
-DOT <- G$as_DOT() # G is a Graph object
-writeLines(DOT, "zz.gv")
-system2(command="dot", args=c("-Tpdf", "-o zz.pdf", "zz.gv"))
-}
-}
-\if{html}{\out{</div>}}
-
-}
-
 }
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-clone"></a>}}

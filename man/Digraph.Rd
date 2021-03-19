@@ -8,20 +8,8 @@
 An R6 class to represent a digraph (a directed graph).
 }
 \details{
-Encapsulates, and provides methods for computation and checking of directed
+Encapsulates and provides methods for computation and checking of directed
 graphs (digraphs). Inherits from class Graph.
-}
-\examples{
-
-## ------------------------------------------------
-## Method `Digraph$as_DOT`
-## ------------------------------------------------
-
-\dontrun{
-DOT <- G$as_DOT() # G is a Digraph object
-writeLines(DOT, "zz.gv")
-system2(command="dot", args=c("-Tpdf", "-o zz.pdf", "zz.gv"))
-}
 }
 \references{
 { 
@@ -353,18 +341,6 @@ of the \code{graphviz} tools including \code{dot} (Gansner, 1993).
 A character vector. Intended for passing to \code{writeLines}
 for saving as a text file.
 }
-\subsection{Examples}{
-\if{html}{\out{<div class="r example copy">}}
-\preformatted{\dontrun{
-DOT <- G$as_DOT() # G is a Digraph object
-writeLines(DOT, "zz.gv")
-system2(command="dot", args=c("-Tpdf", "-o zz.pdf", "zz.gv"))
-}
-}
-\if{html}{\out{</div>}}
-
-}
-
 }
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-clone"></a>}}

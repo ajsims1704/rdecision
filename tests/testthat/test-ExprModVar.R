@@ -193,7 +193,15 @@ test_that("expression chi square from SN is correct", {
   mu <- 1 # true mean is k=1
   sigma <- sqrt(2) # variance is 2k
   samp <- y$r(1000)
-  expect_samplemean(samp, mu, sigma)  
-  expect_sampleSD(samp, sigma) 
+  expect_samplemean(samp, mu, sigma)
+  expect_sampleSD(samp, sigma)
+  samp <- rchisq(n=1000, df=1)
+  expect_samplemean(samp, mu, sigma)
+  expect_sampleSD(samp, sigma)
+})
+
+test_that("skip on cran", {
+  skip_on_cran()
+  expect_true(FALSE)
 })
 

@@ -93,17 +93,18 @@ expect_samplemean <- function(object, mu, sigma, sig.level=0.001) {
 expect_sampleSD <- function(object, sigma, sig.level=0.001) {
   # capture object and label
   act <- quasi_label(rlang::enquo(object), arg = "object")
-  # sample size, mean and standard deviation
+  # sample size and scaled variance (s^2 / sigma^2)
   n <- length(object)
-  s <- sd(object)
-  # expect that the SD is within the CI
-  sigma.l <- sigma*sqrt((n-1)/qchisq(p=1-sig.level/2, df=n-1))
-  sigma.u <- sigma*sqrt((n-1)/qchisq(p=sig.level/2, df=n-1))
+  v <- var(object) / sigma^2
+  # confidence interval for scaled variance
+  v.l <- qchisq(p=sig.level/2, df=n-1)/(n-1)
+  v.u <- qchisq(p=1-sig.level/2, df=n-1)/(n-1)
+  # expect that the scaled variance within the CI
   expect(
-    ok = ((s>=sigma.l) && (s<=sigma.u)),
+    ok = ((v>=v.l) && (v<=v.u)),
     sprintf(
-      "Sample SD (%f) is not within %.2f%% CI [%f,%f] for %i samples",
-      s, 100*(1-sig.level), sigma.l, sigma.u, n
+      "Scaled variance (%f) is not within %.2f%% CI [%f,%f] for %i samples",
+      v, 100*(1-sig.level), v.l, v.u, n
     )
   ) 
   # Invisibly return the value
