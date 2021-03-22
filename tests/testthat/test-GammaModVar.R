@@ -75,12 +75,10 @@ test_that("random sampling is from a Gamma distribution", {
   g <- GammaModVar$new("gamma", "GBP", k, theta)
   samp <- g$r(n)
   expect_length(samp, n)
-  # 99.9% confidence limits assuming CLT applies; expected test failure rate 
-  # is 0.1%, skip for CRAN
+  # 99.9% empirical confidence limits; expected test failure rate is 0.1%;
+  # skip for CRAN
   skip_on_cran()
-  # population mean and standard deviation
-  sigma <- sqrt(k)*theta
-  mu <- k * theta
-  expect_samplemean(samp, mu, sigma)
-  expect_sampleSD(samp, sigma)
+  ci <- gamma.sampleCI(k, theta, n)
+  expect_between(mean(samp), ci$mean.CI[1], ci$mean.CI[2])
+  expect_between(sd(samp), ci$sd.CI[1], ci$sd.CI[2])
 })

@@ -1,9 +1,10 @@
 # rdecision 1.0.3
 
 * Package tests that involve sampling randomly from a distribution and
-  comparing the results with an expected distribution have been excluded when 
-  running CRAN tests. Otherwise the central limit theorem is used to set 99.9%
-  confidence limits on expected sample mean and SD.
+  comparing the results with parameters of an expected distribution have been
+  excluded when running CRAN tests. Otherwise the central limit theorem or 
+  empirical distributions are used to find 99.9% confidence limits on sample
+  mean and SD.
 * Added common test helpers and bespoke expectations to `testthat/setup.R`.
 * Changed vignette titles to reflect what kind of problem they illustrate,
   rather than the problems themselves, to makes it clearer on the CRAN page.

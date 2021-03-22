@@ -110,8 +110,9 @@ test_that("set and get function as expected", {
   } 
   # 99.9% confidence limits; expected 0.1% test failure rate; skip for CRAN
   skip_on_cran()
-  expect_samplemean(S, mu=0, sigma=2)
-  expect_sampleSD(S, sigma=2)
+  ci <- norm.sampleCI(mu=0, sigma=2, n)
+  expect_between(mean(S), ci$mean.CI[1], ci$mean.CI[2])
+  expect_between(sd(S), ci$sd.CI[1], ci$sd.CI[2])
 })
 
 test_that("modified expressions are created correctly", {
@@ -137,10 +138,9 @@ test_that("modified expressions are created correctly", {
   samp <- q$r(n)
   expect_length(samp, n)
   skip_on_cran()
-  mu <- 1-(alpha / (alpha+beta))
-  sigma <- sqrt(alpha*beta / ((alpha+beta)^2 * (alpha+beta+1)))
-  expect_samplemean(samp, mu, sigma)
-  expect_sampleSD(samp, sigma)
+  ci <- beta.sampleCI(beta,alpha,n)
+  expect_between(mean(samp), ci$mean.CI[1], ci$mean.CI[2])
+  expect_between(sd(samp), ci$sd.CI[1], ci$sd.CI[2])
 })
 
 test_that("illegal sample sizes for estimating parameters are rejected", {
@@ -190,18 +190,11 @@ test_that("expression chi square from SN is correct", {
   expect_true(is.na(y$mode()))  # mode is undefined for ExprModVar
   expect_true(is.na(y$SD()))  # SD is undefined for ExprModVar
   skip_on_cran()
-  mu <- 1 # true mean is k=1
-  sigma <- sqrt(2) # variance is 2k
-  samp <- y$r(1000)
-  expect_samplemean(samp, mu, sigma)
-  expect_sampleSD(samp, sigma)
-  samp <- rchisq(n=1000, df=1)
-  expect_samplemean(samp, mu, sigma)
-  expect_sampleSD(samp, sigma)
+  n <- 1000
+  samp <- y$r(n)
+  ci <- chisq.sampleCI(df=1, n)
+  expect_between(mean(samp), ci$mean.CI[1], ci$mean.CI[2])
+  expect_between(sd(samp), ci$sd.CI[1], ci$sd.CI[2])
 })
 
-test_that("skip on cran", {
-  skip_on_cran()
-  expect_true(FALSE)
-})
 

@@ -10,6 +10,93 @@ R6setequal <- function(A,B) {
   return(AinB & BinA)
 }
 
+# CI for sample mean and sample SD of n samples from Beta(alpha,beta)
+beta.sampleCI <- function(alpha, beta, n, sig.level=0.001) {
+  # TODO: approximate with CLT under some circumstances
+  # generate distributions of sample mean and sample sd
+  nsamples <- 10000
+  m <- vector(mode="numeric", length=nsamples)
+  s <- vector(mode="numeric", length=nsamples)
+  for (i in 1:nsamples) {
+    S <- rbeta(n, shape1=alpha, shape2=beta)
+    m[i] <- mean(S)
+    s[i] <- sd(S)
+  }
+  # find quantiles
+  m.ci <- quantile(m, probs=c(sig.level/2, 1-sig.level/2))
+  s.ci <- quantile(s, probs=c(sig.level/2, 1-sig.level/2))
+  # return 
+  return(list(mean.CI=m.ci, sd.CI=s.ci))
+}
+
+# CI for sample mean and sample SD of n samples from Chisq(df)
+chisq.sampleCI <- function(df, n, sig.level=0.001) {
+  # generate distributions of sample mean and sample sd
+  nsamples <- 10000
+  m <- vector(mode="numeric", length=nsamples)
+  s <- vector(mode="numeric", length=nsamples)
+  for (i in 1:nsamples) {
+    S <- rchisq(n, df=df)
+    m[i] <- mean(S)
+    s[i] <- sd(S)
+  }
+  # find quantiles
+  m.ci <- quantile(m, probs=c(sig.level/2, 1-sig.level/2))
+  s.ci <- quantile(s, probs=c(sig.level/2, 1-sig.level/2))
+  # return 
+  return(list(mean.CI=m.ci, sd.CI=s.ci))
+}
+
+# CI for sample mean and sample SD of n samples from Gamma(k,theta)
+gamma.sampleCI <- function(k, theta, n, sig.level=0.001) {
+  # generate distributions of sample mean and sample sd
+  nsamples <- 10000
+  m <- vector(mode="numeric", length=nsamples)
+  s <- vector(mode="numeric", length=nsamples)
+  for (i in 1:nsamples) {
+    S <- rgamma(n, shape=k, scale=theta)
+    m[i] <- mean(S)
+    s[i] <- sd(S)
+  }
+  # find quantiles
+  m.ci <- quantile(m, probs=c(sig.level/2, 1-sig.level/2))
+  s.ci <- quantile(s, probs=c(sig.level/2, 1-sig.level/2))
+  # return 
+  return(list(mean.CI=m.ci, sd.CI=s.ci))
+}
+
+# CI for sample mean and sample SD of n samples from Gamma(k,theta)
+lognorm.sampleCI <- function(meanlog, sdlog, n, sig.level=0.001) {
+  # generate distributions of sample mean and sample sd
+  nsamples <- 10000
+  m <- vector(mode="numeric", length=nsamples)
+  s <- vector(mode="numeric", length=nsamples)
+  for (i in 1:nsamples) {
+    S <- rlnorm(n, meanlog=meanlog, sdlog=sdlog)
+    m[i] <- mean(S)
+    s[i] <- sd(S)
+  }
+  # find quantiles
+  m.ci <- quantile(m, probs=c(sig.level/2, 1-sig.level/2))
+  s.ci <- quantile(s, probs=c(sig.level/2, 1-sig.level/2))
+  # return 
+  return(list(mean.CI=m.ci, sd.CI=s.ci))
+}
+
+# CI for sample mean and sample SD of n samples from N(mu,sigma^2)
+norm.sampleCI <- function(mu, sigma, n, sig.level=0.001) {
+  # assume central limit theorem applies to sample mean
+  m.ci <- vector(mode="numeric", length=2)
+  m.ci[1] <- mu - qnorm(p=1-sig.level/2)*sigma/sqrt(n)
+  m.ci[2] <- mu + qnorm(p=1-sig.level/2)*sigma/sqrt(n)
+  # assume central limit applies to sample SD
+  s.ci <- vector(mode="numeric", length=2)
+  s.ci[1] <- sqrt(sigma^2*(qchisq(p=sig.level/2, df=n-1)/(n-1)))
+  s.ci[2] <- sqrt(sigma^2*(qchisq(p=1-sig.level/2, df=n-1)/(n-1)))
+  # return 
+  return(list(mean.CI=m.ci, sd.CI=s.ci))
+}
+
 # custom expectation to compare two sets of R6 objects
 expect_R6setequal <- function(object, eset) {
   # capture object and label
@@ -59,55 +146,20 @@ expect_intol <- function(object, E, tolerance) {
   invisible(act$val)    
 }
 
-# expectation that the mean of a sample, object, is from a Normal distribution
-# with mean mu and standard deviation sigma. Can be used for any sampling
-# distribution provided the central limit theorem applies. Tests whether the
-# standard error of the mean is within the confidence interval defined by the
-# significance level (i.e. the test will fail with a type I error at a rate of
-# sig.level, skip for CRAN).
-expect_samplemean <- function(object, mu, sigma, sig.level=0.001) {
+# expectation that object, lies in an interval (including its limits).
+expect_between <- function(object, lower, upper) {
   # capture object and label
   act <- quasi_label(rlang::enquo(object), arg = "object")
-  # sample size, mean and standard deviation
-  n <- length(object)
-  m <- mean(object)
-  # expect that the mean is in the CI
-  mu.l <- mu - qnorm(p=1-sig.level/2)*sigma/sqrt(n)
-  mu.u <- mu + qnorm(p=1-sig.level/2)*sigma/sqrt(n)
+  # test
   expect(
-    ok = ((m >= mu.l) && (m <= mu.u)),
+    ok = ((act$val>=lower) && (act$val<=upper)),
     sprintf(
-      "Sample mean (%f) is not within %.2f%% CI [%f,%f] for %i samples", 
-      m, 100*(1-sig.level), mu.l, mu.u, n
-    )
-  )
-  # Invisibly return the value
-  invisible(act$val)    
-}
-
-# expectation that the SD of a sample, object, is from a Normal distribution
-# with standard deviation sigma. Can be used for any sampling distribution
-# provided the central limit theorem applies. Tests whether the standard error 
-# of the SD is within the confidence interval defined by the significance level.
-# The test will fail (type I error) at a rate of sig.level (skip for CRAN).
-expect_sampleSD <- function(object, sigma, sig.level=0.001) {
-  # capture object and label
-  act <- quasi_label(rlang::enquo(object), arg = "object")
-  # sample size and scaled variance (s^2 / sigma^2)
-  n <- length(object)
-  v <- var(object) / sigma^2
-  # confidence interval for scaled variance
-  v.l <- qchisq(p=sig.level/2, df=n-1)/(n-1)
-  v.u <- qchisq(p=1-sig.level/2, df=n-1)/(n-1)
-  # expect that the scaled variance within the CI
-  expect(
-    ok = ((v>=v.l) && (v<=v.u)),
-    sprintf(
-      "Scaled variance (%f) is not within %.2f%% CI [%f,%f] for %i samples",
-      v, 100*(1-sig.level), v.l, v.u, n
+      "%s (%f) does not lie in the interval [%f,%f]",
+      act$lab, act$val, lower, upper
     )
   ) 
   # Invisibly return the value
   invisible(act$val)    
 }
+
 

@@ -68,13 +68,12 @@ test_that("random sampling is from a log normal distribution", {
   ln <- LogNormModVar$new("ln", "GBP", mu, sigma, "LN1")
   samp <- ln$r(n)
   expect_length(samp, n)
-  # expect sample mean and sd to fall within 99.9% CI assuming CLT; test
+  # expect sample mean and sd to fall within empirical 99.9% CI; test
   # expected to fail 0.1% of the time, exclude from CRAN
   skip_on_cran()
-  m.pop <- exp(mu + 0.5*sigma^2)
-  sd.pop <- sqrt( (exp(sigma^2)-1)*(exp(2*mu+sigma^2)) )
-  expect_samplemean(samp, m.pop, sd.pop)
-  expect_sampleSD(samp, sd.pop)
+  ci <- lognorm.sampleCI(mu, sigma, n)
+  expect_between(mean(samp), ci$mean.CI[1], ci$mean.CI[2])
+  expect_between(sd(samp), ci$sd.CI[1], ci$sd.CI[2])
 })
 
 test_that("parametrizations are linked", {
