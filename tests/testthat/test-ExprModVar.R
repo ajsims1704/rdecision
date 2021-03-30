@@ -110,9 +110,8 @@ test_that("set and get function as expected", {
   } 
   # 99.9% confidence limits; expected 0.1% test failure rate; skip for CRAN
   skip_on_cran()
-  ci <- norm.sampleCI(mu=0, sigma=2, n)
-  expect_between(mean(S), ci$mean.CI[1], ci$mean.CI[2])
-  expect_between(sd(S), ci$sd.CI[1], ci$sd.CI[2])
+  ht <- ks.test(S, rnorm(n,mean=0,sd=2))
+  expect_true(ht$p.value>0.001)
 })
 
 test_that("modified expressions are created correctly", {
@@ -138,9 +137,8 @@ test_that("modified expressions are created correctly", {
   samp <- q$r(n)
   expect_length(samp, n)
   skip_on_cran()
-  ci <- beta.sampleCI(beta,alpha,n)
-  expect_between(mean(samp), ci$mean.CI[1], ci$mean.CI[2])
-  expect_between(sd(samp), ci$sd.CI[1], ci$sd.CI[2])
+  ht <- ks.test(samp, rbeta(n,shape1=beta,shape2=alpha))
+  expect_true(ht$p.value > 0.001)
 })
 
 test_that("illegal sample sizes for estimating parameters are rejected", {
@@ -194,10 +192,6 @@ test_that("expression chi square from SN is correct", {
   samp <- y$r(n)
   ht <- ks.test(samp, rchisq(n, df=1))
   expect_true(ht$p.value>0.001)
-#  print(ht)
-#  ci <- chisq.sampleCI(df=1, n)
-#  expect_between(mean(samp), ci$mean.CI[1], ci$mean.CI[2])
-#  expect_between(sd(samp), ci$sd.CI[1], ci$sd.CI[2])
 })
 
 

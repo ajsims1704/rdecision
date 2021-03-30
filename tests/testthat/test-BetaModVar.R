@@ -99,12 +99,12 @@ test_that("random sampling is from a Beta distribution", {
   beta <- 5
   n <- 1000
   b <- BetaModVar$new("beta", "GBP", alpha, beta)
-  samp <- b$r(n)
-  expect_length(samp, n)
-  # 99.9% empirical confidence limits; expected test failure rate is 0.1%, 
+  osamp <- b$r(n)
+  expect_length(osamp, n)
+  # 99.9% confidence limits; expected test failure rate is 0.1%, 
   # skip for CRAN
   skip_on_cran()
-  ci <- beta.sampleCI(alpha,beta,n)
-  expect_between(mean(samp), ci$mean.CI[1], ci$mean.CI[2])
-  expect_between(sd(samp), ci$sd.CI[1], ci$sd.CI[2])
+  esamp <- rbeta(n, shape1=alpha, shape2=beta)
+  ht <- ks.test(osamp, esamp)
+  expect_true(ht$p.value > 0.001)
 })
