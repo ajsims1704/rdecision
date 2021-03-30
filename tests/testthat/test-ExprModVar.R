@@ -192,9 +192,12 @@ test_that("expression chi square from SN is correct", {
   skip_on_cran()
   n <- 1000
   samp <- y$r(n)
-  ci <- chisq.sampleCI(df=1, n)
-  expect_between(mean(samp), ci$mean.CI[1], ci$mean.CI[2])
-  expect_between(sd(samp), ci$sd.CI[1], ci$sd.CI[2])
+  ht <- ks.test(samp, rchisq(n, df=1))
+  expect_true(ht$p.value>0.001)
+#  print(ht)
+#  ci <- chisq.sampleCI(df=1, n)
+#  expect_between(mean(samp), ci$mean.CI[1], ci$mean.CI[2])
+#  expect_between(sd(samp), ci$sd.CI[1], ci$sd.CI[2])
 })
 
 

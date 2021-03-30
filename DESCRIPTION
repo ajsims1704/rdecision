@@ -31,7 +31,7 @@ Suggests:
     testthat (>= 3.0.0),
     utf8
 License: GPL-3
-LazyData: true
+LazyData: false
 Language: en-GB
 Encoding: UTF-8
 RoxygenNote: 7.1.1
