@@ -47,13 +47,13 @@
 #' @note 
 #' The log normal distribution may be used to model the uncertainty in 
 #' an estimate of relative risk (Briggs 2006, p90). If a relative risk 
-#' estimate is available with a 95% confidence interval, the \verb{"LN7"} 
+#' estimate is available with a 95\% confidence interval, the \verb{"LN7"} 
 #' parametrization
 #' allows the uncertainty distribution to be specified directly. For example, 
-#' if RR = 0.67 with 95% confidence interval 0.53 to 0.84 (Leaper, 2016), it 
+#' if RR = 0.67 with 95\% confidence interval 0.53 to 0.84 (Leaper, 2016), it 
 #' can be modelled with
 #' \code{LogNormModVar$new("rr", "RR", p1=0.67, 
-#' p2=(0.84-0.53)/(2*1.96)), "LN7"}.
+#' p2=(0.84-0.53)/(2*1.96)), "LN7")}.
 #' 
 #' @docType class
 #' @author Andrew J. Sims \email{andrew.sims@@newcastle.ac.uk}
