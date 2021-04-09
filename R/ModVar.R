@@ -145,8 +145,8 @@ ModVar <- R6::R6Class(
     #' Sets the value of the \verb{ModVar} that will be returned by subsequent
     #' calls to \code{get()} until \code{set()} is called again. 
     #' @param what Character: one of "random" (samples from the uncertainty
-    #' distribution), "expected" (mean), "q2.5" (lower 95% confidence limit),
-    #' "q50" (median), "q97.5" (upper 95% confidence limit), "current" (leaves
+    #' distribution), "expected" (mean), "q2.5" (lower 95\% confidence limit),
+    #' "q50" (median), "q97.5" (upper 95\% confidence limit), "current" (leaves
     #' the value unchanged). The "current" option is provided to support having
     #' common functions to set (or leave alone) sets of model variables, 
     #' depending on their use case.
