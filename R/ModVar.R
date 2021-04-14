@@ -147,11 +147,17 @@ ModVar <- R6::R6Class(
     #' @param what Character: one of "random" (samples from the uncertainty
     #' distribution), "expected" (mean), "q2.5" (lower 95\% confidence limit),
     #' "q50" (median), "q97.5" (upper 95\% confidence limit), "current" (leaves
-    #' the value unchanged). The "current" option is provided to support having
-    #' common functions to set (or leave alone) sets of model variables, 
-    #' depending on their use case.
+    #' the value unchanged), "value" (sets the value explicitly). 
+    #' @param val A numeric value, only used with what = "value", ignored
+    #' otherwise.
+    #' @details The "current" option is provided to support having common 
+    #' functions to set (or leave alone) sets of model variables, depending on
+    #' their use case and avoids additional if loops. Option 'value' is
+    #' not recommended for normal usage because it allows the model variable
+    #' to be set to an implausible value, based on its defined uncertainty. An 
+    #' example of where this may be needed is in threshold finding. 
     #' @return Updated \verb{ModVar}.
-    set = function(what="random") {
+    set = function(what="random", val=NULL) {
       # check argument
       if (!is.character(what)) {
         rlang::abort(
@@ -173,10 +179,17 @@ ModVar <- R6::R6Class(
         v <- self$quantile(c(0.975))
       } else if (what == "current") {
         v <- private$.val
+      } else if (what == "value") {
+        if (is.null(val) | !is.numeric(val)) {
+          rlang::abort("'v' must be numeric", class = "invalid_val")
+        } else {
+          v <- val
+        }
       }
       else {
         rlang::abort(
-          "'what' must be one of 'random', 'expected', 'q2.5', 'q50', '97.5'", 
+          paste("'what' must be one of", "'random',", "'expected',", 
+                "'q2.5',", "'q50',", "'97.5',", "'current',", "'value'"), 
           class ="what_not_supported"
         )
       }

@@ -1163,8 +1163,82 @@ DecisionTree <- R6::R6Class(
       
       # return tornado data frame
       return(TO)
+    },
+ 
+    #' @description Find the threshold value of a model variable at which
+    #' either the cost difference or ICER, for an index strategy compared with  
+    #' a reference strategy, is zero. 
+    #' @param index The index strategy (option) to be evaluated.
+    #' @param ref The reference strategy (option) with which the index strategy
+    #' will be compared.
+    #' @param outcome One of \verb{"cost"} or \verb{"ICER"}. For \verb{"cost"}
+    #' (e.g. in cost consequence analysis), the x axis is cost saved (cost of
+    #' reference minus cost of index), on the presumption that the new 
+    #' technology will be cost
+    #' saving at the point estimate. For \verb{"ICER"} the x axis is
+    #' \eqn{\Delta C/\Delta E} and is expected to be positive at the point 
+    #' estimate (i.e. in the NE or SW quadrants of the cost-effectiveness 
+    #' plane), where \eqn{\Delta C} is cost of index minus cost of reference, 
+    #' and \eqn{\Delta E} is utility of index minus utility of reference.
+    #' @param mvd The description of the model variable for which the threshold
+    #' is to be found.
+    #' @param a The lower bound of the range to search for the root (numeric).
+    #' @param b The lower bound of the range to search for the root (numeric).
+    threshold = function(index, ref, outcome="cost", mvd, a, b) {
+      # find all input modvars, excluding expressions
+      mvlist <- self$modvars()
+      lv <- vapply(X=mvlist, FUN.VALUE=TRUE, FUN=function(v) {
+        return(!v$is_expression())
+      })
+      mvlist <- mvlist[lv]
+      # check the parameters
+      if (missing(index) || missing(ref)) {
+        rlang::abort(
+          "'index' and 'ref' must be defined",
+          class = "missing_strategy"
+        )
+      }
+      if (!self$is_strategy(index) || !self$is_strategy(ref)) {
+        rlang::abort(
+          "'index' and 'ref' must be valid strategies for the decision tree",
+         class = "invalid_strategy"
+        )
+      }
+      if (!(outcome %in% c("cost", "ICER"))) {
+        rlang::abort(
+          "'outcome' must be one of {cost|ICER}",
+          class = "invalid_outcome"
+        )
+      }
+      dsa <- NULL
+      if (is.character(mvd)) {
+        lv <- vapply(X=mvlist, FUN.VALUE=TRUE, FUN=function(v) {
+          return(v$description() %in% mvd)
+        })
+        if (sum(lv) != 1) {
+          rlang::abort(
+            "'mvd' must identify exactly one variable in the model",
+            class = "invalid_mvd"
+          )
+        }
+        dsa <- mvlist[lv]
+      } else {
+        rlang::abort(
+          "'mvd' must be a character string",
+          class = "invalid_mvd"
+        )
+      }
+      if (!is.numeric(a) | !is.numeric(b) | (b < a)) {
+        rlang::abort(
+          "'a' and 'b' must be numeric and 'b' > 'a'",
+          class = "invalid_brackets"
+        )
+      }
+      
+      
+      
+  
     }
-    
     
   )
 )

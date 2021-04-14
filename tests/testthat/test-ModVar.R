@@ -56,8 +56,11 @@ test_that("set checks its argument", {
   expect_error(x$set(42), class="what_not_character")
   expect_error(x$set(TRUE), class="what_not_character")
   expect_error(x$set("arodnm"), class="what_not_supported")
+  expect_error(x$set("value"), class="invalid_val")
+  expect_error(x$set("value", "b42"), class="invalid_val")
   expect_silent(x$set("expected"))
   expect_silent(x$set())
+  expect_silent(x$set("value", 42))
 })
 
 test_that("get is initialized to NA for base class", {
