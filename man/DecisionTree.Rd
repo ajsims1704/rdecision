@@ -75,6 +75,7 @@ Andrew J. Sims \email{andrew.sims@newcastle.ac.uk}
 \item \href{#method-evaluate_walks}{\code{DecisionTree$evaluate_walks()}}
 \item \href{#method-evaluate}{\code{DecisionTree$evaluate()}}
 \item \href{#method-tornado}{\code{DecisionTree$tornado()}}
+\item \href{#method-threshold}{\code{DecisionTree$threshold()}}
 \item \href{#method-clone}{\code{DecisionTree$clone()}}
 }
 }
@@ -444,27 +445,40 @@ will be repetitive and uninformative.}
 
 \item{\code{by}}{One of {"path", "strategy"}. If "path", the table has one row
 per path walked per strategy, per run, and includes the label of the
-terminating leaf node to identify each path. if "strategy" (the default),
+terminating leaf node to identify each path. If "strategy" (the default),
 the table is aggregated by strategy, i.e. there is one row per strategy,
-per run and there is no "Leaf" column.}
+per run.}
 }
 \if{html}{\out{</div>}}
 }
-\subsection{Returns}{
-A data frame with one row per strategy per run and columns
-organized as follows:
-\describe{
-  \item{Leaf}{The label of the leaf that terminates the path, 
-  for by='path'.}
-  \item{Strategy}{The strategy expressed as the values of the action 
-  edges emanating from each decision node.}
-  \item{Run}{The run number}
-  \item{Probability}{Probability (1 if by='strategy')}
-  \item{Cost}{Aggregate cost of the strategy.}
-  \item{Benefit}{Aggregate benefit of the strategy.}
-  \item{Utility}{Aggregate utility of the strategy.}
-  \item{QALY}{Aggregate QALY of the strategy.}
+\subsection{Details}{
+For \code{by="path"} the columns of the data frame are: 
+\tabular{lllllllll}{
+Leaf \tab The label of terminating leaf node \cr
+<label of 1st decision node> \tab label of action leaving the node \cr
+<label of 2nd decision node (etc.)> \tab label of action \cr
+Probability \tab Probability of traversing the path \cr
+Cost \tab Cost of traversing the path \cr
+Benefit \tab Benefit of traversing the path \cr
+Utility \tab Utility of traversing the path \cr
+QALY \tab QALY of traversing the path \cr
+Run \tab Run number \cr
 }
+For \code{by="strategy"}:
+\tabular{llllllll}{
+<label of first decision node> \tab label of action leaving the node \cr
+<label of second decision node (etc) \tab label of action \cr
+Run \tab Run number \cr
+Probability \tab \eqn{\Sigma p_i} for the run (1) \cr
+Cost \tab Aggregate cost of the strategy \cr
+Benefit \tab Aggregate benefit of the strategy \cr
+Utility \tab Aggregate utility of the strategy \cr
+QALY \tab Aggregate QALY of the strategy \cr
+}
+}
+
+\subsection{Returns}{
+A data frame whose columns depend on \code{by}; see "Details".
 }
 }
 \if{html}{\out{<hr>}}
@@ -516,6 +530,45 @@ A data frame with one row per input model variable and columns
 for: minimum value of the variable, maximum value of the variable,
 minimum value of the outcome and maximum value of the outcome. NULL
 if there are no \verb{ModVar}s.
+}
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-threshold"></a>}}
+\if{latex}{\out{\hypertarget{method-threshold}{}}}
+\subsection{Method \code{threshold()}}{
+Find the threshold value of a model variable at which
+either the cost difference or ICER, for an index strategy compared with  
+a reference strategy, is zero.
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{DecisionTree$threshold(index, ref, outcome = "cost", mvd, a, b)}\if{html}{\out{</div>}}
+}
+
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{index}}{The index strategy (option) to be evaluated.}
+
+\item{\code{ref}}{The reference strategy (option) with which the index strategy
+will be compared.}
+
+\item{\code{outcome}}{One of \verb{"cost"} or \verb{"ICER"}. For \verb{"cost"}
+(e.g. in cost consequence analysis), the x axis is cost saved (cost of
+reference minus cost of index), on the presumption that the new 
+technology will be cost
+saving at the point estimate. For \verb{"ICER"} the x axis is
+\eqn{\Delta C/\Delta E} and is expected to be positive at the point 
+estimate (i.e. in the NE or SW quadrants of the cost-effectiveness 
+plane), where \eqn{\Delta C} is cost of index minus cost of reference, 
+and \eqn{\Delta E} is utility of index minus utility of reference.}
+
+\item{\code{mvd}}{The description of the model variable for which the threshold
+is to be found.}
+
+\item{\code{a}}{The lower bound of the range to search for the root (numeric).}
+
+\item{\code{b}}{The lower bound of the range to search for the root (numeric).}
+}
+\if{html}{\out{</div>}}
 }
 }
 \if{html}{\out{<hr>}}

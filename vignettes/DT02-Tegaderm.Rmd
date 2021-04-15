@@ -121,7 +121,7 @@ model variables. Forms of expression involving R functions and
 multiple model variables are supported, provided they conform to R syntax.
 The following code creates the model variable expressions to be used as values
 in the decision tree edges. For probabilities, the convention $q = 1-p$ is 
-used to ensure that the sum of probabilities leaving each chance is one.
+used to ensure that the sum of probabilities leaving each chance node is one.
 
 ```{r expressions, echo=TRUE}
 # probabilities
@@ -381,35 +381,35 @@ the PSA:
 
 ```{r PSA, echo=TRUE}
 N <- 1000
-PSA <- DT$evaluate(setvars="random", N=N)
+PSA <- DT$evaluate(setvars="random", by="run", N=N)
 ```
 
-The first few runs of PSA are as follows (after reshaping the table to give
-one row per simulation, rather than one row per run, per strategy):
+The first few runs of PSA are as follows; the `by="run"` option reshapes the
+table to give one row per simulation, rather than one row per run, per strategy.
 
 ```{r PSA_table, echo=FALSE}
-RES <- reshape(PSA, idvar="Run", timevar="d1", direction="wide")
-RES$Difference <- RES$Cost.Tegaderm - RES$Cost.Standard
+#RES <- reshape(PSA, idvar="Run", timevar="d1", direction="wide")
+PSA$Difference <- PSA$Cost.Tegaderm - PSA$Cost.Standard
 keep<- c("Run", "Cost.Tegaderm", "Cost.Standard", "Difference")
-pander::pander(head(RES[,keep], n=10), round=2, row.names=F, justify="lrrr")
+pander::pander(head(PSA[,keep], n=10), round=2, row.names=F, justify="lrrr")
 ```
 
 From PSA (`r N` runs), the mean cost of treatment with Tegaderm 
-was `r round(mean(RES$Cost.Tegaderm),2)`,
+was `r round(mean(PSA$Cost.Tegaderm),2)`,
 the mean cost of treatment with standard dressings was 
-`r round(mean(RES$Cost.Standard),2)`
-and the mean cost saving was `r round(mean(RES$Difference),2)`. The 95% 
+`r round(mean(PSA$Cost.Standard),2)`
+and the mean cost saving was `r round(mean(PSA$Difference),2)`. The 95% 
 confidence interval for cost saving was 
-`r round(quantile(RES$Difference, probs=c(0.025)),2)` to 
-`r round(quantile(RES$Difference, probs=c(0.975)),2)`; the standard deviation
-of the cost saving was `r round(sd(RES$Difference),2)`.
-Overall, `r round(100*sum(RES$Difference<0)/nrow(RES),2)`% of runs found that
+`r round(quantile(PSA$Difference, probs=c(0.025)),2)` to 
+`r round(quantile(PSA$Difference, probs=c(0.975)),2)`; the standard deviation
+of the cost saving was `r round(sd(PSA$Difference),2)`.
+Overall, `r round(100*sum(PSA$Difference<0)/nrow(PSA),2)`% of runs found that
 Tegaderm was cost saving. These results replicate those reported by the
 manufacturer (saving of 77.76, 98.5% cases cost saving; mean cost of standard 
 dressing 176.89, mean cost of Tegaderm 99.63).
 
 ```{r echo=F}
-rm(RES)
+rm(PSA)
 ```
 
 

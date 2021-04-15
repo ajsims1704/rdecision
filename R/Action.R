@@ -29,7 +29,8 @@ Action <- R6::R6Class(
     #' @param target Node which the arrow enters.
     #' @param label Character string containing the arrow label. This
     #' must be defined for an action because the label is used in
-    #' tabulation of strategies.
+    #' tabulation of strategies. It is recommended to choose labels that are
+    #' brief and not punctuated with spaces, dots or underscores.
     #' @param cost Cost associated with traversal of this edge.
     #' @param benefit Benefit associated with traversal of the edge.
     #' @return A new \verb{Action} object.

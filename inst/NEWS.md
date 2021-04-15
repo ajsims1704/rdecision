@@ -1,9 +1,10 @@
 
 # rdecision 1.0.3.9000
 
-* Added option "value" to method 'set' in class 'ModVar'. This allows
-  variables to be set to an explicit value; useful in threshold finding.
-
+* Added option `value` to method `set` in class `ModVar`. This allows
+  variables to be set to an explicit value; used in threshold finding.
+* Added option `run` to `by` argument of `DecisionTree$evaluate()`. Avoids
+  application having to `reshape` output before reporting PSA results.
 
 # rdecision 1.0.3
 

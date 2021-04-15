@@ -218,21 +218,31 @@ Vector of numeric values of the same length as \verb{probs}.
 Sets the value of the \verb{ModVar} that will be returned by subsequent
 calls to \code{get()} until \code{set()} is called again.
 \subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{ModVar$set(what = "random")}\if{html}{\out{</div>}}
+\if{html}{\out{<div class="r">}}\preformatted{ModVar$set(what = "random", val = NULL)}\if{html}{\out{</div>}}
 }
 
 \subsection{Arguments}{
 \if{html}{\out{<div class="arguments">}}
 \describe{
 \item{\code{what}}{Character: one of "random" (samples from the uncertainty
-distribution), "expected" (mean), "q2.5" (lower 95% confidence limit),
-"q50" (median), "q97.5" (upper 95% confidence limit), "current" (leaves
-the value unchanged). The "current" option is provided to support having
-common functions to set (or leave alone) sets of model variables, 
-depending on their use case.}
+distribution), "expected" (mean), "q2.5" (lower 95\% confidence limit),
+"q50" (median), "q97.5" (upper 95\% confidence limit), "current" (leaves
+the value unchanged), "value" (sets the value explicitly).}
+
+\item{\code{val}}{A numeric value, only used with what = "value", ignored
+otherwise.}
 }
 \if{html}{\out{</div>}}
 }
+\subsection{Details}{
+The "current" option is provided to support having common 
+functions to set (or leave alone) sets of model variables, depending on
+their use case and avoids additional if loops. Option 'value' is
+not recommended for normal usage because it allows the model variable
+to be set to an implausible value, based on its defined uncertainty. An 
+example of where this may be needed is in threshold finding.
+}
+
 \subsection{Returns}{
 Updated \verb{ModVar}.
 }

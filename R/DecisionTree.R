@@ -579,7 +579,8 @@ DecisionTree <- R6::R6Class(
     #' single strategy into a readable form.
     #' @return A data frame where each row is a potential strategy 
     #' and each column is a Decision Node. Values are either the index of each
-    #' action edge, or their label.
+    #' action edge, or their label. The row names are the edge labels of each
+    #' strategy, concatenated with underscores.
     strategy_table = function(what="index", select=NULL) {
       # check arguments
       if ((what != "index") & (what != "label")) {
@@ -602,10 +603,10 @@ DecisionTree <- R6::R6Class(
         })
         f[[d$label()]] <- a
       }
-      TT <- expand.grid(f, KEEP.OUT.ATTRS=FALSE, stringsAsFactors=FALSE)
+      TTI <- expand.grid(f, KEEP.OUT.ATTRS=FALSE, stringsAsFactors=FALSE)
       # select a single strategy, if required
       if (!is.null(select)) {
-        lv <- apply(X=TT, MARGIN=1, FUN=function(row) {
+        lv <- apply(X=TTI, MARGIN=1, FUN=function(row) {
           # indexes of action edges from the table
           st <- row
           # indexes of action edges in 'select' argument
@@ -615,17 +616,25 @@ DecisionTree <- R6::R6Class(
           # test whether the table row is the same as 'select'
           return(setequal(st,ss))
         })
-        TT <- TT[lv,,drop=FALSE]
+        TTI <- TTI[lv,,drop=FALSE]
       }
-      # replace edge indexes with strategy names, if required
+      # build a table with edge labels in place of edge indexes
+      TTL <- TTI
+      dn <- self$decision_nodes("label")
+      for (d in dn) {
+        TTL[,d] <- vapply(X=TTI[,d], FUN.VALUE="x", FUN=function(ie){
+          e <- private$E[[ie]]$label()
+          return(e)
+        })
+      }
+      # build row names
+      rn <- apply(TTL, 1, paste, collapse="_")
+      rownames(TTI) <- rn
+      rownames(TTL) <- rn
+      # return object
+      TT <- TTI
       if (what == "label") {
-        dn <- self$decision_nodes("label")
-        for (d in dn) {
-          TT[,d] <- vapply(X=TT[,d], FUN.VALUE="x", FUN=function(ie){
-            e <- private$E[[ie]]$label()
-            return(e)
-          })
-        }
+        TT = TTL
       }
       # return the table
       return(TT)
@@ -772,26 +781,51 @@ DecisionTree <- R6::R6Class(
     #' @param N Number of replicates. Intended for use with PSA 
     #' (\code{modvars="random"}); use with \code{modvars="expected"}
     #' will be repetitive and uninformative. 
-    #' @param by One of {"path", "strategy"}. If "path", the table has one row
-    #' per path walked per strategy, per run, and includes the label of the
-    #' terminating leaf node to identify each path. if "strategy" (the default),
-    #' the table is aggregated by strategy, i.e. there is one row per strategy,
-    #' per run and there is no "Leaf" column. 
-    #' @return A data frame with one row per strategy per run and columns
-    #' organized as follows:
-    #' \describe{
-    #'   \item{Leaf}{The label of the leaf that terminates the path, 
-    #'   for by='path'.}
-    #'   \item{Strategy}{The strategy expressed as the values of the action 
-    #'   edges emanating from each decision node.}
-    #'   \item{Run}{The run number}
-    #'   \item{Probability}{Probability (1 if by='strategy')}
-    #'   \item{Cost}{Aggregate cost of the strategy.}
-    #'   \item{Benefit}{Aggregate benefit of the strategy.}
-    #'   \item{Utility}{Aggregate utility of the strategy.}
-    #'   \item{QALY}{Aggregate QALY of the strategy.}
+    #' @param by One of {"path", "strategy", "run"}. If "path", the table has
+    #' one row per path walked per strategy, per run, and includes the label of
+    #' the terminating leaf node to identify each path. If "strategy" (the 
+    #' default), the table is aggregated by strategy, i.e. there is one row per
+    #' strategy per run. If "run", the table has one row per run and uses
+    #' concatenated strategy names and one (cost, benefit, utility, QALY) column
+    #' for each strategy. 
+    #' @return A data frame whose columns depend on \code{by}; see "Details".
+    #' @details 
+    #' For \code{by="path"} the columns of the data frame are: 
+    #' \tabular{lllllllll}{
+    #' Leaf \tab The label of terminating leaf node \cr
+    #' <label of 1st decision node> \tab label of action leaving the node \cr
+    #' <label of 2nd decision node (etc.)> \tab label of action \cr
+    #' Probability \tab Probability of traversing the path \cr
+    #' Cost \tab Cost of traversing the path \cr
+    #' Benefit \tab Benefit of traversing the path \cr
+    #' Utility \tab Utility of traversing the path \cr
+    #' QALY \tab QALY of traversing the path \cr
+    #' Run \tab Run number \cr
     #' }
-    evaluate = function(setvars="expected", N=1, by="strategy") {
+    #' For \code{by="strategy"} the columns are:
+    #' \tabular{llllllll}{
+    #' <label of first decision node> \tab label of action leaving the node \cr
+    #' <label of second decision node (etc) \tab label of action \cr
+    #' Run \tab Run number \cr
+    #' Probability \tab \eqn{\Sigma p_i} for the run (1) \cr
+    #' Cost \tab Aggregate cost of the strategy \cr
+    #' Benefit \tab Aggregate benefit of the strategy \cr
+    #' Utility \tab Aggregate utility of the strategy \cr
+    #' QALY \tab Aggregate QALY of the strategy \cr
+    #' }
+    #' For \code{by="run"} the columns are:
+    #' \tabular{llllll}{
+    #' Run \tab Run number \cr
+    #' Probability.<S> \tab Probability for strategy S \cr
+    #' Cost.<S> \tab Cost for strategy S\cr
+    #' Benefit.<S> \tab Benefit for strategy S\cr
+    #' Utility.<S> \tab Benefit for strategy S\cr
+    #' QALY.<S> \tab QALY for strategy S\cr
+    #' }
+    #' where <S> is string composed of the action labels in strategy S
+    #' concatenated with an underscore and there will be one probability etc.,
+    #' column for each strategy.
+   evaluate = function(setvars="expected", N=1, by="strategy") {
       # check arguments
       if (!is.character(setvars)) {
         rlang::abort(
@@ -816,9 +850,9 @@ DecisionTree <- R6::R6Class(
       if (!is.character(by)) {
         rlang::abort("'by' must be character", class="by_not_character")
       }
-      if (!(by %in% c("path", "strategy"))) {
+      if (!(by %in% c("path", "strategy", "run"))) {
         rlang::abort(
-          "'by' must be one of {path|strategy}.",
+          "'by' must be one of {path|strategy|run}.",
           class = "by_invalid"
         )
       }
@@ -880,6 +914,27 @@ DecisionTree <- R6::R6Class(
           ) 
         )
         PAYOFF <- aggregate(f, data=RES, FUN=sum)
+      } else if (by == "run") {
+        # aggregate by strategy
+        dn <- self$decision_nodes("label")
+        f <- as.formula(
+          paste(
+            "cbind(Probability, Cost, Benefit, Utility, QALY)",
+            paste(paste(dn, collapse="+"), "Run", sep = "+"),
+            sep = "~"
+          ) 
+        )
+        STR <- aggregate(f, data=RES, FUN=sum)
+        # reshape to wide format
+        if (length(dn)==1) {
+          STR$Strategy <- STR[,dn[[1]]]
+        } else {
+          STR$Strategy <- apply(STR[,dn], MARGIN=1, FUN=paste, collapse="_")
+        }
+        STR[,dn] <- NULL
+        PAYOFF <- reshape(
+          STR, idvar="Run", timevar="Strategy", direction="wide"
+        )
       }
       # return the data frame     
       return(PAYOFF)
@@ -1014,7 +1069,7 @@ DecisionTree <- R6::R6Class(
         for (v in all.mv) {
           v$set("expected")
         }
-        # function to evaluate outcome for levels of this.mv
+        # function to evaluate outcome for levels of this mv
         ce <- function(what) {
           # set this modvar to its minimum
           this.mv$set(what)
@@ -1210,7 +1265,7 @@ DecisionTree <- R6::R6Class(
           class = "invalid_outcome"
         )
       }
-      dsa <- NULL
+      dsav <- NULL
       if (is.character(mvd)) {
         lv <- vapply(X=mvlist, FUN.VALUE=TRUE, FUN=function(v) {
           return(v$description() %in% mvd)
@@ -1221,7 +1276,7 @@ DecisionTree <- R6::R6Class(
             class = "invalid_mvd"
           )
         }
-        dsa <- mvlist[lv]
+        dsav <- mvlist[lv]
       } else {
         rlang::abort(
           "'mvd' must be a character string",
@@ -1234,8 +1289,71 @@ DecisionTree <- R6::R6Class(
           class = "invalid_brackets"
         )
       }
-      
-      
+      # set all modvars to their mean
+      for (v in modvars) {
+        v$set("expected")
+      }
+      # get names of index and ref strategies
+      ST <- self$strategy_table(select=index)
+      index.name <- rownames(ST)[1]
+      ST <- self$strategy_table(select=ref)
+      ref.name <- rownames(ST)[1]
+      # construct a function to calculate the outcome at value x of the 
+      # variable to be thresholded
+      f <- function(x) {
+        # set the variable under investigation to be x
+        dsav$set("value",x)
+        # evaluate the tree
+        RES <- DT$evaluate(by="run")
+        # get costs and QALYs of index and ref strategies
+        ref.cost <- RES[1,paste("Cost", ref.name, sep=".")]
+        index.cost <- RES[1,paste("Cost", index.name, sep=".")]
+        ref.qaly <- RES[1,paste("QALY", ref.name, sep=".")]
+        index.qaly <- RES[1,paste("QALY", index.name, sep=".")]
+        # outcome
+        if (outcome == "cost") {
+          rv <- ref.cost - index.cost
+        } else {
+          rv <- (index.cost-ref.cost)/(index.QALY-ref.QALY)
+        }
+        return(rv)
+      }
+      # 
+      # # tolerance
+      # tol <- 1
+      # 
+      # # check that sign of cost saving is different at the brackets
+      # a <- 0
+      # b <- c.SSI$mean()
+      # c <- Inf
+      # 
+      # if ((f(a)*f(b)) < 0) {
+      #   
+      #   # maximum iterations
+      #   nmax <- 10000
+      #   n <- 0
+      #   
+      #   while (n <- nmax) {
+      #     
+      #     # new midpoint
+      #     c <- (a + b)/2
+      #     
+      #     if (((b-a)/2) < tol) {
+      #       break
+      #     }
+      #     
+      #     n <- n + 1
+      #     
+      #     if (sign(f(c))==sign(f(a))) {
+      #       a <- c
+      #     } else {
+      #       b <- c
+      #     }
+      #   }
+      #   
+      #   c.SSI.threshold <<- c
+      #   
+      # }      
       
   
     }

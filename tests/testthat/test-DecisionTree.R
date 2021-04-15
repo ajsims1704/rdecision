@@ -78,7 +78,7 @@ test_that("arborescences that are not decision trees are rejected", {
   # evaluate
   expect_error(DT$evaluate(N="forty two"), class = "N_not_numeric")
   expect_error(DT$evaluate(by=42), class = "by_not_character")
-  expect_error(DT$evaluate(by="run"), class = "by_invalid")
+  expect_error(DT$evaluate(by="forty two"), class = "by_invalid")
   # tornado
   expect_null(DT$tornado(index=list(e1),ref=list(e4)))
 })
@@ -126,8 +126,10 @@ test_that("simple decision trees are modelled correctly", {
   )
   S <- DT$strategy_table()
   expect_equal(nrow(S),2)
+  expect_setequal(rownames(S), c("e1","e4"))
   S <- DT$strategy_table("label", select=list(e1))
   expect_identical(S$d1[1],"e1")
+  expect_setequal(rownames(S), c("e1"))
   # evaluations
   RES <- DT$evaluate(by="path")
   expect_intol(RES[RES$Leaf=="t1","Benefit"], 22.5, 0.05)
@@ -286,6 +288,13 @@ test_that("rdecision replicates Kaminski et al, fig 7", {
     class = "invalid_strategy"
   )
   S <- DT$strategy_table("label")
+  expect_setequal(
+    rownames(S),
+    list("sell_sell_sell", "sell_sell_dig", "sell_dig_sell", "sell_dig_dig",
+         "dig_sell_sell", "dig_sell_dig", "dig_dig_sell", "dig_dig_dig",
+         "test_sell_sell", "test_sell_dig", "test_dig_sell", "test_dig_dig"
+         )
+  )
   expect_equal(nrow(S),12)
   expect_equal(sum(S$d1=="sell"),4)
   expect_equal(sum(S$d2=="sell"),6)
@@ -327,8 +336,8 @@ test_that("rdecision replicates Kaminski et al, fig 7", {
   RES <- DT$evaluate()
   expect_equal(nrow(RES),12)
   imax <- which.max(RES$Benefit-RES$Cost)
-  popt <- paste(RES$d1[imax], RES$d2[imax], RES$d3[imax], sep="/")
-  expect_identical(popt, "test/sell/dig")
+  popt <- paste(RES$d1[imax], RES$d2[imax], RES$d3[imax], sep="_")
+  expect_identical(popt, "test_sell_dig")
 })
 
 # ----------------------------------------------------------------------------
@@ -351,7 +360,7 @@ test_that("paths common to >1 strategy are analyzed", {
   e3 <- Action$new(d1,t1,label="treat",cost=1000)
   e4 <- Action$new(d1,d2,label="manage",cost=0)
   e5 <- Action$new(d2,t2,label="conservatively",cost=200)
-  e6 <- Action$new(d2,t3,label="watchful wait",cost=50)
+  e6 <- Action$new(d2,t3,label="watch",cost=50)
   expect_silent(
     DT<-DecisionTree$new(V=list(c1,d1,d2,t1,t2,t3,t4),E=list(e1,e2,e3,e4,e5,e6))
   )
@@ -360,9 +369,15 @@ test_that("paths common to >1 strategy are analyzed", {
   # each strategy walks 2 paths
   expect_silent(SP <- DT$strategy_paths())
   expect_equal(nrow(SP),8)
-  # evaluate it (4 strategies x 2 runs)
+  # evaluate by path
+  RES <- DT$evaluate(by="path")
+  # evaluate by strategy (4 strategies x 2 runs)
   RES <- DT$evaluate(N=2)
   expect_equal(nrow(RES),8)
+  # evaluate by run
+  RES <- DT$evaluate(setvars="random", by="run", N=2)
+  expect_equal(nrow(RES),2)
+  expect_equal(length(RES$Probability.manage_conservatively),2)
 })
 
 # ------------------------------------------------------------
@@ -619,11 +634,10 @@ test_that("redecision replicates Jenks et al, 2016", {
   
   # PSA (skip on CRAN)
   skip_on_cran()
-  PSA <- DT$evaluate(setvars="random",N=200)
-  RES <- reshape(PSA, idvar='Run', timevar="d1", direction="wide")
-  RES$Difference <- RES$Cost.Standard - RES$Cost.Tegaderm
-  expect_intol(mean(RES$Difference), 77.76, 10.00)
-  expect_intol(mean(RES$Cost.Standard), 176.89, 10.00)
-  expect_intol(mean(RES$Cost.Tegaderm), 99.63, 10.00)
+  PSA <- DT$evaluate(setvars="random",by="run",N=250)
+  PSA$Difference <- PSA$Cost.Standard - PSA$Cost.Tegaderm
+  expect_intol(mean(PSA$Difference), 77.76, 10.00)
+  expect_intol(mean(PSA$Cost.Standard), 176.89, 10.00)
+  expect_intol(mean(PSA$Cost.Tegaderm), 99.63, 10.00)
 
 })
