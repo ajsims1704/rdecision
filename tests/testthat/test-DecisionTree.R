@@ -632,6 +632,18 @@ test_that("redecision replicates Jenks et al, 2016", {
   dev.off()
   expect_equal(nrow(TO),8)
   
+  # threshold
+  tHR <- DT$threshold(
+    index = list(e10), 
+    ref = list(e9),
+    outcome = "cost",
+    mvd = "SN1",
+    a = -2.31,
+    b = 0,
+    tol = 0.01
+  )
+  print(tHR)
+  
   # PSA (skip on CRAN)
   skip_on_cran()
   PSA <- DT$evaluate(setvars="random",by="run",N=250)

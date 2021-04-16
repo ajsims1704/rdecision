@@ -251,7 +251,7 @@ DecisionTree <- R6::R6Class(
     modvars = function() {
       # create list
       mv <- list()
-      # find the \verb{ModVar}s in Actions and Reactions
+      # find the ModVars in Actions and Reactions
       for (e in private$E) {
         if (inherits(e, what=c("Action", "Reaction"))) {
           mv <- c(mv, e$modvars())
@@ -1239,7 +1239,16 @@ DecisionTree <- R6::R6Class(
     #' is to be found.
     #' @param a The lower bound of the range to search for the root (numeric).
     #' @param b The lower bound of the range to search for the root (numeric).
-    threshold = function(index, ref, outcome="cost", mvd, a, b) {
+    #' @param tol The tolerance to which the threshold should be 
+    #' calculated (numeric).
+    #' @param nmax Maximum number if iterations allowed to reach convergence.
+    #' @returns Value of the model variable of interest at the threshold.
+    #' @details Uses a rudimentary bisection method method to find the root
+    #' (i.e. threshold value when the outcome is zero). In PSA terms, the 
+    #' algorithm finds the value of the specified model variable for which
+    #' 50% of runs are cost saving and 50% are cost incurring. 
+    threshold = function(index, ref, outcome="cost", mvd, a, b, tol, 
+                         nmax=1000) {
       # find all input modvars, excluding expressions
       mvlist <- self$modvars()
       lv <- vapply(X=mvlist, FUN.VALUE=TRUE, FUN=function(v) {
@@ -1268,7 +1277,7 @@ DecisionTree <- R6::R6Class(
       dsav <- NULL
       if (is.character(mvd)) {
         lv <- vapply(X=mvlist, FUN.VALUE=TRUE, FUN=function(v) {
-          return(v$description() %in% mvd)
+          return(identical(v$description(),mvd))
         })
         if (sum(lv) != 1) {
           rlang::abort(
@@ -1276,7 +1285,7 @@ DecisionTree <- R6::R6Class(
             class = "invalid_mvd"
           )
         }
-        dsav <- mvlist[lv]
+        dsav <- mvlist[[which(lv)]]
       } else {
         rlang::abort(
           "'mvd' must be a character string",
@@ -1289,8 +1298,11 @@ DecisionTree <- R6::R6Class(
           class = "invalid_brackets"
         )
       }
+      if (!is.numeric(tol) | tol <= 0) {
+        rlang::abort("'tol' must be numeric and >0", class = "invalid_tol")
+      }
       # set all modvars to their mean
-      for (v in modvars) {
+      for (v in mvlist) {
         v$set("expected")
       }
       # get names of index and ref strategies
@@ -1299,12 +1311,12 @@ DecisionTree <- R6::R6Class(
       ST <- self$strategy_table(select=ref)
       ref.name <- rownames(ST)[1]
       # construct a function to calculate the outcome at value x of the 
-      # variable to be thresholded
+      # variable for which the threshold is needed
       f <- function(x) {
         # set the variable under investigation to be x
         dsav$set("value",x)
         # evaluate the tree
-        RES <- DT$evaluate(by="run")
+        RES <- self$evaluate(by="run")
         # get costs and QALYs of index and ref strategies
         ref.cost <- RES[1,paste("Cost", ref.name, sep=".")]
         index.cost <- RES[1,paste("Cost", index.name, sep=".")]
@@ -1318,44 +1330,37 @@ DecisionTree <- R6::R6Class(
         }
         return(rv)
       }
-      # 
-      # # tolerance
-      # tol <- 1
-      # 
-      # # check that sign of cost saving is different at the brackets
-      # a <- 0
-      # b <- c.SSI$mean()
-      # c <- Inf
-      # 
-      # if ((f(a)*f(b)) < 0) {
-      #   
-      #   # maximum iterations
-      #   nmax <- 10000
-      #   n <- 0
-      #   
-      #   while (n <- nmax) {
-      #     
-      #     # new midpoint
-      #     c <- (a + b)/2
-      #     
-      #     if (((b-a)/2) < tol) {
-      #       break
-      #     }
-      #     
-      #     n <- n + 1
-      #     
-      #     if (sign(f(c))==sign(f(a))) {
-      #       a <- c
-      #     } else {
-      #       b <- c
-      #     }
-      #   }
-      #   
-      #   c.SSI.threshold <<- c
-      #   
-      # }      
-      
-  
+      # return variable
+      threshold <- NA
+      # check that sign of cost saving is different at the brackets
+      if ((f(a)*f(b)) < 0) {
+        n <- 0
+        while (n < nmax) {
+          # new midpoint
+          c <- (a + b)/2
+          if (((b-a)/2) < tol) {
+            break
+          }
+          n <- n + 1
+          if (sign(f(c))==sign(f(a))) {
+            a <- c
+          } else {
+            b <- c
+          }
+        }
+        if (n >= nmax) {
+          rlang::abort("Failed to converge", class="convergence_failure")          
+        } else {
+          threshold <- c  
+        }
+      } else {
+        rlang::abort(
+          "[a,b] does not bracket the root", 
+          class = "invalid_brackets"
+        )
+      }     
+      # return the threshold
+      return(threshold)
     }
     
   )

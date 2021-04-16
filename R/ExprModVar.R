@@ -364,7 +364,7 @@ ExprModVar <- R6::R6Class(
     #' @param what Character string; for compatibility with non-expression
     #' \verb{ModVar}s only; not used.
     #' @return Updated \verb{ExprModVar}.
-    set = function(what="random") {
+    set = function(what="random", val=NULL) {
       # check argument
       if (!is.character(what)) {
         rlang::abort(
@@ -372,9 +372,10 @@ ExprModVar <- R6::R6Class(
           class = "what_not_character"
         )
       }
-      if (!(what %in% c("random","expected","q2.5","q50","q97.5","current"))) {
+      opts <- c("random","expected","q2.5","q50","q97.5","current", "value")
+      if (!(what %in% opts)) {
         rlang::abort(
-          "'what' must be one of 'random', 'expected', 'q2.5', 'q50', '97.5'", 
+          paste("'what' must be one of", paste(opts, collpse= "|")), 
           class ="what_not_supported"
         )
       }
