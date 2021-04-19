@@ -1316,7 +1316,7 @@ DecisionTree <- R6::R6Class(
         # set the variable under investigation to be x
         dsav$set("value",x)
         # evaluate the tree
-        RES <- self$evaluate(by="run")
+        RES <- self$evaluate(setvars="current", by="run")
         # get costs and QALYs of index and ref strategies
         ref.cost <- RES[1,paste("Cost", ref.name, sep=".")]
         index.cost <- RES[1,paste("Cost", index.name, sep=".")]
@@ -1333,6 +1333,9 @@ DecisionTree <- R6::R6Class(
       # return variable
       threshold <- NA
       # check that sign of cost saving is different at the brackets
+      print(f(dsav$mean()))
+      print(f(a))
+      print(f(b))
       if ((f(a)*f(b)) < 0) {
         n <- 0
         while (n < nmax) {

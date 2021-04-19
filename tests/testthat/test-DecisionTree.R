@@ -385,25 +385,22 @@ test_that("paths common to >1 strategy are analyzed", {
 # ------------------------------------------------------------
 test_that("redecision replicates Jenks et al, 2016", {
   
-  # standard normals
-  n1 <- NormModVar$new("SN1","", 0, 1)
-  n2 <- NormModVar$new("SN2","", 0, 1)
-  n3 <- NormModVar$new("SN3","", 0, 1)
-  
   # clinical variables
   r.CRBSI <- NormModVar$new(
     'Baseline CRBSI rate', '/1000 catheter days', mu=1.48, sigma=0.074
   )
-  hr.CRBSI <- ExprModVar$new("Tegaderm CRBSI HR", "HR", 
-                             rlang::quo(exp(-0.911-0.393*n1)))
-  hr.LSI <- ExprModVar$new("Tegaderm LSI HR", "HR", 
-                           rlang::quo(exp(-0.911-0.393*n2)))
+  hr.CRBSI <- LogNormModVar$new(
+    "Tegaderm CRBSI HR", "HR", p1=-0.911, p2=0.393, "LN1"
+  )
+  hr.LSI <- LogNormModVar$new(
+    "Tegaderm LSI HR", "HR", p1=-0.911, p2=0.393, "LN1"
+  )
   r.Dermatitis <- NormModVar$new(
     'Baseline dermatitis risk', '/catheter', mu=0.0026, sigma=0.00026
   )
-  rr.Dermatitis <- ExprModVar$new("Tegaderm LSI HR", "HR", 
-                                  rlang::quo(exp(1.482-0.490*n3)))
-
+  rr.Dermatitis <- LogNormModVar$new(
+    "Tegaderm Dermatitis RR", "RR", p1=1.482, p2=0.490, "LN1"
+  )
   # cost variables
   c.CRBSI <- GammaModVar$new(
     'CRBSI cost', 'GBP', shape=198.0, scale=50
@@ -426,7 +423,6 @@ test_that("redecision replicates Jenks et al, 2016", {
   n.cathdays <- NormModVar$new(
     'No. days with catheter', 'days', mu=10, sigma=2
   )  
-
   # probabilities
   p.Dermatitis.S <- ExprModVar$new(
     'P(dermatitis|standard dressing)', 'P', 
@@ -444,7 +440,6 @@ test_that("redecision replicates Jenks et al, 2016", {
     'Q(dermatitis|Tegaderm)', '1-P', 
     rlang::quo(1-p.Dermatitis.T)
   )
-
   p.LSI.S <- NormModVar$new(
     'P(LSI|Standard)', '/patient', mu=0.1, sigma=0.01 
   )
@@ -457,7 +452,6 @@ test_that("redecision replicates Jenks et al, 2016", {
   q.LSI.T <- ExprModVar$new(
     'Q(LSI|Tegaderm)', '1-P', rlang::quo(1-p.LSI.T)
   )
-  
   p.CRBSI.S <- ExprModVar$new(
     'P(CRBSI|standard dressing)', 'P',  rlang::quo(r.CRBSI*n.cathdays/1000)
   )
@@ -465,12 +459,11 @@ test_that("redecision replicates Jenks et al, 2016", {
     'Q(CRBSI|standard dressing)', '1-P',  rlang::quo(1-p.CRBSI.S)
   )
   p.CRBSI.T <- ExprModVar$new(
-    'P(CRBSI|Tegaderm)', 'P', rlang::quo(1-(1-r.CRBSI*n.cathdays/1000)^hr.CRBSI)
+    'P(CRBSI|Tegaderm)', 'P', rlang::quo(1-(1-p.CRBSI.S)^hr.CRBSI)
   )
   q.CRBSI.T <- ExprModVar$new(
     'Q(CRBSI|Tegaderm)', '1-P', rlang::quo(1-p.CRBSI.T)
   )
-
   # create decision tree
   th <- as.difftime(7, units="days")
   # standard dressing
@@ -560,27 +553,31 @@ test_that("redecision replicates Jenks et al, 2016", {
   expect_silent(DT <- DecisionTree$new(V,E))
 
   # direct calculation, from values in Table 3
-  p.crbsi <- 10*1.48/1000
+  n.cath <- 3
+  n.cdays <- 10
+  r.crbsi <- 1.48
+  p.crbsi <- n.cdays*r.crbsi/1000
   p.lsi <- 0.1
-  p.derm <- 0.0026
-  c.crbsi <- 9900*p.crbsi
-  c.lsi <- 250*p.lsi
-  c.derm <- 150*3*p.derm
-  c.std <- 1.34*3+c.crbsi+c.lsi+c.derm
-  p.crbsi <- 1-((1-p.crbsi)^0.402)
-  p.lsi <- 1-((1-p.lsi)^0.402)
-  p.derm <- 4.4*p.derm
-  c.crbsi <- 9900*p.crbsi
-  c.lsi <- 250*p.lsi
-  c.derm <- 150*3*p.derm
-  c.teg <- 6.21*3+c.crbsi+c.lsi+c.derm
+  r.derm <- 0.0026
+  p.derm <- r.derm*n.cath
+  c.crbsi <- 9900
+  c.lsi <- 250
+  c.derm <- 150
+  c.std <- 1.34*n.cath+c.crbsi*p.crbsi+c.lsi*p.lsi+c.derm*p.derm
+  hr.crbsi <- 0.434
+  p.crbsi <- 1-((1-p.crbsi)^hr.crbsi)
+  hr.lsi <- 0.434
+  p.lsi <- 1-((1-p.lsi)^hr.lsi)
+  rr.derm <- 4.963
+  p.derm <- rr.derm*r.derm*n.cath
+  c.teg <- 6.21*n.cath+c.crbsi*p.crbsi+c.lsi*p.lsi+c.derm*p.derm
 
   # check the model variables
   mv <- DT$modvars()
-  expect_length(mv, 27)
+  expect_length(mv, 24)
   MVT <- DT$modvar_table()
-  expect_equal(nrow(MVT), 27)
-  expect_equal(sum(MVT$Est),16)
+  expect_equal(nrow(MVT), 24)
+  expect_equal(sum(MVT$Est),13)
   MVT <- DT$modvar_table(FALSE)
   expect_equal(nrow(MVT),11)
 
@@ -625,24 +622,12 @@ test_that("redecision replicates Jenks et al, 2016", {
   )
   expect_silent(
     TO <- DT$tornado(
-      index=list(e10), ref=list(e9), exclude=list("SN1", "SN2", "SN3"),
+      index=list(e10), ref=list(e9),
       draw = TRUE
     )
   )
   dev.off()
-  expect_equal(nrow(TO),8)
-  
-  # threshold
-  tHR <- DT$threshold(
-    index = list(e10), 
-    ref = list(e9),
-    outcome = "cost",
-    mvd = "SN1",
-    a = -2.31,
-    b = 0,
-    tol = 0.01
-  )
-  print(tHR)
+  expect_equal(nrow(TO),11)
   
   # PSA (skip on CRAN)
   skip_on_cran()
