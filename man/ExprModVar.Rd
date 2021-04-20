@@ -366,7 +366,7 @@ method have no effect. To affect the
 value returned by the next call to \code{get}, call \code{set} for each
 of the operands of this expression.
 \subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{ExprModVar$set(what = "random")}\if{html}{\out{</div>}}
+\if{html}{\out{<div class="r">}}\preformatted{ExprModVar$set(what = "random", val = NULL)}\if{html}{\out{</div>}}
 }
 
 \subsection{Arguments}{
@@ -374,6 +374,9 @@ of the operands of this expression.
 \describe{
 \item{\code{what}}{Character string; for compatibility with non-expression
 \verb{ModVar}s only; not used.}
+
+\item{\code{val}}{Numerical value when what="value"; not used for expression
+model variables.}
 }
 \if{html}{\out{</div>}}
 }

@@ -363,6 +363,8 @@ ExprModVar <- R6::R6Class(
     #' of the operands of this expression.
     #' @param what Character string; for compatibility with non-expression
     #' \verb{ModVar}s only; not used.
+    #' @param val Numerical value when what="value"; not used for expression
+    #' model variables.
     #' @return Updated \verb{ExprModVar}.
     set = function(what="random", val=NULL) {
       # check argument

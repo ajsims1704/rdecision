@@ -4,6 +4,9 @@
 \name{DecisionTree}
 \alias{DecisionTree}
 \title{\verb{DecisionTree} class}
+\value{
+Value of the model variable of interest at the threshold.
+}
 \description{
 An R6 class to represent a decision tree
 }
@@ -347,7 +350,8 @@ single strategy into a readable form.}
 \subsection{Returns}{
 A data frame where each row is a potential strategy 
 and each column is a Decision Node. Values are either the index of each
-action edge, or their label.
+action edge, or their label. The row names are the edge labels of each
+strategy, concatenated with underscores.
 }
 }
 \if{html}{\out{<hr>}}
@@ -443,11 +447,13 @@ value prior to calling the function and evaluate the model).}
 (\code{modvars="random"}); use with \code{modvars="expected"}
 will be repetitive and uninformative.}
 
-\item{\code{by}}{One of {"path", "strategy"}. If "path", the table has one row
-per path walked per strategy, per run, and includes the label of the
-terminating leaf node to identify each path. If "strategy" (the default),
-the table is aggregated by strategy, i.e. there is one row per strategy,
-per run.}
+\item{\code{by}}{One of {"path", "strategy", "run"}. If "path", the table has
+one row per path walked per strategy, per run, and includes the label of
+the terminating leaf node to identify each path. If "strategy" (the 
+default), the table is aggregated by strategy, i.e. there is one row per
+strategy per run. If "run", the table has one row per run and uses
+concatenated strategy names and one (cost, benefit, utility, QALY) column
+for each strategy.}
 }
 \if{html}{\out{</div>}}
 }
@@ -464,7 +470,7 @@ Utility \tab Utility of traversing the path \cr
 QALY \tab QALY of traversing the path \cr
 Run \tab Run number \cr
 }
-For \code{by="strategy"}:
+For \code{by="strategy"} the columns are:
 \tabular{llllllll}{
 <label of first decision node> \tab label of action leaving the node \cr
 <label of second decision node (etc) \tab label of action \cr
@@ -475,6 +481,18 @@ Benefit \tab Aggregate benefit of the strategy \cr
 Utility \tab Aggregate utility of the strategy \cr
 QALY \tab Aggregate QALY of the strategy \cr
 }
+For \code{by="run"} the columns are:
+\tabular{llllll}{
+Run \tab Run number \cr
+Probability.<S> \tab Probability for strategy S \cr
+Cost.<S> \tab Cost for strategy S\cr
+Benefit.<S> \tab Benefit for strategy S\cr
+Utility.<S> \tab Benefit for strategy S\cr
+QALY.<S> \tab QALY for strategy S\cr
+}
+where <S> is string composed of the action labels in strategy S
+concatenated with an underscore and there will be one probability etc.,
+column for each strategy.
 }
 
 \subsection{Returns}{
@@ -540,7 +558,16 @@ Find the threshold value of a model variable at which
 either the cost difference or ICER, for an index strategy compared with  
 a reference strategy, is zero.
 \subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{DecisionTree$threshold(index, ref, outcome = "cost", mvd, a, b)}\if{html}{\out{</div>}}
+\if{html}{\out{<div class="r">}}\preformatted{DecisionTree$threshold(
+  index,
+  ref,
+  outcome = "cost",
+  mvd,
+  a,
+  b,
+  tol,
+  nmax = 1000
+)}\if{html}{\out{</div>}}
 }
 
 \subsection{Arguments}{
@@ -567,9 +594,21 @@ is to be found.}
 \item{\code{a}}{The lower bound of the range to search for the root (numeric).}
 
 \item{\code{b}}{The lower bound of the range to search for the root (numeric).}
+
+\item{\code{tol}}{The tolerance to which the threshold should be 
+calculated (numeric).}
+
+\item{\code{nmax}}{Maximum number if iterations allowed to reach convergence.}
 }
 \if{html}{\out{</div>}}
 }
+\subsection{Details}{
+Uses a rudimentary bisection method method to find the root
+(i.e. threshold value when the outcome is zero). In PSA terms, the 
+algorithm finds the value of the specified model variable for which
+50% of runs are cost saving and 50% are cost incurring.
+}
+
 }
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-clone"></a>}}

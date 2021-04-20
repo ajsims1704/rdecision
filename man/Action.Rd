@@ -60,7 +60,8 @@ used here is more general.
 
 \item{\code{label}}{Character string containing the arrow label. This
 must be defined for an action because the label is used in
-tabulation of strategies.}
+tabulation of strategies. It is recommended to choose labels that are
+brief and not punctuated with spaces, dots or underscores.}
 
 \item{\code{cost}}{Cost associated with traversal of this edge.}
 
