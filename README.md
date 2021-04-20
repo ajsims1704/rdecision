@@ -34,17 +34,17 @@ between providing two forms of lifestyle advice, offered to people with
 vascular disease, which reduce the risk of needing an interventional
 procedure. The model has a time horizon of 1 year. The cost to a
 healthcare provider of the interventional procedure (e.g. inserting a
-stent) is 3000 GBP; the cost of providing the current form of lifestyle
+stent) is 5000 GBP; the cost of providing the current form of lifestyle
 advice, an appointment with a dietician (“diet”), is 50 GBP and the cost
 of providing an alternative form, attendance at an exercise programme
 (“exercise”), is 500 GBP. If the advice programme is successful, there
 is no need for an interventional procedure. In a small trial of the
-“diet” programme, 12 out of 68 patients avoided having a procedure, and
-in a separate small trial of the “exercise” programme 18 out of 58
-patients avoided the procedure. It is assumed that the baseline
-characteristics in the two trials were comparable, that the model is
-from the perspective of the healthcare provider and that the utility is
-the same for all patients.
+“diet” programme, 12 out of 68 patients (17.6%) avoided having a
+procedure, and in a separate small trial of the “exercise” programme 18
+out of 58 patients (31.0%) avoided the procedure. It is assumed that the
+baseline characteristics in the two trials were comparable, that the
+model is from the perspective of the healthcare provider and that the
+utility is the same for all patients.
 
 A decision tree can be constructed to estimate the uncertainty of the
 cost difference between the two types of advice programme, due to the
@@ -57,10 +57,15 @@ associated with each chance node is one.
 
 ``` r
 library("rdecision")
+# probabilities of programme success & failure
 p.diet <- BetaModVar$new("P(diet)", "", alpha=12, beta=68-12)
 p.exercise <- BetaModVar$new("P(exercise)", "", alpha=18, beta=58-18)
 q.diet <- ExprModVar$new("1-P(diet)", "", rlang::quo(1-p.diet))
 q.exercise <- ExprModVar$new("1-P(exercise)", "", rlang::quo(1-p.exercise))
+# costs
+c.diet <- 50
+c.exercise <- ConstModVar$new("Cost of exercise programme", "GBP", 500)
+c.stent <- 5000
 ```
 
 The decision tree is constructed from nodes and edges as follows:
@@ -74,12 +79,12 @@ c.d <- ChanceNode$new("Outcome")
 c.e <- ChanceNode$new("Outcome")
 d <- DecisionNode$new("Programme")
 
-e.d <- Action$new(d, c.d, cost = 50, label = "Diet")
-e.e <- Action$new(d, c.e, cost = 500, label = "Exercise")
-e.ds <- Reaction$new(c.d, t.ds, p = p.diet, cost = 0, label = "success")
-e.df <- Reaction$new(c.d, t.df, p = q.diet, cost = 5000, label = "failure")
-e.es <- Reaction$new(c.e, t.es, p = p.exercise, cost = 0, label = "success")
-e.ef <- Reaction$new(c.e, t.ef, p = q.exercise, cost = 5000, label = "failure")
+e.d <- Action$new(d, c.d, cost=c.diet, label = "Diet")
+e.e <- Action$new(d, c.e, cost=c.exercise, label = "Exercise")
+e.ds <- Reaction$new(c.d, t.ds, p=p.diet, cost = 0, label = "success")
+e.df <- Reaction$new(c.d, t.df, p=q.diet, cost=c.stent, label="failure")
+e.es <- Reaction$new(c.e, t.es, p=p.exercise, cost=0, label="success")
+e.ef <- Reaction$new(c.e, t.ef, p=q.exercise, cost=c.stent, label="failure")
 
 DT <- DecisionTree$new(
   V = list(d, c.d, c.e, t.ds, t.df, t.es, t.ef),
@@ -89,22 +94,25 @@ DT <- DecisionTree$new(
 
 <img src="man/figures/README-treedraw-1.png" width="75%" style="display: block; margin: auto;" />
 
-The expected per-patient cost of each option is obtained by evaluating
-the tree with expected values of all variables using `DT$evaluate()`.
-Examination of the data frame from this call shows that the expected
-per-patient cost of the diet advice programme is 4167.65 GBP and the
-per-patient cost of the exercise programme is 3948.28 GBP, a point
-estimate saving of 219.37 per patient if the exercise advice programme
-is adopted.
+The expected per-patient net cost of each option is obtained by
+evaluating the tree with expected values of all variables using
+`DT$evaluate()` and threshold values with `DT$threshold()`. Examination
+of the results of evaluation shows that the expected per-patient net
+cost of the diet advice programme is 4167.65 GBP and the per-patient net
+cost of the exercise programme is 3948.28 GBP, a point estimate saving
+of 219.37 GBP per patient if the exercise advice programme is adopted.
+By univariate threshold analysis, the exercise program will be cost
+saving when its cost of delivery is less than 719.73 GBP or when its
+success rate is greater than 26.6%.
 
 The confidence interval of the cost saving is estimated by repeated
 evaluation of the tree, each time sampling from the uncertainty
 distribution of the two probabilities using, for example,
 `DT$evaluate(setvars="random", N=1000)` and inspecting the resulting
 data frame. From 1000 runs, the 95% confidence interval of the per
-patient cost saving is -516.67 GBP to 1017.04 GBP and it can be
-concluded that there is no evidence for there being a cost difference
-between the choices.
+patient cost saving is -529.24 GBP to 962.74 GBP, with 71% being cost
+saving, and it can be concluded that more evidence is required to be
+confident that the exercise programme is cost saving.
 
 # Acknowledgements
 
@@ -112,7 +120,7 @@ In addition to using base R,<sup>2</sup> `redecision` relies heavily on
 the `R6` implementation of classes<sup>3</sup> and the `rlang` package
 for error handling and non-standard evaluation used in expression model
 variables.<sup>4</sup> Building the package vignettes and documentation
-rely on the `testthat` package,<sup>5</sup> the `devtools`
+relies on the `testthat` package,<sup>5</sup> the `devtools`
 package<sup>6</sup> and `rmarkdown`.<sup>9</sup>
 
 Underpinning graph theory is based on terminology, definitions and

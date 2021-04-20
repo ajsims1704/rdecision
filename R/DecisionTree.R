@@ -1132,24 +1132,23 @@ DecisionTree <- R6::R6Class(
         # create sufficient space in the inner margin to write the variable
         # limits to the left and right of each bar
         lw <- vapply(X=TO$LL, FUN.VAL=0.5, FUN=function(v){
-          return(strwidth(signif(v,4), cex=cex, units="inches"))
+          return(strwidth(signif(v,3), cex=cex, units="inches"))
         })
         uw <- vapply(X=TO$UL, FUN.VAL=0.5, FUN=function(v){
-          return(strwidth(signif(v,4), cex=cex, units="inches"))
+          return(strwidth(signif(v,3), cex=cex, units="inches"))
         })
         par(mar = c(4.1,4.1,1.1,1.1))
         mai = par("mai")
         par(mai = c(mai[1],max(max(lw),max(uw)),mai[3],max(max(lw),max(uw))))
         mgp <- par("mgp")
         mgp <- mgp*cex
-#        par(mgp = mgp)
         # create the plot frame
         plot(
           x = NULL,
           y = NULL,
           xlim = c(
-            min(min(TO$outcome.min),min(TO$outcome.min)),
-            max(max(TO$outcome.max),min(TO$outcome.max))
+            min(min(TO$outcome.min),min(TO$outcome.max)),
+            max(max(TO$outcome.min),max(TO$outcome.max))
           ),
           ylim = c(0.5,nrow(TO)+0.5),
           xlab = xlab,
@@ -1185,7 +1184,8 @@ DecisionTree <- R6::R6Class(
             ybottom = i - 0.25,
             ytop = i + 0.25,
             border = "black",
-            col = "lightgray"
+            col = "lightgray",
+            xpd = TRUE
           )
           LL <- TO[i,"LL"]
           UL <- TO[i,"UL"]
@@ -1198,7 +1198,8 @@ DecisionTree <- R6::R6Class(
             x = c(xleft, xright),
             y = c(i, i),
             labels = labels,
-            pos = c(2, 4), 
+            pos = c(2, 4),
+            offset = 0.25,
             cex = cex, 
             xpd = TRUE
           )
@@ -1207,15 +1208,15 @@ DecisionTree <- R6::R6Class(
         abline(v = TO[1,"outcome.mean"], lty = "dashed")
         # remove label column
         TO$Label <- NULL
+        # restore graphics state
+        par(oldpar)
       }
-      
       # re-order it with greatest variation first
       TO$range <- abs(TO$outcome.max - TO$outcome.min)
       TO <- TO[order(TO$range, decreasing=TRUE),]
       TO$range <- NULL
       # remove mean column
       TO$outcome.mean <- NULL
-      
       # return tornado data frame
       return(TO)
     },
@@ -1333,9 +1334,6 @@ DecisionTree <- R6::R6Class(
       # return variable
       threshold <- NA
       # check that sign of cost saving is different at the brackets
-      print(f(dsav$mean()))
-      print(f(a))
-      print(f(b))
       if ((f(a)*f(b)) < 0) {
         n <- 0
         while (n < nmax) {

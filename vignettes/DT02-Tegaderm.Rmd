@@ -30,7 +30,7 @@ library("pander")
 
 # Introduction
 This vignette is an example of modelling a decision tree using the `rdecision`
-package, with probabilistic sensitivity analysis. It is based on the model 
+package, with probabilistic sensitivity analysis (PSA). It is based on the model 
 reported by Jenks *et al* [-@jenks2016] in which a transparent dressing used 
 to secure vascular catheters (Tegaderm CHG) was compared with a 
 standard dressing.
@@ -42,19 +42,20 @@ Thirteen source variables were used in the model. The choice of
 variables, their distributions and their parameters are taken from Table 3 
 of Jenks *et al* [-@jenks2016], with the following additional information:
 
-* For variables with lognormal uncertainty, the manufacturer synthesized a log
-  normal distribution as $\exp(\alpha + \beta r())$ where $r()$ is a random
-  draw from a standard normal distribution. This does not follow the 
-  parametrizations of the `LogNormModVar` provided in `rdecision`, but can
-  be reproduced using expression model variables. Three standard normal
-  model variables were introduced for this purpose.
-* The values for
-  $\alpha$ and $\beta$ for the hazard ratio for CRBSI and LSI were
+* For variables with lognormal uncertainty, the company synthesized a log
+  normal distribution as $\exp(\mu + \sigma r())$ where $r()$ is a random
+  draw from a standard normal distribution. This is equivalent to the
+  `LN1` parametrization of the `LogNormModVar` provided in `rdecision`.
+* The values for $\mu$ and $\sigma$ for the hazard ratio for CRBSI and LSI were
   -0.911 and -0.393 respectively, and 1.482 and 0.490 for the relative
-  risk of dermatitis. 
+  risk of dermatitis. The point estimates in the company's model were taken at
+  $\exp(-0.911)$ (0.402) and $\exp(1.482)$ (4.40), the expected value
+  of the uncertainty distributions on the log scale, rather than at the 
+  expected values on the linear scale (0.434 and 4.963). In this vignette
+  the latter are used for consistency between base case and PSA.
 * The probabilities of CRBSI and LSI for standard dressings ($p$) were 
-  modified by the hazard ratio for Tegaderm using the form $(1-(1-p)^h)$
-  where $h$ is the hazard ratio. Relative risks were applied as
+  modified by the hazard ratio for Tegaderm using the form $(1-(1-p)^r)$
+  where $r$ is the hazard ratio. Relative risks were applied as
   multipliers.
 * The point estimate cost of CRBSI was £9900, not £9990, although the parameters
   (198,50) are quoted correctly.
@@ -62,34 +63,22 @@ of Jenks *et al* [-@jenks2016], with the following additional information:
 The model variables were constructed as follows:
 
 ```{r variables, echo=T}
-# standard normals
-n1 <- NormModVar$new("SN1","", 0, 1)
-n2 <- NormModVar$new("SN2","", 0, 1)
-n3 <- NormModVar$new("SN3","", 0, 1)
-  
 # clinical variables
 r.CRBSI <- NormModVar$new(
   'Baseline CRBSI rate', '/1000 catheter days', mu=1.48, sigma=0.074
 )
-hr.CRBSI <- ExprModVar$new(
-  "Tegaderm CRBSI HR", 
-  "HR", 
-  rlang::quo(exp(-0.911-0.393*n1))
+hr.CRBSI <- LogNormModVar$new(
+  "Tegaderm CRBSI HR", "HR", p1 = -0.911, p2 = 0.393
 )
-hr.LSI <- ExprModVar$new(
-  "Tegaderm LSI HR", 
-  "HR", 
-  rlang::quo(exp(-0.911-0.393*n2))
+hr.LSI <- LogNormModVar$new(
+  "Tegaderm LSI HR", "HR", p1 = -0.911, p2 = 0.393
 )
 r.Dermatitis <- NormModVar$new(
   'Baseline dermatitis risk', '/catheter', mu=0.0026, sigma=0.00026
 )
-rr.Dermatitis <- ExprModVar$new(
-  "Tegaderm LSI HR", 
-  "HR", 
-  rlang::quo(exp(1.482-0.490*n3))
+rr.Dermatitis <- LogNormModVar$new(
+  "Tegaderm Dermatitis RR", "RR", p1=1.482, p2=0.490
 )
-
 # cost variables
 c.CRBSI <- GammaModVar$new(
   'CRBSI cost', 'GBP', shape=198.0, scale=50
@@ -168,7 +157,6 @@ q.CRBSI.T <- ExprModVar$new(
   'Q(CRBSI|Tegaderm)', '1-P', rlang::quo(1-p.CRBSI.T)
 )
 ```
-
 
 
 # The decision tree
@@ -299,7 +287,7 @@ f1c <- "Decision tree for the Tegaderm model"
 DT$draw(border=TRUE)
 ```
 
-In the manufacturer's model, the uncertainties in the probabilities associated
+In the company's model, the uncertainties in the probabilities associated
 with the polytomous chance nodes were modelled as independent variables. This is
 not recommended because there is a chance that a particular run of the PSA will
 yield probabilities that are outside the range [0,1]. 
@@ -312,9 +300,7 @@ frame describing each variable, its description, units and uncertainty
 distribution. Variables inheriting from type `ModVar` will be included in the
 tabulation unless explicitly excluded, regular numeric values will not be
 listed. In the Tegaderm model, the input model variables are in the following
-table, with expression model variables excluded. Variables SN1, 
-SN2 and SN3 were introduced to model the uncertainties of the hazard and risk 
-ratios.
+table, with expression model variables excluded. 
 
 ```{r modelinputs-structure, echo=FALSE}
 local({
@@ -370,7 +356,7 @@ f2c <- "Tornado diagram for the Tegaderm model"
 ```
 ```{r tornado,echo=FALSE,results="hide",fig.keep="last",fig.align="center",fig.cap=f2c}
 DT$tornado(
-  index=list(e10), ref=list(e9), exclude=list("SN1","SN2","SN3"), draw=TRUE
+  index=list(e10), ref=list(e9), draw=TRUE
 )
 ```
 
@@ -388,7 +374,6 @@ The first few runs of PSA are as follows; the `by="run"` option reshapes the
 table to give one row per simulation, rather than one row per run, per strategy.
 
 ```{r PSA_table, echo=FALSE}
-#RES <- reshape(PSA, idvar="Run", timevar="d1", direction="wide")
 PSA$Difference <- PSA$Cost.Tegaderm - PSA$Cost.Standard
 keep<- c("Run", "Cost.Tegaderm", "Cost.Standard", "Difference")
 pander::pander(head(PSA[,keep], n=10), round=2, row.names=F, justify="lrrr")
@@ -411,7 +396,6 @@ dressing 176.89, mean cost of Tegaderm 99.63).
 ```{r echo=F}
 rm(PSA)
 ```
-
 
 
 # References

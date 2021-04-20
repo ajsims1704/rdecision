@@ -3,8 +3,13 @@
 
 * Added option `value` to method `set` in class `ModVar`. This allows
   variables to be set to an explicit value; used in threshold finding.
+* Added `threshold` function to DecisionTree to calculate the value of a 
+  model variable at which the cost difference or QALY becomes zero.
 * Added option `run` to `by` argument of `DecisionTree$evaluate()`. Avoids
   application having to `reshape` output before reporting PSA results.
+* Fixed bug in method `DecisionTree$tornado` which caused bars to be clipped 
+  under some circumstances.
+* Minor revisions to the Tegaderm vignette.
 
 # rdecision 1.0.3
 

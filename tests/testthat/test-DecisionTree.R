@@ -638,3 +638,65 @@ test_that("redecision replicates Jenks et al, 2016", {
   expect_intol(mean(PSA$Cost.Tegaderm), 99.63, 10.00)
 
 })
+
+test_that("readme example is correct, with thresholds", {
+  # inputs
+  c.diet <- 50
+  c.exercise <- ConstModVar$new("Cost of exercise programme", "GBP", 500)
+  c.stent <- 5000
+  diet.s <- 12
+  diet.f <- 56
+  exercise.s <- 18
+  exercise.f <- 40
+  # define probabilities
+  p.diet <- BetaModVar$new("P(diet)", "", alpha=diet.s, beta=diet.f)
+  p.exercise <- BetaModVar$new(
+    "P(exercise)", "", alpha=exercise.s, beta=exercise.f
+  )
+  q.diet <- ExprModVar$new("1-P(diet)", "", rlang::quo(1-p.diet))
+  q.exercise <- ExprModVar$new("1-P(exercise)", "", rlang::quo(1-p.exercise))
+  # construct tree
+  t.ds <- LeafNode$new("no stent")
+  t.df <- LeafNode$new("stent")
+  t.es <- LeafNode$new("no stent")
+  t.ef <- LeafNode$new("stent")
+  c.d <- ChanceNode$new("Outcome")
+  c.e <- ChanceNode$new("Outcome")
+  d <- DecisionNode$new("Programme")
+  e.d <- Action$new(d, c.d, cost = c.diet, label = "Diet")
+  e.e <- Action$new(d, c.e, cost = c.exercise, label = "Exercise")
+  e.ds <- Reaction$new(c.d, t.ds, p = p.diet, cost = 0, label = "success")
+  e.df <- Reaction$new(c.d, t.df, p = q.diet, cost = c.stent, label = "failure")
+  e.es <- Reaction$new(c.e, t.es, p = p.exercise, cost = 0, label = "success")
+  e.ef <- Reaction$new(
+    c.e, t.ef, p = q.exercise, cost = c.stent, label = "failure"
+  )
+  DT <- DecisionTree$new(
+    V = list(d, c.d, c.e, t.ds, t.df, t.es, t.ef),
+    E = list(e.d, e.e, e.ds, e.df, e.es, e.ef)
+  )
+  # evaluate
+  RES <- DT$evaluate()
+  # direct calculation of costs
+  cost.diet <- c.diet + c.stent*(diet.f/(diet.s+diet.f))
+  cost.exercise <- c.exercise$mean() + 
+                   c.stent*(exercise.f/(exercise.s+exercise.f))
+  expect_intol(RES$Cost[RES$Programme=="Exercise"], cost.exercise, 5)
+  expect_intol(RES$Cost[RES$Programme=="Diet"], cost.diet, 5)
+  # threshold analysis on cost of new programme
+  c.exercise.t <- DT$threshold(
+    index=list(e.e), ref=list(e.d), mvd=c.exercise$description(),
+    a=c.exercise$mean(), b=1000, tol=1
+  )
+  c.exercise.t.e <- c.diet + c.stent*(diet.f/(diet.s+diet.f)) - 
+                    c.stent*(exercise.f/(exercise.s+exercise.f))
+  expect_intol(c.exercise.t, c.exercise.t.e, 5)
+  # threshold analysis on success of new programme
+  p.ex.t <- DT$threshold(
+    index=list(e.e), ref=list(e.d), mvd=p.exercise$description(),
+    a=0, b=p.exercise$mean(), tol=0.001
+  )
+  p.ex.t.e <- (c.exercise$mean()-c.diet)/c.stent - (diet.f/(diet.f+diet.s)) + 1
+  expect_intol(p.ex.t, p.ex.t.e, 0.03)
+})
+
