@@ -108,21 +108,20 @@ test_that("simple decision trees are modelled correctly", {
   expect_silent(DT$draw(border=TRUE))
   dev.off()
   # strategy validity
-  expect_error(DT$is_strategy(list(e2,e3)), class = "incorrect_strategy_type")
+  expect_false(DT$is_strategy(list(e2,e3)))
   expect_false(DT$is_strategy(list()))
   expect_false(DT$is_strategy(list(e1,e4)))
   # strategy paths
   P <- DT$root_to_leaf_paths()
   expect_length(P,3)
-  expect_error(DT$is_strategy(list(e2)),class="incorrect_strategy_type")
+  expect_false(DT$is_strategy(list(e2)))
   expect_false(DT$is_strategy(list(e1,e4)))
   PS <- DT$strategy_paths()
   expect_equal(nrow(PS),3)
   # strategies
   expect_error(DT$strategy_table(42), class="unknown_what_value")
   expect_error(
-    DT$strategy_table(select=list(e2,e3)), 
-    class = "incorrect_strategy_type"
+    DT$strategy_table(select=list(e2,e3)), class="invalid_strategy"
   )
   S <- DT$strategy_table()
   expect_equal(nrow(S),2)
@@ -139,15 +138,19 @@ test_that("simple decision trees are modelled correctly", {
 # (base case)
 test_that("rdecision replicates Evans et al, Sumatriptan base case", {
   # Time horizon
-  th <- as.difftime(48, units="hours")
+  th <- as.difftime(24, units="hours")
   # model variables
   c.sumatriptan <- ConstModVar$new("Sumatriptan","CAD",16.10)
   c.caffeine <- ConstModVar$new("Caffeine", "CAD", 1.32)
   c.ED <- 63.16
   c.admission <- 1093
-  #
+  p.caffeine.relief <- 0.379
+  p.sumatriptan.relief <- ConstModVar$new("P(relief|sumatriptan)", "P", 0.558)
+  q.sumatriptan.relief <- ExprModVar$new(
+    "Q(relief|sumatriptan)", "P", rlang::quo(1-p.sumatriptan.relief)
+  )
+  
   # Sumatriptan branch
-  #
   ta <- LeafNode$new("A", utility=1.0, interval=th)
   tb <- LeafNode$new("B", utility=0.9, interval=th)
   c3 <- ChanceNode$new("c3")
@@ -167,11 +170,10 @@ test_that("rdecision replicates Evans et al, Sumatriptan base case", {
   e6 <- Reaction$new(c4, c7, p=0.080, cost=c.ED, label="Emergency Department")
   #
   c1 <- ChanceNode$new("c1")
-  e7 <- Reaction$new(c1, c3, p=0.558, label="Relief")
-  e8 <- Reaction$new(c1, c4, p=0.442, label="No relief")
-  #
+  e7 <- Reaction$new(c1, c3, p=p.sumatriptan.relief, label="Relief")
+  e8 <- Reaction$new(c1, c4, p=q.sumatriptan.relief, label="No relief")
+  
   # Caffeine/Ergotamine branch
-  #
   tf <- LeafNode$new("F", utility=1.0, interval=th)
   tg <- LeafNode$new("G", utility=0.9, interval=th)
   c5 <- ChanceNode$new("c5")
@@ -193,14 +195,14 @@ test_that("rdecision replicates Evans et al, Sumatriptan base case", {
   #
   c2 <- ChanceNode$new("c2")
   expect_identical(c2$label(), "c2")
-  e15 <- Reaction$new(c2, c5, p=0.379, label="Relief")
-  e16 <- Reaction$new(c2, c6, p=0.621, label="No relief")
+  e15 <- Reaction$new(c2, c5, p=p.caffeine.relief, label="Relief")
+  e16 <- Reaction$new(c2, c6, p=1-p.caffeine.relief, label="No relief")
   #
   # decision node
   d1 <- DecisionNode$new("d1")
   expect_identical(d1$label(), "d1")
   e17 <- Action$new(d1, c1, cost=c.sumatriptan, label="Sumatriptan")
-  e18 <- Action$new(d1, c2, cost=c.caffeine, label="Caffeine/Ergotamine")
+  e18 <- Action$new(d1, c2, cost=c.caffeine, label="Caffeine")
   # 
   # create lists of nodes and edges
   V <- list(
@@ -214,21 +216,30 @@ test_that("rdecision replicates Evans et al, Sumatriptan base case", {
   # tree
   expect_silent(dt <- DecisionTree$new(V,E))
   # evaluate
-  RES <- dt$evaluate()
-  # check
+  RES <- dt$evaluate(by="run")
+  # check costs and utilities
   expect_true(is.data.frame(RES))
-  c.Sumatriptan <- round(RES[RES$Run==1 & RES$d1=="Sumatriptan", "Cost"],2)
+  c.Sumatriptan <- RES$Cost.Sumatriptan[1]
   expect_intol(c.Sumatriptan, 22.06, 0.1)
-  c.Caffeine <- round(RES[RES$Run==1 & RES$d1=="Caffeine/Ergotamine", "Cost"],2)
+  c.Caffeine <- RES$Cost.Caffeine[1]
   expect_intol(c.Caffeine, 4.71, 0.1)
-  u.Sumatriptan <- round(RES[RES$Run==1 & RES$d1=="Sumatriptan", "Utility"],2)
+  u.Sumatriptan <- RES$Utility.Sumatriptan[1]
   expect_intol(u.Sumatriptan, 0.42, 0.1)
-  u.Caffeine <- round(RES[RES$Run==1 & 
-                          RES$d1=="Caffeine/Ergotamine", "Utility"],2)
+  u.Caffeine <- RES$Utility.Caffeine[1]
   expect_intol(u.Caffeine, 0.20, 0.05)
-  # tornado (only drug costs are modvars)
-  TO <- dt$tornado(index=list(e17),ref=list(e18),outcome="ICER",draw=FALSE)
-  expect_intol(TO[TO$Description=="Sumatriptan","outcome.min"],14692,2)
+  # check ICER
+  q.Sumatriptan <- RES$QALY.Sumatriptan[1]
+  q.Caffeine <- RES$QALY.Caffeine[1]
+  ICER <- (c.Sumatriptan-c.Caffeine)/(q.Sumatriptan-q.Caffeine)
+  expect_intol(ICER, 29366, tol=100)
+  # relief rate threshold for ICER
+  pt <- dt$threshold(
+    index=list(e17), ref=list(e18), outcome="ICER", 
+    mvd=p.sumatriptan.relief$description(), 
+    a=p.caffeine.relief, b=p.sumatriptan.relief$mean(),
+    tol=0.0001
+  )
+  expect_intol(pt, p.caffeine.relief+0.112, tol=0.001)
 })
 
 # -----------------------------------------------------------------------------
@@ -599,6 +610,10 @@ test_that("redecision replicates Jenks et al, 2016", {
   # tornado
   expect_error(DT$tornado(), class="missing_strategy")
   expect_error(
+    DT$tornado(index=list(e10),ref=list(e52)),
+    class="invalid_strategy"
+  )
+  expect_error(
     DT$tornado(index=list(e10),ref=list(e9),outcome="survival"),
     class = "invalid_outcome"
   )
@@ -619,6 +634,12 @@ test_that("redecision replicates Jenks et al, 2016", {
       draw = TRUE
     ),
     class = "exclude_element_not_modvar"
+  )
+  expect_silent(
+    TO <- DT$tornado(
+      index=list(e10), ref=list(e9), exclude=list(hr.CRBSI$description()),
+      draw = TRUE
+    )
   )
   expect_silent(
     TO <- DT$tornado(
@@ -684,6 +705,44 @@ test_that("readme example is correct, with thresholds", {
   expect_intol(RES$Cost[RES$Programme=="Exercise"], cost.exercise, 5)
   expect_intol(RES$Cost[RES$Programme=="Diet"], cost.diet, 5)
   # threshold analysis on cost of new programme
+  expect_error(
+    DT$threshold(),
+    class = "missing_strategy"
+  )
+  expect_error(
+    iss <- DT$threshold(ref=list(e.e), index=list(e.ds)),
+    class = "invalid_strategy"
+  )
+  expect_error(
+    DT$threshold(ref=list(e.e), index=list(e.d), outcome="widgets"),
+    class = "invalid_outcome"
+  )
+  expect_error(
+    DT$threshold(ref=list(e.e), index=list(e.d), outcome="cost",
+                 mvd="P(dyet)"),
+    class = "invalid_mvd"
+  )
+  expect_error(
+    DT$threshold(ref=list(e.e), index=list(e.d), outcome="cost",
+                 mvd=42),
+    class = "invalid_mvd"
+  )
+  expect_error(
+    DT$threshold(ref=list(e.e), index=list(e.d), outcome="cost",
+                 mvd=c.exercise$description(), a=1000, b=1000),
+    class = "invalid_tol"
+  )
+  expect_error(
+    DT$threshold(ref=list(e.e), index=list(e.d), outcome="cost",
+                 mvd=c.exercise$description(), a=1000, b=999, tol=10),
+    class = "invalid_brackets"
+  )
+  expect_error(
+    DT$threshold(ref=list(e.e), index=list(e.d), outcome="cost",
+                 mvd=c.exercise$description(), a=c.exercise$mean(), b=1000,
+                 tol=-2),
+    class = "invalid_tol"
+  )
   c.exercise.t <- DT$threshold(
     index=list(e.e), ref=list(e.d), mvd=c.exercise$description(),
     a=c.exercise$mean(), b=1000, tol=1

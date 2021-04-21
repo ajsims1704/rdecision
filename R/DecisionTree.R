@@ -95,29 +95,6 @@ DecisionTree <- R6::R6Class(
         rlang::abort("Each edge must inherit from Action or Reaction", 
                      class="incorrect_edge_type")
       }
-# nocov start
-# Action and Reaction already check for correct source node type
-      # Action (reaction) edges must emerge from DecisionNodes (ChanceNodes)
-      eok <- sapply(E,function(e){
-        rc <- TRUE
-        if (inherits(e,what="Action")) {
-          if (!inherits(e$source(), what="DecisionNode")) {
-            rc <- FALSE
-          }
-        } else {
-          if (!inherits(e$source(), what="ChanceNode")) {
-            rc <- FALSE
-          }
-        }
-        return(rc)
-      })
-      if (!all(eok)) {
-        rlang::abort( 
-          "Actions must start at DecisionNodes; Reactions at ChanceNodes", 
-          class = "incorrect_edge_type" 
-        )
-      }
-# nocov end
       # DecisionNode labels must be unique and all their Action labels
       # must be unique
       D.lab <- sapply(D,function(d){
@@ -537,19 +514,16 @@ DecisionTree <- R6::R6Class(
     #' action in each decision node, specified as a list of nodes) is a valid
     #' strategy for this decision tree.
     #' @param strategy A list of Action edges.
-    #' @return TRUE if the strategy is valid for this tree. Throws an
-    #' exception if the argument is not a list of Action edges. Returns
+    #' @return TRUE if the strategy is valid for this tree. Returns
     #' FALSE if the list of Action edges are not a valid strategy.
     is_strategy = function(strategy) {
       # check that the argument is a list of Action edges
-      vapply(X=strategy, FUN.VALUE=TRUE, FUN=function(e) {
-        if (!inherits(e,what="Action")) {
-          rlang::abort(
-            "Argument 'strategy' must only contain Action elements",
-            class = "incorrect_strategy_type")
-        }
-        return(TRUE)
+      isA <- vapply(X=strategy, FUN.VALUE=TRUE, FUN=function(e) {
+        inherits(e,what="Action")
       })
+      if (!all(isA)) {
+        return(FALSE)
+      }
       # there must be as many Actions as Decision nodes
       iD <- self$decision_nodes("index")
       if (length(strategy) != length(iD)) {
@@ -986,12 +960,10 @@ DecisionTree <- R6::R6Class(
         )
       }
       if (!self$is_strategy(index) || !self$is_strategy(ref)) {
-# nocov start
         rlang::abort(
           "'index' and 'ref' must be valid strategies for the decision tree",
           class = "invalid_strategy"
         )
-# nocov end
       }
       if (!(outcome %in% c("cost", "ICER"))) {
         rlang::abort(
@@ -1088,13 +1060,9 @@ DecisionTree <- R6::R6Class(
           # outcome
           if (outcome == "cost") {
             rv <- ref.cost - index.cost
-          } else if (outcome == "ICER") {
-            rv <- (index.cost-ref.cost)/(index.QALY-ref.QALY)
           } else {
-# nocov start
-            rv <- NA
-# nocov end
-          }
+            rv <- (index.cost-ref.cost)/(index.QALY-ref.QALY)
+          } 
           return(rv)          
         }
         res["outcome.min"] <- ce("q2.5")
@@ -1293,13 +1261,13 @@ DecisionTree <- R6::R6Class(
           class = "invalid_mvd"
         )
       }
-      if (!is.numeric(a) | !is.numeric(b) | (b < a)) {
+      if (!is.numeric(a) || !is.numeric(b) || (b < a)) {
         rlang::abort(
           "'a' and 'b' must be numeric and 'b' > 'a'",
           class = "invalid_brackets"
         )
       }
-      if (!is.numeric(tol) | tol <= 0) {
+      if (missing(tol) || !is.numeric(tol) || tol <= 0) {
         rlang::abort("'tol' must be numeric and >0", class = "invalid_tol")
       }
       # set all modvars to their mean
@@ -1327,7 +1295,7 @@ DecisionTree <- R6::R6Class(
         if (outcome == "cost") {
           rv <- ref.cost - index.cost
         } else {
-          rv <- (index.cost-ref.cost)/(index.QALY-ref.QALY)
+          rv <- (index.cost-ref.cost)/(index.qaly-ref.qaly)
         }
         return(rv)
       }

@@ -53,7 +53,7 @@ expect_intol <- function(object, E, tolerance) {
   # test if object value is equal to E within tolerance
   expect(
     ok = (abs(act$val - E) <= tolerance),
-    sprintf("%s is not within %f of %f", act$lab, tolerance, E)
+    sprintf("%s (%f) is not within %f of %f", act$lab, act$val, tolerance, E)
   )
   # Invisibly return the value
   invisible(act$val)    
