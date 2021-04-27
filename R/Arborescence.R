@@ -1,7 +1,7 @@
 #' @title \verb{Arborescence} class
 #' 
 #' @description
-#' An R6 class to represent an arborescence (rooted directed tree).
+#' An R6 class to represent an \dfn{arborescence} (rooted directed tree).
 #' 
 #' @details 
 #' Class to encapsulate a directed rooted tree specialization of a digraph.

@@ -22,9 +22,9 @@ ChanceNode <- R6::R6Class(
   public = list(
     
     #' @description
-    #' Create a new \verb{ChanceNode} object
+    #' Create a new \code{ChanceNode} object
     #' @param label An optional label for the chance node.
-    #' @return A new \verb{ChanceNode} object
+    #' @return A new \code{ChanceNode} object
     initialize = function(label="") {
       # ensure base class fields are initialized
       super$initialize(label)

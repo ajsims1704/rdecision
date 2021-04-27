@@ -52,7 +52,7 @@ name in a data frame.}
 \if{html}{\out{</div>}}
 }
 \subsection{Returns}{
-A new \verb{DecisionNode} object
+A new \code{DecisionNode} object
 }
 }
 \if{html}{\out{<hr>}}

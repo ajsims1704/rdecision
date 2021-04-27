@@ -10,7 +10,7 @@ An R6 class for a model variable with Beta function uncertainty
 \details{
 A model variable for which the uncertainty in the point estimate can
 be modelled with a Beta distribution. The hyperparameters of the
-distribution are the shape (\verb{alpha}) and the shape (\verb{beta}) of
+distribution are the shape (\verb{alpha}) and the shape (\code{beta}) of
 the uncertainty distribution.
 }
 \author{
@@ -48,7 +48,7 @@ Andrew J. Sims \email{andrew.sims@newcastle.ac.uk}
 \if{html}{\out{<a id="method-new"></a>}}
 \if{latex}{\out{\hypertarget{method-new}{}}}
 \subsection{Method \code{new()}}{
-Create an object of class \verb{BetaModVar}.
+Create an object of class \code{BetaModVar}.
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{BetaModVar$new(description, units, alpha, beta)}\if{html}{\out{</div>}}
 }
@@ -67,7 +67,7 @@ Create an object of class \verb{BetaModVar}.
 \if{html}{\out{</div>}}
 }
 \subsection{Returns}{
-An object of class \verb{BetaModVar}.
+An object of class \code{BetaModVar}.
 }
 }
 \if{html}{\out{<hr>}}
@@ -115,7 +115,7 @@ Expected value as a numeric value.
 \if{html}{\out{<a id="method-mode"></a>}}
 \if{latex}{\out{\hypertarget{method-mode}{}}}
 \subsection{Method \code{mode()}}{
-Return the mode of the distribution (if \verb{alpha}, \verb{beta} > 1)
+Return the mode of the distribution (if \code{alpha}, \code{beta} > 1)
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{BetaModVar$mode()}\if{html}{\out{</div>}}
 }
@@ -135,13 +135,13 @@ Return the standard deviation of the distribution.
 
 \subsection{Returns}{
 Standard deviation as a numeric value
-Draw a random sample from the model variable.
 }
 }
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-r"></a>}}
 \if{latex}{\out{\hypertarget{method-r}{}}}
 \subsection{Method \code{r()}}{
+Draw a random sample from the model variable.
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{BetaModVar$r(n = 1)}\if{html}{\out{</div>}}
 }

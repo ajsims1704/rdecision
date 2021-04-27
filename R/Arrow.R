@@ -4,7 +4,7 @@
 #' An R6 class to represent an directed edge in a digraph.
 #' 
 #' @details Arrows are the formal term for links between pairs of nodes in a
-#' directed graph. Inherits from class \verb{Edge}.
+#' directed graph. Inherits from class \code{Edge}.
 #' 
 #' @docType class
 #' @author Andrew J. Sims \email{andrew.sims@@newcastle.ac.uk}
@@ -18,11 +18,11 @@ Arrow <- R6::R6Class(
   public = list(
     
     #' @description
-    #' Create an object of type \verb{Arrow}.
+    #' Create an object of type \code{Arrow}.
     #' @param source Node from which the arrow leaves.
-    #' @param target second Node to which the arrow enters.
+    #' @param target Node to which the arrow points.
     #' @param label Character string containing the arrow label.
-    #' @return A new \verb{Arrow} object.
+    #' @return A new \code{Arrow} object.
     initialize = function(source, target, label="") {
       # base class
       super$initialize(v1=source, v2=target, label=label)

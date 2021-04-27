@@ -4,7 +4,7 @@
 #' An R6 class to represent an action (choice) edge in a decision tree.
 #' 
 #' @details A specialism of class Arrow which is used in a decision tree to
-#' represent edges with source nodes joined to \verb{DecisionNode}s.
+#' represent edges with source nodes joined to \code{DecisionNode}s.
 #' 
 #' @docType class
 #' @author Andrew J. Sims \email{andrew.sims@@newcastle.ac.uk}
@@ -21,19 +21,20 @@ Action <- R6::R6Class(
   public = list(
     
     #' @description
-    #' Create an object of type 'Action'. Optionally, a cost and a benefit may 
+    #' Create an object of type \code{Action}. Optionally, a cost and a benefit 
+    #' may 
     #' be associated with traversing the edge. A \dfn{pay-off} (benefit minus 
     #' cost)  is sometimes used in edges of decision trees; the parametrization
     #' used here is more general.
     #' @param source Decision node from which the arrow leaves.
-    #' @param target Node which the arrow enters.
+    #' @param target Node to which the arrow points.
     #' @param label Character string containing the arrow label. This
     #' must be defined for an action because the label is used in
     #' tabulation of strategies. It is recommended to choose labels that are
     #' brief and not punctuated with spaces, dots or underscores.
     #' @param cost Cost associated with traversal of this edge.
     #' @param benefit Benefit associated with traversal of the edge.
-    #' @return A new \verb{Action} object.
+    #' @return A new \code{Action} object.
     initialize = function(source, target, label, cost=0, benefit=0) {
       # check label
       if (!is.character(label)) {
@@ -81,11 +82,11 @@ Action <- R6::R6Class(
     },
     
     #' @description 
-    #' Find all the model variables of type \verb{ModVar} that have been 
+    #' Find all the model variables of type \code{ModVar} that have been 
     #' specified
-    #' as values associated with this Action. Includes operands of these
-    #' \verb{ModVar}s, if they are expressions.
-    #' @return A list of \verb{ModVar}s.
+    #' as values associated with this \code{Action}. Includes operands of these
+    #' \code{ModVar}s, if they are expressions.
+    #' @return A list of \code{ModVar}s.
     modvars = function() {
       # create lists of input variables and output ModVars
       iv <- c(private$edge.cost, private$edge.benefit)

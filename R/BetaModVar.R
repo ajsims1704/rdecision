@@ -6,7 +6,7 @@
 #' @details 
 #' A model variable for which the uncertainty in the point estimate can
 #' be modelled with a Beta distribution. The hyperparameters of the
-#' distribution are the shape (\verb{alpha}) and the shape (\verb{beta}) of
+#' distribution are the shape (\verb{alpha}) and the shape (\code{beta}) of
 #' the uncertainty distribution. 
 #'
 #' @docType class
@@ -24,12 +24,12 @@ BetaModVar <- R6::R6Class(
   public = list(
     
     #' @description 
-    #' Create an object of class \verb{BetaModVar}.
+    #' Create an object of class \code{BetaModVar}.
     #' @param description A character string describing the variable.
     #' @param units Units of the variable, as character string.
     #' @param alpha parameter of the Beta distribution.
     #' @param beta parameter of the Beta distribution.
-    #' @return An object of class \verb{BetaModVar}. 
+    #' @return An object of class \code{BetaModVar}. 
     initialize = function(description, units, alpha, beta) {
       super$initialize(description, units)
       # check alpha parameter
@@ -91,7 +91,7 @@ BetaModVar <- R6::R6Class(
     },
 
     #' @description 
-    #' Return the mode of the distribution (if \verb{alpha}, \verb{beta} > 1) 
+    #' Return the mode of the distribution (if \code{alpha}, \code{beta} > 1) 
     #' @return mode as a numeric value.
     mode = function() {
       rv <- as.numeric(NA)
@@ -109,8 +109,7 @@ BetaModVar <- R6::R6Class(
       return(rv)
     },
     
-    #' @description 
-    #' Return the standard deviation of the distribution. 
+    #' @description Return the standard deviation of the distribution. 
     #' @return Standard deviation as a numeric value
     SD = function() {
       a <- private$alpha
@@ -119,7 +118,7 @@ BetaModVar <- R6::R6Class(
       return(sqrt(v))
     },
 
-    #' Draw a random sample from the model variable. 
+    #' @description Draw a random sample from the model variable. 
     #' @param n Number of samples to draw.
     #' @return Samples drawn at random.
     r = function(n=1) {

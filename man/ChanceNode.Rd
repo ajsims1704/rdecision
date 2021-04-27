@@ -38,7 +38,7 @@ Andrew Sims \email{andrew.sims@newcastle.ac.uk}
 \if{html}{\out{<a id="method-new"></a>}}
 \if{latex}{\out{\hypertarget{method-new}{}}}
 \subsection{Method \code{new()}}{
-Create a new \verb{ChanceNode} object
+Create a new \code{ChanceNode} object
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{ChanceNode$new(label = "")}\if{html}{\out{</div>}}
 }
@@ -51,7 +51,7 @@ Create a new \verb{ChanceNode} object
 \if{html}{\out{</div>}}
 }
 \subsection{Returns}{
-A new \verb{ChanceNode} object
+A new \code{ChanceNode} object
 }
 }
 \if{html}{\out{<hr>}}

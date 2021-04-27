@@ -4,9 +4,6 @@
 \name{DecisionTree}
 \alias{DecisionTree}
 \title{\verb{DecisionTree} class}
-\value{
-Value of the model variable of interest at the threshold.
-}
 \description{
 An R6 class to represent a decision tree
 }
@@ -20,22 +17,22 @@ conditions:
 there must be a unique path from the root to each node.
 In graph theory terminology, the directed graph formed by the nodes
 and edges must be an \dfn{arborescence}.}
-\item{Each node must inherit from one of \verb{DecisionNode},
-\code{ChanceNode} or \verb{LeafNode}. Formally the set of vertices
+\item{Each node must inherit from one of \code{DecisionNode},
+\code{ChanceNode} or \code{LeafNode}. Formally the set of vertices
 must be a disjoint union of sets of decision nodes, chance nodes
 and leaf nodes.}
 \item{All and only leaf nodes must have no children.}
-\item{Each edge must inherit from either \verb{Action} or
+\item{Each edge must inherit from either \code{Action} or
 \code{Reaction}.}
 \item{All and only edges that have source endpoints joined to 
-decision nodes must inherit from \verb{Action}.}
+decision nodes must inherit from \code{Action}.}
 \item{All and only edges that have source endpoints joined to 
-chance nodes must inherit from \verb{Reaction}.}
+chance nodes must inherit from \code{Reaction}.}
 \item{The sum of probabilities of each set of reaction edges 
 with a common source endpoint must be 1.}
-\item{Each \verb{DecisionNode} must have a label, and the labels of all
+\item{Each \code{DecisionNode} must have a label, and the labels of all
 \code{DecisionNodes} must be unique within the model.}
-\item{Each \verb{Action} must have a label, and the labels of  
+\item{Each \code{Action} must have a label, and the labels of  
 \code{Action}s that share a common source endpoint must be unique.}
 }
 }
@@ -139,7 +136,7 @@ in the details section of this class.
 \if{html}{\out{</div>}}
 }
 \subsection{Returns}{
-A \verb{DecisionTree} object
+A \code{DecisionTree} object
 }
 }
 \if{html}{\out{<hr>}}
@@ -160,7 +157,7 @@ of "node", "label" or "index".}
 \if{html}{\out{</div>}}
 }
 \subsection{Returns}{
-A list of \verb{DecisionNode} objects (for what="node"); a list
+A list of \code{DecisionNode} objects (for what="node"); a list
 of character strings (for what="label"); or a list of integer indexes of 
 the decision nodes (for what="index").
 }
@@ -175,7 +172,7 @@ Find the chance nodes in the tree.
 }
 
 \subsection{Returns}{
-A list of \verb{ChanceNode} objects.
+A list of \code{ChanceNode} objects.
 }
 }
 \if{html}{\out{<hr>}}
@@ -191,13 +188,13 @@ Find the leaf nodes in the tree.
 \if{html}{\out{<div class="arguments">}}
 \describe{
 \item{\code{what}}{One of "node" (returns Node objects), "label" (returns the
-leaf node labels) or "index" (returns the vertex index of the leaf
+leaf node labels) or "index" (returns the vertex indexes of the leaf
 nodes).}
 }
 \if{html}{\out{</div>}}
 }
 \subsection{Returns}{
-A list of \verb{LeafNode} objects (for what="node"); a list
+A list of \code{LeafNode} objects (for what="node"); a list
 of character strings (for what="label"); or a list of integer indexes of 
 the decision nodes (for what="index").
 }
@@ -219,21 +216,21 @@ Return the edges that have the specified decision node as their source.
 \if{html}{\out{</div>}}
 }
 \subsection{Returns}{
-A list of \verb{Action} edges.
+A list of \code{Action} edges.
 }
 }
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-modvars"></a>}}
 \if{latex}{\out{\hypertarget{method-modvars}{}}}
 \subsection{Method \code{modvars()}}{
-Find all the model variables of type \verb{ModVar} that have been 
+Find all the model variables of type \code{ModVar} that have been 
 specified as values associated with the nodes and edges of the tree.
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{DecisionTree$modvars()}\if{html}{\out{</div>}}
 }
 
 \subsection{Returns}{
-A list of \verb{ModVar}s.
+A list of \code{ModVar}s.
 }
 }
 \if{html}{\out{<hr>}}
@@ -256,22 +253,22 @@ variables should be included in the tabulation.}
 \subsection{Returns}{
 Data frame with one row per model variable, as follows:
 \describe{
-\item{Description}{As given at initialization.}
-\item{Units}{Units of the variable.}
-\item{Distribution}{Either the uncertainty distribution, if
+\item{\code{Description}}{As given at initialization.}
+\item{\code{Units}}{Units of the variable.}
+\item{\code{Distribution}}{Either the uncertainty distribution, if
 it is a regular model variable, or the expression used to create it,
-if it is an \verb{ExprModVar}.}
-\item{Mean}{Mean; calculated from means of operands if
+if it is an \code{ExprModVar}.}
+\item{\code{Mean}}{Mean; calculated from means of operands if
 an expression.}
-\item{E}{Expectation; estimated from random sample if expression, 
+\item{\code{E}}{Expectation; estimated from random sample if expression, 
 mean otherwise.}
-\item{SD}{Standard deviation; estimated from random sample if
+\item{\code{SD}}{Standard deviation; estimated from random sample if
 expression, exact value otherwise.}
-\item{Q2.5}{p=0.025 quantile; estimated from random sample if
+\item{\code{Q2.5}}{p=0.025 quantile; estimated from random sample if
 expression, exact value otherwise.}
-\item{Q97.5}{p=0.975 quantile; estimated from random sample if
+\item{\code{Q97.5}}{p=0.975 quantile; estimated from random sample if
 expression, exact value otherwise.}
-\item{Est}{TRUE if the quantiles and SD have been estimated by 
+\item{\code{Est}}{TRUE if the quantiles and SD have been estimated by 
 random sampling.}
 }
 }
@@ -317,8 +314,7 @@ strategy for this decision tree.
 \if{html}{\out{</div>}}
 }
 \subsection{Returns}{
-TRUE if the strategy is valid for this tree. Throws an
-exception if the argument is not a list of Action edges. Returns
+TRUE if the strategy is valid for this tree. Returns
 FALSE if the list of Action edges are not a valid strategy.
 }
 }
@@ -461,8 +457,8 @@ for each strategy.}
 For \code{by="path"} the columns of the data frame are: 
 \tabular{lllllllll}{
 Leaf \tab The label of terminating leaf node \cr
-<label of 1st decision node> \tab label of action leaving the node \cr
-<label of 2nd decision node (etc.)> \tab label of action \cr
+<label of first decision node> \tab label of action leaving the node \cr
+<label of second decision node (etc.)> \tab label of action \cr
 Probability \tab Probability of traversing the path \cr
 Cost \tab Cost of traversing the path \cr
 Benefit \tab Benefit of traversing the path \cr
@@ -507,7 +503,13 @@ Create a "tornado" diagram to compare two strategies for traversing
 the decision tree. A strategy is a unanimous prescription of the actions
 at each decision node.
 \subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{DecisionTree$tornado(index, ref, outcome = "cost", exclude = NULL, draw = TRUE)}\if{html}{\out{</div>}}
+\if{html}{\out{<div class="r">}}\preformatted{DecisionTree$tornado(
+  index,
+  ref,
+  outcome = "saving",
+  exclude = NULL,
+  draw = TRUE
+)}\if{html}{\out{</div>}}
 }
 
 \subsection{Arguments}{
@@ -518,11 +520,11 @@ at each decision node.
 \item{\code{ref}}{The reference strategy (option) with which the index strategy
 will be compared.}
 
-\item{\code{outcome}}{One of \verb{"cost"} or \verb{"ICER"}. For \verb{"cost"}
-(e.g. in cost
-consequence analysis), the x axis is cost saved (cost of reference minus
+\item{\code{outcome}}{One of \code{"saving"} or \code{"ICER"}. For 
+\code{"saving"} (e.g. in cost consequence analysis), the x axis is cost
+saved (cost of reference minus
 cost of index), on the presumption that the new technology will be cost
-saving at the point estimate. For \verb{"ICER"} the x axis is
+saving at the point estimate. For \code{"ICER"} the x axis is
 \eqn{\Delta C/\Delta E} and is expected to be positive at the point 
 estimate (i.e. in the NE or SW quadrants of the cost-effectiveness 
 plane), where \eqn{\Delta C} is cost of index minus cost of reference, 
@@ -547,7 +549,7 @@ variable. This ensures that the range of each input is defensible
 A data frame with one row per input model variable and columns
 for: minimum value of the variable, maximum value of the variable,
 minimum value of the outcome and maximum value of the outcome. NULL
-if there are no \verb{ModVar}s.
+if there are no \code{ModVar}s.
 }
 }
 \if{html}{\out{<hr>}}
@@ -555,17 +557,18 @@ if there are no \verb{ModVar}s.
 \if{latex}{\out{\hypertarget{method-threshold}{}}}
 \subsection{Method \code{threshold()}}{
 Find the threshold value of a model variable at which
-either the cost difference or ICER, for an index strategy compared with  
-a reference strategy, is zero.
+the cost difference is zero or the ICER is equal to a threshold, for an
+index strategy compared with a reference strategy.
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{DecisionTree$threshold(
   index,
   ref,
-  outcome = "cost",
+  outcome = "saving",
   mvd,
   a,
   b,
   tol,
+  lambda = NULL,
   nmax = 1000
 )}\if{html}{\out{</div>}}
 }
@@ -578,37 +581,49 @@ a reference strategy, is zero.
 \item{\code{ref}}{The reference strategy (option) with which the index strategy
 will be compared.}
 
-\item{\code{outcome}}{One of \verb{"cost"} or \verb{"ICER"}. For \verb{"cost"}
-(e.g. in cost consequence analysis), the x axis is cost saved (cost of
-reference minus cost of index), on the presumption that the new 
-technology will be cost
-saving at the point estimate. For \verb{"ICER"} the x axis is
-\eqn{\Delta C/\Delta E} and is expected to be positive at the point 
-estimate (i.e. in the NE or SW quadrants of the cost-effectiveness 
-plane), where \eqn{\Delta C} is cost of index minus cost of reference, 
-and \eqn{\Delta E} is utility of index minus utility of reference.}
+\item{\code{outcome}}{One of \code{"saving"} or \code{"ICER"}. For 
+\code{"saving"} (e.g. in cost consequence analysis), the value of 
+\code{mvd}
+is found at which cost saved is zero (cost saved is cost of reference 
+minus cost of index, on the presumption that the new technology will be
+cost saving at the point estimate). For \code{"ICER"} the value of 
+\code{mvd} 
+is found for which the incremental cost effectiveness ratio (ICER) is 
+equal to the threshold \code{lambda}. ICER is calculated as 
+\eqn{\Delta C/\Delta E}, which will normally be positive
+at the point estimate (i.e. in the NE or SW quadrants of the 
+cost-effectiveness plane), where \eqn{\Delta C} is cost of index minus
+cost of reference and \eqn{\Delta E} is utility of index minus utility 
+of reference.}
 
 \item{\code{mvd}}{The description of the model variable for which the threshold
 is to be found.}
 
-\item{\code{a}}{The lower bound of the range to search for the root (numeric).}
+\item{\code{a}}{The lower bound of the range of values of \code{mvd} to search 
+for the root (numeric).}
 
-\item{\code{b}}{The lower bound of the range to search for the root (numeric).}
+\item{\code{b}}{The upper bound of the range of values of \code{mvd} to search
+for the root (numeric).}
 
 \item{\code{tol}}{The tolerance to which the threshold should be 
 calculated (numeric).}
+
+\item{\code{lambda}}{The ICER threshold (threshold ratio) for outcome="ICER".}
 
 \item{\code{nmax}}{Maximum number if iterations allowed to reach convergence.}
 }
 \if{html}{\out{</div>}}
 }
 \subsection{Details}{
-Uses a rudimentary bisection method method to find the root
-(i.e. threshold value when the outcome is zero). In PSA terms, the 
-algorithm finds the value of the specified model variable for which
-50% of runs are cost saving and 50% are cost incurring.
+Uses a rudimentary bisection method method to find the root.
+In PSA terms, the algorithm finds the value of the specified model
+variable for which 50\% of runs are cost saving (or above the ICER
+threshold) and 50\% are cost incurring (below the ICER threshold).
 }
 
+\subsection{Returns}{
+Value of the model variable of interest at the threshold.
+}
 }
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-clone"></a>}}

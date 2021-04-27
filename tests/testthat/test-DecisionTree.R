@@ -232,14 +232,30 @@ test_that("rdecision replicates Evans et al, Sumatriptan base case", {
   q.Caffeine <- RES$QALY.Caffeine[1]
   ICER <- (c.Sumatriptan-c.Caffeine)/(q.Sumatriptan-q.Caffeine)
   expect_intol(ICER, 29366, tol=100)
-  # relief rate threshold for ICER
+  # mean relief rate threshold for ICER
   pt <- dt$threshold(
     index=list(e17), ref=list(e18), outcome="ICER", 
     mvd=p.sumatriptan.relief$description(), 
-    a=p.caffeine.relief, b=p.sumatriptan.relief$mean(),
-    tol=0.0001
+    a=0.5, b=0.6,
+    lambda=29366, tol=0.0001
   )
-  expect_intol(pt, p.caffeine.relief+0.112, tol=0.001)
+  expect_intol(pt, p.caffeine.relief+0.179, tol=0.02)
+  # upper 95% relief rate threshold for ICER (Table VIII)
+  pt <- dt$threshold(
+    index=list(e17), ref=list(e18), outcome="ICER", 
+    mvd=p.sumatriptan.relief$description(), 
+    a=0.6, b=0.7,
+    lambda=18950, tol=0.0001
+  )
+  expect_intol(pt, p.caffeine.relief+0.268, tol=0.02)
+  # lower 95% relief rate threshold for ICER (Table VIII)
+  pt <- dt$threshold(
+    index=list(e17), ref=list(e18), outcome="ICER", 
+    mvd=p.sumatriptan.relief$description(), 
+    a=0.4, b=0.5,
+    lambda=60839, tol=0.0001
+  )
+  expect_intol(pt, p.caffeine.relief+0.091, tol=0.02)
 })
 
 # -----------------------------------------------------------------------------
@@ -718,27 +734,27 @@ test_that("readme example is correct, with thresholds", {
     class = "invalid_outcome"
   )
   expect_error(
-    DT$threshold(ref=list(e.e), index=list(e.d), outcome="cost",
+    DT$threshold(ref=list(e.e), index=list(e.d), outcome="saving",
                  mvd="P(dyet)"),
     class = "invalid_mvd"
   )
   expect_error(
-    DT$threshold(ref=list(e.e), index=list(e.d), outcome="cost",
+    DT$threshold(ref=list(e.e), index=list(e.d), outcome="saving",
                  mvd=42),
     class = "invalid_mvd"
   )
   expect_error(
-    DT$threshold(ref=list(e.e), index=list(e.d), outcome="cost",
+    DT$threshold(ref=list(e.e), index=list(e.d), outcome="saving",
                  mvd=c.exercise$description(), a=1000, b=1000),
     class = "invalid_tol"
   )
   expect_error(
-    DT$threshold(ref=list(e.e), index=list(e.d), outcome="cost",
+    DT$threshold(ref=list(e.e), index=list(e.d), outcome="saving",
                  mvd=c.exercise$description(), a=1000, b=999, tol=10),
     class = "invalid_brackets"
   )
   expect_error(
-    DT$threshold(ref=list(e.e), index=list(e.d), outcome="cost",
+    DT$threshold(ref=list(e.e), index=list(e.d), outcome="saving",
                  mvd=c.exercise$description(), a=c.exercise$mean(), b=1000,
                  tol=-2),
     class = "invalid_tol"

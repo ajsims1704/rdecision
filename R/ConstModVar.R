@@ -4,10 +4,10 @@
 #' An R6 class for a constant in a model
 #' 
 #' @details
-#' A \verb{ModVar} with no uncertainty in its value. It has no
+#' A \code{ModVar} with no uncertainty in its value. It has no
 #' distribution and there are no hyperparameters. Its 
 #' benefit over using a regular numeric variable in a model is that
-#' it will appear in automatic tabulations of the model variables
+#' it will appear in tabulations of the model variables
 #' associated with a model and therefore be explicitly documented
 #' as a model input.
 #' 
@@ -32,7 +32,7 @@ ConstModVar <- R6::R6Class(
     #' @param units A character string description of the units, e.g. "GBP",
     #' "per year".
     #' @param const The constant numerical value of the object.
-    #' @return A new \verb{ConstModVar} object.
+    #' @return A new \code{ConstModVar} object.
     initialize = function(description, units, const) {
       super$initialize(description, units)
       if (!is.numeric(const)) {
@@ -100,7 +100,7 @@ ConstModVar <- R6::R6Class(
     #' Quantiles of the uncertainty distribution; for a constant all
     #' quantiles are returned as the value of the constant.
     #' @param probs Numeric vector of probabilities, each in range [0,1].
-    #' @return Vector of numeric values of the same length as \verb{probs}.
+    #' @return Vector of numeric values of the same length as \code{probs}.
     quantile = function(probs) {
       # test argument
       sapply(probs, FUN=function(x) {

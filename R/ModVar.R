@@ -152,11 +152,11 @@ ModVar <- R6::R6Class(
     #' otherwise.
     #' @details The "current" option is provided to support having common 
     #' functions to set (or leave alone) sets of model variables, depending on
-    #' their use case and avoids additional if loops. Option 'value' is
+    #' their use case and avoids additional if statements. Option "value" is
     #' not recommended for normal usage because it allows the model variable
     #' to be set to an implausible value, based on its defined uncertainty. An 
     #' example of where this may be needed is in threshold finding. 
-    #' @return Updated \verb{ModVar}.
+    #' @return Updated \code{ModVar}.
     set = function(what="random", val=NULL) {
       # check argument
       if (!is.character(what)) {

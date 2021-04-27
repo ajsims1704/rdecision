@@ -9,7 +9,7 @@ An R6 class to represent an directed edge in a digraph.
 }
 \details{
 Arrows are the formal term for links between pairs of nodes in a
-directed graph. Inherits from class \verb{Edge}.
+directed graph. Inherits from class \code{Edge}.
 }
 \author{
 Andrew J. Sims \email{andrew.sims@newcastle.ac.uk}
@@ -39,7 +39,7 @@ Andrew J. Sims \email{andrew.sims@newcastle.ac.uk}
 \if{html}{\out{<a id="method-new"></a>}}
 \if{latex}{\out{\hypertarget{method-new}{}}}
 \subsection{Method \code{new()}}{
-Create an object of type \verb{Arrow}.
+Create an object of type \code{Arrow}.
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{Arrow$new(source, target, label = "")}\if{html}{\out{</div>}}
 }
@@ -49,14 +49,14 @@ Create an object of type \verb{Arrow}.
 \describe{
 \item{\code{source}}{Node from which the arrow leaves.}
 
-\item{\code{target}}{second Node to which the arrow enters.}
+\item{\code{target}}{Node to which the arrow points.}
 
 \item{\code{label}}{Character string containing the arrow label.}
 }
 \if{html}{\out{</div>}}
 }
 \subsection{Returns}{
-A new \verb{Arrow} object.
+A new \code{Arrow} object.
 }
 }
 \if{html}{\out{<hr>}}

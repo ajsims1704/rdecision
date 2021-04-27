@@ -9,7 +9,7 @@ An R6 class to represent an action (choice) edge in a decision tree.
 }
 \details{
 A specialism of class Arrow which is used in a decision tree to
-represent edges with source nodes joined to \verb{DecisionNode}s.
+represent edges with source nodes joined to \code{DecisionNode}s.
 }
 \author{
 Andrew J. Sims \email{andrew.sims@newcastle.ac.uk}
@@ -43,7 +43,8 @@ Andrew J. Sims \email{andrew.sims@newcastle.ac.uk}
 \if{html}{\out{<a id="method-new"></a>}}
 \if{latex}{\out{\hypertarget{method-new}{}}}
 \subsection{Method \code{new()}}{
-Create an object of type 'Action'. Optionally, a cost and a benefit may 
+Create an object of type \code{Action}. Optionally, a cost and a benefit 
+may 
 be associated with traversing the edge. A \dfn{pay-off} (benefit minus 
 cost)  is sometimes used in edges of decision trees; the parametrization
 used here is more general.
@@ -56,7 +57,7 @@ used here is more general.
 \describe{
 \item{\code{source}}{Decision node from which the arrow leaves.}
 
-\item{\code{target}}{Node which the arrow enters.}
+\item{\code{target}}{Node to which the arrow points.}
 
 \item{\code{label}}{Character string containing the arrow label. This
 must be defined for an action because the label is used in
@@ -70,23 +71,23 @@ brief and not punctuated with spaces, dots or underscores.}
 \if{html}{\out{</div>}}
 }
 \subsection{Returns}{
-A new \verb{Action} object.
+A new \code{Action} object.
 }
 }
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-modvars"></a>}}
 \if{latex}{\out{\hypertarget{method-modvars}{}}}
 \subsection{Method \code{modvars()}}{
-Find all the model variables of type \verb{ModVar} that have been 
+Find all the model variables of type \code{ModVar} that have been 
 specified
-as values associated with this Action. Includes operands of these
-\verb{ModVar}s, if they are expressions.
+as values associated with this \code{Action}. Includes operands of these
+\code{ModVar}s, if they are expressions.
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{Action$modvars()}\if{html}{\out{</div>}}
 }
 
 \subsection{Returns}{
-A list of \verb{ModVar}s.
+A list of \code{ModVar}s.
 }
 }
 \if{html}{\out{<hr>}}
