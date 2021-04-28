@@ -673,19 +673,22 @@ DecisionTree <- R6::R6Class(
     #' @return A matrix (pay-off table) with one row per path and columns
     #' organized as follows:
     #' \describe{
-    #' \item{Leaf}{The unique identifier of the path, taken to be the index 
-    #' of the terminal (leaf) node.}
-    #' \item{Probability}{The probability of traversing the pathway. }
-    #' \item{Path.Cost}{The cost of traversing the pathway.}
-    #' \item{Path.Benefit}{The benefit derived from traversing the pathway.}
-    #' \item{Path.Utility}{The utility associated with the outcome (leaf node).}
-    #' \item{Path.QALY}{The QALYs associated with the outcome (leaf node).}
-    #' \item{Cost}{Path.Cost \eqn{*} probability of traversing the pathway.}
-    #' \item{Benefit}{Path.Benefit \eqn{*} probability of traversing the 
+    #' \item{\code{Leaf}}{The unique identifier of the path, taken to be the 
+    #' index of the terminal (leaf) node.}
+    #' \item{\code{Probability}}{The probability of traversing the pathway. }
+    #' \item{\code{Path.Cost}}{The cost of traversing the pathway.}
+    #' \item{\code{Path.Benefit}}{The benefit derived from traversing the pathway.}
+    #' \item{\code{Path.Utility}}{The utility associated with the outcome (leaf
+    #'  node).}
+    #' \item{\code{Path.QALY}}{The QALYs associated with the outcome (leaf 
+    #' node).}
+    #' \item{\code{Cost}}{\code{Path.Cost} \eqn{*} probability of traversing the 
     #' pathway.}
-    #' \item{Utility}{Path.Utility \eqn{*} probability of traversing the
-    #' pathway.}
-    #' \item{QALY}{Path.QALY \eqn{*} probability of traversing the
+    #' \item{\code{Benefit}}{\code{Path.Benefit} \eqn{*} probability of 
+    #' traversing the pathway.}
+    #' \item{\code{Utility}}{\code{Path.Utility} \eqn{*} probability of 
+    #' traversing the pathway.}
+    #' \item{\code{QALY}}{\code{Path.QALY} \eqn{*} probability of traversing the
     #' pathway.}
     #' }
     evaluate_walks = function(W) {
@@ -744,16 +747,16 @@ DecisionTree <- R6::R6Class(
     #' @description 
     #' Evaluate each strategy. Starting with the root, the function
     #' works though all possible paths to leaf nodes and computes the 
-    #' probability, cost, benefit and utility of each, then aggregates 
-    #' by strategy.   
+    #' probability, cost, benefit and utility of each, then optionally 
+    #' aggregates by strategy or run.   
     #' @param setvars One of "expected" (evaluate with each model variable at
     #' its mean value), "random" (sample each variable from its uncertainty 
     #' distribution and evaluate the model), "q2.5", "q50", "q97.5" (set each
     #' model variable to its 2.5\%, 50\% or 97.5\% quantile, respectively, and
-    #' evaluate the model), "current" (leave each model variable at its current
-    #' value prior to calling the function and evaluate the model).
+    #' evaluate the model) or "current" (leave each model variable at its 
+    #' current value prior to calling the function and evaluate the model).
     #' @param N Number of replicates. Intended for use with PSA 
-    #' (\code{modvars="random"}); use with \code{modvars="expected"}
+    #' (\code{modvars="random"}); use with \code{modvars}="expected"
     #' will be repetitive and uninformative. 
     #' @param by One of {"path", "strategy", "run"}. If "path", the table has
     #' one row per path walked per strategy, per run, and includes the label of
@@ -764,42 +767,55 @@ DecisionTree <- R6::R6Class(
     #' for each strategy. 
     #' @return A data frame whose columns depend on \code{by}; see "Details".
     #' @details 
-    #' For \code{by="path"} the columns of the data frame are: 
-    #' \tabular{lllllllll}{
-    #' Leaf \tab The label of terminating leaf node \cr
-    #' <label of first decision node> \tab label of action leaving the node \cr
-    #' <label of second decision node (etc.)> \tab label of action \cr
-    #' Probability \tab Probability of traversing the path \cr
-    #' Cost \tab Cost of traversing the path \cr
-    #' Benefit \tab Benefit of traversing the path \cr
-    #' Utility \tab Utility of traversing the path \cr
-    #' QALY \tab QALY of traversing the path \cr
-    #' Run \tab Run number \cr
+    #' The columns of the returned data frame are:
+    #' \describe{
+    #' \item{\code{by="path"}}{
+    #'   \describe{
+    #'     \item{}{}
+    #'     \item{\code{Leaf}}{The label of terminating leaf node}
+    #'     \item{\code{<label of first decision node>}}{label of action leaving 
+    #'           the node}
+    #'     \item{\code{<label of second decision node (etc.)>}}{label of action}
+    #'     \item{\code{Probability}}{Probability of traversing the path}
+    #'     \item{\code{Cost}}{Cost of traversing the path}
+    #'     \item{\code{Benefit}}{Benefit of traversing the path}
+    #'     \item{\code{Utility}}{Utility of traversing the path}
+    #'     \item{\code{QALY}}{QALY of traversing the path}
+    #'     \item{\code{Run}}{Run number}
+    #'   }
     #' }
-    #' For \code{by="strategy"} the columns are:
-    #' \tabular{llllllll}{
-    #' <label of first decision node> \tab label of action leaving the node \cr
-    #' <label of second decision node (etc) \tab label of action \cr
-    #' Run \tab Run number \cr
-    #' Probability \tab \eqn{\Sigma p_i} for the run (1) \cr
-    #' Cost \tab Aggregate cost of the strategy \cr
-    #' Benefit \tab Aggregate benefit of the strategy \cr
-    #' Utility \tab Aggregate utility of the strategy \cr
-    #' QALY \tab Aggregate QALY of the strategy \cr
+    #' 
+    #' \item{\code{by="strategy"}}{
+    #'   \describe{
+    #'     \item{}{}
+    #'     \item{\code{<label of first decision node>}}{label of action leaving 
+    #'           the node}
+    #'     \item{\code{<label of second decision node (etc)}}{label of action}
+    #'     \item{\code{Run}}{Run number}
+    #'     \item{\code{Probability}}{\eqn{\Sigma p_i} for the run (1)}
+    #'     \item{\code{Cost}}{Aggregate cost of the strategy}
+    #'     \item{\code{Benefit}}{Aggregate benefit of the strategy}
+    #'     \item{\code{Utility}}{Aggregate utility of the strategy}
+    #'     \item{\code{QALY}}{Aggregate QALY of the strategy}
+    #'   }
+    #' } 
+    #' 
+    #' \item{\code{by="run"}}{
+    #'   \describe{
+    #'     \item{}{}
+    #'     \item{\code{Run}}{Run number}
+    #'     \item{\code{Probability.<S>}}{Probability for strategy S}
+    #'     \item{\code{Cost.<S>}}{Cost for strategy S}
+    #'     \item{\code{Benefit.<S>}}{Benefit for strategy S}
+    #'     \item{\code{Utility.<S>}}{Benefit for strategy S}
+    #'     \item{\code{QALY.<S>}}{QALY for strategy S}
+    #'   }
+    #'   where <S> is string composed of the action labels in strategy \code{S}
+    #'   concatenated with an underscore and there will be one probability etc.,
+    #'   column for each strategy.
+    #'   }
     #' }
-    #' For \code{by="run"} the columns are:
-    #' \tabular{llllll}{
-    #' Run \tab Run number \cr
-    #' Probability.<S> \tab Probability for strategy S \cr
-    #' Cost.<S> \tab Cost for strategy S\cr
-    #' Benefit.<S> \tab Benefit for strategy S\cr
-    #' Utility.<S> \tab Benefit for strategy S\cr
-    #' QALY.<S> \tab QALY for strategy S\cr
-    #' }
-    #' where <S> is string composed of the action labels in strategy S
-    #' concatenated with an underscore and there will be one probability etc.,
-    #' column for each strategy.
-   evaluate = function(setvars="expected", N=1, by="strategy") {
+    evaluate = function(setvars="expected", N=1, by="strategy") {
       # check arguments
       if (!is.character(setvars)) {
         rlang::abort(
