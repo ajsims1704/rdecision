@@ -8,8 +8,8 @@
 An R6 class to represent an action (choice) edge in a decision tree.
 }
 \details{
-A specialism of class Arrow which is used in a decision tree to
-represent edges with source nodes joined to \code{DecisionNode}s.
+A specialism of class \code{Arrow} which is used in a decision tree
+to represent edges with source nodes joined to \code{DecisionNode}s.
 }
 \author{
 Andrew J. Sims \email{andrew.sims@newcastle.ac.uk}

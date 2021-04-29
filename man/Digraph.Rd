@@ -9,7 +9,7 @@ An R6 class to represent a digraph (a directed graph).
 }
 \details{
 Encapsulates and provides methods for computation and checking of directed
-graphs (digraphs). Inherits from class Graph.
+graphs (digraphs). Inherits from class \code{Graph}.
 }
 \references{
 { 
@@ -72,7 +72,7 @@ Andrew Sims \email{andrew.sims@newcastle.ac.uk}
 \if{html}{\out{<a id="method-new"></a>}}
 \if{latex}{\out{\hypertarget{method-new}{}}}
 \subsection{Method \code{new()}}{
-Create a new Digraph object from sets of nodes and edges.
+Create a new \code{Digraph} object from sets of nodes and edges.
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{Digraph$new(V, A)}\if{html}{\out{</div>}}
 }
@@ -96,8 +96,10 @@ A Digraph object.
 \subsection{Method \code{digraph_adjacency_matrix()}}{
 Compute the adjacency matrix for the digraph. Each cell contains the
 number of edges from the row vertex to the column vertex, with the 
-convention of self loops being counted once, unless 'boolean' is TRUE
-when cells are either FALSE (not adjacent) or TRUE (adjacent).
+convention of self loops being counted once, unless \code{boolean} is 
+\code{TRUE}
+when cells are either \code{FALSE} (not adjacent) or \code{TRUE} 
+(adjacent).
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{Digraph$digraph_adjacency_matrix(boolean = FALSE)}\if{html}{\out{</div>}}
 }
@@ -105,15 +107,15 @@ when cells are either FALSE (not adjacent) or TRUE (adjacent).
 \subsection{Arguments}{
 \if{html}{\out{<div class="arguments">}}
 \describe{
-\item{\code{boolean}}{If TRUE, the adjacency matrix is logical, each cell is
-{FALSE,TRUE}.}
+\item{\code{boolean}}{If \code{TRUE}, the adjacency matrix is logical, each 
+cell is \code{{FALSE,TRUE}}.}
 }
 \if{html}{\out{</div>}}
 }
 \subsection{Returns}{
 A square numeric matrix with the number of rows and columns
 equal to the order of the graph. The rows and columns are in the
-same order as V. If the nodes have defined and unique labels the
+same order as \code{V}. If the nodes have defined and unique labels the
 dimnames of the matrix are the labels of the nodes.
 }
 }
@@ -155,15 +157,15 @@ in the graph, but no error will be raised.
 \if{latex}{\out{\hypertarget{method-is_connected}{}}}
 \subsection{Method \code{is_connected()}}{
 Test whether the graph is connected. For digraphs this will
-always return FALSE because "connected" is not defined. Function
-\code{weakly_connected} calculates whether the underlying
+always return \code{FALSE} because \dfn{connected} is not defined. 
+Function \code{weakly_connected} calculates whether the underlying
 graph is connected.
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{Digraph$is_connected()}\if{html}{\out{</div>}}
 }
 
 \subsection{Returns}{
-TRUE if connected, FALSE if not.
+\code{TRUE} if connected, \code{FALSE} if not.
 }
 }
 \if{html}{\out{<hr>}}
@@ -177,7 +179,7 @@ underlying graph is connected.
 }
 
 \subsection{Returns}{
-TRUE if connected, FALSE if not.
+\code{TRUE} if connected, \code{FALSE} if not.
 }
 }
 \if{html}{\out{<hr>}}
@@ -193,7 +195,7 @@ This method overrides 'is_acyclic' in Graph.
 }
 
 \subsection{Returns}{
-TRUE if no cycles detected.
+\code{TRUE} if no cycles detected.
 }
 }
 \if{html}{\out{<hr>}}
@@ -207,7 +209,8 @@ acyclic).
 }
 
 \subsection{Returns}{
-TRUE if the underlying graph is a tree; FALSE if not.
+\code{TRUE} if the underlying graph is a tree; \code{FALSE} 
+if not.
 }
 }
 \if{html}{\out{<hr>}}
@@ -215,13 +218,14 @@ TRUE if the underlying graph is a tree; FALSE if not.
 \if{latex}{\out{\hypertarget{method-is_polytree}{}}}
 \subsection{Method \code{is_polytree()}}{
 Compute whether the digraph's underlying graph is a tree (connected and
-acyclic). Synonymous with 'is_graph'.
+acyclic).
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{Digraph$is_polytree()}\if{html}{\out{</div>}}
 }
 
 \subsection{Returns}{
-TRUE if the underlying graph is a tree; FALSE if not.
+\code{TRUE} if the underlying graph is a tree; \code{FALSE}
+if not.
 }
 }
 \if{html}{\out{<hr>}}
@@ -235,7 +239,8 @@ single root and unique paths from the root).
 }
 
 \subsection{Returns}{
-TRUE if the digraph is an arborescence; FALSE if not.
+\code{TRUE} if the digraph is an arborescence; \code{FALSE}
+if not.
 }
 }
 \if{html}{\out{<hr>}}

@@ -10,7 +10,7 @@ An R6 class for a model variable with Gamma function uncertainty
 \details{
 A model variable for which the uncertainty in the point estimate can
 be modelled with a Gamma distribution. The hyperparameters of the
-distribution are the shape (\verb{alpha}) and the rate (\verb{beta}) of
+distribution are the shape (\code{alpha}) and the rate (\code{beta}) of
 the uncertainty distribution. Note that this is the conventional
 parametrization used in Bayesian statistics; in econometrics the
 shape/scale (\code{k}/\code{theta}) parametrization is more common (and the
@@ -70,7 +70,7 @@ Andrew J. Sims \email{andrew.sims@newcastle.ac.uk}
 \if{html}{\out{<a id="method-new"></a>}}
 \if{latex}{\out{\hypertarget{method-new}{}}}
 \subsection{Method \code{new()}}{
-Create an object of class \verb{GammaModVar}.
+Create an object of class \code{GammaModVar}.
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{GammaModVar$new(description, units, shape, scale)}\if{html}{\out{</div>}}
 }
@@ -89,7 +89,7 @@ Create an object of class \verb{GammaModVar}.
 \if{html}{\out{</div>}}
 }
 \subsection{Returns}{
-An object of class \verb{GammaModVar}.
+An object of class \code{GammaModVar}.
 }
 }
 \if{html}{\out{<hr>}}
@@ -104,7 +104,7 @@ random variables, some of which follow distributions.
 }
 
 \subsection{Returns}{
-TRUE if probabilistic
+\code{TRUE} if probabilistic
 }
 }
 \if{html}{\out{<hr>}}
@@ -137,7 +137,7 @@ Expected value as a numeric value.
 \if{html}{\out{<a id="method-mode"></a>}}
 \if{latex}{\out{\hypertarget{method-mode}{}}}
 \subsection{Method \code{mode()}}{
-Return the mode of the distribution (if shape >= 1)
+Return the mode of the distribution (if \code{shape} >= 1)
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{GammaModVar$mode()}\if{html}{\out{</div>}}
 }

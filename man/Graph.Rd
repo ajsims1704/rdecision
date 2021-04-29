@@ -49,7 +49,7 @@ Andrew Sims \email{andrew.sims@newcastle.ac.uk}
 \if{html}{\out{<a id="method-new"></a>}}
 \if{latex}{\out{\hypertarget{method-new}{}}}
 \subsection{Method \code{new()}}{
-Create a new \verb{Graph} object from sets of nodes and edges.
+Create a new \code{Graph} object from sets of nodes and edges.
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{Graph$new(V, E)}\if{html}{\out{</div>}}
 }
@@ -64,7 +64,7 @@ Create a new \verb{Graph} object from sets of nodes and edges.
 \if{html}{\out{</div>}}
 }
 \subsection{Returns}{
-A \verb{Graph} object.
+A \code{Graph} object.
 }
 }
 \if{html}{\out{<hr>}}
@@ -84,10 +84,10 @@ Find the index of a vertex in the graph.
 \if{html}{\out{</div>}}
 }
 \subsection{Returns}{
-Index of v. The vertexes are normally stored in the same order
-they are specified in \code{new}, but this cannot be guaranteed. This
-function returns the same index as used in the adjacency matrix and 
-\verb{NA} if the vertex is not in the graph.
+Index of \code{v}. The vertexes are normally stored in the same
+order they are specified in \code{new}, but this cannot be guaranteed. 
+This' function returns the same index as used in the adjacency matrix and 
+\code{NA} if the vertex is not in the graph.
 }
 }
 \if{html}{\out{<hr>}}
@@ -127,9 +127,9 @@ Find the index of an edge in a graph.
 \if{html}{\out{</div>}}
 }
 \subsection{Returns}{
-Index of e. The edges are normally stored in the same order
+Index of \code{e}. The edges are normally stored in the same order
 they are specified in \code{new}, but this cannot be guaranteed. This
-function returns the same index returned in other functions and \verb{NA}
+function returns the same index returned in other functions and \code{NA}
 if the edge is not in the graph.
 }
 }
@@ -150,7 +150,7 @@ Test whether an edge is element of the graph.
 \if{html}{\out{</div>}}
 }
 \subsection{Returns}{
-TRUE if e is an element of E(G).
+\code{TRUE} if \code{e} is an element of \eqn{E(G)}.
 }
 }
 \if{html}{\out{<hr>}}
@@ -185,7 +185,7 @@ Size of the graph (integer).
 \subsection{Method \code{graph_adjacency_matrix()}}{
 Compute the adjacency matrix for the graph. Each cell contains the
 number of edges joining the two vertexes, with the convention of
-self loops being counted twice, unless \verb{binary} is \verb{TRUE} when
+self loops being counted twice, unless \code{binary} is \code{TRUE} when
 cells are either 0 (not adjacent) or 1 (adjacent).
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{Graph$graph_adjacency_matrix(boolean = FALSE)}\if{html}{\out{</div>}}
@@ -194,15 +194,15 @@ cells are either 0 (not adjacent) or 1 (adjacent).
 \subsection{Arguments}{
 \if{html}{\out{<div class="arguments">}}
 \describe{
-\item{\code{boolean}}{If TRUE, the adjacency matrix is logical, each cell is
-{FALSE,TRUE}.}
+\item{\code{boolean}}{If \code{TRUE}, the adjacency matrix is logical, each
+cell is {\code{FALSE},\code{TRUE}}.}
 }
 \if{html}{\out{</div>}}
 }
 \subsection{Returns}{
 A square numeric matrix with the number of rows and columns
 equal to the order of the graph. The rows and columns are in the
-same order as V. If the nodes have defined and unique labels the
+same order as \code{V}. If the nodes have defined and unique labels the
 \verb{dimnames} of the matrix are the labels of the nodes.
 }
 }
@@ -216,7 +216,7 @@ A simple graph has no self loops or multi-edges.
 }
 
 \subsection{Returns}{
-TRUE if simple, FALSE if not.
+\code{TRUE} if simple, \code{FALSE} if not.
 }
 }
 \if{html}{\out{<hr>}}
@@ -233,7 +233,7 @@ search.
 }
 
 \subsection{Returns}{
-TRUE if connected, FALSE if not.
+\code{TRUE} if connected, \code{FALSE} if not.
 }
 }
 \if{html}{\out{<hr>}}
@@ -249,7 +249,7 @@ edge is an edge from the current node joining a previously detected
 }
 
 \subsection{Returns}{
-TRUE if no cycles detected.
+\code{TRUE} if no cycles detected.
 }
 }
 \if{html}{\out{<hr>}}
@@ -262,7 +262,7 @@ Compute whether the graph is connected and acyclic.
 }
 
 \subsection{Returns}{
-TRUE if the graph is a tree; FALSE if not.
+\code{TRUE} if the graph is a tree; \code{FALSE} if not.
 }
 }
 \if{html}{\out{<hr>}}

@@ -31,10 +31,10 @@ Graph <- R6::R6Class(
   public = list(
     
     #' @description 
-    #' Create a new \verb{Graph} object from sets of nodes and edges. 
+    #' Create a new \code{Graph} object from sets of nodes and edges. 
     #' @param V A list of Nodes.
     #' @param E A list of Edges.
-    #' @return A \verb{Graph} object.
+    #' @return A \code{Graph} object.
     initialize = function(V, E) {
       # check and set nodes
       if (!is.list(V)) {
@@ -79,10 +79,10 @@ Graph <- R6::R6Class(
     #' @description 
     #' Find the index of a vertex in the graph.
     #' @param v Subject vertex
-    #' @return Index of v. The vertexes are normally stored in the same order
-    #' they are specified in \code{new}, but this cannot be guaranteed. This
-    #' function returns the same index as used in the adjacency matrix and 
-    #' \verb{NA} if the vertex is not in the graph.
+    #' @return Index of \code{v}. The vertexes are normally stored in the same
+    #' order they are specified in \code{new}, but this cannot be guaranteed. 
+    #' This' function returns the same index as used in the adjacency matrix and 
+    #' \code{NA} if the vertex is not in the graph.
     vertex_index = function(v) {
       # check argument
       if (!inherits(v, what="Node")) {
@@ -115,9 +115,9 @@ Graph <- R6::R6Class(
     #' @description 
     #' Find the index of an edge in a graph.
     #' @param e Subject edge.
-    #' @return Index of e. The edges are normally stored in the same order
+    #' @return Index of \code{e}. The edges are normally stored in the same order
     #' they are specified in \code{new}, but this cannot be guaranteed. This
-    #' function returns the same index returned in other functions and \verb{NA}
+    #' function returns the same index returned in other functions and \code{NA}
     #' if the edge is not in the graph.
     edge_index = function(e) {
       # check argument
@@ -141,7 +141,7 @@ Graph <- R6::R6Class(
     #' @description 
     #' Test whether an edge is element of the graph.
     #' @param e Subject edge.
-    #' @return TRUE if e is an element of E(G).
+    #' @return \code{TRUE} if \code{e} is an element of \eqn{E(G)}.
     has_edge = function(e) {
       # edge_index checks argument
       index <- self$edge_index(e)
@@ -165,14 +165,14 @@ Graph <- R6::R6Class(
     #' @description 
     #' Compute the adjacency matrix for the graph. Each cell contains the
     #' number of edges joining the two vertexes, with the convention of
-    #' self loops being counted twice, unless \verb{binary} is \verb{TRUE} when
+    #' self loops being counted twice, unless \code{binary} is \code{TRUE} when
     #' cells are either 0 (not adjacent) or 1 (adjacent).
-    #' @param boolean If TRUE, the adjacency matrix is logical, each cell is
-    #' {FALSE,TRUE}.
+    #' @param boolean If \code{TRUE}, the adjacency matrix is logical, each
+    #' cell is {\code{FALSE},\code{TRUE}}.
     #' @return A square numeric matrix with the number of rows and columns
     #' equal to the order of the graph. The rows and columns are in the
-    #' same order as V. If the nodes have defined and unique labels the
-    #' \verb{dimnames} of the matrix are the labels of the nodes. 
+    #' same order as \code{V}. If the nodes have defined and unique labels the
+    #' \code{dimnames} of the matrix are the labels of the nodes. 
     graph_adjacency_matrix = function(boolean=FALSE) {
       # check argument
       if (!is.logical(boolean)) {
@@ -214,7 +214,7 @@ Graph <- R6::R6Class(
     
     #' @description 
     #' A simple graph has no self loops or multi-edges.
-    #' @return TRUE if simple, FALSE if not.    
+    #' @return \code{TRUE} if simple, \code{FALSE} if not.    
     is_simple = function() {
       simple <- TRUE
       A <- self$graph_adjacency_matrix()
@@ -235,7 +235,7 @@ Graph <- R6::R6Class(
     #' connected. Otherwise a graph is connected if all nodes can be 
     #' reached from an arbitrary starting point. Uses a depth first
     #' search.
-    #' @return TRUE if connected, FALSE if not.
+    #' @return \code{TRUE} if connected, \code{FALSE} if not.
     is_connected = function() {
       connected <- FALSE
       if (self$order()==0) {
@@ -276,7 +276,7 @@ Graph <- R6::R6Class(
     #' search from each node to detect the presence of back edges. A back
     #' edge is an edge from the current node joining a previously detected 
     #' (visited) node, that is not the parent node of the current one.
-    #' @return TRUE if no cycles detected.
+    #' @return \code{TRUE} if no cycles detected.
     is_acyclic = function() {
       # acyclic if trivial
       if (self$order()==0) {
@@ -325,7 +325,7 @@ Graph <- R6::R6Class(
     
     #' @description 
     #' Compute whether the graph is connected and acyclic.
-    #' @return TRUE if the graph is a tree; FALSE if not.
+    #' @return \code{TRUE} if the graph is a tree; \code{FALSE} if not.
     is_tree = function() {
       return(self$is_connected() && self$is_acyclic())
     },

@@ -5,7 +5,7 @@
 \alias{Arborescence}
 \title{\verb{Arborescence} class}
 \description{
-An R6 class to represent an \dfn{arborescence} (rooted directed tree).
+An R6 class to represent an \dfn{arborescence} (a rooted directed tree).
 }
 \details{
 Class to encapsulate a directed rooted tree specialization of a digraph.
@@ -71,7 +71,7 @@ Andrew Sims \email{andrew.sims@newcastle.ac.uk}
 \if{html}{\out{<a id="method-new"></a>}}
 \if{latex}{\out{\hypertarget{method-new}{}}}
 \subsection{Method \code{new()}}{
-Create a new \verb{Arborescence} object from sets of nodes and edges.
+Create a new \code{Arborescence} object from sets of nodes and edges.
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{Arborescence$new(V, A)}\if{html}{\out{</div>}}
 }
@@ -114,7 +114,7 @@ TRUE if v has one or more child nodes, FALSE otherwise.
 \if{latex}{\out{\hypertarget{method-is_leaf}{}}}
 \subsection{Method \code{is_leaf()}}{
 Test whether the given node is a leaf. In an arborescence,
-\code{is_parent()} and \code{is_leaf()} will be mutually exclusive.
+\code{is_parent()} and \code{is_leaf()} are mutually exclusive.
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{Arborescence$is_leaf(v)}\if{html}{\out{</div>}}
 }

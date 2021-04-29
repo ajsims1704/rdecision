@@ -5,9 +5,9 @@
 #' involving other model variables.
 #' 
 #' @details A class to support expressions involving objects
-#' of base class \verb{ModVar}, which itself behaves like a 
+#' of base class \code{ModVar}, which itself behaves like a 
 #' model variable. For example, if \code{A} and
-#' \code{B} are variables with base class \verb{ModVar}
+#' \code{B} are variables with base class \code{ModVar}
 #' and \code{c} is a variable of type \code{numeric}, then
 #' it is not possible to write, for example, 
 #' \code{x <- 42*A/B + c}, because R cannot manipulate class
@@ -25,7 +25,7 @@
 #' the quantiles. Therefore they are obtained by simulation, via
 #' functions \code{mu_hat}, \code{sigma_hat} and \code{q_hat}.
 #' 
-#' @note For consistency with \verb{ModVar}s which are not expressions, the
+#' @note For consistency with \code{ModVar}s which are not expressions, the
 #' function \code{mean} returns the value of the expression when all
 #' its operands take their mean values. This will, in general, not
 #' be the mean of the expression distribution (which can be obtained
@@ -36,7 +36,7 @@
 #' probabilistic model and that model evaluated at the mean values
 #' of the input parameters, is likely to be modest."
 #' 
-#' @note Functions \code{SD}, \code{mode} and \code{quantile} return NA
+#' @note Functions \code{SD}, \code{mode} and \code{quantile} return \code{NA}
 #' because they do not necessarily have a closed form. The standard
 #' deviation can be estimated by calling \code{sigma_hat} and the
 #' quantiles by \code{q_hat}. Because a unimodal distribution is not
@@ -64,7 +64,7 @@ ExprModVar <- R6::R6Class(
   public = list(
     
     #' @description 
-    #' Create a Model Variable formed from an expression involving other
+    #' Create a \code{ModVar} formed from an expression involving other
     #' model variables.
     #' @param description Name for the model variable expression. In 
     #' a complex model it may help to tabulate how model variables are
@@ -72,9 +72,8 @@ ExprModVar <- R6::R6Class(
     #' @param units Units in which the variable is expressed.
     #' @param quo A \verb{quosure} (see package \pkg{rlang}), which contains an 
     #' expression and its environment. The usage is \code{quo(x+y)} or 
-    #' \code{rlang::quo(x+y)}.\code{quo} cannot be evaluated directly, unless
-    #' it contains no \verb{ModVar}s.
-    #' @return An object of type \verb{ExprModVar}
+    #' \code{rlang::quo(x+y)}.
+    #' @return An object of type \code{ExprModVar}
     initialize = function(description, units, quo) {
       # initialize the base class
       super$initialize(description, units)
@@ -94,17 +93,17 @@ ExprModVar <- R6::R6Class(
 
     #' @description 
     #' Create a new \verb{quosure} from that supplied in \code{new()} but with
-    #' each \verb{ModVar}
+    #' each \code{ModVar}
     #' operand appended with \code{$x} where \code{x} is the argument to this
     #' function.
-    #' @param method A character string with the method, e.g. "mean()".
-    #' @return A \verb{quosure} whose expression is each \verb{ModVar} \code{v}
+    #' @param method A character string with the method, e.g. \code{"mean()"}.
+    #' @return A \dfn{quosure} whose expression is each \code{ModVar} \code{v}
     #' in the  
     #' expression replaced with \code{v$method} and the same environment as
-    #' specified in the \verb{quosure} supplied in new().
+    #' specified in the quosure supplied in new().
     #' @details This method is mostly intended for internal use within the
     #' class and will not generally be needed for normal use of
-    #' \verb{ExprModVar} objects. The returned expression is \emph{not} 
+    #' \code{ExprModVar} objects. The returned expression is \emph{not} 
     #' syntactically checked or evaluated before it is returned.
     add_method = function(method="mean()") {
       # check argument
@@ -138,7 +137,7 @@ ExprModVar <- R6::R6Class(
     #' Tests whether the model variable is probabilistic, i.e. a random
     #' variable that follows a distribution, or an expression involving
     #' random variables, at least one of which follows a distribution. 
-    #' @return TRUE if probabilistic
+    #' @return \code{TRUE} if probabilistic
     is_probabilistic = function() {
       # test each operand for whether it is probabilistic
       lv <- sapply(base::all.vars(private$expr), FUN=function(v) {
@@ -155,7 +154,7 @@ ExprModVar <- R6::R6Class(
     },
 
     #' @description
-    #' Return a list of operands that are themselves \verb{ModVar}s given
+    #' Return a list of operands that are themselves \code{ModVar}s given
     #' in the expression.
     #' @return A list of model variables.
     operands = function() {
@@ -222,16 +221,16 @@ ExprModVar <- R6::R6Class(
     },
     
     #' @description 
-    #' Return the mode of the variable. By default returns NA, which will be
-    #' the case for most \verb{ExprModVar} variables, because an arbitrary
-    #' expression is not guaranteed to be unimodal.
+    #' Return the mode of the variable. By default returns \code{NA}, which 
+    #' will be the case for most \code{ExprModVar} variables, because an 
+    #' arbitrary expression is not guaranteed to be unimodal.
     #' @return Mode as a numeric value.
     mode = function() {
       return(as.numeric(NA))
     },
 
     #' @description 
-    #' Return the standard deviation of the distribution as \verb{NA} because 
+    #' Return the standard deviation of the distribution as \code{NA} because 
     #' the variance is not available as a closed form for all functions of
     #' distributions. 
     #' @return Standard deviation as a numeric value
@@ -241,9 +240,9 @@ ExprModVar <- R6::R6Class(
     
     #' @description 
     #' Find quantiles of the uncertainty distribution.  Not available
-    #' as a closed form, and returned as \verb{NA}.
+    #' as a closed form, and returned as \code{NA}.
     #' @param probs Numeric vector of probabilities, each in range [0,1].
-    #' @return Vector of numeric values of the same length as\code{probs}.
+    #' @return Vector of numeric values of the same length as \code{probs}.
     quantile = function(probs) {
       # test argument
       sapply(probs, FUN=function(x) {
@@ -354,18 +353,18 @@ ExprModVar <- R6::R6Class(
     },
     
     #' @description
-    #' Sets the value of the \verb{ExprModVar} that will be returned by 
+    #' Sets the value of the \code{ExprModVar} that will be returned by 
     #' subsequent calls to \code{get()} until \code{set()} is called again. 
-    #' Because an \verb{ExprModVar} can be considered as a dependent variable,
+    #' Because an \code{ExprModVar} can be considered as a dependent variable,
     #' the idea of \code{set}ting a value is meaningless, and calls to this
     #' method have no effect. To affect the
     #' value returned by the next call to \code{get}, call \code{set} for each
     #' of the operands of this expression.
     #' @param what Character string; for compatibility with non-expression
-    #' \verb{ModVar}s only; not used.
+    #' \code{ModVar}s only; not used.
     #' @param val Numerical value when what="value"; not used for expression
     #' model variables.
-    #' @return Updated \verb{ExprModVar}.
+    #' @return Updated \code{ExprModVar}.
     set = function(what="random", val=NULL) {
       # check argument
       if (!is.character(what)) {
@@ -385,7 +384,7 @@ ExprModVar <- R6::R6Class(
     },
     
     #' @description
-    #' Gets the value of the \verb{ExprModVar} that was set by the most recent
+    #' Gets the value of the \code{ExprModVar} that was set by the most recent
     #' call to \code{set()} to each operand of the expression.
     #' @return Value determined by last \code{set()}.
     get = function() {

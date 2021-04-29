@@ -1,7 +1,7 @@
 #' @title \verb{Arborescence} class
 #' 
 #' @description
-#' An R6 class to represent an \dfn{arborescence} (rooted directed tree).
+#' An R6 class to represent an \dfn{arborescence} (a rooted directed tree).
 #' 
 #' @details 
 #' Class to encapsulate a directed rooted tree specialization of a digraph.
@@ -32,10 +32,10 @@ Arborescence <- R6::R6Class(
   public = list(
     
     #' @description 
-    #' Create a new \verb{Arborescence} object from sets of nodes and edges. 
+    #' Create a new \code{Arborescence} object from sets of nodes and edges. 
     #' @param V A list of Nodes.
     #' @param A A list of Arrows.
-    #' @return An \verb{Arborescence} object.
+    #' @return An \code{Arborescence} object.
     initialize = function(V,A) {
       # initialize the base Digraph class (checks V, A)
       super$initialize(V,A)
@@ -62,7 +62,7 @@ Arborescence <- R6::R6Class(
     
     #' @description 
     #' Test whether the given node is a leaf. In an arborescence,
-    #' \code{is_parent()} and \code{is_leaf()} will be mutually exclusive.
+    #' \code{is_parent()} and \code{is_leaf()} are mutually exclusive.
     #' @param v Vertex to test.
     #' @return TRUE if v has no child nodes, FALSE otherwise. 
     is_leaf = function(v) {

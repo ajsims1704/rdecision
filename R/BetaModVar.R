@@ -6,7 +6,7 @@
 #' @details 
 #' A model variable for which the uncertainty in the point estimate can
 #' be modelled with a Beta distribution. The hyperparameters of the
-#' distribution are the shape (\verb{alpha}) and the shape (\code{beta}) of
+#' distribution are the shape parameters (\code{alpha} and \code{beta}) of
 #' the uncertainty distribution. 
 #'
 #' @docType class

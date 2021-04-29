@@ -5,7 +5,7 @@
 #' 
 #' @details 
 #' Encapsulates and provides methods for computation and checking of directed
-#' graphs (digraphs). Inherits from class Graph. 
+#' graphs (digraphs). Inherits from class \code{Graph}. 
 #'
 #' @references{ 
 #'   Gansner ER, Koutsofios E, North SC, Vo K-P. A technique for drawing
@@ -36,7 +36,7 @@ Digraph <- R6::R6Class(
   public = list(
     
     #' @description 
-    #' Create a new Digraph object from sets of nodes and edges. 
+    #' Create a new \code{Digraph} object from sets of nodes and edges. 
     #' @param V A list of Nodes.
     #' @param A A list of Arrows.
     #' @return A Digraph object.
@@ -63,13 +63,15 @@ Digraph <- R6::R6Class(
     #' @description 
     #' Compute the adjacency matrix for the digraph. Each cell contains the
     #' number of edges from the row vertex to the column vertex, with the 
-    #' convention of self loops being counted once, unless 'boolean' is TRUE
-    #' when cells are either FALSE (not adjacent) or TRUE (adjacent).
-    #' @param boolean If TRUE, the adjacency matrix is logical, each cell is
-    #' {FALSE,TRUE}.
+    #' convention of self loops being counted once, unless \code{boolean} is 
+    #' \code{TRUE}
+    #' when cells are either \code{FALSE} (not adjacent) or \code{TRUE} 
+    #' (adjacent).
+    #' @param boolean If \code{TRUE}, the adjacency matrix is logical, each 
+    #' cell is \code{{FALSE,TRUE}}.
     #' @return A square numeric matrix with the number of rows and columns
     #' equal to the order of the graph. The rows and columns are in the
-    #' same order as V. If the nodes have defined and unique labels the
+    #' same order as \code{V}. If the nodes have defined and unique labels the
     #' dimnames of the matrix are the labels of the nodes. 
     digraph_adjacency_matrix = function(boolean=FALSE) {
       # check argument
@@ -199,10 +201,10 @@ Digraph <- R6::R6Class(
 
     #' @description 
     #' Test whether the graph is connected. For digraphs this will
-    #' always return FALSE because "connected" is not defined. Function
-    #' \code{weakly_connected} calculates whether the underlying
+    #' always return \code{FALSE} because \dfn{connected} is not defined. 
+    #' Function \code{weakly_connected} calculates whether the underlying
     #' graph is connected.
-    #' @return TRUE if connected, FALSE if not.
+    #' @return \code{TRUE} if connected, \code{FALSE} if not.
     is_connected = function() {
       return(FALSE)
     },
@@ -210,7 +212,7 @@ Digraph <- R6::R6Class(
     #' @description 
     #' Test whether the digraph is weakly connected, i.e. if the
     #' underlying graph is connected.
-    #' @return TRUE if connected, FALSE if not.
+    #' @return \code{TRUE} if connected, \code{FALSE} if not.
     is_weakly_connected = function() {
       connected <- super$is_connected()
       return(connected)
@@ -221,7 +223,7 @@ Digraph <- R6::R6Class(
     #' a topological sort. If the sort does not contain all vertexes, the
     #' digraph contains at least one cycle.
     #' This method overrides 'is_acyclic' in Graph.
-    #' @return TRUE if no cycles detected.
+    #' @return \code{TRUE} if no cycles detected.
     is_acyclic = function() {
       L <- self$topological_sort()
       return(length(L)==length(private$V))
@@ -230,15 +232,17 @@ Digraph <- R6::R6Class(
     #' @description 
     #' Compute whether the digraph's underlying graph is a tree (connected and
     #' acyclic).
-    #' @return TRUE if the underlying graph is a tree; FALSE if not.
+    #' @return \code{TRUE} if the underlying graph is a tree; \code{FALSE} 
+    #' if not.
     is_tree = function() {
       return(self$is_weakly_connected() && super$is_acyclic())
     },
     
     #' @description 
     #' Compute whether the digraph's underlying graph is a tree (connected and
-    #' acyclic). Synonymous with 'is_graph'.
-    #' @return TRUE if the underlying graph is a tree; FALSE if not.
+    #' acyclic). 
+    #' @return \code{TRUE} if the underlying graph is a tree; \code{FALSE}
+    #' if not.
     is_polytree = function() {
       return(self$is_tree())
     },
@@ -246,7 +250,8 @@ Digraph <- R6::R6Class(
     #' @description    
     #' Check whether the digraph is an arborescence (a tree with a
     #' single root and unique paths from the root).
-    #' @return TRUE if the digraph is an arborescence; FALSE if not.
+    #' @return \code{TRUE} if the digraph is an arborescence; \code{FALSE}
+    #' if not.
     is_arborescence = function() {
       # there must be one and only one root vertex
       B <- self$digraph_incidence_matrix()

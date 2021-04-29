@@ -6,7 +6,7 @@
 #' @details 
 #' A model variable for which the uncertainty in the point estimate can
 #' be modelled with a Gamma distribution. The hyperparameters of the
-#' distribution are the shape (\verb{alpha}) and the rate (\verb{beta}) of
+#' distribution are the shape (\code{alpha}) and the rate (\code{beta}) of
 #' the uncertainty distribution. Note that this is the conventional
 #' parametrization used in Bayesian statistics; in econometrics the
 #' shape/scale (\code{k}/\code{theta}) parametrization is more common (and the
@@ -45,12 +45,12 @@ GammaModVar <- R6::R6Class(
   public = list(
     
     #' @description 
-    #' Create an object of class \verb{GammaModVar}.
+    #' Create an object of class \code{GammaModVar}.
     #' @param description A character string describing the variable.
     #' @param units Units of the variable, as character string.
     #' @param shape shape parameter of the Gamma distribution.
     #' @param scale scale parameter of the Gamma distribution.
-    #' @return An object of class \verb{GammaModVar}. 
+    #' @return An object of class \code{GammaModVar}. 
     initialize = function(description, units, shape, scale) {
       super$initialize(description, units)
       if (!is.numeric(shape)) {
@@ -89,7 +89,7 @@ GammaModVar <- R6::R6Class(
     #' Tests whether the model variable is probabilistic, i.e. a random
     #' variable that follows a distribution, or an expression involving
     #' random variables, some of which follow distributions. 
-    #' @return TRUE if probabilistic
+    #' @return \code{TRUE} if probabilistic
     is_probabilistic = function() {
       return(TRUE)
     },
@@ -115,7 +115,7 @@ GammaModVar <- R6::R6Class(
     },
 
     #' @description 
-    #' Return the mode of the distribution (if shape >= 1) 
+    #' Return the mode of the distribution (if \code{shape} >= 1) 
     #' @return mode as a numeric value.
     mode = function() {
       rv <- as.numeric(NA)

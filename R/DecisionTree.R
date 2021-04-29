@@ -620,8 +620,8 @@ DecisionTree <- R6::R6Class(
     #' that do not pass a decision node.
     #' @return A data frame, where each row is a path walked in a strategy. The
     #' structure is similar to that returned by \code{strategy_table} but 
-    #' includes an extra column, 'Leaf' which gives the leaf node index of each
-    #' path, and there is one row for each path in each strategy.
+    #' includes an extra column, \code{Leaf} which gives the leaf node index of 
+    #' each path, and there is one row for each path in each strategy.
     strategy_paths = function() {
       # find possible strategies 
       S <- self$strategy_table()
@@ -665,8 +665,7 @@ DecisionTree <- R6::R6Class(
     #' calculated. 
     #' @details There is minimal checking of the argument because this function 
     #' is intended to be called repeatedly during tree evaluation, including
-    #' PSA. The argument P is expected to be obtained from 
-    #' \code{root_to_leaf_paths}.
+    #' PSA. 
     #' @param W A list of root-to-leaf walks. Each walk must start with the
     #' root node and end with a leaf node. Normally this is all the root to leaf
     #' paths in a tree.
@@ -677,13 +676,14 @@ DecisionTree <- R6::R6Class(
     #' index of the terminal (leaf) node.}
     #' \item{\code{Probability}}{The probability of traversing the pathway. }
     #' \item{\code{Path.Cost}}{The cost of traversing the pathway.}
-    #' \item{\code{Path.Benefit}}{The benefit derived from traversing the pathway.}
+    #' \item{\code{Path.Benefit}}{The benefit derived from traversing the 
+    #'       pathway.}
     #' \item{\code{Path.Utility}}{The utility associated with the outcome (leaf
-    #'  node).}
+    #'       node).}
     #' \item{\code{Path.QALY}}{The QALYs associated with the outcome (leaf 
-    #' node).}
+    #'       node).}
     #' \item{\code{Cost}}{\code{Path.Cost} \eqn{*} probability of traversing the 
-    #' pathway.}
+    #'       pathway.}
     #' \item{\code{Benefit}}{\code{Path.Benefit} \eqn{*} probability of 
     #' traversing the pathway.}
     #' \item{\code{Utility}}{\code{Path.Utility} \eqn{*} probability of 
@@ -756,7 +756,7 @@ DecisionTree <- R6::R6Class(
     #' evaluate the model) or "current" (leave each model variable at its 
     #' current value prior to calling the function and evaluate the model).
     #' @param N Number of replicates. Intended for use with PSA 
-    #' (\code{modvars="random"}); use with \code{modvars}="expected"
+    #' (\code{modvars="random"}); use with \code{modvars} = "expected"
     #' will be repetitive and uninformative. 
     #' @param by One of {"path", "strategy", "run"}. If "path", the table has
     #' one row per path walked per strategy, per run, and includes the label of

@@ -80,7 +80,7 @@ LogNormModVar <- R6::R6Class(
     #'        See 'Details'.
     #' @param parametrization A character string taking one of the values
     #'        \verb{"LN1"} (default) through \verb{"LN7"} (see 'Details').
-    #' @return A \verb{LogNormModVar} object.
+    #' @return A \code{LogNormModVar} object.
     initialize = function(description, units, p1, p2, parametrization='LN1') {
       super$initialize(description, units)
       # check that p1 and p2 are numeric
@@ -136,7 +136,7 @@ LogNormModVar <- R6::R6Class(
     #' Tests whether the model variable is probabilistic, i.e. a random
     #' variable that follows a distribution, or an expression involving
     #' random variables, some of which follow distributions. 
-    #' @return TRUE if probabilistic
+    #' @return \code{TRUE} if probabilistic
     is_probabilistic = function() {
       return(TRUE)
     },

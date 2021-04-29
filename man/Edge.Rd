@@ -28,7 +28,7 @@ Andrew J. Sims \email{andrew.sims@newcastle.ac.uk}
 \if{html}{\out{<a id="method-new"></a>}}
 \if{latex}{\out{\hypertarget{method-new}{}}}
 \subsection{Method \code{new()}}{
-Create an object of type \verb{Edge}.
+Create an object of type \code{Edge}.
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{Edge$new(v1, v2, label = "")}\if{html}{\out{</div>}}
 }
@@ -45,14 +45,14 @@ Create an object of type \verb{Edge}.
 \if{html}{\out{</div>}}
 }
 \subsection{Returns}{
-A new \verb{Edge} object.
+A new \code{Edge} object.
 }
 }
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-is_same_edge"></a>}}
 \if{latex}{\out{\hypertarget{method-is_same_edge}{}}}
 \subsection{Method \code{is_same_edge()}}{
-Is this edge the same as the argument? (DOM-style)
+Is this edge the same as the argument?
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{Edge$is_same_edge(e)}\if{html}{\out{</div>}}
 }
@@ -65,7 +65,7 @@ Is this edge the same as the argument? (DOM-style)
 \if{html}{\out{</div>}}
 }
 \subsection{Returns}{
-TRUE if `e` is also this one.
+\code{TRUE} if \code{e} is also this one.
 }
 }
 \if{html}{\out{<hr>}}

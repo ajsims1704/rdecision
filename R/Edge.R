@@ -20,11 +20,11 @@ Edge <- R6::R6Class(
   public = list(
     
     #' @description
-    #' Create an object of type \verb{Edge}.
+    #' Create an object of type \code{Edge}.
     #' @param v1 Node at one endpoint of the edge.
     #' @param v2 Node at the other endpoint of the edge.
     #' @param label Character string containing the edge label.
-    #' @return A new \verb{Edge} object.
+    #' @return A new \code{Edge} object.
     initialize = function(v1, v2, label="") {
       # check and set v1
       if (!inherits(v1, what="Node")) {
@@ -52,9 +52,9 @@ Edge <- R6::R6Class(
     },
     
     #' @description
-    #' Is this edge the same as the argument? (DOM-style)
+    #' Is this edge the same as the argument? 
     #' @param e edge to compare with this one
-    #' @return TRUE if `e` is also this one.
+    #' @return \code{TRUE} if \code{e} is also this one.
     is_same_edge = function(e) {
       return(identical(self,e))
     },
