@@ -41,7 +41,7 @@ Andrew Sims \email{andrew.sims@newcastle.ac.uk}
 \if{html}{\out{<a id="method-new"></a>}}
 \if{latex}{\out{\hypertarget{method-new}{}}}
 \subsection{Method \code{new()}}{
-Create an object of type \verb{ModVar}
+Create an object of type \code{ModVar}
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{ModVar$new(description, units)}\if{html}{\out{</div>}}
 }
@@ -54,7 +54,7 @@ and its role in the model. This description will be used in a
 tabulation of the variables linked to a model.}
 
 \item{\code{units}}{A character string description of the units, e.g. 
-\code{GBP}, \code{per year}.}
+\code{"GBP"}, \code{"per year"}.}
 }
 \if{html}{\out{</div>}}
 }
@@ -66,13 +66,13 @@ A new \verb{ModVar} object.
 \if{html}{\out{<a id="method-is_expression"></a>}}
 \if{latex}{\out{\hypertarget{method-is_expression}{}}}
 \subsection{Method \code{is_expression()}}{
-Is this \verb{ModVar} an expression?
+Is this \code{ModVar} an expression?
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{ModVar$is_expression()}\if{html}{\out{</div>}}
 }
 
 \subsection{Returns}{
-TRUE if it inherits from \verb{ExprModVar}, \verb{FALSE}
+\code{TRUE} if it inherits from \code{ExprModVar}, \code{FALSE}
 otherwise.
 }
 }
@@ -88,7 +88,7 @@ random variables, some of which follow distributions.
 }
 
 \subsection{Returns}{
-TRUE if probabilistic
+\code{TRUE} if probabilistic
 }
 }
 \if{html}{\out{<hr>}}
@@ -167,9 +167,9 @@ Mean value as a numeric value.
 \if{html}{\out{<a id="method-mode"></a>}}
 \if{latex}{\out{\hypertarget{method-mode}{}}}
 \subsection{Method \code{mode()}}{
-Return the mode of the variable. By default returns NA, which will be
-the case for most \verb{ExprModVar} variables, because an arbitrary
-expression is not guaranteed to be unimodal.
+Return the mode of the variable. By default returns \code{NA}, which 
+will be the case for most \code{ExprModVar} variables, because an 
+arbitrary expression is not guaranteed to be unimodal.
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{ModVar$mode()}\if{html}{\out{</div>}}
 }
@@ -208,14 +208,14 @@ Find quantiles of the uncertainty distribution.
 \if{html}{\out{</div>}}
 }
 \subsection{Returns}{
-Vector of numeric values of the same length as \verb{probs}.
+Vector of numeric values of the same length as \code{probs}.
 }
 }
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-set"></a>}}
 \if{latex}{\out{\hypertarget{method-set}{}}}
 \subsection{Method \code{set()}}{
-Sets the value of the \verb{ModVar} that will be returned by subsequent
+Sets the value of the \code{ModVar} that will be returned by subsequent
 calls to \code{get()} until \code{set()} is called again.
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{ModVar$set(what = "random", val = NULL)}\if{html}{\out{</div>}}
@@ -224,21 +224,22 @@ calls to \code{get()} until \code{set()} is called again.
 \subsection{Arguments}{
 \if{html}{\out{<div class="arguments">}}
 \describe{
-\item{\code{what}}{Character: one of "random" (samples from the uncertainty
-distribution), "expected" (mean), "q2.5" (lower 95\% confidence limit),
-"q50" (median), "q97.5" (upper 95\% confidence limit), "current" (leaves
-the value unchanged), "value" (sets the value explicitly).}
+\item{\code{what}}{Character: one of \code{"random"} (samples from the 
+uncertainty distribution), \code{"expected"} (mean), \code{"q2.5"}
+(lower 95\% confidence limit), \code{"q50"} (median), \code{"q97.5"}
+(upper 95\% confidence limit), \code{"current"} (leaves
+the value unchanged), \code{"value"} (sets the value explicitly).}
 
-\item{\code{val}}{A numeric value, only used with what = "value", ignored
-otherwise.}
+\item{\code{val}}{A numeric value, only used with \code{what}=\code{"value"}, 
+ignored otherwise.}
 }
 \if{html}{\out{</div>}}
 }
 \subsection{Details}{
-The "current" option is provided to support having common 
+The \code{"current"} option is provided to support having common 
 functions to set (or leave alone) sets of model variables, depending on
-their use case and avoids additional if statements. Option "value" is
-not recommended for normal usage because it allows the model variable
+their use case and avoids additional if statements. Option \code{"value"}
+is not recommended for normal usage because it allows the model variable
 to be set to an implausible value, based on its defined uncertainty. An 
 example of where this may be needed is in threshold finding.
 }
@@ -251,7 +252,7 @@ Updated \code{ModVar}.
 \if{html}{\out{<a id="method-get"></a>}}
 \if{latex}{\out{\hypertarget{method-get}{}}}
 \subsection{Method \code{get()}}{
-Gets the value of the \verb{ModVar} that was set by the most recent call
+Gets the value of the \code{ModVar} that was set by the most recent call
 to \code{set()}.
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{ModVar$get()}\if{html}{\out{</div>}}

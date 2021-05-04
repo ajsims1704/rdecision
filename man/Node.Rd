@@ -9,7 +9,7 @@ An R6 class to represent a node in a decision tree
 }
 \details{
 Base class to represent a single node in a decision tree. Objects of base
-class Node are not expected to be created as model objects.
+class \code{Node} are not expected to be created as model objects.
 }
 \author{
 Andrew Sims \email{andrew.sims@newcastle.ac.uk}
@@ -27,7 +27,7 @@ Andrew Sims \email{andrew.sims@newcastle.ac.uk}
 \if{html}{\out{<a id="method-new"></a>}}
 \if{latex}{\out{\hypertarget{method-new}{}}}
 \subsection{Method \code{new()}}{
-Create new Node object.
+Create new \code{Node} object.
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{Node$new(label = "")}\if{html}{\out{</div>}}
 }
@@ -40,7 +40,7 @@ Create new Node object.
 \if{html}{\out{</div>}}
 }
 \subsection{Returns}{
-A new \verb{Node} object.
+A new \code{Node} object.
 }
 }
 \if{html}{\out{<hr>}}
@@ -66,7 +66,7 @@ node type
 }
 
 \subsection{Returns}{
-Node class, as character string
+\code{Node} class, as character string.
 }
 }
 \if{html}{\out{<hr>}}

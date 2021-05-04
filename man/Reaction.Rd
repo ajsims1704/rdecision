@@ -8,8 +8,8 @@
 An R6 class to represent a reaction (chance) edge in a decision tree.
 }
 \details{
-A specialism of class Arrow which is used in a decision tree to
-represent edges with source nodes joined to \verb{ChanceNode}s.
+A specialism of class \code{Arrow} which is used in a decision tree
+to represent edges with source nodes joined to \code{ChanceNode}s.
 }
 \author{
 Andrew J. Sims \email{andrew.sims@newcastle.ac.uk}
@@ -43,7 +43,7 @@ Andrew J. Sims \email{andrew.sims@newcastle.ac.uk}
 \if{html}{\out{<a id="method-new"></a>}}
 \if{latex}{\out{\hypertarget{method-new}{}}}
 \subsection{Method \code{new()}}{
-Create an object of type \verb{Reaction}. A probability must be assigned
+Create an object of type \code{Reaction}. A probability must be assigned
 to the edge. Optionally, a cost and a benefit may be associated
 with traversing the edge. A \dfn{pay-off} (benefit-cost) is sometimes
 used in edges of decision trees; the parametrization used here is more
@@ -70,23 +70,23 @@ general.
 \if{html}{\out{</div>}}
 }
 \subsection{Returns}{
-A new \verb{Reaction} object.
+A new \code{Reaction} object.
 }
 }
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-modvars"></a>}}
 \if{latex}{\out{\hypertarget{method-modvars}{}}}
 \subsection{Method \code{modvars()}}{
-Find all the model variables of type \verb{ModVar} that have been 
+Find all the model variables of type \code{ModVar} that have been 
 specified
 as values associated with this Action. Includes operands of these
-\verb{ModVar}s, if they are expressions.
+\code{ModVar}s, if they are expressions.
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{Reaction$modvars()}\if{html}{\out{</div>}}
 }
 
 \subsection{Returns}{
-A list of \verb{ModVar}s.
+A list of \code{ModVar}s.
 }
 }
 \if{html}{\out{<hr>}}

@@ -32,7 +32,7 @@ NormModVar <- R6::R6Class(
     #'        the uncertainty of the variable.
     #' @param sigma Hyperparameter equal to the standard deviation of the
     #'        normal distribution for the uncertainty of the variable.
-    #' @return A \verb{NormModVar} object.
+    #' @return A \code{NormModVar} object.
     initialize = function(description, units, mu, sigma) {
       super$initialize(description, units)
       if (!is.numeric(mu)) {
@@ -59,7 +59,7 @@ NormModVar <- R6::R6Class(
     #' Tests whether the model variable is probabilistic, i.e. a random
     #' variable that follows a distribution, or an expression involving
     #' random variables, some of which follow distributions. 
-    #' @return \verb{TRUE} if probabilistic
+    #' @return \code{TRUE} if probabilistic.
     is_probabilistic = function() {
       return(TRUE)
     },
@@ -78,7 +78,7 @@ NormModVar <- R6::R6Class(
 
     #' @description 
     #' Draw a random sample from the model variable. Normally accessed by a 
-    #' call to value(what="r").
+    #' call to \code{value(what="r")}.
     #' @param n Number of samples to draw.
     #' @return A sample drawn at random.
     r = function(n=1) {

@@ -38,7 +38,7 @@ Create a stack.
 }
 
 \subsection{Returns}{
-A new \verb{Stack} object.
+A new \code{Stack} object.
 }
 }
 \if{html}{\out{<hr>}}
@@ -60,7 +60,7 @@ checked.}
 \if{html}{\out{</div>}}
 }
 \subsection{Returns}{
-An updated \verb{Stack} object
+An updated \code{Stack} object
 }
 }
 \if{html}{\out{<hr>}}

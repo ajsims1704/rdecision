@@ -203,7 +203,7 @@ cell is {\code{FALSE},\code{TRUE}}.}
 A square numeric matrix with the number of rows and columns
 equal to the order of the graph. The rows and columns are in the
 same order as \code{V}. If the nodes have defined and unique labels the
-\verb{dimnames} of the matrix are the labels of the nodes.
+\code{dimnames} of the matrix are the labels of the nodes.
 }
 }
 \if{html}{\out{<hr>}}

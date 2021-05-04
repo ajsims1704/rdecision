@@ -75,11 +75,11 @@ LogNormModVar <- R6::R6Class(
     #' @param description A character string describing the variable.
     #' @param units Units of the quantity; character string.
     #' @param p1 First hyperparameter, a measure of location. 
-    #'        See 'Details'.
+    #'        See \emph{Details}.
     #' @param p2 Second hyperparameter, a measure of spread.
-    #'        See 'Details'.
+    #'        See \emph{Details}.
     #' @param parametrization A character string taking one of the values
-    #'        \verb{"LN1"} (default) through \verb{"LN7"} (see 'Details').
+    #'        \verb{"LN1"} (default) through \verb{"LN7"} (see \emph{Details}).
     #' @return A \code{LogNormModVar} object.
     initialize = function(description, units, p1, p2, parametrization='LN1') {
       super$initialize(description, units)

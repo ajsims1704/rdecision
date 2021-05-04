@@ -86,7 +86,7 @@ Create a new \code{Arborescence} object from sets of nodes and edges.
 \if{html}{\out{</div>}}
 }
 \subsection{Returns}{
-An \verb{Arborescence} object.
+An \code{Arborescence} object.
 }
 }
 \if{html}{\out{<hr>}}

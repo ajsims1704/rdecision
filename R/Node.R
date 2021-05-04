@@ -5,7 +5,7 @@
 #' 
 #' @details 
 #' Base class to represent a single node in a decision tree. Objects of base
-#' class Node are not expected to be created as model objects. 
+#' class \code{Node} are not expected to be created as model objects. 
 #'
 #' @docType class
 #' @author Andrew Sims \email{andrew.sims@@newcastle.ac.uk}
@@ -21,9 +21,9 @@ Node <- R6::R6Class(
   public = list(
     
     #' @description
-    #' Create new Node object.
+    #' Create new \code{Node} object.
     #' @param label An optional label for the node.
-    #' @return A new \verb{Node} object.
+    #' @return A new \code{Node} object.
     initialize = function(label="") {
       if (!is.character(label)) {
         rlang::abort("Argument label is not a string", class="non-string_label")
@@ -41,8 +41,7 @@ Node <- R6::R6Class(
 
     #' @description
     #' node type
-    #' @return 
-    #' Node class, as character string
+    #' @return \code{Node} class, as character string.
     type = function() {
       c <- class(self)[1]
       return(c)

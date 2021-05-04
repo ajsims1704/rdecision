@@ -24,7 +24,7 @@ Stack <- R6::R6Class(
 
     #' @description 
     #' Create a stack.
-    #' @return A new \verb{Stack} object.
+    #' @return A new \code{Stack} object.
     initialize = function() {
       private$items <- list()
       return(invisible(self))
@@ -35,7 +35,7 @@ Stack <- R6::R6Class(
     #' @param x The item to push onto the top of the stack. It should be
     #' of the same class as items previously pushed on to the stack. It is not
     #' checked.
-    #' @return An updated \verb{Stack} object
+    #' @return An updated \code{Stack} object
     push = function(x) {
       private$items[[length(private$items)+1]] <- x
       return(invisible(self))

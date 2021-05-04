@@ -70,7 +70,7 @@ normal distribution for the uncertainty of the variable.}
 \if{html}{\out{</div>}}
 }
 \subsection{Returns}{
-A \verb{NormModVar} object.
+A \code{NormModVar} object.
 }
 }
 \if{html}{\out{<hr>}}
@@ -85,7 +85,7 @@ random variables, some of which follow distributions.
 }
 
 \subsection{Returns}{
-\verb{TRUE} if probabilistic
+\code{TRUE} if probabilistic.
 }
 }
 \if{html}{\out{<hr>}}
@@ -106,7 +106,7 @@ Distribution name as character string.
 \if{latex}{\out{\hypertarget{method-r}{}}}
 \subsection{Method \code{r()}}{
 Draw a random sample from the model variable. Normally accessed by a 
-call to value(what="r").
+call to \code{value(what="r")}.
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{NormModVar$r(n = 1)}\if{html}{\out{</div>}}
 }

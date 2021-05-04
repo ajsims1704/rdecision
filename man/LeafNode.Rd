@@ -8,7 +8,7 @@
 An R6 class for a leaf node in a decision tree representing a clinical state.
 }
 \details{
-Represents a state of being, and is associated with an
+Represents a terminal state in a tree, and is associated with an
 incremental utility.
 }
 \author{
@@ -40,7 +40,7 @@ Andrew J. Sims \email{andrew.sims@newcastle.ac.uk}
 \if{html}{\out{<a id="method-new"></a>}}
 \if{latex}{\out{\hypertarget{method-new}{}}}
 \subsection{Method \code{new()}}{
-Create a new \verb{LeafNode} object; synonymous with a clinical outcome.
+Create a new \code{LeafNode} object; synonymous with a clinical outcome.
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{LeafNode$new(
   label,
@@ -58,32 +58,32 @@ converted to a syntactically valid (in R) name to ensure it can be used
 as a column name in a data frame.}
 
 \item{\code{utility}}{The incremental utility that a user associates with
-being in the health state (range \verb{-Inf} to 1) for the interval.
+being in the health state (range \code{-Inf} to 1) for the interval.
 Intended for use with cost benefit analysis.}
 
-\item{\code{interval}}{The time interval over which the \verb{utility}
-parameter applies, expressed as an R \verb{difftime} object; default 
+\item{\code{interval}}{The time interval over which the \code{utility}
+parameter applies, expressed as an R \code{difftime} object; default 
 1 year.}
 }
 \if{html}{\out{</div>}}
 }
 \subsection{Returns}{
-A new \verb{LeafNode} object
+A new \code{LeafNode} object
 }
 }
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-modvars"></a>}}
 \if{latex}{\out{\hypertarget{method-modvars}{}}}
 \subsection{Method \code{modvars()}}{
-Find all the model variables of type \verb{ModVar} that have been 
-specified as values associated with this \verb{LeafNode}. Includes 
-operands of these \verb{ModVar}s, if they are expressions.
+Find all the model variables of type \code{ModVar} that have been 
+specified as values associated with this \code{LeafNode}. Includes 
+operands of these \code{ModVar}s, if they are expressions.
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{LeafNode$modvars()}\if{html}{\out{</div>}}
 }
 
 \subsection{Returns}{
-A list of \verb{ModVar}s.
+A list of \code{ModVar}s.
 }
 }
 \if{html}{\out{<hr>}}
@@ -110,7 +110,7 @@ Return the interval associated with being in the state.
 }
 
 \subsection{Returns}{
-Interval (as a \verb{difftime}).
+Interval (as a \code{difftime}).
 }
 }
 \if{html}{\out{<hr>}}

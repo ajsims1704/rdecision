@@ -108,18 +108,18 @@ Create a model variable with log normal uncertainty.
 \item{\code{units}}{Units of the quantity; character string.}
 
 \item{\code{p1}}{First hyperparameter, a measure of location. 
-See 'Details'.}
+See \emph{Details}.}
 
 \item{\code{p2}}{Second hyperparameter, a measure of spread.
-See 'Details'.}
+See \emph{Details}.}
 
 \item{\code{parametrization}}{A character string taking one of the values
-\verb{"LN1"} (default) through \verb{"LN7"} (see 'Details').}
+\verb{"LN1"} (default) through \verb{"LN7"} (see \emph{Details}).}
 }
 \if{html}{\out{</div>}}
 }
 \subsection{Returns}{
-A \verb{LogNormModVar} object.
+A \code{LogNormModVar} object.
 }
 }
 \if{html}{\out{<hr>}}
@@ -134,7 +134,7 @@ random variables, some of which follow distributions.
 }
 
 \subsection{Returns}{
-TRUE if probabilistic
+\code{TRUE} if probabilistic
 }
 }
 \if{html}{\out{<hr>}}

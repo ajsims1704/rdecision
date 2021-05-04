@@ -26,12 +26,12 @@ ModVar <- R6::R6Class(
   public = list(
     
     #' @description 
-    #' Create an object of type \verb{ModVar}
+    #' Create an object of type \code{ModVar}
     #' @param description A character string description of the variable
     #' and its role in the model. This description will be used in a
     #' tabulation of the variables linked to a model.
     #' @param units A character string description of the units, e.g. 
-    #' \code{GBP}, \code{per year}.
+    #' \code{"GBP"}, \code{"per year"}.
     #' @return A new \verb{ModVar} object.
     initialize = function(description, units) {
       # test and set description
@@ -49,8 +49,8 @@ ModVar <- R6::R6Class(
     },
 
     #' @description 
-    #' Is this \verb{ModVar} an expression?
-    #' @return TRUE if it inherits from \verb{ExprModVar}, \verb{FALSE}
+    #' Is this \code{ModVar} an expression?
+    #' @return \code{TRUE} if it inherits from \code{ExprModVar}, \code{FALSE}
     #' otherwise.
     is_expression = function() {
       return(inherits(self, what="ExprModVar"))
@@ -60,7 +60,7 @@ ModVar <- R6::R6Class(
     #' Tests whether the model variable is probabilistic, i.e. a random
     #' variable that follows a distribution, or an expression involving
     #' random variables, some of which follow distributions. 
-    #' @return TRUE if probabilistic
+    #' @return \code{TRUE} if probabilistic
     is_probabilistic = function() {
       return(as.logical(NA))
     },
@@ -103,9 +103,9 @@ ModVar <- R6::R6Class(
     },
     
     #' @description 
-    #' Return the mode of the variable. By default returns NA, which will be
-    #' the case for most \verb{ExprModVar} variables, because an arbitrary
-    #' expression is not guaranteed to be unimodal.
+    #' Return the mode of the variable. By default returns \code{NA}, which 
+    #' will be the case for most \code{ExprModVar} variables, because an 
+    #' arbitrary expression is not guaranteed to be unimodal.
     #' @return Mode as a numeric value.
     mode = function() {
       return(as.numeric(NA))
@@ -121,7 +121,7 @@ ModVar <- R6::R6Class(
     #' @description 
     #' Find quantiles of the uncertainty distribution. 
     #' @param probs Numeric vector of probabilities, each in range [0,1].
-    #' @return Vector of numeric values of the same length as \verb{probs}.
+    #' @return Vector of numeric values of the same length as \code{probs}.
     quantile = function(probs) {
       # test argument
       sapply(probs, FUN=function(x) {
@@ -142,18 +142,19 @@ ModVar <- R6::R6Class(
     },
 
     #' @description
-    #' Sets the value of the \verb{ModVar} that will be returned by subsequent
+    #' Sets the value of the \code{ModVar} that will be returned by subsequent
     #' calls to \code{get()} until \code{set()} is called again. 
-    #' @param what Character: one of "random" (samples from the uncertainty
-    #' distribution), "expected" (mean), "q2.5" (lower 95\% confidence limit),
-    #' "q50" (median), "q97.5" (upper 95\% confidence limit), "current" (leaves
-    #' the value unchanged), "value" (sets the value explicitly). 
-    #' @param val A numeric value, only used with what = "value", ignored
-    #' otherwise.
-    #' @details The "current" option is provided to support having common 
+    #' @param what Character: one of \code{"random"} (samples from the 
+    #' uncertainty distribution), \code{"expected"} (mean), \code{"q2.5"}
+    #' (lower 95\% confidence limit), \code{"q50"} (median), \code{"q97.5"}
+    #' (upper 95\% confidence limit), \code{"current"} (leaves
+    #' the value unchanged), \code{"value"} (sets the value explicitly). 
+    #' @param val A numeric value, only used with \code{what}=\code{"value"}, 
+    #' ignored otherwise.
+    #' @details The \code{"current"} option is provided to support having common 
     #' functions to set (or leave alone) sets of model variables, depending on
-    #' their use case and avoids additional if statements. Option "value" is
-    #' not recommended for normal usage because it allows the model variable
+    #' their use case and avoids additional if statements. Option \code{"value"}
+    #' is not recommended for normal usage because it allows the model variable
     #' to be set to an implausible value, based on its defined uncertainty. An 
     #' example of where this may be needed is in threshold finding. 
     #' @return Updated \code{ModVar}.
@@ -199,7 +200,7 @@ ModVar <- R6::R6Class(
     },
     
     #' @description
-    #' Gets the value of the \verb{ModVar} that was set by the most recent call
+    #' Gets the value of the \code{ModVar} that was set by the most recent call
     #' to \code{set()}.
     #' @return Value determined by last \code{set()}.
     get = function() {

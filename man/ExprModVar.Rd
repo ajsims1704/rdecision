@@ -114,7 +114,7 @@ expression and its environment. The usage is \code{quo(x+y)} or
 \if{html}{\out{</div>}}
 }
 \subsection{Returns}{
-An object of type \verb{ExprModVar}
+An object of type \code{ExprModVar}
 }
 }
 \if{html}{\out{<hr>}}
@@ -139,7 +139,7 @@ function.
 \subsection{Details}{
 This method is mostly intended for internal use within the
 class and will not generally be needed for normal use of
-\verb{ExprModVar} objects. The returned expression is \emph{not} 
+\code{ExprModVar} objects. The returned expression is \emph{not} 
 syntactically checked or evaluated before it is returned.
 }
 
@@ -147,7 +147,7 @@ syntactically checked or evaluated before it is returned.
 A \dfn{quosure} whose expression is each \code{ModVar} \code{v}
 in the  
 expression replaced with \code{v$method} and the same environment as
-specified in the \verb{quosure} supplied in new().
+specified in the quosure supplied in new().
 }
 }
 \if{html}{\out{<hr>}}
