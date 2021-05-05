@@ -27,14 +27,14 @@ library(rdecision)
 ```
 
 # Introduction
-Kamiński *et al* [-@kaminski2018] (Fig 7) provide an example of a decision tree
+Kaminski *et al* [-@kaminski2018] (Fig 7) provide an example of a decision tree
 with multiple decision nodes, including some that are descendants of another
 decision node. This vignette illustrates how `rdecision` can be used to model
 a complex decision tree, using the example from Figure 7 of Kamiński 
 *et al* [-@kaminski2018]. 
 
 # The problem
-Kamiński *et al* [-@kaminski2018] state the problem as follows:
+Kaminski *et al* [-@kaminski2018] state the problem as follows:
 
 > Consider an investor owning a plot of land, possibly (*a priori* probability
 > amounting to 70%) hiding shale gas layers. The plot can be sold immediately

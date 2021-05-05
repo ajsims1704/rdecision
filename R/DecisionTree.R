@@ -41,7 +41,7 @@
 #'   \emph{Value in Health} 2012;\bold{15}:835–42, 
 #'   \doi{10.1016/j.jval.2012.04.014}.
 #'
-#'   Kamiński B, Jakubczyk M, Szufel P. A framework for sensitivity analysis of
+#'   Kaminski B, Jakubczyk M, Szufel P. A framework for sensitivity analysis of
 #'   decision trees. \emph{Central European Journal of Operational Research}
 #'   2018;\bold{26}:135–59, \doi{10.1007/s10100-017-0479-6}.
 #' } 

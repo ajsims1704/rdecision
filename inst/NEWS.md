@@ -1,5 +1,5 @@
 
-# rdecision 1.0.3.9000
+# rdecision 1.0.4
 
 * Added option `value` to method `set` in class `ModVar`. This allows
   variables to be set to an explicit value; used in threshold finding.

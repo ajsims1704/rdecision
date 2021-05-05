@@ -159,7 +159,7 @@ Underpinning graph theory is based on terminology, definitions and
 algorithms from Gross *et al* [-@gross2013], the Wikipedia 
 glossary [@wikipedia2021] and links therein. Topological sorting of graphs
 is based on Kahn's algorithm [-@kahn1962]. Some of the terminology for decision
-trees was based on the work of Kamiński *et al* [-@kaminski2018] and an 
+trees was based on the work of Kaminski *et al* [-@kaminski2018] and an 
 efficient tree drawing algorithm was based on the work of Walker [-@walker1989]. 
 Terminology for decision trees in health economic evaluation was based on
 the book by Briggs *et al* [-@briggs2006] and the output format and terminology 

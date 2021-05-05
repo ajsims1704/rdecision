@@ -1,24 +1,13 @@
 ## Test environments
-* local R installation, R 4.0.4
-* ubuntu 16.04 (on travis-ci), R 4.0.4
-* win-builder (devel)
+* local R installation, R 3.6.1
+* Windows Server 2008 R2 SP1, R-devel, 32/64 bit
+* Ubuntu Linux 20.04.1 LTS, R-release, GCC
+* Fedora Linux, R-devel, clang, gfortran
+* win-builder (devel), R 4.1.0 alpha
 
 ## R CMD check results
 
-1 error | 0 warnings | 2 notes
+0 error | 0 warnings | 0 notes
 
 * This is a new release.
 
-* ERROR: *test_check("rdecision"), failed tests (test-ExprModVar.R:186:3)*. 
-  Package tests that involve sampling randomly from a distribution and
-  comparing the results with parameters of an expected distribution have been 
-  excluded when running CRAN tests because they fail at a type I error rate
-  of about 0.1%.
-
-* NOTE: *'LazyData' is specified without a 'data' directory*. In DESCRIPTION
-  LazyData now set to false.
-
-* NOTE: *Namespaces in Imports field not imported from: R6, grid, rlang, stats,
-  utils. All declared Imports should be used*. import statements now added to 
-   NAMESPACE file.
-  
