@@ -14,10 +14,10 @@ test_that("incorrect state types are rejected", {
   n1 <- Node$new()
   expect_error(
     CohortMarkovModel$new(
-      V=list(s.well, n1, "STROKE", "DEAD"), 
+      V=list(s.well, n1), 
       E=list()
     ), 
-    class="non-Node_vertex"
+    class="invalid_state"
   )  
 })
 
@@ -39,15 +39,38 @@ test_that("incorrect state types are rejected", {
 #   expect_silent(CohortMarkovModel$new(states, Ip))  
 # })
 # 
-# test_that("an incorrect transition matrix type is rejected", {
-#   s.well <- MarkovState$new("Well")
-#   s.disabled <- MarkovState$new("Disabled")
-#   s.dead <- MarkovState$new("Dead")
-#   states <- list(s.well, s.disabled, s.dead)
-#   Ip <- list("Well", "Disabled", "Dead")
-#   expect_error(CohortMarkovModel$new(states, Ip), class="not_transition_matrix")  
-# })
-# 
+test_that("incorrect transition types are rejected", {
+  s.well <- MarkovState$new("Well")
+  s.disabled <- MarkovState$new("Disabled")
+  s.dead <- MarkovState$new("Dead")
+  e.ww <- MarkovTransition$new(s.well, s.well)
+  e.wd <- MarkovTransition$new(s.well, s.dead)
+  e.dd <- Arrow$new(s.dead, s.dead)
+  expect_error(
+    CohortMarkovModel$new(
+      V = list(s.well, s.disabled, s.dead),
+      E = list(e.ww, e.wd, e.dd)
+    ), 
+    class="invalid_transition"
+  )  
+})
+
+test_that("unconnected underlying graphs are detected", {
+  s.well <- MarkovState$new("Well")
+  s.disabled <- MarkovState$new("Disabled")
+  s.dead <- MarkovState$new("Dead")
+  e.ww <- MarkovTransition$new(s.well, s.well)
+  e.wd <- MarkovTransition$new(s.well, s.dead)
+  e.dd <- MarkovTransition$new(s.dead, s.dead)
+  expect_error(
+    CohortMarkovModel$new(
+      V = list(s.well, s.disabled, s.dead),
+      E = list(e.ww, e.wd, e.dd)
+    ), 
+    class="invalid_graph"
+  )  
+})
+
 # test_that("differing state and transition matrix names are rejected", {
 #   s.well <- MarkovState$new("Well")
 #   s.disabled <- MarkovState$new("Disabled")
@@ -98,20 +121,35 @@ test_that("incorrect state types are rejected", {
 # Sonnenberg & Beck, Med Decis Making, 1993;13:322, Fig 3
 # (prosthetic heart valve)
 # -----------------------------------------------------------------------------
-# test_that("rdecision replicates Sonnenberg & Beck, Fig 3", {
-#   s.well <- MarkovState$new(name="Well")
-#   s.disabled <- MarkovState$new("Disabled")
-#   s.dead <- MarkovState$new("Dead")
-#   Ip <- TransitionMatrix$new(c("Well", "Disabled", "Dead"))
-#   Ip$set_rate(from="Well", to="Disabled", rate=0.2)
-#   Ip$set_rate(from="Well", to="Dead", rate=0.2)
-#   Ip$set_rate(from="Disabled", to="Dead", rate=0.4)
-#   M <- CohortMarkovModel$new(c(s.well, s.disabled, s.dead), Ip)
-#   M$set_populations(c(Well=10000, Disabled=0, Dead=0))  
-#   RC <- M$cycles(25)
-#   expect_true(is.data.frame(RC))
-#   expect_equal(round(RC$Well[RC$Cycle==2]), 3600)
-#   expect_equal(round(RC$Disabled[RC$Cycle==2]), 2400)
-#   expect_equal(round(RC$Dead[RC$Cycle==2]), 4000)
-# })
+test_that("rdecision replicates Sonnenberg & Beck, Fig 3", {
+  # create states
+  s.well <- MarkovState$new(name="Well")
+  s.disabled <- MarkovState$new(name="Disabled")
+  s.dead <- MarkovState$new(name="Dead")
+  # create transitions
+  E <- list(
+    MarkovTransition$new(s.well, s.well),
+    MarkovTransition$new(s.dead, s.dead),
+    MarkovTransition$new(s.disabled, s.disabled),
+    MarkovTransition$new(s.well, s.disabled),
+    MarkovTransition$new(s.well, s.dead),
+    MarkovTransition$new(s.disabled, s.dead)
+  )
+  
+#  Ip <- TransitionMatrix$new(c("Well", "Disabled", "Dead"))
+#  Ip$set_rate(from="Well", to="Disabled", rate=0.2)
+#  Ip$set_rate(from="Well", to="Dead", rate=0.2)
+#  Ip$set_rate(from="Disabled", to="Dead", rate=0.4)
+  M <- CohortMarkovModel$new(
+    V = list(s.well, s.disabled, s.dead),
+    E
+  )
+#  M$set_populations(c(Well=10000, Disabled=0, Dead=0))  
+#  RC <- M$cycles(25)
+#  expect_true(is.data.frame(RC))
+#  expect_equal(round(RC$Well[RC$Cycle==2]), 3600)
+#  expect_equal(round(RC$Disabled[RC$Cycle==2]), 2400)
+#  expect_equal(round(RC$Dead[RC$Cycle==2]), 4000)
+  expect_true(TRUE)
+})
 

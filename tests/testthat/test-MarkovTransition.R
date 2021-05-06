@@ -3,7 +3,7 @@ test_that("initialize parameters are checked", {
   s1 <- MarkovState$new("s1")
   s2 <- MarkovState$new("s2")
   r <- 0.1
-  expect_error(MarkovTransition$new(s1,s2), class="invalid_rate")
+  expect_silent(MarkovTransition$new(s1,s2))
   expect_error(MarkovTransition$new(s1,s2,r,label=42), class="non-string_label")
   n1 <- Node$new()
   expect_error(MarkovTransition$new(n1,s2,r), class="invalid_source")
