@@ -71,6 +71,51 @@ test_that("unconnected underlying graphs are detected", {
   )  
 })
 
+test_that("non-absorbing states without one NULL rate are detected", {
+  s.well <- MarkovState$new("Well")
+  s.disabled <- MarkovState$new("Disabled")
+  s.dead <- MarkovState$new("Dead")
+  # under-constrain (no rates specified for outgoing 'disabled' state)
+  e.ww <- MarkovTransition$new(s.well, s.well)
+  e.ss <- MarkovTransition$new(s.disabled, s.disabled)
+  e.dd <- MarkovTransition$new(s.dead, s.dead)
+  e.ws <- MarkovTransition$new(s.well, s.disabled, r=0.2)
+  e.wd <- MarkovTransition$new(s.well, s.dead, r=0.2)
+  e.sd <- MarkovTransition$new(s.disabled, s.dead)
+  expect_error(
+    CohortMarkovModel$new(
+      V = list(s.well, s.disabled, s.dead),
+      E = list(e.ww, e.ss, e.dd, e.ws, e.wd, e.sd)
+    ), 
+    class="invalid_rate"
+  ) 
+  # over-constrain (all rates specified for 'dead' state)
+  e.sd <- MarkovTransition$new(s.disabled, s.dead, r=0.4)
+  e.dd <- MarkovTransition$new(s.dead, s.dead, r=1)
+  expect_error(
+    CohortMarkovModel$new(
+      V = list(s.well, s.disabled, s.dead),
+      E = list(e.ww, e.ss, e.dd, e.ws, e.wd, e.sd)
+    ), 
+    class="invalid_rate"
+  )
+  # correctly specified 
+  e.ww <- MarkovTransition$new(s.well, s.well)
+  e.ss <- MarkovTransition$new(s.disabled, s.disabled)
+  e.dd <- MarkovTransition$new(s.dead, s.dead)
+  e.ws <- MarkovTransition$new(s.well, s.disabled, r=0.2)
+  e.wd <- MarkovTransition$new(s.well, s.dead, r=0.2)
+  e.sd <- MarkovTransition$new(s.disabled, s.dead, r=0.4)
+  expect_silent(
+    CohortMarkovModel$new(
+      V = list(s.well, s.disabled, s.dead),
+      E = list(e.ww, e.ss, e.dd, e.ws, e.wd, e.sd)
+    )
+  )
+  
+})
+
+
 # test_that("differing state and transition matrix names are rejected", {
 #   s.well <- MarkovState$new("Well")
 #   s.disabled <- MarkovState$new("Disabled")

@@ -162,8 +162,8 @@ Graph <- R6::R6Class(
       return(length(private$E))  
     },
 
-    #' @description 
-    #' Compute the adjacency matrix for the graph. Each cell contains the
+    #' @description Compute the adjacency matrix for the graph. 
+    #' @details Each cell contains the
     #' number of edges joining the two vertexes, with the convention of
     #' self loops being counted twice, unless \code{binary} is \code{TRUE} when
     #' cells are either 0 (not adjacent) or 1 (adjacent).

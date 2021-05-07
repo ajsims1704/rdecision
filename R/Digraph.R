@@ -114,9 +114,9 @@ Digraph <- R6::R6Class(
       return(A)
     },
     
-    #' @description 
-    #' Compute the incidence matrix for the graph. Each row is a vertex and
-    #' each column is an edge. Edges leaving a vertex have value -1 and edges
+    #' @description Compute the incidence matrix for the digraph. 
+    #' @details Each row is a vertex and each column is an edge. Edges leaving
+    #' a vertex have value -1 and edges
     #' entering have value +1. if all vertexes have defined and unique labels
     #' and all edges have defined and unique labels, the dimnames of the matrix
     #' are the labels of the vertexes and edges.
@@ -271,8 +271,7 @@ Digraph <- R6::R6Class(
       return(TRUE)
     },
 
-    #' @description
-    #' Find the direct successors of a node. 
+    #' @description Find the direct successors of a node. 
     #' @param v The index vertex.
     #' @return A list of nodes or an empty list if the specified
     #' node has no successors.
@@ -400,8 +399,9 @@ Digraph <- R6::R6Class(
       return(E)
     },
     
-    #' @description Writes a representation of the digraph in the 
-    #' \code{graphviz} DOT language
+    #' @description Exports the digraph in DOT notation.
+    #' @details Writes a representation of the digraph in the 
+    #' \code{graphviz} DOT language 
     #' (\url{http://graphviz.org/doc/info/lang.html}) for drawing with one
     #' of the \code{graphviz} tools including \code{dot} (Gansner, 1993). 
     #' @return A character vector. Intended for passing to \code{writeLines}

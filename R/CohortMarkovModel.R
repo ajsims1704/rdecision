@@ -31,8 +31,8 @@ CohortMarkovModel <- R6::R6Class(
     #'   \item All edges must be of class \code{MarkovTransition};
     #'   \item The nodes and edges must form a digraph whose underlying
     #'   graph is connected;
-    #'   \item Each non-absorbing state must have exactly one outgoing
-    #'   transition whose hazard rate is NULL;
+    #'   \item Each non-absorbing state must have one outgoing transition
+    #'    whose hazard rate is NULL;
     #' }
     #' @param V A list of nodes (\code{MarkovState}s).
     #' @param E A list of edges (\code{MarkovTransition}s).
@@ -65,7 +65,33 @@ CohortMarkovModel <- R6::R6Class(
       }
       # check that each non-absorbing state has exactly one outgoing
       # transition whose rate is NULL
-      lv <- sapply(V, function(v) {})
+      B <- self$digraph_incidence_matrix()
+      print("")
+      print(B)
+      lv <- sapply(seq(1,nrow(B)), FUN=function(iv) {
+        n.out <- 0
+        n.null <- 0
+        for (ie in 1:ncol(B)) {
+          if (B[iv,ie]==-1) {
+             n.out <- n.out + 1
+             e <- private$E[[ie]]
+             if (is.na(e$rate())) {
+               n.null <- n.null + 1
+             }
+          }
+        }
+        print(" ")
+        print(paste(n.out, n.null))
+        rv <- TRUE
+        if (n.out > 0) {
+          if (n.null != 1) {
+            rv <- FALSE
+          }
+        }
+        return(rv)
+      })
+      print(" ")
+      print(lv)
       if (!all(lv)) {
         rlang::abort(
           "Each non-absorbing state must have one NULL rate transition",
