@@ -94,12 +94,7 @@ A Digraph object.
 \if{html}{\out{<a id="method-digraph_adjacency_matrix"></a>}}
 \if{latex}{\out{\hypertarget{method-digraph_adjacency_matrix}{}}}
 \subsection{Method \code{digraph_adjacency_matrix()}}{
-Compute the adjacency matrix for the digraph. Each cell contains the
-number of edges from the row vertex to the column vertex, with the 
-convention of self loops being counted once, unless \code{boolean} is 
-\code{TRUE}
-when cells are either \code{FALSE} (not adjacent) or \code{TRUE} 
-(adjacent).
+Compute the adjacency matrix for the digraph.
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{Digraph$digraph_adjacency_matrix(boolean = FALSE)}\if{html}{\out{</div>}}
 }
@@ -112,6 +107,13 @@ cell is \code{{FALSE,TRUE}}.}
 }
 \if{html}{\out{</div>}}
 }
+\subsection{Details}{
+Each cell contains the number of edges from the row vertex to
+the column vertex, with the convention of self loops being counted once,
+unless \code{boolean} is \code{TRUE}' when cells are either \code{FALSE}
+(not adjacent) or \code{TRUE} (adjacent).
+}
+
 \subsection{Returns}{
 A square numeric matrix with the number of rows and columns
 equal to the order of the graph. The rows and columns are in the
@@ -123,13 +125,17 @@ dimnames of the matrix are the labels of the nodes.
 \if{html}{\out{<a id="method-digraph_incidence_matrix"></a>}}
 \if{latex}{\out{\hypertarget{method-digraph_incidence_matrix}{}}}
 \subsection{Method \code{digraph_incidence_matrix()}}{
-Compute the incidence matrix for the graph. Each row is a vertex and
-each column is an edge. Edges leaving a vertex have value -1 and edges
-entering have value +1. if all vertexes have defined and unique labels
-and all edges have defined and unique labels, the dimnames of the matrix
-are the labels of the vertexes and edges.
+Compute the incidence matrix for the digraph.
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{Digraph$digraph_incidence_matrix()}\if{html}{\out{</div>}}
+}
+
+\subsection{Details}{
+Each row is a vertex and each column is an edge. Edges leaving
+a vertex have value -1 and edges entering have value +1. By convention
+self loops have value 0 (1-1). If all vertexes have defined and unique 
+labels and all edges have defined and unique labels, the dimnames of the
+matrix are the labels of the vertexes and edges.
 }
 
 \subsection{Returns}{
@@ -140,10 +146,13 @@ The incidence matrix.
 \if{html}{\out{<a id="method-topological_sort"></a>}}
 \if{latex}{\out{\hypertarget{method-topological_sort}{}}}
 \subsection{Method \code{topological_sort()}}{
-Attempt to topologically sort the vertexes in the directed graph using
-Kahn's algorithm (Kahn, 1962).
+Topologically sort the vertexes in the digraph.
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{Digraph$topological_sort()}\if{html}{\out{</div>}}
+}
+
+\subsection{Details}{
+Uses Kahn's algorithm (Kahn, 1962).
 }
 
 \subsection{Returns}{
@@ -156,12 +165,15 @@ in the graph, but no error will be raised.
 \if{html}{\out{<a id="method-is_connected"></a>}}
 \if{latex}{\out{\hypertarget{method-is_connected}{}}}
 \subsection{Method \code{is_connected()}}{
-Test whether the graph is connected. For digraphs this will
-always return \code{FALSE} because \dfn{connected} is not defined. 
-Function \code{weakly_connected} calculates whether the underlying
-graph is connected.
+Test whether the graph is connected.
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{Digraph$is_connected()}\if{html}{\out{</div>}}
+}
+
+\subsection{Details}{
+For digraphs this will always return \code{FALSE} because
+\dfn{connected} is not defined. Function \code{weakly_connected} 
+calculates whether the underlying graph is connected.
 }
 
 \subsection{Returns}{
@@ -186,12 +198,15 @@ underlying graph is connected.
 \if{html}{\out{<a id="method-is_acyclic"></a>}}
 \if{latex}{\out{\hypertarget{method-is_acyclic}{}}}
 \subsection{Method \code{is_acyclic()}}{
-Checks for the presence of a cycle in the graph by attempting to do 
-a topological sort. If the sort does not contain all vertexes, the
-digraph contains at least one cycle.
-This method overrides 'is_acyclic' in Graph.
+Checks for the presence of a cycle in the graph.
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{Digraph$is_acyclic()}\if{html}{\out{</div>}}
+}
+
+\subsection{Details}{
+Attempts to do a topological sort. If the sort does not contain
+all vertexes, the digraph contains at least one cycle. This method 
+overrides \code{is_acyclic} in \code{Graph}.
 }
 
 \subsection{Returns}{
@@ -202,10 +217,13 @@ This method overrides 'is_acyclic' in Graph.
 \if{html}{\out{<a id="method-is_tree"></a>}}
 \if{latex}{\out{\hypertarget{method-is_tree}{}}}
 \subsection{Method \code{is_tree()}}{
-Compute whether the digraph's underlying graph is a tree (connected and
-acyclic).
+Is the digraph's underlying graph a tree?
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{Digraph$is_tree()}\if{html}{\out{</div>}}
+}
+
+\subsection{Details}{
+It is a tree if it is connected and acyclic.
 }
 
 \subsection{Returns}{
@@ -217,10 +235,15 @@ if not.
 \if{html}{\out{<a id="method-is_polytree"></a>}}
 \if{latex}{\out{\hypertarget{method-is_polytree}{}}}
 \subsection{Method \code{is_polytree()}}{
-Compute whether the digraph's underlying graph is a tree (connected and
-acyclic).
+Is the digraph's underlying graph a polytree?
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{Digraph$is_polytree()}\if{html}{\out{</div>}}
+}
+
+\subsection{Details}{
+It is a polytree if it is directed, connected and acyclic.
+Because the object is a digraph (directed), this is synomymous with
+\code{tree}.
 }
 
 \subsection{Returns}{
@@ -232,10 +255,14 @@ if not.
 \if{html}{\out{<a id="method-is_arborescence"></a>}}
 \if{latex}{\out{\hypertarget{method-is_arborescence}{}}}
 \subsection{Method \code{is_arborescence()}}{
-Check whether the digraph is an arborescence (a tree with a
-single root and unique paths from the root).
+Is the digraph an arborescence?
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{Digraph$is_arborescence()}\if{html}{\out{</div>}}
+}
+
+\subsection{Details}{
+An \dfn{arborescence} is a tree with a single root and unique
+paths from the root.
 }
 
 \subsection{Returns}{
@@ -289,9 +316,7 @@ node has no predecessors.
 \if{html}{\out{<a id="method-paths"></a>}}
 \if{latex}{\out{\hypertarget{method-paths}{}}}
 \subsection{Method \code{paths()}}{
-Find all directed simple paths from source node \code{s} to target node
-\code{t}. In "simple" paths all vertexes are unique.
-Uses a recursive depth-first search algorithm.
+Find all directed simple paths from source to target.
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{Digraph$paths(s, t)}\if{html}{\out{</div>}}
 }
@@ -305,6 +330,11 @@ Uses a recursive depth-first search algorithm.
 }
 \if{html}{\out{</div>}}
 }
+\subsection{Details}{
+In simple paths all vertexes are unique. Uses a recursive 
+depth-first search algorithm.
+}
+
 \subsection{Returns}{
 A list of ordered node lists.
 }
@@ -313,8 +343,7 @@ A list of ordered node lists.
 \if{html}{\out{<a id="method-walk"></a>}}
 \if{latex}{\out{\hypertarget{method-walk}{}}}
 \subsection{Method \code{walk()}}{
-Construct the sequence of edges which joins the specified
-sequence of vertexes in this graph.
+Sequence of edges which join the specified path.
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{Digraph$walk(P)}\if{html}{\out{</div>}}
 }
@@ -334,12 +363,16 @@ A list of Edges
 \if{html}{\out{<a id="method-as_DOT"></a>}}
 \if{latex}{\out{\hypertarget{method-as_DOT}{}}}
 \subsection{Method \code{as_DOT()}}{
-Writes a representation of the digraph in the 
-\code{graphviz} DOT language
-(\url{http://graphviz.org/doc/info/lang.html}) for drawing with one
-of the \code{graphviz} tools including \code{dot} (Gansner, 1993).
+Exports the digraph in DOT notation.
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{Digraph$as_DOT()}\if{html}{\out{</div>}}
+}
+
+\subsection{Details}{
+Writes a representation of the digraph in the 
+\code{graphviz} DOT language 
+(\url{http://graphviz.org/doc/info/lang.html}) for drawing with one
+of the \code{graphviz} tools including \code{dot} (Gansner, 1993).
 }
 
 \subsection{Returns}{

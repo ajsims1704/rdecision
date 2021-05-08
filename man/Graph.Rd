@@ -49,7 +49,8 @@ Andrew Sims \email{andrew.sims@newcastle.ac.uk}
 \if{html}{\out{<a id="method-new"></a>}}
 \if{latex}{\out{\hypertarget{method-new}{}}}
 \subsection{Method \code{new()}}{
-Create a new \code{Graph} object from sets of nodes and edges.
+Create a new \code{Graph} object from sets of nodes 
+and edges.
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{Graph$new(V, E)}\if{html}{\out{</div>}}
 }
@@ -183,10 +184,7 @@ Size of the graph (integer).
 \if{html}{\out{<a id="method-graph_adjacency_matrix"></a>}}
 \if{latex}{\out{\hypertarget{method-graph_adjacency_matrix}{}}}
 \subsection{Method \code{graph_adjacency_matrix()}}{
-Compute the adjacency matrix for the graph. Each cell contains the
-number of edges joining the two vertexes, with the convention of
-self loops being counted twice, unless \code{binary} is \code{TRUE} when
-cells are either 0 (not adjacent) or 1 (adjacent).
+Compute the adjacency matrix for the graph.
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{Graph$graph_adjacency_matrix(boolean = FALSE)}\if{html}{\out{</div>}}
 }
@@ -199,6 +197,13 @@ cell is {\code{FALSE},\code{TRUE}}.}
 }
 \if{html}{\out{</div>}}
 }
+\subsection{Details}{
+Each cell contains the
+number of edges joining the two vertexes, with the convention of
+self loops being counted twice, unless \code{binary} is \code{TRUE} when
+cells are either 0 (not adjacent) or 1 (adjacent).
+}
+
 \subsection{Returns}{
 A square numeric matrix with the number of rows and columns
 equal to the order of the graph. The rows and columns are in the
@@ -210,9 +215,13 @@ same order as \code{V}. If the nodes have defined and unique labels the
 \if{html}{\out{<a id="method-is_simple"></a>}}
 \if{latex}{\out{\hypertarget{method-is_simple}{}}}
 \subsection{Method \code{is_simple()}}{
-A simple graph has no self loops or multi-edges.
+Is this a simple graph?
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{Graph$is_simple()}\if{html}{\out{</div>}}
+}
+
+\subsection{Details}{
+A simple graph has no self loops or multi-edges.
 }
 
 \subsection{Returns}{
@@ -223,13 +232,16 @@ A simple graph has no self loops or multi-edges.
 \if{html}{\out{<a id="method-is_connected"></a>}}
 \if{latex}{\out{\hypertarget{method-is_connected}{}}}
 \subsection{Method \code{is_connected()}}{
-Test whether the graph is connected. Graphs with no vertices are 
-considered unconnected; graphs with 1 vertex are considered
-connected. Otherwise a graph is connected if all nodes can be 
-reached from an arbitrary starting point. Uses a depth first
-search.
+Test whether the graph is connected.
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{Graph$is_connected()}\if{html}{\out{</div>}}
+}
+
+\subsection{Details}{
+Graphs with no vertices are considered unconnected; graphs with
+1 vertex are considered connected. Otherwise a graph is connected if all 
+nodes can be reached from an arbitrary starting point. Uses a depth first
+search.
 }
 
 \subsection{Returns}{
@@ -240,12 +252,16 @@ search.
 \if{html}{\out{<a id="method-is_acyclic"></a>}}
 \if{latex}{\out{\hypertarget{method-is_acyclic}{}}}
 \subsection{Method \code{is_acyclic()}}{
-Checks for the presence of a cycle in the graph using a depth-first
-search from each node to detect the presence of back edges. A back
-edge is an edge from the current node joining a previously detected 
-(visited) node, that is not the parent node of the current one.
+Checks for the presence of a cycle in the graph.
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{Graph$is_acyclic()}\if{html}{\out{</div>}}
+}
+
+\subsection{Details}{
+Uses a depth-first search from each node to detect the
+presence of back edges. A back edge is an edge from the current node
+joining a previously detected (visited) node, that is not the parent 
+node of the current one.
 }
 
 \subsection{Returns}{
@@ -269,7 +285,7 @@ Compute whether the graph is connected and acyclic.
 \if{html}{\out{<a id="method-degree"></a>}}
 \if{latex}{\out{\hypertarget{method-degree}{}}}
 \subsection{Method \code{degree()}}{
-The degree of a vertex in the graph, or number of incident edges.
+The degree of a vertex in the graph.
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{Graph$degree(v)}\if{html}{\out{</div>}}
 }
@@ -281,6 +297,10 @@ The degree of a vertex in the graph, or number of incident edges.
 }
 \if{html}{\out{</div>}}
 }
+\subsection{Details}{
+The number of incident edges.
+}
+
 \subsection{Returns}{
 Degree of the vertex, integer.
 }
@@ -289,8 +309,7 @@ Degree of the vertex, integer.
 \if{html}{\out{<a id="method-neighbours"></a>}}
 \if{latex}{\out{\hypertarget{method-neighbours}{}}}
 \subsection{Method \code{neighbours()}}{
-Find the neighbours of a node. A property of the graph, not the node.
-Does not include self, even in the case of a loop to self.
+Find the neighbours of a node.
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{Graph$neighbours(v)}\if{html}{\out{</div>}}
 }
@@ -302,6 +321,11 @@ Does not include self, even in the case of a loop to self.
 }
 \if{html}{\out{</div>}}
 }
+\subsection{Details}{
+A property of the graph, not the node. Does not include self, 
+even in the case of a loop to self.
+}
+
 \subsection{Returns}{
 A list of nodes which are joined to the subject.
 }
@@ -310,12 +334,15 @@ A list of nodes which are joined to the subject.
 \if{html}{\out{<a id="method-as_DOT"></a>}}
 \if{latex}{\out{\hypertarget{method-as_DOT}{}}}
 \subsection{Method \code{as_DOT()}}{
-Writes a representation of the graph in the 
-\code{graphviz} DOT language
-(\url{http://graphviz.org/doc/info/lang.html}) for drawing with one
-of the \code{graphviz} tools including \code{dot} (Gansner, 1993).
+Export a representation of the graph in DOT format.
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{Graph$as_DOT()}\if{html}{\out{</div>}}
+}
+
+\subsection{Details}{
+Writes the representation in the \code{graphviz} DOT language
+(\url{http://graphviz.org/doc/info/lang.html}) for drawing with one
+of the \code{graphviz} tools including \code{dot} (Gansner, 1993).
 }
 
 \subsection{Returns}{

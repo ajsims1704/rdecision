@@ -80,6 +80,16 @@ test_that("adjacency matrix has correct properties", {
   expect_setequal(dn$out.node, c("n1", "n2"))
   expect_setequal(dn$in.node, c("n1", "n2"))
   expect_equal(sum(A-matrix(c(0,1,0,0),nrow=2,byrow=TRUE)),0)
+  # self loops and double self loops
+  n1 <- Node$new("n1")
+  n2 <- Node$new("n2")
+  ea <- Arrow$new(n1,n1,"a")
+  eb <- Arrow$new(n1,n2,"b")
+  ec <- Arrow$new(n2,n2,"c")
+  ed <- Arrow$new(n2,n2,"d")
+  G <- Digraph$new(V=list(n1,n2),A=list(ea,eb,ec,ed))
+  A <- G$digraph_adjacency_matrix(boolean=FALSE)
+  expect_equal(sum(A-matrix(c(1,1,0,2),nrow=2,byrow=TRUE)),0)
   # boolean
   n1 <- Node$new("n1")
   n2 <- Node$new("n2")
@@ -103,6 +113,7 @@ test_that("incidence matrix has correct properties", {
   G <- Digraph$new(V=list(n1,n2),A=list(e1))
   B <- G$digraph_incidence_matrix()
   expect_null(dimnames(B))
+  # two nodes linked by two edges
   n1 <- Node$new("n1")
   n2 <- Node$new("n2")
   ea <- Arrow$new(n1,n2,"a")
@@ -114,6 +125,19 @@ test_that("incidence matrix has correct properties", {
   expect_setequal(dn$vertex, c("n1", "n2"))
   expect_setequal(dn$edge, c("a", "b"))
   expect_equal(sum(B-matrix(c(-1,1,1,-1),nrow=2,byrow=TRUE)),0)
+  # two nodes and two edges with self loops
+  n1 <- Node$new("n1")
+  n2 <- Node$new("n2")
+  ea <- Arrow$new(n1,n1,"a")
+  eb <- Arrow$new(n1,n2,"b")
+  ec <- Arrow$new(n2,n2,"c")
+  G <- Digraph$new(V=list(n1,n2),A=list(ea,eb,ec))
+  B <- G$digraph_incidence_matrix()
+  dn <- dimnames(B)
+  expect_setequal(names(dn), c("vertex", "edge"))
+  expect_setequal(dn$vertex, c("n1", "n2"))
+  expect_setequal(dn$edge, c("a", "b", "c"))
+  expect_equal(sum(B-matrix(c(0,1,0,0,-1,0),nrow=2,byrow=TRUE)),0)
 })
 
 test_that("arborescences are detected", {

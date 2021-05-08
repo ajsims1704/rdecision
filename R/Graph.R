@@ -30,8 +30,8 @@ Graph <- R6::R6Class(
   ),
   public = list(
     
-    #' @description 
-    #' Create a new \code{Graph} object from sets of nodes and edges. 
+    #' @description Create a new \code{Graph} object from sets of nodes 
+    #' and edges. 
     #' @param V A list of Nodes.
     #' @param E A list of Edges.
     #' @return A \code{Graph} object.
@@ -76,8 +76,7 @@ Graph <- R6::R6Class(
       return(invisible(self))
     },
 
-    #' @description 
-    #' Find the index of a vertex in the graph.
+    #' @description Find the index of a vertex in the graph.
     #' @param v Subject vertex
     #' @return Index of \code{v}. The vertexes are normally stored in the same
     #' order they are specified in \code{new}, but this cannot be guaranteed. 
@@ -102,8 +101,7 @@ Graph <- R6::R6Class(
       return(index)
     }, 
   
-    #' @description 
-    #' Test whether a vertex is an element of the graph.
+    #' @description Test whether a vertex is an element of the graph.
     #' @param v Subject vertex.
     #' @return TRUE if v is an element of V(G).
     has_vertex = function(v) {
@@ -112,8 +110,7 @@ Graph <- R6::R6Class(
       return(!is.na(index))
     },
 
-    #' @description 
-    #' Find the index of an edge in a graph.
+    #' @description Find the index of an edge in a graph.
     #' @param e Subject edge.
     #' @return Index of \code{e}. The edges are normally stored in the same order
     #' they are specified in \code{new}, but this cannot be guaranteed. This
@@ -138,8 +135,7 @@ Graph <- R6::R6Class(
       return(index)
     },
 
-    #' @description 
-    #' Test whether an edge is element of the graph.
+    #' @description Test whether an edge is element of the graph.
     #' @param e Subject edge.
     #' @return \code{TRUE} if \code{e} is an element of \eqn{E(G)}.
     has_edge = function(e) {
@@ -148,15 +144,13 @@ Graph <- R6::R6Class(
       return(!is.na(index))
     },
 
-    #' @description 
-    #' Return the order of the graph (number of vertices).
+    #' @description Return the order of the graph (number of vertices).
     #' @return Order of the graph (integer).
     order = function() {
       return(length(private$V))  
     },
     
-    #' @description 
-    #' Return the size of the graph (number of edges).
+    #' @description Return the size of the graph (number of edges).
     #' @return Size of the graph (integer).
     size = function() {
       return(length(private$E))  
@@ -212,8 +206,8 @@ Graph <- R6::R6Class(
       return(A)
     },
     
-    #' @description 
-    #' A simple graph has no self loops or multi-edges.
+    #' @description Is this a simple graph?
+    #' @details A simple graph has no self loops or multi-edges.
     #' @return \code{TRUE} if simple, \code{FALSE} if not.    
     is_simple = function() {
       simple <- TRUE
@@ -229,11 +223,10 @@ Graph <- R6::R6Class(
       return(simple)
     },
     
-    #' @description 
-    #' Test whether the graph is connected. Graphs with no vertices are 
-    #' considered unconnected; graphs with 1 vertex are considered
-    #' connected. Otherwise a graph is connected if all nodes can be 
-    #' reached from an arbitrary starting point. Uses a depth first
+    #' @description Test whether the graph is connected.
+    #' @details Graphs with no vertices are considered unconnected; graphs with
+    #' 1 vertex are considered connected. Otherwise a graph is connected if all 
+    #' nodes can be reached from an arbitrary starting point. Uses a depth first
     #' search.
     #' @return \code{TRUE} if connected, \code{FALSE} if not.
     is_connected = function() {
@@ -271,11 +264,11 @@ Graph <- R6::R6Class(
       return(connected)
     },
 
-    #' @description 
-    #' Checks for the presence of a cycle in the graph using a depth-first
-    #' search from each node to detect the presence of back edges. A back
-    #' edge is an edge from the current node joining a previously detected 
-    #' (visited) node, that is not the parent node of the current one.
+    #' @description Checks for the presence of a cycle in the graph.
+    #' @details Uses a depth-first search from each node to detect the
+    #' presence of back edges. A back edge is an edge from the current node
+    #' joining a previously detected (visited) node, that is not the parent 
+    #' node of the current one.
     #' @return \code{TRUE} if no cycles detected.
     is_acyclic = function() {
       # acyclic if trivial
@@ -323,15 +316,14 @@ Graph <- R6::R6Class(
       return(TRUE)
     },    
     
-    #' @description 
-    #' Compute whether the graph is connected and acyclic.
+    #' @description Compute whether the graph is connected and acyclic.
     #' @return \code{TRUE} if the graph is a tree; \code{FALSE} if not.
     is_tree = function() {
       return(self$is_connected() && self$is_acyclic())
     },
 
-    #' @description 
-    #' The degree of a vertex in the graph, or number of incident edges.
+    #' @description The degree of a vertex in the graph.
+    #' @details The number of incident edges.
     #' @param v The subject node.
     #' @return Degree of the vertex, integer.
     degree = function(v) {
@@ -346,9 +338,9 @@ Graph <- R6::R6Class(
       return(d)
     },
 
-    #' @description 
-    #' Find the neighbours of a node. A property of the graph, not the node.
-    #' Does not include self, even in the case of a loop to self.
+    #' @description Find the neighbours of a node. 
+    #' @details A property of the graph, not the node. Does not include self, 
+    #' even in the case of a loop to self.
     #' @param v The subject node. 
     #' @return A list of nodes which are joined to the subject.
     neighbours = function(v) {
@@ -365,8 +357,8 @@ Graph <- R6::R6Class(
       return(n)
     },
 
-    #' @description Writes a representation of the graph in the 
-    #' \code{graphviz} DOT language
+    #' @description Export a representation of the graph in DOT format.
+    #' @details Writes the representation in the \code{graphviz} DOT language
     #' (\url{http://graphviz.org/doc/info/lang.html}) for drawing with one
     #' of the \code{graphviz} tools including \code{dot} (Gansner, 1993). 
     #' @return A character vector. Intended for passing to \code{writeLines}

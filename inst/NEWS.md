@@ -1,4 +1,8 @@
 
+# rdecision 1.0.4.9000
+
+* Self loops in digraphs have a value of zero in the incidence matrix.
+
 # rdecision 1.0.4
 
 * Added option `value` to method `set` in class `ModVar`. This allows
