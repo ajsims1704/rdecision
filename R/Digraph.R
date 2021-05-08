@@ -400,7 +400,7 @@ Digraph <- R6::R6Class(
     #' @details Writes a representation of the digraph in the 
     #' \code{graphviz} DOT language 
     #' (\url{http://graphviz.org/doc/info/lang.html}) for drawing with one
-    #' of the \code{graphviz} tools including \code{dot} (Gansner, 1993). 
+    #' of the \code{graphviz} tools, including \code{dot} (Gansner, 1993). 
     #' @return A character vector. Intended for passing to \code{writeLines}
     #' for saving as a text file.
     as_DOT = function() {

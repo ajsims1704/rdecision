@@ -115,6 +115,35 @@ test_that("non-absorbing states without one NULL rate are detected", {
   
 })
 
+test_that("the transition matrix has the correct properties and values", {
+  # create the model
+  s.well <- MarkovState$new("Well")
+  s.disabled <- MarkovState$new("Disabled")
+  s.dead <- MarkovState$new("Dead")
+  e.ww <- MarkovTransition$new(s.well, s.well)
+  e.ss <- MarkovTransition$new(s.disabled, s.disabled)
+  e.dd <- MarkovTransition$new(s.dead, s.dead)
+  e.ws <- MarkovTransition$new(s.well, s.disabled, r=0.2)
+  e.wd <- MarkovTransition$new(s.well, s.dead, r=0.2)
+  e.sd <- MarkovTransition$new(s.disabled, s.dead, r=0.4)
+  M <- CohortMarkovModel$new(
+    V = list(s.well, s.disabled, s.dead),
+    E = list(e.ww, e.ss, e.dd, e.ws, e.wd, e.sd)
+  )
+  # check the transition matrix properties
+  Ip <- M$transition_matrix()
+  expect_equal(nrow(Ip),3)
+  expect_equal(ncol(Ip),3)
+  dn <- dimnames(Ip)
+  expect_setequal(names(dn),list("source","target"))
+  expect_setequal(dn[[1]],list("Well","Disabled","Dead"))
+  expect_setequal(dn[[2]],list("Well","Disabled","Dead"))
+  expect_true(is.matrix(Ip))
+  # check the transition matrix values
+  print("")
+  print(Ip)
+})
+
 
 # test_that("differing state and transition matrix names are rejected", {
 #   s.well <- MarkovState$new("Well")
@@ -176,9 +205,9 @@ test_that("rdecision replicates Sonnenberg & Beck, Fig 3", {
     MarkovTransition$new(s.well, s.well),
     MarkovTransition$new(s.dead, s.dead),
     MarkovTransition$new(s.disabled, s.disabled),
-    MarkovTransition$new(s.well, s.disabled),
-    MarkovTransition$new(s.well, s.dead),
-    MarkovTransition$new(s.disabled, s.dead)
+    MarkovTransition$new(s.well, s.disabled, r=0.2),
+    MarkovTransition$new(s.well, s.dead, r=0.2),
+    MarkovTransition$new(s.disabled, s.dead, r=0.4)
   )
   
 #  Ip <- TransitionMatrix$new(c("Well", "Disabled", "Dead"))

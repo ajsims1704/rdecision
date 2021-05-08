@@ -1,7 +1,6 @@
 #' @title \verb{CohortMarkovModel}
 #' 
 #' @description An R6 class for a Markov model with cohort simulation.
-#' 
 #' @details A class to represent a Markov model, using cohort simulation. In 
 #' graph theory terms, a Markov model is a directed multidigraph permitting 
 #' loops (a loop multidigraph), optionally labelled, or \dfn{quiver}. It is a
@@ -21,6 +20,7 @@ CohortMarkovModel <- R6::R6Class(
   lock_class = TRUE,
   inherit = Digraph,
   private = list(
+    Ip = NULL
   ),
   public = list(
     
@@ -65,33 +65,21 @@ CohortMarkovModel <- R6::R6Class(
       }
       # check that each non-absorbing state has exactly one outgoing
       # transition whose rate is NULL
-      B <- self$digraph_incidence_matrix()
-      print("")
-      print(B)
-      lv <- sapply(seq(1,nrow(B)), FUN=function(iv) {
+      lv <- sapply(1:self$order(), function(iv) {
         n.out <- 0
         n.null <- 0
-        for (ie in 1:ncol(B)) {
-          if (B[iv,ie]==-1) {
-             n.out <- n.out + 1
-             e <- private$E[[ie]]
-             if (is.na(e$rate())) {
-               n.null <- n.null + 1
-             }
+        v <- private$V[[iv]]
+        for (ie in 1:self$size()) {
+          e <- private$E[[ie]]
+          if (identical(e$source(),v)) {
+            n.out <- n.out + 1
+            if (is.na(e$rate())) {
+              n.null <- n.null + 1
+            }
           }
         }
-        print(" ")
-        print(paste(n.out, n.null))
-        rv <- TRUE
-        if (n.out > 0) {
-          if (n.null != 1) {
-            rv <- FALSE
-          }
-        }
-        return(rv)
+        return(ifelse(n.out==0, TRUE, n.null==1))
       })
-      print(" ")
-      print(lv)
       if (!all(lv)) {
         rlang::abort(
           "Each non-absorbing state must have one NULL rate transition",
@@ -99,6 +87,48 @@ CohortMarkovModel <- R6::R6Class(
       }
       # return a new CohortMarkovModel object
       return(invisible(self))
+    },
+    
+    #' @description Return the per-cycle transition matrix for the model.
+    #' @returns A square matrix of size equal to the number of states. If all
+    #' states are labelled, the dimnames take the names of the states.
+    transition_matrix = function() {
+      # if the matrix is not null, create it. This assumes the graph is 
+      # immutable (no edges or vertexes added or removed since its creation)
+      if (is.null(private$Ip)) {
+        # get the state names
+        state.names <- sapply(private$V, function(v) {v$label()})
+        # construct the matrix
+        Ip <- matrix(
+          data = 0, 
+          nrow = self$order(), ncol = self$order(),
+          dimnames = list(source=state.names, target=state.names)
+        )
+        # populate the cells with rates
+        for (ie in 1:self$size()) {
+          e <- private$E[[ie]]
+          is <- self$vertex_index(e$source())
+          it <- self$vertex_index(e$target())
+          Ip[is,it] <- e$rate()
+        }
+        # convert rates to per-cycle probabilities
+        
+        # replace NAs with values to ensure all rows sum to unity
+        for (iv in 1:nrow(Ip)) {
+          p.out <- sum(Ip[iv,], na.rm=TRUE)
+          if (p.out > 1) {
+            rlang::abort(
+              paste("P(transition) from state", state.name[iv],"exceeds 1"),
+              class = "invalid_transitions"
+            )
+          }
+          Ip[iv,which(is.na(Ip[iv,]))] <- 1 - p.out
+        }
+        # save the matrix as a class private variable
+        private$Ip <- Ip
+      }
+      return(private$Ip)
     }
+    
   )
 )

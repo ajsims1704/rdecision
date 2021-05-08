@@ -28,8 +28,8 @@ MarkovTransition <- R6::R6Class(
     #' a cost may be associated' with the transition.
     #' @param source \code{MarkovState} from which the transition starts.
     #' @param target \code{MarkovState} to which the transition ends.
-    #' @param r Hazard rate in units of per patient per year. Exactly one of
-    #' the outgoing transitions from each state must be NULL.
+    #' @param r Instantaneous hazard rate in units of per patient per year.
+    #' Exactly one of the outgoing transitions from each state must be NULL.
     #' @param cost Cost associated with the transition.
     #' @param label Character string containing a label for the transition (the
     #' name of the event).
@@ -107,9 +107,9 @@ MarkovTransition <- R6::R6Class(
       if (is.null(private$transition.rate)) {
         r <- as.numeric(NA)
       } else if (inherits(private$transition.rate, what="ModVar")) {
-        prob <- private$transition.rate$get()
+        r <- private$transition.rate$get()
       } else {
-        prob <- private$transition.rate
+        r <- private$transition.rate
       }
       return(r)
     },
