@@ -4,6 +4,10 @@
 \name{CohortMarkovModel}
 \alias{CohortMarkovModel}
 \title{\verb{CohortMarkovModel}}
+\value{
+A square matrix of size equal to the number of states. If all
+states are labelled, the dimnames take the names of the states.
+}
 \description{
 An R6 class for a Markov model with cohort simulation.
 }
@@ -18,6 +22,35 @@ rates refer to transitions in one direction. Each edge can be optionally
 labelled. It permits loops (edges whose source and target are the same node)
 to represent patients that remain in the same state between cycles.
 }
+\section{Probabilities and rates}{
+
+To calculate per-cycle probabilities from rates, Briggs (2002) and
+Sonnenberg & Beck (1993) use the expression \eqn{p = 1-\exp(-rt)}, where 
+\eqn{r} is an instantaneous rate
+and \eqn{t} is a time interval of interest. This is derived by assuming that 
+if there is a population of \eqn{N} patients the rate of events is
+proportional to the number of patients, i.e. that events occur independently:
+\eqn{\frac{dN}{dt} \propto N}. The number of patients, \eqn{N(t)} who have
+not experienced an event at time \eqn{t} is therefore given by the solution
+to this differential equation, i.e. \eqn{N(t) = N e^{-r t}}, where \eqn{r}
+is the rate, or the reciprocal of the time constant. The expected number of 
+events \eqn{\hat{K}} which occur in interval \eqn{t} from a starting 
+population of \eqn{N} is \eqn{\hat{K} = N - N e^{-r t}}, or 
+\eqn{\hat{K} = Np}, where \eqn{p = 1-\exp(-r t)} is the probability with 
+which events arise during interval \eqn{t}. If instead a per-interval 
+probability is known, the rate is derived from the inverse relationship 
+\eqn{r = -\ln(1-p)/t}.
+}
+
+\references{
+{
+  Briggs A, Claxton K, Sculpher M. Decision modelling for health economic 
+  evaluation. Oxford, UK: Oxford University Press; 2006.
+  
+  Sonnenberg FA, Beck JR. Markov models in medical decision making: a
+  practical guide. \emph{Med Decis Making}, 1993:\strong{13}:322. 
+}
+}
 \author{
 Andrew J. Sims \email{andrew.sims@newcastle.ac.uk}
 }
@@ -28,6 +61,7 @@ Andrew J. Sims \email{andrew.sims@newcastle.ac.uk}
 \subsection{Public methods}{
 \itemize{
 \item \href{#method-new}{\code{CohortMarkovModel$new()}}
+\item \href{#method-transition_matrix}{\code{CohortMarkovModel$transition_matrix()}}
 \item \href{#method-clone}{\code{CohortMarkovModel$clone()}}
 }
 }
@@ -67,7 +101,7 @@ Andrew J. Sims \email{andrew.sims@newcastle.ac.uk}
 \subsection{Method \code{new()}}{
 Creates a Markov model for cohort simulation.
 \subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{CohortMarkovModel$new(V, E)}\if{html}{\out{</div>}}
+\if{html}{\out{<div class="r">}}\preformatted{CohortMarkovModel$new(V, E, tcycle = as.difftime(365.25, units = "days"))}\if{html}{\out{</div>}}
 }
 
 \subsection{Arguments}{
@@ -76,6 +110,9 @@ Creates a Markov model for cohort simulation.
 \item{\code{V}}{A list of nodes (\code{MarkovState}s).}
 
 \item{\code{E}}{A list of edges (\code{MarkovTransition}s).}
+
+\item{\code{tcycle}}{Cycle length, expressed as an R \code{difftime} object; 
+default 1 year.}
 }
 \if{html}{\out{</div>}}
 }
@@ -87,13 +124,23 @@ A Markov model must meet the following conditions:
   \item The nodes and edges must form a digraph whose underlying
   graph is connected;
   \item Each non-absorbing state must have one outgoing transition
-   whose hazard rate is NULL;
+   whose hazard rate is NULL.
 }
 }
 
 \subsection{Returns}{
 A \code{CohortMarkovModel} object.
 }
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-transition_matrix"></a>}}
+\if{latex}{\out{\hypertarget{method-transition_matrix}{}}}
+\subsection{Method \code{transition_matrix()}}{
+Return the per-cycle transition matrix for the model.
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{CohortMarkovModel$transition_matrix()}\if{html}{\out{</div>}}
+}
+
 }
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-clone"></a>}}

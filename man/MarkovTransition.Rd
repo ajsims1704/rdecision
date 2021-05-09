@@ -10,9 +10,9 @@ An R6 class to represent a transition in a Markov model.
 \details{
 A specialism of class \code{Arrow} which is used in a Markov model
 to represent a transition between two \code{MarkovState}s. The transition
-is associated with an instantaneous hazard rate: the rate of failure at
-the next instant given survival up to the current time. It can also be
-associated with a cost.
+is associated with an instantaneous hazard rate and optionally, a cost. The
+hazard rate is the rate of failure at the next instant given survival up to
+the current time.
 }
 \author{
 Andrew J. Sims \email{andrew.sims@newcastle.ac.uk}
@@ -57,8 +57,8 @@ Create an object of type \code{MarkovTransition}.
 
 \item{\code{target}}{\code{MarkovState} to which the transition ends.}
 
-\item{\code{r}}{Hazard rate in units of per patient per year. Exactly one of
-the outgoing transitions from each state must be NULL.}
+\item{\code{r}}{Instantaneous hazard rate in units of per patient per year.
+Exactly one of the outgoing transitions from each state must be NULL.}
 
 \item{\code{cost}}{Cost associated with the transition.}
 

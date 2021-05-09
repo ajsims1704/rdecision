@@ -1,13 +1,12 @@
 #' @title \verb{MarkovTransition} class
 #' 
-#' @description
-#' An R6 class to represent a transition in a Markov model.
+#' @description An R6 class to represent a transition in a Markov model.
 #' 
 #' @details A specialism of class \code{Arrow} which is used in a Markov model
 #' to represent a transition between two \code{MarkovState}s. The transition
-#' is associated with an instantaneous hazard rate: the rate of failure at
-#' the next instant given survival up to the current time. It can also be
-#' associated with a cost. 
+#' is associated with an instantaneous hazard rate and optionally, a cost. The
+#' hazard rate is the rate of failure at the next instant given survival up to
+#' the current time. 
 #' 
 #' @docType class
 #' @author Andrew J. Sims \email{andrew.sims@@newcastle.ac.uk}

@@ -42,7 +42,7 @@ Andrew J. Sims \email{andrew.sims@newcastle.ac.uk}
 \subsection{Method \code{new()}}{
 Create an object of type \code{MarkovState}.
 \subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{MarkovState$new(name, cost = 0, utility = 1, absorbing = FALSE)}\if{html}{\out{</div>}}
+\if{html}{\out{<div class="r">}}\preformatted{MarkovState$new(name, cost = 0, utility = 1)}\if{html}{\out{</div>}}
 }
 
 \subsection{Arguments}{
@@ -85,7 +85,7 @@ Sets the annual cost of state occupancy.
 \subsection{Arguments}{
 \if{html}{\out{<div class="arguments">}}
 \describe{
-\item{\code{annualCost}}{Annual cost of occupying the state; numeric.}
+\item{\code{cost}}{Annual cost of occupying the state; numeric.}
 }
 \if{html}{\out{</div>}}
 }

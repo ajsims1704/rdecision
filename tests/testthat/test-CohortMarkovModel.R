@@ -123,9 +123,12 @@ test_that("the transition matrix has the correct properties and values", {
   e.ww <- MarkovTransition$new(s.well, s.well)
   e.ss <- MarkovTransition$new(s.disabled, s.disabled)
   e.dd <- MarkovTransition$new(s.dead, s.dead)
-  e.ws <- MarkovTransition$new(s.well, s.disabled, r=0.2)
-  e.wd <- MarkovTransition$new(s.well, s.dead, r=0.2)
-  e.sd <- MarkovTransition$new(s.disabled, s.dead, r=0.4)
+  r.ws <- -log(1-0.2)/1
+  e.ws <- MarkovTransition$new(s.well, s.disabled, r=r.ws)
+  r.wd <- -log(1-0.2)/1
+  e.wd <- MarkovTransition$new(s.well, s.dead, r=r.wd)
+  r.sd <- -log(1-0.4)/1
+  e.sd <- MarkovTransition$new(s.disabled, s.dead, r=r.sd)
   M <- CohortMarkovModel$new(
     V = list(s.well, s.disabled, s.dead),
     E = list(e.ww, e.ss, e.dd, e.ws, e.wd, e.sd)
@@ -140,10 +143,11 @@ test_that("the transition matrix has the correct properties and values", {
   expect_setequal(dn[[2]],list("Well","Disabled","Dead"))
   expect_true(is.matrix(Ip))
   # check the transition matrix values
-  print("")
-  print(Ip)
+  expect_equal(
+    sum(Ip-matrix(c(0.6,0.2,0.2,0,0.6,0.4,0,0,1),nrow=3,byrow=TRUE)),0
+  )
+  
 })
-
 
 # test_that("differing state and transition matrix names are rejected", {
 #   s.well <- MarkovState$new("Well")
@@ -155,26 +159,40 @@ test_that("the transition matrix has the correct properties and values", {
 # })
 
 # -----------------------------------------------------------------------------
-# tests of setting state populations
+# tests of getting and setting state populations
 # -----------------------------------------------------------------------------
-# test_that("invalid population vectors are rejected", {
-#   s.well <- MarkovState$new(name="Well")
-#   s.disabled <- MarkovState$new("Disabled")
-#   s.dead <- MarkovState$new("Dead")
-#   Ip <- TransitionMatrix$new(c("Well", "Disabled", "Dead"))
-#   M <- CohortMarkovModel$new(list(s.well, s.disabled, s.dead), Ip)
-#   # number of elements
-#   pop <- c(Well=10000, Disabled=0)
-#   expect_error(M$set_populations(pop), class="incorrect_state_count")
-#   # state names
-#   pop <- c(Well=10000, Poorly=0, Disabled=0)
-#   expect_error(M$set_populations(pop), class="unmatched_states")
-#   pop <- c(10000, 0, 0)
-#   expect_error(M$set_populations(pop), class="unmatched_states")
-#   # type
-#   pop <- c(Well=10000, Disabled="0", Dead=0)
-#   expect_error(M$set_populations(pop), class="non-numeric_state_population")
-# })
+test_that("invalid population vectors are rejected", {
+  # create the model
+  s.well <- MarkovState$new(name="Well")
+  s.disabled <- MarkovState$new("Disabled")
+  s.dead <- MarkovState$new("Dead")
+  e.ww <- MarkovTransition$new(s.well, s.well)
+  e.ss <- MarkovTransition$new(s.disabled, s.disabled)
+  e.dd <- MarkovTransition$new(s.dead, s.dead)
+  e.ws <- MarkovTransition$new(s.well, s.disabled, r=0.2)
+  e.wd <- MarkovTransition$new(s.well, s.dead, r=0.2)
+  e.sd <- MarkovTransition$new(s.disabled, s.dead, r=0.4)
+  M <- CohortMarkovModel$new(
+    V = list(s.well, s.disabled, s.dead),
+    E = list(e.ww, e.ss, e.dd, e.ws, e.wd, e.sd)
+  )
+  # check state names
+  expect_setequal(M$get_statenames(), list("Well", "Disabled", "Dead"))
+  # number of elements
+  pop <- c(Well=10000, Disabled=0)
+  expect_error(M$set_populations(pop), class="incorrect_state_count")
+  # state names
+  pop <- c(Well=10000, Poorly=0, Disabled=0)
+  expect_error(M$set_populations(pop), class="unmatched_states")
+  pop <- c(10000, 0, 0)
+  expect_error(M$set_populations(pop), class="unmatched_states")
+  # type
+  pop <- c(Well=10000, Disabled="0", Dead=0)
+  expect_error(M$set_populations(pop), class="non-numeric_state_population")
+  # correct
+  pop <- c(Well=10000, Disabled=0, Dead=0)
+  expect_silent(M$set_populations(pop))
+})
 
 # -----------------------------------------------------------------------------
 # tests of cycling
@@ -214,10 +232,10 @@ test_that("rdecision replicates Sonnenberg & Beck, Fig 3", {
 #  Ip$set_rate(from="Well", to="Disabled", rate=0.2)
 #  Ip$set_rate(from="Well", to="Dead", rate=0.2)
 #  Ip$set_rate(from="Disabled", to="Dead", rate=0.4)
-  M <- CohortMarkovModel$new(
-    V = list(s.well, s.disabled, s.dead),
-    E
-  )
+#  M <- CohortMarkovModel$new(
+#    V = list(s.well, s.disabled, s.dead),
+#    E
+#  )
 #  M$set_populations(c(Well=10000, Disabled=0, Dead=0))  
 #  RC <- M$cycles(25)
 #  expect_true(is.data.frame(RC))

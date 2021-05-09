@@ -26,7 +26,7 @@ MarkovState <- R6::R6Class(
     #' @param cost The annual cost of state occupancy.
     #' @param utility The utility associated with being in the state.
     #' @return An object of type \code{MarkovState}.
-    initialize = function(name, cost=0, utility=1, absorbing=FALSE) {
+    initialize = function(name, cost=0, utility=1) {
       # set the name
       if (missing(name) || is.na(name)) {
         rlang::abort(
@@ -73,7 +73,7 @@ MarkovState <- R6::R6Class(
     },
     
     #' @description Sets the annual cost of state occupancy.
-    #' @param annualCost Annual cost of occupying the state; numeric.
+    #' @param cost Annual cost of occupying the state; numeric.
     #' @return Updated MarkovState object.
     set_cost = function(cost) {
       # check that cost is numeric, then set it

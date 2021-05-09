@@ -372,7 +372,7 @@ Exports the digraph in DOT notation.
 Writes a representation of the digraph in the 
 \code{graphviz} DOT language 
 (\url{http://graphviz.org/doc/info/lang.html}) for drawing with one
-of the \code{graphviz} tools including \code{dot} (Gansner, 1993).
+of the \code{graphviz} tools, including \code{dot} (Gansner, 1993).
 }
 
 \subsection{Returns}{
