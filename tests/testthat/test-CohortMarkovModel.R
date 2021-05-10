@@ -134,7 +134,7 @@ test_that("the transition matrix has the correct properties and values", {
     E = list(e.ww, e.ss, e.dd, e.ws, e.wd, e.sd)
   )
   # check the transition matrix properties
-  Ip <- M$transition_matrix()
+  Ip <- M$transition_probability()
   expect_equal(nrow(Ip),3)
   expect_equal(ncol(Ip),3)
   dn <- dimnames(Ip)
@@ -192,6 +192,10 @@ test_that("invalid population vectors are rejected", {
   # correct
   pop <- c(Well=10000, Disabled=0, Dead=0)
   expect_silent(M$set_populations(pop))
+  rp <- M$get_populations()
+  expect_equal(unname(rp["Well"]), 10000)
+  expect_equal(unname(rp["Disabled"]), 0)
+  expect_equal(unname(rp["Dead"]), 0)
 })
 
 # -----------------------------------------------------------------------------
@@ -219,24 +223,33 @@ test_that("rdecision replicates Sonnenberg & Beck, Fig 3", {
   s.disabled <- MarkovState$new(name="Disabled")
   s.dead <- MarkovState$new(name="Dead")
   # create transitions
+  r.ws <- -log(1-0.2)/1
+  r.wd <- -log(1-0.2)/1
+  r.sd <- -log(1-0.4)/1
   E <- list(
     MarkovTransition$new(s.well, s.well),
     MarkovTransition$new(s.dead, s.dead),
     MarkovTransition$new(s.disabled, s.disabled),
-    MarkovTransition$new(s.well, s.disabled, r=0.2),
-    MarkovTransition$new(s.well, s.dead, r=0.2),
-    MarkovTransition$new(s.disabled, s.dead, r=0.4)
+    e.ws <- MarkovTransition$new(s.well, s.disabled, r=r.ws),
+    e.wd <- MarkovTransition$new(s.well, s.dead, r=r.wd),
+    e.sd <- MarkovTransition$new(s.disabled, s.dead, r=r.sd)
   )
+  # create the model
+  M <- CohortMarkovModel$new(
+    V = list(s.well, s.disabled, s.dead),
+    E
+  )
+  # check the transition matrix values
+  Ip <- M$transition_probability()
+  expect_equal(
+    sum(Ip-matrix(c(0.6,0.2,0.2,0,0.6,0.4,0,0,1),nrow=3,byrow=TRUE)),0
+  )
+  # set the starting populations
+  M$set_populations(c(Well=10000, Disabled=0, Dead=0)) 
+  # cycle
+  M$cycle()
+  M$cycle()
   
-#  Ip <- TransitionMatrix$new(c("Well", "Disabled", "Dead"))
-#  Ip$set_rate(from="Well", to="Disabled", rate=0.2)
-#  Ip$set_rate(from="Well", to="Dead", rate=0.2)
-#  Ip$set_rate(from="Disabled", to="Dead", rate=0.4)
-#  M <- CohortMarkovModel$new(
-#    V = list(s.well, s.disabled, s.dead),
-#    E
-#  )
-#  M$set_populations(c(Well=10000, Disabled=0, Dead=0))  
 #  RC <- M$cycles(25)
 #  expect_true(is.data.frame(RC))
 #  expect_equal(round(RC$Well[RC$Cycle==2]), 3600)

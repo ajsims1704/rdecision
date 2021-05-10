@@ -117,9 +117,9 @@ MarkovTransition <- R6::R6Class(
     #' @return Cost.
     cost = function() {
       if (inherits(private$edge.cost, what="ModVar")) {
-        rv <- private$edge.cost$get()
+        rv <- private$transition.cost$get()
       } else {
-        rv <- private$edge.cost
+        rv <- private$transition.cost
       }
       return(rv)
     }

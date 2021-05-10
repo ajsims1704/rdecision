@@ -48,7 +48,12 @@ CohortMarkovModel <- R6::R6Class(
   inherit = Digraph,
   private = list(
     cmm.tcycle = NULL,
-    cmm.Ip = NULL
+    cmm.Ip = NULL,
+    cmm.Ic = NULL,
+    cmm.hcc = NULL,
+    cmm.discount = NULL,
+    cmm.pop = NULL,
+    cmm.icycle = NULL
   ),
   public = list(
     
@@ -66,8 +71,11 @@ CohortMarkovModel <- R6::R6Class(
     #' @param E A list of edges (\code{MarkovTransition}s).
     #' @param tcycle Cycle length, expressed as an R \code{difftime} object; 
     #' default 1 year.
+    #' @param hcc Boolean; whether to apply half cycle correction.
+    #' @param discount Annual discount rate, as a percentage.
     #' @return A \code{CohortMarkovModel} object.
-    initialize = function(V,E,tcycle=as.difftime(365.25, units="days")) {
+    initialize = function(V,E,tcycle=as.difftime(365.25, units="days"),
+                          hcc=TRUE, discount=0) {
       # initialize the base class(es)
       super$initialize(V,E)
       # check that all nodes inherit from MarkovState
@@ -123,6 +131,29 @@ CohortMarkovModel <- R6::R6Class(
         )
       }
       private$cmm.tcycle <- tcycle
+      # check and set half cycle correction
+      if (!is.logical(hcc)) {
+        rlang::abort(
+          "Argument 'hcc' must be logical.",
+          class = "invalid_hcc"
+        )
+      }
+      private$cmm.hcc <- hcc
+      # check and set discount
+      if (!is.numeric(discount)) {
+        rlang.abort(
+          "Discount rate must be numeric", class="invalid_discount"
+        )
+      }
+      private$cmm.discount <- discount/100
+      # create a population vector
+      private$cmm.pop <- vector(mode="numeric", length=self$order())
+      names(private$cmm.pop) <- self$get_statenames()
+      # set the cycle number
+      private$cmm.icycle <- 0
+      # force creation of transition probabilities and costs matrices
+      self$transition_probability()
+      self$transition_cost()
       # return a new CohortMarkovModel object
       return(invisible(self))
     },
@@ -130,7 +161,7 @@ CohortMarkovModel <- R6::R6Class(
     #' @description Return the per-cycle transition matrix for the model.
     #' @returns A square matrix of size equal to the number of states. If all
     #' states are labelled, the dimnames take the names of the states.
-    transition_matrix = function() {
+    transition_probability = function() {
       # if the matrix is not null, create it. This assumes the graph is 
       # immutable (no edges or vertexes added or removed since its creation)
       if (is.null(private$Ip)) {
@@ -174,6 +205,34 @@ CohortMarkovModel <- R6::R6Class(
       return(private$cmm.Ip)
     },
 
+    #' @description Return the per-cycle transition costs for the model.
+    #' @returns A square matrix of size equal to the number of states. If all
+    #' states are labelled, the dimnames take the names of the states.
+    transition_cost = function() {
+      # if the matrix is not null, create it. This assumes the graph is 
+      # immutable (no edges or vertexes added or removed since its creation)
+      if (is.null(private$cmm.Ic)) {
+        # get the state names
+        state.names <- sapply(private$V, function(v) {v$label()})
+        # construct the matrix
+        Ic <- matrix(
+          data = 0, 
+          nrow = self$order(), ncol = self$order(),
+          dimnames = list(source=state.names, target=state.names)
+        )
+        # populate the cells with costs
+        for (ie in 1:self$size()) {
+          e <- private$E[[ie]]
+          is <- self$vertex_index(e$source())
+          it <- self$vertex_index(e$target())
+          Ic[is,it] <- e$cost()
+        }
+        # save the matrix as a class private variable
+        private$cmm.Ic <- Ic
+      }
+      return(private$cmm.Ic)
+    },
+
     #' @description Returns a character list of state names.
     #' @return List of the names of each state.
     get_statenames = function() {
@@ -206,14 +265,59 @@ CohortMarkovModel <- R6::R6Class(
                        class="non-numeric_state_population")
         }
       })
-      # re-order the population vector to match the transition matrix
-      colnames <- private$Ip$dimnames()[["from"]]
-      private$populations <- populations[order(match(names(populations), colnames))]
+      # set the populations
+      for (s in self$get_statenames()) {
+        private$cmm.pop[s] <- populations[s]
+      }
       # reset the cycle number (assumed restart if new population)
-      private$icycle <- 0
+      private$cmm.icycle <- 0
       # return updated object
       return(invisible(self))
+    },
+    
+    #' @description Gets the occupancy of each state
+    #' @returns A numeric vector of populations, named with state names.
+    get_populations = function() {
+      return(private$cmm.pop)
+    },
+    
+    #' @description Applies one cycle of the model
+    #' @return Calculated values, per state.
+    cycle = function() {
+      # transition costs, calculated as number of transitions between each
+      # pair of states, multiplied by transition cost, summed by the state
+      # being entered (entry costs)
+      P <- matrix(
+        data=rep(private$cmm.pop,times=self$order()),
+        nrow = self$order(), ncol=self$order(),
+        byrow = FALSE
+      )
+      TC <- P*private$cmm.Ip*private$cmm.Ic
+      entry.costs <- colSums(TC)
+      # Apply the transition probabilities to get the end state populations
+      pop.end <- private$cmm.pop %*% self$transition_probability()
+      pop.end <- drop(pop.end)
+      # calculate annual costs of state occupancy
+      state.costs <- sapply(private$V, function(x) {return(x$cost())})
+      # state.costs <- state.costs / private$nCyclesPerYear
+      # occupancy.costs <- private$populations*state.costs
+      # # apply discounting
+      # y <- (private$icycle)/(private$nCyclesPerYear)
+      # denom <- (1+private$discount)^y
+      # entry.costs <- entry.costs / (1+private$discount)^y
+      # occupancy.costs <- occupancy.costs / (1+private$discount)^y
+      # # return calculated values, per state
+      # RC <- data.frame(
+      #   Cycle = rep(private$icycle, times=length(private$populations)),
+      #   Population = private$populations,
+      #   Normalized.Cycle.Cost = (occupancy.costs+entry.costs)/sum(private$populations),
+      #   stringsAsFactors = F
+      # )
+      # # update cycle number
+      # private$icycle <- private$icycle + 1
+      # return(RC)
     }
+    
     
     
   )

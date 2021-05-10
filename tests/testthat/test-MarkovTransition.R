@@ -12,6 +12,10 @@ test_that("initialize parameters are checked", {
   expect_error(MarkovTransition$new(s1,s2,r,cost="200"), class="invalid_cost")
   expect_silent(MarkovTransition$new(s1,s2,r,label=""))
   expect_silent(MarkovTransition$new(s1,s2,r,label="mychance"))
+  # check values are retrieved
+  MT <- MarkovTransition$new(s1,s2,r=0.1,cost=20)
+  expect_equal(MT$rate(),0.1)
+  expect_equal(MT$cost(),20)
 })
 
 test_that("modvars are identified", {

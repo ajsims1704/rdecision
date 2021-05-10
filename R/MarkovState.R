@@ -68,34 +68,21 @@ MarkovState <- R6::R6Class(
     
     #' @description Accessor function to retrieve the state name.
     #' @return State name.
-    get_name = function() {
+    name = function() {
       return(self$label())
-    },
-    
-    #' @description Sets the annual cost of state occupancy.
-    #' @param cost Annual cost of occupying the state; numeric.
-    #' @return Updated MarkovState object.
-    set_cost = function(cost) {
-      # check that cost is numeric, then set it
-      if (!is.numeric(cost)){
-        rlang::abort("`cost` must be of type `numeric`",
-                     class = "non_numeric_annual_cost")
-      }
-      private$state.cost <- cost
-      return(invisible(self))
     },
     
     #' @description 
     #' Gets the annual cost of state occupancy.
     #' @return Annual cost; numeric.
-    get_cost = function() {
+    cost = function() {
       return(private$state.cost)
     },
     
     #' @description 
     #' Gets the utility associated with the state.
     #' @return Utility; numeric.
-    get_utility = function() {
+    utility = function() {
       return(private$state.utility)
     }
   )
