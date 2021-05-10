@@ -21,24 +21,6 @@ test_that("incorrect state types are rejected", {
   )  
 })
 
-# test_that("temporary states with cycle limit > 1 are rejected", {
-#   s.well <- MarkovState$new("Well")
-#   s.disabled <- MarkovState$new("Disabled", cycleLimit=2)
-#   s.dead <- MarkovState$new("Dead")
-#   states <- list(s.well, s.disabled, s.dead)
-#   Ip <- TransitionMatrix$new(c("Well", "Disabled", "Dead"))
-#   expect_error(CohortMarkovModel$new(states, Ip), class="unsupported_cycle_limit")  
-# })
-# 
-# test_that("temporary states with cycle limit = 1 are accepted", {
-#   s.well <- MarkovState$new("Well")
-#   s.disabled <- MarkovState$new("Disabled", cycleLimit=1)
-#   s.dead <- MarkovState$new("Dead")
-#   states <- list(s.well, s.disabled, s.dead)
-#   Ip <- TransitionMatrix$new(c("Well", "Disabled", "Dead"))
-#   expect_silent(CohortMarkovModel$new(states, Ip))  
-# })
-# 
 test_that("incorrect transition types are rejected", {
   s.well <- MarkovState$new("Well")
   s.disabled <- MarkovState$new("Disabled")
@@ -112,7 +94,6 @@ test_that("non-absorbing states without one NULL rate are detected", {
       E = list(e.ww, e.ss, e.dd, e.ws, e.wd, e.sd)
     )
   )
-  
 })
 
 test_that("the transition matrix has the correct properties and values", {
@@ -146,17 +127,7 @@ test_that("the transition matrix has the correct properties and values", {
   expect_equal(
     sum(Ip-matrix(c(0.6,0.2,0.2,0,0.6,0.4,0,0,1),nrow=3,byrow=TRUE)),0
   )
-  
 })
-
-# test_that("differing state and transition matrix names are rejected", {
-#   s.well <- MarkovState$new("Well")
-#   s.disabled <- MarkovState$new("Disabled")
-#   s.dead <- MarkovState$new("Dead")
-#   states <- list(s.well, s.disabled, s.dead)
-#   Ip <- TransitionMatrix$new(c("Well", "Poorly", "Dead"))
-#   expect_error(CohortMarkovModel$new(states, Ip), class="unmatched_states")  
-# })
 
 # -----------------------------------------------------------------------------
 # tests of getting and setting state populations
@@ -201,17 +172,34 @@ test_that("invalid population vectors are rejected", {
 # -----------------------------------------------------------------------------
 # tests of cycling
 # -----------------------------------------------------------------------------
-# test_that("model is cyclable", {
-#   s.well <- MarkovState$new(name="Well")
-#   s.disabled <- MarkovState$new("Disabled")
-#   s.dead <- MarkovState$new("Dead")
-#   Ip <- TransitionMatrix$new(c("Well", "Disabled", "Dead"))
-#   Ip$set_rate(from="Well", to="Disabled", rate=0.2)
-#   Ip$set_rate(from="Well", to="Dead", rate=0.2)
-#   Ip$set_rate(from="Disabled", to="Dead", rate=0.4)
-#   M <- CohortMarkovModel$new(c(s.well, s.disabled, s.dead), Ip)
-#   expect_error(M$cycle(), class="missing_state_populations")
-# })
+test_that("model is cyclable", {
+  # create states
+  s.well <- MarkovState$new(name="Well")
+  s.disabled <- MarkovState$new(name="Disabled")
+  s.dead <- MarkovState$new(name="Dead")
+  # create transitions
+  r.ws <- -log(1-0.2)/1
+  r.wd <- -log(1-0.2)/1
+  r.sd <- -log(1-0.4)/1
+  E <- list(
+    MarkovTransition$new(s.well, s.well),
+    MarkovTransition$new(s.dead, s.dead),
+    MarkovTransition$new(s.disabled, s.disabled),
+    e.ws <- MarkovTransition$new(s.well, s.disabled, r=r.ws),
+    e.wd <- MarkovTransition$new(s.well, s.dead, r=r.wd),
+    e.sd <- MarkovTransition$new(s.disabled, s.dead, r=r.sd)
+  )
+  # create the model
+  M <- CohortMarkovModel$new(
+    V = list(s.well, s.disabled, s.dead),
+    E
+  )
+  # test cycles
+  DF <- M$cycle()
+  expect_true(is.data.frame(DF))
+  expect_setequal(names(DF), c("Cycle", "Population", "NormCost"))
+  expect_equal(nrow(DF),3)
+})
 
 # -----------------------------------------------------------------------------
 # Sonnenberg & Beck, Med Decis Making, 1993;13:322, Fig 3
@@ -237,7 +225,8 @@ test_that("rdecision replicates Sonnenberg & Beck, Fig 3", {
   # create the model
   M <- CohortMarkovModel$new(
     V = list(s.well, s.disabled, s.dead),
-    E
+    E,
+    hcc = FALSE
   )
   # check the transition matrix values
   Ip <- M$transition_probability()
@@ -247,14 +236,13 @@ test_that("rdecision replicates Sonnenberg & Beck, Fig 3", {
   # set the starting populations
   M$set_populations(c(Well=10000, Disabled=0, Dead=0)) 
   # cycle
-  M$cycle()
-  M$cycle()
-  
-#  RC <- M$cycles(25)
-#  expect_true(is.data.frame(RC))
-#  expect_equal(round(RC$Well[RC$Cycle==2]), 3600)
-#  expect_equal(round(RC$Disabled[RC$Cycle==2]), 2400)
-#  expect_equal(round(RC$Dead[RC$Cycle==2]), 4000)
+  RC <- M$cycles(25)
+  print("")
+  print(RC)
+  expect_true(is.data.frame(RC))
+  expect_equal(round(RC$Well[RC$Cycle==2]), 3600)
+  expect_equal(round(RC$Disabled[RC$Cycle==2]), 2400)
+  expect_equal(round(RC$Dead[RC$Cycle==2]), 4000)
   expect_true(TRUE)
 })
 

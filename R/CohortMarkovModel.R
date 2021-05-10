@@ -297,28 +297,85 @@ CohortMarkovModel <- R6::R6Class(
       # Apply the transition probabilities to get the end state populations
       pop.end <- private$cmm.pop %*% self$transition_probability()
       pop.end <- drop(pop.end)
+      # half-cycle correction
+      if (private$cmm.hcc) {
+        pop.occ <- (private$cmm.pop + pop.end)/2
+      } else {
+        pop.occ <- pop.end
+      }
+      private$cmm.pop <- pop.end
       # calculate annual costs of state occupancy
       state.costs <- sapply(private$V, function(x) {return(x$cost())})
-      # state.costs <- state.costs / private$nCyclesPerYear
-      # occupancy.costs <- private$populations*state.costs
-      # # apply discounting
-      # y <- (private$icycle)/(private$nCyclesPerYear)
-      # denom <- (1+private$discount)^y
-      # entry.costs <- entry.costs / (1+private$discount)^y
-      # occupancy.costs <- occupancy.costs / (1+private$discount)^y
-      # # return calculated values, per state
-      # RC <- data.frame(
-      #   Cycle = rep(private$icycle, times=length(private$populations)),
-      #   Population = private$populations,
-      #   Normalized.Cycle.Cost = (occupancy.costs+entry.costs)/sum(private$populations),
-      #   stringsAsFactors = F
-      # )
-      # # update cycle number
-      # private$icycle <- private$icycle + 1
-      # return(RC)
+      dty <- as.numeric(private$cmm.tcycle, units="days")/365.25
+      state.costs <- state.costs * dty
+      occupancy.costs <- pop.occ*state.costs
+      # apply discounting
+      ty <- (private$cmm.icycle)*dty
+      denom <- (1+private$cmm.discount)^ty
+      entry.costs <- entry.costs / (1+private$cmm.discount)^ty
+      occupancy.costs <- occupancy.costs / (1+private$cmm.discount)^ty
+      # update cycle number
+      private$cmm.icycle <- private$cmm.icycle + 1
+      # return calculated values, per state
+      RC <- data.frame(
+        Cycle = rep(private$cmm.icycle, times=length(private$cmm.pop)),
+        Population = private$cmm.pop,
+        NormCost = (occupancy.costs+entry.costs)/sum(private$cmm.pop),
+        stringsAsFactors = F
+      )
+      return(RC)
+    },
+    
+    #' @description Applies multiple cycles of the model.
+    #' @details The starting populations are redistributed through the
+    #' transition probabilities and the state occupancy costs are
+    #' calculated, using function \code{cycle}. The end populations are
+    #' then fed back into the model for a further cycle and the
+    #' process is repeated. For each cycle, the state populations and
+    #' the aggregated occupancy costs are saved in one row of the
+    #' returned data frame, with the cycle number. If the cycle count
+    #' for the model is zero when called, the first cycle reported
+    #' will be cycle zero, i.e. the distribution of patients to starting
+    #' states.
+    #' @param ncycles Number of cycles to run; default is 2.
+    #' @return Data frame with cycle results.
+    cycles = function(ncycles=2) {
+      # show zero?
+      if (private$cmm.icycle==0) {
+        nzero <- 1
+      } else {
+        nzero <- 0
+      }
+      # data frame for cycle summaries
+      DF <- data.frame(
+        Cycle = integer(length=ncycles+nzero),
+        Cost = numeric(length=ncycles+nzero)
+      )
+      statenames <- self$get_statenames()
+      POP <- matrix(data=NA, nrow=ncycles+nzero, ncol=length(statenames))
+      colnames(POP) <- statenames
+      DF <- cbind(DF, POP)
+      # add zero
+      if (nzero > 0) {
+        DF[1,"Cycle"] <- 0
+        DF[1, names(private$cmm.pop)] <- private$cmm.pop
+        DF[1,"Cost"] <- 0
+      }
+      # run the model
+      for (i in (1+nzero):(ncycles+nzero)) {
+        # single cycle
+        DF.cycle <- self$cycle()
+        # set the cycle number
+        DF[i, 'Cycle'] <- min(DF.cycle$Cycle)
+        # collect state populations and cycle sums into a single frame
+        DF[i, names(private$cmm.pop)] <- private$cmm.pop
+        # add sum of costs for all states 
+        DF[i,'Cost'] <- sum(DF.cycle$NormCost)
+      }
+      # return summary data frame
+      return(DF)
     }
     
-    
-    
+  
   )
 )
