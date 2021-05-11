@@ -20,6 +20,7 @@ knitr::opts_chunk$set(
 
 ```{r setup, echo=F}
 library(rdecision)
+library(png)
 ```
 
 # Introduction
@@ -102,11 +103,17 @@ returns a character vector which can be saved in a file (`.gv` extension) for
 visualization with the `dot` tool of Graphviz, or plotted directly in R via
 the `DiagrammeR` package. The Markov model for monotherapy is as follows:
 
-```{r draw, echo=FALSE}
-DOT <- m.mono$as_DOT()
-#writeLines(DOT, con="mono.gv")
+```{r caption, echo=FALSE}
+f1c  <- "Markov model for monotherapy"
 ```
-![mono graph]("mono.png")
+```{r draw,echo=FALSE,results="hide",fig.keep="last",fig.align="center",fig.cap=f1c}
+DOT <- m.mono$as_DOT()
+writeLines(DOT, con="mono.gv")
+system2(command="dot", args=c("-Tpng","-o","mono.png","mono.gv"))
+img <- png::readPNG(source="mono.png", native=TRUE)
+grid::grid.newpage()
+grid::grid.raster(image=img)
+```
 
 ## Summary of model states
 ```{r echo=T}
