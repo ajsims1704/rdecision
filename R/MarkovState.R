@@ -1,12 +1,7 @@
 #' @title \verb{MarkovState} class
-#' 
-#' @description
-#' An R6 class for a state in a Markov model.
-#' 
-#' @details 
-#' Represents a single state in a Markov model. A Markov model is a digraph
-#' in which states are nodes and transitions are arrows. 
-#' 
+#' @description' An R6 class for a state in a Markov model.
+#' @details  Represents a single state in a Markov model. A Markov model is 
+#' a digraph in which states are nodes and transitions are arrows. 
 #' @docType class
 #' @author Andrew J. Sims \email{andrew.sims@@newcastle.ac.uk}
 #' @export
@@ -72,15 +67,13 @@ MarkovState <- R6::R6Class(
       return(self$label())
     },
     
-    #' @description 
-    #' Gets the annual cost of state occupancy.
+    #' @description Gets the annual cost of state occupancy.
     #' @return Annual cost; numeric.
     cost = function() {
       return(private$state.cost)
     },
     
-    #' @description 
-    #' Gets the utility associated with the state.
+    #' @description Gets the utility associated with the state.
     #' @return Utility; numeric.
     utility = function() {
       return(private$state.utility)

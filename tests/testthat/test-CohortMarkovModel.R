@@ -197,7 +197,10 @@ test_that("model is cyclable", {
   # test cycles
   DF <- M$cycle()
   expect_true(is.data.frame(DF))
-  expect_setequal(names(DF), c("Cycle", "Population", "NormCost"))
+  expect_setequal(
+    names(DF), 
+    c("State", "Cycle", "Population", "EntryCost", "OccCost", "Cost", "QALY")
+  )
   expect_equal(nrow(DF),3)
 })
 
@@ -207,9 +210,9 @@ test_that("model is cyclable", {
 # -----------------------------------------------------------------------------
 test_that("rdecision replicates Sonnenberg & Beck, Fig 3", {
   # create states
-  s.well <- MarkovState$new(name="Well")
-  s.disabled <- MarkovState$new(name="Disabled")
-  s.dead <- MarkovState$new(name="Dead")
+  s.well <- MarkovState$new(name="Well", utility=1)
+  s.disabled <- MarkovState$new(name="Disabled",utility=0.7)
+  s.dead <- MarkovState$new(name="Dead",utility=0)
   # create transitions
   r.ws <- -log(1-0.2)/1
   r.wd <- -log(1-0.2)/1

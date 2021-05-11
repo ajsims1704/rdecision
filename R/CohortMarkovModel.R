@@ -51,7 +51,8 @@ CohortMarkovModel <- R6::R6Class(
     cmm.Ip = NULL,
     cmm.Ic = NULL,
     cmm.hcc = NULL,
-    cmm.discount = NULL,
+    cmm.discost = NULL,
+    cmm.disutil = NULL,
     cmm.pop = NULL,
     cmm.icycle = NULL
   ),
@@ -72,10 +73,12 @@ CohortMarkovModel <- R6::R6Class(
     #' @param tcycle Cycle length, expressed as an R \code{difftime} object; 
     #' default 1 year.
     #' @param hcc Boolean; whether to apply half cycle correction.
-    #' @param discount Annual discount rate, as a percentage.
+    #' @param discount.cost Annual discount rate for future costs.
+    #' @param discount.utility Annual discount rate for future incremental
+    #' utility.
     #' @return A \code{CohortMarkovModel} object.
     initialize = function(V,E,tcycle=as.difftime(365.25, units="days"),
-                          hcc=TRUE, discount=0) {
+                          hcc=TRUE, discount.cost=0, discount.utility=0) {
       # initialize the base class(es)
       super$initialize(V,E)
       # check that all nodes inherit from MarkovState
@@ -139,13 +142,19 @@ CohortMarkovModel <- R6::R6Class(
         )
       }
       private$cmm.hcc <- hcc
-      # check and set discount
-      if (!is.numeric(discount)) {
+      # check and set discounts
+      if (!is.numeric(discount.cost)) {
         rlang.abort(
           "Discount rate must be numeric", class="invalid_discount"
         )
       }
-      private$cmm.discount <- discount/100
+      private$cmm.discost <- discount.cost
+      if (!is.numeric(discount.utility)) {
+        rlang.abort(
+          "Discount rate must be numeric", class="invalid_discount"
+        )
+      }
+      private$cmm.disutil <- discount.utility
       # create a population vector
       private$cmm.pop <- vector(mode="numeric", length=self$order())
       names(private$cmm.pop) <- self$get_statenames()
@@ -281,9 +290,35 @@ CohortMarkovModel <- R6::R6Class(
       return(private$cmm.pop)
     },
     
-    #' @description Applies one cycle of the model
-    #' @return Calculated values, per state.
+    #' @description Applies one cycle of the model.
+    #' @return Calculated values, one row per state, as a data frame with the
+    #' following columns:
+    #' \describe{
+    #' \item{\code{State}}{Name of the state.}
+    #' \item{\code{Cycle}}{The cycle number.}
+    #' \item{\code{Population}}{Population of the state at the end of
+    #' the cycle.}
+    #' \item{\item{OccCost}}{Cost of the population occupying the state for 
+    #' the cycle. Half-cycle correction and discount are applied, if the
+    #' options are set. the costs are normalized by the model population. The
+    #' cycle costs are derived from the annual occupancy costs of the
+    #' \code{MarkovState}s.}
+    #' \item{code{EntryCost}}{Cost of the transitions \emph{into} the state
+    #' during the cycle. Discounting is applied, if the option is set. 
+    #' The result is normalized by the model population. The cycle costs
+    #' are derived from \code{MarkovTransition} costs.}
+    #' \item{\code{Cost}}{Total cost, normalized by model population.}
+    #' \item{QALY}{Quality adjusted life years gained by occupancy of the states
+    #' during the cycle. Half cycle correction and discounting are applied,
+    #' if these options are set. Normalized by the model population.}
+    #' }
     cycle = function() {
+      # calculate cycle duration (dty), clock time (ty) and discount 
+      # factors (dfc, dfu)
+      dty <- as.numeric(private$cmm.tcycle, units="days")/365.25
+      ty <- (private$cmm.icycle)*dty
+      dfc <- 1/(1+private$cmm.discost)^ty
+      dfu <- 1/(1+private$cmm.disutil)^ty
       # transition costs, calculated as number of transitions between each
       # pair of states, multiplied by transition cost, summed by the state
       # being entered (entry costs)
@@ -293,11 +328,11 @@ CohortMarkovModel <- R6::R6Class(
         byrow = FALSE
       )
       TC <- P*private$cmm.Ip*private$cmm.Ic
-      entry.costs <- colSums(TC)
-      # Apply the transition probabilities to get the end state populations
+      entry.costs <- colSums(TC)*dfc
+      # Apply the transition probabilities to get the end state populations,
+      # with half-cycle correction, if required
       pop.end <- private$cmm.pop %*% self$transition_probability()
       pop.end <- drop(pop.end)
-      # half-cycle correction
       if (private$cmm.hcc) {
         pop.occ <- (private$cmm.pop + pop.end)/2
       } else {
@@ -306,21 +341,23 @@ CohortMarkovModel <- R6::R6Class(
       private$cmm.pop <- pop.end
       # calculate annual costs of state occupancy
       state.costs <- sapply(private$V, function(x) {return(x$cost())})
-      dty <- as.numeric(private$cmm.tcycle, units="days")/365.25
       state.costs <- state.costs * dty
-      occupancy.costs <- pop.occ*state.costs
-      # apply discounting
-      ty <- (private$cmm.icycle)*dty
-      denom <- (1+private$cmm.discount)^ty
-      entry.costs <- entry.costs / (1+private$cmm.discount)^ty
-      occupancy.costs <- occupancy.costs / (1+private$cmm.discount)^ty
+      occupancy.costs <- pop.occ*state.costs*dfc
+      # calculate QALYs gained from state occupancy
+      state.utilities <- sapply(private$V, FUN=function(v){v$utility()})
+      state.utilities <- state.utilities*dfu
+      qaly <- pop.occ*state.utilities*dty
       # update cycle number
       private$cmm.icycle <- private$cmm.icycle + 1
       # return calculated values, per state
       RC <- data.frame(
+        State = self$get_statenames(),
         Cycle = rep(private$cmm.icycle, times=length(private$cmm.pop)),
         Population = private$cmm.pop,
-        NormCost = (occupancy.costs+entry.costs)/sum(private$cmm.pop),
+        OccCost = occupancy.costs/sum(private$cmm.pop),
+        EntryCost = entry.costs/sum(private$cmm.pop),
+        Cost = (occupancy.costs+entry.costs)/sum(private$cmm.pop),
+        QALY = qaly / sum(private$cmm.pop),
         stringsAsFactors = F
       )
       return(RC)
@@ -360,6 +397,7 @@ CohortMarkovModel <- R6::R6Class(
         DF[1,"Cycle"] <- 0
         DF[1, names(private$cmm.pop)] <- private$cmm.pop
         DF[1,"Cost"] <- 0
+        DF[1,"QALY"] <- 0
       }
       # run the model
       for (i in (1+nzero):(ncycles+nzero)) {
@@ -369,8 +407,10 @@ CohortMarkovModel <- R6::R6Class(
         DF[i, 'Cycle'] <- min(DF.cycle$Cycle)
         # collect state populations and cycle sums into a single frame
         DF[i, names(private$cmm.pop)] <- private$cmm.pop
-        # add sum of costs for all states 
-        DF[i,'Cost'] <- sum(DF.cycle$NormCost)
+        # add normalized sum of costs for all states 
+        DF[i,'Cost'] <- sum(DF.cycle$Cost)
+        # add normalized sum of QALYs gained
+        DF[i,"QALY"] <- sum(DF.cycle$QALY)
       }
       # return summary data frame
       return(DF)

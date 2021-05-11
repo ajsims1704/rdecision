@@ -21,10 +21,9 @@ Andrew J. Sims \email{andrew.sims@newcastle.ac.uk}
 \subsection{Public methods}{
 \itemize{
 \item \href{#method-new}{\code{MarkovState$new()}}
-\item \href{#method-get_name}{\code{MarkovState$get_name()}}
-\item \href{#method-set_cost}{\code{MarkovState$set_cost()}}
-\item \href{#method-get_cost}{\code{MarkovState$get_cost()}}
-\item \href{#method-get_utility}{\code{MarkovState$get_utility()}}
+\item \href{#method-name}{\code{MarkovState$name()}}
+\item \href{#method-cost}{\code{MarkovState$cost()}}
+\item \href{#method-utility}{\code{MarkovState$utility()}}
 \item \href{#method-clone}{\code{MarkovState$clone()}}
 }
 }
@@ -61,12 +60,12 @@ An object of type \code{MarkovState}.
 }
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-get_name"></a>}}
-\if{latex}{\out{\hypertarget{method-get_name}{}}}
-\subsection{Method \code{get_name()}}{
+\if{html}{\out{<a id="method-name"></a>}}
+\if{latex}{\out{\hypertarget{method-name}{}}}
+\subsection{Method \code{name()}}{
 Accessor function to retrieve the state name.
 \subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{MarkovState$get_name()}\if{html}{\out{</div>}}
+\if{html}{\out{<div class="r">}}\preformatted{MarkovState$name()}\if{html}{\out{</div>}}
 }
 
 \subsection{Returns}{
@@ -74,32 +73,12 @@ State name.
 }
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-set_cost"></a>}}
-\if{latex}{\out{\hypertarget{method-set_cost}{}}}
-\subsection{Method \code{set_cost()}}{
-Sets the annual cost of state occupancy.
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{MarkovState$set_cost(cost)}\if{html}{\out{</div>}}
-}
-
-\subsection{Arguments}{
-\if{html}{\out{<div class="arguments">}}
-\describe{
-\item{\code{cost}}{Annual cost of occupying the state; numeric.}
-}
-\if{html}{\out{</div>}}
-}
-\subsection{Returns}{
-Updated MarkovState object.
-}
-}
-\if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-get_cost"></a>}}
-\if{latex}{\out{\hypertarget{method-get_cost}{}}}
-\subsection{Method \code{get_cost()}}{
+\if{html}{\out{<a id="method-cost"></a>}}
+\if{latex}{\out{\hypertarget{method-cost}{}}}
+\subsection{Method \code{cost()}}{
 Gets the annual cost of state occupancy.
 \subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{MarkovState$get_cost()}\if{html}{\out{</div>}}
+\if{html}{\out{<div class="r">}}\preformatted{MarkovState$cost()}\if{html}{\out{</div>}}
 }
 
 \subsection{Returns}{
@@ -107,12 +86,12 @@ Annual cost; numeric.
 }
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-get_utility"></a>}}
-\if{latex}{\out{\hypertarget{method-get_utility}{}}}
-\subsection{Method \code{get_utility()}}{
+\if{html}{\out{<a id="method-utility"></a>}}
+\if{latex}{\out{\hypertarget{method-utility}{}}}
+\subsection{Method \code{utility()}}{
 Gets the utility associated with the state.
 \subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{MarkovState$get_utility()}\if{html}{\out{</div>}}
+\if{html}{\out{<div class="r">}}\preformatted{MarkovState$utility()}\if{html}{\out{</div>}}
 }
 
 \subsection{Returns}{

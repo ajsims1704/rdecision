@@ -7,6 +7,11 @@
 \value{
 A square matrix of size equal to the number of states. If all
 states are labelled, the dimnames take the names of the states.
+
+A square matrix of size equal to the number of states. If all
+states are labelled, the dimnames take the names of the states.
+
+A numeric vector of populations, named with state names.
 }
 \description{
 An R6 class for a Markov model with cohort simulation.
@@ -36,7 +41,7 @@ to this differential equation, i.e. \eqn{N(t) = N e^{-r t}}, where \eqn{r}
 is the rate, or the reciprocal of the time constant. The expected number of 
 events \eqn{\hat{K}} which occur in interval \eqn{t} from a starting 
 population of \eqn{N} is \eqn{\hat{K} = N - N e^{-r t}}, or 
-\eqn{\hat{K} = Np}, where \eqn{p = 1-\exp(-r t)} is the probability with 
+\eqn{\hat{K} = Np}, where \eqn{p = 1-\exp(-r t)}, the probability with 
 which events arise during interval \eqn{t}. If instead a per-interval 
 probability is known, the rate is derived from the inverse relationship 
 \eqn{r = -\ln(1-p)/t}.
@@ -61,7 +66,13 @@ Andrew J. Sims \email{andrew.sims@newcastle.ac.uk}
 \subsection{Public methods}{
 \itemize{
 \item \href{#method-new}{\code{CohortMarkovModel$new()}}
-\item \href{#method-transition_matrix}{\code{CohortMarkovModel$transition_matrix()}}
+\item \href{#method-transition_probability}{\code{CohortMarkovModel$transition_probability()}}
+\item \href{#method-transition_cost}{\code{CohortMarkovModel$transition_cost()}}
+\item \href{#method-get_statenames}{\code{CohortMarkovModel$get_statenames()}}
+\item \href{#method-set_populations}{\code{CohortMarkovModel$set_populations()}}
+\item \href{#method-get_populations}{\code{CohortMarkovModel$get_populations()}}
+\item \href{#method-cycle}{\code{CohortMarkovModel$cycle()}}
+\item \href{#method-cycles}{\code{CohortMarkovModel$cycles()}}
 \item \href{#method-clone}{\code{CohortMarkovModel$clone()}}
 }
 }
@@ -101,7 +112,13 @@ Andrew J. Sims \email{andrew.sims@newcastle.ac.uk}
 \subsection{Method \code{new()}}{
 Creates a Markov model for cohort simulation.
 \subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{CohortMarkovModel$new(V, E, tcycle = as.difftime(365.25, units = "days"))}\if{html}{\out{</div>}}
+\if{html}{\out{<div class="r">}}\preformatted{CohortMarkovModel$new(
+  V,
+  E,
+  tcycle = as.difftime(365.25, units = "days"),
+  hcc = TRUE,
+  discount = 0
+)}\if{html}{\out{</div>}}
 }
 
 \subsection{Arguments}{
@@ -113,6 +130,10 @@ Creates a Markov model for cohort simulation.
 
 \item{\code{tcycle}}{Cycle length, expressed as an R \code{difftime} object; 
 default 1 year.}
+
+\item{\code{hcc}}{Boolean; whether to apply half cycle correction.}
+
+\item{\code{discount}}{Annual discount rate, as a percentage.}
 }
 \if{html}{\out{</div>}}
 }
@@ -133,14 +154,137 @@ A \code{CohortMarkovModel} object.
 }
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-transition_matrix"></a>}}
-\if{latex}{\out{\hypertarget{method-transition_matrix}{}}}
-\subsection{Method \code{transition_matrix()}}{
+\if{html}{\out{<a id="method-transition_probability"></a>}}
+\if{latex}{\out{\hypertarget{method-transition_probability}{}}}
+\subsection{Method \code{transition_probability()}}{
 Return the per-cycle transition matrix for the model.
 \subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{CohortMarkovModel$transition_matrix()}\if{html}{\out{</div>}}
+\if{html}{\out{<div class="r">}}\preformatted{CohortMarkovModel$transition_probability()}\if{html}{\out{</div>}}
 }
 
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-transition_cost"></a>}}
+\if{latex}{\out{\hypertarget{method-transition_cost}{}}}
+\subsection{Method \code{transition_cost()}}{
+Return the per-cycle transition costs for the model.
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{CohortMarkovModel$transition_cost()}\if{html}{\out{</div>}}
+}
+
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-get_statenames"></a>}}
+\if{latex}{\out{\hypertarget{method-get_statenames}{}}}
+\subsection{Method \code{get_statenames()}}{
+Returns a character list of state names.
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{CohortMarkovModel$get_statenames()}\if{html}{\out{</div>}}
+}
+
+\subsection{Returns}{
+List of the names of each state.
+}
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-set_populations"></a>}}
+\if{latex}{\out{\hypertarget{method-set_populations}{}}}
+\subsection{Method \code{set_populations()}}{
+Sets the occupancy of each state.
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{CohortMarkovModel$set_populations(populations)}\if{html}{\out{</div>}}
+}
+
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{populations}}{A named vector of populations for
+the start of the state. The names should be the state names. 
+Due to R's implementation of matrix algebra, \code{populations} 
+must be a numeric type and is not restricted to being an integer.}
+}
+\if{html}{\out{</div>}}
+}
+\subsection{Details}{
+Sets the cycle count to zero.
+}
+
+\subsection{Returns}{
+Updated \code{CohortMarkovModel} object.
+}
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-get_populations"></a>}}
+\if{latex}{\out{\hypertarget{method-get_populations}{}}}
+\subsection{Method \code{get_populations()}}{
+Gets the occupancy of each state
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{CohortMarkovModel$get_populations()}\if{html}{\out{</div>}}
+}
+
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-cycle"></a>}}
+\if{latex}{\out{\hypertarget{method-cycle}{}}}
+\subsection{Method \code{cycle()}}{
+Applies one cycle of the model.
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{CohortMarkovModel$cycle()}\if{html}{\out{</div>}}
+}
+
+\subsection{Returns}{
+Calculated values, one row per state, as a data frame with the
+following columns:
+\describe{
+\item{\code{State}}{Name of the state.}
+\item{\code{Cycle}}{The cycle number.}
+\item{\code{Population}}{Population of the state at the end of
+the cycle.}
+\item{\item{OccCost}}{Cost of the population occupying the state, for 
+the cycle. Half-cycle correction and discount are applied, if the
+option is set. the costs are normalized by the model population. The
+cycle costs are derived from the annual occupancy costs of the
+\code{MarkovState}s.}
+\item{code{EntryCost}}{Cost of the transitions \emph{into} the state
+during the cycle. Discounting is applied, if the option is set. 
+The result is normalized by the model population. The cycle costs
+are derived from \code{MarkovTransition} costs.}
+\item{\code{Cost}}{Total cost, normalized by model population.}
+}
+}
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-cycles"></a>}}
+\if{latex}{\out{\hypertarget{method-cycles}{}}}
+\subsection{Method \code{cycles()}}{
+Applies multiple cycles of the model.
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{CohortMarkovModel$cycles(ncycles = 2)}\if{html}{\out{</div>}}
+}
+
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{ncycles}}{Number of cycles to run; default is 2.}
+}
+\if{html}{\out{</div>}}
+}
+\subsection{Details}{
+The starting populations are redistributed through the
+transition probabilities and the state occupancy costs are
+calculated, using function \code{cycle}. The end populations are
+then fed back into the model for a further cycle and the
+process is repeated. For each cycle, the state populations and
+the aggregated occupancy costs are saved in one row of the
+returned data frame, with the cycle number. If the cycle count
+for the model is zero when called, the first cycle reported
+will be cycle zero, i.e. the distribution of patients to starting
+states.
+}
+
+\subsection{Returns}{
+Data frame with cycle results.
+}
 }
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-clone"></a>}}
