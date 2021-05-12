@@ -289,6 +289,23 @@ CohortMarkovModel <- R6::R6Class(
     get_populations = function() {
       return(private$cmm.pop)
     },
+ 
+    #' @description Tabulation of states
+    #' @details Creates a data frame summary of each state in the model.
+    #' @returns A data frame with the following columns:
+    #' \describe{
+    #' \item{Name}{State name}
+    #' \item{Cost}{Annual cost of occupying the state}
+    #' \item{Utility}{Incremental utility associated with being in the state.}
+    #' }
+    tabulate_states = function() {
+      DF <- data.frame(
+        Name = sapply(private$V, function(x) {return(x$name())}),
+        Cost = sapply(private$V, function(x) {return(x$cost())}),
+        Utility = sapply(private$V, function(x) {return(x$utility())})
+      )
+      return(DF)
+    },
     
     #' @description Applies one cycle of the model.
     #' @return Calculated values, one row per state, as a data frame with the

@@ -13,6 +13,9 @@ csl: "../inst/national-institute-of-health-research.csl"
 ---
 ```{r, include = FALSE}
 knitr::opts_chunk$set(
+  echo = FALSE,
+  fig.keep = "last",
+  fig.align = "center",
   collapse = TRUE,
   comment = "#>"
 )
@@ -20,6 +23,7 @@ knitr::opts_chunk$set(
 
 ```{r setup, echo=F}
 library(rdecision)
+library(pander)
 library(png)
 ```
 
@@ -68,12 +72,12 @@ of probabilities leaving each state, per cycle, to be adjusted to 1. The usual
 case, as here, is to set the self-loop rates to NULL (i.e. the probability of
 remaining in a state is given by one minus the probability of leaving 
 the state).
-```{r mono-model, echo=T}
+```{r mono-model, echo=TRUE}
 # create Markov states for monotherapy (zidovudine only)
-s.mono.A <- MarkovState$new("A", cost=dmca+ccca+cAZT)
-s.mono.B <- MarkovState$new("B", cost=dmcb+cccb+cAZT)
-s.mono.C <- MarkovState$new("C", cost=dmcc+cccc+cAZT)
-s.mono.D <- MarkovState$new("D", cost=0)
+s.mono.A <- MarkovState$new("A: 200 < cd4 < 500", cost=dmca+ccca+cAZT)
+s.mono.B <- MarkovState$new("B: cd4 < 200", cost=dmcb+cccb+cAZT)
+s.mono.C <- MarkovState$new("C: AIDS", cost=dmcc+cccc+cAZT)
+s.mono.D <- MarkovState$new("D: Death", cost=0)
 # create transitions
 tAA <- MarkovTransition$new(s.mono.A, s.mono.A, r=NULL)
 tAB <- MarkovTransition$new(s.mono.A, s.mono.B, r=trAB)
@@ -101,12 +105,12 @@ A representation of the model in DOT format ([Graphviz](https://graphviz.org))
 can be created using the `as_DOT` function of `CohortMarkovModel`. The function
 returns a character vector which can be saved in a file (`.gv` extension) for
 visualization with the `dot` tool of Graphviz, or plotted directly in R via
-the `DiagrammeR` package. The Markov model for monotherapy is as follows:
+the `DiagrammeR` package. The Markov model for monotherapy is shown in Figure 1.
 
 ```{r caption, echo=FALSE}
 f1c  <- "Markov model for monotherapy"
 ```
-```{r draw,echo=FALSE,results="hide",fig.keep="last",fig.align="center",fig.cap=f1c}
+```{r draw,results="hide",fig.cap=f1c,fig.asp=0.21}
 DOT <- m.mono$as_DOT()
 writeLines(DOT, con="mono.gv")
 system2(command="dot", args=c("-Tpng","-o","mono.png","mono.gv"))
@@ -115,76 +119,61 @@ grid::grid.newpage()
 grid::grid.raster(image=img)
 ```
 
-## Summary of model states
-```{r echo=T}
-#model.states <- m.mono$stateSummary()
+## Model states
+The states in the model can be tabulated with the function `tabulate_states`.
+For the monotherapy model, the states are tabulated below. The cost of each
+state includes the annual cost of AZT (Zidovudine). 
+```{r echo=FALSE}
+DF <- m.mono$tabulate_states()
+pander::pander(DF[,c("Name", "Cost")], justify="lr")
+rm(DF)
 ```
 
-```{r echo=F}
-#knitr::kable(model.states)
-#rm(model.states)
+## Per-cycle transition probabilities
+The per-cycle transition probabilities, which are the cells of the Markov
+transition matrix, can be extracted from the model via the function
+`transition_probability`. For the monotherapy model, the transition matrix is
+shown below. This is consistent with the Table 1 of 
+Chancellor *et al* [-@chancellor1997].
+```{r echo=FALSE}
+TM <- m.mono$transition_probability()
+pander::pander(TM, emphasize.rownames=FALSE, justify="lcccc")
+rm(TM)
 ```
-
-## Summary of annual transition probabilities
-```{r echo=T}
-#transition.matrix <- m.mono$transitionSummary()
-```
-
-```{r echo=F}
-#knitr::kable(transition.matrix)
-#rm(transition.matrix)
-```
-
 
 # Running the model
 
-## Single cycle
 Model function `cycle` applies one cycle of a Markov model to a defined 
 starting population in each state. It returns a table with one row per state, 
 and each row containing several columns, including the population at the end of
-the state, and the cost of occupancy of states, normalized by the number of 
-patients in the cohort, with discounting applied. For example, the first cycle 
-of the model is as follows:
+the state and the cost of occupancy of states, normalized by the number of 
+patients in the cohort, with discounting applied.
 
-```{r echo=T}
-# create starting populations
-#populations <- c('A'=1000, 'B'=0, 'C'=0, 'D'=0)
-#m.mono$setPopulations(populations)
-# run the model
-#DF <- m.mono$cycle()
-```
-which returns the following result:
-```{r echo=F}
-#knitr::kable(DF)
-#rm(DF)
-```
-
-## Multiple cycles
 Multiple cycles are run by feeding the state populations at the end of
 one cycle into the next. Function `cycles` returns a data frame with one 
 row per cycle, and each row containing the state populations and the
-aggregated cost of
-occupancy for all states, with discounting applied. If costs per
-state, per cycle, are needed, use the lower level function `cycle` to extract
-state values. Below, this is done for
-the first 20 cycles of the model. In addition, the proportion
-of patients alive at each cycle is added to the table.  
-```{r echo=T}
+aggregated cost of occupancy for all states, with discounting applied. This is
+done for the first 20 cycles of the model. In addition, the proportion
+of patients alive at each cycle (the Markov trace) is added to the table.  
+```{r monocycle, echo=TRUE}
 # create starting populations
-#N <- 1000
-#populations <- c('A'=N, 'B'=0, 'C'=0, 'D'=0)
-#m.mono$setPopulations(populations)
+N <- 1000
+populations <- c(
+  "A: 200 < cd4<500" = N, 
+  "B: cd4 < 200" = 0, 
+  "C: AIDS" = 0, 
+  "D: Death" = 0
+)
+m.mono$set_populations(populations)
 # run 20 cycles
-#DF.mono <- m.mono$cycles(nCycles=20+1)
+DF.mono <- m.mono$cycles(ncycles=20)
 # calculate the proportion alive at each cycle
-#DF.mono$Alive <- (DF.mono$A + DF.mono$B + DF.mono$C)/N
+DF.mono$Alive <- (DF.mono$A + DF.mono$B + DF.mono$C)/N
 ```
 
-This yields the following summary table for monotherapy:
-```{r echo=F}
-#knitr::kable(DF.mono)
+```{r print_monocycle}
+pander::pander(DF.mono, row.names=FALSE, justify="rrrrrrr", round=0)
 ```
-
 
 # Model results
 
