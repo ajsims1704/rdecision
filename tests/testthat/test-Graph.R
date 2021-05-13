@@ -38,13 +38,19 @@ test_that("basic graph properties are set and got", {
   n1 <- Node$new()
   n2 <- Node$new()
   e1 <- Edge$new(n1, n2)
-  #
+  # empty graph
+  V <- list()
+  E <- list()
+  G <- Graph$new(V, E)
+  expect_equal(G$order(), 0)
+  expect_equal(G$size(), 0)
+  # 2 nodes and an edge
   V <- list(n1,n2)
   E <- list(e1)
   G <- Graph$new(V, E)
   expect_equal(G$order(), length(V))
   expect_equal(G$size(), length(E))
-  #
+  # a graph with one node
   V <- list(n1)
   E <- list()
   G <- Graph$new(V, E)

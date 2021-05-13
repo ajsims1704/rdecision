@@ -12,6 +12,47 @@ A square matrix of size equal to the number of states. If all
 states are labelled, the dimnames take the names of the states.
 
 A numeric vector of populations, named with state names.
+
+A data frame with the following columns:
+\describe{
+\item{Name}{State name}
+\item{Cost}{Annual cost of occupying the state}
+\item{Utility}{Incremental utility associated with being in the state.}
+}
+
+Calculated values, one row per state, as a data frame with the
+following columns:
+\describe{
+\item{\code{State}}{Name of the state.}
+\item{\code{Cycle}}{The cycle number.}
+\item{\code{Population}}{Population of the state at the end of
+the cycle.}
+\item{\item{OccCost}}{Cost of the population occupying the state for 
+the cycle. Half-cycle correction and discount are applied, if the
+options are set. the costs are normalized by the model population. The
+cycle costs are derived from the annual occupancy costs of the
+\code{MarkovState}s.}
+\item{code{EntryCost}}{Cost of the transitions \emph{into} the state
+during the cycle. Discounting is applied, if the option is set. 
+The result is normalized by the model population. The cycle costs
+are derived from \code{MarkovTransition} costs.}
+\item{\code{Cost}}{Total cost, normalized by model population.}
+\item{QALY}{Quality adjusted life years gained by occupancy of the states
+during the cycle. Half cycle correction and discounting are applied,
+if these options are set. Normalized by the model population.}
+}
+
+Data frame with cycle results.
+following columns:
+\describe{
+\item{\code{Cycle}}{The cycle number.}
+\item{\code{<name>}}{Population of state \code{<name} at the end of
+the cycle.}
+\item{\code{Cost}}{Cost associated with occupancy and transitions between
+states during the cycle.}
+\item{\code{QALY}}{Quality adjusted life years associated with occupancy
+of the states in the cycle.}
+}
 }
 \description{
 An R6 class for a Markov model with cohort simulation.
@@ -71,6 +112,7 @@ Andrew J. Sims \email{andrew.sims@newcastle.ac.uk}
 \item \href{#method-get_statenames}{\code{CohortMarkovModel$get_statenames()}}
 \item \href{#method-set_populations}{\code{CohortMarkovModel$set_populations()}}
 \item \href{#method-get_populations}{\code{CohortMarkovModel$get_populations()}}
+\item \href{#method-tabulate_states}{\code{CohortMarkovModel$tabulate_states()}}
 \item \href{#method-cycle}{\code{CohortMarkovModel$cycle()}}
 \item \href{#method-cycles}{\code{CohortMarkovModel$cycles()}}
 \item \href{#method-clone}{\code{CohortMarkovModel$clone()}}
@@ -117,7 +159,8 @@ Creates a Markov model for cohort simulation.
   E,
   tcycle = as.difftime(365.25, units = "days"),
   hcc = TRUE,
-  discount = 0
+  discount.cost = 0,
+  discount.utility = 0
 )}\if{html}{\out{</div>}}
 }
 
@@ -133,7 +176,10 @@ default 1 year.}
 
 \item{\code{hcc}}{Boolean; whether to apply half cycle correction.}
 
-\item{\code{discount}}{Annual discount rate, as a percentage.}
+\item{\code{discount.cost}}{Annual discount rate for future costs.}
+
+\item{\code{discount.utility}}{Annual discount rate for future incremental
+utility.}
 }
 \if{html}{\out{</div>}}
 }
@@ -224,6 +270,20 @@ Gets the occupancy of each state
 
 }
 \if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-tabulate_states"></a>}}
+\if{latex}{\out{\hypertarget{method-tabulate_states}{}}}
+\subsection{Method \code{tabulate_states()}}{
+Tabulation of states
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{CohortMarkovModel$tabulate_states()}\if{html}{\out{</div>}}
+}
+
+\subsection{Details}{
+Creates a data frame summary of each state in the model.
+}
+
+}
+\if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-cycle"></a>}}
 \if{latex}{\out{\hypertarget{method-cycle}{}}}
 \subsection{Method \code{cycle()}}{
@@ -232,26 +292,6 @@ Applies one cycle of the model.
 \if{html}{\out{<div class="r">}}\preformatted{CohortMarkovModel$cycle()}\if{html}{\out{</div>}}
 }
 
-\subsection{Returns}{
-Calculated values, one row per state, as a data frame with the
-following columns:
-\describe{
-\item{\code{State}}{Name of the state.}
-\item{\code{Cycle}}{The cycle number.}
-\item{\code{Population}}{Population of the state at the end of
-the cycle.}
-\item{\item{OccCost}}{Cost of the population occupying the state, for 
-the cycle. Half-cycle correction and discount are applied, if the
-option is set. the costs are normalized by the model population. The
-cycle costs are derived from the annual occupancy costs of the
-\code{MarkovState}s.}
-\item{code{EntryCost}}{Cost of the transitions \emph{into} the state
-during the cycle. Discounting is applied, if the option is set. 
-The result is normalized by the model population. The cycle costs
-are derived from \code{MarkovTransition} costs.}
-\item{\code{Cost}}{Total cost, normalized by model population.}
-}
-}
 }
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-cycles"></a>}}
@@ -282,9 +322,6 @@ will be cycle zero, i.e. the distribution of patients to starting
 states.
 }
 
-\subsection{Returns}{
-Data frame with cycle results.
-}
 }
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-clone"></a>}}

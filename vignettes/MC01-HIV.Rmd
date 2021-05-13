@@ -60,7 +60,7 @@ cLam <- 2086 # lamivudine drug cost
 # Other parameters
 RR <- 0.509 # treatment effect
 cDR <- 6 # annual discount rate, costs (%)
-oDR <- 6 # annual discount rate, benefits (%)
+oDR <- 0 # annual discount rate, benefits (%)
 ```
 
 The monotherapy model is constructed by forming a graph, with each state as a 
@@ -68,16 +68,19 @@ node and each transition as an edge. Nodes (of class `MarkovState`) and edges
 (class `MarkovTransition`) have various properties whose values reflect the
 variables of the model (costs, rates etc.). The rate for one of the outgoing
 transitions from each non-absorbing state is set to NULL to allow the sum
-of probabilities leaving each state, per cycle, to be adjusted to 1. The usual
-case, as here, is to set the self-loop rates to NULL (i.e. the probability of
-remaining in a state is given by one minus the probability of leaving 
-the state).
+of probabilities leaving each state, per cycle, to be adjusted to 1 within the
+package. The usual case, as here, is to set the self-loop rates to NULL and the 
+package will compute the probability of remaining in a state as one minus the 
+probability of leaving the state. Because the model is intended to evaluate 
+survival, the utility of states A, B and C are set to 1 (by default) and
+state D to zero. Thus the incremental quality adjusted life years gained per
+cycle is equivalent to the survival function. 
 ```{r mono-model, echo=TRUE}
 # create Markov states for monotherapy (zidovudine only)
-s.mono.A <- MarkovState$new("A: 200 < cd4 < 500", cost=dmca+ccca+cAZT)
-s.mono.B <- MarkovState$new("B: cd4 < 200", cost=dmcb+cccb+cAZT)
-s.mono.C <- MarkovState$new("C: AIDS", cost=dmcc+cccc+cAZT)
-s.mono.D <- MarkovState$new("D: Death", cost=0)
+s.mono.A <- MarkovState$new("A", cost=dmca+ccca+cAZT)
+s.mono.B <- MarkovState$new("B", cost=dmcb+cccb+cAZT)
+s.mono.C <- MarkovState$new("C", cost=dmcc+cccc+cAZT)
+s.mono.D <- MarkovState$new("D", cost=0, utility=0)
 # create transitions
 tAA <- MarkovTransition$new(s.mono.A, s.mono.A, r=NULL)
 tAB <- MarkovTransition$new(s.mono.A, s.mono.B, r=trAB)
@@ -93,6 +96,7 @@ tDD <- MarkovTransition$new(s.mono.D, s.mono.D, r=NULL)
 m.mono <- CohortMarkovModel$new(
   V = list(s.mono.A, s.mono.B, s.mono.C, s.mono.D),
   E = list(tAA, tAB, tAC, tAD, tBB, tBC, tBD, tCC, tCD, tDD),
+  hcc = FALSE,
   discount.cost = cDR/100,
   discount.utility = oDR/100
 )
@@ -108,7 +112,8 @@ visualization with the `dot` tool of Graphviz, or plotted directly in R via
 the `DiagrammeR` package. The Markov model for monotherapy is shown in Figure 1.
 
 ```{r caption, echo=FALSE}
-f1c  <- "Markov model for monotherapy"
+f1c  <- paste("Markov model for monotherapy.", "A: 200 < cd4 < 500,", 
+  "B: cd4 < 200,", "C: AIDS,","D: Death.")
 ```
 ```{r draw,results="hide",fig.cap=f1c,fig.asp=0.21}
 DOT <- m.mono$as_DOT()
@@ -150,72 +155,63 @@ the state and the cost of occupancy of states, normalized by the number of
 patients in the cohort, with discounting applied.
 
 Multiple cycles are run by feeding the state populations at the end of
-one cycle into the next. Function `cycles` returns a data frame with one 
-row per cycle, and each row containing the state populations and the
+one cycle into the next. Function `cycles` does this and returns a data frame 
+with one row per cycle, and each row containing the state populations and the
 aggregated cost of occupancy for all states, with discounting applied. This is
-done for the first 20 cycles of the model. In addition, the proportion
-of patients alive at each cycle (the Markov trace) is added to the table.  
+done below for the first 20 cycles of the model, without half cycle correction,
+with discount. In addition, the proportion of patients alive at each cycle
+(the Markov trace) is added to the table. The populations and discounted costs
+are consistent with Briggs *et al*, Table 2.3 [-@briggs2006], and the QALY 
+column is consistent with Table 2.4 (without half cycle correction). No 
+discount was applied to the utilities.
 ```{r monocycle, echo=TRUE}
 # create starting populations
 N <- 1000
-populations <- c(
-  "A: 200 < cd4<500" = N, 
-  "B: cd4 < 200" = 0, 
-  "C: AIDS" = 0, 
-  "D: Death" = 0
-)
+populations <- c(A = N, B = 0, C = 0, D = 0)
 m.mono$set_populations(populations)
 # run 20 cycles
 DF.mono <- m.mono$cycles(ncycles=20)
-# calculate the proportion alive at each cycle
-DF.mono$Alive <- (DF.mono$A + DF.mono$B + DF.mono$C)/N
 ```
 
 ```{r print_monocycle}
-pander::pander(DF.mono, row.names=FALSE, justify="rrrrrrr", round=0)
+keep <- c("Years", "A", "B", "C", "D", "Cost", "QALY")
+pander::pander(DF.mono[,keep], row.names=FALSE, justify="rrrrrrr", 
+               round=c(2,0,0,0,0,0,3))
 ```
 
 # Model results
 
-## Expected survival
-The estimated life years is given by summing the proportions of
-patients left alive at each cycle [@briggs2006, Exercise 2.5]. This is
-proved as follows. If patients are
-assumed to die at the start of the cycle, then the expected life years
-is equal to the probability of death in one cycle multiplied by the
-survival time. 
-If $p_i$ is the proportion of patients alive at the start of cycle $i$, 
-then the expected life years is given by
-$$
-\begin{aligned}
-E[LY] &= (p_0 - p_1) \times 0 + (p_2 - p_1) \times 1 + \quad ... \quad + (p_{n-1}-p_n)\times (n-1)\\
-&= \sum_1^N (p_{i-1} -p_i)\times (i-1)\\
-&= \sum_1^N (ip_{i-1}-ip_i -p_{i-1} + p_i)\\
-&= \sum_1^N (i-1)p_{i-1} - \sum_1^N i p_i + \sum_1^N p_i\\
-&= -Np_n + \sum_1^N p_i\\
-\end{aligned}
-$$
-If $p_N = 0$ (*i.e.* all patients have died by cycle $N$), then $E[LY] = \sum_1^N p_i$. 
+## Monotherapy
+```{r mon_results, echo=FALSE}
+el.mono <- sum(DF.mono$QALY)
+cost.mono <- sum(DF.mono$Cost)
+```
+The estimated life years is approximated by summing the proportions of patients
+left alive at each cycle (Briggs *et al*[@briggs2006], Exercise 2.5). This is 
+an approximation because it ignores the population who remain alive after 
+21 years, and assumes all deaths occurred at the start of each cycle. For
+monotherapy the expected life gained is `r round(el.mono,3)` years at a cost
+of `r round(cost.mono,2)` GBP.
 
 ## Combination therapy
-For combination therapy, the model is constructed as follows:
+For combination therapy, a similar model is constructed. The annual cost of
 ```{r echo=T}
 # create Markov states for combination therapy (zidovudine and lamivudine)
-#state.comb.A <- MarkovState$new("A", dmca+ccca+cAZT+cLam)
-#state.comb.B <- MarkovState$new("B", dmcb+cccb+cAZT+cLam)
-#state.comb.C <- MarkovState$new("C", dmcc+cccc+cAZT+cLam)
-#state.comb.D <- MarkovState$new("D", 0)
-## transition matrix for combination therapy
-#I.comb <- matrix(
-#  data = c(0.858, 0.103, 0.034, 0.005,
-#           0.000, 0.787, 0.207, 0.006,
-#           0.000, 0.000, 0.873, 0.127,
-#           0.000, 0.000, 0.000, 1.000),
-#  nrow = 4,
-#  ncol = 4, 
-#  byrow = T,
-#  dimnames = list(c('A', 'B', 'C', 'D'), c('A', 'B', 'C', 'D'))
-#)
+s.comb.A <- MarkovState$new("A", dmca+ccca+cAZT+cLam)
+s.comb.B <- MarkovState$new("B", dmcb+cccb+cAZT+cLam)
+s.comb.C <- MarkovState$new("C", dmcc+cccc+cAZT+cLam)
+s.comb.D <- MarkovState$new("D", 0)
+# create transitions
+tAA <- MarkovTransition$new(s.mono.A, s.mono.A, r=NULL)
+tAB <- MarkovTransition$new(s.mono.A, s.mono.B, r=trAB)
+tAC <- MarkovTransition$new(s.mono.A, s.mono.C, r=trAC)
+tAD <- MarkovTransition$new(s.mono.A, s.mono.D, r=trAD)
+tBB <- MarkovTransition$new(s.mono.B, s.mono.B, r=NULL)
+tBC <- MarkovTransition$new(s.mono.B, s.mono.C, r=trBC)
+tBD <- MarkovTransition$new(s.mono.B, s.mono.D, r=trBD)
+tCC <- MarkovTransition$new(s.mono.C, s.mono.C, r=NULL)
+tCD <- MarkovTransition$new(s.mono.C, s.mono.D, r=trCD)
+tDD <- MarkovTransition$new(s.mono.D, s.mono.D, r=NULL)
 ## construct the model
 #m.comb <- MarkovModel$new(
 #  states = list(state.comb.A, state.comb.B, state.comb.C, state.comb.D),

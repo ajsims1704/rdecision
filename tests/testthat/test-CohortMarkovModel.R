@@ -12,10 +12,11 @@ test_that("incorrect state types are rejected", {
     class="non-Node_vertex"
   )  
   n1 <- Node$new()
+  e.ww <- MarkovTransition$new(s.well, s.well)
   expect_error(
     CohortMarkovModel$new(
       V=list(s.well, n1), 
-      E=list()
+      E=list(e.ww)
     ), 
     class="invalid_state"
   )  
@@ -35,6 +36,23 @@ test_that("incorrect transition types are rejected", {
     ), 
     class="invalid_transition"
   )  
+})
+
+test_that("edge case graphs are rejected", {
+  # empty graph
+  expect_error(
+    CohortMarkovModel$new(V=list(), E=list()),
+    class = "invalid_graph"
+  )
+  # single node, no edges
+  s.dead <- MarkovState$new("Dead")
+  expect_error(
+    CohortMarkovModel$new(V=list(s.dead), E=list()),
+    class = "invalid_graph"
+  )
+  # minimal model
+  e.dd <- MarkovTransition$new(s.dead, s.dead)
+  expect_silent(CohortMarkovModel$new(V=list(s.dead),E=list(e.dd)))
 })
 
 test_that("unconnected underlying graphs are detected", {
@@ -149,6 +167,11 @@ test_that("invalid population vectors are rejected", {
   )
   # check state names
   expect_setequal(M$get_statenames(), list("Well", "Disabled", "Dead"))
+  # check default population
+  rp <- M$get_populations()
+  expect_equal(unname(rp[1]),1000)
+  expect_equal(unname(rp[2]),0)
+  expect_equal(unname(rp[3]),0)
   # number of elements
   pop <- c(Well=10000, Disabled=0)
   expect_error(M$set_populations(pop), class="incorrect_state_count")
@@ -199,7 +222,8 @@ test_that("model is cyclable", {
   expect_true(is.data.frame(DF))
   expect_setequal(
     names(DF), 
-    c("State", "Cycle", "Population", "EntryCost", "OccCost", "Cost", "QALY")
+    c("State", "Cycle", "Time", "Population", "EntryCost", "OccCost", "Cost", 
+      "QALY")
   )
   expect_equal(nrow(DF),3)
 })
@@ -240,8 +264,6 @@ test_that("rdecision replicates Sonnenberg & Beck, Fig 3", {
   M$set_populations(c(Well=10000, Disabled=0, Dead=0)) 
   # cycle
   RC <- M$cycles(25)
-  print("")
-  print(RC)
   expect_true(is.data.frame(RC))
   expect_equal(round(RC$Well[RC$Cycle==2]), 3600)
   expect_equal(round(RC$Disabled[RC$Cycle==2]), 2400)

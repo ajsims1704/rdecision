@@ -61,6 +61,7 @@ CohortMarkovModel <- R6::R6Class(
     #' @description Creates a Markov model for cohort simulation.
     #' @details A Markov model must meet the following conditions:
     #' \enumerate{
+    #'   \item It must have at least one node and one edge.
     #'   \item All nodes must be of class \code{MarkovState};
     #'   \item All edges must be of class \code{MarkovTransition};
     #'   \item The nodes and edges must form a digraph whose underlying
@@ -76,11 +77,19 @@ CohortMarkovModel <- R6::R6Class(
     #' @param discount.cost Annual discount rate for future costs.
     #' @param discount.utility Annual discount rate for future incremental
     #' utility.
-    #' @return A \code{CohortMarkovModel} object.
+    #' @return A \code{CohortMarkovModel} object. The population of the first
+    #' state is set to 1000.
     initialize = function(V,E,tcycle=as.difftime(365.25, units="days"),
                           hcc=TRUE, discount.cost=0, discount.utility=0) {
       # initialize the base class(es)
       super$initialize(V,E)
+      # check minimum number of nodes and edges
+      if (self$order() < 1 || self$size() < 1) {
+        rlang::abort(
+          "The model must have at least 1 node and 1 edge", 
+          class = "invalid_graph"
+        )
+      }
       # check that all nodes inherit from MarkovState
       S <- which(
         sapply(V, function(v){inherits(v,what="MarkovState")}),arr.ind=TRUE
@@ -155,9 +164,10 @@ CohortMarkovModel <- R6::R6Class(
         )
       }
       private$cmm.disutil <- discount.utility
-      # create a population vector
+      # create a population vector and initialize first state to 1000
       private$cmm.pop <- vector(mode="numeric", length=self$order())
       names(private$cmm.pop) <- self$get_statenames()
+      private$cmm.pop[1] <- 1000
       # set the cycle number
       private$cmm.icycle <- 0
       # force creation of transition probabilities and costs matrices
@@ -308,11 +318,12 @@ CohortMarkovModel <- R6::R6Class(
     },
     
     #' @description Applies one cycle of the model.
-    #' @return Calculated values, one row per state, as a data frame with the
+    #' @returns Calculated values, one row per state, as a data frame with the
     #' following columns:
     #' \describe{
     #' \item{\code{State}}{Name of the state.}
     #' \item{\code{Cycle}}{The cycle number.}
+    #' \item{\code{Time}}{Clock time, years.}
     #' \item{\code{Population}}{Population of the state at the end of
     #' the cycle.}
     #' \item{\item{OccCost}}{Cost of the population occupying the state for 
@@ -333,7 +344,11 @@ CohortMarkovModel <- R6::R6Class(
       # calculate cycle duration (dty), clock time (ty) and discount 
       # factors (dfc, dfu)
       dty <- as.numeric(private$cmm.tcycle, units="days")/365.25
-      ty <- (private$cmm.icycle)*dty
+      if (private$cmm.hcc) {
+        ty <- (private$cmm.icycle+0.5)*dty
+      } else {
+        ty <- (private$cmm.icycle+1)*dty
+      }
       dfc <- 1/(1+private$cmm.discost)^ty
       dfu <- 1/(1+private$cmm.disutil)^ty
       # transition costs, calculated as number of transitions between each
@@ -369,10 +384,11 @@ CohortMarkovModel <- R6::R6Class(
       # return calculated values, per state
       RC <- data.frame(
         State = self$get_statenames(),
-        Cycle = rep(private$cmm.icycle, times=length(private$cmm.pop)),
+        Cycle = rep(private$cmm.icycle, times=length(self$order())),
+        Time = rep(ty, times=length(self$order())),
         Population = private$cmm.pop,
-        OccCost = occupancy.costs/sum(private$cmm.pop),
-        EntryCost = entry.costs/sum(private$cmm.pop),
+        OccCost = occupancy.costs/sum(self$order()),
+        EntryCost = entry.costs/sum(self$order()),
         Cost = (occupancy.costs+entry.costs)/sum(private$cmm.pop),
         QALY = qaly / sum(private$cmm.pop),
         stringsAsFactors = F
@@ -392,7 +408,18 @@ CohortMarkovModel <- R6::R6Class(
     #' will be cycle zero, i.e. the distribution of patients to starting
     #' states.
     #' @param ncycles Number of cycles to run; default is 2.
-    #' @return Data frame with cycle results.
+    #' @returns Data frame with cycle results.
+    #' following columns:
+    #' \describe{
+    #' \item{\code{Cycle}}{The cycle number.}
+    #' \item{\code{Time}}{Elapsed time at end of cycle, years}
+    #' \item{\code{<name>}}{Population of state \code{<name} at the end of
+    #' the cycle.}
+    #' \item{\code{Cost}}{Cost associated with occupancy and transitions between
+    #' states during the cycle.}
+    #' \item{\code{QALY}}{Quality adjusted life years associated with occupancy
+    #' of the states in the cycle.}
+    #' } 
     cycles = function(ncycles=2) {
       # show zero?
       if (private$cmm.icycle==0) {
@@ -412,6 +439,7 @@ CohortMarkovModel <- R6::R6Class(
       # add zero
       if (nzero > 0) {
         DF[1,"Cycle"] <- 0
+        DF["Years"] <- 0
         DF[1, names(private$cmm.pop)] <- private$cmm.pop
         DF[1,"Cost"] <- 0
         DF[1,"QALY"] <- 0
@@ -421,11 +449,12 @@ CohortMarkovModel <- R6::R6Class(
         # single cycle
         DF.cycle <- self$cycle()
         # set the cycle number
-        DF[i, 'Cycle'] <- min(DF.cycle$Cycle)
+        DF[i, "Cycle"] <- DF.cycle$Cycle[1]
+        DF[i, "Years"] <- DF.cycle$Time[1]
         # collect state populations and cycle sums into a single frame
         DF[i, names(private$cmm.pop)] <- private$cmm.pop
         # add normalized sum of costs for all states 
-        DF[i,'Cost'] <- sum(DF.cycle$Cost)
+        DF[i,"Cost"] <- sum(DF.cycle$Cost)
         # add normalized sum of QALYs gained
         DF[i,"QALY"] <- sum(DF.cycle$QALY)
       }
