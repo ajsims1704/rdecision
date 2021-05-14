@@ -25,6 +25,7 @@ Andrew J. Sims \email{andrew.sims@newcastle.ac.uk}
 \itemize{
 \item \href{#method-new}{\code{MarkovTransition$new()}}
 \item \href{#method-modvars}{\code{MarkovTransition$modvars()}}
+\item \href{#method-set_rate}{\code{MarkovTransition$set_rate()}}
 \item \href{#method-rate}{\code{MarkovTransition$rate()}}
 \item \href{#method-cost}{\code{MarkovTransition$cost()}}
 \item \href{#method-clone}{\code{MarkovTransition$clone()}}
@@ -96,10 +97,31 @@ A list of \code{ModVar}s.
 }
 }
 \if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-set_rate"></a>}}
+\if{latex}{\out{\hypertarget{method-set_rate}{}}}
+\subsection{Method \code{set_rate()}}{
+Set the value of the transition rate
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{MarkovTransition$set_rate(r)}\if{html}{\out{</div>}}
+}
+
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{r}}{Instantaneous hazard rate in units of per patient per year.
+Exactly one of the outgoing transitions from each state must be NULL.}
+}
+\if{html}{\out{</div>}}
+}
+\subsection{Returns}{
+Updated \code{MarkovTransition} cost
+}
+}
+\if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-rate"></a>}}
 \if{latex}{\out{\hypertarget{method-rate}{}}}
 \subsection{Method \code{rate()}}{
-Return the current value of the hazard rate.
+Return the value of the hazard rate.
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{MarkovTransition$rate()}\if{html}{\out{</div>}}
 }

@@ -242,7 +242,7 @@ Is the digraph's underlying graph a polytree?
 
 \subsection{Details}{
 It is a polytree if it is directed, connected and acyclic.
-Because the object is a digraph (directed), this is synomymous with
+Because the object is a digraph (directed), this is synonymous with
 \code{tree}.
 }
 

@@ -4,6 +4,9 @@
 \name{MarkovState}
 \alias{MarkovState}
 \title{\verb{MarkovState} class}
+\value{
+Updated \code{MarkovState} object
+}
 \description{
 ' An R6 class for a state in a Markov model.
 }
@@ -22,6 +25,7 @@ Andrew J. Sims \email{andrew.sims@newcastle.ac.uk}
 \itemize{
 \item \href{#method-new}{\code{MarkovState$new()}}
 \item \href{#method-name}{\code{MarkovState$name()}}
+\item \href{#method-set_cost}{\code{MarkovState$set_cost()}}
 \item \href{#method-cost}{\code{MarkovState$cost()}}
 \item \href{#method-utility}{\code{MarkovState$utility()}}
 \item \href{#method-clone}{\code{MarkovState$clone()}}
@@ -70,6 +74,23 @@ Accessor function to retrieve the state name.
 
 \subsection{Returns}{
 State name.
+}
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-set_cost"></a>}}
+\if{latex}{\out{\hypertarget{method-set_cost}{}}}
+\subsection{Method \code{set_cost()}}{
+Set the annual occupancy cost
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{MarkovState$set_cost(cost)}\if{html}{\out{</div>}}
+}
+
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{cost}}{The annual cost of state occupancy}
+}
+\if{html}{\out{</div>}}
 }
 }
 \if{html}{\out{<hr>}}

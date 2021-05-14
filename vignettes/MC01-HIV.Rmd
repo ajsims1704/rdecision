@@ -3,7 +3,11 @@ title: "Elementary Markov Model (Chancellor 1997)"
 subtitle: "Monotherapy versus combination therapy for HIV"
 author: "Andrew J. Sims"
 date: "May 2021"
-output: rmarkdown::pdf_document
+output: 
+  rmarkdown::html_vignette:
+    fig_width: 7
+    fig_height: 5
+    fig_caption: true
 vignette: >
   %\VignetteIndexEntry{Elementary Markov Model (Chancellor 1997)}
   %\VignetteEngine{knitr::rmarkdown}
@@ -56,7 +60,7 @@ cccb <- 1278 # Community care costs associated with state B
 cccc <- 2059 # Community care costs associated with state C
 # Drug costs
 cAZT <- 2278 # zidovudine drug cost
-cLam <- 2086 # lamivudine drug cost
+cLam <- 2087 # lamivudine drug cost
 # Other parameters
 RR <- 0.509 # treatment effect
 cDR <- 6 # annual discount rate, costs (%)
@@ -116,9 +120,9 @@ f1c  <- paste("Markov model for comparison of HIV therapy.",
               "A: 200 < cd4 < 500,", "B: cd4 < 200,", "C: AIDS,","D: Death.")
 ```
 ```{r draw,results="hide",fig.cap=f1c,fig.asp=0.21}
-DOT <- mhiv$as_DOT()
-writeLines(DOT, con="mono.gv")
-system2(command="dot", args=c("-Tpng","-o","mono.png","mono.gv"))
+#DOT <- mhiv$as_DOT()
+#writeLines(DOT, con="mono.gv")
+#system2(command="dot", args=c("-Tpng","-o","mono.png","mono.gv"))
 img <- png::readPNG(source="mono.png", native=TRUE)
 grid::grid.newpage()
 grid::grid.raster(image=img)
@@ -195,7 +199,8 @@ of `r format(cost.mono,digits=2,scientific=FALSE)` GBP.
 
 ## Combination therapy
 For combination therapy, the same model structure was used, and in `rdecision`,
-the same nodes, edges and model used for the monotherapy can be re-used for the 
+the same nodes, edges and model used for the monotherapy model can be re-used
+for the 
 combination therapy model by setting costs and transition rates to amended 
 values.
 ```{r combo, echo=TRUE}
@@ -209,7 +214,7 @@ tAC$set_rate(trAC*RR)
 tAD$set_rate(trAD*RR)
 tBC$set_rate(trBC*RR)
 tBD$set_rate(trBD*RR)
-tCD*set_rate(trCD*RR)
+tCD$set_rate(trCD*RR)
 ```
 
 In this model, lamivudine is given for the first 2 years, with 
@@ -224,44 +229,43 @@ populations <- c('A'=N, 'B'=0, 'C'=0, 'D'=0)
 mhiv$set_populations(populations)
 # run 2 cycles
 MT.comb <- mhiv$cycles(2)
-# revise costs and transitions, and run model for next 18 years
-#state.comb.A$setAnnualCost(1701+1055+2278)
-#state.comb.B$setAnnualCost(1774+1278+2278)
-#state.comb.C$setAnnualCost(6948+2059+2278)
-#m.comb$setTransitions(I.mono)
-#DF.comb <- rbind(DF.comb, m.comb$cycles(nCycles=18))
-## calculate the proportion alive at end of each cycle
-#DF.comb$Alive <- (DF.comb$A + DF.comb$B + DF.comb$C)/N
+# revise costs and transitions, 
+sA$set_cost(dmca+ccca+cAZT)
+sB$set_cost(dmcb+cccb+cAZT)
+sC$set_cost(dmcc+cccc+cAZT)
+tAB$set_rate(trAB)
+tAC$set_rate(trAC)
+tAD$set_rate(trAD)
+tBC$set_rate(trBC)
+tBD$set_rate(trBD)
+tCD$set_rate(trCD)
+# and run model for next 18 years
+MT.comb <- rbind(MT.comb, mhiv$cycles(ncycles=18))
 ```
 
-The cycle history for combination therapy is as follows:
+The Markov trace for combination therapy is as follows:
 ```{r echo=F}
-#knitr::kable(DF.comb)
+keep <- c("Years", "A", "B", "C", "D", "Cost", "QALY")
+pander::pander(MT.comb[,keep], row.names=FALSE, justify="rrrrrrr", 
+               round=c(2,0,0,0,0,0,3))
 ```
 
 ## Comparison of treatments
-```{r echo=F}
-#el.mono <- sum(DF.mono$Alive)
-#el.comb <- sum(DF.comb$Alive)
-#cost.mono <- sum(DF.mono$Cost)
-#cost.comb <- sum(DF.comb$Cost)
-#icer <- (cost.comb-cost.mono)/(el.comb-el.mono)
+```{r ICER, echo=FALSE}
+el.comb <- sum(MT.comb$QALY)
+cost.comb <- sum(MT.comb$Cost)
+icer <- (cost.comb-cost.mono)/(el.comb-el.mono)
 ```
 The ICER is calculated by running both models and calculating the incremental
-cost per life year gained. 
-
-```{r echo=FALSE}
-#Over the 20 year time horizon, the expected life years for monotherapy was
-#`r round(el.mono,3)` years at a total cost per patient of 
-#`r format(cost.mono,digits=2,scientific=F,big.mark=',')` GBP. The expected life years
-#with combination therapy
-#was `r round(el.comb,3)` at a total cost per patient of 
-#`r format(cost.comb,digits=2,scientific=F,big.mark=',')` GBP. 
-#The incremental change in life years was `r round(el.comb-el.mono,3)` years
-#at an incremental cost of 
-#`r format(cost.comb-cost.mono,digits=2,scientific=F,big.mark=',')` GBP,
-#giving an ICER of `r round(icer,2)` GBP.
-```
-
+cost per life year gained. Over the 20 year time horizon, the expected life
+years gained for monotherapy was `r round(el.mono,3)` years at a total cost
+per patient of `r format(cost.mono,digits=2,scientific=F,big.mark=',')` GBP.
+The expected life years gained with combination therapy  for two years was
+`r round(el.comb,3)` at a total cost per patient of 
+`r format(cost.comb,digits=2,scientific=F,big.mark=',')` GBP. The incremental 
+change in life years was `r round(el.comb-el.mono,3)` years at an incremental 
+cost of `r format(cost.comb-cost.mono,digits=2,scientific=F,big.mark=',')` GBP,
+giving an ICER of `r round(icer,2)` GBP/QALY. This is consistent with the
+result obtained by Briggs *et al* [-@briggs2006], within rounding error.
 
 # References

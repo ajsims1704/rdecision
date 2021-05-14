@@ -25,9 +25,10 @@ following columns:
 \describe{
 \item{\code{State}}{Name of the state.}
 \item{\code{Cycle}}{The cycle number.}
+\item{\code{Time}}{Clock time, years.}
 \item{\code{Population}}{Population of the state at the end of
 the cycle.}
-\item{\item{OccCost}}{Cost of the population occupying the state for 
+\item{\code{OccCost}}{Cost of the population occupying the state for 
 the cycle. Half-cycle correction and discount are applied, if the
 options are set. the costs are normalized by the model population. The
 cycle costs are derived from the annual occupancy costs of the
@@ -46,6 +47,7 @@ Data frame with cycle results.
 following columns:
 \describe{
 \item{\code{Cycle}}{The cycle number.}
+\item{\code{Time}}{Elapsed time at end of cycle, years}
 \item{\code{<name>}}{Population of state \code{<name} at the end of
 the cycle.}
 \item{\code{Cost}}{Cost associated with occupancy and transitions between
@@ -186,6 +188,7 @@ utility.}
 \subsection{Details}{
 A Markov model must meet the following conditions:
 \enumerate{
+  \item It must have at least one node and one edge.
   \item All nodes must be of class \code{MarkovState};
   \item All edges must be of class \code{MarkovTransition};
   \item The nodes and edges must form a digraph whose underlying
@@ -196,7 +199,8 @@ A Markov model must meet the following conditions:
 }
 
 \subsection{Returns}{
-A \code{CohortMarkovModel} object.
+A \code{CohortMarkovModel} object. The population of the first
+state is set to 1000.
 }
 }
 \if{html}{\out{<hr>}}
@@ -206,6 +210,11 @@ A \code{CohortMarkovModel} object.
 Return the per-cycle transition matrix for the model.
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{CohortMarkovModel$transition_probability()}\if{html}{\out{</div>}}
+}
+
+\subsection{Details}{
+Checks that each non-absorbing state has exactly one outgoing
+transition rate whose rate is NULL.
 }
 
 }
@@ -246,7 +255,7 @@ Sets the occupancy of each state.
 \describe{
 \item{\code{populations}}{A named vector of populations for
 the start of the state. The names should be the state names. 
-Due to R's implementation of matrix algebra, \code{populations} 
+Due to the R implementation of matrix algebra, \code{populations} 
 must be a numeric type and is not restricted to being an integer.}
 }
 \if{html}{\out{</div>}}

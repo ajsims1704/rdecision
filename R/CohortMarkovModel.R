@@ -254,7 +254,7 @@ CohortMarkovModel <- R6::R6Class(
     #' @details Sets the cycle count to zero.
     #' @param populations A named vector of populations for
     #' the start of the state. The names should be the state names. 
-    #' Due to R's implementation of matrix algebra, \code{populations} 
+    #' Due to the R implementation of matrix algebra, \code{populations} 
     #' must be a numeric type and is not restricted to being an integer.
     #' @return Updated \code{CohortMarkovModel} object.
     set_populations = function(populations) {
@@ -317,7 +317,7 @@ CohortMarkovModel <- R6::R6Class(
     #' \item{\code{Time}}{Clock time, years.}
     #' \item{\code{Population}}{Population of the state at the end of
     #' the cycle.}
-    #' \item{\item{OccCost}}{Cost of the population occupying the state for 
+    #' \item{\code{OccCost}}{Cost of the population occupying the state for 
     #' the cycle. Half-cycle correction and discount are applied, if the
     #' options are set. the costs are normalized by the model population. The
     #' cycle costs are derived from the annual occupancy costs of the

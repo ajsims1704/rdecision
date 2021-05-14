@@ -240,7 +240,7 @@ Digraph <- R6::R6Class(
     
     #' @description Is the digraph's underlying graph a polytree?
     #' @details It is a polytree if it is directed, connected and acyclic.
-    #' Because the object is a digraph (directed), this is synomymous with
+    #' Because the object is a digraph (directed), this is synonymous with
     #' \code{tree}.
     #' @return \code{TRUE} if the underlying graph is a tree; \code{FALSE}
     #' if not.
