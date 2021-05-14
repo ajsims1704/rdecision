@@ -48,8 +48,6 @@ CohortMarkovModel <- R6::R6Class(
   inherit = Digraph,
   private = list(
     cmm.tcycle = NULL,
-    cmm.Ip = NULL,
-    cmm.Ic = NULL,
     cmm.hcc = NULL,
     cmm.discost = NULL,
     cmm.disutil = NULL,
@@ -113,28 +111,6 @@ CohortMarkovModel <- R6::R6Class(
         rlang::abort("The underlying graph of {V,E} must be connected",
                      class = "invalid_graph")
       }
-      # check that each non-absorbing state has exactly one outgoing
-      # transition whose rate is NULL
-      lv <- sapply(1:self$order(), function(iv) {
-        n.out <- 0
-        n.null <- 0
-        v <- private$V[[iv]]
-        for (ie in 1:self$size()) {
-          e <- private$E[[ie]]
-          if (identical(e$source(),v)) {
-            n.out <- n.out + 1
-            if (is.na(e$rate())) {
-              n.null <- n.null + 1
-            }
-          }
-        }
-        return(ifelse(n.out==0, TRUE, n.null==1))
-      })
-      if (!all(lv)) {
-        rlang::abort(
-          "Each non-absorbing state must have one NULL rate transition",
-          class = "invalid_rate")
-      }
       # check that the cycle time is an interval
       if (class(tcycle) != "difftime") {
         rlang::abort(
@@ -143,6 +119,9 @@ CohortMarkovModel <- R6::R6Class(
         )
       }
       private$cmm.tcycle <- tcycle
+      # check that each non-absorbing state has exactly one outgoing
+      # transition whose rate is NULL, by creating the transition matrix
+      self$transition_probability()
       # check and set half cycle correction
       if (!is.logical(hcc)) {
         rlang::abort(
@@ -178,78 +157,90 @@ CohortMarkovModel <- R6::R6Class(
     },
     
     #' @description Return the per-cycle transition matrix for the model.
+    #' @details Checks that each non-absorbing state has exactly one outgoing
+    #' transition rate whose rate is NULL. 
     #' @returns A square matrix of size equal to the number of states. If all
     #' states are labelled, the dimnames take the names of the states.
     transition_probability = function() {
-      # if the matrix is not null, create it. This assumes the graph is 
-      # immutable (no edges or vertexes added or removed since its creation)
-      if (is.null(private$Ip)) {
-        # get the state names
-        state.names <- sapply(private$V, function(v) {v$label()})
-        # construct the matrix
-        Ip <- matrix(
-          data = 0, 
-          nrow = self$order(), ncol = self$order(),
-          dimnames = list(source=state.names, target=state.names)
-        )
-        # populate the cells with rates
+      # check that each non-absorbing state has exactly one outgoing
+      # transition whose rate is NULL
+      lv <- sapply(1:self$order(), function(iv) {
+        n.out <- 0
+        n.null <- 0
+        v <- private$V[[iv]]
         for (ie in 1:self$size()) {
           e <- private$E[[ie]]
-          is <- self$vertex_index(e$source())
-          it <- self$vertex_index(e$target())
-          Ip[is,it] <- e$rate()
-        }
-        # convert rates to per-cycle probabilities
-        for (is in 1:nrow(Ip)) {
-          for (it in 1:nrow(Ip)) {
-            t <- as.numeric(private$cmm.tcycle, units="days")/365.25
-            Ip[is,it] <- 1 - exp(-Ip[is,it]*t)
+          if (identical(e$source(),v)) {
+            n.out <- n.out + 1
+            if (is.na(e$rate())) {
+              n.null <- n.null + 1
+            }
           }
         }
-        # replace NAs with values to ensure all rows sum to unity
-        for (iv in 1:nrow(Ip)) {
-          p.out <- sum(Ip[iv,], na.rm=TRUE)
-          if (p.out > 1) {
-            label <- private$V[[iv]]$label()
-            rlang::abort(
-              paste("P(transition) from state", label, "exceeds 1"),
-              class = "invalid_transitions"
-            )
-          }
-          Ip[iv,which(is.na(Ip[iv,]))] <- 1 - p.out
-        }
-        # save the matrix as a class private variable
-        private$cmm.Ip <- Ip
+        return(ifelse(n.out==0, TRUE, n.null==1))
+      })
+      if (!all(lv)) {
+        rlang::abort(
+          "Each non-absorbing state must have one NULL rate transition",
+          class = "invalid_rate")
       }
-      return(private$cmm.Ip)
+      # get the state names
+      state.names <- sapply(private$V, function(v) {v$label()})
+      # construct the matrix
+      Ip <- matrix(
+        data = 0, 
+        nrow = self$order(), ncol = self$order(),
+        dimnames = list(source=state.names, target=state.names)
+      )
+      # populate the cells with rates
+      for (ie in 1:self$size()) {
+        e <- private$E[[ie]]
+        is <- self$vertex_index(e$source())
+        it <- self$vertex_index(e$target())
+        Ip[is,it] <- e$rate()
+      }
+      # convert rates to per-cycle probabilities
+      for (is in 1:nrow(Ip)) {
+        for (it in 1:nrow(Ip)) {
+          t <- as.numeric(private$cmm.tcycle, units="days")/365.25
+          Ip[is,it] <- 1 - exp(-Ip[is,it]*t)
+        }
+      }
+      # replace NAs with values to ensure all rows sum to unity
+      for (iv in 1:nrow(Ip)) {
+        p.out <- sum(Ip[iv,], na.rm=TRUE)
+        if (p.out > 1) {
+          label <- private$V[[iv]]$label()
+          rlang::abort(
+            paste("P(transition) from state", label, "exceeds 1"),
+            class = "invalid_transitions"
+          )
+        }
+        Ip[iv,which(is.na(Ip[iv,]))] <- 1 - p.out
+      }
+      return(Ip)
     },
 
     #' @description Return the per-cycle transition costs for the model.
     #' @returns A square matrix of size equal to the number of states. If all
     #' states are labelled, the dimnames take the names of the states.
     transition_cost = function() {
-      # if the matrix is not null, create it. This assumes the graph is 
-      # immutable (no edges or vertexes added or removed since its creation)
-      if (is.null(private$cmm.Ic)) {
-        # get the state names
-        state.names <- sapply(private$V, function(v) {v$label()})
-        # construct the matrix
-        Ic <- matrix(
-          data = 0, 
-          nrow = self$order(), ncol = self$order(),
-          dimnames = list(source=state.names, target=state.names)
-        )
-        # populate the cells with costs
-        for (ie in 1:self$size()) {
-          e <- private$E[[ie]]
-          is <- self$vertex_index(e$source())
-          it <- self$vertex_index(e$target())
-          Ic[is,it] <- e$cost()
-        }
-        # save the matrix as a class private variable
-        private$cmm.Ic <- Ic
+      # get the state names
+      state.names <- sapply(private$V, function(v) {v$label()})
+      # construct the matrix
+      Ic <- matrix(
+        data = 0, 
+        nrow = self$order(), ncol = self$order(),
+        dimnames = list(source=state.names, target=state.names)
+      )
+      # populate the cells with costs
+      for (ie in 1:self$size()) {
+        e <- private$E[[ie]]
+        is <- self$vertex_index(e$source())
+        it <- self$vertex_index(e$target())
+        Ic[is,it] <- e$cost()
       }
-      return(private$cmm.Ic)
+      return(Ic)
     },
 
     #' @description Returns a character list of state names.
@@ -359,7 +350,7 @@ CohortMarkovModel <- R6::R6Class(
         nrow = self$order(), ncol=self$order(),
         byrow = FALSE
       )
-      TC <- P*private$cmm.Ip*private$cmm.Ic
+      TC <- P*self$transition_probability()*self$transition_cost()
       entry.costs <- colSums(TC)*dfc
       # Apply the transition probabilities to get the end state populations,
       # with half-cycle correction, if required
