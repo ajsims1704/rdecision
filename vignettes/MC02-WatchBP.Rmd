@@ -1,0 +1,110 @@
+---
+title: "Markov Model with transition costs (Willits 2012)"
+subtitle: "Cost impact of the WatchBP Home A used in primary healthcare"
+author: "Andrew J. Sims"
+date: "May 2021"
+output: 
+  rmarkdown::html_vignette:
+    fig_width: 7
+    fig_height: 5
+    fig_caption: true
+vignette: >
+  %\VignetteIndexEntry{Markov Model with transition costs (Willits 2012)}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+bibliography: "../inst/REFERENCES.bib"
+csl: "../inst/national-institute-of-health-research.csl"
+---
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  echo = FALSE,
+  fig.keep = "last",
+  fig.align = "center",
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+```{r setup, echo=F}
+library(rdecision)
+library(pander)
+library(png)
+```
+
+# Introduction
+This vignette describes a Markov model that was used to evaluate the cost 
+consequences of opportunistic screening for atrial fibrillation (AF) during
+clinic visits involving blood pressure measurement. It was first developed
+for the assessment of the WatchBP oscillometric blood pressure measurement
+device by the National Institute of Health and Care Excellence (NICE)
+[@willits2014a] and is described fully in a report that was published during
+the guidance development process [@willits2012a].
+
+The guidance report followed two cohorts, those aged 65-74 and those aged 
+75-84, to account for the age dependency in risk of AF. This vignette
+focuses on the older cohort.
+
+# Detection of AF
+The diagnostic phase was modelled as a decision tree, in which the diagnostic
+test accuracies of the index technology (WatchBP) and the comparator technology 
+(pulse palpation) were used to estimate the proportions of the cohort falling
+into the true positive (TP), true negative (TN), false positive (FP) and false
+negative (FN) categories. These proportions were used to define the starting
+populations in the management model (a Markov model).
+
+```{r tree, echo=TRUE}
+# sens and spec of index and comparator tests
+Sn.I <- 0.967
+Sp.I <- 0.888
+Sn.C <- 0.872
+Sp.C <- 0.813
+# prevalence
+prev <- 0.072
+# index test branch
+TP.I <- LeafNode$new("TP.I")
+FP.I <- LeafNode$new("FP.I")
+cP.I <- ChanceNode$new()
+eTP.I <- Reaction$new(cP.I, TP.I, p=Sn.I, label="Test +ve")
+eFP.I <- Reaction$new(cP.I, TP.I, p=1-Sp.I, label="Test -ve")
+FN.I <- LeafNode$new("FN.I")
+TN.I <- LeafNode$new("TN.I")
+cN.I <- ChanceNode$new()
+eFN.I <- Reaction$new(cN.I, FN.I, p=1-Sn.I, label="Test +ve")
+eTN.I <- Reaction$new(cN.I, TN.I, p=Sp.I, label="Test -ve")
+c.I <- ChanceNode$new()
+eP.I <- Reaction$new(c.I, cP.I, p=prev, label="Has AF")
+eN.I <- Reaction$new(c.I, cN.I, p=1-prev, label="Does not have AF")
+# comparator test branch
+TP.C <- LeafNode$new("TP.C")
+FP.C <- LeafNode$new("FP.C")
+cP.C <- ChanceNode$new()
+eTP.C <- Reaction$new(cP.C, TP.C, p=Sn.C, label="Test +ve")
+eFP.C <- Reaction$new(cP.C, TP.C, p=1-Sp.C, label="Test -ve")
+FN.C <- LeafNode$new("FN.C")
+TN.C <- LeafNode$new("TN.C")
+cN.C <- ChanceNode$new()
+eFN.C <- Reaction$new(cN.C, FN.C, p=1-Sn.C, label="Test +ve")
+eTN.C <- Reaction$new(cN.C, TN.C, p=Sp.C, label="Test -ve")
+c.C <- ChanceNode$new()
+eP.C <- Reaction$new(c.C, cP.C, p=prev, label="Has AF")
+eN.C <- Reaction$new(c.C, cN.C, p=1-prev, label="Does not have AF")
+# decision node
+d <- DecisionNode$new("Test")
+e.I <- Action$new(d,c.I,label="WatchBP")
+e.C <- Action$new(d,c.C,label="PP")
+# tree
+DT <- DecisionTree$new(
+  V = list(
+    TP.I,FP.I,FN.I,TN.I,cP.I,cN.I,c.I,
+    TP.C,FP.C,FN.C,TN.C,cP.C,cN.C,c.C,
+    d),
+  E = list(
+    eTP.I,eFP.I,eFN.I,eTN.I,eP.I,eN.I,e.I,
+    eTP.C,eFP.C,eFN.C,eTN.C,eP.C,eN.C,e.C
+  )
+)
+```
+
+
+
+# References

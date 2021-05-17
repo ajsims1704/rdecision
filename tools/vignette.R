@@ -1,6 +1,6 @@
 rm(list=ls())
 devtools::load_all()
-rmarkdown::render("vignettes/MC01-HIV.Rmd")
+rmarkdown::render("vignettes/MC02-WatchBP.Rmd")
 rm(list=ls())
 
 
