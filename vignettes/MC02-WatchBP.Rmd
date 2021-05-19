@@ -44,15 +44,8 @@ The guidance report followed two cohorts, those aged 65-74 and those aged
 75-84, to account for the age dependency in risk of AF. This vignette
 focuses on the older cohort.
 
-# Detection of AF
-The diagnostic phase was modelled as a decision tree, in which the diagnostic
-test accuracies of the index technology (WatchBP) and the comparator technology 
-(pulse palpation) were used to estimate the proportions of the cohort falling
-into the true positive (TP), true negative (TN), false positive (FP) and false
-negative (FN) categories. These proportions were used to define the starting
-populations in the management model (a Markov model).
-
-```{r tree, echo=TRUE}
+# Diagnostic phase
+```{r tree-vars, echo=FALSE}
 # sens and spec of index and comparator tests
 Sn.I <- 0.967
 Sp.I <- 0.888
@@ -60,30 +53,45 @@ Sn.C <- 0.872
 Sp.C <- 0.813
 # prevalence
 prev <- 0.072
+# cohort size
+N <- 100000
+```
+The diagnostic phase was modelled as a decision tree in which the
+diagnostic
+test accuracies of the index technology (WatchBP) and the comparator technology 
+(pulse palpation) were used to estimate the proportions of the cohort falling
+into the true positive (TP), true negative (TN), false positive (FP) and false
+negative (FN) categories. These proportions were used to define the starting
+populations in the management phase (a Markov model) with a cohort size 
+of `r N`. In the diagnostic phase the prevalance of AF was `r prev`; WatchBP 
+had a sensitivity of `r Sn.I` and a specificity of `r Sp.I`; pulse palpation had 
+a sensitivity of `r Sn.C` and a specificity of `r Sp.C`.
+
+```{r tree, echo=FALSE}
 # index test branch
-TP.I <- LeafNode$new("TP.I")
-FP.I <- LeafNode$new("FP.I")
+TP.I <- LeafNode$new("TP")
+FN.I <- LeafNode$new("FN")
 cP.I <- ChanceNode$new()
 eTP.I <- Reaction$new(cP.I, TP.I, p=Sn.I, label="Test +ve")
-eFP.I <- Reaction$new(cP.I, TP.I, p=1-Sp.I, label="Test -ve")
-FN.I <- LeafNode$new("FN.I")
-TN.I <- LeafNode$new("TN.I")
+eFN.I <- Reaction$new(cP.I, FN.I, p=1-Sn.I, label="Test -ve")
+FP.I <- LeafNode$new("FP")
+TN.I <- LeafNode$new("TN")
 cN.I <- ChanceNode$new()
-eFN.I <- Reaction$new(cN.I, FN.I, p=1-Sn.I, label="Test +ve")
+eFP.I <- Reaction$new(cN.I, FP.I, p=1-Sp.I, label="Test +ve")
 eTN.I <- Reaction$new(cN.I, TN.I, p=Sp.I, label="Test -ve")
 c.I <- ChanceNode$new()
 eP.I <- Reaction$new(c.I, cP.I, p=prev, label="Has AF")
 eN.I <- Reaction$new(c.I, cN.I, p=1-prev, label="Does not have AF")
 # comparator test branch
-TP.C <- LeafNode$new("TP.C")
-FP.C <- LeafNode$new("FP.C")
+TP.C <- LeafNode$new("TP")
+FN.C <- LeafNode$new("FN")
 cP.C <- ChanceNode$new()
 eTP.C <- Reaction$new(cP.C, TP.C, p=Sn.C, label="Test +ve")
-eFP.C <- Reaction$new(cP.C, TP.C, p=1-Sp.C, label="Test -ve")
-FN.C <- LeafNode$new("FN.C")
-TN.C <- LeafNode$new("TN.C")
+eFN.C <- Reaction$new(cP.C, FN.C, p=1-Sn.C, label="Test -ve")
+FP.C <- LeafNode$new("FP")
+TN.C <- LeafNode$new("TN")
 cN.C <- ChanceNode$new()
-eFN.C <- Reaction$new(cN.C, FN.C, p=1-Sn.C, label="Test +ve")
+eFP.C <- Reaction$new(cN.C, FP.C, p=1-Sp.C, label="Test +ve")
 eTN.C <- Reaction$new(cN.C, TN.C, p=Sp.C, label="Test -ve")
 c.C <- ChanceNode$new()
 eP.C <- Reaction$new(c.C, cP.C, p=prev, label="Has AF")
@@ -104,6 +112,17 @@ DT <- DecisionTree$new(
   )
 )
 ```
+
+The number of patients predicted to be in each of the four categories for each
+test is shown in the table below.
+```{r tree-calc, echo=FALSE}
+DF <- DT$evaluate(by="path")
+DF$Population <- DF$Probability*N
+keep <- c("Leaf", "Test", "Population")
+pander::pander(DF[,keep])
+```
+
+# Management phase
 
 
 
