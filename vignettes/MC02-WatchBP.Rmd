@@ -124,6 +124,97 @@ pander::pander(DF[,keep])
 
 # Management phase
 
+## Model variables
+The model variables used in the management phase are as follows:
+```{r cm-vars, echo=TRUE}
+# risks of GI bleed for each therapy (per year)
+r.GB.ap <- -log(1-0.016)/1
+r.GB.ac <- -log(1-0.014)/1
+# SMR for a person aged 79
+r.SMR <- -log(1-0.0593)/1
+# CHADS2 annual risk of stroke
+p.CHADS2.1 <- 0.028
+p.CHADS2.2 <- 0.040
+p.CHADS2.3 <- 0.059
+p.CHADS2.4 <- 0.085
+p.CHADS2.5 <- 0.125
+p.CHADS2.6 <- 0.182
+# relative risk of stroke given therapy
+rr.ap <- 0.78
+rr.ac <- 0.32
+# risks of stroke (per year)
+r.S1.ap <- -log(1-p.CHADS2.1*rr.ap)/1
+r.S1.ac <- -log(1-p.CHADS2.1*rr.ac)/1
+r.S2.ac <- -log(1-p.CHADS2.2*rr.ac)/1
+r.S3.ac <- -log(1-p.CHADS2.3*rr.ac)/1
+r.S4.ac <- -log(1-p.CHADS2.4*rr.ac)/1
+r.S5.ac <- -log(1-p.CHADS2.5*rr.ac)/1
+r.S6.ac <- -log(1-p.CHADS2.6*rr.ac)/1
+# risks of fatal stroke in year 1 and in subsequent years
+r.SF.1 <- -log(1-0.333)/1
+r.SF.N <- -log(1-0.100)/1
+```
+
+## Model structure
+
+A Markov model was constructed with six states (Fig 1): AF, GI bleed, stroke
+(year 1), stroke (subsequent years), fatal stroke and dead. The GI bleed state 
+was a 
+tunnel state, which patients occupied for 1 cycle before returning to the AF
+state. The fatal stroke and
+dead states were absorbing states. The stroke in year 1 had no self loop and
+thus a maximum occupancy of 1 cycle.
+
+```{r cm, echo=TRUE}
+# AF state
+AF <- MarkovState$new("AF")
+# disease states
+GB <- MarkovState$new("GIbleed")
+S1 <- MarkovState$new("StrokeY1")
+SN <- MarkovState$new("StrokeYN")
+SF <- MarkovState$new("FatalStroke")
+D <- MarkovState$new("Dead")
+# transitions
+E <- list(
+  # from AF
+  MarkovTransition$new(AF, AF, r=NULL),
+  MarkovTransition$new(AF, GB, r=r.GB.ap),
+  MarkovTransition$new(AF, D, r=r.SMR),
+  MarkovTransition$new(AF, S1, r=r.S1.ap),
+  # from stroke, year 1
+  MarkovTransition$new(S1, SF, r=r.SF.1),
+  MarkovTransition$new(S1, SN, r=NULL),
+  # from stroke, subsequent years
+  MarkovTransition$new(SN, SF, r=r.SF.N),
+  MarkovTransition$new(SN, SN, r=NULL)
+)
+# create model
+CM <- CohortMarkovModel$new(
+  V = list(AF, GB, D, S1, SN, SF),
+  E 
+)
+```
+
+```{r caption, echo=FALSE}
+f1c  <- paste("Markov model for comparison of WatchBP with pulse palpation.")
+```
+```{r draw,results="hide",fig.cap=f1c}
+DOT <- CM$as_DOT()
+writeLines(DOT, con="WatchBP.gv")
+system2(command="dot", args=c("-Tpng","-o","WatchBP.png","WatchBP.gv"))
+img <- png::readPNG(source="WatchBP.png", native=TRUE)
+grid::grid.newpage()
+grid::grid.raster(image=img)
+```
+
+The per-cycle transition probability matrix for one scenario (patients with
+AF, CHADS2 score of 1 and antiplatelet therapy) is shown below.
+
+```{r tm, echo=FALSE}
+TM <- CM$transition_probability()
+pander::pander(TM, emphasize.rownames=FALSE, justify="lcccccc")
+rm(TM)
+```
 
 
 # References

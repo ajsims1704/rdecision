@@ -1,0 +1,12 @@
+digraph rdecision {
+  size="7,7" ;
+  rankdir=LR ;
+   "AF" -> "AF"  ;
+   "AF" -> "GIbleed"  ;
+   "AF" -> "Dead"  ;
+   "AF" -> "StrokeY1"  ;
+   "StrokeY1" -> "FatalStroke"  ;
+   "StrokeY1" -> "StrokeYN"  ;
+   "StrokeYN" -> "FatalStroke"  ;
+   "StrokeYN" -> "StrokeYN"  ;
+}
