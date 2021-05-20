@@ -1,6 +1,11 @@
 
 # rdecision 1.0.4.9000
 
+* Added WatchBP vignette.
+* Added single/combined therapy HIV vignette.
+* Added class `CohortMarkovModel` and its test script.
+* Added class `MarkovTransition` (inherits from `Node`) and its test script.
+* Added class `MarkovState` (inherits from `Edge`) and its test script.
 * Self loops in digraphs have a value of zero in the incidence matrix.
 
 # rdecision 1.0.4

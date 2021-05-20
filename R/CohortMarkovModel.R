@@ -64,8 +64,8 @@ CohortMarkovModel <- R6::R6Class(
     #'   \item All edges must be of class \code{MarkovTransition};
     #'   \item The nodes and edges must form a digraph whose underlying
     #'   graph is connected;
-    #'   \item Each non-absorbing state must have one outgoing transition
-    #'    whose hazard rate is NULL.
+    #'   \item Each state must have at least one outgoing transition and 
+    #'   have exactly one outgoing whose hazard rate is NULL.
     #' }
     #' @param V A list of nodes (\code{MarkovState}s).
     #' @param E A list of edges (\code{MarkovTransition}s).
@@ -157,8 +157,8 @@ CohortMarkovModel <- R6::R6Class(
     },
     
     #' @description Return the per-cycle transition matrix for the model.
-    #' @details Checks that each non-absorbing state has exactly one outgoing
-    #' transition rate whose rate is NULL. 
+    #' @details Checks that each state has at least one outgoing transition and
+    #' that exactly one outgoing transition rate whose rate is NULL. 
     #' @returns A square matrix of size equal to the number of states. If all
     #' states are labelled, the dimnames take the names of the states.
     transition_probability = function() {
@@ -177,11 +177,11 @@ CohortMarkovModel <- R6::R6Class(
             }
           }
         }
-        return(ifelse(n.out==0, TRUE, n.null==1))
+        return(n.out>=1 && n.null==1)
       })
       if (!all(lv)) {
         rlang::abort(
-          "Each non-absorbing state must have one NULL rate transition",
+          "Each state must have one outgoing NULL rate transition",
           class = "invalid_rate")
       }
       # get the state names

@@ -71,10 +71,20 @@ test_that("unconnected underlying graphs are detected", {
   )  
 })
 
-test_that("non-absorbing states without one NULL rate are detected", {
+test_that("states without one NULL rate are detected", {
   s.well <- MarkovState$new("Well")
   s.disabled <- MarkovState$new("Disabled")
   s.dead <- MarkovState$new("Dead")
+  # no outgoing transitions from one state
+  e.ww <- MarkovTransition$new(s.well, s.well)
+  e.ws <- MarkovTransition$new(s.well, s.disabled, r=0.2)
+  expect_error(
+    CohortMarkovModel$new(
+      V = list(s.well, s.disabled),
+      E = list(e.ww, e.ws)
+    ), 
+    class="invalid_rate"
+  ) 
   # under-constrain (no rates specified for outgoing 'disabled' state)
   e.ww <- MarkovTransition$new(s.well, s.well)
   e.ss <- MarkovTransition$new(s.disabled, s.disabled)
