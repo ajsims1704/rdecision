@@ -26,9 +26,9 @@ knitr::opts_chunk$set(
 ```
 
 ```{r setup, echo=F}
-library(rdecision)
-library(pander)
-library(png)
+library("rdecision")
+library("knitr")
+library("pander")
 ```
 
 # Introduction
@@ -116,16 +116,14 @@ visualization with the `dot` tool of Graphviz, or plotted directly in R via
 the `DiagrammeR` package. The Markov model for monotherapy is shown in Figure 1.
 
 ```{r caption, echo=FALSE}
-f1c  <- paste("Markov model for comparison of HIV therapy.", 
+f1c  <- paste("Figure 1. Markov model for comparison of HIV therapy.", 
               "A: 200 < cd4 < 500,", "B: cd4 < 200,", "C: AIDS,","D: Death.")
 ```
-```{r draw,results="hide",fig.cap=f1c,fig.asp=0.21}
+```{r draw,fig.cap=f1c,fig.asp=0.21}
 #DOT <- mhiv$as_DOT()
 #writeLines(DOT, con="mono.gv")
 #system2(command="dot", args=c("-Tpng","-o","mono.png","mono.gv"))
-img <- png::readPNG(source="mono.png", native=TRUE)
-grid::grid.newpage()
-grid::grid.raster(image=img)
+knitr::include_graphics(path="mono.png")
 ```
 
 ## Model states

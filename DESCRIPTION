@@ -27,7 +27,6 @@ Suggests:
     covr,
     knitr,
     pander,
-    png,
     rmarkdown,
     testthat (>= 3.0.0),
     utf8

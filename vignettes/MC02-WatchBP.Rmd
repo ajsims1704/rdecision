@@ -26,9 +26,9 @@ knitr::opts_chunk$set(
 ```
 
 ```{r setup, echo=F}
-library(rdecision)
-library(pander)
-library(png)
+library("rdecision")
+library("knitr")
+library("pander")
 ```
 
 # Introduction
@@ -124,6 +124,16 @@ pander::pander(DF[,keep])
 
 # Management phase
 
+```{r cohorts, echo=FALSE}
+COHORT <- data.frame(
+  CHADS2 = c(1,1,2,3,4,5,6),
+  Treatment = c("Aspirin", rep("Anticoagulant", times=6)),
+  rBleed = c(1.6, rep(1.4, times=6)),
+  rStroke = c(2.8, 2.8, 4.0, 5.9, 8.5, 12.5, 18.2)
+)
+```
+
+
 ## Model variables
 The model variables used in the management phase are as follows:
 ```{r cm-vars, echo=TRUE}
@@ -171,7 +181,7 @@ AF <- MarkovState$new("AF")
 # disease states
 GB <- MarkovState$new("GIbleed")
 S1 <- MarkovState$new("StrokeY1")
-SN <- MarkovState$new("StrokeYN")
+SN <- MarkovState$new("StrokeY2+")
 SF <- MarkovState$new("FatalStroke")
 D <- MarkovState$new("Dead")
 # transitions
@@ -201,16 +211,39 @@ CM <- CohortMarkovModel$new(
 ```
 
 ```{r caption, echo=FALSE}
-f1c  <- paste("Markov model for management of atrial fibrillation")
+f1c  <- paste("Figure 1. Markov model for management of atrial fibrillation")
 ```
-```{r draw,fig.cap=f1c}
+```{r draw, fig.cap=f1c}
 DOT <- CM$as_DOT()
 writeLines(DOT, con="WatchBP.gv")
 system2(command="dot", args=c("-Tpng","-o","WatchBP.png","WatchBP.gv"))
-img <- png::readPNG(source="WatchBP.png", native=TRUE)
-grid::grid.newpage()
-grid::grid.raster(image=img)
+knitr::include_graphics(path="WatchBP.png")
 ```
+
+
+## Cohorts
+The model was run for several sub-cohorts, each defined by their CHADS2 score 
+and medication. The annual risk of major GI bleed and annual risk of stroke for
+each sub-cohort are shown in the table below. The annual risk of a fatal first
+stroke was 
+
+```{r print-cohorts, echo=FALSE}
+pander::pander(
+  COHORT,
+  caption = "Characteristics of each sub-cohort.",
+  col.names = c(
+    "CHADS2 score", 
+    "Treatment", 
+    "Annual risk of GI bleed (%)", 
+    "Annual risk of stroke"
+  )
+)
+```
+
+
+
+
+
 
 The per-cycle transition probability matrix for one scenario (patients with
 AF, CHADS2 score of 1 and antiplatelet therapy) is shown below.

@@ -7,9 +7,9 @@ digraph rdecision {
    "AF" -> "StrokeY1"  ;
    "GIbleed" -> "AF"  ;
    "StrokeY1" -> "FatalStroke"  ;
-   "StrokeY1" -> "StrokeYN"  ;
-   "StrokeYN" -> "StrokeYN"  ;
-   "StrokeYN" -> "FatalStroke"  ;
+   "StrokeY1" -> "StrokeY2+"  ;
+   "StrokeY2+" -> "StrokeY2+"  ;
+   "StrokeY2+" -> "FatalStroke"  ;
    "Dead" -> "Dead"  ;
    "FatalStroke" -> "FatalStroke"  ;
 }
