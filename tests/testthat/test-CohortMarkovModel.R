@@ -55,6 +55,40 @@ test_that("edge case graphs are rejected", {
   expect_silent(CohortMarkovModel$new(V=list(s.dead),E=list(e.dd)))
 })
 
+test_that("multiple digraph edges are rejected", {
+  s.well <- MarkovState$new("Well")
+  s.dead <- MarkovState$new("Dead")
+  e.ww <- MarkovTransition$new(s.well, s.well)
+  e.ww.bleed <- MarkovTransition$new(s.well, s.well, r=0.2)
+  e.wd <- MarkovTransition$new(s.well, s.dead, r=0.1)
+  e.dd <- MarkovTransition$new(s.dead, s.dead)
+  # two self loops from well to well
+  expect_error(
+    CohortMarkovModel$new(
+      V = list(s.well, s.dead), 
+      E = list(e.ww, e.ww.bleed, e.wd, e.dd)
+    ),
+    class = "multiple_edges"
+  )
+  # two loops from well to dead
+  e.wd.bleed <- MarkovTransition$new(s.well, s.dead, r=NULL)
+  expect_error(
+    CohortMarkovModel$new(
+      V = list(s.well, s.dead), 
+      E = list(e.ww, e.wd.bleed, e.wd, e.dd)
+    ),
+    class = "multiple_edges"
+  )
+  # but multiple edges for graph but not digraph are allowed
+  e.dw <- MarkovTransition$new(s.dead, s.well, r=0.1)
+  expect_silent(
+    CohortMarkovModel$new(
+      V = list(s.well, s.dead), 
+      E = list(e.ww, e.wd, e.dw, e.dd)
+    )
+  )
+})
+
 test_that("unconnected underlying graphs are detected", {
   s.well <- MarkovState$new("Well")
   s.disabled <- MarkovState$new("Disabled")

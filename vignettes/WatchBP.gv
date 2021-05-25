@@ -2,14 +2,17 @@ digraph rdecision {
   size="7,7" ;
   rankdir=LR ;
    "AF" -> "AF"  ;
-   "AF" -> "GIbleed"  ;
+   "AF" -> "GIbleed" [ label =  "bleed" ] ;
    "AF" -> "Dead"  ;
    "AF" -> "StrokeY1"  ;
    "GIbleed" -> "AF"  ;
+   "GIbleed" -> "Dead"  ;
    "StrokeY1" -> "FatalStroke"  ;
    "StrokeY1" -> "StrokeY2+"  ;
+   "StrokeY1" -> "Dead"  ;
    "StrokeY2+" -> "StrokeY2+"  ;
    "StrokeY2+" -> "FatalStroke"  ;
+   "StrokeY2+" -> "Dead"  ;
    "Dead" -> "Dead"  ;
    "FatalStroke" -> "FatalStroke"  ;
 }

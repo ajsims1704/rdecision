@@ -125,55 +125,28 @@ pander::pander(DF[,keep])
 # Management phase
 
 ```{r cohorts, echo=FALSE}
+# CHADS and medic
 COHORT <- data.frame(
   CHADS2 = c(1,1,2,3,4,5,6),
-  Treatment = c("Aspirin", rep("Anticoagulant", times=6)),
-  rBleed = c(1.6, rep(1.4, times=6)),
-  rStroke = c(2.8, 2.8, 4.0, 5.9, 8.5, 12.5, 18.2)
+  Tx = c("Aspirin", rep("Anticoagulant", times=6)),
+  pB = c(1.6, rep(1.4, times=6)),
+  pS = c(2.8, 2.8, 4.0, 5.9, 8.5, 12.5, 18.2),
+  SMR = rep(5.93, times=7),
+  pF1 = rep(36.5, rep=7),
+  pFN = rep(10.0, rep=7),
+  rr.S = c(0.78, rep(0.32, times=6))
 )
 ```
 
 
-## Model variables
-The model variables used in the management phase are as follows:
-```{r cm-vars, echo=TRUE}
-# risks of GI bleed for each therapy (per year)
-r.GB.ap <- -log(1-0.016)/1
-r.GB.ac <- -log(1-0.014)/1
-# SMR for a person aged 79
-r.SMR <- -log(1-0.0593)/1
-# CHADS2 annual risk of stroke
-p.CHADS2.1 <- 0.028
-p.CHADS2.2 <- 0.040
-p.CHADS2.3 <- 0.059
-p.CHADS2.4 <- 0.085
-p.CHADS2.5 <- 0.125
-p.CHADS2.6 <- 0.182
-# relative risk of stroke given therapy
-rr.ap <- 0.78
-rr.ac <- 0.32
-# risks of stroke (per year)
-r.S1.ap <- -log(1-p.CHADS2.1*rr.ap)/1
-r.S1.ac <- -log(1-p.CHADS2.1*rr.ac)/1
-r.S2.ac <- -log(1-p.CHADS2.2*rr.ac)/1
-r.S3.ac <- -log(1-p.CHADS2.3*rr.ac)/1
-r.S4.ac <- -log(1-p.CHADS2.4*rr.ac)/1
-r.S5.ac <- -log(1-p.CHADS2.5*rr.ac)/1
-r.S6.ac <- -log(1-p.CHADS2.6*rr.ac)/1
-# risks of fatal stroke in year 1 and in subsequent years
-r.SF.1 <- -log(1-0.333)/1
-r.SF.N <- -log(1-0.100)/1
-```
-
 ## Model structure
-
 A Markov model was constructed with six states (Fig 1): AF, GI bleed, stroke
 (year 1), stroke (subsequent years), fatal stroke and dead. The GI bleed state 
-was a 
-tunnel state, which patients occupied for 1 cycle before returning to the AF
-state. The fatal stroke and
-dead states were absorbing states. The stroke in year 1 had no self loop and
-thus a maximum occupancy of 1 cycle.
+was a tunnel state, which patients occupied for 1 cycle before returning to the
+AF state. The fatal stroke and dead states were absorbing states. The stroke 
+in year 1 had no self loop and thus a maximum occupancy of 1 cycle. The 
+transition rates and costs that will be set for each cohort are set to zero
+when each edge is created.
 
 ```{r cm, echo=TRUE}
 # AF state
@@ -183,30 +156,32 @@ GB <- MarkovState$new("GIbleed")
 S1 <- MarkovState$new("StrokeY1")
 SN <- MarkovState$new("StrokeY2+")
 SF <- MarkovState$new("FatalStroke")
-D <- MarkovState$new("Dead")
-# transitions
-E <- list(
-  # from AF
-  MarkovTransition$new(AF, AF, r=NULL),
-  MarkovTransition$new(AF, GB, r=r.GB.ap),
-  MarkovTransition$new(AF, D, r=r.SMR),
-  MarkovTransition$new(AF, S1, r=r.S1.ap),
-  # from GI bleed
-  MarkovTransition$new(GB, AF, r=NULL),
-  # from stroke, year 1
-  MarkovTransition$new(S1, SF, r=r.SF.1),
-  MarkovTransition$new(S1, SN, r=NULL),
-  # from stroke, subsequent years
-  MarkovTransition$new(SN, SN, r=NULL),
-  MarkovTransition$new(SN, SF, r=r.SF.N),
-  # abosrbing states
-  MarkovTransition$new(D, D),
-  MarkovTransition$new(SF, SF)
-)
+DD <- MarkovState$new("Dead")
+# transitions from AF
+e.AFAF <- MarkovTransition$new(AF, AF, r=NULL)
+e.AFGB <- MarkovTransition$new(AF, GB, r=0, label="bleed")
+e.AFDD <- MarkovTransition$new(AF, DD, r=0)
+e.AFS1 <- MarkovTransition$new(AF, S1, r=0, cost=1)
+# transitions from GI bleed
+e.GBAF <- MarkovTransition$new(GB, AF, r=NULL)
+e.GBDD <- MarkovTransition$new(GB, DD, r=0)
+# transitions from stroke, year 1
+e.S1SN <- MarkovTransition$new(S1, SN, r=NULL)
+e.S1SF <- MarkovTransition$new(S1, SF, r=0)
+e.S1DD <- MarkovTransition$new(S1, DD, r=0)
+# transitions from stroke, subsequent years
+e.SNSN <- MarkovTransition$new(SN, SN, r=NULL)
+e.SNSF <- MarkovTransition$new(SN, SF, r=0)
+e.SNDD <- MarkovTransition$new(SN, DD, r=0)
+# transitions from absorbing states
+e.DDDD <- MarkovTransition$new(DD, DD)
+e.SFSF <- MarkovTransition$new(SF, SF)
 # create model
 CM <- CohortMarkovModel$new(
-  V = list(AF, GB, D, S1, SN, SF),
-  E 
+  V = list(AF, GB, DD, S1, SN, SF),
+  E = list(e.AFAF, e.AFGB, e.AFDD, e.AFS1, e.GBAF, e.GBDD, 
+           e.S1SF, e.S1SN, e.S1DD, 
+           e.SNSN, e.SNSF, e.SNDD, e.DDDD, e.SFSF) 
 )
 ```
 
@@ -220,39 +195,69 @@ system2(command="dot", args=c("-Tpng","-o","WatchBP.png","WatchBP.gv"))
 knitr::include_graphics(path="WatchBP.png")
 ```
 
-
 ## Cohorts
 The model was run for several sub-cohorts, each defined by their CHADS2 score 
-and medication. The annual risk of major GI bleed and annual risk of stroke for
-each sub-cohort are shown in the table below. The annual risk of a fatal first
-stroke was 
+and medication. The variables used in the model were: the annual probability of
+a major GI bleed due to aspirin or oral anticoagulant medication (`pB`); the
+annual probability of a stroke, based on CHADS2 risk (`pS`); the annual 
+probability of death due to all causes (`SMR`) for the age at the centre of the
+range; the proportion of strokes that are fatal in the first year (`pF1`); the
+proportion of strokes that are fatal in subsequent years (`pFN`) and the relative
+risk of stroke associated with medication (`rr.S`). These are shown in
+the table below (probabilities shown as percentages).
 
 ```{r print-cohorts, echo=FALSE}
 pander::pander(
   COHORT,
-  caption = "Characteristics of each sub-cohort.",
-  col.names = c(
-    "CHADS2 score", 
-    "Treatment", 
-    "Annual risk of GI bleed (%)", 
-    "Annual risk of stroke"
-  )
+  caption = "Characteristics of each sub-cohort."
 )
 ```
 
+## An example cohort
+The transition rates were computed from the annual transition probabilities
+and set for each cohort. To illustrate, for patients in the the 75-84 year
+cohort with a CHADS2 score of 2 and who were treated with anticoagulant, the
+rates were set as follows:
+```{r egcohort, echo=TRUE}
+idx <- 4
+e.AFGB$set_rate(-log(1-COHORT[idx,"pB"]/100))
+e.AFDD$set_rate(-log(1-COHORT[idx,"SMR"]/100))
+p.stroke <- (COHORT[idx,"pS"]/100) * COHORT[idx,"rr.S"]
+r.stroke <- -log(1-p.stroke)/1
+e.AFS1$set_rate(r.stroke)
+e.GBDD$set_rate(-log(1-COHORT[idx,"SMR"]/100))
+e.S1SF$set_rate(-log(1-COHORT[idx,"pF1"]/100))
+e.S1DD$set_rate(-log(1-COHORT[idx,"SMR"]/100))
+e.SNSF$set_rate(-log(1-COHORT[idx,"pFN"]/100))
+e.SNDD$set_rate(-log(1-COHORT[idx,"SMR"]/100))
+```
 
-
-
-
-
-The per-cycle transition probability matrix for one scenario (patients with
-AF, CHADS2 score of 1 and antiplatelet therapy) is shown below.
-
+The per-cycle (annual) transition probability matrix for this cohort is as 
+follows:
 ```{r tm, echo=FALSE}
 TM <- CM$transition_probability()
-pander::pander(TM, emphasize.rownames=FALSE, justify="lcccccc")
+pander::pander(TM, emphasize.rownames=FALSE) #, justify="lcccccc")
 rm(TM)
 ```
+
+Over ten years, the Markov trace is as follows:
+```{r egcohort-trace, echo=FALSE}
+# set the population
+pop <- CM$get_populations()
+pop["AF"] <- 100000
+CM$set_populations(pop)
+# run 10 cycles
+MT <- CM$cycles(ncycles=10)
+MT <- rbind(MT, colSums(MT))
+# print it
+pander::pander(MT)
+```
+
+
+## Results
+
+
+
 
 
 # References

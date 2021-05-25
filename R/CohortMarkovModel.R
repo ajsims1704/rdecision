@@ -59,13 +59,18 @@ CohortMarkovModel <- R6::R6Class(
     #' @description Creates a Markov model for cohort simulation.
     #' @details A Markov model must meet the following conditions:
     #' \enumerate{
-    #'   \item It must have at least one node and one edge.
+    #'   \item It must have at least one node and at least one edge.
     #'   \item All nodes must be of class \code{MarkovState};
     #'   \item All edges must be of class \code{MarkovTransition};
     #'   \item The nodes and edges must form a digraph whose underlying
     #'   graph is connected;
     #'   \item Each state must have at least one outgoing transition and 
-    #'   have exactly one outgoing whose hazard rate is NULL.
+    #'   have exactly one outgoing edge whose hazard rate is NULL. This is to
+    #'   ensure that the multinomial distribution of the probability of leaving
+    #'   each node is not over-constrained.
+    #'   \item No two edges may share the same source and target nodes (i.e. 
+    #'   the digraph may not have multiple edges). This is to ensure that there
+    #'   are no more transitions than cells in the transition matrix.
     #' }
     #' @param V A list of nodes (\code{MarkovState}s).
     #' @param E A list of edges (\code{MarkovTransition}s).
@@ -110,6 +115,14 @@ CohortMarkovModel <- R6::R6Class(
       if (!self$is_weakly_connected()) {
         rlang::abort("The underlying graph of {V,E} must be connected",
                      class = "invalid_graph")
+      }
+      # check that there are no multiple edges
+      A <- self$digraph_adjacency_matrix()
+      if (any(A > 1)) {
+        rlang::abort(
+          "The digraph must not have multiple edges",
+          class = "multiple_edges"
+        )
       }
       # check that the cycle time is an interval
       if (class(tcycle) != "difftime") {
