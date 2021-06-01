@@ -143,7 +143,9 @@ COHORT <- data.frame(
 A Markov model was constructed with six states (Fig 1): AF, GI bleed, stroke
 (year 1), stroke (subsequent years), fatal stroke and dead. The GI bleed state 
 was a tunnel state, which patients occupied for 1 cycle before returning to the
-AF state. The fatal stroke and dead states were absorbing states. The stroke 
+AF state. Patients in this state have AF, and thus the same risk of stroke and
+death as patients in the AF state. The fatal stroke and dead states were
+absorbing states. The stroke 
 in year 1 had no self loop and thus a maximum occupancy of 1 cycle. The 
 transition rates and costs that will be set for each cohort are set to zero
 when each edge is created.
@@ -159,11 +161,12 @@ SF <- MarkovState$new("FatalStroke")
 DD <- MarkovState$new("Dead")
 # transitions from AF
 e.AFAF <- MarkovTransition$new(AF, AF, r=NULL)
-e.AFGB <- MarkovTransition$new(AF, GB, r=0, label="bleed")
+e.AFGB <- MarkovTransition$new(AF, GB, r=0)
 e.AFDD <- MarkovTransition$new(AF, DD, r=0)
 e.AFS1 <- MarkovTransition$new(AF, S1, r=0, cost=1)
 # transitions from GI bleed
 e.GBAF <- MarkovTransition$new(GB, AF, r=NULL)
+e.GBS1 <- MarkovTransition$new(GB, S1, r=0)
 e.GBDD <- MarkovTransition$new(GB, DD, r=0)
 # transitions from stroke, year 1
 e.S1SN <- MarkovTransition$new(S1, SN, r=NULL)
@@ -179,9 +182,11 @@ e.SFSF <- MarkovTransition$new(SF, SF)
 # create model
 CM <- CohortMarkovModel$new(
   V = list(AF, GB, DD, S1, SN, SF),
-  E = list(e.AFAF, e.AFGB, e.AFDD, e.AFS1, e.GBAF, e.GBDD, 
+  E = list(e.AFAF, e.AFGB, e.AFDD, e.AFS1, e.GBAF, e.GBDD, e.GBS1,
            e.S1SF, e.S1SN, e.S1DD, 
-           e.SNSN, e.SNSF, e.SNDD, e.DDDD, e.SFSF) 
+           e.SNSN, e.SNSF, e.SNDD, e.DDDD, e.SFSF),
+  hcc = FALSE,
+  tcycle = as.difftime(365.25/12, units="days")
 )
 ```
 
@@ -225,6 +230,7 @@ e.AFDD$set_rate(-log(1-COHORT[idx,"SMR"]/100))
 p.stroke <- (COHORT[idx,"pS"]/100) * COHORT[idx,"rr.S"]
 r.stroke <- -log(1-p.stroke)/1
 e.AFS1$set_rate(r.stroke)
+e.GBS1$set_rate(r.stroke)
 e.GBDD$set_rate(-log(1-COHORT[idx,"SMR"]/100))
 e.S1SF$set_rate(-log(1-COHORT[idx,"pF1"]/100))
 e.S1DD$set_rate(-log(1-COHORT[idx,"SMR"]/100))
@@ -236,6 +242,7 @@ The per-cycle (annual) transition probability matrix for this cohort is as
 follows:
 ```{r tm, echo=FALSE}
 TM <- CM$transition_probability()
+TM <- cbind(TM, rowSums(TM))
 pander::pander(TM, emphasize.rownames=FALSE) #, justify="lcccccc")
 rm(TM)
 ```
@@ -247,11 +254,24 @@ pop <- CM$get_populations()
 pop["AF"] <- 100000
 CM$set_populations(pop)
 # run 10 cycles
-MT <- CM$cycles(ncycles=10)
+MT <- CM$cycles(ncycles=10*12)
+# cumulative totals
+CT <- data.frame(
+  Years = MT$Years,
+  GIbleed = cumsum(MT$GIbleed),
+  Stroke = cumsum(MT$StrokeY1),
+  FatalStroke = MT$FatalStroke
+)
 MT <- rbind(MT, colSums(MT))
 # print it
 pander::pander(MT)
 ```
+
+```{r egcohort-cumulative, echo=FALSE}
+# print it
+pander::pander(CT)
+```
+
 
 
 ## Results

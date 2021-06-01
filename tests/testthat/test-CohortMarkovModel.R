@@ -252,9 +252,9 @@ test_that("model is cyclable", {
     MarkovTransition$new(s.well, s.well),
     MarkovTransition$new(s.dead, s.dead),
     MarkovTransition$new(s.disabled, s.disabled),
-    e.ws <- MarkovTransition$new(s.well, s.disabled, r=r.ws),
-    e.wd <- MarkovTransition$new(s.well, s.dead, r=r.wd),
-    e.sd <- MarkovTransition$new(s.disabled, s.dead, r=r.sd)
+    MarkovTransition$new(s.well, s.disabled, r=r.ws),
+    MarkovTransition$new(s.well, s.dead, r=r.wd),
+    MarkovTransition$new(s.disabled, s.dead, r=r.sd)
   )
   # create the model
   M <- CohortMarkovModel$new(
@@ -270,6 +270,39 @@ test_that("model is cyclable", {
       "QALY")
   )
   expect_equal(nrow(DF),3)
+})
+
+# ---------------------------------------------------------------------------
+# tests of rates
+# ---------------------------------------------------------------------------
+test_that("results are independent of cycle time", {
+  # create states
+  s.well <- MarkovState$new(name="Well")
+  s.dead <- MarkovState$new(name="Dead")
+  # create transitions
+  r.wd <- -log(1-0.2)/1
+  E <- list(
+    MarkovTransition$new(s.well, s.well),
+    MarkovTransition$new(s.dead, s.dead),
+    MarkovTransition$new(s.well, s.dead, r=r.wd)
+  )
+  # create the model and cycle for 5 years
+  M <- CohortMarkovModel$new(
+    V = list(s.well, s.dead), 
+    E, 
+    hcc = FALSE
+  )
+  MT <- M$cycles(5)
+  expect_equal(MT$Well[MT$Cycle==5], 327.68)
+  # create the model and cycle for 5 years
+  M <- CohortMarkovModel$new(
+    V = list(s.well, s.dead), 
+    E, 
+    hcc = FALSE,
+    tcycle = as.difftime(365.25/12, units="days")
+  )
+  MT <- M$cycles(5*12)
+  expect_equal(MT$Well[MT$Cycle==60], 327.68)
 })
 
 # -----------------------------------------------------------------------------

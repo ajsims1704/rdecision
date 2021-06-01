@@ -76,7 +76,10 @@ CohortMarkovModel <- R6::R6Class(
     #' @param E A list of edges (\code{MarkovTransition}s).
     #' @param tcycle Cycle length, expressed as an R \code{difftime} object; 
     #' default 1 year.
-    #' @param hcc Boolean; whether to apply half cycle correction.
+    #' @param hcc Boolean; whether to apply half cycle correction. If TRUE, 
+    #' the correction is only applied to the outputs of functions \code{cycle} 
+    #' and \code{cycles}; the state population passed to the next cycle is
+    #' the end cycle population, obtainable with \code{get_populations}.
     #' @param discount.cost Annual discount rate for future costs.
     #' @param discount.utility Annual discount rate for future incremental
     #' utility.
@@ -328,8 +331,8 @@ CohortMarkovModel <- R6::R6Class(
     #' \item{\code{State}}{Name of the state.}
     #' \item{\code{Cycle}}{The cycle number.}
     #' \item{\code{Time}}{Clock time, years.}
-    #' \item{\code{Population}}{Population of the state at the end of
-    #' the cycle.}
+    #' \item{\code{Population}}{Population of the state at the end of 
+    #' the cycle, or at mid-cycle if half-cycle correction is applied.}
     #' \item{\code{OccCost}}{Cost of the population occupying the state for 
     #' the cycle. Half-cycle correction and discount are applied, if the
     #' options are set. the costs are normalized by the model population. The
@@ -390,7 +393,7 @@ CohortMarkovModel <- R6::R6Class(
         State = self$get_statenames(),
         Cycle = rep(private$cmm.icycle, times=length(self$order())),
         Time = rep(ty, times=length(self$order())),
-        Population = private$cmm.pop,
+        Population = pop.occ,
         OccCost = occupancy.costs/sum(self$order()),
         EntryCost = entry.costs/sum(self$order()),
         Cost = (occupancy.costs+entry.costs)/sum(private$cmm.pop),
@@ -456,7 +459,7 @@ CohortMarkovModel <- R6::R6Class(
         DF[i, "Cycle"] <- DF.cycle$Cycle[1]
         DF[i, "Years"] <- DF.cycle$Time[1]
         # collect state populations and cycle sums into a single frame
-        DF[i, names(private$cmm.pop)] <- private$cmm.pop
+        DF[i, names(private$cmm.pop)] <- DF.cycle$Population
         # add normalized sum of costs for all states 
         DF[i,"Cost"] <- sum(DF.cycle$Cost)
         # add normalized sum of QALYs gained
