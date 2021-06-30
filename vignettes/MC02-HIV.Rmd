@@ -1,15 +1,15 @@
 ---
-title: "Elementary Markov Model (Chancellor 1997)"
+title: "Markov Model with PSA (Chancellor 1997 revisited)"
 subtitle: "Monotherapy versus combination therapy for HIV"
 author: "Andrew J. Sims"
-date: "May 2021"
+date: "July 2021"
 output: 
   rmarkdown::html_vignette:
     fig_width: 7
     fig_height: 5
     fig_caption: true
 vignette: >
-  %\VignetteIndexEntry{Elementary Markov Model (Chancellor 1997)}
+  %\VignetteIndexEntry{Markov Model with PSA (Chancellor 1997 revisited)}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 bibliography: "../inst/REFERENCES.bib"
@@ -61,8 +61,10 @@ cccc <- 2059 # Community care costs associated with state C
 # Drug costs
 cAZT <- 2278 # zidovudine drug cost
 cLam <- 2087 # lamivudine drug cost
-# Other parameters
-RR <- 0.509 # treatment effect
+# Treatment effect
+#RR <- LogNormModVar$new("RR", "RR", p1=0.509, p2=(0.710-0.365)/(2*1.96), "LN7")
+RR <- 0.509
+# Discounts
 cDR <- 6 # annual discount rate, costs (%)
 oDR <- 0 # annual discount rate, benefits (%)
 ```
@@ -100,7 +102,7 @@ tDD <- MarkovTransition$new(sD, sD, r=NULL)
 mhiv <- CohortMarkovModel$new(
   V = list(sA, sB, sC, sD),
   E = list(tAA, tAB, tAC, tAD, tBB, tBC, tBD, tCC, tCD, tDD),
-  hcc = TRUE,
+  hcc = FALSE,
   discount.cost = cDR/100,
   discount.utility = oDR/100
 )
@@ -149,7 +151,6 @@ rm(TM)
 ```
 
 # Running the model
-
 Model function `cycle` applies one cycle of a Markov model to a defined 
 starting population in each state. It returns a table with one row per state, 
 and each row containing several columns, including the population at the end of
@@ -180,6 +181,11 @@ keep <- c("Years", "A", "B", "C", "D", "Cost", "QALY")
 pander::pander(MT.mono[,keep], row.names=FALSE, justify="rrrrrrr", 
                round=c(2,0,0,0,0,0,3))
 ```
+
+## Probabilistic sensitivity analysis
+
+
+
 
 # Model results
 
