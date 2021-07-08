@@ -348,3 +348,121 @@ test_that("rdecision replicates Sonnenberg & Beck, Fig 3", {
   expect_true(TRUE)
 })
 
+
+# ---------------------------------------------------------------------------
+# Chancellor, 1997 (HIV) and Briggs exercise 2.5
+# ---------------------------------------------------------------------------
+test_that("redecision replicates Briggs' example 2.5", {
+  # transition rates calculated from annual transition probabilities
+  trAB <- -log(1-0.202)/1 
+  trAC <- -log(1-0.067)/1
+  trAD <- -log(1-0.010)/1
+  trBC <- -log(1-0.407)/1
+  trBD <- -log(1-0.012)/1
+  trCD <- -log(1-0.250)/1
+  # Costs
+  dmca <- 1701 # direct medical costs associated with state A
+  dmcb <- 1774 # direct medical costs associated with state B
+  dmcc <- 6948 # direct medical costs associated with state C
+  ccca <- 1055 # Community care costs associated with state A
+  cccb <- 1278 # Community care costs associated with state B
+  cccc <- 2059 # Community care costs associated with state C
+  # Drug costs
+  cAZT <- 2278 # zidovudine drug cost
+  cLam <- 2087 # lamivudine drug cost
+  # Other parameters
+  RR <- 0.509 # treatment effect
+  cDR <- 6 # annual discount rate, costs (%)
+  oDR <- 0 # annual discount rate, benefits (%)
+  # create Markov states for monotherapy (zidovudine only)
+  sA <- MarkovState$new("A", cost=dmca+ccca+cAZT)
+  sB <- MarkovState$new("B", cost=dmcb+cccb+cAZT)
+  sC <- MarkovState$new("C", cost=dmcc+cccc+cAZT)
+  sD <- MarkovState$new("D", cost=0, utility=0)
+  # create transitions
+  tAA <- MarkovTransition$new(sA, sA, r=NULL)
+  tAB <- MarkovTransition$new(sA, sB, r=trAB)
+  tAC <- MarkovTransition$new(sA, sC, r=trAC)
+  tAD <- MarkovTransition$new(sA, sD, r=trAD)
+  tBB <- MarkovTransition$new(sB, sB, r=NULL)
+  tBC <- MarkovTransition$new(sB, sC, r=trBC)
+  tBD <- MarkovTransition$new(sB, sD, r=trBD)
+  tCC <- MarkovTransition$new(sC, sC, r=NULL)
+  tCD <- MarkovTransition$new(sC, sD, r=trCD)
+  tDD <- MarkovTransition$new(sD, sD, r=NULL)
+  # construct the model
+  mhiv <- CohortMarkovModel$new(
+    V = list(sA, sB, sC, sD),
+    E = list(tAA, tAB, tAC, tAD, tBB, tBC, tBD, tCC, tCD, tDD),
+    hcc = FALSE,
+    discount.cost = 0,#cDR/100,
+    discount.utility = oDR/100
+  )
+  # tabulate states
+  DF <- mhiv$tabulate_states()
+  expect_equal(nrow(DF), 4)
+  expect_equal(DF[1,"Name"], "A")
+  expect_equal(DF[1,"Cost"], 2756+2278)
+  expect_equal(DF[2,"Cost"], 3052+2278)
+  expect_equal(DF[3,"Cost"], 9007+2278)
+  expect_equal(DF[4,"Cost"], 0)
+  # per-cycle transition probabilities
+  TM <- mhiv$transition_probability()
+  E <- matrix(
+    c(0.721, 0.202, 0.067, 0.010,  
+      0.000, 0.581, 0.407, 0.012,
+      0.000, 0.000, 0.750, 0.250,
+      0.000, 0.000, 0.000, 1.000),   # typo in book (D,D) = 1!
+    byrow = TRUE,
+    nrow = 4)
+  expect_equal(sum(TM-E), 0)
+  # create starting populations
+  N <- 1000
+  populations <- c(A = N, B = 0, C = 0, D = 0)
+  mhiv$set_populations(populations)
+  # run 20 cycles
+  MT.mono <- mhiv$cycles(ncycles=20)
+  # monotherapy results
+  print("")
+  print(MT.mono)
+  el.mono <- sum(MT.mono$QALY)
+  expect_intol(el.mono, 7.996, tolerance=0.01)
+  cost.mono <- sum(MT.mono$Cost)
+  expect_intol(cost.mono, 44663, 1)
+  #
+  # set occupancy costs for combination therapy (zidovudine and lamivudine)
+  sA$set_cost(dmca+ccca+cAZT+cLam)
+  sB$set_cost(dmcb+cccb+cAZT+cLam)
+  sC$set_cost(dmcc+cccc+cAZT+cLam)
+  # modify transition rates by the treatment effect
+  tAB$set_rate(trAB*RR)
+  tAC$set_rate(trAC*RR)
+  tAD$set_rate(trAD*RR)
+  tBC$set_rate(trBC*RR)
+  tBD$set_rate(trBD*RR)
+  tCD$set_rate(trCD*RR)
+  # run combination therapy model for 2 years
+  populations <- c('A'=N, 'B'=0, 'C'=0, 'D'=0)
+  mhiv$set_populations(populations)
+  # run 2 cycles
+  MT.comb <- mhiv$cycles(2)
+  # revise costs and transitions, 
+  sA$set_cost(dmca+ccca+cAZT)
+  sB$set_cost(dmcb+cccb+cAZT)
+  sC$set_cost(dmcc+cccc+cAZT)
+  tAB$set_rate(trAB)
+  tAC$set_rate(trAC)
+  tAD$set_rate(trAD)
+  tBC$set_rate(trBC)
+  tBD$set_rate(trBD)
+  tCD$set_rate(trCD)
+  # and run model for next 18 years
+  MT.comb <- rbind(MT.comb, mhiv$cycles(ncycles=18)) 
+  # combination therapy results
+  el.comb <- sum(MT.comb$QALY)
+  cost.comb <- sum(MT.comb$Cost)
+  # icer
+  icer <- (cost.comb-cost.mono)/(el.comb-el.mono)
+  expect_intol(icer, 6276, 1)
+})
+
