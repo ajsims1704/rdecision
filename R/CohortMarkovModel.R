@@ -4,7 +4,7 @@
 #' 
 #' @details A class to represent a Markov model, using cohort simulation. In 
 #' graph theory terms, a Markov model is a directed multidigraph permitting 
-#' loops (a loop multidigraph), optionally labelled, or \dfn{quiver}. It is a
+#' loops (a loop multidigraph), optionally labelled, or a \dfn{quiver}. It is a
 #' multidigraph because there are potentially two edges between each pair of
 #' nodes {A,B} representing the transition probabilities from A to B and 
 #' \emph{vice versa}. It is a directed graph because the transition
@@ -47,8 +47,6 @@ CohortMarkovModel <- R6::R6Class(
   lock_class = TRUE,
   inherit = Digraph,
   private = list(
-    cmm.tcycle = NULL,
-    cmm.hcc = NULL,
     cmm.discost = NULL,
     cmm.disutil = NULL,
     cmm.pop = NULL,
@@ -67,26 +65,21 @@ CohortMarkovModel <- R6::R6Class(
     #'   \item Each state must have at least one outgoing transition and 
     #'   have exactly one outgoing edge whose hazard rate is NULL. This is to
     #'   ensure that the multinomial distribution of the probability of leaving
-    #'   each node is not over-constrained.
+    #'   each node is not over or under-constrained. Rates can be changed
+    #'   between cycles, and this constraint is checked at the point of cycling,
+    #'   not at the point of model creation.
     #'   \item No two edges may share the same source and target nodes (i.e. 
     #'   the digraph may not have multiple edges). This is to ensure that there
     #'   are no more transitions than cells in the transition matrix.
     #' }
     #' @param V A list of nodes (\code{MarkovState}s).
     #' @param E A list of edges (\code{MarkovTransition}s).
-    #' @param tcycle Cycle length, expressed as an R \code{difftime} object; 
-    #' default 1 year.
-    #' @param hcc Boolean; whether to apply half cycle correction. If TRUE, 
-    #' the correction is only applied to the outputs of functions \code{cycle} 
-    #' and \code{cycles}; the state population passed to the next cycle is
-    #' the end cycle population, obtainable with \code{get_populations}.
     #' @param discount.cost Annual discount rate for future costs.
     #' @param discount.utility Annual discount rate for future incremental
     #' utility.
     #' @return A \code{CohortMarkovModel} object. The population of the first
     #' state is set to 1000.
-    initialize = function(V,E,tcycle=as.difftime(365.25, units="days"),
-                          hcc=TRUE, discount.cost=0, discount.utility=0) {
+    initialize = function(V, E, discount.cost=0, discount.utility=0) {
       # initialize the base class(es)
       super$initialize(V,E)
       # check minimum number of nodes and edges
@@ -127,25 +120,6 @@ CohortMarkovModel <- R6::R6Class(
           class = "multiple_edges"
         )
       }
-      # check that the cycle time is an interval
-      if (class(tcycle) != "difftime") {
-        rlang::abort(
-          "Argument 'tcycle' must be of class 'difftime'.",
-          class = "invalid_cycle_length"
-        )
-      }
-      private$cmm.tcycle <- tcycle
-      # check that each non-absorbing state has exactly one outgoing
-      # transition whose rate is NULL, by creating the transition matrix
-      self$transition_probability()
-      # check and set half cycle correction
-      if (!is.logical(hcc)) {
-        rlang::abort(
-          "Argument 'hcc' must be logical.",
-          class = "invalid_hcc"
-        )
-      }
-      private$cmm.hcc <- hcc
       # check and set discounts
       if (!is.numeric(discount.cost)) {
         rlang.abort(
@@ -165,19 +139,24 @@ CohortMarkovModel <- R6::R6Class(
       private$cmm.pop[1] <- 1000
       # set the cycle number
       private$cmm.icycle <- 0
-      # force creation of transition probabilities and costs matrices
-      self$transition_probability()
-      self$transition_cost()
       # return a new CohortMarkovModel object
       return(invisible(self))
     },
     
     #' @description Return the per-cycle transition matrix for the model.
+    #' @param tcycle Cycle length, expressed as an R \code{difftime} object.
     #' @details Checks that each state has at least one outgoing transition and
     #' that exactly one outgoing transition rate whose rate is NULL. 
     #' @returns A square matrix of size equal to the number of states. If all
     #' states are labelled, the dimnames take the names of the states.
-    transition_probability = function() {
+    transition_probability = function(tcycle) {
+      # check that the cycle time is an interval
+      if (class(tcycle) != "difftime") {
+        rlang::abort(
+          "Argument 'tcycle' must be of class 'difftime'.",
+          class = "invalid_cycle_length"
+        )
+      }
       # check that each non-absorbing state has exactly one outgoing
       # transition whose rate is NULL
       lv <- sapply(1:self$order(), function(iv) {
@@ -218,7 +197,7 @@ CohortMarkovModel <- R6::R6Class(
       # convert rates to per-cycle probabilities
       for (is in 1:nrow(Ip)) {
         for (it in 1:nrow(Ip)) {
-          t <- as.numeric(private$cmm.tcycle, units="days")/365.25
+          t <- as.numeric(tcycle, units="days")/365.25
           Ip[is,it] <- 1 - exp(-Ip[is,it]*t)
         }
       }
@@ -325,6 +304,12 @@ CohortMarkovModel <- R6::R6Class(
     },
     
     #' @description Applies one cycle of the model.
+    #' @param tcycle Cycle length, expressed as an R \code{difftime} object; 
+    #' default 1 year.
+    #' @param hcc Boolean; whether to apply half cycle correction. If TRUE, 
+    #' the correction is only applied to the outputs of functions \code{cycle} 
+    #' and \code{cycles}; the state population passed to the next cycle is
+    #' the end cycle population, obtainable with \code{get_populations}.
     #' @returns Calculated values, one row per state, as a data frame with the
     #' following columns:
     #' \describe{
@@ -347,11 +332,25 @@ CohortMarkovModel <- R6::R6Class(
     #' during the cycle. Half cycle correction and discounting are applied,
     #' if these options are set. Normalized by the model population.}
     #' }
-    cycle = function() {
+    cycle = function(tcycle=as.difftime(365.25, units="days"), hcc=TRUE) {
+      # check that the cycle time is an interval
+      if (class(tcycle) != "difftime") {
+        rlang::abort(
+          "Argument 'tcycle' must be of class 'difftime'.",
+          class = "invalid_cycle_length"
+        )
+      }
+      # check and set half cycle correction
+      if (!is.logical(hcc)) {
+        rlang::abort(
+          "Argument 'hcc' must be logical.",
+          class = "invalid_hcc"
+        )
+      }
       # calculate cycle duration (dty), clock time (ty) and discount 
       # factors (dfc, dfu)
-      dty <- as.numeric(private$cmm.tcycle, units="days")/365.25
-      if (private$cmm.hcc) {
+      dty <- as.numeric(tcycle, units="days")/365.25
+      if (hcc) {
         ty <- (private$cmm.icycle+0.5)*dty
       } else {
         ty <- (private$cmm.icycle+1)*dty
@@ -366,13 +365,13 @@ CohortMarkovModel <- R6::R6Class(
         nrow = self$order(), ncol=self$order(),
         byrow = FALSE
       )
-      TC <- P*self$transition_probability()*self$transition_cost()
+      TC <- P*self$transition_probability(tcycle)*self$transition_cost()
       entry.costs <- colSums(TC)*dfc
       # Apply the transition probabilities to get the end state populations,
       # with half-cycle correction, if required
-      pop.end <- private$cmm.pop %*% self$transition_probability()
+      pop.end <- private$cmm.pop %*% self$transition_probability(tcycle)
       pop.end <- drop(pop.end)
-      if (private$cmm.hcc) {
+      if (hcc) {
         pop.occ <- (private$cmm.pop + pop.end)/2
       } else {
         pop.occ <- pop.end
@@ -415,6 +414,12 @@ CohortMarkovModel <- R6::R6Class(
     #' will be cycle zero, i.e. the distribution of patients to starting
     #' states.
     #' @param ncycles Number of cycles to run; default is 2.
+    #' @param tcycle Cycle length, expressed as an R \code{difftime} object; 
+    #' default 1 year.
+    #' @param hcc Boolean; whether to apply half cycle correction. If TRUE, 
+    #' the correction is only applied to the outputs of functions \code{cycle} 
+    #' and \code{cycles}; the state population passed to the next cycle is
+    #' the end cycle population, obtainable with \code{get_populations}.
     #' @returns Data frame with cycle results.
     #' following columns:
     #' \describe{
@@ -427,7 +432,8 @@ CohortMarkovModel <- R6::R6Class(
     #' \item{\code{QALY}}{Quality adjusted life years associated with occupancy
     #' of the states in the cycle.}
     #' } 
-    cycles = function(ncycles=2) {
+    cycles = function(ncycles=2, tcycle=as.difftime(365.25, units="days"), 
+                      hcc=TRUE) {
       # show zero?
       if (private$cmm.icycle==0) {
         nzero <- 1
@@ -454,7 +460,7 @@ CohortMarkovModel <- R6::R6Class(
       # run the model
       for (i in (1+nzero):(ncycles+nzero)) {
         # single cycle
-        DF.cycle <- self$cycle()
+        DF.cycle <- self$cycle(tcycle, hcc)
         # set the cycle number
         DF[i, "Cycle"] <- DF.cycle$Cycle[1]
         DF[i, "Years"] <- DF.cycle$Time[1]
@@ -467,8 +473,112 @@ CohortMarkovModel <- R6::R6Class(
       }
       # return summary data frame
       return(DF)
-    }
+    },
+
+    #' @description Find all the model variables in the Markov model.
+    #' @details Returns variables of type \code{ModVar} that have been 
+    #' specified as values associated with transition rates and costs and
+    #' the state occupancy costs and utilities.
+    #' @return A list of \code{ModVar}s.
+    modvars = function() {
+      # create list
+      mv <- list()
+      # find the ModVars in the transitions
+      for (e in private$E) {
+        if (inherits(e, what=c("MarkovTransition"))) {
+          mv <- c(mv, e$modvars())
+        }
+      }
+      # find the modvars in the states
+      for (v in private$V){
+        if (inherits(v, what=c("MarkovState"))) {
+          mv <- c(mv, v$modvars())
+        }
+      }
+      # return a unique list
+      return(unique(mv))
+    },
     
-  
+    #' @description Tabulate the model variables in the Markov model.
+    #' @param expressions A logical that defines whether expression model
+    #' variables should be included in the tabulation. 
+    #' @return Data frame with one row per model variable, as follows:
+    #' \describe{
+    #' \item{\code{Description}}{As given at initialization.}
+    #' \item{\code{Units}}{Units of the variable.}
+    #' \item{\code{Distribution}}{Either the uncertainty distribution, if
+    #' it is a regular model variable, or the expression used to create it,
+    #' if it is an \code{ExprModVar}.}
+    #' \item{\code{Mean}}{Mean; calculated from means of operands if
+    #' an expression.}
+    #' \item{\code{E}}{Expectation; estimated from random sample if expression, 
+    #' mean otherwise.}
+    #' \item{\code{SD}}{Standard deviation; estimated from random sample if
+    #' expression, exact value otherwise.}
+    #' \item{\code{Q2.5}}{p=0.025 quantile; estimated from random sample if
+    #' expression, exact value otherwise.}
+    #' \item{\code{Q97.5}}{p=0.975 quantile; estimated from random sample if
+    #' expression, exact value otherwise.}
+    #' \item{\code{Est}}{TRUE if the quantiles and SD have been estimated by 
+    #' random sampling.}
+    #' }
+    modvar_table = function(expressions=TRUE) {
+      # create list of model variables in this decision tree, excluding
+      # expressions if not wanted
+      mvlist <- self$modvars()
+      if (!expressions) {
+        mvlist <- mvlist[sapply(mvlist,FUN=function(v){!v$is_expression()})]
+      }
+      # create a data frame of model variables
+      DF <- data.frame(
+        Description = sapply(mvlist, FUN=function(x){
+          rv <- x$description()
+          return(rv)
+        }),
+        Units = sapply(mvlist, FUN=function(x){
+          rv <- x$units()
+          return(rv)
+        }),
+        Distribution = sapply(mvlist, FUN=function(x){
+          rv <- x$distribution()
+          return(rv)
+        }),
+        Mean = sapply(mvlist, FUN=function(x){
+          rv <- x$mean()
+          return(rv)
+        }),
+        E = sapply(mvlist, FUN=function(x){
+          rv <- ifelse(x$is_expression(), x$mu_hat(), x$mean())
+          return(rv)
+        }),
+        SD = sapply(mvlist, FUN=function(x){
+          rv <- ifelse(x$is_expression(), x$sigma_hat(), x$SD())
+          return(rv)
+        }),
+        Q2.5 = sapply(mvlist, FUN=function(x){
+          rv <- ifelse(
+            x$is_expression(), 
+            x$q_hat(probs=c(0.025)), 
+            x$quantile(probs=c(0.025))
+          )
+          return(rv)
+        }),
+        Q97.5 = sapply(mvlist, FUN=function(x){
+          rv <- ifelse(
+            x$is_expression(), 
+            x$q_hat(probs=c(0.975)), 
+            x$quantile(probs=c(0.975))
+          )
+          return(rv)
+        }),
+        Est = sapply(mvlist, FUN=function(exp){
+          rv <- ifelse(exp$is_expression(),TRUE,FALSE)
+          return(rv)
+        })
+      )
+      # Return the table
+      return(DF)
+    }
+
   )
 )

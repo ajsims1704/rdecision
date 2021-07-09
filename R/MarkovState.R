@@ -86,6 +86,30 @@ MarkovState <- R6::R6Class(
     #' @return Utility; numeric.
     utility = function() {
       return(private$state.utility)
+    },
+    
+    #' @description Find all the model variables.
+    #' @details Find variables of type \code{ModVar} that have been 
+    #' specified as values associated with this \code{MarkovState}. 
+    #' Includes operands of these \code{ModVar}s, if they are expressions.
+    #' @return A list of \code{ModVar}s.
+    modvars = function() {
+      # create lists of input variables and output Modvars
+      iv <- c(private$state.cost, private$state.utility)
+      ov <- list()
+      for (v in iv) {
+        if (inherits(v, what="ModVar")) {
+          ov <- c(ov, v)
+          if (inherits(v, what="ExprModVar")) {
+            for (o in v$operands()) {
+              ov <- c(ov, o)
+            }
+          } 
+        }
+      }
+      # return the unique list
+      return(unique(ov))
     }
+    
   )
 )

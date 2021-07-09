@@ -89,8 +89,10 @@ MarkovTransition <- R6::R6Class(
     },
 
     #' @description Set the value of the transition rate
-    #' @param r Instantaneous hazard rate in units of per patient per year.
-    #' Exactly one of the outgoing transitions from each state must be NULL.
+    #' @param r Instantaneous hazard rate in units of per patient per year,
+    #' or NULL.
+    #' @details Exactly one of the outgoing transitions from each state must
+    #' be NULL.
     #' @return Updated \code{MarkovTransition} cost
     set_rate = function(r) {
       # check r and set private variable
