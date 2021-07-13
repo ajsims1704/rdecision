@@ -11,8 +11,8 @@
 #' parametrization used in Bayesian statistics; in econometrics the
 #' shape/scale (\code{k}/\code{theta}) parametrization is more common (and the
 #' one used in this implementation). Note, however, that although Briggs 
-#' \emph{et al} (2006) use the shape/scale formulation, they use 
-#' \code{alpha}/\code{beta} as parameter names.
+#' \emph{et al} (2006) use the shape, scale formulation, they use 
+#' \code{alpha}, \code{beta} as parameter names.
 #'  
 #' @references{
 #'   Briggs A, Claxton K, Sculpher M. Decision modelling for health

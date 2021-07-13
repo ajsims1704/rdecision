@@ -288,20 +288,37 @@ test_that("results are independent of cycle time", {
 # -----------------------------------------------------------------------------
 # tests of model variables
 # -----------------------------------------------------------------------------
-test_that("state cost and utility modvars are recognised", {
-  # create model variables
-  c.dis <- GammaModVar$new("Cost", "GBP", shape=10000, scale=1/10)
-  u.dis <- BetaModVar$new("Utility", "U", alpha=0.5, beta=0.5) 
+test_that("Model variables are recognised, set and got", {
+  # create modvars
+  c.dis <- GammaModVar$new("Care cost", "GBP", shape=1000, scale=1/10)
+  u.dis <- BetaModVar$new("u.dis", "U", alpha=7, beta=3)
+  p.dis <- BetaModVar$new("p.disabled", "P", alpha=20, beta=80)
+  p.ded <- BetaModVar$new("p.dead", "P", alpha=40, beta=60)
   # create states
   s.well <- MarkovState$new(name="Well")
-  expect_silent(
-    s.disabled <- MarkovState$new(name="Disabled", cost=c.dis, u.dis)
-  )
+  s.disabled <- MarkovState$new(name="Disabled", cost=c.dis, utility=u.dis)
   s.dead <- MarkovState$new(name="Dead")
+  # create transitions
+  r.ws <- ExprModVar$new("r.ws", "HR", rlang::quo(-log(1-p.dis)/1))
+  r.wd <- ExprModVar$new("r.wd", "HR", rlang::quo(-log(1-p.dis)/1))
+  r.sd <- ExprModVar$new("r.sd", "HR", rlang::quo(-log(1-p.ded)/1))
+  E <- list(
+    MarkovTransition$new(s.well, s.well),
+    MarkovTransition$new(s.dead, s.dead),
+    MarkovTransition$new(s.disabled, s.disabled),
+    e.ws <- MarkovTransition$new(s.well, s.disabled, r=r.ws),
+    e.wd <- MarkovTransition$new(s.well, s.dead, r=r.wd),
+    e.sd <- MarkovTransition$new(s.disabled, s.dead, r=r.sd)
+  )
+  # create the Markov model
+  M <- CohortMarkovModel$new(V = list(s.well, s.disabled, s.dead), E)
+  # extract the model variables
+  MV <- M$modvars()
+  expect_equal(length(MV), 7)
+  # tabulate the input variables
+  MVT <- M$modvar_table(expressions=FALSE)
+  expect_equal(nrow(MVT), 4)
 })
-
-
-
 
 # -----------------------------------------------------------------------------
 # Sonnenberg & Beck, Med Decis Making, 1993;13:322, Fig 3
@@ -490,8 +507,8 @@ test_that("redecision replicates Briggs' example 4.7", {
   trBC <- -log(1-0.407)/1
   trBD <- -log(1-0.012)/1
   trCD <- -log(1-0.250)/1
-  # Costs
-  dmca <- 1701 # direct medical costs associated with state A
+  # Costs (modelled as gamma distributions)
+  dmca <- GammaModVar$new("dmca", "GBP", shape=1, scale=1701)
   dmcb <- 1774 # direct medical costs associated with state B
   dmcc <- 6948 # direct medical costs associated with state C
   ccca <- 1055 # Community care costs associated with state A
@@ -507,8 +524,10 @@ test_that("redecision replicates Briggs' example 4.7", {
   # discount rates
   cDR <- 6 # annual discount rate, costs (%)
   oDR <- 0 # annual discount rate, benefits (%)
+  # create expressions for occupancy costs of each state
+  cA <- ExprModVar$new("cA", "GBP", rlang::quo(dmca+ccca+cAZT))
   # create Markov states for monotherapy (zidovudine only)
-  sA <- MarkovState$new("A", cost=dmca+ccca+cAZT)
+  sA <- MarkovState$new("A", cost=cA)
   sB <- MarkovState$new("B", cost=dmcb+cccb+cAZT)
   sC <- MarkovState$new("C", cost=dmcc+cccc+cAZT)
   sD <- MarkovState$new("D", cost=0, utility=0)

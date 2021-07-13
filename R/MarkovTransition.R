@@ -127,7 +127,7 @@ MarkovTransition <- R6::R6Class(
     #' @description Return the cost associated with traversing the edge.
     #' @return Cost.
     cost = function() {
-      if (inherits(private$edge.cost, what="ModVar")) {
+      if (inherits(private$transition.cost, what="ModVar")) {
         rv <- private$transition.cost$get()
       } else {
         rv <- private$transition.cost

@@ -18,8 +18,11 @@ MarkovState <- R6::R6Class(
     
     #' @description Create an object of type \code{MarkovState}.
     #' @param name The name of the state (character string).
-    #' @param cost The annual cost of state occupancy.
-    #' @param utility The utility associated with being in the state.
+    #' @param cost The annual cost of state occupancy (numeric or ModVar).
+    #' @param utility The utility associated with being in the state (numeric
+    #' or ModVar).
+    #' @details Utility must be in the range [-Inf,1]. If it is of type numeric,
+    #' the range is checked on object creation. 
     #' @return An object of type \code{MarkovState}.
     initialize = function(name, cost=0, utility=1) {
       # set the name
@@ -40,17 +43,20 @@ MarkovState <- R6::R6Class(
       # check that annual cost is numeric, then set it
       self$set_cost(cost)
       # check the utility is numeric, and in range[-Inf,1], and set it
-      if (!is.numeric(utility)) {
+      if (inherits(utility, what="numeric")) {
+        if (utility > 1) {
+          rlang::abort("Utility must be in the range [-Inf,1]",
+                       class="utility_out_of_range")
+        }
+        private$state.utility <- utility
+      } else if (inherits(utility, what="ModVar")) {
+        private$state.utility <- utility
+      } else {
         rlang::abort(
-          "Argument 'utility; must be numeric", 
-          class="non-numeric_utility"
+          "Argument 'utility' must be numeric or ModVar", 
+          class="invalid_utility"
         )
       }
-      if (utility > 1) {
-        rlang::abort("Utility must be in the range [-Inf,1]",
-                     class="utility_out_of_range")
-      }
-      private$state.utility <- utility
       # return invisible MarkovState object
       return(invisible(self))
     },
@@ -66,26 +72,47 @@ MarkovState <- R6::R6Class(
     #' @returns Updated \code{MarkovState} object
     set_cost = function(cost) {
       # check that annual cost is numeric, then set it
-      if (!is.numeric(cost)){
+      if (inherits(cost, what="numeric")){
+        private$state.cost <- cost
+      } else if (inherits(cost, what="ModVar")) {
+        private$state.cost <- cost
+      } else {
         rlang::abort(
-          "'cost' must be of type 'numeric'",
-          class="non-numeric_annual_cost"
+          "'cost' must be of type 'numeric' or 'ModVar'",
+          class="invalid_annual_cost"
         )
       }
-      private$state.cost <- cost
       return(invisible(self))
     },
     
     #' @description Gets the annual cost of state occupancy.
     #' @return Annual cost; numeric.
     cost = function() {
-      return(private$state.cost)
+      if (inherits(private$state.cost, what="ModVar")) {
+        rv <- private$state.cost$get()
+      } else {
+        rv <- private$state.cost
+      }
+      return(rv)
     },
     
     #' @description Gets the utility associated with the state.
+    #' @details If the state utility is a \code{ModVar} and its sampled
+    #' value exceeds 1, a warning is issued. 
     #' @return Utility; numeric.
     utility = function() {
-      return(private$state.utility)
+      if (inherits(private$state.utility, what="ModVar")) {
+        rv <- private$state.utility$get()
+        if (rv > 1) {
+          rlang::warn(
+            "Utility must be in the range [-Inf,1]",
+            class="utility_out_of_range"
+          )
+        }
+      } else {
+        rv <- private$state.utility
+      }
+      return(rv)
     },
     
     #' @description Find all the model variables.
