@@ -20,7 +20,6 @@ ConstModVar <- R6::R6Class(
   lock_class = TRUE,
   inherit = ModVar,
   private = list(
-    val = NULL
   ),
   public = list(
     
@@ -41,7 +40,7 @@ ConstModVar <- R6::R6Class(
           class="const_not_numeric"
         )
       }
-      private$val <- const
+      private$.val <- const
       # initialize next get() call
       self$set("expected")
       # return object
@@ -62,7 +61,7 @@ ConstModVar <- R6::R6Class(
     #' @return Distribution name as character string.
     distribution = function() {
       rv <- paste('Const(', 
-                  format(private$val, digits=4, scientific=F),
+                  format(private$.val, digits=4, scientific=F),
                   ')', sep='')
       return(rv)
     },
@@ -71,14 +70,14 @@ ConstModVar <- R6::R6Class(
     #' Return the mode of the distribution.
     #' @return Value of the constant.
     mode = function() {
-      return(private$val)
+      return(private$.val)
     },
 
     #' @description 
     #' Return the expected value of the distribution. 
     #' @return Expected value as a numeric value.
     mean = function() {
-      return(private$val)
+      return(private$.val)
     },
     
     #' @description 
@@ -86,7 +85,7 @@ ConstModVar <- R6::R6Class(
     #' @param n Number of samples to draw.
     #' @return Constant value as a numeric value.
     r = function(n=1) {
-      return(rep(private$val, times=n))
+      return(rep(private$.val, times=n))
     },
     
     #' @description 
@@ -117,7 +116,7 @@ ConstModVar <- R6::R6Class(
                        class="probs_out_of_range")
         }
       })
-      q <- rep(private$val, times=length(probs))
+      q <- rep(private$.val, times=length(probs))
       return(q)
     }
 
