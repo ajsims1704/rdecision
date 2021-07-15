@@ -50,6 +50,7 @@ test_that("set('value') works as expected", {
   expect_equal(x$get(), 42)
   x$set("value", 7)
   expect_equal(x$get(), 7)
-  expect_equal(x$mean(), 7)
+  # but the hyperparameter should be unchanged
+  expect_equal(x$mean(), 42)
 })
 

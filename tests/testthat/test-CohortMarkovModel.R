@@ -509,11 +509,11 @@ test_that("redecision replicates Briggs' example 4.7", {
   trCD <- -log(1-0.250)/1
   # Costs (modelled as gamma distributions)
   dmca <- GammaModVar$new("dmca", "GBP", shape=1, scale=1701)
-  dmcb <- 1774 # direct medical costs associated with state B
-  dmcc <- 6948 # direct medical costs associated with state C
-  ccca <- 1055 # Community care costs associated with state A
-  cccb <- 1278 # Community care costs associated with state B
-  cccc <- 2059 # Community care costs associated with state C
+  dmcb <- GammaModVar$new("dmcb", "GBP", shape=1, scale=1774)
+  dmcc <- GammaModVar$new("dmcc", "GBP", shape=1, scale=6948)
+  ccca <- GammaModVar$new("ccca", "GBP", shape=1, scale=1055)
+  cccb <- GammaModVar$new("cccb", "GBP", shape=1, scale=1278)
+  cccc <- GammaModVar$new("cccc", "GBP", shape=1, scale=2059)
   # Drug costs
   cAZT <- 2278 # zidovudine drug cost
   cLam <- 2087 # lamivudine drug cost
@@ -526,10 +526,12 @@ test_that("redecision replicates Briggs' example 4.7", {
   oDR <- 0 # annual discount rate, benefits (%)
   # create expressions for occupancy costs of each state
   cA <- ExprModVar$new("cA", "GBP", rlang::quo(dmca+ccca+cAZT))
+  cB <- ExprModVar$new("cB", "GBP", rlang::quo(dmcb+cccb+cAZT))
+  cC <- ExprModVar$new("cC", "GBP", rlang::quo(dmcc+cccc+cAZT))
   # create Markov states for monotherapy (zidovudine only)
   sA <- MarkovState$new("A", cost=cA)
-  sB <- MarkovState$new("B", cost=dmcb+cccb+cAZT)
-  sC <- MarkovState$new("C", cost=dmcc+cccc+cAZT)
+  sB <- MarkovState$new("B", cost=cB)
+  sC <- MarkovState$new("C", cost=cC)
   sD <- MarkovState$new("D", cost=0, utility=0)
   # create transitions
   tAA <- MarkovTransition$new(sA, sA, r=NULL)
@@ -582,10 +584,14 @@ test_that("redecision replicates Briggs' example 4.7", {
   #
   # combination therapy
   #
+  # occupany costs for each state with combination therapy
+  cAc <- ExprModVar$new("cAc", "GBP", rlang::quo(dmca+ccca+cAZT+cLam))
+  cBc <- ExprModVar$new("cBc", "GBP", rlang::quo(dmcb+cccb+cAZT+cLam))
+  cCc <- ExprModVar$new("cCc", "GBP", rlang::quo(dmcc+cccc+cAZT+cLam))
   # set occupancy costs for combination therapy (zidovudine and lamivudine)
-  sA$set_cost(dmca+ccca+cAZT+cLam)
-  sB$set_cost(dmcb+cccb+cAZT+cLam)
-  sC$set_cost(dmcc+cccc+cAZT+cLam)
+  sA$set_cost(cAc)
+  sB$set_cost(cBc)
+  sC$set_cost(cCc)
   # apply treatment effect to annual probabilities
   trABm <- ExprModVar$new(
     "trAB", "HR", rlang::quo(-log(1-0.202*RR)/1) 
@@ -628,9 +634,9 @@ test_that("redecision replicates Briggs' example 4.7", {
   # run 2 cycles
   MT.comb <- mhiv$cycles(2, tcycle=tcycle, hcc=FALSE)
   # revise costs and revert transition rates 
-  sA$set_cost(dmca+ccca+cAZT)
-  sB$set_cost(dmcb+cccb+cAZT)
-  sC$set_cost(dmcc+cccc+cAZT)
+  sA$set_cost(cA)
+  sB$set_cost(cB)
+  sC$set_cost(cC)
   tAB$set_rate(trAB)
   tAC$set_rate(trAC)
   tAD$set_rate(trAD)

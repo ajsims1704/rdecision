@@ -1,15 +1,17 @@
 #' @title \verb{ConstModVar} class
 #' 
-#' @description 
-#' An R6 class for a constant in a model
+#' @description An R6 class for a constant in a model.
 #' 
-#' @details
-#' A \code{ModVar} with no uncertainty in its value. It has no
-#' distribution and there are no hyperparameters. Its 
-#' benefit over using a regular numeric variable in a model is that
-#' it will appear in tabulations of the model variables
-#' associated with a model and therefore be explicitly documented
-#' as a model input.
+#' @details A \code{ModVar} with no uncertainty in its value. Its distribution 
+#' is treated as a Dirac delta function \eqn{\delta(x-c)} where \eqn{c} is the 
+#' hyperparameter (value of the constant). It has probability 1 that the value
+#' will be equal to \eqn{c} and zero otherwise. The mode, mean, quantiles and
+#' random samples are all equal to \eqn{c}. It is acknowledged that there is
+#' debate over whether Dirac delta functions are true distributions, but the
+#' assumption makes little practical difference in this case. The benefit over 
+#' using a regular numeric variable in a model is that it will appear in 
+#' tabulations of the model variables associated with a model and therefore be
+#' explicitly documented as a model input.
 #' 
 #' @docType class
 #' @author Andrew Sims \email{andrew.sims@@newcastle.ac.uk}
@@ -20,6 +22,7 @@ ConstModVar <- R6::R6Class(
   lock_class = TRUE,
   inherit = ModVar,
   private = list(
+    c = NULL
   ),
   public = list(
     
@@ -40,7 +43,7 @@ ConstModVar <- R6::R6Class(
           class="const_not_numeric"
         )
       }
-      private$.val <- const
+      private$c <- const
       # initialize next get() call
       self$set("expected")
       # return object
@@ -61,7 +64,7 @@ ConstModVar <- R6::R6Class(
     #' @return Distribution name as character string.
     distribution = function() {
       rv <- paste('Const(', 
-                  format(private$.val, digits=4, scientific=F),
+                  format(private$c, digits=4, scientific=F),
                   ')', sep='')
       return(rv)
     },
@@ -70,14 +73,14 @@ ConstModVar <- R6::R6Class(
     #' Return the mode of the distribution.
     #' @return Value of the constant.
     mode = function() {
-      return(private$.val)
+      return(private$c)
     },
 
     #' @description 
     #' Return the expected value of the distribution. 
     #' @return Expected value as a numeric value.
     mean = function() {
-      return(private$.val)
+      return(private$c)
     },
     
     #' @description 
@@ -85,7 +88,7 @@ ConstModVar <- R6::R6Class(
     #' @param n Number of samples to draw.
     #' @return Constant value as a numeric value.
     r = function(n=1) {
-      return(rep(private$.val, times=n))
+      return(rep(private$c, times=n))
     },
     
     #' @description 
@@ -116,7 +119,7 @@ ConstModVar <- R6::R6Class(
                        class="probs_out_of_range")
         }
       })
-      q <- rep(private$.val, times=length(probs))
+      q <- rep(private$c, times=length(probs))
       return(q)
     }
 
