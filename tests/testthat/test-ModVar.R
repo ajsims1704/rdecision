@@ -1,4 +1,6 @@
-
+# --------------------------------------------------------------------------
+# tests of creation
+# --------------------------------------------------------------------------
 test_that("illegal arguments are rejected", {
   expect_error(ModVar$new(42, "GBP"), class="description_not_string")
   expect_error(ModVar$new(TRUE, "GBP"), class="description_not_string")
@@ -30,6 +32,36 @@ test_that("ModVar description is saved", {
   expect_identical(yy$description(), "y")
 })
 
+test_that("association with uncertainty distributions is correct", {
+  # incorrect distribution type
+  expect_error(
+    ModVar$new("x", "GBP", 42),
+    class = "invalid_distribution"
+  )
+  # non-integer index
+  expect_error(
+    ModVar$new("x", "GBP", k=2),
+    class = "invalid_index"
+  )
+  # integer index
+  expect_silent(
+    ModVar$new("x", "GBP", k=as.integer(1))
+  )
+  # index out of range
+  expect_error(
+    ModVar$new("x", "GBP", k=as.integer(0)),
+    class = "invalid_index"
+  )
+  expect_error(
+    ModVar$new("x", "GBP", k=as.integer(2)),
+    class = "invalid_index"
+  )
+
+})
+
+# --------------------------------------------------------------------------
+# tests of uncertainty values
+# --------------------------------------------------------------------------
 test_that("stub quantile function checks inputs and has correct output", {
   x <- ModVar$new("x", "GBP")
   probs <- c(0.1, 0.2, 0.5)
@@ -51,6 +83,9 @@ test_that("stub functions return NA", {
   expect_true(is.na(x$SD()))
 })
 
+# --------------------------------------------------------------------------
+# tests of set and get
+# --------------------------------------------------------------------------
 test_that("set checks its argument", {
   x <- ModVar$new("x", "GBP")
   expect_error(x$set(42), class="what_not_character")

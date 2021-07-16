@@ -15,16 +15,17 @@ Distribution <- R6::R6Class(
   lock_class = TRUE,
   private = list(
     name = NULL,
-    k = NULL
+    K = NULL,
+    .r = NULL
   ),
   public = list(
     
     #' @description Create an object of class \code{Distribution}.
     #' @param name Name of the distribution ("Beta" etc.)
-    #' @param k Order of the distribution (1=univariate etc.). Must be an 
-    #' integer; use \code{as.integer()} to avoid an error.
+    #' @param K Order of the distribution (1=univariate, 2=bivariate etc.). 
+    #' Must be an integer; use \code{as.integer()} to avoid an error.
     #' @return An object of class \code{Distribution}. 
-    initialize = function(name, k=as.integer(1)) {
+    initialize = function(name, K=as.integer(1)) {
       # check name parameter
       if (base::missing(name)) {
         rlang::abort(
@@ -40,106 +41,128 @@ Distribution <- R6::R6Class(
       }
       private$name <- name
       # check dimension parameter
-      if (!is.integer(k)) {
+      if (!is.integer(K)) {
         rlang::abort(
-          "Argument 'k must be an integer", 
+          "Argument 'K must be an integer", 
           class = "invalid_order"
         )
       }
-      if (k <= 0) {
+      if (K <= 0) {
         rlang::abort(
-          "Argument 'k' must be > 0", 
+          "Argument 'K' must be > 0", 
           class="order_not_supported"
         )
       }
-      private$k <- k
+      private$K <- K
+      # create space for a random draw and populate it
+      private$.r <- vector(mode="numeric", length=K)
       # return Distribution
       return(invisible(self))
+    },
+    
+    #' @description Order of the distribution
+    #' @returns Order (\code{K}).
+    order = function() {
+      return(private$K)
+    }, 
+
+    #' @description Description of the uncertainty distribution.
+    #' @details Includes the distribution name and its parameters.
+    #' @return Distribution name and parameters as character string.
+    distribution = function() {
+      return(as.character(NA))
+    },
+    
+    #' @description Draw and hold a random sample from the distribution.
+    #' @returns Void
+    sample = function() {
+       return(invisible(self)) 
+    },
+    
+    #' @description Return a random sample drawn from the distribution.
+    #' @details Returns the sample generated at the last call to \code{sample}. 
+    #' @returns A vector of length \code{K} representing one sample.
+    r = function(n=1) {
+      # return the sample
+      return(private$.r)
+    },
+    
+    #' @description Mean value of the distribution. 
+    #' @return Mean value as a numeric scalar (\code{K=1}) or vector of 
+    #' length \code{K}.
+    mean = function() {
+      rv <- vector(mode="numeric", length=private$K)
+      return(rv)
+    },
+    
+    #' @description Return the mode of the distribution. By default returns
+    #' \code{NA}, which will be the case for most \code{ExprModVar} variables,
+    #' because an arbitrary expression is not guaranteed to be unimodal.
+    #' @return Mode as a numeric scalar (\code{K=1}) or vector of 
+    #' length \code{K}.
+    mode = function() {
+      rv <- vector(mode="numeric", length=private$K)
+      return(rv)
+    },
+    
+    #' @description Return the standard deviation of a univariate distribution.
+    #' @details Only defined for univariate (\code{K=1}) distributions; for 
+    #' multivariate distributions, function \code{varcov} returns the 
+    #' variance-covariance matrix. 
+    #' @return Standard deviation as a numeric value.
+    SD = function() {
+      if (private$K != 1) {
+        rlang::abort(
+          "Function 'SD' not defined for multivariate distributions",
+          class = "SD_undefined"
+        )
+      }
+      return(as.numeric(NA))
+    },
+    
+    #' @description Variance-covariance matrix.
+    #' @returns A positive definite symmetric matrix of size \code{K} by 
+    #' \code{K}, or a scalar for \code{K=1}, equal to the variance.
+    varcov = function() {
+      rv <- NULL
+      if (private$K==1) {
+        rv <- as.numeric(NA)
+      } else {
+        rv <- matrix(data=as.numeric(NA), nrow=private$K, ncol=private$K)
+      }
+      return(rv)
+    },
+    
+    #' @description Quantiles of a univariate distribution. 
+    #' @param probs Numeric vector of probabilities, each in range [0,1].
+    #' @return Vector of numeric values of the same length as \code{probs}.
+    #' The quantiles for \code{K>1} are not not single values (they are 
+    #' lines for \code{K=2}, surfaces for \code{K=3}, etc.).
+    quantile = function(probs) {
+      # throw error for K>1
+      if (private$K > 1) {
+        rlang::abort(
+          "Function 'quantile' not defined for multivariate distributions",
+          class = "quantile_undefined"
+        )
+      }
+      # test argument
+      sapply(probs, FUN=function(x) {
+        if (is.na(x)) {
+          rlang::abort("All elements of 'probs' must be defined",
+                       class="probs_not_defined")
+        }
+        if (!is.numeric(x)) {
+          rlang::abort("Argument 'probs' must be a numeric vector",
+                       class="probs_not_numeric")
+        }
+        if (x<0 || x>1) {
+          rlang::abort("Elements of 'probs' must be in range[0,1]",
+                       class="probs_out_of_range")
+        }
+      })
+      return(rep(as.numeric(NA), length(probs)))
     }
-    
-    #' #' @description 
-    #' #' Tests whether the model variable is probabilistic, i.e. a random
-    #' #' variable that follows a distribution, or an expression involving
-    #' #' random variables, some of which follow distributions. 
-    #' #' @return TRUE if probabilistic
-    #' is_probabilistic = function() {
-    #'   return(TRUE)
-    #' },
-    #' 
-    #' #' @description 
-    #' #' Accessor function for the name of the uncertainty distribution.
-    #' #' @return Distribution name as character string.
-    #' distribution = function() {
-    #'   rv <- paste('Be(', private$alpha, ',', private$beta, ')', sep='')
-    #'   return(rv)
-    #' },
-    #' 
-    #' #' @description 
-    #' #' Return the expected value of the distribution. 
-    #' #' @return Expected value as a numeric value.
-    #' mean = function() {
-    #'   return(private$alpha/(private$alpha+private$beta))
-    #' },
-    #' 
-    #' #' @description 
-    #' #' Return the mode of the distribution (if \code{alpha}, \code{beta} > 1) 
-    #' #' @return mode as a numeric value.
-    #' mode = function() {
-    #'   rv <- as.numeric(NA)
-    #'   if (private$alpha==1 && private$beta==1) {
-    #'     rv <- 0.5
-    #'   } else if (private$alpha<1 && private$beta < 1) {
-    #'     rv <- as.numeric(NA) # bimodal
-    #'   } else if (private$alpha<=1 && private$beta>1) {
-    #'     rv <- 0
-    #'   } else if (private$alpha>1 && private$beta<=1) {
-    #'     rv <- 1
-    #'   } else {
-    #'     rv <- (private$alpha-1)/(private$alpha+private$beta-2) 
-    #'   }
-    #'   return(rv)
-    #' },
-    #' 
-    #' #' @description Return the standard deviation of the distribution. 
-    #' #' @return Standard deviation as a numeric value
-    #' SD = function() {
-    #'   a <- private$alpha
-    #'   b <- private$beta
-    #'   v <- (a*b) / ( (a+b)^2 * (a+b+1) )
-    #'   return(sqrt(v))
-    #' },
-    #' 
-    #' #' @description Draw a random sample from the model variable. 
-    #' #' @param n Number of samples to draw.
-    #' #' @return Samples drawn at random.
-    #' r = function(n=1) {
-    #'   rv <- rbeta(n, shape1=private$alpha, shape2=private$beta)
-    #'   return(rv)
-    #' },
-    #' 
-    #' #' @description
-    #' #' Return the quantiles of the Beta uncertainty distribution.
-    #' #' @param probs Vector of probabilities, in range [0,1].    
-    #' #' @return Vector of quantiles.
-    #' quantile = function(probs) {
-    #'   # test argument
-    #'   sapply(probs, FUN=function(x) {
-    #'     if (is.na(x)) {
-    #'       rlang::abort("All elements of 'probs' must be defined",
-    #'                    class="probs_not_defined")
-    #'     }
-    #'     if (!is.numeric(x)) {
-    #'       rlang::abort("Argument 'probs' must be a numeric vector",
-    #'                    class="probs_not_numeric")
-    #'     }
-    #'     if (x<0 || x>1) {
-    #'       rlang::abort("Elements of 'probs' must be in range[0,1]",
-    #'                    class="probs_out_of_range")
-    #'     }
-    #'   })
-    #'   q <- qbeta(probs, shape1=private$alpha, shape2=private$beta)
-    #'   return(q)
-    #' }
-    
+
   )
 )

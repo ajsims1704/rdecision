@@ -1,10 +1,8 @@
 #' @title \verb{ModVar} class
 #' 
-#' @description
-#' An R6 class for a variable in an health economic model
+#' @description An R6 class for a variable in an health economic model
 #' 
-#' @details 
-#' Base class for a variable used in a health economic model. The base 
+#' @details Base class for a variable used in a health economic model. The base 
 #' class, which is not intended to be directly instantiated by model
 #' applications, wraps a numerical value which is used in calculations.
 #' The base class provides a framework for creating classes of model
@@ -21,30 +19,71 @@ ModVar <- R6::R6Class(
   private = list(
     .description = NULL,
     .units = NULL,
+    .D = NULL,
+    .k = NULL,
     .val = NA
   ),
   public = list(
     
-    #' @description 
-    #' Create an object of type \code{ModVar}
+    #' @description Create an object of type \code{ModVar}.
+    #' @details A ModVar is associated with an uncertainty distribution (a
+    #' "has-a" relationship in object-oriented terminology). There can be a
+    #' 1-1 mapping of \code{ModVar}s to \code{Distribution}s, or several
+    #' model variables can be linked to the same distribution in a
+    #' many-1 mapping, e.g. when each transition probability from a Markov state
+    #' is represented as a \code{ModVar} and each can be linked to the \code{k}
+    #' dimensions of a common multivariate Dirichlet distribution.
     #' @param description A character string description of the variable
     #' and its role in the model. This description will be used in a
     #' tabulation of the variables linked to a model.
     #' @param units A character string description of the units, e.g. 
     #' \code{"GBP"}, \code{"per year"}.
+    #' @param D The distribution representing the uncertainty in the variable.
+    #' Should inherit from class \code{Distribution}, or NULL if none is
+    #' defined.
+    #' @param k The index of the dimension of the multivariate distribution
+    #' that applies to this model variable. 
     #' @return A new \verb{ModVar} object.
-    initialize = function(description, units) {
+    initialize = function(description, units, D=NULL, k=as.integer(1)) {
       # test and set description
       if (!is.character(description)) {
         rlang::abort("Argument 'description' must be a string", 
                      class="description_not_string")
       }
       private$.description <- description
+      # test and set units
       if (!is.character(units)) {
         rlang::abort("Argument 'units' must be a string", 
                      class="units_not_string")
       }
       private$.units <- units
+      # test and set distribution
+      if (!is.null(D)) {
+        if (!inherits(D, what="Distribution")) {
+          rlang::abort(
+            "'D' must inherit from Distribution",
+            class = "invalid_distribution"
+          )
+        }
+        private$.D <- D
+      } else {
+        private$.D <- Distribution$new("Undefined")
+      }
+      # test and set dimension
+      if (!is.integer(k)) {
+        rlang::abort(
+          "'k' must be an integer",
+          class = "invalid_index"
+        )
+      }
+      if ((k <= 0) || (k > private$.D$order())) {
+        rlang::abort(
+          "'k' must not exceed the order of 'D'",
+          class = "invalid_index"
+        )
+      }
+      private$.k <- k
+      # return new object
       return(invisible(self))
     },
 
@@ -65,25 +104,24 @@ ModVar <- R6::R6Class(
       return(as.logical(NA))
     },
     
-    #' @description
-    #' Accessor function for the description.
+    #' @description Accessor function for the description.
     #' @return Description of model variable as character string.
     description = function() {
       return(private$.description)
     },
     
-    #' @description
-    #' Accessor function for units.
+    #' @description Accessor function for units.
     #' @return Description of units as character string.
     units = function() {
       return(private$.units)
     },
     
-    #' @description 
-    #' Accessor function for the name of the uncertainty distribution.
+    #' @description Accessor function for the name of the uncertainty 
+    #' distribution.
     #' @return Distribution name as character string.
     distribution = function() {
-      return(as.character(NA))
+      return(private$.D$distribution())
+#      return(as.character(NA))
     },
     
     #' @description 
