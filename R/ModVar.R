@@ -19,9 +19,12 @@ ModVar <- R6::R6Class(
   private = list(
     .description = NULL,
     .units = NULL,
+    .whats = NULL,
+    .whatnext = NULL,
     .D = NULL,
     .k = NULL,
-    .val = NA
+#    .val = NA,
+    .value = NULL
   ),
   public = list(
     
@@ -83,6 +86,14 @@ ModVar <- R6::R6Class(
         )
       }
       private$.k <- k
+      # set possible "what" values for get()
+      private$.whats <- c(
+        "random", "expected", "q2.5", "q50", "q97.5", "current", "value"
+      )
+      # set the .value variable members
+      private$.value <- rep(as.numeric(NA), times=length(private$.whats))
+      names(private$.value) <- private$.whats
+      private$.whatnext <- "expected"
       # return new object
       return(invisible(self))
     },
@@ -208,21 +219,29 @@ ModVar <- R6::R6Class(
       v <- NA
       if (what == "random") {
         v <- self$r()
+        private$.value[what] <- v
       } else if (what == "expected") {
         v <- self$mean()
+        private$.value[what] <- v
       } else if (what == "q2.5") {
         v <- self$quantile(c(0.025))
+        private$.value[what] <- v
       } else if (what == "q50") {
         v <- self$quantile(c(0.5))
+        private$.value[what] <- v
       } else if (what == "q97.5") {
         v <- self$quantile(c(0.975))
+        private$.value[what] <- v
       } else if (what == "current") {
-        v <- private$.val
+        #v <- private$.val
+        v <- private$.value[private$.whatnext]
+        private$.value["current"] <- v
       } else if (what == "value") {
         if (is.null(val) | !is.numeric(val)) {
           rlang::abort("'v' must be numeric", class = "invalid_val")
         } else {
           v <- val
+          private$.value[what] <- val
         }
       }
       else {
@@ -232,7 +251,8 @@ ModVar <- R6::R6Class(
           class ="what_not_supported"
         )
       }
-      private$.val <- v
+#      private$.val <- v
+      private$.whatnext <- what
       # silently return updated object
       return(invisible(self))
     },
@@ -242,7 +262,9 @@ ModVar <- R6::R6Class(
     #' to \code{set()}.
     #' @return Value determined by last \code{set()}.
     get = function() {
-      return(private$.val)
+      #v <- private$.val
+      v <- unname(private$.value[private$.whatnext])
+      return(v)
     }
 
     
