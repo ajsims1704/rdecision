@@ -103,3 +103,15 @@ test_that("get is initialized to NA for base class", {
   expect_true(is.na(x$get()))
 })
 
+test_that("get() after set('current') returns NA", {
+  x <- ModVar$new("x", "GBP")
+  x$set("current")
+  expect_true(is.na(x$get()))
+})
+
+test_that("get() after set('random') returns NA", {
+  x <- ModVar$new("x", "GBP")
+  x$set("random")
+  expect_true(is.na(x$get()))
+})
+

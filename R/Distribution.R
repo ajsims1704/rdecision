@@ -82,7 +82,7 @@ Distribution <- R6::R6Class(
     #' @description Return a random sample drawn from the distribution.
     #' @details Returns the sample generated at the last call to \code{sample}. 
     #' @returns A vector of length \code{K} representing one sample.
-    r = function(n=1) {
+    r = function() {
       # return the sample
       return(private$.r)
     },
@@ -91,7 +91,7 @@ Distribution <- R6::R6Class(
     #' @return Mean value as a numeric scalar (\code{K=1}) or vector of 
     #' length \code{K}.
     mean = function() {
-      rv <- vector(mode="numeric", length=private$K)
+      rv <- rep(as.numeric(NA), times=private$K)
       return(rv)
     },
     
@@ -101,7 +101,7 @@ Distribution <- R6::R6Class(
     #' @return Mode as a numeric scalar (\code{K=1}) or vector of 
     #' length \code{K}.
     mode = function() {
-      rv <- vector(mode="numeric", length=private$K)
+      rv <- rep(as.numeric(NA), times=private$K)
       return(rv)
     },
     

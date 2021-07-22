@@ -39,8 +39,9 @@ test_that("set(current) works as intended", {
   B <- BetaModVar$new("beta", "GBP", a, b)
   B$set("random")
   x <- B$get()
+  print(x)
   B$set("current")
-  expect_equal(x, B$get())
+  expect_equal(B$get(), x)
 })
 
 test_that("set(value) works as intended", {

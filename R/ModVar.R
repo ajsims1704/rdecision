@@ -23,7 +23,6 @@ ModVar <- R6::R6Class(
     .whatnext = NULL,
     .D = NULL,
     .k = NULL,
-#    .val = NA,
     .value = NULL
   ),
   public = list(
@@ -88,11 +87,13 @@ ModVar <- R6::R6Class(
       private$.k <- k
       # set possible "what" values for get()
       private$.whats <- c(
-        "random", "expected", "q2.5", "q50", "q97.5", "current", "value"
+        "random", "expected", "q2.5", "q50", "q97.5", "value"
       )
       # set the .value variable members
       private$.value <- rep(as.numeric(NA), times=length(private$.whats))
       names(private$.value) <- private$.whats
+      private$.value["expected"] <- private$.D$mean()
+      # value to return on first get
       private$.whatnext <- "expected"
       # return new object
       return(invisible(self))
@@ -132,23 +133,14 @@ ModVar <- R6::R6Class(
     #' @return Distribution name as character string.
     distribution = function() {
       return(private$.D$distribution())
-#      return(as.character(NA))
     },
     
     #' @description 
-    #' Draw a random sample from the model variable. 
-    #' @param n Number of samples to draw.
-    #' @return A sample drawn at random.
-    r = function(n=1) {
-      # return the sample
-      return(rep(as.numeric(NA),n))
-    },
-
-    #' @description 
-    #' Return the mean value of the distribution. 
+    #' Return the mean value of the model variable. 
     #' @return Mean value as a numeric value.
     mean = function() {
-      return(as.numeric(NA))
+      mvmean <- private$.D$mean()
+      return(mvmean[private$.k])
     },
     
     #' @description 
@@ -157,14 +149,16 @@ ModVar <- R6::R6Class(
     #' arbitrary expression is not guaranteed to be unimodal.
     #' @return Mode as a numeric value.
     mode = function() {
-      return(as.numeric(NA))
+      mvmode <- private$.D$mode()
+      return(mvmode[private$.k])
     },
 
     #' @description 
-    #' Return the standard deviation of the distribution. 
+    #' Return the standard deviation of the model variable. 
     #' @return Standard deviation as a numeric value
     SD = function() {
-      return(as.numeric(NA))
+      mvsd <- private$.D$SD()
+      return(mvsd[private$.k])
     },
     
     #' @description 
@@ -187,7 +181,21 @@ ModVar <- R6::R6Class(
                        class="probs_out_of_range")
         }
       })
-      return(rep(as.numeric(NA), length(probs)))
+      # only applicable for univariate distributions
+      if (private$.D$order() > 1) {
+        rv <- rep(as.numeric(NA), length(probs)) 
+      } else {
+        rv <- private$.D$quantile(probs)
+      }
+      return(rv)
+    },
+
+    #' @description 
+    #' Draw a random sample from the model variable. 
+    #' @return A sample drawn at random.
+    r = function() {
+      # return the sample
+      return(private$.value["random"])
     },
 
     #' @description
@@ -234,7 +242,7 @@ ModVar <- R6::R6Class(
         private$.value[what] <- v
       } else if (what == "current") {
         #v <- private$.val
-        v <- private$.value[private$.whatnext]
+        #v <- private$.value[private$.whatnext]
         private$.value["current"] <- v
       } else if (what == "value") {
         if (is.null(val) | !is.numeric(val)) {
@@ -251,7 +259,6 @@ ModVar <- R6::R6Class(
           class ="what_not_supported"
         )
       }
-#      private$.val <- v
       private$.whatnext <- what
       # silently return updated object
       return(invisible(self))
