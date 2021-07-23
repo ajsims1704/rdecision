@@ -54,8 +54,8 @@ Distribution <- R6::R6Class(
         )
       }
       private$K <- K
-      # create space for a random draw and populate it
-      private$.r <- vector(mode="numeric", length=K)
+      # create space for a random draw and populate it with NA
+      private$.r <- rep(as.numeric(NA), times=K)
       # return Distribution
       return(invisible(self))
     },

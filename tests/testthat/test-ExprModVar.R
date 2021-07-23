@@ -96,8 +96,11 @@ test_that("set and get function as expected", {
   # check illegal input
   expect_error(z$set(TRUE), class="what_not_character")
   expect_error(z$set("red"), class="what_not_supported")
-  # check that set() is ignored for ExprModVar
-  expect_silent(z$set())
+  # check that set() is honoured for ExprModVar
+  z$set("q97.5")
+  v <- z$get()
+  expect_true(v>3.5)
+  z$set("expected")
   expect_equal(z$get(),0)
   # check that set() for operands affects get() for the expression
   y$set("expected")
@@ -129,12 +132,17 @@ test_that("modified expressions are created correctly", {
   )
   expect_intol(q$mean(), 0.9, 0.05)
   # check that pre-prepared r() method is present
-  rbeta <- q$r(1)
+  q$set("random")
+  rbeta <- q$get()
   expect_true((rbeta>=0) && (rbeta <= 1))
   # check internally added methods; 99.9% confidence limits assuming CLT; expect
   # 0.1% test failure rate; skip for CRAN
   n <- 1000
-  samp <- q$r(n)
+  samp <- sapply(1:n, FUN=function(i) {
+    q$set("random")
+    rv <- q$get()
+    return(rv)
+  })
   expect_length(samp, n)
   skip_on_cran()
   ht <- ks.test(samp, rbeta(n,shape1=beta,shape2=alpha))
@@ -189,7 +197,11 @@ test_that("expression chi square from SN is correct", {
   expect_true(is.na(y$SD()))  # SD is undefined for ExprModVar
   skip_on_cran()
   n <- 1000
-  samp <- y$r(n)
+  samp <- sapply(1:n, FUN=function(i) {
+    y$set("random")
+    rv <- y$get()
+    return(rv)
+  })
   ht <- ks.test(samp, rchisq(n, df=1))
   expect_true(ht$p.value>0.001)
 })

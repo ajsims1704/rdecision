@@ -1,7 +1,18 @@
 
 # rdecision 1.0.4.9000
 
-* Added WatchBP vignette.
+* Deprecated function `r()` from `Modvar` and its subclasses. Use set/get
+  methods to sample from associated uncertainty distribution.
+* Refactored model variable classes into much smaller convenience classes
+  with an underlying distribution. For example `BetaModVar` has a
+  `BetaDistribution` uncertainty.
+* Refactored `ModVar` with a "has-a" relationship to an underlying uncertainty
+  distribution. Incorporated ability to link several model variables to a 
+  common underlying distribution (for use with multinomial Dirichlet etc.).
+* Added distribution class `DiracDistribution`. 
+* Added subclasses of `Distribution` for each of the currently
+  supported distributions (Beta, Normal, Log Normal, Gamma).
+* Added base class `Distribution` to represent multivariate distributions.
 * Added single/combined therapy HIV vignette.
 * Added class `CohortMarkovModel` and its test script.
 * Added class `MarkovTransition` (inherits from `Node`) and its test script.

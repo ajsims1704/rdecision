@@ -89,10 +89,13 @@ ModVar <- R6::R6Class(
       private$.whats <- c(
         "random", "expected", "q2.5", "q50", "q97.5", "value"
       )
-      # set the .value variable members
+      # set the .value vector members
       private$.value <- rep(as.numeric(NA), times=length(private$.whats))
       names(private$.value) <- private$.whats
       private$.value["expected"] <- private$.D$mean()
+      private$.value["q2.5"] <- private$.D$quantile(0.025)
+      private$.value["q50"] = private$.D$quantile(0.5)
+      private$.value["q97.5"] <- private$.D$quantile(0.975)
       # value to return on first get
       private$.whatnext <- "expected"
       # return new object
@@ -161,8 +164,7 @@ ModVar <- R6::R6Class(
       return(mvsd[private$.k])
     },
     
-    #' @description 
-    #' Find quantiles of the uncertainty distribution. 
+    #' @description Find quantiles of the uncertainty distribution. 
     #' @param probs Numeric vector of probabilities, each in range [0,1].
     #' @return Vector of numeric values of the same length as \code{probs}.
     quantile = function(probs) {
@@ -190,16 +192,16 @@ ModVar <- R6::R6Class(
       return(rv)
     },
 
-    #' @description 
-    #' Draw a random sample from the model variable. 
+    #' @description Draw a random sample from the model variable. 
     #' @return A sample drawn at random.
     r = function() {
+      .Deprecated("set('random')")
       # return the sample
       return(private$.value["random"])
     },
 
-    #' @description
-    #' Sets the value of the \code{ModVar} that will be returned by subsequent
+    #' @description Sets the value of the \code{ModVar} that will be returned
+    #' by subsequent
     #' calls to \code{get()} until \code{set()} is called again. 
     #' @param what Character: one of \code{"random"} (samples from the 
     #' uncertainty distribution), \code{"expected"} (mean), \code{"q2.5"}
@@ -223,43 +225,28 @@ ModVar <- R6::R6Class(
           class="what_not_character"
         )
       }
-      # options
-      v <- NA
-      if (what == "random") {
-        v <- self$r()
-        private$.value[what] <- v
-      } else if (what == "expected") {
-        v <- self$mean()
-        private$.value[what] <- v
-      } else if (what == "q2.5") {
-        v <- self$quantile(c(0.025))
-        private$.value[what] <- v
-      } else if (what == "q50") {
-        v <- self$quantile(c(0.5))
-        private$.value[what] <- v
-      } else if (what == "q97.5") {
-        v <- self$quantile(c(0.975))
-        private$.value[what] <- v
-      } else if (what == "current") {
-        #v <- private$.val
-        #v <- private$.value[private$.whatnext]
-        private$.value["current"] <- v
-      } else if (what == "value") {
-        if (is.null(val) | !is.numeric(val)) {
-          rlang::abort("'v' must be numeric", class = "invalid_val")
-        } else {
-          v <- val
-          private$.value[what] <- val
-        }
-      }
-      else {
+      if (!(what %in% c(private$.whats, "current"))) {
         rlang::abort(
           paste("'what' must be one of", "'random',", "'expected',", 
                 "'q2.5',", "'q50',", "'97.5',", "'current',", "'value'"), 
           class ="what_not_supported"
         )
       }
-      private$.whatnext <- what
+      # if random, make a new draw from the distribution
+      if (what == "random") {
+        private$.D$sample()
+      # if value, check and save the supplied number
+      } else if (what == "value") {
+        if (is.null(val) | !is.numeric(val)) {
+          rlang::abort("'v' must be numeric", class = "invalid_val")
+        } else {
+          private$.value["value"] <- val
+        }
+      }
+      # set whatnext for next call to get(), unless required to leave unchanged
+      if (what != "current") {
+        private$.whatnext <- what
+      }
       # silently return updated object
       return(invisible(self))
     },
@@ -269,7 +256,11 @@ ModVar <- R6::R6Class(
     #' to \code{set()}.
     #' @return Value determined by last \code{set()}.
     get = function() {
-      #v <- private$.val
+      # if random, save the sample
+      if (private$.whatnext == "random") {
+        private$.value["random"] <- private$.D$r()
+      }
+      # return the required value
       v <- unname(private$.value[private$.whatnext])
       return(v)
     }

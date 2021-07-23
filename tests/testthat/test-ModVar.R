@@ -83,6 +83,14 @@ test_that("stub functions return NA", {
   expect_true(is.na(x$SD()))
 })
 
+test_that("r() is deprecated", {
+  x <- ModVar$new("x", "GBP")
+  expect_warning(
+    x$r()
+  )
+})
+
+
 # --------------------------------------------------------------------------
 # tests of set and get
 # --------------------------------------------------------------------------

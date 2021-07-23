@@ -1,26 +1,19 @@
 #' @title \verb{GammaModVar} class
 #' 
-#' @description
-#' An R6 class for a model variable with Gamma function uncertainty
+#' @description An R6 class for a model variable with Gamma uncertainty
 #' 
-#' @details 
-#' A model variable for which the uncertainty in the point estimate can
+#' @details A model variable for which the uncertainty in the point estimate can
 #' be modelled with a Gamma distribution. The hyperparameters of the
-#' distribution are the shape (\code{alpha}) and the rate (\code{beta}) of
-#' the uncertainty distribution. Note that this is the conventional
-#' parametrization used in Bayesian statistics; in econometrics the
-#' shape/scale (\code{k}/\code{theta}) parametrization is more common (and the
-#' one used in this implementation). Note, however, that although Briggs 
-#' \emph{et al} (2006) use the shape, scale formulation, they use 
-#' \code{alpha}, \code{beta} as parameter names.
+#' distribution are the shape (\code{k}) and the scale (\code{theta}). Note
+#' that although Briggs \emph{et al} (2006) use the shape, scale formulation,
+#' they use \code{alpha}, \code{beta} as parameter names.
 #'  
 #' @references{
 #'   Briggs A, Claxton K, Sculpher M. Decision modelling for health
 #'   economic evaluation. Oxford, UK: Oxford University Press; 2006. 
 #' }
 #' 
-#' @note 
-#' The Gamma model variable class can be used to model the uncertainty of
+#' @note The Gamma model variable class can be used to model the uncertainty of
 #' the mean of a count quantity which follows a Poisson distribution. The Gamma
 #' distribution is the conjugate prior of a Poisson distribution, and the shape
 #' and scale relate directly to the number of intervals from which the mean
@@ -39,8 +32,6 @@ GammaModVar <- R6::R6Class(
   lock_class = TRUE,
   inherit = ModVar,
   private = list(
-    shape = NULL,
-    scale = NULL
   ),
   public = list(
     
@@ -52,35 +43,10 @@ GammaModVar <- R6::R6Class(
     #' @param scale scale parameter of the Gamma distribution.
     #' @return An object of class \code{GammaModVar}. 
     initialize = function(description, units, shape, scale) {
-      super$initialize(description, units)
-      if (!is.numeric(shape)) {
-        rlang::abort(
-          "Argument 'shape' must be numeric", 
-          class="shape_not_numeric"
-        )
-      }
-      if (shape <= 0) {
-        rlang::abort(
-          "Argument 'shape' must be > 0", 
-          class="shape_not_supported"
-        )
-      }
-      private$shape <- shape
-      if (!is.numeric(scale)) {
-        rlang::abort(
-          "Argument 'scale' must be numeric", 
-          class="scale_not_numeric"
-        )
-      }
-      if (scale <= 0) {
-        rlang::abort(
-          "Argument 'scale' must be > 0", 
-          class="scale_not_supported"
-        )
-      }
-      private$scale <- scale
-      # ensure first call to get() is valid
-      self$set("expected")
+      # create a Gamma distribution (and check arguments)
+      D <- GammaDistribution$new(shape, scale)
+      # create the base class model variable
+      super$initialize(description, units, D=D, k=as.integer(1))
       # return object
       return(invisible(self))
     },
@@ -92,77 +58,6 @@ GammaModVar <- R6::R6Class(
     #' @return \code{TRUE} if probabilistic
     is_probabilistic = function() {
       return(TRUE)
-    },
-
-    #' @description 
-    #' Accessor function for the name of the uncertainty distribution.
-    #' @return Distribution name as character string.
-    distribution = function() {
-      rv <- paste(
-        'Ga(', 
-        round(private$shape,3), ',', 
-        round(private$scale,3), ')', 
-        sep=''
-      )
-      return(rv)
-    },
-
-    #' @description 
-    #' Return the expected value of the distribution. 
-    #' @return Expected value as a numeric value.
-    mean = function() {
-      return(private$shape*private$scale)
-    },
-
-    #' @description 
-    #' Return the mode of the distribution (if \code{shape} >= 1) 
-    #' @return mode as a numeric value.
-    mode = function() {
-      rv <- as.numeric(NA)
-      if (private$shape>=1) {
-        rv <- (private$shape-1)*private$scale 
-      }
-      return(rv)
-    },
-
-    #' @description 
-    #' Return the standard deviation of the distribution. 
-    #' @return Standard deviation as a numeric value
-    SD = function() {
-      return(sqrt(private$shape)*private$scale)
-    },
-
-    #' @description 
-    #' Draw a random sample from the model variable. 
-    #' @param n Number of samples to draw.
-    #' @return Samples drawn at random.
-    r = function(n=1) {
-      rv <- rgamma(n, shape=private$shape, scale=private$scale)
-      return(rv)
-    },
-
-    #' @description
-    #' Return the quantiles of the Gamma uncertainty distribution.
-    #' @param probs Vector of probabilities, in range [0,1].    
-    #' @return Vector of quantiles.
-    quantile = function(probs) {
-      # test argument
-      sapply(probs, FUN=function(x) {
-        if (is.na(x)) {
-          rlang::abort("All elements of 'probs' must be defined",
-                       class="probs_not_defined")
-        }
-        if (!is.numeric(x)) {
-          rlang::abort("Argument 'probs' must be a numeric vector",
-                       class="probs_not_numeric")
-        }
-        if (x<0 || x>1) {
-          rlang::abort("Elements of 'probs' must be in range[0,1]",
-                       class="probs_out_of_range")
-        }
-      })
-      q <- qgamma(probs, shape=private$shape, scale=private$scale)
-      return(q)
     }
 
   )
