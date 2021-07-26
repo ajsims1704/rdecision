@@ -133,6 +133,7 @@ BetaDistribution <- R6::R6Class(
         }
       })
       q <- qbeta(probs, shape1=private$alpha, shape2=private$beta)
+      names(q) <- probs
       return(q)
     }
     

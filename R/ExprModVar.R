@@ -182,15 +182,6 @@ ExprModVar <- R6::R6Class(
       return(estr)
     },
 
-#    #' @description Draw a random sample from the model variable. 
-#    #' @return A sample drawn at random.
-#    r = function() {
-#      # use the pre-packed expression
-#      rv <- rlang::eval_tidy(private$q.r)
-#      # return result
-#      return(rv)
-#    },
-
     #' @description Return the value of the expression when its operands take
     #' their mean value (i.e. value returned by call to \code{mean} or their
     #' value, if numeric). See notes on this class for further explanation.

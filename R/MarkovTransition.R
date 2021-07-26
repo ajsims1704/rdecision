@@ -29,11 +29,13 @@ MarkovTransition <- R6::R6Class(
     #' @param target \code{MarkovState} to which the transition ends.
     #' @param r Instantaneous hazard rate in units of per patient per year.
     #' Exactly one of the outgoing transitions from each state must be NULL.
-    #' @param cost Cost associated with the transition.
+    #' Default value is \code{NA} to indicate that rates will be set with
+    #' \code{set_rate} as the model is run.
+    #' @param cost Cost associated with the transition. 
     #' @param label Character string containing a label for the transition (the
     #' name of the event).
     #' @return A new \code{MarkovTransition} object.
-    initialize = function(source, target, r=NULL, cost=0, label="") {
+    initialize = function(source, target, r=as.numeric(NA), cost=0, label="") {
       # initialize base class
       super$initialize(source=source, target=target, label=label)
       # check that source inherits from MarkovState

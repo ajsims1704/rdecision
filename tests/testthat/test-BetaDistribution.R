@@ -44,7 +44,9 @@ test_that("quantile function checks inputs and has correct output", {
   probs <- c(0.1, 0.4, 1.5)
   expect_error(b$quantile(probs), class="probs_out_of_range")
   probs <- c(0.1, 0.2, 0.5)
-  expect_length(b$quantile(probs),3)
+  q <- b$quantile(probs)
+  expect_length(q,  3)
+  expect_setequal(names(q), c("0.1", "0.2", "0.5"))
 })
 
 test_that("Extreme mode values are defined", {

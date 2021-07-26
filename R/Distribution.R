@@ -73,20 +73,6 @@ Distribution <- R6::R6Class(
       return(as.character(NA))
     },
     
-    #' @description Draw and hold a random sample from the distribution.
-    #' @returns Void
-    sample = function() {
-       return(invisible(self)) 
-    },
-    
-    #' @description Return a random sample drawn from the distribution.
-    #' @details Returns the sample generated at the last call to \code{sample}. 
-    #' @returns A vector of length \code{K} representing one sample.
-    r = function() {
-      # return the sample
-      return(private$.r)
-    },
-    
     #' @description Mean value of the distribution. 
     #' @return Mean value as a numeric scalar (\code{K=1}) or vector of 
     #' length \code{K}.
@@ -95,9 +81,10 @@ Distribution <- R6::R6Class(
       return(rv)
     },
     
-    #' @description Return the mode of the distribution. By default returns
-    #' \code{NA}, which will be the case for most \code{ExprModVar} variables,
-    #' because an arbitrary expression is not guaranteed to be unimodal.
+    #' @description Return the mode of the distribution. 
+    #' @details By default returns \code{NA}, which will be the case for most
+    #' \code{ExprModVar} variables, because an arbitrary expression is not 
+    #' guaranteed to be unimodal.
     #' @return Mode as a numeric scalar (\code{K=1}) or vector of 
     #' length \code{K}.
     mode = function() {
@@ -133,19 +120,26 @@ Distribution <- R6::R6Class(
       return(rv)
     },
     
-    #' @description Quantiles of a univariate distribution. 
+    #' @description Marginal quantiles of the distribution. 
+    #' @details If they are defined, this function returns the marginal 
+    #' quantiles of the multivariate distribution; i.e. the quantiles of each
+    #' univariate marginal distribution of the multivariate distribution. For
+    #' example, the univariate marginal distributions of a multivariate
+    #' normal are univariate normals, and the univariate marginal distributions
+    #' of a Dirichlet distribution are Beta distributions. Note that these are 
+    #' not the true quantiles of a multivariate distribution, which are contours
+    #' for \code{K=2}, surfaces for \code{K=3}, etc. Thus, for example, the
+    #' 2.5\% and 97.5\% marginal quantiles of a bivariate normal distribution
+    #' define a rectangle in \eqn{x_1, x_2} space that will include more than
+    #' 95\% of the distribution, whereas the contour containing 95%% of the
+    #' distribution is an ellipse.
     #' @param probs Numeric vector of probabilities, each in range [0,1].
-    #' @return Vector of numeric values of the same length as \code{probs}.
-    #' The quantiles for \code{K>1} are not not single values (they are 
-    #' lines for \code{K=2}, surfaces for \code{K=3}, etc.).
+    #' @return For \code{K=1} a numeric vector of length equal to the length of
+    #' \code{probs}, with each entry labelled with the quantile. For \code{K>1}
+    #' a matrix of numeric values with the number of rows equal to the length
+    #' of \code{probs}, the number of columns equal to the order; rows are
+    #' labelled with quantiles and columns with the dimension (1, 2, etc).
     quantile = function(probs) {
-      # throw error for K>1
-      if (private$K > 1) {
-        rlang::abort(
-          "Function 'quantile' not defined for multivariate distributions",
-          class = "quantile_undefined"
-        )
-      }
       # test argument
       sapply(probs, FUN=function(x) {
         if (is.na(x)) {
@@ -161,7 +155,33 @@ Distribution <- R6::R6Class(
                        class="probs_out_of_range")
         }
       })
-      return(rep(as.numeric(NA), length(probs)))
+      # create output object
+      if (private$K == 1) {
+        rv <- rep(as.numeric(NA), times=length(probs))
+        names(rv) <- probs
+      } else {
+        rv <- matrix(
+          rep(as.numeric(NA), times=length(probs)*private$K),
+          nrow = length(probs), 
+          ncol = private$K,
+          dimnames = list(probs, seq(1:private$K))
+        )
+      }
+      return(rv)
+    },
+    
+    #' @description Draw and hold a random sample from the distribution.
+    #' @returns Void
+    sample = function() {
+      return(invisible(self)) 
+    },
+    
+    #' @description Return a random sample drawn from the distribution.
+    #' @details Returns the sample generated at the last call to \code{sample}. 
+    #' @returns A vector of length \code{K} representing one sample.
+    r = function() {
+      # return the sample
+      return(private$.r)
     }
 
   )

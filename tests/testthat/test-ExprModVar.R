@@ -131,7 +131,7 @@ test_that("modified expressions are created correctly", {
     0.05
   )
   expect_intol(q$mean(), 0.9, 0.05)
-  # check that pre-prepared r() method is present
+  # check that random sampling is supported
   q$set("random")
   rbeta <- q$get()
   expect_true((rbeta>=0) && (rbeta <= 1))
@@ -206,4 +206,23 @@ test_that("expression chi square from SN is correct", {
   expect_true(ht$p.value>0.001)
 })
 
-
+test_that("one Dirichlet matches a Beta and an expression", {
+  # p follows Beta(1,9) and q is 1-p
+  alpha <- 1
+  beta <- 9
+  p <- BetaModVar$new("P(success)", "P", alpha=alpha, beta=beta)
+  q <- ExprModVar$new("P(failure)", "P", rlang::quo(1-p))
+  # p and q are both derived from Dir(1,9) distribution
+  D <- DirichletDistribution$new(alpha=c(1,9))
+  p.d <- ModVar$new("P(success)", "P", D=D, k=as.integer(1))
+  q.d <- ModVar$new("P(failure)", "P", D=D, k=as.integer(2))
+  # compare means
+  expect_equal(p$mean(), p.d$mean())
+  expect_equal(q$mean(), q.d$mean())
+  # compare quantiles for p 
+  probs<- c(0.025, 0.975)
+  expect_setequal(unname(p$quantile(probs)), unname(p.d$quantile(probs)))
+  # quantiles defined for q.d but not q (an expression)
+  expect_true(all(is.na(q$quantile(probs))))
+  expect_true(all(!is.na(q.d$quantile(probs))))
+})

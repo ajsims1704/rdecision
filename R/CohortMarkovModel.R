@@ -251,8 +251,11 @@ CohortMarkovModel <- R6::R6Class(
     #' the start of the state. The names should be the state names. 
     #' Due to the R implementation of matrix algebra, \code{populations} 
     #' must be a numeric type and is not restricted to being an integer.
+    #' @param icycle Cycle number at which to start/restart. Values greater than
+    #' zero assume a restart of the model.
+    #' it is assumed the model is continuing and the current time is
     #' @return Updated \code{CohortMarkovModel} object.
-    set_populations = function(populations) {
+    set_populations = function(populations, icycle=0) {
       # check that prevalence is valid
       if (length(populations) != self$order()) {
         rlang::abort("Argument 'populations' must have one element per state", 
@@ -275,7 +278,7 @@ CohortMarkovModel <- R6::R6Class(
         private$cmm.pop[s] <- populations[s]
       }
       # reset the cycle number (assumed restart if new population)
-      private$cmm.icycle <- 0
+      private$cmm.icycle <- icycle
       # return updated object
       return(invisible(self))
     },
@@ -489,7 +492,7 @@ CohortMarkovModel <- R6::R6Class(
           mv <- c(mv, e$modvars())
         }
       }
-      # find the modvars in the states
+      # find the ModVars in the states
       for (v in private$V){
         if (inherits(v, what=c("MarkovState"))) {
           mv <- c(mv, v$modvars())

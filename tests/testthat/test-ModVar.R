@@ -90,7 +90,6 @@ test_that("r() is deprecated", {
   )
 })
 
-
 # --------------------------------------------------------------------------
 # tests of set and get
 # --------------------------------------------------------------------------
@@ -122,4 +121,40 @@ test_that("get() after set('random') returns NA", {
   x$set("random")
   expect_true(is.na(x$get()))
 })
+
+# --------------------------------------------------------------------------
+# modvars associated with univariate and multivariate distributions
+# --------------------------------------------------------------------------
+test_that("modvar can be associated with a univariate uncertainty", {
+  # create Beta distribution
+  D <- BetaDistribution$new(alpha=1, beta=9)
+  # create a ModVar and associate with the distribution
+  m <- ModVar$new("p(success)", "P", D=D, k=as.integer(1))
+  expect_equal(m$mean(), 1/10)
+  expect_equal(
+    unname(m$quantile(0.5)), 
+    stats::qbeta(p=0.5, shape1=1, shape2=9)
+  )
+})
+
+test_that("modvars can be associated with a dimension of a multivariate dist", {
+  # create a Dirichlet distribution
+  D <- DirichletDistribution$new(c(1,9))
+  # create a ModVar and associate it with the first dimension
+  m <- ModVar$new("p(success)", "P", D=D, k=as.integer(1))
+  expect_equal(m$mean(), 1/10)
+  expect_equal(
+    unname(m$quantile(0.5)), 
+    stats::qbeta(p=0.5, shape1=1, shape2=9)
+  )
+  # create a ModVar and associate it with the second dimension
+  m <- ModVar$new("p(failure)", "P", D=D, k=as.integer(2))
+  expect_equal(m$mean(), 9/10)
+  expect_equal(
+    unname(m$quantile(0.5)), 
+    stats::qbeta(p=0.5, shape1=9, shape2=1)
+  )
+})
+
+
 

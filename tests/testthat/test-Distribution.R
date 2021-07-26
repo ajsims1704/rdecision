@@ -34,23 +34,7 @@ test_that("Invalid base distributions are rejected", {
   expect_equal(D$order(), 3)
 })
 
-# --------------------------------------------------------------------------
-# tests of random sampling
-# --------------------------------------------------------------------------
-test_that("single sample has K dimensions", {
-  D <- Distribution$new("Base", K=as.integer(3))
-  expect_length(D$r(), 3)
-  D$sample()
-  expect_length(D$r(), 3)
-})
 
-test_that("univariate samples are scalars", {
-  D <- Distribution$new("Base", K=as.integer(1))
-  R <- D$r()
-  expect_true(is.vector(R))
-  expect_length(R, 1)
-})
-  
 # --------------------------------------------------------------------------
 # tests of mean and mode
 # --------------------------------------------------------------------------
@@ -84,14 +68,35 @@ test_that("sd is only defined for K=1", {
 # --------------------------------------------------------------------------
 # tests of quantiles
 # --------------------------------------------------------------------------
-test_that("quantiles are only available for K=1", {
-  D <- Distribution$new("Base", K=as.integer(3))
-  expect_error(
-    D$quantile(probs=c(0.025,0.975)),
-    class = "quantile_undefined"
-  )
+test_that("form of quantiles object is correct", {
+  # univariate
   D <- Distribution$new("Base")
   q <- D$quantile(probs=c(0.025,0.975))
   expect_length(q, 2)
+  expect_setequal(names(q), c("0.025", "0.975"))
+  # trivariate
+  D <- Distribution$new("Base", K=as.integer(3))
+  q <- D$quantile(probs=c(0.025,0.975))
+  expect_true(is.matrix(q))
+  expect_equal(nrow(q), 2)
+  expect_equal(ncol(q), 3)
+  expect_setequal(rownames(q), c("0.025", "0.975"))
+  expect_setequal(colnames(q), c("1", "2", "3"))
 })
 
+# --------------------------------------------------------------------------
+# tests of random sampling
+# --------------------------------------------------------------------------
+test_that("single sample has K dimensions", {
+  D <- Distribution$new("Base", K=as.integer(3))
+  expect_length(D$r(), 3)
+  D$sample()
+  expect_length(D$r(), 3)
+})
+
+test_that("univariate samples are scalars", {
+  D <- Distribution$new("Base", K=as.integer(1))
+  R <- D$r()
+  expect_true(is.vector(R))
+  expect_length(R, 1)
+})

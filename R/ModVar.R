@@ -92,10 +92,6 @@ ModVar <- R6::R6Class(
       # set the .value vector members
       private$.value <- rep(as.numeric(NA), times=length(private$.whats))
       names(private$.value) <- private$.whats
-      private$.value["expected"] <- private$.D$mean()
-      private$.value["q2.5"] <- private$.D$quantile(0.025)
-      private$.value["q50"] = private$.D$quantile(0.5)
-      private$.value["q97.5"] <- private$.D$quantile(0.975)
       # value to return on first get
       private$.whatnext <- "expected"
       # return new object
@@ -168,26 +164,13 @@ ModVar <- R6::R6Class(
     #' @param probs Numeric vector of probabilities, each in range [0,1].
     #' @return Vector of numeric values of the same length as \code{probs}.
     quantile = function(probs) {
-      # test argument
-      sapply(probs, FUN=function(x) {
-        if (is.na(x)) {
-          rlang::abort("All elements of 'probs' must be defined",
-                       class="probs_not_defined")
-        }
-        if (!is.numeric(x)) {
-          rlang::abort("Argument 'probs' must be a numeric vector",
-                       class="probs_not_numeric")
-        }
-        if (x<0 || x>1) {
-          rlang::abort("Elements of 'probs' must be in range[0,1]",
-                       class="probs_out_of_range")
-        }
-      })
-      # only applicable for univariate distributions
+      # matrix for multivariate, vector for univariate distributions; argument
+      # is checked in .D$quantiles()
+      q <- private$.D$quantile(probs)
       if (private$.D$order() > 1) {
-        rv <- rep(as.numeric(NA), length(probs)) 
+        rv <- q[,private$.k]
       } else {
-        rv <- private$.D$quantile(probs)
+        rv <- q
       }
       return(rv)
     },
@@ -259,6 +242,14 @@ ModVar <- R6::R6Class(
       # if random, save the sample
       if (private$.whatnext == "random") {
         private$.value["random"] <- private$.D$r()
+      } else if (private$.whatnext == "expected") {
+        private$.value["expected"] <- self$mean()
+      } else if (private$.whatnext == "q2.5") {
+        private$.value["q2.5"] <- self$quantile(0.025)
+      } else if (private$.whatnext == "q50") {
+        private$.value["q50"] <- self$quantile(0.5)
+      } else if (private$.whatnext == "q97.5") {
+        private$.value["q97.5"] <- self$quantile(0.975)
       }
       # return the required value
       v <- unname(private$.value[private$.whatnext])
