@@ -50,7 +50,8 @@ CohortMarkovModel <- R6::R6Class(
     cmm.discost = NULL,
     cmm.disutil = NULL,
     cmm.pop = NULL,
-    cmm.icycle = NULL
+    cmm.icycle = NULL,
+    cmm.elapsed = NULL
   ),
   public = list(
     
@@ -133,12 +134,16 @@ CohortMarkovModel <- R6::R6Class(
         )
       }
       private$cmm.disutil <- discount.utility
-      # create a population vector and initialize first state to 1000
-      private$cmm.pop <- vector(mode="numeric", length=self$order())
-      names(private$cmm.pop) <- self$get_statenames()
-      private$cmm.pop[1] <- 1000
-      # set the cycle number
-      private$cmm.icycle <- 0
+      # reset the model to its ground state
+      self$reset()
+      ## create a population vector and initialize first state to 1000
+      #private$cmm.pop <- vector(mode="numeric", length=self$order())
+      #names(private$cmm.pop) <- self$get_statenames()
+      #private$cmm.pop[1] <- 1000
+      ## set the cycle number
+      #private$cmm.icycle <- 0
+      ## set the clock time
+      #private$cmm.elapsed <- 0
       # return a new CohortMarkovModel object
       return(invisible(self))
     },
@@ -245,40 +250,80 @@ CohortMarkovModel <- R6::R6Class(
       return(statenames)
     },
     
-    #' @description Sets the occupancy of each state. 
-    #' @details Sets the cycle count to zero.
+    #' @description Resets the model counters. 
+    #' @details Resets the state populations, next cycle number and elapsed time
+    #' of the model. By default the model is returned to its ground state (1000
+    #' people in the first state and zero in the others; next cycle is labelled
+    #' zero; elapsed time (years) is zero). Any or all of these can be set via 
+    #' this function. \code{icycle} is simply an integer counter label for each 
+    #' cycle, \code{elapsed} sets the elapsed time in years from the index time
+    #' from which discounting is assumed to apply.
     #' @param populations A named vector of populations for
     #' the start of the state. The names should be the state names. 
     #' Due to the R implementation of matrix algebra, \code{populations} 
-    #' must be a numeric type and is not restricted to being an integer.
-    #' @param icycle Cycle number at which to start/restart. Values greater than
-    #' zero assume a restart of the model.
-    #' it is assumed the model is continuing and the current time is
+    #' must be a numeric type and is not restricted to being an integer. If 
+    #' NULL, the population of the first state is set to 1000 and the others
+    #' to zero.
+    #' @param icycle Cycle number at which to start/restart. 
+    #' @param elapsed Elapsed time since the index (reference) time used for
+    #' discounting as an R \code{difftime} object.
     #' @return Updated \code{CohortMarkovModel} object.
-    set_populations = function(populations, icycle=0) {
-      # check that prevalence is valid
-      if (length(populations) != self$order()) {
-        rlang::abort("Argument 'populations' must have one element per state", 
-                     class="incorrect_state_count")
-      }
-      # check the state names are correct
-      if (!setequal(self$get_statenames(), names(populations))) {
-        rlang::abort("Each element of 'populations' must have a state name",
-                     class="unmatched_states")
-      }  
-      # check that all populations are of type numeric
-      sapply(populations, function(x) {
-        if (is.numeric(x)==F){
-          rlang::abort("Each element of 'populations' must be of type numeric",
-                       class="non-numeric_state_population")
+    reset = function(populations=NULL, icycle=as.integer(0), 
+                     elapsed=as.difftime(0, units="days")) {
+      # check that population is valid
+      if (is.null(populations)) {
+        private$cmm.pop <- vector(mode="numeric", length=self$order())
+        names(private$cmm.pop) <- self$get_statenames()
+        private$cmm.pop[1] <- 1000
+      } else {
+        if (length(populations) != self$order()) {
+          rlang::abort(
+            "Argument 'populations' must have one element per state", 
+            class="incorrect_state_count"
+          )
         }
-      })
-      # set the populations
-      for (s in self$get_statenames()) {
-        private$cmm.pop[s] <- populations[s]
+        # check the state names are correct
+        if (!setequal(self$get_statenames(), names(populations))) {
+          rlang::abort(
+            "Each element of 'populations' must have a state name",
+            class="unmatched_states")
+        }  
+        # check that all populations are of type numeric
+        sapply(populations, function(x) {
+          if (is.numeric(x)==F){
+            rlang::abort(
+              "Each element of 'populations' must be of type numeric",
+              class="non-numeric_state_population")
+          }
+        })
+        # set the populations
+        for (s in self$get_statenames()) {
+          private$cmm.pop[s] <- populations[s]
+        }
       }
-      # reset the cycle number (assumed restart if new population)
+      # check and set the cycle number
+      if (!is.integer(icycle)) {
+        rlang::abort(
+          "'icycle' must be an integer",
+          class = "invalid_icycle"
+        )
+      }
+      if (icycle < 0) {
+        rlang::abort(
+          "'icycle' must be >= 0",
+          class = "invalid_icycle"
+        )
+        
+      }
       private$cmm.icycle <- icycle
+      # check and update the elapsed time
+      if (class(elapsed) != "difftime") {
+        rlang::abort(
+          "Argument 'elapsed' must be of class 'difftime'.",
+          class = "invalid_elapsed"
+        )
+      }
+      private$cmm.elapsed <- elapsed
       # return updated object
       return(invisible(self))
     },
@@ -287,6 +332,20 @@ CohortMarkovModel <- R6::R6Class(
     #' @returns A numeric vector of populations, named with state names.
     get_populations = function() {
       return(private$cmm.pop)
+    },
+    
+    #' @description Gets the current elapsed time.
+    #' @details The elapsed time is defined as the difference between the 
+    #' current time in the model and an index time used as the reference
+    #' time for applying discounting. By default the elapsed time starts at
+    #' zero. It can be set directly by calling \code{reset}. It is incremented
+    #' after each call to \code{cycle} by the cycle duration to the time at the
+    #' end of the cycle (even if half cycle correction is used). Thus, via the
+    #' \code{reset} and \code{cycle} methods, the time of each cycle relative 
+    #' to the discounting index and its duration can be controlled arbitrarily.
+    #' @returns Elapsed time as an R \code{difftime} object.
+    get_elapsed = function() {
+      return(private$cmm.elapsed)  
     },
  
     #' @description Tabulation of states
@@ -309,10 +368,16 @@ CohortMarkovModel <- R6::R6Class(
     #' @description Applies one cycle of the model.
     #' @param tcycle Cycle length, expressed as an R \code{difftime} object; 
     #' default 1 year.
-    #' @param hcc Boolean; whether to apply half cycle correction. If TRUE, 
-    #' the correction is only applied to the outputs of functions \code{cycle} 
-    #' and \code{cycles}; the state population passed to the next cycle is
-    #' the end cycle population, obtainable with \code{get_populations}.
+    #' @param hcc.pop Boolean; whether to apply half cycle correction to the
+    #' population and QALY. If TRUE, the correction is only applied to the 
+    #' outputs of 
+    #' functions \code{cycle} and \code{cycles}; the state population passed to
+    #' the next cycle is the end cycle population, obtainable 
+    #' with \code{get_populations}.
+    #' @param hcc.cost Boolean; whether to apply half cycle correction to the
+    #' costs. If true, the occupancy costs are computed using the population
+    #' at half cycle; if false they are applied at the end of the cycle. 
+    #' Applicable only if hcc.pop is TRUE.
     #' @returns Calculated values, one row per state, as a data frame with the
     #' following columns:
     #' \describe{
@@ -322,10 +387,11 @@ CohortMarkovModel <- R6::R6Class(
     #' \item{\code{Population}}{Population of the state at the end of 
     #' the cycle, or at mid-cycle if half-cycle correction is applied.}
     #' \item{\code{OccCost}}{Cost of the population occupying the state for 
-    #' the cycle. Half-cycle correction and discount are applied, if the
-    #' options are set. the costs are normalized by the model population. The
-    #' cycle costs are derived from the annual occupancy costs of the
-    #' \code{MarkovState}s.}
+    #' the cycle. Discount is applied, if the options are set. The costs are
+    #' normalized by the model population. The cycle costs are derived from the
+    #' annual occupancy costs of the \code{MarkovState}s. Applied to the end
+    #' population, i.e. unaffacted by half cycle correction, as per 
+    #' Briggs \emph{et al}.}
     #' \item{code{EntryCost}}{Cost of the transitions \emph{into} the state
     #' during the cycle. Discounting is applied, if the option is set. 
     #' The result is normalized by the model population. The cycle costs
@@ -335,7 +401,8 @@ CohortMarkovModel <- R6::R6Class(
     #' during the cycle. Half cycle correction and discounting are applied,
     #' if these options are set. Normalized by the model population.}
     #' }
-    cycle = function(tcycle=as.difftime(365.25, units="days"), hcc=TRUE) {
+    cycle = function(tcycle=as.difftime(365.25, units="days"), hcc.pop=TRUE,
+                     hcc.cost=TRUE) {
       # check that the cycle time is an interval
       if (class(tcycle) != "difftime") {
         rlang::abort(
@@ -344,22 +411,30 @@ CohortMarkovModel <- R6::R6Class(
         )
       }
       # check and set half cycle correction
-      if (!is.logical(hcc)) {
+      if (!is.logical(hcc.pop)) {
         rlang::abort(
-          "Argument 'hcc' must be logical.",
+          "Argument 'hcc.pop' must be logical.",
           class = "invalid_hcc"
         )
       }
-      # calculate cycle duration (dty), clock time (ty) and discount 
-      # factors (dfc, dfu)
-      dty <- as.numeric(tcycle, units="days")/365.25
-      if (hcc) {
-        ty <- (private$cmm.icycle+0.5)*dty
-      } else {
-        ty <- (private$cmm.icycle+1)*dty
+      if (!is.logical(hcc.cost)) {
+        rlang::abort(
+          "Argument 'hcc.cost' must be logical.",
+          class = "invalid_hcc"
+        )
       }
-      dfc <- 1/(1+private$cmm.discost)^ty
-      dfu <- 1/(1+private$cmm.disutil)^ty
+      if (hcc.cost & !hcc.pop) {
+        rlang::abort(
+          "hcc.cost applies only if hcc.pop is TRUE",
+          class = "invalid_hcc"
+        )
+      }
+      # calculate cycle duration in years (dty), elapsed time at end cycle and 
+      # discount factors (dfc, dfu)
+      dty <- as.numeric(tcycle, units="days")/365.25
+      elapsed <- as.numeric(private$cmm.elapsed, units="days")/365.25 + dty
+      dfc <- 1/(1+private$cmm.discost)^elapsed
+      dfu <- 1/(1+private$cmm.disutil)^elapsed
       # transition costs, calculated as number of transitions between each
       # pair of states, multiplied by transition cost, summed by the state
       # being entered (entry costs)
@@ -371,31 +446,40 @@ CohortMarkovModel <- R6::R6Class(
       TC <- P*self$transition_probability(tcycle)*self$transition_cost()
       entry.costs <- colSums(TC)*dfc
       # Apply the transition probabilities to get the end state populations,
-      # with half-cycle correction, if required
       pop.end <- private$cmm.pop %*% self$transition_probability(tcycle)
       pop.end <- drop(pop.end)
-      if (hcc) {
-        pop.occ <- (private$cmm.pop + pop.end)/2
-      } else {
-        pop.occ <- pop.end
-      }
-      private$cmm.pop <- pop.end
       # calculate annual costs of state occupancy
       state.costs <- sapply(private$V, function(x) {return(x$cost())})
       state.costs <- state.costs * dty
-      occupancy.costs <- pop.occ*state.costs*dfc
       # calculate QALYs gained from state occupancy
       state.utilities <- sapply(private$V, FUN=function(v){v$utility()})
       state.utilities <- state.utilities*dfu
-      qaly <- pop.occ*state.utilities*dty
+      # half cycle correction (affects reporting only)
+      if (hcc.pop) {
+        pop <- (private$cmm.pop + pop.end)/2
+        elapsed <- as.numeric(private$cmm.elapsed, units="days")/365.25 + dty/2
+      } else {
+        pop <- pop.end
+        elapsed <- as.numeric(private$cmm.elapsed, units="days")/365.25 + dty
+      }
+      qaly <- pop*state.utilities*dty
+      if (hcc.cost) {
+        occupancy.costs <- pop*state.costs*dfc
+      } else {
+        occupancy.costs <- pop.end*state.costs*dfc
+      }
+      # update the populations
+      private$cmm.pop <- pop.end
       # update cycle number
       private$cmm.icycle <- private$cmm.icycle + 1
+      # update elapsed time
+      private$cmm.elapsed <- private$cmm.elapsed + tcycle
       # return calculated values, per state
       RC <- data.frame(
         State = self$get_statenames(),
         Cycle = rep(private$cmm.icycle, times=length(self$order())),
-        Time = rep(ty, times=length(self$order())),
-        Population = pop.occ,
+        Time = rep(elapsed, times=length(self$order())),
+        Population = pop,
         OccCost = occupancy.costs/sum(self$order()),
         EntryCost = entry.costs/sum(self$order()),
         Cost = (occupancy.costs+entry.costs)/sum(private$cmm.pop),
@@ -419,10 +503,16 @@ CohortMarkovModel <- R6::R6Class(
     #' @param ncycles Number of cycles to run; default is 2.
     #' @param tcycle Cycle length, expressed as an R \code{difftime} object; 
     #' default 1 year.
-    #' @param hcc Boolean; whether to apply half cycle correction. If TRUE, 
-    #' the correction is only applied to the outputs of functions \code{cycle} 
-    #' and \code{cycles}; the state population passed to the next cycle is
-    #' the end cycle population, obtainable with \code{get_populations}.
+    #' @param hcc.pop Boolean; whether to apply half cycle correction to the
+    #' population and QALY. If TRUE, the correction is only applied to the 
+    #' outputs of functions \code{cycle} and \code{cycles}; the state 
+    #' population passed to
+    #' the next cycle is the end cycle population, obtainable 
+    #' with \code{get_populations}.
+    #' @param hcc.cost Boolean; whether to apply half cycle correction to the
+    #' costs. If true, the occupancy costs are computed using the population
+    #' at half cycle; if false they are applied at the end of the cycle.
+    #' Applicable only if hcc.pop is TRUE.
     #' @returns Data frame with cycle results.
     #' following columns:
     #' \describe{
@@ -436,7 +526,7 @@ CohortMarkovModel <- R6::R6Class(
     #' of the states in the cycle.}
     #' } 
     cycles = function(ncycles=2, tcycle=as.difftime(365.25, units="days"), 
-                      hcc=TRUE) {
+                      hcc.pop=TRUE, hcc.cost=TRUE) {
       # show zero?
       if (private$cmm.icycle==0) {
         nzero <- 1
@@ -463,7 +553,7 @@ CohortMarkovModel <- R6::R6Class(
       # run the model
       for (i in (1+nzero):(ncycles+nzero)) {
         # single cycle
-        DF.cycle <- self$cycle(tcycle, hcc)
+        DF.cycle <- self$cycle(tcycle, hcc.pop, hcc.cost)
         # set the cycle number
         DF[i, "Cycle"] <- DF.cycle$Cycle[1]
         DF[i, "Years"] <- DF.cycle$Time[1]

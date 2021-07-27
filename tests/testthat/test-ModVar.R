@@ -83,13 +83,6 @@ test_that("stub functions return NA", {
   expect_true(is.na(x$SD()))
 })
 
-test_that("r() is deprecated", {
-  x <- ModVar$new("x", "GBP")
-  expect_warning(
-    x$r()
-  )
-})
-
 # --------------------------------------------------------------------------
 # tests of set and get
 # --------------------------------------------------------------------------
@@ -141,19 +134,22 @@ test_that("modvars can be associated with a dimension of a multivariate dist", {
   # create a Dirichlet distribution
   D <- DirichletDistribution$new(c(1,9))
   # create a ModVar and associate it with the first dimension
-  m <- ModVar$new("p(success)", "P", D=D, k=as.integer(1))
-  expect_equal(m$mean(), 1/10)
+  m1 <- ModVar$new("p(success)", "P", D=D, k=as.integer(1))
+  expect_equal(m1$mean(), 1/10)
   expect_equal(
-    unname(m$quantile(0.5)), 
+    unname(m1$quantile(0.5)), 
     stats::qbeta(p=0.5, shape1=1, shape2=9)
   )
   # create a ModVar and associate it with the second dimension
-  m <- ModVar$new("p(failure)", "P", D=D, k=as.integer(2))
-  expect_equal(m$mean(), 9/10)
+  m2 <- ModVar$new("p(failure)", "P", D=D, k=as.integer(2))
+  expect_equal(m2$mean(), 9/10)
   expect_equal(
-    unname(m$quantile(0.5)), 
+    unname(m2$quantile(0.5)), 
     stats::qbeta(p=0.5, shape1=9, shape2=1)
   )
+  # access distributional values via get()
+  m1$set("expected")
+  expect_equal(m1$get(), 1/10)
 })
 
 

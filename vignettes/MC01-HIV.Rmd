@@ -44,13 +44,22 @@ The variables used in the model are all numerical constants, and are defined
 as follows. The original model was based on annual transition probabilities;
 these are converted to instantaneous hazard rates in units of events/year.
 ```{r model-variables, echo=TRUE}
-# transition rates calculated from annual transition probabilities
-trAB <- -log(1-0.202)/1 
-trAC <- -log(1-0.067)/1
-trAD <- -log(1-0.010)/1
-trBC <- -log(1-0.407)/1
-trBD <- -log(1-0.012)/1
-trCD <- -log(1-0.250)/1
+# cycle time
+tcycle <- as.difftime(365.25, units="days")
+# annual probabilities
+pAB <- 0.202 
+pAC <- 0.067
+pAD <- 0.010
+pBC <- 0.407
+pBD <- 0.012
+pCD <- 0.250
+# transition rates for monotherapy calculated from annual probabilities
+trABm <- -log(1-pAB)/1 
+trACm <- -log(1-pAC)/1
+trADm <- -log(1-pAD)/1
+trBCm <- -log(1-pBC)/1
+trBDm <- -log(1-pBD)/1
+trCDm <- -log(1-pCD)/1
 # Costs
 dmca <- 1701 # direct medical costs associated with state A
 dmcb <- 1774 # direct medical costs associated with state B
@@ -81,26 +90,25 @@ state D to zero. Thus the incremental quality adjusted life years gained per
 cycle is equivalent to the survival function. 
 ```{r model, echo=TRUE}
 # create Markov states for monotherapy (zidovudine only)
-sA <- MarkovState$new("A", cost=dmca+ccca+cAZT)
-sB <- MarkovState$new("B", cost=dmcb+cccb+cAZT)
-sC <- MarkovState$new("C", cost=dmcc+cccc+cAZT)
-sD <- MarkovState$new("D", cost=0, utility=0)
+sAm <- MarkovState$new("A", cost=dmca+ccca+cAZT)
+sBm <- MarkovState$new("B", cost=dmcb+cccb+cAZT)
+sCm <- MarkovState$new("C", cost=dmcc+cccc+cAZT)
+sDm <- MarkovState$new("D", cost=0, utility=0)
 # create transitions
-tAA <- MarkovTransition$new(sA, sA, r=NULL)
-tAB <- MarkovTransition$new(sA, sB, r=trAB)
-tAC <- MarkovTransition$new(sA, sC, r=trAC)
-tAD <- MarkovTransition$new(sA, sD, r=trAD)
-tBB <- MarkovTransition$new(sB, sB, r=NULL)
-tBC <- MarkovTransition$new(sB, sC, r=trBC)
-tBD <- MarkovTransition$new(sB, sD, r=trBD)
-tCC <- MarkovTransition$new(sC, sC, r=NULL)
-tCD <- MarkovTransition$new(sC, sD, r=trCD)
-tDD <- MarkovTransition$new(sD, sD, r=NULL)
+tAAm <- MarkovTransition$new(sAm, sAm, r=NULL)
+tABm <- MarkovTransition$new(sAm, sBm, r=trABm)
+tACm <- MarkovTransition$new(sAm, sCm, r=trACm)
+tADm <- MarkovTransition$new(sAm, sDm, r=trADm)
+tBBm <- MarkovTransition$new(sBm, sBm, r=NULL)
+tBCm <- MarkovTransition$new(sBm, sCm, r=trBCm)
+tBDm <- MarkovTransition$new(sBm, sDm, r=trBDm)
+tCCm <- MarkovTransition$new(sCm, sCm, r=NULL)
+tCDm <- MarkovTransition$new(sCm, sDm, r=trCDm)
+tDDm <- MarkovTransition$new(sDm, sDm, r=NULL)
 # construct the model
-mhiv <- CohortMarkovModel$new(
-  V = list(sA, sB, sC, sD),
-  E = list(tAA, tAB, tAC, tAD, tBB, tBC, tBD, tCC, tCD, tDD),
-  hcc = TRUE,
+m.mono <- CohortMarkovModel$new(
+  V = list(sAm, sBm, sCm, sDm),
+  E = list(tAAm, tABm, tACm, tADm, tBBm, tBCm, tBDm, tCCm, tCDm, tDDm),
   discount.cost = cDR/100,
   discount.utility = oDR/100
 )
@@ -120,7 +128,7 @@ f1c  <- paste("Figure 1. Markov model for comparison of HIV therapy.",
               "A: 200 < cd4 < 500,", "B: cd4 < 200,", "C: AIDS,","D: Death.")
 ```
 ```{r draw,fig.cap=f1c,fig.asp=0.21}
-#DOT <- mhiv$as_DOT()
+#DOT <- m.mono$as_DOT()
 #writeLines(DOT, con="mono.gv")
 #system2(command="dot", args=c("-Tpng","-o","mono.png","mono.gv"))
 knitr::include_graphics(path="mono.png")
@@ -131,7 +139,7 @@ The states in the model can be tabulated with the function `tabulate_states`.
 For the monotherapy model, the states are tabulated below. The cost of each
 state includes the annual cost of AZT (Zidovudine). 
 ```{r echo=FALSE}
-DF <- mhiv$tabulate_states()
+DF <- m.mono$tabulate_states()
 pander::pander(DF[,c("Name", "Cost")], justify="lr")
 rm(DF)
 ```
@@ -143,7 +151,7 @@ transition matrix, can be extracted from the model via the function
 shown below. This is consistent with the Table 1 of 
 Chancellor *et al* [-@chancellor1997].
 ```{r echo=FALSE}
-TM <- mhiv$transition_probability()
+TM <- m.mono$transition_probability(tcycle)
 pander::pander(TM, emphasize.rownames=FALSE, justify="lcccc")
 rm(TM)
 ```
@@ -170,9 +178,9 @@ correction). No discount was applied to the utilities.
 # create starting populations
 N <- 1000
 populations <- c(A = N, B = 0, C = 0, D = 0)
-mhiv$set_populations(populations)
+m.mono$reset(populations)
 # run 20 cycles
-MT.mono <- mhiv$cycles(ncycles=20)
+MT.mono <- m.mono$cycles(ncycles=20, hcc.pop=FALSE, hcc.cost=FALSE)
 ```
 
 ```{r print_monocycle}
@@ -189,56 +197,74 @@ el.mono <- sum(MT.mono$QALY)
 cost.mono <- sum(MT.mono$Cost)
 ```
 The estimated life years is approximated by summing the proportions of patients
-left alive at each cycle (Briggs *et al*[@briggs2006], Exercise 2.5). This is 
+left alive at each cycle (Briggs *et al* [@briggs2006], Exercise 2.5). This is 
 an approximation because it ignores the population who remain alive after 
 21 years, and assumes all deaths occurred at the start of each cycle. For
 monotherapy the expected life gained is `r round(el.mono,3)` years at a cost
 of `r format(cost.mono,digits=2,scientific=FALSE)` GBP.
 
 ## Combination therapy
-For combination therapy, the same model structure was used, and in `rdecision`,
-the same nodes, edges and model used for the monotherapy model can be re-used
-for the 
-combination therapy model by setting costs and transition rates to amended 
-values.
+For combination therapy, a similar model was created, with adjusted costs and 
+transition rates. Following Briggs *et al* [@briggs2006] the treatment effect
+was applied to the probabilities.
 ```{r combo, echo=TRUE}
-# set occupancy costs for combination therapy (zidovudine and lamivudine)
-sA$set_cost(dmca+ccca+cAZT+cLam)
-sB$set_cost(dmcb+cccb+cAZT+cLam)
-sC$set_cost(dmcc+cccc+cAZT+cLam)
-# modify transition rates by the treatment effect
-tAB$set_rate(trAB*RR)
-tAC$set_rate(trAC*RR)
-tAD$set_rate(trAD*RR)
-tBC$set_rate(trBC*RR)
-tBD$set_rate(trBD*RR)
-tCD$set_rate(trCD*RR)
+# transition rates for combination therapy calculated from annual probabilities
+trABc <- -log(1-RR*pAB)/1 
+trACc <- -log(1-RR*pAC)/1
+trADc <- -log(1-RR*pAD)/1
+trBCc <- -log(1-RR*pBC)/1
+trBDc <- -log(1-RR*pBD)/1
+trCDc <- -log(1-RR*pCD)/1
+# create Markov states for combination therapy
+sAc <- MarkovState$new("A", cost=dmca+ccca+cAZT+cLam)
+sBc <- MarkovState$new("B", cost=dmcb+cccb+cAZT+cLam)
+sCc <- MarkovState$new("C", cost=dmcc+cccc+cAZT+cLam)
+sDc <- MarkovState$new("D", cost=0, utility=0)
+# create transitions
+tAAc <- MarkovTransition$new(sAc, sAc, r=NULL)
+tABc <- MarkovTransition$new(sAc, sBc, r=trABc)
+tACc <- MarkovTransition$new(sAc, sCc, r=trACc)
+tADc <- MarkovTransition$new(sAc, sDc, r=trADc)
+tBBc <- MarkovTransition$new(sBc, sBc, r=NULL)
+tBCc <- MarkovTransition$new(sBc, sCc, r=trBCc)
+tBDc <- MarkovTransition$new(sBc, sDc, r=trBDc)
+tCCc <- MarkovTransition$new(sCc, sCc, r=NULL)
+tCDc <- MarkovTransition$new(sCc, sDc, r=trCDc)
+tDDc <- MarkovTransition$new(sDc, sDc, r=NULL)
+# construct the model
+m.comb <- CohortMarkovModel$new(
+  V = list(sAc, sBc, sCc, sDc),
+  E = list(tAAc, tABc, tACc, tADc, tBBc, tBCc, tBDc, tCCc, tCDc, tDDc),
+  discount.cost = cDR/100,
+  discount.utility = oDR/100
+)
 ```
 
 In this model, lamivudine is given for the first 2 years, with 
 the treatment effect assumed to persist for the same period. The
 state populations and cycle numbers are retained by the model between 
-calls to `cycle` or `cycles` making it easy to change probabilities or
-costs during a simulation. The cycle count and elapsed time are reset when
-a new population is set. 
+calls to `cycle` or `cycles` and can be retrieved by calling `get_populations`.
+In this example, the combination therapy model is run for 2 cycles, then the
+population is used to continue with the monotherapy model for the remaining
+8 years. The `reset` function is used to set the cycle number and elapsed
+time of the new run of the mono model.
 ```{r combo_run, echo=TRUE}
 # run combination therapy model for 2 years
 populations <- c('A'=N, 'B'=0, 'C'=0, 'D'=0)
-mhiv$set_populations(populations)
+m.comb$reset(populations)
 # run 2 cycles
-MT.comb <- mhiv$cycles(2)
-# revise costs and transitions, 
-sA$set_cost(dmca+ccca+cAZT)
-sB$set_cost(dmcb+cccb+cAZT)
-sC$set_cost(dmcc+cccc+cAZT)
-tAB$set_rate(trAB)
-tAC$set_rate(trAC)
-tAD$set_rate(trAD)
-tBC$set_rate(trBC)
-tBD$set_rate(trBD)
-tCD$set_rate(trCD)
+MT.comb <- m.comb$cycles(2, hcc.pop=FALSE, hcc.cost=FALSE)
+# feed populations into mono model & reset cycle counter and time
+populations <- m.comb$get_populations()
+m.mono$reset(
+  populations, 
+  icycle=as.integer(2), 
+  elapsed=as.difftime(365.25*2, units="days")
+)
 # and run model for next 18 years
-MT.comb <- rbind(MT.comb, mhiv$cycles(ncycles=18))
+MT.comb <- rbind(
+  MT.comb, m.mono$cycles(ncycles=18, hcc.pop=FALSE, hcc.cost=FALSE)
+)
 ```
 
 The Markov trace for combination therapy is as follows:

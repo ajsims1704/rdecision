@@ -176,11 +176,21 @@ ModVar <- R6::R6Class(
     },
 
     #' @description Draw a random sample from the model variable. 
+    #' @details The same random sample will be returned until \code{set} is
+    #' called to force a resample.
     #' @return A sample drawn at random.
     r = function() {
-      .Deprecated("set('random')")
+#      .Deprecated("set('random')")
+      # fetch the sample from the distribution
+      rd <- private$.D$r()
+      # get random sample for this dimension
+      if (private$.D$order() > 1) {
+        rv <- rd[private$.k]
+      } else {
+        rv <- rd
+      }
       # return the sample
-      return(private$.value["random"])
+      return(rv)
     },
 
     #' @description Sets the value of the \code{ModVar} that will be returned
@@ -241,7 +251,7 @@ ModVar <- R6::R6Class(
     get = function() {
       # if random, save the sample
       if (private$.whatnext == "random") {
-        private$.value["random"] <- private$.D$r()
+        private$.value["random"] <- self$r()
       } else if (private$.whatnext == "expected") {
         private$.value["expected"] <- self$mean()
       } else if (private$.whatnext == "q2.5") {

@@ -28,6 +28,7 @@ Andrew J. Sims \email{andrew.sims@newcastle.ac.uk}
 \item \href{#method-set_cost}{\code{MarkovState$set_cost()}}
 \item \href{#method-cost}{\code{MarkovState$cost()}}
 \item \href{#method-utility}{\code{MarkovState$utility()}}
+\item \href{#method-modvars}{\code{MarkovState$modvars()}}
 \item \href{#method-clone}{\code{MarkovState$clone()}}
 }
 }
@@ -45,7 +46,7 @@ Andrew J. Sims \email{andrew.sims@newcastle.ac.uk}
 \subsection{Method \code{new()}}{
 Create an object of type \code{MarkovState}.
 \subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{MarkovState$new(name, cost = 0, utility = 1)}\if{html}{\out{</div>}}
+\if{html}{\out{<div class="r">}}\preformatted{MarkovState$new(name, cost = as.numeric(NA), utility = 1)}\if{html}{\out{</div>}}
 }
 
 \subsection{Arguments}{
@@ -53,12 +54,20 @@ Create an object of type \code{MarkovState}.
 \describe{
 \item{\code{name}}{The name of the state (character string).}
 
-\item{\code{cost}}{The annual cost of state occupancy.}
+\item{\code{cost}}{The annual cost of state occupancy (numeric or ModVar). Set
+as \code{NA} by default to help distinguish costs to be set with 
+\code{set_cost} in future from those deliberatly set to zero.}
 
-\item{\code{utility}}{The utility associated with being in the state.}
+\item{\code{utility}}{The utility associated with being in the state (numeric
+or ModVar).}
 }
 \if{html}{\out{</div>}}
 }
+\subsection{Details}{
+Utility must be in the range [-Inf,1]. If it is of type numeric,
+the range is checked on object creation.
+}
+
 \subsection{Returns}{
 An object of type \code{MarkovState}.
 }
@@ -115,8 +124,32 @@ Gets the utility associated with the state.
 \if{html}{\out{<div class="r">}}\preformatted{MarkovState$utility()}\if{html}{\out{</div>}}
 }
 
+\subsection{Details}{
+If the state utility is a \code{ModVar} and its sampled
+value exceeds 1, a warning is issued.
+}
+
 \subsection{Returns}{
 Utility; numeric.
+}
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-modvars"></a>}}
+\if{latex}{\out{\hypertarget{method-modvars}{}}}
+\subsection{Method \code{modvars()}}{
+Find all the model variables.
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{MarkovState$modvars()}\if{html}{\out{</div>}}
+}
+
+\subsection{Details}{
+Find variables of type \code{ModVar} that have been 
+specified as values associated with this \code{MarkovState}. 
+Includes operands of these \code{ModVar}s, if they are expressions.
+}
+
+\subsection{Returns}{
+A list of \code{ModVar}s.
 }
 }
 \if{html}{\out{<hr>}}

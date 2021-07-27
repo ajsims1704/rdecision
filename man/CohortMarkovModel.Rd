@@ -13,6 +13,8 @@ states are labelled, the dimnames take the names of the states.
 
 A numeric vector of populations, named with state names.
 
+Elapsed time as an R \code{difftime} object.
+
 A data frame with the following columns:
 \describe{
 \item{Name}{State name}
@@ -26,13 +28,14 @@ following columns:
 \item{\code{State}}{Name of the state.}
 \item{\code{Cycle}}{The cycle number.}
 \item{\code{Time}}{Clock time, years.}
-\item{\code{Population}}{Population of the state at the end of
-the cycle.}
+\item{\code{Population}}{Population of the state at the end of 
+the cycle, or at mid-cycle if half-cycle correction is applied.}
 \item{\code{OccCost}}{Cost of the population occupying the state for 
-the cycle. Half-cycle correction and discount are applied, if the
-options are set. the costs are normalized by the model population. The
-cycle costs are derived from the annual occupancy costs of the
-\code{MarkovState}s.}
+the cycle. Discount is applied, if the options are set. The costs are
+normalized by the model population. The cycle costs are derived from the
+annual occupancy costs of the \code{MarkovState}s. Applied to the end
+population, i.e. unaffacted by half cycle correction, as per 
+Briggs \emph{et al}.}
 \item{code{EntryCost}}{Cost of the transitions \emph{into} the state
 during the cycle. Discounting is applied, if the option is set. 
 The result is normalized by the model population. The cycle costs
@@ -62,7 +65,7 @@ An R6 class for a Markov model with cohort simulation.
 \details{
 A class to represent a Markov model, using cohort simulation. In 
 graph theory terms, a Markov model is a directed multidigraph permitting 
-loops (a loop multidigraph), optionally labelled, or \dfn{quiver}. It is a
+loops (a loop multidigraph), optionally labelled, or a \dfn{quiver}. It is a
 multidigraph because there are potentially two edges between each pair of
 nodes {A,B} representing the transition probabilities from A to B and 
 \emph{vice versa}. It is a directed graph because the transition
@@ -112,11 +115,14 @@ Andrew J. Sims \email{andrew.sims@newcastle.ac.uk}
 \item \href{#method-transition_probability}{\code{CohortMarkovModel$transition_probability()}}
 \item \href{#method-transition_cost}{\code{CohortMarkovModel$transition_cost()}}
 \item \href{#method-get_statenames}{\code{CohortMarkovModel$get_statenames()}}
-\item \href{#method-set_populations}{\code{CohortMarkovModel$set_populations()}}
+\item \href{#method-reset}{\code{CohortMarkovModel$reset()}}
 \item \href{#method-get_populations}{\code{CohortMarkovModel$get_populations()}}
+\item \href{#method-get_elapsed}{\code{CohortMarkovModel$get_elapsed()}}
 \item \href{#method-tabulate_states}{\code{CohortMarkovModel$tabulate_states()}}
 \item \href{#method-cycle}{\code{CohortMarkovModel$cycle()}}
 \item \href{#method-cycles}{\code{CohortMarkovModel$cycles()}}
+\item \href{#method-modvars}{\code{CohortMarkovModel$modvars()}}
+\item \href{#method-modvar_table}{\code{CohortMarkovModel$modvar_table()}}
 \item \href{#method-clone}{\code{CohortMarkovModel$clone()}}
 }
 }
@@ -156,14 +162,7 @@ Andrew J. Sims \email{andrew.sims@newcastle.ac.uk}
 \subsection{Method \code{new()}}{
 Creates a Markov model for cohort simulation.
 \subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{CohortMarkovModel$new(
-  V,
-  E,
-  tcycle = as.difftime(365.25, units = "days"),
-  hcc = TRUE,
-  discount.cost = 0,
-  discount.utility = 0
-)}\if{html}{\out{</div>}}
+\if{html}{\out{<div class="r">}}\preformatted{CohortMarkovModel$new(V, E, discount.cost = 0, discount.utility = 0)}\if{html}{\out{</div>}}
 }
 
 \subsection{Arguments}{
@@ -172,11 +171,6 @@ Creates a Markov model for cohort simulation.
 \item{\code{V}}{A list of nodes (\code{MarkovState}s).}
 
 \item{\code{E}}{A list of edges (\code{MarkovTransition}s).}
-
-\item{\code{tcycle}}{Cycle length, expressed as an R \code{difftime} object; 
-default 1 year.}
-
-\item{\code{hcc}}{Boolean; whether to apply half cycle correction.}
 
 \item{\code{discount.cost}}{Annual discount rate for future costs.}
 
@@ -188,13 +182,20 @@ utility.}
 \subsection{Details}{
 A Markov model must meet the following conditions:
 \enumerate{
-  \item It must have at least one node and one edge.
+  \item It must have at least one node and at least one edge.
   \item All nodes must be of class \code{MarkovState};
   \item All edges must be of class \code{MarkovTransition};
   \item The nodes and edges must form a digraph whose underlying
   graph is connected;
-  \item Each non-absorbing state must have one outgoing transition
-   whose hazard rate is NULL.
+  \item Each state must have at least one outgoing transition and 
+  have exactly one outgoing edge whose hazard rate is NULL. This is to
+  ensure that the multinomial distribution of the probability of leaving
+  each node is not over or under-constrained. Rates can be changed
+  between cycles, and this constraint is checked at the point of cycling,
+  not at the point of model creation.
+  \item No two edges may share the same source and target nodes (i.e. 
+  the digraph may not have multiple edges). This is to ensure that there
+  are no more transitions than cells in the transition matrix.
 }
 }
 
@@ -209,12 +210,19 @@ state is set to 1000.
 \subsection{Method \code{transition_probability()}}{
 Return the per-cycle transition matrix for the model.
 \subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{CohortMarkovModel$transition_probability()}\if{html}{\out{</div>}}
+\if{html}{\out{<div class="r">}}\preformatted{CohortMarkovModel$transition_probability(tcycle)}\if{html}{\out{</div>}}
 }
 
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{tcycle}}{Cycle length, expressed as an R \code{difftime} object.}
+}
+\if{html}{\out{</div>}}
+}
 \subsection{Details}{
-Checks that each non-absorbing state has exactly one outgoing
-transition rate whose rate is NULL.
+Checks that each state has at least one outgoing transition and
+that exactly one outgoing transition rate whose rate is NULL.
 }
 
 }
@@ -242,12 +250,16 @@ List of the names of each state.
 }
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-set_populations"></a>}}
-\if{latex}{\out{\hypertarget{method-set_populations}{}}}
-\subsection{Method \code{set_populations()}}{
-Sets the occupancy of each state.
+\if{html}{\out{<a id="method-reset"></a>}}
+\if{latex}{\out{\hypertarget{method-reset}{}}}
+\subsection{Method \code{reset()}}{
+Resets the model counters.
 \subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{CohortMarkovModel$set_populations(populations)}\if{html}{\out{</div>}}
+\if{html}{\out{<div class="r">}}\preformatted{CohortMarkovModel$reset(
+  populations = NULL,
+  icycle = as.integer(0),
+  elapsed = as.difftime(0, units = "days")
+)}\if{html}{\out{</div>}}
 }
 
 \subsection{Arguments}{
@@ -256,12 +268,25 @@ Sets the occupancy of each state.
 \item{\code{populations}}{A named vector of populations for
 the start of the state. The names should be the state names. 
 Due to the R implementation of matrix algebra, \code{populations} 
-must be a numeric type and is not restricted to being an integer.}
+must be a numeric type and is not restricted to being an integer. If 
+NULL, the population of the first state is set to 1000 and the others
+to zero.}
+
+\item{\code{icycle}}{Cycle number at which to start/restart.}
+
+\item{\code{elapsed}}{Elapsed time since the index (reference) time used for
+discounting as an R \code{difftime} object.}
 }
 \if{html}{\out{</div>}}
 }
 \subsection{Details}{
-Sets the cycle count to zero.
+Resets the state populations, next cycle number and elapsed time
+of the model. By default the model is returned to its ground state (1000
+people in the first state and zero in the others; next cycle is labelled
+zero; elapsed time (years) is zero). Any or all of these can be set via 
+this function. \code{icycle} is simply an integer counter label for each 
+cycle, \code{elapsed} sets the elapsed time in years from the index time
+from which discounting is assumed to apply.
 }
 
 \subsection{Returns}{
@@ -275,6 +300,27 @@ Updated \code{CohortMarkovModel} object.
 Gets the occupancy of each state
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{CohortMarkovModel$get_populations()}\if{html}{\out{</div>}}
+}
+
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-get_elapsed"></a>}}
+\if{latex}{\out{\hypertarget{method-get_elapsed}{}}}
+\subsection{Method \code{get_elapsed()}}{
+Gets the current elapsed time.
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{CohortMarkovModel$get_elapsed()}\if{html}{\out{</div>}}
+}
+
+\subsection{Details}{
+The elapsed time is defined as the difference between the 
+current time in the model and an index time used as the reference
+time for applying discounting. By default the elapsed time starts at
+zero. It can be set directly by calling \code{reset}. It is incremented
+after each call to \code{cycle} by the cycle duration to the time at the
+end of the cycle (even if half cycle correction is used). Thus, via the
+\code{reset} and \code{cycle} methods, the time of each cycle relative 
+to the discounting index and its duration can be controlled arbitrarily.
 }
 
 }
@@ -298,9 +344,33 @@ Creates a data frame summary of each state in the model.
 \subsection{Method \code{cycle()}}{
 Applies one cycle of the model.
 \subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{CohortMarkovModel$cycle()}\if{html}{\out{</div>}}
+\if{html}{\out{<div class="r">}}\preformatted{CohortMarkovModel$cycle(
+  tcycle = as.difftime(365.25, units = "days"),
+  hcc.pop = TRUE,
+  hcc.cost = TRUE
+)}\if{html}{\out{</div>}}
 }
 
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{tcycle}}{Cycle length, expressed as an R \code{difftime} object; 
+default 1 year.}
+
+\item{\code{hcc.pop}}{Boolean; whether to apply half cycle correction to the
+population and QALY. If TRUE, the correction is only applied to the 
+outputs of 
+functions \code{cycle} and \code{cycles}; the state population passed to
+the next cycle is the end cycle population, obtainable 
+with \code{get_populations}.}
+
+\item{\code{hcc.cost}}{Boolean; whether to apply half cycle correction to the
+costs. If true, the occupancy costs are computed using the population
+at half cycle; if false they are applied at the end of the cycle. 
+Applicable only if hcc.pop is TRUE.}
+}
+\if{html}{\out{</div>}}
+}
 }
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-cycles"></a>}}
@@ -308,13 +378,33 @@ Applies one cycle of the model.
 \subsection{Method \code{cycles()}}{
 Applies multiple cycles of the model.
 \subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{CohortMarkovModel$cycles(ncycles = 2)}\if{html}{\out{</div>}}
+\if{html}{\out{<div class="r">}}\preformatted{CohortMarkovModel$cycles(
+  ncycles = 2,
+  tcycle = as.difftime(365.25, units = "days"),
+  hcc.pop = TRUE,
+  hcc.cost = TRUE
+)}\if{html}{\out{</div>}}
 }
 
 \subsection{Arguments}{
 \if{html}{\out{<div class="arguments">}}
 \describe{
 \item{\code{ncycles}}{Number of cycles to run; default is 2.}
+
+\item{\code{tcycle}}{Cycle length, expressed as an R \code{difftime} object; 
+default 1 year.}
+
+\item{\code{hcc.pop}}{Boolean; whether to apply half cycle correction to the
+population and QALY. If TRUE, the correction is only applied to the 
+outputs of functions \code{cycle} and \code{cycles}; the state 
+population passed to
+the next cycle is the end cycle population, obtainable 
+with \code{get_populations}.}
+
+\item{\code{hcc.cost}}{Boolean; whether to apply half cycle correction to the
+costs. If true, the occupancy costs are computed using the population
+at half cycle; if false they are applied at the end of the cycle.
+Applicable only if hcc.pop is TRUE.}
 }
 \if{html}{\out{</div>}}
 }
@@ -331,6 +421,65 @@ will be cycle zero, i.e. the distribution of patients to starting
 states.
 }
 
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-modvars"></a>}}
+\if{latex}{\out{\hypertarget{method-modvars}{}}}
+\subsection{Method \code{modvars()}}{
+Find all the model variables in the Markov model.
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{CohortMarkovModel$modvars()}\if{html}{\out{</div>}}
+}
+
+\subsection{Details}{
+Returns variables of type \code{ModVar} that have been 
+specified as values associated with transition rates and costs and
+the state occupancy costs and utilities.
+}
+
+\subsection{Returns}{
+A list of \code{ModVar}s.
+}
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-modvar_table"></a>}}
+\if{latex}{\out{\hypertarget{method-modvar_table}{}}}
+\subsection{Method \code{modvar_table()}}{
+Tabulate the model variables in the Markov model.
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{CohortMarkovModel$modvar_table(expressions = TRUE)}\if{html}{\out{</div>}}
+}
+
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{expressions}}{A logical that defines whether expression model
+variables should be included in the tabulation.}
+}
+\if{html}{\out{</div>}}
+}
+\subsection{Returns}{
+Data frame with one row per model variable, as follows:
+\describe{
+\item{\code{Description}}{As given at initialization.}
+\item{\code{Units}}{Units of the variable.}
+\item{\code{Distribution}}{Either the uncertainty distribution, if
+it is a regular model variable, or the expression used to create it,
+if it is an \code{ExprModVar}.}
+\item{\code{Mean}}{Mean; calculated from means of operands if
+an expression.}
+\item{\code{E}}{Expectation; estimated from random sample if expression, 
+mean otherwise.}
+\item{\code{SD}}{Standard deviation; estimated from random sample if
+expression, exact value otherwise.}
+\item{\code{Q2.5}}{p=0.025 quantile; estimated from random sample if
+expression, exact value otherwise.}
+\item{\code{Q97.5}}{p=0.975 quantile; estimated from random sample if
+expression, exact value otherwise.}
+\item{\code{Est}}{TRUE if the quantiles and SD have been estimated by 
+random sampling.}
+}
+}
 }
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-clone"></a>}}

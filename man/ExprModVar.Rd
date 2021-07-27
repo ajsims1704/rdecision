@@ -66,7 +66,6 @@ Andrew J. Sims \email{andrew.sims@newcastle.ac.uk}
 \item \href{#method-is_probabilistic}{\code{ExprModVar$is_probabilistic()}}
 \item \href{#method-operands}{\code{ExprModVar$operands()}}
 \item \href{#method-distribution}{\code{ExprModVar$distribution()}}
-\item \href{#method-r}{\code{ExprModVar$r()}}
 \item \href{#method-mean}{\code{ExprModVar$mean()}}
 \item \href{#method-mode}{\code{ExprModVar$mode()}}
 \item \href{#method-SD}{\code{ExprModVar$SD()}}
@@ -84,6 +83,7 @@ Andrew J. Sims \email{andrew.sims@newcastle.ac.uk}
 \itemize{
 \item \out{<span class="pkg-link" data-pkg="rdecision" data-topic="ModVar" data-id="description">}\href{../../rdecision/html/ModVar.html#method-description}{\code{rdecision::ModVar$description()}}\out{</span>}
 \item \out{<span class="pkg-link" data-pkg="rdecision" data-topic="ModVar" data-id="is_expression">}\href{../../rdecision/html/ModVar.html#method-is_expression}{\code{rdecision::ModVar$is_expression()}}\out{</span>}
+\item \out{<span class="pkg-link" data-pkg="rdecision" data-topic="ModVar" data-id="r">}\href{../../rdecision/html/ModVar.html#method-r}{\code{rdecision::ModVar$r()}}\out{</span>}
 \item \out{<span class="pkg-link" data-pkg="rdecision" data-topic="ModVar" data-id="units">}\href{../../rdecision/html/ModVar.html#method-units}{\code{rdecision::ModVar$units()}}\out{</span>}
 }
 \out{</details>}
@@ -92,8 +92,8 @@ Andrew J. Sims \email{andrew.sims@newcastle.ac.uk}
 \if{html}{\out{<a id="method-new"></a>}}
 \if{latex}{\out{\hypertarget{method-new}{}}}
 \subsection{Method \code{new()}}{
-Create a \code{ModVar} formed from an expression involving other
-model variables.
+Create a \code{ModVar} formed from an expression involving 
+other model variables.
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{ExprModVar$new(description, units, quo)}\if{html}{\out{</div>}}
 }
@@ -121,8 +121,8 @@ An object of type \code{ExprModVar}
 \if{html}{\out{<a id="method-add_method"></a>}}
 \if{latex}{\out{\hypertarget{method-add_method}{}}}
 \subsection{Method \code{add_method()}}{
-Create a new \verb{quosure} from that supplied in \code{new()} but with
-each \code{ModVar}
+Create a new \verb{quosure} from that supplied in 
+\code{new()} but with each \code{ModVar}
 operand appended with \code{$x} where \code{x} is the argument to this
 function.
 \subsection{Usage}{
@@ -154,8 +154,8 @@ specified in the quosure supplied in new().
 \if{html}{\out{<a id="method-is_probabilistic"></a>}}
 \if{latex}{\out{\hypertarget{method-is_probabilistic}{}}}
 \subsection{Method \code{is_probabilistic()}}{
-Tests whether the model variable is probabilistic, i.e. a random
-variable that follows a distribution, or an expression involving
+Tests whether the model variable is probabilistic, i.e. 
+a random variable that follows a distribution, or an expression involving
 random variables, at least one of which follows a distribution.
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{ExprModVar$is_probabilistic()}\if{html}{\out{</div>}}
@@ -169,8 +169,8 @@ random variables, at least one of which follows a distribution.
 \if{html}{\out{<a id="method-operands"></a>}}
 \if{latex}{\out{\hypertarget{method-operands}{}}}
 \subsection{Method \code{operands()}}{
-Return a list of operands that are themselves \code{ModVar}s given
-in the expression.
+Return a list of operands that are themselves 
+\code{ModVar}s given in the expression.
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{ExprModVar$operands()}\if{html}{\out{</div>}}
 }
@@ -183,7 +183,8 @@ A list of model variables.
 \if{html}{\out{<a id="method-distribution"></a>}}
 \if{latex}{\out{\hypertarget{method-distribution}{}}}
 \subsection{Method \code{distribution()}}{
-Accessor function for the name of the expression model variable.
+Accessor function for the name of the expression model 
+variable.
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{ExprModVar$distribution()}\if{html}{\out{</div>}}
 }
@@ -194,31 +195,11 @@ having been removed.
 }
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-r"></a>}}
-\if{latex}{\out{\hypertarget{method-r}{}}}
-\subsection{Method \code{r()}}{
-Draw a random sample from the model variable.
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{ExprModVar$r(n = 1)}\if{html}{\out{</div>}}
-}
-
-\subsection{Arguments}{
-\if{html}{\out{<div class="arguments">}}
-\describe{
-\item{\code{n}}{Number of samples to draw.}
-}
-\if{html}{\out{</div>}}
-}
-\subsection{Returns}{
-A sample drawn at random.
-}
-}
-\if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-mean"></a>}}
 \if{latex}{\out{\hypertarget{method-mean}{}}}
 \subsection{Method \code{mean()}}{
-Return the value of the expression when its operands take their
-mean value (i.e. value returned by call to \code{mean} or their
+Return the value of the expression when its operands take
+their mean value (i.e. value returned by call to \code{mean} or their
 value, if numeric). See notes on this class for further explanation.
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{ExprModVar$mean()}\if{html}{\out{</div>}}
@@ -232,9 +213,9 @@ Mean value as a numeric value.
 \if{html}{\out{<a id="method-mode"></a>}}
 \if{latex}{\out{\hypertarget{method-mode}{}}}
 \subsection{Method \code{mode()}}{
-Return the mode of the variable. By default returns \code{NA}, which 
-will be the case for most \code{ExprModVar} variables, because an 
-arbitrary expression is not guaranteed to be unimodal.
+Return the mode of the variable. By default returns
+\code{NA}, which will be the case for most \code{ExprModVar} variables,
+because an arbitrary expression is not guaranteed to be unimodal.
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{ExprModVar$mode()}\if{html}{\out{</div>}}
 }
@@ -247,9 +228,9 @@ Mode as a numeric value.
 \if{html}{\out{<a id="method-SD"></a>}}
 \if{latex}{\out{\hypertarget{method-SD}{}}}
 \subsection{Method \code{SD()}}{
-Return the standard deviation of the distribution as \code{NA} because 
-the variance is not available as a closed form for all functions of
-distributions.
+Return the standard deviation of the distribution as 
+\code{NA} because the variance is not available as a closed form for
+all functions of distributions.
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{ExprModVar$SD()}\if{html}{\out{</div>}}
 }
@@ -262,8 +243,8 @@ Standard deviation as a numeric value
 \if{html}{\out{<a id="method-quantile"></a>}}
 \if{latex}{\out{\hypertarget{method-quantile}{}}}
 \subsection{Method \code{quantile()}}{
-Find quantiles of the uncertainty distribution.  Not available
-as a closed form, and returned as \code{NA}.
+Find quantiles of the uncertainty distribution. Not 
+available as a closed form, and returned as \code{NA}.
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{ExprModVar$quantile(probs)}\if{html}{\out{</div>}}
 }
@@ -283,9 +264,7 @@ Vector of numeric values of the same length as \code{probs}.
 \if{html}{\out{<a id="method-mu_hat"></a>}}
 \if{latex}{\out{\hypertarget{method-mu_hat}{}}}
 \subsection{Method \code{mu_hat()}}{
-Return the estimated expected value of the expression variable. This is
-computed by numerical simulation because there is, in general, no closed
-form expressions for the mean of a function of distributions.
+Return the estimated expected value of the variable.
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{ExprModVar$mu_hat(nest = 1000)}\if{html}{\out{</div>}}
 }
@@ -299,6 +278,12 @@ be rejected.}
 }
 \if{html}{\out{</div>}}
 }
+\subsection{Details}{
+This is computed by numerical simulation because there is, in 
+general, no closed form expressions for the mean of a function of 
+distributions.
+}
+
 \subsection{Returns}{
 Expected value as a numeric value.
 }
@@ -307,9 +292,7 @@ Expected value as a numeric value.
 \if{html}{\out{<a id="method-sigma_hat"></a>}}
 \if{latex}{\out{\hypertarget{method-sigma_hat}{}}}
 \subsection{Method \code{sigma_hat()}}{
-Return the estimated standard deviation of the distribution. This is
-computed by numerical simulation because there is, in general, no closed
-form expressions for the SD of a function of distributions.
+Return the estimated standard deviation of the distribution.
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{ExprModVar$sigma_hat(nest = 1000)}\if{html}{\out{</div>}}
 }
@@ -323,6 +306,12 @@ be rejected.}
 }
 \if{html}{\out{</div>}}
 }
+\subsection{Details}{
+This is computed by numerical simulation because there is, in 
+general, no closed form expressions for the SD of a function of 
+distributions.
+}
+
 \subsection{Returns}{
 Standard deviation as a numeric value.
 }
@@ -331,9 +320,7 @@ Standard deviation as a numeric value.
 \if{html}{\out{<a id="method-q_hat"></a>}}
 \if{latex}{\out{\hypertarget{method-q_hat}{}}}
 \subsection{Method \code{q_hat()}}{
-Return the estimated quantiles by sampling the variable. This is
-computed by numerical simulation because there is, in general, no closed
-form expressions for the quantiles of a function of distributions.
+' Return the estimated quantiles by sampling the variable.
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{ExprModVar$q_hat(probs, nest = 1000)}\if{html}{\out{</div>}}
 }
@@ -349,6 +336,12 @@ be rejected.}
 }
 \if{html}{\out{</div>}}
 }
+\subsection{Details}{
+This is computed by numerical simulation because there is, in 
+general, no closed form expressions for the quantiles of a function of 
+distributions.
+}
+
 \subsection{Returns}{
 Vector of quantiles.
 }
@@ -357,13 +350,11 @@ Vector of quantiles.
 \if{html}{\out{<a id="method-set"></a>}}
 \if{latex}{\out{\hypertarget{method-set}{}}}
 \subsection{Method \code{set()}}{
-Sets the value of the \code{ExprModVar} that will be returned by 
-subsequent calls to \code{get()} until \code{set()} is called again. 
-Because an \code{ExprModVar} can be considered as a dependent variable,
-the idea of \code{set}ting a value is meaningless, and calls to this
-method have no effect. To affect the
-value returned by the next call to \code{get}, call \code{set} for each
-of the operands of this expression.
+Sets the value of the \code{ExprModVar} that will be 
+returned by subsequent calls to \code{get()} until \code{set()} is called
+again. Because an \code{ExprModVar} can be considered as a dependent 
+variable, this method calls \code{set} for each of the operands of this
+expression.
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{ExprModVar$set(what = "random", val = NULL)}\if{html}{\out{</div>}}
 }
@@ -371,11 +362,10 @@ of the operands of this expression.
 \subsection{Arguments}{
 \if{html}{\out{<div class="arguments">}}
 \describe{
-\item{\code{what}}{Character string; for compatibility with non-expression
-\code{ModVar}s only; not used.}
+\item{\code{what}}{Character string; one of "random","expected","q2.5","q50",
+"q97.5","current", "value"}
 
-\item{\code{val}}{Numerical value when what="value"; not used for expression
-model variables.}
+\item{\code{val}}{Numerical value when what="value".}
 }
 \if{html}{\out{</div>}}
 }

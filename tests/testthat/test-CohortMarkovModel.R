@@ -180,7 +180,7 @@ test_that("the transition matrix has the correct properties and values", {
 })
 
 # -----------------------------------------------------------------------------
-# tests of getting and setting state populations
+# tests of resetting the model
 # -----------------------------------------------------------------------------
 test_that("invalid population vectors are rejected", {
   # create the model
@@ -206,22 +206,67 @@ test_that("invalid population vectors are rejected", {
   expect_equal(unname(rp[3]),0)
   # number of elements
   pop <- c(Well=10000, Disabled=0)
-  expect_error(M$set_populations(pop), class="incorrect_state_count")
+  expect_error(M$reset(pop), class="incorrect_state_count")
   # state names
   pop <- c(Well=10000, Poorly=0, Disabled=0)
-  expect_error(M$set_populations(pop), class="unmatched_states")
+  expect_error(M$reset(pop), class="unmatched_states")
   pop <- c(10000, 0, 0)
-  expect_error(M$set_populations(pop), class="unmatched_states")
+  expect_error(M$reset(pop), class="unmatched_states")
   # type
   pop <- c(Well=10000, Disabled="0", Dead=0)
-  expect_error(M$set_populations(pop), class="non-numeric_state_population")
+  expect_error(M$reset(pop), class="non-numeric_state_population")
   # correct
   pop <- c(Well=10000, Disabled=0, Dead=0)
-  expect_silent(M$set_populations(pop))
+  expect_silent(M$reset(pop))
   rp <- M$get_populations()
   expect_equal(unname(rp["Well"]), 10000)
   expect_equal(unname(rp["Disabled"]), 0)
   expect_equal(unname(rp["Dead"]), 0)
+})
+
+test_that("invalid cycle numbers are rejected", {
+  # create the model
+  s.well <- MarkovState$new(name="Well")
+  s.disabled <- MarkovState$new("Disabled")
+  s.dead <- MarkovState$new("Dead")
+  e.ww <- MarkovTransition$new(s.well, s.well)
+  e.ss <- MarkovTransition$new(s.disabled, s.disabled)
+  e.dd <- MarkovTransition$new(s.dead, s.dead)
+  e.ws <- MarkovTransition$new(s.well, s.disabled, r=0.2)
+  e.wd <- MarkovTransition$new(s.well, s.dead, r=0.2)
+  e.sd <- MarkovTransition$new(s.disabled, s.dead, r=0.4)
+  M <- CohortMarkovModel$new(
+    V = list(s.well, s.disabled, s.dead),
+    E = list(e.ww, e.ss, e.dd, e.ws, e.wd, e.sd)
+  )
+  # attempt to reset with illegal cycle numbers
+  expect_error(M$reset(icycle=2), class="invalid_icycle")
+  expect_error(M$reset(icycle="2"), class="invalid_icycle")
+  expect_error(M$reset(icycle=as.integer(-1)), class="invalid_icycle")
+})
+
+test_that("invalid elapsed times are rejected", {
+  # create the model
+  s.well <- MarkovState$new(name="Well")
+  s.disabled <- MarkovState$new("Disabled")
+  s.dead <- MarkovState$new("Dead")
+  e.ww <- MarkovTransition$new(s.well, s.well)
+  e.ss <- MarkovTransition$new(s.disabled, s.disabled)
+  e.dd <- MarkovTransition$new(s.dead, s.dead)
+  e.ws <- MarkovTransition$new(s.well, s.disabled, r=0.2)
+  e.wd <- MarkovTransition$new(s.well, s.dead, r=0.2)
+  e.sd <- MarkovTransition$new(s.disabled, s.dead, r=0.4)
+  M <- CohortMarkovModel$new(
+    V = list(s.well, s.disabled, s.dead),
+    E = list(e.ww, e.ss, e.dd, e.ws, e.wd, e.sd)
+  )
+  # attempt to reset with illegal elapsed times
+  expect_error(M$reset(elapsed=2), class="invalid_elapsed")
+  expect_error(M$reset(elapsed="2"), class="invalid_elapsed")
+  expect_error(
+    M$reset(icycle=as.difftime(-1, units="days")), 
+    class="invalid_icycle"
+  )
 })
 
 # -----------------------------------------------------------------------------
@@ -257,6 +302,43 @@ test_that("model is cyclable", {
   expect_equal(nrow(DF),3)
 })
 
+test_that("cycle time increments and resets correctly", {
+  # create the model
+  s.well <- MarkovState$new(name="Well")
+  s.disabled <- MarkovState$new("Disabled")
+  s.dead <- MarkovState$new("Dead")
+  e.ww <- MarkovTransition$new(s.well, s.well)
+  e.ss <- MarkovTransition$new(s.disabled, s.disabled)
+  e.dd <- MarkovTransition$new(s.dead, s.dead)
+  e.ws <- MarkovTransition$new(s.well, s.disabled, r=0.2)
+  e.wd <- MarkovTransition$new(s.well, s.dead, r=0.2)
+  e.sd <- MarkovTransition$new(s.disabled, s.dead, r=0.4)
+  M <- CohortMarkovModel$new(
+    V = list(s.well, s.disabled, s.dead),
+    E = list(e.ww, e.ss, e.dd, e.ws, e.wd, e.sd)
+  )
+  # check that the elapsed time starts at zero
+  t <- M$get_elapsed()
+  expect_equal(as.numeric(t, units="days"), 0)
+  # cycle for 2 years, including with hcc
+  M$cycle()
+  M$cycle(hcc.pop=FALSE,hcc.cost=FALSE)
+  # check that the elapsed time is 2 years
+  t <- M$get_elapsed()
+  expect_equal(as.numeric(t, units="days"), 365.25*2)
+  # run a further half year cycle
+  M$cycle(tcycle=as.difftime(365.25/2, units="days"))
+  # check that the elapsed time is 2.5 years
+  t <- M$get_elapsed()
+  expect_equal(as.numeric(t, units="days"), 365.25*2.5)
+  # reset the time to 3 years and run a further cycle
+  M$reset(elapsed=as.difftime(365.25*3, units="days"))
+  M$cycle()
+  # check that the elapsed time is 4 years
+  t <- M$get_elapsed()
+  expect_equal(as.numeric(t, units="days"), 365.25*4)
+})
+
 # ---------------------------------------------------------------------------
 # tests of rates
 # ---------------------------------------------------------------------------
@@ -273,13 +355,13 @@ test_that("results are independent of cycle time", {
   )
   # create the model and cycle for 5 years
   M <- CohortMarkovModel$new(V = list(s.well, s.dead), E)
-  MT <- M$cycles(5, hcc=FALSE)
+  MT <- M$cycles(5, hcc.pop=FALSE, hcc.cost=FALSE)
   expect_equal(MT$Well[MT$Cycle==5], 327.68)
   # create the model and cycle for 5 years
   M <- CohortMarkovModel$new(V = list(s.well, s.dead), E)
   MT <- M$cycles(
     5*12, 
-    hcc = FALSE, 
+    hcc.pop = FALSE, hcc.cost=FALSE, 
     tcycle = as.difftime(365.25/12, units="days")
   )
   expect_equal(MT$Well[MT$Cycle==60], 327.68)
@@ -351,9 +433,9 @@ test_that("rdecision replicates Sonnenberg & Beck, Fig 3", {
     sum(Ip-matrix(c(0.6,0.2,0.2,0,0.6,0.4,0,0,1),nrow=3,byrow=TRUE)),0
   )
   # set the starting populations
-  M$set_populations(c(Well=10000, Disabled=0, Dead=0)) 
+  M$reset(c(Well=10000, Disabled=0, Dead=0)) 
   # cycle
-  RC <- M$cycles(25, tcycle=tcycle, hcc=FALSE)
+  RC <- M$cycles(25, tcycle=tcycle, hcc.pop=FALSE, hcc.cost=FALSE)
   expect_true(is.data.frame(RC))
   expect_equal(round(RC$Well[RC$Cycle==2]), 3600)
   expect_equal(round(RC$Disabled[RC$Cycle==2]), 2400)
@@ -361,143 +443,8 @@ test_that("rdecision replicates Sonnenberg & Beck, Fig 3", {
   expect_true(TRUE)
 })
 
-
 # ---------------------------------------------------------------------------
-# Chancellor, 1997 (HIV) and Briggs exercise 2.5
-# ---------------------------------------------------------------------------
-test_that("redecision replicates Briggs' example 2.5", {
-  # transition rates calculated from annual transition probabilities
-  trAB <- -log(1-0.202)/1 
-  trAC <- -log(1-0.067)/1
-  trAD <- -log(1-0.010)/1
-  trBC <- -log(1-0.407)/1
-  trBD <- -log(1-0.012)/1
-  trCD <- -log(1-0.250)/1
-  # Costs
-  dmca <- 1701 # direct medical costs associated with state A
-  dmcb <- 1774 # direct medical costs associated with state B
-  dmcc <- 6948 # direct medical costs associated with state C
-  ccca <- 1055 # Community care costs associated with state A
-  cccb <- 1278 # Community care costs associated with state B
-  cccc <- 2059 # Community care costs associated with state C
-  # Drug costs
-  cAZT <- 2278 # zidovudine drug cost
-  cLam <- 2087 # lamivudine drug cost
-  # Other parameters
-  RR <- 0.509 # treatment effect
-  cDR <- 6 # annual discount rate, costs (%)
-  oDR <- 0 # annual discount rate, benefits (%)
-  # create Markov states for monotherapy (zidovudine only)
-  sA <- MarkovState$new("A", cost=dmca+ccca+cAZT)
-  sB <- MarkovState$new("B", cost=dmcb+cccb+cAZT)
-  sC <- MarkovState$new("C", cost=dmcc+cccc+cAZT)
-  sD <- MarkovState$new("D", cost=0, utility=0)
-  # create transitions
-  tAA <- MarkovTransition$new(sA, sA, r=NULL)
-  tAB <- MarkovTransition$new(sA, sB, r=trAB)
-  tAC <- MarkovTransition$new(sA, sC, r=trAC)
-  tAD <- MarkovTransition$new(sA, sD, r=trAD)
-  tBB <- MarkovTransition$new(sB, sB, r=NULL)
-  tBC <- MarkovTransition$new(sB, sC, r=trBC)
-  tBD <- MarkovTransition$new(sB, sD, r=trBD)
-  tCC <- MarkovTransition$new(sC, sC, r=NULL)
-  tCD <- MarkovTransition$new(sC, sD, r=trCD)
-  tDD <- MarkovTransition$new(sD, sD, r=NULL)
-  # construct the model
-  mhiv <- CohortMarkovModel$new(
-    V = list(sA, sB, sC, sD),
-    E = list(tAA, tAB, tAC, tAD, tBB, tBC, tBD, tCC, tCD, tDD),
-    discount.cost = cDR/100,
-    discount.utility = oDR/100
-  )
-  # tabulate states
-  DF <- mhiv$tabulate_states()
-  expect_equal(nrow(DF), 4)
-  expect_equal(DF[1,"Name"], "A")
-  expect_equal(DF[1,"Cost"], 2756+2278)
-  expect_equal(DF[2,"Cost"], 3052+2278)
-  expect_equal(DF[3,"Cost"], 9007+2278)
-  expect_equal(DF[4,"Cost"], 0)
-  # per-cycle transition probabilities
-  tcycle = as.difftime(365.24, units="days")
-  TM <- mhiv$transition_probability(tcycle)
-  E <- matrix(
-    c(0.721, 0.202, 0.067, 0.010,  
-      0.000, 0.581, 0.407, 0.012,
-      0.000, 0.000, 0.750, 0.250,
-      0.000, 0.000, 0.000, 1.000),   # typo in book (D,D) = 1!
-    byrow = TRUE,
-    nrow = 4)
-  expect_equal(sum(TM-E), 0)
-  # create starting populations
-  N <- 1000
-  populations <- c(A = N, B = 0, C = 0, D = 0)
-  mhiv$set_populations(populations)
-  # run 20 cycles
-  MT.mono <- mhiv$cycles(ncycles=20, tcycle=tcycle, hcc=FALSE)
-  # monotherapy results
-  el.mono <- sum(MT.mono$QALY)
-  expect_intol(el.mono, 7.991, tolerance=0.03) # 7.991 from spreadsheet
-  cost.mono <- sum(MT.mono$Cost)
-  expect_intol(cost.mono, 44663, 100) # rounding errors in book
-  #
-  # set occupancy costs for combination therapy (zidovudine and lamivudine)
-  sA$set_cost(dmca+ccca+cAZT+cLam)
-  sB$set_cost(dmcb+cccb+cAZT+cLam)
-  sC$set_cost(dmcc+cccc+cAZT+cLam)
-  # apply treatment effect to annual probabilities
-  trABm <- -log(1-0.202*RR)/1 
-  trACm <- -log(1-0.067*RR)/1
-  trADm <- -log(1-0.010*RR)/1
-  trBCm <- -log(1-0.407*RR)/1
-  trBDm <- -log(1-0.012*RR)/1
-  trCDm <- -log(1-0.250*RR)/1
-  # update transition rates
-  tAB$set_rate(trABm)
-  tAC$set_rate(trACm)
-  tAD$set_rate(trADm)
-  tBC$set_rate(trBCm)
-  tBD$set_rate(trBDm)
-  tCD$set_rate(trCDm)
-  # check transition matrix
-  TM <- mhiv$transition_probability(tcycle)
-  E <- matrix(
-    c(0.858, 0.103, 0.034, 0.005,  
-      0.000, 0.787, 0.207, 0.006,
-      0.000, 0.000, 0.873, 0.127,
-      0.000, 0.000, 0.000, 1.000),   
-    byrow = TRUE,
-    nrow = 4)
-  expect_equal(sum(TM-E), 0)
-  # run combination therapy model for 2 years
-  populations <- c('A'=N, 'B'=0, 'C'=0, 'D'=0)
-  mhiv$set_populations(populations)
-  # run 2 cycles
-  MT.comb <- mhiv$cycles(2, tcycle=tcycle, hcc=FALSE)
-  # revise costs and revert transition rates 
-  sA$set_cost(dmca+ccca+cAZT)
-  sB$set_cost(dmcb+cccb+cAZT)
-  sC$set_cost(dmcc+cccc+cAZT)
-  tAB$set_rate(trAB)
-  tAC$set_rate(trAC)
-  tAD$set_rate(trAD)
-  tBC$set_rate(trBC)
-  tBD$set_rate(trBD)
-  tCD$set_rate(trCD)
-  # and run model for next 18 years
-  MT.comb <- rbind(MT.comb, mhiv$cycles(ncycles=18, tcycle=tcycle,hcc=FALSE)) 
-  # combination therapy results
-  el.comb <- sum(MT.comb$QALY)
-  expect_intol(el.comb, 8.937, tolerance=0.02) # 8.937 from spreadsheet
-  cost.comb <- sum(MT.comb$Cost)
-  expect_intol(cost.comb, 50602, 100) # rounding errors in book
-  # icer
-  icer <- (cost.comb-cost.mono)/(el.comb-el.mono)
-  expect_intol(icer, 6276, 10) # rounding errors in book
-})
-
-# ---------------------------------------------------------------------------
-# Chancellor, 1997 (HIV) with PSA and Briggs exercise 4.7 
+# Chancellor, 1997 (HIV) with PSA and Briggs exercises 2.5 and 4.7 
 # ---------------------------------------------------------------------------
 test_that("redecision replicates Briggs' example 4.7", {
   #
@@ -506,31 +453,6 @@ test_that("redecision replicates Briggs' example 4.7", {
   cDR <- 6 # annual discount rate, costs (%)
   oDR <- 0 # annual discount rate, benefits (%)
   #
-  # # Model structure
-  # # ===============
-  # # states
-  # sA <- MarkovState$new("A")
-  # sB <- MarkovState$new("B")
-  # sC <- MarkovState$new("C")
-  # sD <- MarkovState$new("D", cost=0, utility=0)
-  # # transitions
-  # tAA <- MarkovTransition$new(sA, sA, r=NULL)
-  # tAB <- MarkovTransition$new(sA, sB)
-  # tAC <- MarkovTransition$new(sA, sC)
-  # tAD <- MarkovTransition$new(sA, sD)
-  # tBB <- MarkovTransition$new(sB, sB, r=NULL)
-  # tBC <- MarkovTransition$new(sB, sC)
-  # tBD <- MarkovTransition$new(sB, sD)
-  # tCC <- MarkovTransition$new(sC, sC, r=NULL)
-  # tCD <- MarkovTransition$new(sC, sD)
-  # tDD <- MarkovTransition$new(sD, sD, r=NULL)
-  # # model
-  # mhiv <- CohortMarkovModel$new(
-  #   V = list(sA, sB, sC, sD),
-  #   E = list(tAA, tAB, tAC, tAD, tBB, tBC, tBD, tCC, tCD, tDD),
-  #   discount.cost = cDR/100,
-  #   discount.utility = oDR/100
-  # )
   # Cycle time
   # ==========
   tcycle = as.difftime(365.24, units="days")
@@ -614,6 +536,15 @@ test_that("redecision replicates Briggs' example 4.7", {
     discount.cost = cDR/100,
     discount.utility = oDR/100
   )
+  TM <- m.mono$transition_probability(tcycle)
+  E <- matrix(
+    c(0.721, 0.202, 0.067, 0.010,  
+      0.000, 0.581, 0.407, 0.012,
+      0.000, 0.000, 0.750, 0.250,
+      0.000, 0.000, 0.000, 1.000),   # typo in book (D,D) = 1!
+    byrow = TRUE,
+    nrow = 4)
+  expect_equal(sum(TM-E), 0)
   #
   # Combination therapy model
   # =========================
@@ -640,69 +571,67 @@ test_that("redecision replicates Briggs' example 4.7", {
     discount.cost = cDR/100,
     discount.utility = oDR/100
   )
+  # check transition matrix
+  TM <- m.comb$transition_probability(tcycle)
+  E <- matrix(
+    c(0.858, 0.103, 0.034, 0.005,  
+      0.000, 0.787, 0.207, 0.006,
+      0.000, 0.000, 0.873, 0.127,
+      0.000, 0.000, 0.000, 1.000),   
+    byrow = TRUE,
+    nrow = 4)
+  expect_equal(sum(TM-E), 0)
+  #
   # Function to estimate life years gained and costs
   # ================================================
-  runmodel <- function() {
+  runmodel <- function(hcc.pop=FALSE, hcc.cost=FALSE) {
     # 
     # Monotherapy
     # ===========
-    # set costs for monotherapy
-    #sA$set_cost(cA)
-    #sB$set_cost(cB)
-    #sC$set_cost(cC)
-    # set rates for monotherapy
-    #tAB$set_rate(trAB)
-    #tAC$set_rate(trAC)
-    #tAD$set_rate(trAD)
-    #tBC$set_rate(trBC)
-    #tBD$set_rate(trBD)
-    #tCD$set_rate(trCD)
     # create starting populations
     N <- 1000
     populations <- c(A = N, B = 0, C = 0, D = 0)
-    m.mono$set_populations(populations)
+    m.mono$reset(populations)
     # run 20 cycles
-    MT.mono <- m.mono$cycles(ncycles=20, tcycle=tcycle, hcc=FALSE)
+    MT.mono <- m.mono$cycles(
+      ncycles=20, 
+      tcycle=tcycle,
+      hcc.pop = hcc.pop,
+      hcc.cost = hcc.cost
+    )
     # expected life years and costs
     el.mono <- sum(MT.mono$QALY)
     cost.mono <- sum(MT.mono$Cost)
     #
     # Combination therapy
     # ===================
-    # occupancy costs for combination therapy (zidovudine and lamivudine)
-    #sA$set_cost(cAc)
-    #sB$set_cost(cBc)
-    #sC$set_cost(cCc)
-    # transition rates for combination therapy
-    #tAB$set_rate(trABm)
-    #tAC$set_rate(trACm)
-    #tAD$set_rate(trADm)
-    #tBC$set_rate(trBCm)
-    #tBD$set_rate(trBDm)
-    #tCD$set_rate(trCDm)
     # run combination therapy model for 2 years
     populations <- c('A'=N, 'B'=0, 'C'=0, 'D'=0)
-    m.comb$set_populations(populations)
+    m.comb$reset(populations)
     # run 2 cycles
-    MT.comb <- m.comb$cycles(2, tcycle=tcycle, hcc=FALSE)
-    # revise costs after 2 years
-    #sA$set_cost(cA)
-    #sB$set_cost(cB)
-    #sC$set_cost(cC)
-    # revert transition rates 
-    #tAB$set_rate(trAB)
-    #tAC$set_rate(trAC)
-    #tAD$set_rate(trAD)
-    #tBC$set_rate(trBC)
-    #tBD$set_rate(trBD)
-    #tCD$set_rate(trCD)
-    # set populations in mono model
+    MT.comb <- m.comb$cycles(
+      2, 
+      tcycle = tcycle, 
+      hcc.pop = hcc.pop,
+      hcc.cost = hcc.cost
+    )
+    # set populations in mono model & reset cycle counter and time
     populations <- m.comb$get_populations()
-    m.mono$set_populations(populations, icycle=2)
+    m.mono$reset(
+      populations, 
+      icycle=as.integer(2), 
+      elapsed=as.difftime(365.25*2, units="days")
+    )
     # run mono model for next 18 years
-    MT.comb <- rbind(MT.comb, m.mono$cycles(ncycles=18, tcycle=tcycle,hcc=FALSE)) 
-    print("")
-    print(MT.comb)
+    MT.comb <- rbind(
+      MT.comb, 
+      m.mono$cycles(
+        ncycles=18, 
+        tcycle=tcycle,
+        hcc.pop = hcc.pop,
+        hcc.cost = hcc.cost
+      )
+    ) 
     # expected life years and costs
     el.comb <- sum(MT.comb$QALY)
     cost.comb <- sum(MT.comb$Cost)
@@ -711,12 +640,16 @@ test_that("redecision replicates Briggs' example 4.7", {
              "el.comb"=el.comb, "cost.comb"=cost.comb))
   }
   #
-  # Point estimate
-  # ==============
+  # Point estimate (without half-cycle correction)
+  # ==============================================
+  # set all modvars to their expected values in both models
   modvars <- m.mono$modvars()
-  #print(modvars)
   sapply(modvars, FUN=function(mv){mv$set("expected")})
-  M <- runmodel()
+  modvars <- m.comb$modvars()
+  sapply(modvars, FUN=function(mv){mv$set("expected")})
+  # run the model
+  M <- runmodel(hcc.pop=FALSE, hcc.cost=FALSE)
+  # check results
   expect_intol(M["el.mono"], 7.991, tolerance=0.03) # 7.991 from spreadsheet
   expect_intol(M["cost.mono"], 44663, 100) # rounding errors in book
   expect_intol(M["el.comb"], 8.937, tolerance=0.02) # 8.937 from spreadsheet
@@ -724,20 +657,146 @@ test_that("redecision replicates Briggs' example 4.7", {
   icer <- (M["cost.comb"]-M["cost.mono"])/(M["el.comb"]-M["el.mono"])
   expect_intol(icer, 6276, 10) # rounding errors in book
   #
+  # Point estimate (with population half-cycle correction)
+  # ======================================================
+  # set all modvars to their expected values in both models
+  modvars <- m.mono$modvars()
+  sapply(modvars, FUN=function(mv){mv$set("expected")})
+  modvars <- m.comb$modvars()
+  sapply(modvars, FUN=function(mv){mv$set("expected")})
+  # run the model
+  M <- runmodel(hcc.pop=TRUE, hcc.cost=FALSE)
+  # check results
+  expect_intol(M["el.mono"], 8.48, tolerance=0.03) 
+  expect_intol(M["cost.mono"], 44663, 100) # rounding errors in book
+  expect_intol(M["el.comb"], 9.42, tolerance=0.02) 
+  expect_intol(M["cost.comb"], 50602, 100) # rounding errors in book
+  icer <- (M["cost.comb"]-M["cost.mono"])/(M["el.comb"]-M["el.mono"])
+  expect_intol(icer, 6306, 10) # rounding errors in book
+  #
   # PSA
   # ===
-  #n <- 10
-  #DF <- sapply(1:n, FUN=function(i) {
-  #  sapply(modvars, FUN=function(mv){mv$set("random")})
-  #  M <- runmodel()
-  #  return(M)
-  #}) 
-  #DF <- as.data.frame(t(DF))
-  #print("")
-  #print(DF)
-
-  
-  
+  skip_on_cran()
+  n <- 100
+  DF <- sapply(1:n, FUN=function(i) {
+    # set all modvars to random values in both models
+    modvars <- m.mono$modvars()
+    sapply(modvars, FUN=function(mv){mv$set("random")})
+    modvars <- m.comb$modvars()
+    sapply(modvars, FUN=function(mv){mv$set("random")})
+    # run the model
+    M <- runmodel(hcc.pop=TRUE, hcc.cost=FALSE)
+    return(M)
+  })
+  DF <- as.data.frame(t(DF))
+  # calculate ICER and compare with 100 ICER samples from Briggs spreadsheet, 
+  # example 4.7
+  DF$icer <- (DF$cost.comb - DF$cost.mono)/(DF$el.comb - DF$el.mono)
+  esamp <- scan(text=
+    "5301.35
+    9440.15
+    5744.259409
+    6389.097064
+    6392.624986
+    3994.719593
+    7172.362209
+    7911.346126
+    4532.492365
+    5624.510108
+    7661.375273
+    6994.758314
+    6443.136695
+    8415.490257
+    5867.107527
+    5233.06391
+    6622.541882
+    6437.612983
+    2911.766414
+    8913.801308
+    6520.597363
+    5578.340444
+    4729.782693
+    9504.301977
+    6146.588061
+    3765.76602  
+    6489.778374
+    8057.35546
+    11811.25017
+    5670.353086
+    3849.923114
+    4950.39429
+    4122.370475  
+    3821.724085
+    8336.515228
+    4198.215337
+    5253.411175
+    8011.172733
+    5638.448818
+    7453.423065
+    6658.135907
+    4499.134333
+    5201.390732
+    7122.874494
+    4876.858193 
+    4023.805442
+    5129.919089
+    4249.610465
+    12462.7631
+    7434.229976
+    7200.266514
+    7952.9198
+    6556.010328
+    3827.481732
+    5443.137027
+    6012.291712
+    7139.430982
+    6533.022468
+    6739.577098
+    6430.554141
+    5167.152795  
+    6904.27616
+    5573.823787
+    8202.449279
+    6268.396547
+    4602.761381
+    2471.876679
+    5973.696879
+    7414.062825
+    6541.740092
+    1793.977058
+    5224.207019
+    3769.477755
+    3660.149219
+    16972.62138
+    6229.749342
+    2105.755358
+    6150.607183
+    6088.493293
+    6090.582267
+    4299.749596
+    6894.101671
+    8711.266189
+    10316.17458
+    7869.832914
+    4949.493389
+    4319.858777
+    5084.068203
+    7047.4081
+    3261.818576
+    7305.940637
+    10060.60441
+    5851.727982
+    8271.551092
+    5398.198376
+    7150.231396
+    8151.732244
+    3949.116594
+    7574.593941
+    4027.405958",
+    quiet = TRUE
+  ) 
+  ht <- ks.test(DF$icer, esamp)
+  expect_true(ht$p.value > 0.001)
   
 })
 

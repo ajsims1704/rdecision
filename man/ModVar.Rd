@@ -27,11 +27,11 @@ Andrew Sims \email{andrew.sims@newcastle.ac.uk}
 \item \href{#method-description}{\code{ModVar$description()}}
 \item \href{#method-units}{\code{ModVar$units()}}
 \item \href{#method-distribution}{\code{ModVar$distribution()}}
-\item \href{#method-r}{\code{ModVar$r()}}
 \item \href{#method-mean}{\code{ModVar$mean()}}
 \item \href{#method-mode}{\code{ModVar$mode()}}
 \item \href{#method-SD}{\code{ModVar$SD()}}
 \item \href{#method-quantile}{\code{ModVar$quantile()}}
+\item \href{#method-r}{\code{ModVar$r()}}
 \item \href{#method-set}{\code{ModVar$set()}}
 \item \href{#method-get}{\code{ModVar$get()}}
 \item \href{#method-clone}{\code{ModVar$clone()}}
@@ -41,9 +41,9 @@ Andrew Sims \email{andrew.sims@newcastle.ac.uk}
 \if{html}{\out{<a id="method-new"></a>}}
 \if{latex}{\out{\hypertarget{method-new}{}}}
 \subsection{Method \code{new()}}{
-Create an object of type \code{ModVar}
+Create an object of type \code{ModVar}.
 \subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{ModVar$new(description, units)}\if{html}{\out{</div>}}
+\if{html}{\out{<div class="r">}}\preformatted{ModVar$new(description, units, D = NULL, k = as.integer(1))}\if{html}{\out{</div>}}
 }
 
 \subsection{Arguments}{
@@ -55,9 +55,26 @@ tabulation of the variables linked to a model.}
 
 \item{\code{units}}{A character string description of the units, e.g. 
 \code{"GBP"}, \code{"per year"}.}
+
+\item{\code{D}}{The distribution representing the uncertainty in the variable.
+Should inherit from class \code{Distribution}, or NULL if none is
+defined.}
+
+\item{\code{k}}{The index of the dimension of the multivariate distribution
+that applies to this model variable.}
 }
 \if{html}{\out{</div>}}
 }
+\subsection{Details}{
+A ModVar is associated with an uncertainty distribution (a
+"has-a" relationship in object-oriented terminology). There can be a
+1-1 mapping of \code{ModVar}s to \code{Distribution}s, or several
+model variables can be linked to the same distribution in a
+many-1 mapping, e.g. when each transition probability from a Markov state
+is represented as a \code{ModVar} and each can be linked to the \code{k}
+dimensions of a common multivariate Dirichlet distribution.
+}
+
 \subsection{Returns}{
 A new \verb{ModVar} object.
 }
@@ -121,7 +138,8 @@ Description of units as character string.
 \if{html}{\out{<a id="method-distribution"></a>}}
 \if{latex}{\out{\hypertarget{method-distribution}{}}}
 \subsection{Method \code{distribution()}}{
-Accessor function for the name of the uncertainty distribution.
+Accessor function for the name of the uncertainty 
+distribution.
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{ModVar$distribution()}\if{html}{\out{</div>}}
 }
@@ -131,30 +149,10 @@ Distribution name as character string.
 }
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-r"></a>}}
-\if{latex}{\out{\hypertarget{method-r}{}}}
-\subsection{Method \code{r()}}{
-Draw a random sample from the model variable.
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{ModVar$r(n = 1)}\if{html}{\out{</div>}}
-}
-
-\subsection{Arguments}{
-\if{html}{\out{<div class="arguments">}}
-\describe{
-\item{\code{n}}{Number of samples to draw.}
-}
-\if{html}{\out{</div>}}
-}
-\subsection{Returns}{
-A sample drawn at random.
-}
-}
-\if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-mean"></a>}}
 \if{latex}{\out{\hypertarget{method-mean}{}}}
 \subsection{Method \code{mean()}}{
-Return the mean value of the distribution.
+Return the mean value of the model variable.
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{ModVar$mean()}\if{html}{\out{</div>}}
 }
@@ -182,7 +180,7 @@ Mode as a numeric value.
 \if{html}{\out{<a id="method-SD"></a>}}
 \if{latex}{\out{\hypertarget{method-SD}{}}}
 \subsection{Method \code{SD()}}{
-Return the standard deviation of the distribution.
+Return the standard deviation of the model variable.
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{ModVar$SD()}\if{html}{\out{</div>}}
 }
@@ -212,10 +210,29 @@ Vector of numeric values of the same length as \code{probs}.
 }
 }
 \if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-r"></a>}}
+\if{latex}{\out{\hypertarget{method-r}{}}}
+\subsection{Method \code{r()}}{
+Draw a random sample from the model variable.
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{ModVar$r()}\if{html}{\out{</div>}}
+}
+
+\subsection{Details}{
+The same random sample will be returned until \code{set} is
+called to force a resample.
+}
+
+\subsection{Returns}{
+A sample drawn at random.
+}
+}
+\if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-set"></a>}}
 \if{latex}{\out{\hypertarget{method-set}{}}}
 \subsection{Method \code{set()}}{
-Sets the value of the \code{ModVar} that will be returned by subsequent
+Sets the value of the \code{ModVar} that will be returned
+by subsequent
 calls to \code{get()} until \code{set()} is called again.
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{ModVar$set(what = "random", val = NULL)}\if{html}{\out{</div>}}

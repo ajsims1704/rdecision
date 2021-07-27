@@ -25,21 +25,21 @@ Andrew J. Sims \email{andrew.sims@newcastle.ac.uk}
 \itemize{
 \item \href{#method-new}{\code{NormModVar$new()}}
 \item \href{#method-is_probabilistic}{\code{NormModVar$is_probabilistic()}}
-\item \href{#method-distribution}{\code{NormModVar$distribution()}}
-\item \href{#method-r}{\code{NormModVar$r()}}
-\item \href{#method-mean}{\code{NormModVar$mean()}}
-\item \href{#method-SD}{\code{NormModVar$SD()}}
-\item \href{#method-quantile}{\code{NormModVar$quantile()}}
 \item \href{#method-clone}{\code{NormModVar$clone()}}
 }
 }
 \if{html}{
 \out{<details ><summary>Inherited methods</summary>}
 \itemize{
+\item \out{<span class="pkg-link" data-pkg="rdecision" data-topic="ModVar" data-id="SD">}\href{../../rdecision/html/ModVar.html#method-SD}{\code{rdecision::ModVar$SD()}}\out{</span>}
 \item \out{<span class="pkg-link" data-pkg="rdecision" data-topic="ModVar" data-id="description">}\href{../../rdecision/html/ModVar.html#method-description}{\code{rdecision::ModVar$description()}}\out{</span>}
+\item \out{<span class="pkg-link" data-pkg="rdecision" data-topic="ModVar" data-id="distribution">}\href{../../rdecision/html/ModVar.html#method-distribution}{\code{rdecision::ModVar$distribution()}}\out{</span>}
 \item \out{<span class="pkg-link" data-pkg="rdecision" data-topic="ModVar" data-id="get">}\href{../../rdecision/html/ModVar.html#method-get}{\code{rdecision::ModVar$get()}}\out{</span>}
 \item \out{<span class="pkg-link" data-pkg="rdecision" data-topic="ModVar" data-id="is_expression">}\href{../../rdecision/html/ModVar.html#method-is_expression}{\code{rdecision::ModVar$is_expression()}}\out{</span>}
+\item \out{<span class="pkg-link" data-pkg="rdecision" data-topic="ModVar" data-id="mean">}\href{../../rdecision/html/ModVar.html#method-mean}{\code{rdecision::ModVar$mean()}}\out{</span>}
 \item \out{<span class="pkg-link" data-pkg="rdecision" data-topic="ModVar" data-id="mode">}\href{../../rdecision/html/ModVar.html#method-mode}{\code{rdecision::ModVar$mode()}}\out{</span>}
+\item \out{<span class="pkg-link" data-pkg="rdecision" data-topic="ModVar" data-id="quantile">}\href{../../rdecision/html/ModVar.html#method-quantile}{\code{rdecision::ModVar$quantile()}}\out{</span>}
+\item \out{<span class="pkg-link" data-pkg="rdecision" data-topic="ModVar" data-id="r">}\href{../../rdecision/html/ModVar.html#method-r}{\code{rdecision::ModVar$r()}}\out{</span>}
 \item \out{<span class="pkg-link" data-pkg="rdecision" data-topic="ModVar" data-id="set">}\href{../../rdecision/html/ModVar.html#method-set}{\code{rdecision::ModVar$set()}}\out{</span>}
 \item \out{<span class="pkg-link" data-pkg="rdecision" data-topic="ModVar" data-id="units">}\href{../../rdecision/html/ModVar.html#method-units}{\code{rdecision::ModVar$units()}}\out{</span>}
 }
@@ -77,95 +77,13 @@ A \code{NormModVar} object.
 \if{html}{\out{<a id="method-is_probabilistic"></a>}}
 \if{latex}{\out{\hypertarget{method-is_probabilistic}{}}}
 \subsection{Method \code{is_probabilistic()}}{
-Tests whether the model variable is probabilistic, i.e. a random
-variable that follows a distribution, or an expression involving
-random variables, some of which follow distributions.
+Tests whether the model variable is probabilistic.
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{NormModVar$is_probabilistic()}\if{html}{\out{</div>}}
 }
 
 \subsection{Returns}{
 \code{TRUE} if probabilistic.
-}
-}
-\if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-distribution"></a>}}
-\if{latex}{\out{\hypertarget{method-distribution}{}}}
-\subsection{Method \code{distribution()}}{
-Accessor function for the name of the uncertainty distribution.
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{NormModVar$distribution()}\if{html}{\out{</div>}}
-}
-
-\subsection{Returns}{
-Distribution name as character string.
-}
-}
-\if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-r"></a>}}
-\if{latex}{\out{\hypertarget{method-r}{}}}
-\subsection{Method \code{r()}}{
-Draw a random sample from the model variable. Normally accessed by a 
-call to \code{value(what="r")}.
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{NormModVar$r(n = 1)}\if{html}{\out{</div>}}
-}
-
-\subsection{Arguments}{
-\if{html}{\out{<div class="arguments">}}
-\describe{
-\item{\code{n}}{Number of samples to draw.}
-}
-\if{html}{\out{</div>}}
-}
-\subsection{Returns}{
-A sample drawn at random.
-}
-}
-\if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-mean"></a>}}
-\if{latex}{\out{\hypertarget{method-mean}{}}}
-\subsection{Method \code{mean()}}{
-Return the mean value of the distribution.
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{NormModVar$mean()}\if{html}{\out{</div>}}
-}
-
-\subsection{Returns}{
-Expected value as a numeric value.
-}
-}
-\if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-SD"></a>}}
-\if{latex}{\out{\hypertarget{method-SD}{}}}
-\subsection{Method \code{SD()}}{
-Return the standard deviation of the distribution.
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{NormModVar$SD()}\if{html}{\out{</div>}}
-}
-
-\subsection{Returns}{
-Standard deviation as a numeric value
-}
-}
-\if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-quantile"></a>}}
-\if{latex}{\out{\hypertarget{method-quantile}{}}}
-\subsection{Method \code{quantile()}}{
-Return the quantiles of the Normal uncertainty distribution.
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{NormModVar$quantile(probs)}\if{html}{\out{</div>}}
-}
-
-\subsection{Arguments}{
-\if{html}{\out{<div class="arguments">}}
-\describe{
-\item{\code{probs}}{Vector of probabilities, in range [0,1].}
-}
-\if{html}{\out{</div>}}
-}
-\subsection{Returns}{
-Vector of quantiles.
 }
 }
 \if{html}{\out{<hr>}}

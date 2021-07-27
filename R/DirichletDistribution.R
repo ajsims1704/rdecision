@@ -59,8 +59,8 @@ DirichletDistribution <- R6::R6Class(
       return(rv)
     },
     
-    #' @decription Mean value of each dimension of the distribution.
-    #' @returns A numerical vector of length K.
+    #' @description Mean value of each dimension of the distribution.
+    #' @return A numerical vector of length K.
     mean = function() {
       alpha0 <- sum(private$alpha)
       return(private$alpha/alpha0)
@@ -78,7 +78,7 @@ DirichletDistribution <- R6::R6Class(
       return(rv)
     },
     
-    #' @decription Quantiles of the univariate marginal distributions.
+    #' @description Quantiles of the univariate marginal distributions.
     #' @details The univariate marginal distributions of a Dirichlet
     #' distribution are Beta distributions. This function returns the
     #' quantiles of each marginal. Note that these are not the true
