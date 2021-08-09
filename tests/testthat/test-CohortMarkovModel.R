@@ -367,6 +367,48 @@ test_that("results are independent of cycle time", {
   expect_equal(MT$Well[MT$Cycle==60], 327.68)
 })
 
+test_that("rates can be modified correctly", {
+  # create states
+  s.A <- MarkovState$new(name="A")
+  s.B <- MarkovState$new(name="B")
+  # transition probability and rate from A
+  p <- 0.2
+  r <- -log(1-p)/1
+  # set the cycle time
+  tcycle <- as.difftime(365.25, units="days")
+  # create transitions
+  E <- list(
+    MarkovTransition$new(s.A, s.A),
+    MarkovTransition$new(s.B, s.B),
+    MarkovTransition$new(s.A, s.B, r=r)
+  )
+  # create the model and cycle for 5 years
+  M <- CohortMarkovModel$new(V = list(s.A, s.B), E)
+  tm <- M$transition_probability(tcycle=tcycle)
+  print(tm)
+  MT <- M$cycles(5, hcc.pop=FALSE, hcc.cost=FALSE)
+  expect_equal(MT$A[MT$Cycle==5], 327.68)
+  #
+  # add extra absorbing state
+  s.C <- MarkovState$new(name="C")
+  # modified rate
+  rm <- r*log(1-p/2)/log(1-p)
+  # create transitions
+  E <- list(
+    MarkovTransition$new(s.A, s.A),
+    MarkovTransition$new(s.B, s.B),
+    MarkovTransition$new(s.C, s.C),
+    MarkovTransition$new(s.A, s.B, r=rm),
+    MarkovTransition$new(s.A, s.C, r=rm)
+  )
+  # create the model and cycle for 5 years
+  M <- CohortMarkovModel$new(V = list(s.A, s.B, s.C), E)
+  tm <- M$transition_probability(tcycle=tcycle)
+  print(tm)
+  MT <- M$cycles(5, hcc.pop=FALSE, hcc.cost=FALSE)
+  expect_equal(MT$A[MT$Cycle==5], 327.68)
+})
+
 # -----------------------------------------------------------------------------
 # tests of model variables
 # -----------------------------------------------------------------------------
