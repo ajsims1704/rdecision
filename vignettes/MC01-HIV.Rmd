@@ -42,7 +42,10 @@ in people with HIV infection.
 # Creating the model
 The variables used in the model are all numerical constants, and are defined
 as follows. The original model was based on annual transition probabilities;
-these are converted to instantaneous hazard rates in units of events/year.
+these are converted to instantaneous hazard rates in units of events/year. Note
+that this is done by calculating the total probability of leaving each state,
+converting it to a total rate, then partitioning it into rates for each
+of the transitions leaving the state. 
 ```{r model-variables, echo=TRUE}
 # cycle time
 tcycle <- as.difftime(365.25, units="days")
@@ -54,12 +57,18 @@ pBC <- 0.407
 pBD <- 0.012
 pCD <- 0.250
 # transition rates for monotherapy calculated from annual probabilities
-trABm <- -log(1-pAB)/1 
-trACm <- -log(1-pAC)/1
-trADm <- -log(1-pAD)/1
-trBCm <- -log(1-pBC)/1
-trBDm <- -log(1-pBD)/1
-trCDm <- -log(1-pCD)/1
+pA <- pAB + pAC + pAD
+rA <- -log(1-pA)/1
+trABm <- rA*pAB/pA 
+trACm <- rA*pAC/pA
+trADm <- rA*pAD/pA
+pB <- pBC + pBD
+rB <- -log(1-pB)/1
+trBCm <- rB*pBC/pB
+trBDm <- rB*pBD/pB
+pC <- pCD
+rC <- -log(1-pC)/1
+trCDm <- rC*pCD/pC
 # Costs
 dmca <- 1701 # direct medical costs associated with state A
 dmcb <- 1774 # direct medical costs associated with state B
@@ -206,15 +215,29 @@ of `r format(cost.mono,digits=2,scientific=FALSE)` GBP.
 ## Combination therapy
 For combination therapy, a similar model was created, with adjusted costs and 
 transition rates. Following Briggs *et al* [@briggs2006] the treatment effect
-was applied to the probabilities.
+was applied to the probabilities, and the same process is applied to convert
+probabilities into transition rates.
 ```{r combo, echo=TRUE}
+# annual probabilities
+pAB <- 0.202*RR 
+pAC <- 0.067*RR
+pAD <- 0.010*RR
+pBC <- 0.407*RR
+pBD <- 0.012*RR
+pCD <- 0.250*RR
 # transition rates for combination therapy calculated from annual probabilities
-trABc <- -log(1-RR*pAB)/1 
-trACc <- -log(1-RR*pAC)/1
-trADc <- -log(1-RR*pAD)/1
-trBCc <- -log(1-RR*pBC)/1
-trBDc <- -log(1-RR*pBD)/1
-trCDc <- -log(1-RR*pCD)/1
+pA <- pAB + pAC + pAD
+rA <- -log(1-pA)/1
+trABc <- rA*pAB/pA 
+trACc <- rA*pAC/pA
+trADc <- rA*pAD/pA
+pB <- pBC + pBD
+rB <- -log(1-pB)/1
+trBCc <- rB*pBC/pB
+trBDc <- rB*pBD/pB
+pC <- pCD
+rC <- -log(1-pC)/1
+trCDc <- rC*pCD/pC
 # create Markov states for combination therapy
 sAc <- MarkovState$new("A", cost=dmca+ccca+cAZT+cLam)
 sBc <- MarkovState$new("B", cost=dmcb+cccb+cAZT+cLam)
@@ -238,6 +261,13 @@ m.comb <- CohortMarkovModel$new(
   discount.cost = cDR/100,
   discount.utility = oDR/100
 )
+```
+
+The per-cycle transition matrix for the combination therapy is as follows:
+```{r tmcombo, echo=FALSE}
+TM <- m.comb$transition_probability(tcycle)
+pander::pander(TM, emphasize.rownames=FALSE, justify="lcccc")
+rm(TM)
 ```
 
 In this model, lamivudine is given for the first 2 years, with 

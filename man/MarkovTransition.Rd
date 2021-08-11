@@ -48,7 +48,7 @@ Andrew J. Sims \email{andrew.sims@newcastle.ac.uk}
 \subsection{Method \code{new()}}{
 Create an object of type \code{MarkovTransition}.
 \subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{MarkovTransition$new(source, target, r = as.numeric(NA), cost = 0, label = "")}\if{html}{\out{</div>}}
+\if{html}{\out{<div class="r">}}\preformatted{MarkovTransition$new(source, target, r = NULL, cost = 0, label = "")}\if{html}{\out{</div>}}
 }
 
 \subsection{Arguments}{
@@ -60,8 +60,7 @@ Create an object of type \code{MarkovTransition}.
 
 \item{\code{r}}{Instantaneous hazard rate in units of per patient per year.
 Exactly one of the outgoing transitions from each state must be NULL.
-Default value is \code{NA} to indicate that rates will be set with
-\code{set_rate} as the model is run.}
+Default value is NULL.}
 
 \item{\code{cost}}{Cost associated with the transition.}
 
@@ -104,14 +103,14 @@ A list of \code{ModVar}s.
 \subsection{Method \code{set_rate()}}{
 Set the value of the transition rate
 \subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{MarkovTransition$set_rate(r)}\if{html}{\out{</div>}}
+\if{html}{\out{<div class="r">}}\preformatted{MarkovTransition$set_rate(r = 0)}\if{html}{\out{</div>}}
 }
 
 \subsection{Arguments}{
 \if{html}{\out{<div class="arguments">}}
 \describe{
 \item{\code{r}}{Instantaneous hazard rate in units of per patient per year,
-or NULL.}
+or NULL; default value is zero.}
 }
 \if{html}{\out{</div>}}
 }
@@ -121,7 +120,7 @@ be NULL.
 }
 
 \subsection{Returns}{
-Updated \code{MarkovTransition} cost
+Updated \code{MarkovTransition} object.
 }
 }
 \if{html}{\out{<hr>}}

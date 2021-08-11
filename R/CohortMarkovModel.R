@@ -28,14 +28,40 @@
 #' \eqn{\hat{K} = Np}, where \eqn{p = 1-\exp(-r t)}, the probability with 
 #' which events arise during interval \eqn{t}. If instead a per-interval 
 #' probability is known, the rate is derived from the inverse relationship 
-#' \eqn{r = -\ln(1-p)/t}.
+#' \eqn{r = -\ln(1-p)/t}. Miller & Homan (1994) and Fleurence & Hollenbeak 
+#' (2007) discuss the subject in more detail.
+#' 
+#' @section Probabilities and rates in states with multiple transitions:
+#' Consider a model with a starting state A, which has a self-loop, and three 
+#' absorbing states, B, C and D, with allowed transitions from A to B, A to C 
+#' and A to D only. Assume the transition rates (in units of per patient per
+#' year) are \eqn{r_{AB}=2}, \eqn{r_{AC}=0.5} and \eqn{r_{AD}=0.1}. Rates
+#' are additive, and the total rate of patients leaving state A is 2.6. Thus,
+#' the probability of leaving state A in one year is 
+#' \eqn{p_A = 1-e^{-2.6}=0.9257},
+#' and the probability of leaving in one month is \eqn{1-e^{-2.6/12}=0.1948}; 
+#' i.e. 93\% of patients will leave state A within 1 year, and 19\% will leave
+#' within one month. However, the individual transition probabilities per cycle
+#' \eqn{p_{AB}}, \eqn{p_{AC}} and \eqn{p_{AD}} must be calculated from the
+#' total per cycle probability (\eqn{p_A}) and the conditional probability for
+#' each transition. For example in one year, \eqn{p_{AB} = p_A * 2/2.6 = 0.712},
+#' \eqn{p_{AC} = p_A * 0.5/2.6 = 0.178}, \eqn{p_{AD} = p_A * 0.1/2.6 = 0.036}, 
+#' with \eqn{p_{AA} = 1-0.9257 = 0.074}. Applying the inverse relationship 
+#' described in the previous section to calculate individual probabilities 
+#' from individual rates is incorrect  (i.e. \eqn{p_{AB} \ne 1 - e^{-r_{AB}t}}).
 #' 
 #' @references{
 #'   Briggs A, Claxton K, Sculpher M. Decision modelling for health economic 
 #'   evaluation. Oxford, UK: Oxford University Press; 2006.
 #'   
+#'   Fleurence RL and Hollenbeak CS. Rates and probabilities in economic 
+#'   modelling. \emph{PharmacoEconomics}, 2007;\strong{25}:3--6. 
+#'   
+#'   Miller DK and Homan SM. Determining transition probabilities: confusion
+#'   and suggestions. \emph{Medical Decision Making} 1994;\strong{14}:52-58. 
+#'   
 #'   Sonnenberg FA, Beck JR. Markov models in medical decision making: a
-#'   practical guide. \emph{Med Decis Making}, 1993:\strong{13}:322. 
+#'   practical guide. \emph{Medical Decision Making}, 1993:\strong{13}:322. 
 #' }
 #' 
 #' @docType class
@@ -136,14 +162,6 @@ CohortMarkovModel <- R6::R6Class(
       private$cmm.disutil <- discount.utility
       # reset the model to its ground state
       self$reset()
-      ## create a population vector and initialize first state to 1000
-      #private$cmm.pop <- vector(mode="numeric", length=self$order())
-      #names(private$cmm.pop) <- self$get_statenames()
-      #private$cmm.pop[1] <- 1000
-      ## set the cycle number
-      #private$cmm.icycle <- 0
-      ## set the clock time
-      #private$cmm.elapsed <- 0
       # return a new CohortMarkovModel object
       return(invisible(self))
     },
@@ -152,7 +170,7 @@ CohortMarkovModel <- R6::R6Class(
     #' @param tcycle Cycle length, expressed as an R \code{difftime} object.
     #' @details Checks that each state has at least one outgoing transition and
     #' that exactly one outgoing transition rate whose rate is NULL. 
-    #' @returns A square matrix of size equal to the number of states. If all
+    #' @return A square matrix of size equal to the number of states. If all
     #' states are labelled, the dimnames take the names of the states.
     transition_probability = function(tcycle) {
       # check that the cycle time is an interval
@@ -199,11 +217,17 @@ CohortMarkovModel <- R6::R6Class(
         it <- self$vertex_index(e$target())
         Ip[is,it] <- e$rate()
       }
+      # compute the sum of outgoing defined rates for each state
+      sumr <- rowSums(Ip, na.rm=TRUE)
+      # convert total outgoing rates to total per-cycle probabilities, by state
+      t <- as.numeric(tcycle, units="days")/365.25
+      sump <- 1 - exp(-sumr*t)
       # convert rates to per-cycle probabilities
       for (is in 1:nrow(Ip)) {
-        for (it in 1:nrow(Ip)) {
-          t <- as.numeric(tcycle, units="days")/365.25
-          Ip[is,it] <- 1 - exp(-Ip[is,it]*t)
+        if (sumr[is] > 0) {
+          for (it in 1:nrow(Ip)) {
+            Ip[is,it] <- (Ip[is,it] / sumr[is]) * sump[is] 
+          }
         }
       }
       # replace NAs with values to ensure all rows sum to unity
@@ -222,7 +246,7 @@ CohortMarkovModel <- R6::R6Class(
     },
 
     #' @description Return the per-cycle transition costs for the model.
-    #' @returns A square matrix of size equal to the number of states. If all
+    #' @return A square matrix of size equal to the number of states. If all
     #' states are labelled, the dimnames take the names of the states.
     transition_cost = function() {
       # get the state names
@@ -329,7 +353,7 @@ CohortMarkovModel <- R6::R6Class(
     },
     
     #' @description Gets the occupancy of each state
-    #' @returns A numeric vector of populations, named with state names.
+    #' @return A numeric vector of populations, named with state names.
     get_populations = function() {
       return(private$cmm.pop)
     },
@@ -343,14 +367,14 @@ CohortMarkovModel <- R6::R6Class(
     #' end of the cycle (even if half cycle correction is used). Thus, via the
     #' \code{reset} and \code{cycle} methods, the time of each cycle relative 
     #' to the discounting index and its duration can be controlled arbitrarily.
-    #' @returns Elapsed time as an R \code{difftime} object.
+    #' @return Elapsed time as an R \code{difftime} object.
     get_elapsed = function() {
       return(private$cmm.elapsed)  
     },
  
     #' @description Tabulation of states
     #' @details Creates a data frame summary of each state in the model.
-    #' @returns A data frame with the following columns:
+    #' @return A data frame with the following columns:
     #' \describe{
     #' \item{Name}{State name}
     #' \item{Cost}{Annual cost of occupying the state}
@@ -378,7 +402,7 @@ CohortMarkovModel <- R6::R6Class(
     #' costs. If true, the occupancy costs are computed using the population
     #' at half cycle; if false they are applied at the end of the cycle. 
     #' Applicable only if hcc.pop is TRUE.
-    #' @returns Calculated values, one row per state, as a data frame with the
+    #' @return Calculated values, one row per state, as a data frame with the
     #' following columns:
     #' \describe{
     #' \item{\code{State}}{Name of the state.}
@@ -392,14 +416,14 @@ CohortMarkovModel <- R6::R6Class(
     #' annual occupancy costs of the \code{MarkovState}s. Applied to the end
     #' population, i.e. unaffacted by half cycle correction, as per 
     #' Briggs \emph{et al}.}
-    #' \item{code{EntryCost}}{Cost of the transitions \emph{into} the state
+    #' \item{\code{EntryCost}}{Cost of the transitions \emph{into} the state
     #' during the cycle. Discounting is applied, if the option is set. 
     #' The result is normalized by the model population. The cycle costs
     #' are derived from \code{MarkovTransition} costs.}
     #' \item{\code{Cost}}{Total cost, normalized by model population.}
-    #' \item{QALY}{Quality adjusted life years gained by occupancy of the states
-    #' during the cycle. Half cycle correction and discounting are applied,
-    #' if these options are set. Normalized by the model population.}
+    #' \item{\code{QALY}}{Quality adjusted life years gained by occupancy of 
+    #' the states during the cycle. Half cycle correction and discounting are 
+    #' applied, if these options are set. Normalized by the model population.}
     #' }
     cycle = function(tcycle=as.difftime(365.25, units="days"), hcc.pop=TRUE,
                      hcc.cost=TRUE) {
@@ -513,7 +537,7 @@ CohortMarkovModel <- R6::R6Class(
     #' costs. If true, the occupancy costs are computed using the population
     #' at half cycle; if false they are applied at the end of the cycle.
     #' Applicable only if hcc.pop is TRUE.
-    #' @returns Data frame with cycle results.
+    #' @return Data frame with cycle results.
     #' following columns:
     #' \describe{
     #' \item{\code{Cycle}}{The cycle number.}

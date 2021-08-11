@@ -4,61 +4,6 @@
 \name{CohortMarkovModel}
 \alias{CohortMarkovModel}
 \title{\verb{CohortMarkovModel}}
-\value{
-A square matrix of size equal to the number of states. If all
-states are labelled, the dimnames take the names of the states.
-
-A square matrix of size equal to the number of states. If all
-states are labelled, the dimnames take the names of the states.
-
-A numeric vector of populations, named with state names.
-
-Elapsed time as an R \code{difftime} object.
-
-A data frame with the following columns:
-\describe{
-\item{Name}{State name}
-\item{Cost}{Annual cost of occupying the state}
-\item{Utility}{Incremental utility associated with being in the state.}
-}
-
-Calculated values, one row per state, as a data frame with the
-following columns:
-\describe{
-\item{\code{State}}{Name of the state.}
-\item{\code{Cycle}}{The cycle number.}
-\item{\code{Time}}{Clock time, years.}
-\item{\code{Population}}{Population of the state at the end of 
-the cycle, or at mid-cycle if half-cycle correction is applied.}
-\item{\code{OccCost}}{Cost of the population occupying the state for 
-the cycle. Discount is applied, if the options are set. The costs are
-normalized by the model population. The cycle costs are derived from the
-annual occupancy costs of the \code{MarkovState}s. Applied to the end
-population, i.e. unaffacted by half cycle correction, as per 
-Briggs \emph{et al}.}
-\item{code{EntryCost}}{Cost of the transitions \emph{into} the state
-during the cycle. Discounting is applied, if the option is set. 
-The result is normalized by the model population. The cycle costs
-are derived from \code{MarkovTransition} costs.}
-\item{\code{Cost}}{Total cost, normalized by model population.}
-\item{QALY}{Quality adjusted life years gained by occupancy of the states
-during the cycle. Half cycle correction and discounting are applied,
-if these options are set. Normalized by the model population.}
-}
-
-Data frame with cycle results.
-following columns:
-\describe{
-\item{\code{Cycle}}{The cycle number.}
-\item{\code{Time}}{Elapsed time at end of cycle, years}
-\item{\code{<name>}}{Population of state \code{<name} at the end of
-the cycle.}
-\item{\code{Cost}}{Cost associated with occupancy and transitions between
-states during the cycle.}
-\item{\code{QALY}}{Quality adjusted life years associated with occupancy
-of the states in the cycle.}
-}
-}
 \description{
 An R6 class for a Markov model with cohort simulation.
 }
@@ -90,7 +35,29 @@ population of \eqn{N} is \eqn{\hat{K} = N - N e^{-r t}}, or
 \eqn{\hat{K} = Np}, where \eqn{p = 1-\exp(-r t)}, the probability with 
 which events arise during interval \eqn{t}. If instead a per-interval 
 probability is known, the rate is derived from the inverse relationship 
-\eqn{r = -\ln(1-p)/t}.
+\eqn{r = -\ln(1-p)/t}. Miller & Homan (1994) and Fleurence & Hollenbeak 
+(2007) discuss the subject in more detail.
+}
+
+\section{Probabilities and rates in states with multiple transitions}{
+
+Consider a model with a starting state A, which has a self-loop, and three 
+absorbing states, B, C and D, with allowed transitions from A to B, A to C 
+and A to D only. Assume the transition rates (in units of per patient per
+year) are \eqn{r_{AB}=2}, \eqn{r_{AC}=0.5} and \eqn{r_{AD}=0.1}. Rates
+are additive, and the total rate of patients leaving state A is 2.6. Thus,
+the probability of leaving state A in one year is 
+\eqn{p_A = 1-e^{-2.6}=0.9257},
+and the probability of leaving in one month is \eqn{1-e^{-2.6/12}=0.1948}; 
+i.e. 93\% of patients will leave state A within 1 year, and 19\% will leave
+within one month. However, the individual transition probabilities per cycle
+\eqn{p_{AB}}, \eqn{p_{AC}} and \eqn{p_{AD}} must be calculated from the
+total per cycle probability (\eqn{p_A}) and the conditional probability for
+each transition. For example in one year, \eqn{p_{AB} = p_A * 2/2.6 = 0.712},
+\eqn{p_{AC} = p_A * 0.5/2.6 = 0.178}, \eqn{p_{AD} = p_A * 0.1/2.6 = 0.036}, 
+with \eqn{p_{AA} = 1-0.9257 = 0.074}. Applying the inverse relationship 
+described in the previous section to calculate individual probabilities 
+from individual rates is incorrect  (i.e. \eqn{p_{AB} \ne 1 - e^{-r_{AB}t}}).
 }
 
 \references{
@@ -98,8 +65,14 @@ probability is known, the rate is derived from the inverse relationship
   Briggs A, Claxton K, Sculpher M. Decision modelling for health economic 
   evaluation. Oxford, UK: Oxford University Press; 2006.
   
+  Fleurence RL and Hollenbeak CS. Rates and probabilities in economic 
+  modelling. \emph{PharmacoEconomics}, 2007;\strong{25}:3--6. 
+  
+  Miller DK and Homan SM. Determining transition probabilities: confusion
+  and suggestions. \emph{Medical Decision Making} 1994;\strong{14}:52-58. 
+  
   Sonnenberg FA, Beck JR. Markov models in medical decision making: a
-  practical guide. \emph{Med Decis Making}, 1993:\strong{13}:322. 
+  practical guide. \emph{Medical Decision Making}, 1993:\strong{13}:322. 
 }
 }
 \author{
@@ -225,6 +198,10 @@ Checks that each state has at least one outgoing transition and
 that exactly one outgoing transition rate whose rate is NULL.
 }
 
+\subsection{Returns}{
+A square matrix of size equal to the number of states. If all
+states are labelled, the dimnames take the names of the states.
+}
 }
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-transition_cost"></a>}}
@@ -235,6 +212,10 @@ Return the per-cycle transition costs for the model.
 \if{html}{\out{<div class="r">}}\preformatted{CohortMarkovModel$transition_cost()}\if{html}{\out{</div>}}
 }
 
+\subsection{Returns}{
+A square matrix of size equal to the number of states. If all
+states are labelled, the dimnames take the names of the states.
+}
 }
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-get_statenames"></a>}}
@@ -302,6 +283,9 @@ Gets the occupancy of each state
 \if{html}{\out{<div class="r">}}\preformatted{CohortMarkovModel$get_populations()}\if{html}{\out{</div>}}
 }
 
+\subsection{Returns}{
+A numeric vector of populations, named with state names.
+}
 }
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-get_elapsed"></a>}}
@@ -323,6 +307,9 @@ end of the cycle (even if half cycle correction is used). Thus, via the
 to the discounting index and its duration can be controlled arbitrarily.
 }
 
+\subsection{Returns}{
+Elapsed time as an R \code{difftime} object.
+}
 }
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-tabulate_states"></a>}}
@@ -337,6 +324,14 @@ Tabulation of states
 Creates a data frame summary of each state in the model.
 }
 
+\subsection{Returns}{
+A data frame with the following columns:
+\describe{
+\item{Name}{State name}
+\item{Cost}{Annual cost of occupying the state}
+\item{Utility}{Incremental utility associated with being in the state.}
+}
+}
 }
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-cycle"></a>}}
@@ -370,6 +365,31 @@ at half cycle; if false they are applied at the end of the cycle.
 Applicable only if hcc.pop is TRUE.}
 }
 \if{html}{\out{</div>}}
+}
+\subsection{Returns}{
+Calculated values, one row per state, as a data frame with the
+following columns:
+\describe{
+\item{\code{State}}{Name of the state.}
+\item{\code{Cycle}}{The cycle number.}
+\item{\code{Time}}{Clock time, years.}
+\item{\code{Population}}{Population of the state at the end of 
+the cycle, or at mid-cycle if half-cycle correction is applied.}
+\item{\code{OccCost}}{Cost of the population occupying the state for 
+the cycle. Discount is applied, if the options are set. The costs are
+normalized by the model population. The cycle costs are derived from the
+annual occupancy costs of the \code{MarkovState}s. Applied to the end
+population, i.e. unaffacted by half cycle correction, as per 
+Briggs \emph{et al}.}
+\item{\code{EntryCost}}{Cost of the transitions \emph{into} the state
+during the cycle. Discounting is applied, if the option is set. 
+The result is normalized by the model population. The cycle costs
+are derived from \code{MarkovTransition} costs.}
+\item{\code{Cost}}{Total cost, normalized by model population.}
+\item{\code{QALY}}{Quality adjusted life years gained by occupancy of 
+the states during the cycle. Half cycle correction and discounting are 
+applied, if these options are set. Normalized by the model population.}
+}
 }
 }
 \if{html}{\out{<hr>}}
@@ -421,6 +441,20 @@ will be cycle zero, i.e. the distribution of patients to starting
 states.
 }
 
+\subsection{Returns}{
+Data frame with cycle results.
+following columns:
+\describe{
+\item{\code{Cycle}}{The cycle number.}
+\item{\code{Time}}{Elapsed time at end of cycle, years}
+\item{\code{<name>}}{Population of state \code{<name} at the end of
+the cycle.}
+\item{\code{Cost}}{Cost associated with occupancy and transitions between
+states during the cycle.}
+\item{\code{QALY}}{Quality adjusted life years associated with occupancy
+of the states in the cycle.}
+}
+}
 }
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-modvars"></a>}}

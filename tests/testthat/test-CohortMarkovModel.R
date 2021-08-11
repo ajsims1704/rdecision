@@ -151,14 +151,19 @@ test_that("the transition matrix has the correct properties and values", {
   s.well <- MarkovState$new("Well")
   s.disabled <- MarkovState$new("Disabled")
   s.dead <- MarkovState$new("Dead")
+  # transition probabilities and rates
+  p.ws <- 0.2
+  p.wd <- 0.2
+  p.sd <- 0.4
+  r.ws <- (-log(1-(p.ws+p.wd))/1)*(p.ws/(p.ws+p.wd))
+  r.wd <- (-log(1-(p.ws+p.wd))/1)*(p.wd/(p.ws+p.wd))
+  r.sd <- -log(1-p.sd)/1
+  # create transitions
   e.ww <- MarkovTransition$new(s.well, s.well)
   e.ss <- MarkovTransition$new(s.disabled, s.disabled)
   e.dd <- MarkovTransition$new(s.dead, s.dead)
-  r.ws <- -log(1-0.2)/1
   e.ws <- MarkovTransition$new(s.well, s.disabled, r=r.ws)
-  r.wd <- -log(1-0.2)/1
   e.wd <- MarkovTransition$new(s.well, s.dead, r=r.wd)
-  r.sd <- -log(1-0.4)/1
   e.sd <- MarkovTransition$new(s.disabled, s.dead, r=r.sd)
   M <- CohortMarkovModel$new(
     V = list(s.well, s.disabled, s.dead),
@@ -359,15 +364,17 @@ test_that("results are independent of cycle time", {
   expect_equal(MT$Well[MT$Cycle==5], 327.68)
   # create the model and cycle for 5 years
   M <- CohortMarkovModel$new(V = list(s.well, s.dead), E)
+  tcycle = as.difftime(365.25/12, units="days")
+  TM <- M$transition_probability(tcycle=tcycle)
   MT <- M$cycles(
     5*12, 
     hcc.pop = FALSE, hcc.cost=FALSE, 
-    tcycle = as.difftime(365.25/12, units="days")
+    tcycle = tcycle
   )
   expect_equal(MT$Well[MT$Cycle==60], 327.68)
 })
 
-test_that("rates can be modified correctly", {
+test_that("rates can be proportioned correctly", {
   # create states
   s.A <- MarkovState$new(name="A")
   s.B <- MarkovState$new(name="B")
@@ -384,29 +391,80 @@ test_that("rates can be modified correctly", {
   )
   # create the model and cycle for 5 years
   M <- CohortMarkovModel$new(V = list(s.A, s.B), E)
-  tm <- M$transition_probability(tcycle=tcycle)
-  print(tm)
   MT <- M$cycles(5, hcc.pop=FALSE, hcc.cost=FALSE)
   expect_equal(MT$A[MT$Cycle==5], 327.68)
+  expect_equal(MT$B[MT$Cycle==5], 1000-327.68)
   #
   # add extra absorbing state
   s.C <- MarkovState$new(name="C")
-  # modified rate
-  rm <- r*log(1-p/2)/log(1-p)
   # create transitions
   E <- list(
     MarkovTransition$new(s.A, s.A),
     MarkovTransition$new(s.B, s.B),
     MarkovTransition$new(s.C, s.C),
-    MarkovTransition$new(s.A, s.B, r=rm),
-    MarkovTransition$new(s.A, s.C, r=rm)
+    MarkovTransition$new(s.A, s.B, r=r/2),
+    MarkovTransition$new(s.A, s.C, r=r/2)
   )
   # create the model and cycle for 5 years
   M <- CohortMarkovModel$new(V = list(s.A, s.B, s.C), E)
   tm <- M$transition_probability(tcycle=tcycle)
-  print(tm)
   MT <- M$cycles(5, hcc.pop=FALSE, hcc.cost=FALSE)
+  # expected proportions in each state
   expect_equal(MT$A[MT$Cycle==5], 327.68)
+  expect_equal(MT$B[MT$Cycle==5], (1000-327.68)/2)
+  expect_equal(MT$C[MT$Cycle==5], (1000-327.68)/2)
+})
+
+test_that("people waiting for a test are modelled correctly", {
+  # population and test performance
+  p.prev <- 0.4
+  p.sens <- 0.75
+  p.spec <- 0.75
+  # create states
+  s.A <- MarkovState$new(name="A") # people waiting for a test
+  s.TP <- MarkovState$new(name="TP") # TP, absorbing
+  s.TN <- MarkovState$new(name="TN") # TN, absorbing
+  s.FP <- MarkovState$new(name="FP") # FP, absorbing
+  s.FN <- MarkovState$new(name="FN") # FN, absorbing
+  # annual probability and rate of testing
+  p <- 0.2
+  r <- -log(1-p)/1
+  # test outcome proportions and rates
+  pTP <- p.prev*p.sens
+  pTN <- (1-p.prev)*p.spec
+  pFP <- (1-p.prev)*(1-p.spec)
+  pFN <- p.prev*(1-p.sens)
+  rTP <- r*pTP
+  rTN <- r*pTN
+  rFP <- r*pFP
+  rFN <- r*pFN
+  #
+  # create transitions
+  E <- list(
+    MarkovTransition$new(s.A, s.A, r=NULL),
+    MarkovTransition$new(s.A, s.TP, r=rTP),
+    MarkovTransition$new(s.TP, s.TP, r=NULL),
+    MarkovTransition$new(s.A, s.TN, r=rTN),
+    MarkovTransition$new(s.TN, s.TN, r=NULL),
+    MarkovTransition$new(s.A, s.FP, r=rFP),
+    MarkovTransition$new(s.FP, s.FP, r=NULL),
+    MarkovTransition$new(s.A, s.FN, r=rFN),
+    MarkovTransition$new(s.FN, s.FN, r=NULL)
+  )
+  # create the model and cycle for 5 years in months
+  M <- CohortMarkovModel$new(V = list(s.A, s.TP, s.TN, s.FP, s.FN), E)
+  tcycle <- as.difftime(365.25/12, units="days")
+  TM <- M$transition_probability(tcycle)
+  tm <- M$transition_probability(tcycle=tcycle)
+  MT <- M$cycles(5*12, tcycle=tcycle, hcc.pop=FALSE, hcc.cost=FALSE)
+  # expected proportions in each state
+  e.untested <- 327.68
+  e.tested <- 1000-e.untested
+  expect_equal(MT$A[MT$Cycle==5*12], e.untested)
+  expect_equal(MT$TP[MT$Cycle==5*12], e.tested*pTP)
+  expect_equal(MT$TN[MT$Cycle==5*12], e.tested*pTN)
+  expect_equal(MT$FP[MT$Cycle==5*12], e.tested*pFP)
+  expect_equal(MT$FN[MT$Cycle==5*12], e.tested*pFN)
 })
 
 # -----------------------------------------------------------------------------
@@ -455,10 +513,15 @@ test_that("rdecision replicates Sonnenberg & Beck, Fig 3", {
   s.well <- MarkovState$new(name="Well", utility=1)
   s.disabled <- MarkovState$new(name="Disabled",utility=0.7)
   s.dead <- MarkovState$new(name="Dead",utility=0)
+  # transition probabilities and rates (complexity needed because S&B specify 
+  # probabilities, not rates)
+  p.ws <- 0.2
+  p.wd <- 0.2
+  p.sd <- 0.4
+  r.ws <- (-log(1-(p.ws+p.wd))/1)*(p.ws/(p.ws+p.wd))
+  r.wd <- (-log(1-(p.ws+p.wd))/1)*(p.wd/(p.ws+p.wd))
+  r.sd <- -log(1-p.sd)/1
   # create transitions
-  r.ws <- -log(1-0.2)/1
-  r.wd <- -log(1-0.2)/1
-  r.sd <- -log(1-0.4)/1
   E <- list(
     MarkovTransition$new(s.well, s.well),
     MarkovTransition$new(s.dead, s.dead),
@@ -501,36 +564,52 @@ test_that("redecision replicates Briggs' example 4.7", {
   #
   # Transition rates
   # ================
+  # Note the complexity with conditional probabilities being used here to derive
+  # transition rates arises because Briggs et al used probabilities, rather
+  # than rates, as input. 
+  #
   # Dirichlet distribution & model variables for transitions from A
-  DA <- DirichletDistribution$new(c(1251, 350, 116, 17))
+  nA <- c(1251, 350, 116, 17)       # transitions, people, per year
+  DA <- DirichletDistribution$new(nA)
   pAB <- ModVar$new("pAB", "P", D=DA, k=as.integer(2))
-  pAC <- ModVar$new("pCB", "P", D=DA, k=as.integer(3))
+  pAC <- ModVar$new("pAC", "P", D=DA, k=as.integer(3))
   pAD <- ModVar$new("pAD", "P", D=DA, k=as.integer(4))
+  pA <- ExprModVar$new("pA", "P", rlang::quo(pAB+pAC+pAD))
+  rA <- ExprModVar$new("rA", "HR", rlang::quo(-log(1-pA)))
   # Dirichlet distribution & model variables for transitions from B
-  DB <- DirichletDistribution$new(c(731, 512, 15))
+  nB <- c(731,512,15)               # transitions, people per year
+  DB <- DirichletDistribution$new(nB)
   pBC <- ModVar$new("pBC", "P", D=DB, k=as.integer(2)) 
   pBD <- ModVar$new("pBD", "P", D=DB, k=as.integer(3)) 
+  pB <- ExprModVar$new("pB", "P", rlang::quo(pBC+pBD))
+  rB <- ExprModVar$new("rB", "HR", rlang::quo(-log(1-pB)))
   # Dirichlet distribution & model variables for transitions from C
-  DC <- DirichletDistribution$new(c(1312, 437))
+  nC <- c(1312,437)                 # transitions, people per year
+  DC <- DirichletDistribution$new(nC)
   pCD <- ModVar$new("pCD", "P", D=DC, k=as.integer(2)) 
+  pC <- ExprModVar$new("pC", "P", rlang::quo(pCD))
+  rC <- ExprModVar$new("rC", "HR", rlang::quo(-log(1-pC)))
   # transition rates with monotherapy from annual transition probabilities
-  trABm <- ExprModVar$new("trAB", "HR", rlang::quo(-log(1-pAB)/1))
-  trACm <- ExprModVar$new("trAC", "HR", rlang::quo(-log(1-pAC)/1))
-  trADm <- ExprModVar$new("trAD", "HR", rlang::quo(-log(1-pAD)/1))
-  trBCm <- ExprModVar$new("trBC", "HR", rlang::quo(-log(1-pBC)/1))
-  trBDm <- ExprModVar$new("trBD", "HR", rlang::quo(-log(1-pBD)/1))
-  trCDm <- ExprModVar$new("trCD", "HR", rlang::quo(-log(1-pCD)/1))
+  trABm <- ExprModVar$new("trAB", "HR", rlang::quo(rA*pAB/pA))
+  trACm <- ExprModVar$new("trAC", "HR", rlang::quo(rA*pAC/pA))
+  trADm <- ExprModVar$new("trAD", "HR", rlang::quo(rA*pAD/pA))
+  trBCm <- ExprModVar$new("trBC", "HR", rlang::quo(rB*pBC/pB))
+  trBDm <- ExprModVar$new("trBD", "HR", rlang::quo(rB*pBD/pB))
+  trCDm <- ExprModVar$new("trCD", "HR", rlang::quo(rC*pCD/pC))
   # Treatment effect (modelled as a log normal distribution)
   RR <- LogNormModVar$new(
     "Tx effect", "RR", p1=0.509, p2=(0.710-0.365)/(2*1.96), "LN7"
   )
-  # transition rates with treatment effect
-  trABc <- ExprModVar$new("trAB", "HR", rlang::quo(-log(1-pAB*RR)/1))
-  trACc <- ExprModVar$new("trAC", "HR", rlang::quo(-log(1-pAC*RR)/1))
-  trADc <- ExprModVar$new("trAD", "HR", rlang::quo(-log(1-pAD*RR)/1))
-  trBCc <- ExprModVar$new("trBC", "HR", rlang::quo(-log(1-pBC*RR)/1))
-  trBDc <- ExprModVar$new("trBD", "HR", rlang::quo(-log(1-pBD*RR)/1))
-  trCDc <- ExprModVar$new("trCD", "HR", rlang::quo(-log(1-pCD*RR)/1))
+  # transition rates, with treatment effect
+  rAc <- ExprModVar$new("rAc", "HR", rlang::quo(-log(1-pA*RR)))
+  rBc <- ExprModVar$new("rBc", "HR", rlang::quo(-log(1-pB*RR)))
+  rCc <- ExprModVar$new("rCc", "HR", rlang::quo(-log(1-pC*RR)))
+  trABc <- ExprModVar$new("trAB", "HR", rlang::quo(rAc*pAB/pA))
+  trACc <- ExprModVar$new("trAC", "HR", rlang::quo(rAc*pAC/pA))
+  trADc <- ExprModVar$new("trAD", "HR", rlang::quo(rAc*pAD/pA))
+  trBCc <- ExprModVar$new("trBC", "HR", rlang::quo(rBc*pBC/pB))
+  trBDc <- ExprModVar$new("trBD", "HR", rlang::quo(rBc*pBD/pB))
+  trCDc <- ExprModVar$new("trCD", "HR", rlang::quo(rCc*pCD/pC))
   #
   # Costs
   # =====
@@ -586,7 +665,7 @@ test_that("redecision replicates Briggs' example 4.7", {
       0.000, 0.000, 0.000, 1.000),   # typo in book (D,D) = 1!
     byrow = TRUE,
     nrow = 4)
-  expect_equal(sum(TM-E), 0)
+  expect_true(all(TM-E < 0.01))
   #
   # Combination therapy model
   # =========================
@@ -622,7 +701,7 @@ test_that("redecision replicates Briggs' example 4.7", {
       0.000, 0.000, 0.000, 1.000),   
     byrow = TRUE,
     nrow = 4)
-  expect_equal(sum(TM-E), 0)
+  expect_true(all(TM-E < 0.01))
   #
   # Function to estimate life years gained and costs
   # ================================================

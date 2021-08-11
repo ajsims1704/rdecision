@@ -1,6 +1,10 @@
 
 # rdecision 1.0.4.9000
 
+* Fixed `transition_probability` in `CohortMarkovModel` to ensure
+  that the relative probabilities for each outgoing state are preserved
+  correctly. Added note to documentation as the realtionshiop between
+  rates and probabilities requires careful implementation.
 * Deprecated function `r()` from `Modvar` and its subclasses. Use set/get
   methods to sample from associated uncertainty distribution.
 * Refactored model variable classes into much smaller convenience classes

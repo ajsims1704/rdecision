@@ -8,7 +8,7 @@
 Updated \code{MarkovState} object
 }
 \description{
-' An R6 class for a state in a Markov model.
+An R6 class for a state in a Markov model.
 }
 \details{
 Represents a single state in a Markov model. A Markov model is 
