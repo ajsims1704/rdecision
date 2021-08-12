@@ -921,3 +921,4 @@ test_that("redecision replicates Briggs' example 4.7", {
   
 })
 
+
