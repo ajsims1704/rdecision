@@ -12,7 +12,7 @@
 #' labelled. It permits loops (edges whose source and target are the same node)
 #' to represent patients that remain in the same state between cycles.
 #'
-#' @section Probabilities and rates:
+#' @section Probabilities and rates in trivial models:
 #' To calculate per-cycle probabilities from rates, Briggs (2002) and
 #' Sonnenberg & Beck (1993) use the expression \eqn{p = 1-\exp(-rt)}, where 
 #' \eqn{r} is an instantaneous rate
@@ -28,10 +28,10 @@
 #' \eqn{\hat{K} = Np}, where \eqn{p = 1-\exp(-r t)}, the probability with 
 #' which events arise during interval \eqn{t}. If instead a per-interval 
 #' probability is known, the rate is derived from the inverse relationship 
-#' \eqn{r = -\ln(1-p)/t}. Miller & Homan (1994) and Fleurence & Hollenbeak 
-#' (2007) discuss the subject in more detail.
+#' \eqn{r = -\ln(1-p)/t}. Further details are available in Miller & Homan (1994)
+#' and Fleurence & Hollenbeak (2007).
 #' 
-#' @section Probabilities and rates in states with multiple transitions:
+#' @section Probabilities and rates in multi-state, multi-transition models:
 #' Consider a model with a starting state A, which has a self-loop, and three 
 #' absorbing states, B, C and D, with allowed transitions from A to B, A to C 
 #' and A to D only. Assume the transition rates (in units of per patient per
@@ -48,7 +48,14 @@
 #' \eqn{p_{AC} = p_A * 0.5/2.6 = 0.178}, \eqn{p_{AD} = p_A * 0.1/2.6 = 0.036}, 
 #' with \eqn{p_{AA} = 1-0.9257 = 0.074}. Applying the inverse relationship 
 #' described in the previous section to calculate individual probabilities 
-#' from individual rates is incorrect  (i.e. \eqn{p_{AB} \ne 1 - e^{-r_{AB}t}}).
+#' from individual rates is incorrect  (i.e. \eqn{p_{AB} \ne 1 - e^{-r_{AB}t}})
+#' because people can experience more than one type of event in a single cycle.
+#' Further, the solution described here does not work when there are multiple
+#' states with multiple outgoing transitions. For this general case, the 
+#' per-cycle transition probability is the solution to Kolmogorov's forward and
+#' backward equations, and is given by the matrix exponential of the transition
+#' rate matrix multiplied by the cycle time (Jones, 2017). In \pkg{rdecision},
+#' matrix exponentiation is uses the \pkg{expm} package.
 #' 
 #' @references{
 #'   Briggs A, Claxton K, Sculpher M. Decision modelling for health economic 
@@ -57,6 +64,10 @@
 #'   Fleurence RL and Hollenbeak CS. Rates and probabilities in economic 
 #'   modelling. \emph{PharmacoEconomics}, 2007;\strong{25}:3--6. 
 #'   
+#'   Jones E, Epstein D and García-Mochón L. A procedure for deriving 
+#'   formulas to convert transition rates to probabilities for multistate
+#'   Markov models. \emph{Medical Decision Making} 2017;\strong{37}:779–789.
+#'
 #'   Miller DK and Homan SM. Determining transition probabilities: confusion
 #'   and suggestions. \emph{Medical Decision Making} 1994;\strong{14}:52-58. 
 #'   
@@ -166,20 +177,14 @@ CohortMarkovModel <- R6::R6Class(
       return(invisible(self))
     },
     
-    #' @description Return the per-cycle transition matrix for the model.
-    #' @param tcycle Cycle length, expressed as an R \code{difftime} object.
-    #' @details Checks that each state has at least one outgoing transition and
-    #' that exactly one outgoing transition rate whose rate is NULL. 
+    #' @description Transition rate matrix.
+    #' @details The matrix, usually written as \eqn{Q} is the matrix of rates
+    #' (in units of events per person per year) for the model, assuming a
+    #' continuous time Markov chain. As per convention, each row sums to zero.
     #' @return A square matrix of size equal to the number of states. If all
-    #' states are labelled, the dimnames take the names of the states.
-    transition_probability = function(tcycle) {
-      # check that the cycle time is an interval
-      if (class(tcycle) != "difftime") {
-        rlang::abort(
-          "Argument 'tcycle' must be of class 'difftime'.",
-          class = "invalid_cycle_length"
-        )
-      }
+    #' states are labelled, the \code{dimname}s take the names of the states
+    #' and the dimensions are labelled \code{source} and \code{target}.
+    transition_rate = function() {
       # check that each non-absorbing state has exactly one outgoing
       # transition whose rate is NULL
       lv <- sapply(1:self$order(), function(iv) {
@@ -204,8 +209,8 @@ CohortMarkovModel <- R6::R6Class(
       }
       # get the state names
       state.names <- sapply(private$V, function(v) {v$label()})
-      # construct the matrix
-      Ip <- matrix(
+      # construct the rate matrix, Q
+      Q <- matrix(
         data = 0, 
         nrow = self$order(), ncol = self$order(),
         dimnames = list(source=state.names, target=state.names)
@@ -215,34 +220,113 @@ CohortMarkovModel <- R6::R6Class(
         e <- private$E[[ie]]
         is <- self$vertex_index(e$source())
         it <- self$vertex_index(e$target())
-        Ip[is,it] <- e$rate()
+        Q[is,it] <- e$rate()
       }
-      # compute the sum of outgoing defined rates for each state
-      sumr <- rowSums(Ip, na.rm=TRUE)
-      # convert total outgoing rates to total per-cycle probabilities, by state
+      # replace NULL rates to ensure row sums of Q are zero
+      sumQ <- rowSums(Q, na.rm=TRUE)
+      for (iv in 1:nrow(Q)) {
+        Q[iv,which(is.na(Q[iv,]))] <- -sumQ[iv]
+      }
+      # return the matrix
+      return(Q)
+    },
+    
+    #' @description Sets transition rates from per-cycle probabilities.
+    #' @details When the per-cycle probabilities are available, rather than
+    #' the transition rates, this function calculates and sets rates from 
+    #' probabilities using the matrix log of the probabilities, via 
+    #' package \pkg{expm}.
+    #' @param Pt Per-cycle transition probability matrix. Formally, the
+    #' solution of Kolmogorov's forward and backward equations. The row and 
+    #' column labels must be the state names and each row must sum to zero.
+    #' @param tcycle The cycle time, in years, as a \code{difftime} object.
+    #' @return Updated \code{CohortMarkovModel} object
+    set_rates = function(Pt, tcycle) {
+      # check Pt
+      if (missing(Pt)) {
+        rlang::abort("Pt is missing, without default", class="invalid_Pt")
+      }
+      if (!is.matrix(Pt)) {
+        rlang::abort("'Pt' must be a matrix")
+      }
+      if (!setequal(self$get_statenames(), dimnames(Pt)[[1]])) {
+        rlang::abort(
+          "Each row of 'Pt' must have a state name",
+          class = "invalid_Pt")
+      }  
+      if (!setequal(self$get_statenames(), dimnames(Pt)[[2]])) {
+        rlang::abort(
+          "Each column of 'Pt' must have a state name",
+          class = "invalid_Pt")
+      }  
+      if (any(is.na(Pt))) {
+        rlang::abort(
+          "All elements of 'Pt' must be defined",
+          class = "invalid_Pt"
+        )
+      }
+      if (any(Pt<0) | any(Pt>1)) {
+        rlang::abort(
+          "All elements of 'Pt' must be probabilities",
+          class = "invalid_Pt"
+        )
+      }
+      if (missing(tcycle)) {
+        rlang::abort(
+          "'tcycle' is missing, without default", 
+          class="invalid_tcycle"
+        )
+      }
+      # check that the cycle time is an interval
+      if (class(tcycle) != "difftime") {
+        rlang::abort(
+          "Argument 'tcycle' must be of class 'difftime'.",
+          class = "invalid_tcycle"
+        )
+      }
+      # calculate the transition rate matrix, Q
+      # compute Pt using matrix exponentiation
       t <- as.numeric(tcycle, units="days")/365.25
-      sump <- 1 - exp(-sumr*t)
-      # convert rates to per-cycle probabilities
-      for (is in 1:nrow(Ip)) {
-        if (sumr[is] > 0) {
-          for (it in 1:nrow(Ip)) {
-            Ip[is,it] <- (Ip[is,it] / sumr[is]) * sump[is] 
-          }
-        }
+      Q <- expm::logm(Pt)/t
+      # replace negative rates with NA
+      Q[Q<0] <- as.numeric(NA)
+      # set the rates for each transition
+      for (ie in 1:self$size()) {
+        e <- private$E[[ie]]
+        is <- self$vertex_index(e$source())
+        it <- self$vertex_index(e$target())
+        Q[is,it] <- e$set_rate(Q[is,it])
       }
-      # replace NAs with values to ensure all rows sum to unity
-      for (iv in 1:nrow(Ip)) {
-        p.out <- sum(Ip[iv,], na.rm=TRUE)
-        if (p.out > 1) {
-          label <- private$V[[iv]]$label()
-          rlang::abort(
-            paste("P(transition) from state", label, "exceeds 1"),
-            class = "invalid_transitions"
-          )
-        }
-        Ip[iv,which(is.na(Ip[iv,]))] <- 1 - p.out
+      # return updated model
+      return(invisible(self))
+    },
+    
+    #' @description Per-cycle transition probability matrix for the model.
+    #' @param tcycle Cycle length, expressed as an R \code{difftime} object.
+    #' @details Checks that each state has at least one outgoing transition and
+    #' that exactly one outgoing transition rate whose rate is NULL. The 
+    #' transition probability matrix is the solution to Kolmogorov's forward
+    #' and backward equations, and is computed from the transition rate
+    #' matrix using matrix exponentiation with the \pkg{expm} package.
+    #' @return A square matrix of size equal to the number of states. If all
+    #' states are labelled, the dimnames take the names of the states.
+    transition_probability = function(tcycle) {
+      # check that the cycle time is an interval
+      if (class(tcycle) != "difftime") {
+        rlang::abort(
+          "Argument 'tcycle' must be of class 'difftime'.",
+          class = "invalid_cycle_length"
+        )
       }
-      return(Ip)
+      # get the transition rate matrix
+      Q <- self$transition_rate()
+      # compute Pt using matrix exponentiation
+      t <- as.numeric(tcycle, units="days")/365.25
+      Pt <- expm::expm(Q*t)
+      # label the matrix
+      state.names <- sapply(private$V, function(v) {v$label()})
+      dimnames(Pt) <- list(source=state.names, target=state.names)
+      return(Pt)
     },
 
     #' @description Return the per-cycle transition costs for the model.

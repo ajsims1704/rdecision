@@ -160,10 +160,15 @@ algorithms from Gross *et al* [-@gross2013], the Wikipedia
 glossary [@wikipedia2021] and links therein. Topological sorting of graphs
 is based on Kahn's algorithm [-@kahn1962]. Some of the terminology for decision
 trees was based on the work of Kaminski *et al* [-@kaminski2018] and an 
-efficient tree drawing algorithm was based on the work of Walker [-@walker1989]. 
-Terminology for decision trees in health economic evaluation was based on
-the book by Briggs *et al* [-@briggs2006] and the output format and terminology 
-follows ISPOR recommendations [@briggs2012a]. 
+efficient tree drawing algorithm was based on the work of Walker [-@walker1989].
+In Markov models, matrix exponentiation for converting transition rates into
+per-cycle probabilities, and *vice versa* relies on the `expm` 
+package [@goulay2021] and Markov model representations are exported in the
+DOT language [@gansner1993].
+
+Terminology for decision trees and Markov models in health economic evaluation
+was based on the book by Briggs *et al* [-@briggs2006] and the output format
+and terminology follows ISPOR recommendations [@briggs2012a,@siebert2012]. 
 
 Citations for examples used in vignettes are given in applicable vignette
 files. 
