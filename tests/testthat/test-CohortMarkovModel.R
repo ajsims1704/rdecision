@@ -71,7 +71,7 @@ test_that("multiple digraph edges are rejected", {
     class = "multiple_edges"
   )
   # two loops from well to dead
-  e.wd.bleed <- MarkovTransition$new(s.well, s.dead, r=NULL)
+  e.wd.bleed <- MarkovTransition$new(s.well, s.dead)
   expect_error(
     CohortMarkovModel$new(
       V = list(s.well, s.dead), 
@@ -127,23 +127,36 @@ test_that("states without one NULL rate are detected", {
     V = list(s.well, s.disabled, s.dead),
     E = list(e.ww, e.ss, e.dd, e.ws, e.wd, e.sd)
   ) 
-  # under-constrain (no rates specified for outgoing 'disabled' state)
+  # under-specify (no rates specified for outgoing 'disabled' state)
   e.ws$set_rate(r=0.2)
   e.wd$set_rate(r=0.2)
   expect_error(
     MC$transition_probability(tcycle),
     class = "invalid_rate"
   )
-  # over-constrain (all rates specified for 'dead' state)
+  # non-zero rate sum (for 'dead' state)
   e.sd$set_rate(r=0.4)
   e.dd$set_rate(r=1)
   expect_error(
     MC$transition_probability(tcycle),
     class="invalid_rate"
   )
-  # correctly specified 
-  e.dd$set_rate(r=NULL)
+  # correctly specified (d->d has one state as NA)
+  e.dd$set_rate(r=as.numeric(NA))
   e.sd$set_rate(r=0.4)
+  expect_silent(
+    MC$transition_probability(tcycle)
+  )
+  # correctly specified (d -> d is 0)
+  e.sd$set_rate(r=0.4)
+  e.dd$set_rate(r=0)
+  expect_silent(
+    MC$transition_probability(tcycle)
+  )
+  # correctly specified (d -> d is 0 and sum from s is zero)
+  e.sd$set_rate(r=0.4)
+  e.ss$set_rate(r=-0.4)
+  e.dd$set_rate(r=0)
   expect_silent(
     MC$transition_probability(tcycle)
   )
@@ -240,26 +253,22 @@ test_that("rates are calculated from probabilities correctly", {
   expect_error(M$set_rates(EPt), class="invalid_tcycle")
   expect_error(M$set_rates(EPt,1), class="invalid_tcycle")
   # set and check the rates
+  EPt <- matrix(c(0.6,0.2,0.2,0,0.6,0.4,0,0,1),nrow=3,byrow=TRUE)
+  dimnames(EPt) <- list(source=state.names, target=state.names)
   tcycle <- as.difftime(365.25, units="days")
   expect_silent(M$set_rates(EPt,tcycle))
-  
-  # Q <- expm::logm(EPt)/1
-  # r.ws <- Q[1,2]
-  # r.wd <- Q[1,3]
-  # r.sd <- Q[2,3]
-  # # check the transition matrix properties
-  # Pt <- M$transition_probability(as.difftime(365.25, units="days"))
-  # expect_equal(nrow(Pt),3)
-  # expect_equal(ncol(Pt),3)
-  # dn <- dimnames(Pt)
-  # expect_setequal(names(dn),list("source","target"))
-  # expect_setequal(dn[[1]],list("Well","Disabled","Dead"))
-  # expect_setequal(dn[[2]],list("Well","Disabled","Dead"))
-  # expect_true(is.matrix(Pt))
-  # # check the transition matrix values
-  # expect_true(all(abs(Pt-EPt)<0.010))
-  
-  expect_true(TRUE)
+  M$set_rates(EPt,tcycle)
+  # check the transition matrix properties
+  Pt <- M$transition_probability(as.difftime(365.25, units="days"))
+  expect_equal(nrow(Pt),3)
+  expect_equal(ncol(Pt),3)
+  dn <- dimnames(Pt)
+  expect_setequal(names(dn),list("source","target"))
+  expect_setequal(dn[[1]],list("Well","Disabled","Dead"))
+  expect_setequal(dn[[2]],list("Well","Disabled","Dead"))
+  expect_true(is.matrix(Pt))
+  # check the transition matrix values
+  expect_true(all(abs(Pt-EPt)<0.010))
 })
 
 # -----------------------------------------------------------------------------
@@ -533,15 +542,15 @@ test_that("people waiting for a test are modelled correctly", {
   #
   # create transitions
   E <- list(
-    MarkovTransition$new(s.A, s.A, r=NULL),
+    MarkovTransition$new(s.A, s.A),
     MarkovTransition$new(s.A, s.TP, r=rTP),
-    MarkovTransition$new(s.TP, s.TP, r=NULL),
+    MarkovTransition$new(s.TP, s.TP),
     MarkovTransition$new(s.A, s.TN, r=rTN),
-    MarkovTransition$new(s.TN, s.TN, r=NULL),
+    MarkovTransition$new(s.TN, s.TN),
     MarkovTransition$new(s.A, s.FP, r=rFP),
-    MarkovTransition$new(s.FP, s.FP, r=NULL),
+    MarkovTransition$new(s.FP, s.FP),
     MarkovTransition$new(s.A, s.FN, r=rFN),
-    MarkovTransition$new(s.FN, s.FN, r=NULL)
+    MarkovTransition$new(s.FN, s.FN)
   )
   # create the model and cycle for 5 years in months
   M <- CohortMarkovModel$new(V = list(s.A, s.TP, s.TN, s.FP, s.FN), E)
@@ -742,16 +751,16 @@ test_that("redecision replicates Briggs' example 4.7", {
   sCm <- MarkovState$new("C", cost=cCm)
   sDm <- MarkovState$new("D", cost=0, utility=0)
   # transitions
-  tAAm <- MarkovTransition$new(sAm, sAm, r=NULL)
+  tAAm <- MarkovTransition$new(sAm, sAm)
   tABm <- MarkovTransition$new(sAm, sBm, r=trABm)
   tACm <- MarkovTransition$new(sAm, sCm, r=trACm)
   tADm <- MarkovTransition$new(sAm, sDm, r=trADm)
-  tBBm <- MarkovTransition$new(sBm, sBm, r=NULL)
+  tBBm <- MarkovTransition$new(sBm, sBm)
   tBCm <- MarkovTransition$new(sBm, sCm, r=trBCm)
   tBDm <- MarkovTransition$new(sBm, sDm, r=trBDm)
-  tCCm <- MarkovTransition$new(sCm, sCm, r=NULL)
+  tCCm <- MarkovTransition$new(sCm, sCm)
   tCDm <- MarkovTransition$new(sCm, sDm, r=trCDm)
-  tDDm <- MarkovTransition$new(sDm, sDm, r=NULL)
+  tDDm <- MarkovTransition$new(sDm, sDm)
   # model
   m.mono <- CohortMarkovModel$new(
     V = list(sAm, sBm, sCm, sDm),
@@ -777,16 +786,16 @@ test_that("redecision replicates Briggs' example 4.7", {
   sCc <- MarkovState$new("C", cost=cCc)
   sDc <- MarkovState$new("D", cost=0, utility=0)
   # transitions
-  tAAc <- MarkovTransition$new(sAc, sAc, r=NULL)
+  tAAc <- MarkovTransition$new(sAc, sAc)
   tABc <- MarkovTransition$new(sAc, sBc, r=trABc)
   tACc <- MarkovTransition$new(sAc, sCc, r=trACc)
   tADc <- MarkovTransition$new(sAc, sDc, r=trADc)
-  tBBc <- MarkovTransition$new(sBc, sBc, r=NULL)
+  tBBc <- MarkovTransition$new(sBc, sBc)
   tBCc <- MarkovTransition$new(sBc, sCc, r=trBCc)
   tBDc <- MarkovTransition$new(sBc, sDc, r=trBDc)
-  tCCc <- MarkovTransition$new(sCc, sCc, r=NULL)
+  tCCc <- MarkovTransition$new(sCc, sCc)
   tCDc <- MarkovTransition$new(sCc, sDc, r=trCDc)
-  tDDc <- MarkovTransition$new(sDc, sDc, r=NULL)
+  tDDc <- MarkovTransition$new(sDc, sDc)
   # model
   m.comb <- CohortMarkovModel$new(
     V = list(sAc, sBc, sCc, sDc),

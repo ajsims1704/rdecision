@@ -9,10 +9,12 @@
 #' nodes {A,B} representing the transition probabilities from A to B and 
 #' \emph{vice versa}. It is a directed graph because the transition
 #' rates refer to transitions in one direction. Each edge can be optionally
-#' labelled. It permits loops (edges whose source and target are the same node)
-#' to represent patients that remain in the same state between cycles.
+#' labelled. It permits self-loops (edges whose source and target are the same 
+#' node) to represent patients that remain in the same state between cycles.
 #'
-#' @section Probabilities and rates in trivial models:
+#' @section Transition rates and probabilities
+#' 
+#' \subsection{Trivial models}{
 #' To calculate per-cycle probabilities from rates, Briggs (2002) and
 #' Sonnenberg & Beck (1993) use the expression \eqn{p = 1-\exp(-rt)}, where 
 #' \eqn{r} is an instantaneous rate
@@ -30,8 +32,9 @@
 #' probability is known, the rate is derived from the inverse relationship 
 #' \eqn{r = -\ln(1-p)/t}. Further details are available in Miller & Homan (1994)
 #' and Fleurence & Hollenbeak (2007).
+#' }
 #' 
-#' @section Probabilities and rates in multi-state, multi-transition models:
+#' \subsection{Multi-state, multi-transition models}{
 #' Consider a model with a starting state A, which has a self-loop, and three 
 #' absorbing states, B, C and D, with allowed transitions from A to B, A to C 
 #' and A to D only. Assume the transition rates (in units of per patient per
@@ -56,6 +59,7 @@
 #' backward equations, and is given by the matrix exponential of the transition
 #' rate matrix multiplied by the cycle time (Jones, 2017). In \pkg{rdecision},
 #' matrix exponentiation is uses the \pkg{expm} package.
+#' }
 #' 
 #' @references{
 #'   Briggs A, Claxton K, Sculpher M. Decision modelling for health economic 
@@ -100,11 +104,18 @@ CohortMarkovModel <- R6::R6Class(
     #'   \item All edges must be of class \code{MarkovTransition};
     #'   \item The nodes and edges must form a digraph whose underlying
     #'   graph is connected;
-    #'   \item Each state must have at least one outgoing transition and 
-    #'   have exactly one outgoing edge whose hazard rate is NULL. This is to
-    #'   ensure that the multinomial distribution of the probability of leaving
-    #'   each node is not over or under-constrained. Rates can be changed
-    #'   between cycles, and this constraint is checked at the point of cycling,
+    #'   \item Each state must have at least one outgoing transition (which
+    #'   can be a self-loop);
+    #'   \item For each state the sum of outgoing transition rates must be zero.
+    #'   This ensures that the row sums of the transition rate matrix (\eqn{Q}) 
+    #'   are zero, as required to solve Kolmogorov's forward and backward
+    #'   equations. For convenience, one outgoing transition rate from each 
+    #'   state may be set to NA when the \code{MarkovTransition}s are defined,
+    #'   and these will be replaced in \eqn{Q} with a value that ensures the
+    #'   row sums are zero (typically, rates for self loops would be set to 
+    #'   NA). Transition rates in \eqn{Q} associated with transitions that are
+    #'   not defined as edges in the graph are zero. Rates can be changed
+    #'   between cycles, and this condition is checked at the point of cycling,
     #'   not at the point of model creation.
     #'   \item No two edges may share the same source and target nodes (i.e. 
     #'   the digraph may not have multiple edges). This is to ensure that there
@@ -178,54 +189,71 @@ CohortMarkovModel <- R6::R6Class(
     },
     
     #' @description Transition rate matrix.
-    #' @details The matrix, usually written as \eqn{Q} is the matrix of rates
+    #' @details Usually written as \eqn{Q}, the matrix of rates
     #' (in units of events per person per year) for the model, assuming a
     #' continuous time Markov chain. As per convention, each row sums to zero.
     #' @return A square matrix of size equal to the number of states. If all
     #' states are labelled, the \code{dimname}s take the names of the states
     #' and the dimensions are labelled \code{source} and \code{target}.
     transition_rate = function() {
-      # check that each non-absorbing state has exactly one outgoing
-      # transition whose rate is NULL
-      lv <- sapply(1:self$order(), function(iv) {
-        n.out <- 0
-        n.null <- 0
-        v <- private$V[[iv]]
-        for (ie in 1:self$size()) {
-          e <- private$E[[ie]]
-          if (identical(e$source(),v)) {
-            n.out <- n.out + 1
-            if (is.na(e$rate())) {
-              n.null <- n.null + 1
-            }
-          }
-        }
-        return(n.out>=1 && n.null==1)
-      })
-      if (!all(lv)) {
-        rlang::abort(
-          "Each state must have one outgoing NULL rate transition",
-          class = "invalid_rate")
-      }
+      # # check that each non-absorbing state has exactly one outgoing
+      # # transition whose rate is NULL
+      # lv <- sapply(1:self$order(), function(iv) {
+      #   n.out <- 0
+      #   n.null <- 0
+      #   v <- private$V[[iv]]
+      #   for (ie in 1:self$size()) {
+      #     e <- private$E[[ie]]
+      #     if (identical(e$source(),v)) {
+      #       n.out <- n.out + 1
+      #       if (is.na(e$rate())) {
+      #         n.null <- n.null + 1
+      #       }
+      #     }
+      #   }
+      #   return(n.out>=1 && n.null==1)
+      # })
+      # if (!all(lv)) {
+      #   rlang::abort(
+      #     "Each state must have one outgoing NULL rate transition",
+      #     class = "invalid_rate")
+      # }
       # get the state names
       state.names <- sapply(private$V, function(v) {v$label()})
-      # construct the rate matrix, Q
+      # construct the rate matrix, Q, with all zeros
       Q <- matrix(
         data = 0, 
         nrow = self$order(), ncol = self$order(),
         dimnames = list(source=state.names, target=state.names)
       )
-      # populate the cells with rates
+      # populate the cells with rates from transitions in the graph
       for (ie in 1:self$size()) {
         e <- private$E[[ie]]
         is <- self$vertex_index(e$source())
         it <- self$vertex_index(e$target())
         Q[is,it] <- e$rate()
       }
-      # replace NULL rates to ensure row sums of Q are zero
+      # check that there is at most 1 NA rate per state
+      nna <- rowSums(is.na(Q))
+      if (any(nna>1)) {
+        rlang::abort(
+          "Each state must have at most 1 outgoing transition rate set to NA",
+          class = "invalid_rate"
+        )
+      }
+      # replace NA rates to ensure row sums of Q are zero, or check if no NAs
       sumQ <- rowSums(Q, na.rm=TRUE)
       for (iv in 1:nrow(Q)) {
-        Q[iv,which(is.na(Q[iv,]))] <- -sumQ[iv]
+        if (nna[iv] > 0) {
+          Q[iv,which(is.na(Q[iv,]))] <- -sumQ[iv]
+        } else {
+          if (abs(sumQ[iv]) > sqrt(.Machine$double.eps)) {
+            rlang::abort(
+              paste("Sum of rates from state", state.names[iv], "is not zero"),
+              class = "invalid_rate"
+            )
+          }
+        }
       }
       # return the matrix
       return(Q)
@@ -235,10 +263,11 @@ CohortMarkovModel <- R6::R6Class(
     #' @details When the per-cycle probabilities are available, rather than
     #' the transition rates, this function calculates and sets rates from 
     #' probabilities using the matrix log of the probabilities, via 
-    #' package \pkg{expm}.
+    #' package \pkg{expm}. It has the consequence of setting (overwriting) the
+    #' rates in each \code{MarkovTransition}.
     #' @param Pt Per-cycle transition probability matrix. Formally, the
     #' solution of Kolmogorov's forward and backward equations. The row and 
-    #' column labels must be the state names and each row must sum to zero.
+    #' column labels must be the state names and each row must sum to one.
     #' @param tcycle The cycle time, in years, as a \code{difftime} object.
     #' @return Updated \code{CohortMarkovModel} object
     set_rates = function(Pt, tcycle) {
@@ -271,6 +300,10 @@ CohortMarkovModel <- R6::R6Class(
           class = "invalid_Pt"
         )
       }
+      ## todo: check that Pt[i,j]==0 if edge i->j is not in graph
+      ##
+      ## todo: check that all rows of Pt sum to 1
+      ##
       if (missing(tcycle)) {
         rlang::abort(
           "'tcycle' is missing, without default", 
@@ -288,14 +321,12 @@ CohortMarkovModel <- R6::R6Class(
       # compute Pt using matrix exponentiation
       t <- as.numeric(tcycle, units="days")/365.25
       Q <- expm::logm(Pt)/t
-      # replace negative rates with NA
-      Q[Q<0] <- as.numeric(NA)
       # set the rates for each transition
       for (ie in 1:self$size()) {
         e <- private$E[[ie]]
         is <- self$vertex_index(e$source())
         it <- self$vertex_index(e$target())
-        Q[is,it] <- e$set_rate(Q[is,it])
+        e$set_rate(r=Q[is,it])
       }
       # return updated model
       return(invisible(self))
@@ -305,7 +336,8 @@ CohortMarkovModel <- R6::R6Class(
     #' @param tcycle Cycle length, expressed as an R \code{difftime} object.
     #' @details Checks that each state has at least one outgoing transition and
     #' that exactly one outgoing transition rate whose rate is NULL. The 
-    #' transition probability matrix is the solution to Kolmogorov's forward
+    #' transition probability matrix, usually written \eqn{P_t} is the solution
+    #' to Kolmogorov's forward
     #' and backward equations, and is computed from the transition rate
     #' matrix using matrix exponentiation with the \pkg{expm} package.
     #' @return A square matrix of size equal to the number of states. If all
