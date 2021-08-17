@@ -370,21 +370,26 @@ test_that("model is cyclable", {
   s.disabled <- MarkovState$new(name="Disabled")
   s.dead <- MarkovState$new(name="Dead")
   # use S&B per-cycle transition probabilities and calculate rates
-  EPt <- matrix(c(0.6,0.2,0.2,0,0.6,0.4,0,0,1),nrow=3,byrow=TRUE)
-  Q <- expm::logm(EPt)/1
-  r.ws <- Q[1,2]
-  r.wd <- Q[1,3]
-  r.sd <- Q[2,3]
+  snames <- c("Well","Disabled","Dead")
+  Pt <- matrix(
+    data = c(0.6, 0.2, 0.2, 0, 0.6, 0.4, 0, 0, 1),
+    nrow = 3, byrow = TRUE,
+    dimnames = list(source=snames, target=snames)
+  )
+  # create transitions
   E <- list(
     MarkovTransition$new(s.well, s.well),
     MarkovTransition$new(s.dead, s.dead),
     MarkovTransition$new(s.disabled, s.disabled),
-    MarkovTransition$new(s.well, s.disabled, r=r.ws),
-    MarkovTransition$new(s.well, s.dead, r=r.wd),
-    MarkovTransition$new(s.disabled, s.dead, r=r.sd)
+    MarkovTransition$new(s.well, s.disabled),
+    MarkovTransition$new(s.well, s.dead),
+    MarkovTransition$new(s.disabled, s.dead)
   )
   # create the model
   M <- CohortMarkovModel$new(V = list(s.well, s.disabled, s.dead), E)
+  # set rates
+  tcycle <- as.difftime(365.25, units="days")
+  M$set_rates(Pt, tcycle)
   # test cycles
   DF <- M$cycle()
   expect_true(is.data.frame(DF))
@@ -402,22 +407,27 @@ test_that("cycle time increments and resets correctly", {
   s.disabled <- MarkovState$new("Disabled")
   s.dead <- MarkovState$new("Dead")
   # use S&B per-cycle transition probabilities to calculate rates
-  EPt <- matrix(c(0.6,0.2,0.2,0,0.6,0.4,0,0,1),nrow=3,byrow=TRUE)
-  Q <- expm::logm(EPt)/1
-  r.ws <- Q[1,2]
-  r.wd <- Q[1,3]
-  r.sd <- Q[2,3]
+  snames <- c("Well","Disabled","Dead")
+  Pt <- matrix(
+    data = c(0.6, 0.2, 0.2, 0, 0.6, 0.4, 0, 0, 1),
+    nrow = 3, byrow = TRUE,
+    dimnames = list(source=snames, target=snames)
+  )
   # create transitions  
   e.ww <- MarkovTransition$new(s.well, s.well)
   e.ss <- MarkovTransition$new(s.disabled, s.disabled)
   e.dd <- MarkovTransition$new(s.dead, s.dead)
-  e.ws <- MarkovTransition$new(s.well, s.disabled, r=r.ws)
-  e.wd <- MarkovTransition$new(s.well, s.dead, r=r.wd)
-  e.sd <- MarkovTransition$new(s.disabled, s.dead, r=r.sd)
+  e.ws <- MarkovTransition$new(s.well, s.disabled)
+  e.wd <- MarkovTransition$new(s.well, s.dead)
+  e.sd <- MarkovTransition$new(s.disabled, s.dead)
+  # create the model
   M <- CohortMarkovModel$new(
     V = list(s.well, s.disabled, s.dead),
     E = list(e.ww, e.ss, e.dd, e.ws, e.wd, e.sd)
   )
+  # set rates
+  tcycle <- as.difftime(365.25, units="days")
+  M$set_rates(Pt, tcycle)
   # check that the elapsed time starts at zero
   t <- M$get_elapsed()
   expect_equal(as.numeric(t, units="days"), 0)
@@ -447,24 +457,28 @@ test_that("results are independent of cycle time", {
   # create states
   s.well <- MarkovState$new(name="Well")
   s.dead <- MarkovState$new(name="Dead")
-  # calculate rates from per-cycle probabilities
-  Pt <- matrix(c(0.8,0.2,0,1),nrow=2,byrow=TRUE)
-  Q <- expm::logm(Pt)/1
-  r.wd <- Q[1,2]
+  # set annual per-cycle probabilities
+  Pt <- matrix(
+    c(0.8,0.2,0,1), nrow=2, byrow=TRUE, 
+    dimnames=list(source=c("Well", "Dead"), target=c("Well", "Dead"))
+  )
   # create transitions
   E <- list(
     MarkovTransition$new(s.well, s.well),
     MarkovTransition$new(s.dead, s.dead),
-    MarkovTransition$new(s.well, s.dead, r=r.wd)
+    MarkovTransition$new(s.well, s.dead)
   )
-  # create the model and cycle for 5 years
+  # create the model
   M <- CohortMarkovModel$new(V = list(s.well, s.dead), E)
+  # set rates
+  M$set_rates(Pt, tcycle=as.difftime(365.25, units="days"))
+  # cycle for 5 years
   MT <- M$cycles(5, hcc.pop=FALSE, hcc.cost=FALSE)
   expect_equal(MT$Well[MT$Cycle==5], 327.68)
-  # create the model and cycle for 5 years
-  M <- CohortMarkovModel$new(V = list(s.well, s.dead), E)
+  # reset the population
+  M$reset()
+  # cycle for 5 years in months
   tcycle = as.difftime(365.25/12, units="days")
-  TM <- M$transition_probability(tcycle=tcycle)
   MT <- M$cycles(
     5*12, 
     hcc.pop = FALSE, hcc.cost=FALSE, 
@@ -477,10 +491,11 @@ test_that("rates can be proportioned correctly", {
   # create states
   s.A <- MarkovState$new(name="A")
   s.B <- MarkovState$new(name="B")
-  # calculate rates from per-cycle probabilities
-  Pt <- matrix(c(0.8,0.2,0,1),nrow=2,byrow=TRUE)
-  Q <- expm::logm(Pt)/1
-  r <- Q[1,2]
+  # set annual per-cycle probabilities
+  Pt <- matrix(
+    c(0.8,0.2,0,1), nrow=2, byrow=TRUE, 
+    dimnames=list(source=c("Well", "Dead"), target=c("Well", "Dead"))
+  )
   # set the cycle time
   tcycle <- as.difftime(365.25, units="days")
   # create transitions
@@ -613,41 +628,28 @@ test_that("rdecision replicates Sonnenberg & Beck, Fig 3", {
   s.well <- MarkovState$new(name="Well", utility=1)
   s.disabled <- MarkovState$new(name="Disabled",utility=0.7)
   s.dead <- MarkovState$new(name="Dead",utility=0)
-  # transition probabilities and rates (complexity needed because S&B specify 
-  # probabilities, not rates)
-  #p.ws <- 0.2
-  #p.wd <- 0.2
-  #p.sd <- 0.4
-  #r.ws <- (-log(1-(p.ws+p.wd))/1)*(p.ws/(p.ws+p.wd))
-  #print(r.ws)
-  #r.wd <- (-log(1-(p.ws+p.wd))/1)*(p.wd/(p.ws+p.wd))
-  #print(r.wd)
-  #r.sd <- -log(1-p.sd)/1
-  #print(r.sd)
-  ##
-  Pt <- matrix(c(0.6, 0.2, 0.2, 0, 0.6, 0.4, 0, 0, 1), nrow=3, byrow=TRUE)
-  Q <- expm::logm(Pt)/1
-#  print(Q)
-  r.ws <- Q[1,2]
-  r.wd <- Q[1,3]
-  r.sd <- Q[2,3]
-  # create transitions
+  # create transitions leaving rates undefined
   E <- list(
     MarkovTransition$new(s.well, s.well),
     MarkovTransition$new(s.dead, s.dead),
     MarkovTransition$new(s.disabled, s.disabled),
-    e.ws <- MarkovTransition$new(s.well, s.disabled, r=r.ws),
-    e.wd <- MarkovTransition$new(s.well, s.dead, r=r.wd),
-    e.sd <- MarkovTransition$new(s.disabled, s.dead, r=r.sd)
+    e.ws <- MarkovTransition$new(s.well, s.disabled),
+    e.wd <- MarkovTransition$new(s.well, s.dead),
+    e.sd <- MarkovTransition$new(s.disabled, s.dead)
   )
   # create the model
   M <- CohortMarkovModel$new(V = list(s.well, s.disabled, s.dead), E)
-  # check the transition matrix values
-  Ip <- M$transition_probability(tcycle)
-#  print(Ip)
-  expect_equal(
-    sum(Ip-matrix(c(0.6,0.2,0.2,0,0.6,0.4,0,0,1),nrow=3,byrow=TRUE)),0
+  # create transition probability matrix
+  snames <- c("Well","Disabled","Dead")
+  EPt <- matrix(
+    data = c(0.6, 0.2, 0.2, 0, 0.6, 0.4, 0, 0, 1),
+    nrow = 3, byrow = TRUE,
+    dimnames = list(source=snames, target=snames)
   )
+  # set and check the transition rates
+  M$set_rates(EPt, tcycle)
+  Pt <- M$transition_probability(tcycle)
+  expect_true(all(EPt-Pt < sqrt(.Machine$double.eps)))
   # set the starting populations
   M$reset(c(Well=10000, Disabled=0, Dead=0)) 
   # cycle
@@ -673,55 +675,6 @@ test_that("redecision replicates Briggs' example 4.7", {
   # ==========
   tcycle = as.difftime(365.24, units="days")
   #
-  # Transition rates
-  # ================
-  # Note the complexity with conditional probabilities being used here to derive
-  # transition rates arises because Briggs et al used probabilities, rather
-  # than rates, as input. 
-  #
-  # Dirichlet distribution & model variables for transitions from A
-  nA <- c(1251, 350, 116, 17)       # transitions, people, per year
-  DA <- DirichletDistribution$new(nA)
-  pAB <- ModVar$new("pAB", "P", D=DA, k=as.integer(2))
-  pAC <- ModVar$new("pAC", "P", D=DA, k=as.integer(3))
-  pAD <- ModVar$new("pAD", "P", D=DA, k=as.integer(4))
-  pA <- ExprModVar$new("pA", "P", rlang::quo(pAB+pAC+pAD))
-  rA <- ExprModVar$new("rA", "HR", rlang::quo(-log(1-pA)))
-  # Dirichlet distribution & model variables for transitions from B
-  nB <- c(731,512,15)               # transitions, people per year
-  DB <- DirichletDistribution$new(nB)
-  pBC <- ModVar$new("pBC", "P", D=DB, k=as.integer(2)) 
-  pBD <- ModVar$new("pBD", "P", D=DB, k=as.integer(3)) 
-  pB <- ExprModVar$new("pB", "P", rlang::quo(pBC+pBD))
-  rB <- ExprModVar$new("rB", "HR", rlang::quo(-log(1-pB)))
-  # Dirichlet distribution & model variables for transitions from C
-  nC <- c(1312,437)                 # transitions, people per year
-  DC <- DirichletDistribution$new(nC)
-  pCD <- ModVar$new("pCD", "P", D=DC, k=as.integer(2)) 
-  pC <- ExprModVar$new("pC", "P", rlang::quo(pCD))
-  rC <- ExprModVar$new("rC", "HR", rlang::quo(-log(1-pC)))
-  # transition rates with monotherapy from annual transition probabilities
-  trABm <- ExprModVar$new("trAB", "HR", rlang::quo(rA*pAB/pA))
-  trACm <- ExprModVar$new("trAC", "HR", rlang::quo(rA*pAC/pA))
-  trADm <- ExprModVar$new("trAD", "HR", rlang::quo(rA*pAD/pA))
-  trBCm <- ExprModVar$new("trBC", "HR", rlang::quo(rB*pBC/pB))
-  trBDm <- ExprModVar$new("trBD", "HR", rlang::quo(rB*pBD/pB))
-  trCDm <- ExprModVar$new("trCD", "HR", rlang::quo(rC*pCD/pC))
-  # Treatment effect (modelled as a log normal distribution)
-  RR <- LogNormModVar$new(
-    "Tx effect", "RR", p1=0.509, p2=(0.710-0.365)/(2*1.96), "LN7"
-  )
-  # transition rates, with treatment effect
-  rAc <- ExprModVar$new("rAc", "HR", rlang::quo(-log(1-pA*RR)))
-  rBc <- ExprModVar$new("rBc", "HR", rlang::quo(-log(1-pB*RR)))
-  rCc <- ExprModVar$new("rCc", "HR", rlang::quo(-log(1-pC*RR)))
-  trABc <- ExprModVar$new("trAB", "HR", rlang::quo(rAc*pAB/pA))
-  trACc <- ExprModVar$new("trAC", "HR", rlang::quo(rAc*pAC/pA))
-  trADc <- ExprModVar$new("trAD", "HR", rlang::quo(rAc*pAD/pA))
-  trBCc <- ExprModVar$new("trBC", "HR", rlang::quo(rBc*pBC/pB))
-  trBDc <- ExprModVar$new("trBD", "HR", rlang::quo(rBc*pBD/pB))
-  trCDc <- ExprModVar$new("trCD", "HR", rlang::quo(rCc*pCD/pC))
-  #
   # Costs
   # =====
   # drug costs
@@ -743,89 +696,103 @@ test_that("redecision replicates Briggs' example 4.7", {
   cBc <- ExprModVar$new("cBc", "GBP", rlang::quo(dmcb+cccb+cAZT+cLam))
   cCc <- ExprModVar$new("cCc", "GBP", rlang::quo(dmcc+cccc+cAZT+cLam))
   #
-  # Monotherapy model
-  # =================
-  # states
-  sAm <- MarkovState$new("A", cost=cAm)
-  sBm <- MarkovState$new("B", cost=cBm)
-  sCm <- MarkovState$new("C", cost=cCm)
-  sDm <- MarkovState$new("D", cost=0, utility=0)
-  # transitions
-  tAAm <- MarkovTransition$new(sAm, sAm)
-  tABm <- MarkovTransition$new(sAm, sBm, r=trABm)
-  tACm <- MarkovTransition$new(sAm, sCm, r=trACm)
-  tADm <- MarkovTransition$new(sAm, sDm, r=trADm)
-  tBBm <- MarkovTransition$new(sBm, sBm)
-  tBCm <- MarkovTransition$new(sBm, sCm, r=trBCm)
-  tBDm <- MarkovTransition$new(sBm, sDm, r=trBDm)
-  tCCm <- MarkovTransition$new(sCm, sCm)
-  tCDm <- MarkovTransition$new(sCm, sDm, r=trCDm)
-  tDDm <- MarkovTransition$new(sDm, sDm)
+  # Markov model
+  # ============
+  # states (leave all costs as zero initially)
+  sA <- MarkovState$new("A")
+  sB <- MarkovState$new("B")
+  sC <- MarkovState$new("C")
+  sD <- MarkovState$new("D", cost=0, utility=0)
+  # transitions (leave all rates as NA initially)
+  tAA <- MarkovTransition$new(sA, sA)
+  tAB <- MarkovTransition$new(sA, sB)
+  tAC <- MarkovTransition$new(sA, sC)
+  tAD <- MarkovTransition$new(sA, sD)
+  tBB <- MarkovTransition$new(sB, sB)
+  tBC <- MarkovTransition$new(sB, sC)
+  tBD <- MarkovTransition$new(sB, sD)
+  tCC <- MarkovTransition$new(sC, sC)
+  tCD <- MarkovTransition$new(sC, sD)
+  tDD <- MarkovTransition$new(sD, sD)
   # model
-  m.mono <- CohortMarkovModel$new(
-    V = list(sAm, sBm, sCm, sDm),
-    E = list(tAAm, tABm, tACm, tADm, tBBm, tBCm, tBDm, tCCm, tCDm, tDDm),
+  m <- CohortMarkovModel$new(
+    V = list(sA, sB, sC, sD),
+    E = list(tAA, tAB, tAC, tAD, tBB, tBC, tBD, tCC, tCD, tDD),
     discount.cost = cDR/100,
     discount.utility = oDR/100
   )
-  TM <- m.mono$transition_probability(tcycle)
-  E <- matrix(
-    c(0.721, 0.202, 0.067, 0.010,  
-      0.000, 0.581, 0.407, 0.012,
-      0.000, 0.000, 0.750, 0.250,
-      0.000, 0.000, 0.000, 1.000),   # typo in book (D,D) = 1!
-    byrow = TRUE,
-    nrow = 4)
-  expect_true(all(TM-E < 0.01))
   #
-  # Combination therapy model
-  # =========================
-  # states
-  sAc <- MarkovState$new("A", cost=cAc)
-  sBc <- MarkovState$new("B", cost=cBc)
-  sCc <- MarkovState$new("C", cost=cCc)
-  sDc <- MarkovState$new("D", cost=0, utility=0)
-  # transitions
-  tAAc <- MarkovTransition$new(sAc, sAc)
-  tABc <- MarkovTransition$new(sAc, sBc, r=trABc)
-  tACc <- MarkovTransition$new(sAc, sCc, r=trACc)
-  tADc <- MarkovTransition$new(sAc, sDc, r=trADc)
-  tBBc <- MarkovTransition$new(sBc, sBc)
-  tBCc <- MarkovTransition$new(sBc, sCc, r=trBCc)
-  tBDc <- MarkovTransition$new(sBc, sDc, r=trBDc)
-  tCCc <- MarkovTransition$new(sCc, sCc)
-  tCDc <- MarkovTransition$new(sCc, sDc, r=trCDc)
-  tDDc <- MarkovTransition$new(sDc, sDc)
-  # model
-  m.comb <- CohortMarkovModel$new(
-    V = list(sAc, sBc, sCc, sDc),
-    E = list(tAAc, tABc, tACc, tADc, tBBc, tBCc, tBDc, tCCc, tCDc, tDDc),
-    discount.cost = cDR/100,
-    discount.utility = oDR/100
+  # Treatment effect (modelled as a log normal distribution)
+  # ========================================================
+  RR <- LogNormModVar$new(
+    "Tx effect", "RR", p1=0.509, p2=(0.710-0.365)/(2*1.96), "LN7"
   )
-  # check transition matrix
-  TM <- m.comb$transition_probability(tcycle)
-  E <- matrix(
-    c(0.858, 0.103, 0.034, 0.005,  
-      0.000, 0.787, 0.207, 0.006,
-      0.000, 0.000, 0.873, 0.127,
-      0.000, 0.000, 0.000, 1.000),   
-    byrow = TRUE,
-    nrow = 4)
-  expect_true(all(TM-E < 0.01))
+  #
+  # Dirichlet distributions for transition probabilities
+  # ====================================================
+  # transitions from A
+  nA <- c(1251, 350, 116, 17)       # transitions, people per year
+  DA <- DirichletDistribution$new(nA)
+  # transitions from B
+  nB <- c(731,512,15)               # transitions, people per year
+  DB <- DirichletDistribution$new(nB)
+  # transitions from C
+  nC <- c(1312,437)                 # transitions, people per year
+  DC <- DirichletDistribution$new(nC)
   #
   # Function to estimate life years gained and costs
   # ================================================
-  runmodel <- function(hcc.pop=FALSE, hcc.cost=FALSE) {
+  runmodel <- function(expected=TRUE, hcc.pop=FALSE, hcc.cost=FALSE) {
+    # set variables
+    modvars <- m$modvars()
+    if (expected) {
+      sapply(modvars, FUN=function(mv){mv$set("expected")})
+      RR$set("expected")
+      Pt <- matrix(
+        c(DA$mean(), c(0, DB$mean()), c(0, 0, DC$mean()), c(0, 0, 0, 1)), 
+        byrow = TRUE,
+        nrow = 4,
+        dimnames = list(source=c("A","B","C","D"), target=c("A","B","C","D"))
+      )
+    } else {
+      sapply(modvars, FUN=function(mv){mv$set("random")})
+      RR$set("random")
+      Pt <- matrix(
+        c(DA$r(), c(0, DB$r()), c(0, 0, DC$r()), c(0, 0, 0, 1)), 
+        byrow = TRUE,
+        nrow = 4,
+        dimnames = list(source=c("A","B","C","D"), target=c("A","B","C","D"))
+      )
+    }
     # 
     # Monotherapy
     # ===========
+    # set costs
+    sA$set_cost(cAm)
+    sB$set_cost(cBm)
+    sC$set_cost(cCm)
+    sD$set_cost(0)
+    # set transition rates from probabilities
+    m$set_rates(Pt, tcycle)
+    # check them
+    TM <- m$transition_probability(tcycle)
+    if (expected) {
+      E <- matrix(
+        c(0.721, 0.202, 0.067, 0.010,  
+          0.000, 0.581, 0.407, 0.012,
+          0.000, 0.000, 0.750, 0.250,
+          0.000, 0.000, 0.000, 1.000),   # typo in book (D,D) = 1!
+        byrow = TRUE,
+        nrow = 4
+      )
+      expect_true(all(TM-E < 0.01))
+    }
     # create starting populations
     N <- 1000
     populations <- c(A = N, B = 0, C = 0, D = 0)
-    m.mono$reset(populations)
+    m$reset(populations)
     # run 20 cycles
-    MT.mono <- m.mono$cycles(
+    MT.mono <- m$cycles(
       ncycles=20, 
       tcycle=tcycle,
       hcc.pop = hcc.pop,
@@ -837,19 +804,54 @@ test_that("redecision replicates Briggs' example 4.7", {
     #
     # Combination therapy
     # ===================
+    # set costs
+    sA$set_cost(cAc)
+    sB$set_cost(cBc)
+    sC$set_cost(cCc)
+    sD$set_cost(0)
+    # create Pt for combination therapy (Briggs applied the RR to the transition 
+    # probabilities - not recommended, but done here for reproducibility).
+    Ptc <- Pt
+    for (i in 1:4) {
+      for (j in 1:4) {
+        Ptc[i,j] <- ifelse(i==j, NA, RR$get()*Ptc[i,j])
+      }
+      Ptc[i,which(is.na(Ptc[i,]))] <- 1-sum(Ptc[i,],na.rm=TRUE) 
+    }
+    # set transition rates from probabilities
+    m$set_rates(Ptc, tcycle)
+    # check them
+    TC <- m$transition_probability(tcycle)
+    if (expected) {
+      E <- matrix(
+        c(0.858, 0.103, 0.034, 0.005,  
+          0.000, 0.787, 0.207, 0.006,
+          0.000, 0.000, 0.873, 0.127,
+          0.000, 0.000, 0.000, 1.000),   
+        byrow = TRUE,
+        nrow = 4)
+      expect_true(all(TC-E < 0.01))
+    }
     # run combination therapy model for 2 years
     populations <- c('A'=N, 'B'=0, 'C'=0, 'D'=0)
-    m.comb$reset(populations)
+    m$reset(populations)
     # run 2 cycles
-    MT.comb <- m.comb$cycles(
+    MT.comb <- m$cycles(
       2, 
       tcycle = tcycle, 
       hcc.pop = hcc.pop,
       hcc.cost = hcc.cost
     )
+    # set costs
+    sA$set_cost(cAm)
+    sB$set_cost(cBm)
+    sC$set_cost(cCm)
+    sD$set_cost(0)
+    # set transition rates from probabilities
+    m$set_rates(Pt, tcycle)
     # set populations in mono model & reset cycle counter and time
-    populations <- m.comb$get_populations()
-    m.mono$reset(
+    populations <- m$get_populations()
+    m$reset(
       populations, 
       icycle=as.integer(2), 
       elapsed=as.difftime(365.25*2, units="days")
@@ -857,7 +859,7 @@ test_that("redecision replicates Briggs' example 4.7", {
     # run mono model for next 18 years
     MT.comb <- rbind(
       MT.comb, 
-      m.mono$cycles(
+      m$cycles(
         ncycles=18, 
         tcycle=tcycle,
         hcc.pop = hcc.pop,
@@ -869,18 +871,14 @@ test_that("redecision replicates Briggs' example 4.7", {
     cost.comb <- sum(MT.comb$Cost)
     #
     return(c("el.mono"=el.mono, "cost.mono"=cost.mono, 
-             "el.comb"=el.comb, "cost.comb"=cost.comb))
+             "el.comb"=el.comb, "cost.comb"=cost.comb
+             ))
   }
   #
   # Point estimate (without half-cycle correction)
   # ==============================================
-  # set all modvars to their expected values in both models
-  modvars <- m.mono$modvars()
-  sapply(modvars, FUN=function(mv){mv$set("expected")})
-  modvars <- m.comb$modvars()
-  sapply(modvars, FUN=function(mv){mv$set("expected")})
   # run the model
-  M <- runmodel(hcc.pop=FALSE, hcc.cost=FALSE)
+  M <- runmodel(expected=TRUE, hcc.pop=FALSE, hcc.cost=FALSE)
   # check results
   expect_intol(M["el.mono"], 7.991, tolerance=0.03) # 7.991 from spreadsheet
   expect_intol(M["cost.mono"], 44663, 100) # rounding errors in book
@@ -891,13 +889,8 @@ test_that("redecision replicates Briggs' example 4.7", {
   #
   # Point estimate (with population half-cycle correction)
   # ======================================================
-  # set all modvars to their expected values in both models
-  modvars <- m.mono$modvars()
-  sapply(modvars, FUN=function(mv){mv$set("expected")})
-  modvars <- m.comb$modvars()
-  sapply(modvars, FUN=function(mv){mv$set("expected")})
   # run the model
-  M <- runmodel(hcc.pop=TRUE, hcc.cost=FALSE)
+  M <- runmodel(expected=TRUE, hcc.pop=TRUE, hcc.cost=FALSE)
   # check results
   expect_intol(M["el.mono"], 8.48, tolerance=0.03) 
   expect_intol(M["cost.mono"], 44663, 100) # rounding errors in book
@@ -911,13 +904,8 @@ test_that("redecision replicates Briggs' example 4.7", {
   skip_on_cran()
   n <- 100
   DF <- sapply(1:n, FUN=function(i) {
-    # set all modvars to random values in both models
-    modvars <- m.mono$modvars()
-    sapply(modvars, FUN=function(mv){mv$set("random")})
-    modvars <- m.comb$modvars()
-    sapply(modvars, FUN=function(mv){mv$set("random")})
     # run the model
-    M <- runmodel(hcc.pop=TRUE, hcc.cost=FALSE)
+    M <- runmodel(expected=FALSE, hcc.pop=TRUE, hcc.cost=FALSE)
     return(M)
   })
   DF <- as.data.frame(t(DF))
