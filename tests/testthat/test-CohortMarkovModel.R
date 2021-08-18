@@ -494,18 +494,24 @@ test_that("rates can be proportioned correctly", {
   # set annual per-cycle probabilities
   Pt <- matrix(
     c(0.8,0.2,0,1), nrow=2, byrow=TRUE, 
-    dimnames=list(source=c("Well", "Dead"), target=c("Well", "Dead"))
+    dimnames=list(source=c("A", "B"), target=c("A", "B"))
   )
   # set the cycle time
   tcycle <- as.difftime(365.25, units="days")
-  # create transitions
+  # create transitions with no rates set initially
   E <- list(
     MarkovTransition$new(s.A, s.A),
     MarkovTransition$new(s.B, s.B),
-    MarkovTransition$new(s.A, s.B, r=r)
+    MarkovTransition$new(s.A, s.B)
   )
-  # create the model and cycle for 5 years
+  # create the model
   M <- CohortMarkovModel$new(V = list(s.A, s.B), E)
+  # set rates from probabilities
+  M$set_rates(Pt, tcycle=as.difftime(365.25, units="days"))
+  # get the transition rate from A->B
+  Q <- M$transition_rate()
+  r <- Q["A","B"]
+  # cycle for 5 years
   MT <- M$cycles(5, hcc.pop=FALSE, hcc.cost=FALSE)
   expect_equal(MT$A[MT$Cycle==5], 327.68)
   expect_equal(MT$B[MT$Cycle==5], 1000-327.68)
@@ -522,7 +528,6 @@ test_that("rates can be proportioned correctly", {
   )
   # create the model and cycle for 5 years
   M <- CohortMarkovModel$new(V = list(s.A, s.B, s.C), E)
-  tm <- M$transition_probability(tcycle=tcycle)
   MT <- M$cycles(5, hcc.pop=FALSE, hcc.cost=FALSE)
   # expected proportions in each state
   expect_equal(MT$A[MT$Cycle==5], 327.68)
@@ -535,26 +540,25 @@ test_that("people waiting for a test are modelled correctly", {
   p.prev <- 0.4
   p.sens <- 0.75
   p.spec <- 0.75
+  # proportions of outcomes
+  pTP <- p.prev*p.sens
+  pTN <- (1-p.prev)*p.spec
+  pFP <- (1-p.prev)*(1-p.spec)
+  pFN <- p.prev*(1-p.sens)
   # create states
   s.A <- MarkovState$new(name="A") # people waiting for a test
   s.TP <- MarkovState$new(name="TP") # TP, absorbing
   s.TN <- MarkovState$new(name="TN") # TN, absorbing
   s.FP <- MarkovState$new(name="FP") # FP, absorbing
   s.FN <- MarkovState$new(name="FN") # FN, absorbing
-  # calculate rates from per-cycle probabilities
-  Pt <- matrix(c(0.8,0.2,0,1),nrow=2,byrow=TRUE)
-  Q <- expm::logm(Pt)/1
-  r <- Q[1,2]
-  # test outcome proportions and rates
-  pTP <- p.prev*p.sens
-  pTN <- (1-p.prev)*p.spec
-  pFP <- (1-p.prev)*(1-p.spec)
-  pFN <- p.prev*(1-p.sens)
+  # set the rate of testing based on a waiting time of 3 months
+  twait <- as.difftime(365.25/4, units="days")
+  r <- 1/(as.numeric(twait, units="days")/365.25)
+  # set the rates for each outcome
   rTP <- r*pTP
   rTN <- r*pTN
   rFP <- r*pFP
   rFN <- r*pFN
-  #
   # create transitions
   E <- list(
     MarkovTransition$new(s.A, s.A),
@@ -567,20 +571,52 @@ test_that("people waiting for a test are modelled correctly", {
     MarkovTransition$new(s.A, s.FN, r=rFN),
     MarkovTransition$new(s.FN, s.FN)
   )
-  # create the model and cycle for 5 years in months
+  # create the model and cycle for 6 months, in months
   M <- CohortMarkovModel$new(V = list(s.A, s.TP, s.TN, s.FP, s.FN), E)
   tcycle <- as.difftime(365.25/12, units="days")
-  MT <- M$cycles(5*12, tcycle=tcycle, hcc.pop=FALSE, hcc.cost=FALSE)
+  MT <- M$cycles(6, tcycle=tcycle, hcc.pop=FALSE, hcc.cost=FALSE)
   # expected proportions in each state
-  e.untested <- 327.68
-  e.tested <- 1000-e.untested
-  expect_equal(MT$A[MT$Cycle==5*12], e.untested)
-  expect_equal(MT$TP[MT$Cycle==5*12], e.tested*pTP)
-  expect_equal(MT$TN[MT$Cycle==5*12], e.tested*pTN)
-  expect_equal(MT$FP[MT$Cycle==5*12], e.tested*pFP)
-  expect_equal(MT$FN[MT$Cycle==5*12], e.tested*pFN)
+  e.tested <- 1000*(1-exp(-r*6/12))
+  e.untested <- 1000-e.tested
+  expect_equal(MT$A[MT$Cycle==6], e.untested)
+  expect_equal(MT$TP[MT$Cycle==6], e.tested*pTP)
+  expect_equal(MT$TN[MT$Cycle==6], e.tested*pTN)
+  expect_equal(MT$FP[MT$Cycle==6], e.tested*pFP)
+  expect_equal(MT$FN[MT$Cycle==6], e.tested*pFN)
 })
 
+test_that("Welton and Ades (2005) 3-state model is replicated", {
+  # model (fig 3)
+  s1 <- MarkovState$new("State 1")
+  s2 <- MarkovState$new("State 2")
+  s3 <- MarkovState$new("State 3")
+  # transition rates (events per person year, table 1)
+  g12 <- 3/51
+  g13 <- 7/51
+  g23 <- 5/14
+  # transitions
+  t11 <- MarkovTransition$new(s1,s1)
+  t12 <- MarkovTransition$new(s1,s2,r=g12)
+  t13 <- MarkovTransition$new(s1,s3,r=g13)
+  t22 <- MarkovTransition$new(s2,s2)
+  t23 <- MarkovTransition$new(s2,s3,r=g23)
+  # model
+  M <- CohortMarkovModel$new(V=list(s1,s2,s3),E=list(t11,t12,t13,t22,t23))
+  # check Q
+  Q <- M$transition_rate()
+  EQ <- matrix(c(-(g12+g13),g12,g13,0,-g23,g23,0,0,0),nrow=3,byrow=TRUE)
+  expect_true(all(Q-EQ<sqrt(.Machine$double.eps)))
+  # check Pt
+  t <- 1
+  p11 <- exp(-(g12+g13)*t)
+  p12 <-g12*exp(-g23*t)*(1-exp(-(g12+g13-g23)*t))/(g12+g13-g23)
+  p13 <- 1-p11-p12
+  p22 <- exp(-g23*t)
+  p23 <- 1-exp(-g23*t)
+  EPt <- matrix(c(p11,p12,p13,0,p22,p23,0,0,1), nrow=3, byrow=TRUE)
+  Pt <- M$transition_probability(tcycle=as.difftime(365.25,units="days"))
+  expect_true(all(Pt-EPt<sqrt(.Machine$double.eps)))
+})
 
 # -----------------------------------------------------------------------------
 # tests of model variables

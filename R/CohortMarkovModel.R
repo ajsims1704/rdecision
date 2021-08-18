@@ -196,28 +196,6 @@ CohortMarkovModel <- R6::R6Class(
     #' states are labelled, the \code{dimname}s take the names of the states
     #' and the dimensions are labelled \code{source} and \code{target}.
     transition_rate = function() {
-      # # check that each non-absorbing state has exactly one outgoing
-      # # transition whose rate is NULL
-      # lv <- sapply(1:self$order(), function(iv) {
-      #   n.out <- 0
-      #   n.null <- 0
-      #   v <- private$V[[iv]]
-      #   for (ie in 1:self$size()) {
-      #     e <- private$E[[ie]]
-      #     if (identical(e$source(),v)) {
-      #       n.out <- n.out + 1
-      #       if (is.na(e$rate())) {
-      #         n.null <- n.null + 1
-      #       }
-      #     }
-      #   }
-      #   return(n.out>=1 && n.null==1)
-      # })
-      # if (!all(lv)) {
-      #   rlang::abort(
-      #     "Each state must have one outgoing NULL rate transition",
-      #     class = "invalid_rate")
-      # }
       # get the state names
       state.names <- sapply(private$V, function(v) {v$label()})
       # construct the rate matrix, Q, with all zeros
