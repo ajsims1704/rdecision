@@ -15,11 +15,13 @@ multidigraph because there are potentially two edges between each pair of
 nodes {A,B} representing the transition probabilities from A to B and 
 \emph{vice versa}. It is a directed graph because the transition
 rates refer to transitions in one direction. Each edge can be optionally
-labelled. It permits loops (edges whose source and target are the same node)
-to represent patients that remain in the same state between cycles.
+labelled. It permits self-loops (edges whose source and target are the same 
+node) to represent patients that remain in the same state between cycles.
 }
-\section{Probabilities and rates}{
+\section{Transition rates and probabilities}{
 
+
+\subsection{Two state, one transition models}{
 To calculate per-cycle probabilities from rates, Briggs (2002) and
 Sonnenberg & Beck (1993) use the expression \eqn{p = 1-\exp(-rt)}, where 
 \eqn{r} is an instantaneous rate
@@ -35,12 +37,11 @@ population of \eqn{N} is \eqn{\hat{K} = N - N e^{-r t}}, or
 \eqn{\hat{K} = Np}, where \eqn{p = 1-\exp(-r t)}, the probability with 
 which events arise during interval \eqn{t}. If instead a per-interval 
 probability is known, the rate is derived from the inverse relationship 
-\eqn{r = -\ln(1-p)/t}. Miller & Homan (1994) and Fleurence & Hollenbeak 
-(2007) discuss the subject in more detail.
+\eqn{r = -\ln(1-p)/t}. Further details are available in Miller & Homan (1994)
+and Fleurence & Hollenbeak (2007).
 }
 
-\section{Probabilities and rates in states with multiple transitions}{
-
+\subsection{Multi-state, multi-transition models}{
 Consider a model with a starting state A, which has a self-loop, and three 
 absorbing states, B, C and D, with allowed transitions from A to B, A to C 
 and A to D only. Assume the transition rates (in units of per patient per
@@ -57,7 +58,31 @@ each transition. For example in one year, \eqn{p_{AB} = p_A * 2/2.6 = 0.712},
 \eqn{p_{AC} = p_A * 0.5/2.6 = 0.178}, \eqn{p_{AD} = p_A * 0.1/2.6 = 0.036}, 
 with \eqn{p_{AA} = 1-0.9257 = 0.074}. Applying the inverse relationship 
 described in the previous section to calculate individual probabilities 
-from individual rates is incorrect  (i.e. \eqn{p_{AB} \ne 1 - e^{-r_{AB}t}}).
+from individual rates is incorrect (i.e. \eqn{p_{AB} \ne 1 - e^{-r_{AB}t}})
+because people can experience more than one type of event in a single cycle.
+Further, the solution described here does not work when there are multiple
+states with multiple outgoing transitions. For this general case, the 
+per-cycle transition probability is the solution to Kolmogorov's forward and
+backward equations, and is given by the matrix exponential of the transition
+rate matrix multiplied by the cycle time (Jones 2017, Welton 2005). In 
+\pkg{rdecision}, matrix exponentiation is uses the \pkg{expm} package.
+}
+
+\subsection{Uncertainty in rates}{
+Welton and Ades (2005) describe a method for converting observed counts of 
+transitions into transition rates. They also provide a method for modelling
+uncertainties. Firstly, the total number of transitions from each state in 
+each time interval follows a Poisson distribution, and the uncertainty in 
+the rate from each state is represented by a Gamma distribution (because 
+Gamma is the conjugate prior of the Poisson distribution). Secondly, the
+conditional probabilities of the transitions from each state are modelled
+by a Dirichlet distribution. This is the preferred method in \pkg{rdecision}:
+create \code{ModVar}s for each per-state rate (\eqn{\lambda_i}), create a 
+Dirichlet distribution for each state; create model variables for each
+conditional probability (\eqn{\rho_{ij}}) linked to an applicable Dirichlet
+distribution; and finally create expression model variables for each rate
+\eqn{g_{ij}}.
+}
 }
 
 \references{
@@ -68,11 +93,20 @@ from individual rates is incorrect  (i.e. \eqn{p_{AB} \ne 1 - e^{-r_{AB}t}}).
   Fleurence RL and Hollenbeak CS. Rates and probabilities in economic 
   modelling. \emph{PharmacoEconomics}, 2007;\strong{25}:3--6. 
   
+  Jones E, Epstein D and García-Mochón L. A procedure for deriving 
+  formulas to convert transition rates to probabilities for multistate
+  Markov models. \emph{Medical Decision Making} 2017;\strong{37}:779–789.
+
   Miller DK and Homan SM. Determining transition probabilities: confusion
   and suggestions. \emph{Medical Decision Making} 1994;\strong{14}:52-58. 
   
   Sonnenberg FA, Beck JR. Markov models in medical decision making: a
-  practical guide. \emph{Medical Decision Making}, 1993:\strong{13}:322. 
+  practical guide. \emph{Medical Decision Making}, 1993:\strong{13}:322.
+  
+  Welton NJ and Ades A. Estimation of Markov chain transition probabilities
+  and rates from fully and partially observed data: uncertainty
+  propagation, evidence synthesis, and model calibration. 
+  \emph{Medical Decision Making}, 2005;\strong{25}:633-645.
 }
 }
 \author{
@@ -85,6 +119,8 @@ Andrew J. Sims \email{andrew.sims@newcastle.ac.uk}
 \subsection{Public methods}{
 \itemize{
 \item \href{#method-new}{\code{CohortMarkovModel$new()}}
+\item \href{#method-transition_rate}{\code{CohortMarkovModel$transition_rate()}}
+\item \href{#method-set_rates}{\code{CohortMarkovModel$set_rates()}}
 \item \href{#method-transition_probability}{\code{CohortMarkovModel$transition_probability()}}
 \item \href{#method-transition_cost}{\code{CohortMarkovModel$transition_cost()}}
 \item \href{#method-get_statenames}{\code{CohortMarkovModel$get_statenames()}}
@@ -160,11 +196,18 @@ A Markov model must meet the following conditions:
   \item All edges must be of class \code{MarkovTransition};
   \item The nodes and edges must form a digraph whose underlying
   graph is connected;
-  \item Each state must have at least one outgoing transition and 
-  have exactly one outgoing edge whose hazard rate is NULL. This is to
-  ensure that the multinomial distribution of the probability of leaving
-  each node is not over or under-constrained. Rates can be changed
-  between cycles, and this constraint is checked at the point of cycling,
+  \item Each state must have at least one outgoing transition (which
+  can be a self-loop);
+  \item For each state the sum of outgoing transition rates must be zero.
+  This ensures that the row sums of the transition rate matrix (\eqn{Q}) 
+  are zero, as required to solve Kolmogorov's forward and backward
+  equations. For convenience, one outgoing transition rate from each 
+  state may be set to NA when the \code{MarkovTransition}s are defined,
+  and these will be replaced in \eqn{Q} with a value that ensures the
+  row sums are zero (typically, rates for self loops would be set to 
+  NA). Transition rates in \eqn{Q} associated with transitions that are
+  not defined as edges in the graph are zero. Rates can be changed
+  between cycles, and this condition is checked at the point of cycling,
   not at the point of model creation.
   \item No two edges may share the same source and target nodes (i.e. 
   the digraph may not have multiple edges). This is to ensure that there
@@ -178,10 +221,64 @@ state is set to 1000.
 }
 }
 \if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-transition_rate"></a>}}
+\if{latex}{\out{\hypertarget{method-transition_rate}{}}}
+\subsection{Method \code{transition_rate()}}{
+Transition rate matrix.
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{CohortMarkovModel$transition_rate()}\if{html}{\out{</div>}}
+}
+
+\subsection{Details}{
+Usually written as \eqn{Q}, the matrix of rates
+(in units of events per person per year) for the model, assuming a
+continuous time Markov chain. As per convention, each row sums to zero.
+}
+
+\subsection{Returns}{
+A square matrix of size equal to the number of states. If all
+states are labelled, the \code{dimname}s take the names of the states
+and the dimensions are labelled \code{source} and \code{target}.
+}
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-set_rates"></a>}}
+\if{latex}{\out{\hypertarget{method-set_rates}{}}}
+\subsection{Method \code{set_rates()}}{
+Sets transition rates from per-cycle probabilities.
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{CohortMarkovModel$set_rates(Pt, tcycle)}\if{html}{\out{</div>}}
+}
+
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{Pt}}{Per-cycle transition probability matrix. Formally, the
+solution of Kolmogorov's forward and backward equations. The row and 
+column labels must be the state names and each row must sum to one.
+Non-zero probabilities for undefined transitions are not allowed.}
+
+\item{\code{tcycle}}{The cycle time, in years, as a \code{difftime} object.}
+}
+\if{html}{\out{</div>}}
+}
+\subsection{Details}{
+When the per-cycle probabilities are available, rather than
+the transition rates, this function calculates and sets rates from 
+probabilities using the matrix log of the probabilities, via 
+package \pkg{expm}. It has the consequence of setting (overwriting) the
+rates in each \code{MarkovTransition}.
+}
+
+\subsection{Returns}{
+Updated \code{CohortMarkovModel} object
+}
+}
+\if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-transition_probability"></a>}}
 \if{latex}{\out{\hypertarget{method-transition_probability}{}}}
 \subsection{Method \code{transition_probability()}}{
-Return the per-cycle transition matrix for the model.
+Per-cycle transition probability matrix for the model.
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{CohortMarkovModel$transition_probability(tcycle)}\if{html}{\out{</div>}}
 }
@@ -195,7 +292,11 @@ Return the per-cycle transition matrix for the model.
 }
 \subsection{Details}{
 Checks that each state has at least one outgoing transition and
-that exactly one outgoing transition rate whose rate is NULL.
+that exactly one outgoing transition rate whose rate is NULL. The 
+transition probability matrix, usually written \eqn{P_t} is the solution
+to Kolmogorov's forward
+and backward equations, and is computed from the transition rate
+matrix using matrix exponentiation with the \pkg{expm} package.
 }
 
 \subsection{Returns}{
@@ -362,7 +463,7 @@ with \code{get_populations}.}
 \item{\code{hcc.cost}}{Boolean; whether to apply half cycle correction to the
 costs. If true, the occupancy costs are computed using the population
 at half cycle; if false they are applied at the end of the cycle. 
-Applicable only if hcc.pop is TRUE.}
+Applicable only if \code{hcc.pop} is TRUE.}
 }
 \if{html}{\out{</div>}}
 }
@@ -379,7 +480,7 @@ the cycle, or at mid-cycle if half-cycle correction is applied.}
 the cycle. Discount is applied, if the options are set. The costs are
 normalized by the model population. The cycle costs are derived from the
 annual occupancy costs of the \code{MarkovState}s. Applied to the end
-population, i.e. unaffacted by half cycle correction, as per 
+population, i.e. unaffected by half cycle correction, as per 
 Briggs \emph{et al}.}
 \item{\code{EntryCost}}{Cost of the transitions \emph{into} the state
 during the cycle. Discounting is applied, if the option is set. 
@@ -424,7 +525,7 @@ with \code{get_populations}.}
 \item{\code{hcc.cost}}{Boolean; whether to apply half cycle correction to the
 costs. If true, the occupancy costs are computed using the population
 at half cycle; if false they are applied at the end of the cycle.
-Applicable only if hcc.pop is TRUE.}
+Applicable only if \code{hcc.pop} is TRUE.}
 }
 \if{html}{\out{</div>}}
 }

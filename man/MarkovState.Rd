@@ -54,17 +54,19 @@ Create an object of type \code{MarkovState}.
 \describe{
 \item{\code{name}}{The name of the state (character string).}
 
-\item{\code{cost}}{The annual cost of state occupancy (numeric or ModVar). Set
+\item{\code{cost}}{The annual cost of state occupancy (numeric or 
+\code{ModVar}). Set
 as \code{NA} by default to help distinguish costs to be set with 
-\code{set_cost} in future from those deliberatly set to zero.}
+\code{set_cost} in future from those deliberately set to zero.}
 
 \item{\code{utility}}{The utility associated with being in the state (numeric
-or ModVar).}
+or \code{ModVar}).}
 }
 \if{html}{\out{</div>}}
 }
 \subsection{Details}{
-Utility must be in the range [-Inf,1]. If it is of type numeric,
+Utility must be in the range \code{[-Inf,1]}. If it is of type 
+numeric,
 the range is checked on object creation.
 }
 

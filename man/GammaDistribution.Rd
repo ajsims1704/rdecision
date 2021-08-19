@@ -12,7 +12,7 @@ An object representing a Gamma distribution with hyperparameters
 shape (\code{k}) and scale (\code{theta}). In econometrics this
 parametrization is more common but in Bayesian statistics the shape 
 (\code{alpha}) and rate (\code{beta}) parametrization is more usual. Note, 
-however, that although Briggs emph{et al} (2006) use the shape, scale
+however, that although Briggs \emph{et al} (2006) use the shape, scale
 formulation, they use \code{alpha}, \code{beta} as parameter names.
 }
 \references{

@@ -12,9 +12,9 @@
 #' labelled. It permits self-loops (edges whose source and target are the same 
 #' node) to represent patients that remain in the same state between cycles.
 #'
-#' @section Transition rates and probabilities
+#' @section Transition rates and probabilities:
 #' 
-#' \subsection{Trivial models}{
+#' \subsection{Two state, one transition models}{
 #' To calculate per-cycle probabilities from rates, Briggs (2002) and
 #' Sonnenberg & Beck (1993) use the expression \eqn{p = 1-\exp(-rt)}, where 
 #' \eqn{r} is an instantaneous rate
@@ -51,14 +51,30 @@
 #' \eqn{p_{AC} = p_A * 0.5/2.6 = 0.178}, \eqn{p_{AD} = p_A * 0.1/2.6 = 0.036}, 
 #' with \eqn{p_{AA} = 1-0.9257 = 0.074}. Applying the inverse relationship 
 #' described in the previous section to calculate individual probabilities 
-#' from individual rates is incorrect  (i.e. \eqn{p_{AB} \ne 1 - e^{-r_{AB}t}})
+#' from individual rates is incorrect (i.e. \eqn{p_{AB} \ne 1 - e^{-r_{AB}t}})
 #' because people can experience more than one type of event in a single cycle.
 #' Further, the solution described here does not work when there are multiple
 #' states with multiple outgoing transitions. For this general case, the 
 #' per-cycle transition probability is the solution to Kolmogorov's forward and
 #' backward equations, and is given by the matrix exponential of the transition
-#' rate matrix multiplied by the cycle time (Jones, 2017). In \pkg{rdecision},
-#' matrix exponentiation is uses the \pkg{expm} package.
+#' rate matrix multiplied by the cycle time (Jones 2017, Welton 2005). In 
+#' \pkg{rdecision}, matrix exponentiation is uses the \pkg{expm} package.
+#' }
+#' 
+#' \subsection{Uncertainty in rates}{
+#' Welton and Ades (2005) describe a method for converting observed counts of 
+#' transitions into transition rates. They also provide a method for modelling
+#' uncertainties. Firstly, the total number of transitions from each state in 
+#' each time interval follows a Poisson distribution, and the uncertainty in 
+#' the rate from each state is represented by a Gamma distribution (because 
+#' Gamma is the conjugate prior of the Poisson distribution). Secondly, the
+#' conditional probabilities of the transitions from each state are modelled
+#' by a Dirichlet distribution. This is the preferred method in \pkg{rdecision}:
+#' create \code{ModVar}s for each per-state rate (\eqn{\lambda_i}), create a 
+#' Dirichlet distribution for each state; create model variables for each
+#' conditional probability (\eqn{\rho_{ij}}) linked to an applicable Dirichlet
+#' distribution; and finally create expression model variables for each rate
+#' \eqn{g_{ij}}.
 #' }
 #' 
 #' @references{
@@ -76,7 +92,12 @@
 #'   and suggestions. \emph{Medical Decision Making} 1994;\strong{14}:52-58. 
 #'   
 #'   Sonnenberg FA, Beck JR. Markov models in medical decision making: a
-#'   practical guide. \emph{Medical Decision Making}, 1993:\strong{13}:322. 
+#'   practical guide. \emph{Medical Decision Making}, 1993:\strong{13}:322.
+#'   
+#'   Welton NJ and Ades A. Estimation of Markov chain transition probabilities
+#'   and rates from fully and partially observed data: uncertainty
+#'   propagation, evidence synthesis, and model calibration. 
+#'   \emph{Medical Decision Making}, 2005;\strong{25}:633-645.
 #' }
 #' 
 #' @docType class
@@ -246,6 +267,7 @@ CohortMarkovModel <- R6::R6Class(
     #' @param Pt Per-cycle transition probability matrix. Formally, the
     #' solution of Kolmogorov's forward and backward equations. The row and 
     #' column labels must be the state names and each row must sum to one.
+    #' Non-zero probabilities for undefined transitions are not allowed. 
     #' @param tcycle The cycle time, in years, as a \code{difftime} object.
     #' @return Updated \code{CohortMarkovModel} object
     set_rates = function(Pt, tcycle) {
@@ -278,10 +300,34 @@ CohortMarkovModel <- R6::R6Class(
           class = "invalid_Pt"
         )
       }
-      ## todo: check that Pt[i,j]==0 if edge i->j is not in graph
-      ##
-      ## todo: check that all rows of Pt sum to 1
-      ##
+      # check that Pt[i,j]==0 if edge i->j is not in graph
+      M <- matrix(
+        data = FALSE, 
+        nrow = self$order(), ncol = self$order(),
+        dimnames = list(source=dimnames(Pt)[[1]], target=dimnames(Pt)[[2]])
+      )
+      for (ie in 1:self$size()) {
+        e <- private$E[[ie]]
+        is <- e$source()$name()
+        it <- e$target()$name()
+        M[is,it] <- TRUE
+      }
+      AA <- (Pt != 0)    
+      if (sum(M | AA) > sum(M)) {
+        rlang::abort(
+          "All non-zero elements of Pt must correspond to allowed transitions",
+          class = "invalid_Pt"
+        )
+      }
+      # check that all rows of Pt sum to 1
+      sumP <- rowSums(Pt)
+      if (any(abs(sumP-1)>sqrt(.Machine$double.eps))) {
+        rlang::abort(
+          "All rows of Pt must sum to 1",
+          class = "invalid_Pt"
+        )
+      }
+      # check cycle time
       if (missing(tcycle)) {
         rlang::abort(
           "'tcycle' is missing, without default", 
@@ -495,7 +541,7 @@ CohortMarkovModel <- R6::R6Class(
     #' @param hcc.cost Boolean; whether to apply half cycle correction to the
     #' costs. If true, the occupancy costs are computed using the population
     #' at half cycle; if false they are applied at the end of the cycle. 
-    #' Applicable only if hcc.pop is TRUE.
+    #' Applicable only if \code{hcc.pop} is TRUE.
     #' @return Calculated values, one row per state, as a data frame with the
     #' following columns:
     #' \describe{
@@ -508,7 +554,7 @@ CohortMarkovModel <- R6::R6Class(
     #' the cycle. Discount is applied, if the options are set. The costs are
     #' normalized by the model population. The cycle costs are derived from the
     #' annual occupancy costs of the \code{MarkovState}s. Applied to the end
-    #' population, i.e. unaffacted by half cycle correction, as per 
+    #' population, i.e. unaffected by half cycle correction, as per 
     #' Briggs \emph{et al}.}
     #' \item{\code{EntryCost}}{Cost of the transitions \emph{into} the state
     #' during the cycle. Discounting is applied, if the option is set. 
@@ -630,7 +676,7 @@ CohortMarkovModel <- R6::R6Class(
     #' @param hcc.cost Boolean; whether to apply half cycle correction to the
     #' costs. If true, the occupancy costs are computed using the population
     #' at half cycle; if false they are applied at the end of the cycle.
-    #' Applicable only if hcc.pop is TRUE.
+    #' Applicable only if \code{hcc.pop} is TRUE.
     #' @return Data frame with cycle results.
     #' following columns:
     #' \describe{

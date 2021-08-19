@@ -42,10 +42,11 @@ test_that("mode is calculated correctly", {
   expect_true(all(is.na(m)))
 })
 
-test_that("SD is undefined for a multivariate distribution", {
+test_that("SD is NA for a multivariate distribution", {
   alpha <- c(3, 12, 9)
   D <- DirichletDistribution$new(alpha=alpha)
-  expect_error(D$SD(), class="SD_undefined")
+  expect_length(D$SD(), 3)
+  expect_true(all(is.na(D$SD())))
 })
 
 test_that("marginal quantiles are from Beta distributions", {

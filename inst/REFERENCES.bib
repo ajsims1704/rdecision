@@ -183,7 +183,7 @@
 
 @manual{goulet2021,
   type = {manual},
-  title = {Expm: {{Matrix}} Exponential, Log, 'Etc'},
+  title = {Expm: {{Matrix}} Exponential, Log, Etc},
   author = {Goulet, Vincent and Dutang, Christophe and Maechler, Martin and Firth, David and Shapira, Marina and Stadelmann, Michael},
   date = {2021},
   url = {https://CRAN.R-project.org/package=expm}
@@ -448,6 +448,23 @@
   location = {{Chapel Hill}},
   url = {http://www.cs.unc.edu/techreports/89-034.pdf},
   abstract = {Drawing a tree consists of two stages: determining the position of each node, and actually rendering the individuals nodes and interconnecting branches. The algorithm described in this paper is concerned with the first stage: given a list of nodes. an indication of the hierarchical relationship among them. and their shape and size, wrere should each node be positioned for optimal aesthetic effect? This algorithm determines the positions of the nodes for any arbitrary general tree. It is the most desirable positioning with respect to certain widely- accepted heuristics. The positioning, specified in x, y coordinates, minimizes the width of the tree. In a general tree, there is no limit on the number of off- spring per node; this contrasts with binary and ternary trees, for example, which are trees with a limit of 2 and 3 offspring per node. This algorithm oper- ates in time O(N), where N is the number of nodes in the tree. Previously, most tree drawings have been positioned by the sure hand of a human graphic designer. Many computer-generated positionings have been either trivial or contained irregularities. Earlier work by Wetherell and Shannon (1979) and Tilford (1981), upon which this algorithm builds, failed to correctly position the interior nodes of some trees. Radack (1988), also building on Tilford's work, has solved this same problem with a different method which makes four passes. The algorithm presented here correctly positions a tree's nodes using only two passes. It also handles several practical considerations: alternate orientations of the tree, variable node sizes, and out-of-bounds conditions.}
+}
+
+@article{welton2005,
+  title = {Estimation of {{Markov Chain Transition Probabilities}} and {{Rates}} from {{Fully}} and {{Partially Observed Data}}: {{Uncertainty Propagation}}, {{Evidence Synthesis}}, and {{Model Calibration}}},
+  author = {Welton, Nicky J. and Ades, A. E.},
+  date = {2005-11-01},
+  journaltitle = {Medical Decision Making},
+  shortjournal = {Med Decis Making},
+  volume = {25},
+  number = {6},
+  pages = {633--645},
+  publisher = {{SAGE Publications Inc STM}},
+  issn = {0272-989X},
+  doi = {10.1177/0272989X05282637},
+  url = {https://doi.org/10.1177/0272989X05282637},
+  urldate = {2021-08-18},
+  abstract = {Markov transition models are frequently used to model disease progression. The authors show how the solution to Kolmogorov?s forward equations can be exploited to map between transition rates and probabilities from probability data in multistate models. They provide a uniform, Bayesian treatment of estimation and propagation of uncertainty of transition rates and probabilities when 1) observations are available on all transitions and exact time at risk in each state (fully observed data) and 2) observations are on initial state and final state after a fixed interval of time but not on the sequence of transitions (partially observed data). The authors show how underlying transition rates can be recovered from partially observed data using Markov chain Monte Carlo methods in WinBUGS, and they suggest diagnostics to investigate inconsistencies between evidence from different starting states. An illustrative example for a 3-state model is given, which shows how the methods extend to more complex Markov models using the software WBDiff to compute solutions. Finally, the authors illustrate how to statistically combine data from multiple sources, including partially observed data at several follow-up times and also how to calibrate a Markov model to be consistent with data from one specific study.}
 }
 
 @article{wickham2011,

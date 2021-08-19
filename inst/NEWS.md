@@ -1,12 +1,16 @@
 
-# rdecision 1.0.4.9000
+# rdecision 1.1.0
 
-* Fixed `transition_probability` in `CohortMarkovModel` to ensure
-  that the relative probabilities for each outgoing state are preserved
-  correctly. Added note to documentation as the realtionshiop between
-  rates and probabilities requires careful implementation.
-* Deprecated function `r()` from `Modvar` and its subclasses. Use set/get
-  methods to sample from associated uncertainty distribution.
+* Added elementary Markov model vignette (Chancellor).
+* Added narrative to `CohortMarkovModel` to explain how `rdecision` manages 
+  transition rates and per-cycle probabilities. Cited work of Jones et al
+  (2017) and Welton (2005) which motivated the approach taken.
+* Added `set_rates` method to `CohorMarkovModel` to set transition rates from
+  a per-cycle transition probability matrix. Uses `logm` from `expm` package.
+* Added dependency to the `expm` package which provides matrix exponentiation
+  in converting transition rates to per-cycle probabilities.
+* Added multivariate `DirichletDistribution` class, mainly to support
+  PSA in Markov models.
 * Refactored model variable classes into much smaller convenience classes
   with an underlying distribution. For example `BetaModVar` has a
   `BetaDistribution` uncertainty.

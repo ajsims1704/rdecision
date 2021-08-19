@@ -55,14 +55,11 @@ test_that("mode has K dimensions", {
 # --------------------------------------------------------------------------
 # tests of SD and variance
 # --------------------------------------------------------------------------
-test_that("sd is only defined for K=1", {
+test_that("sd has the correct length", {
   D <- Distribution$new("Base", K=as.integer(3))
-  expect_error(
-    D$SD(),
-    class = "SD_undefined"
-  )
+  expect_length(D$SD(),3)
   D <- Distribution$new("Base")
-  expect_silent(D$SD())
+  expect_length(D$SD(),1)
 })
 
 # --------------------------------------------------------------------------

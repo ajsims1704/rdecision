@@ -55,7 +55,6 @@ Distribution <- R6::R6Class(
       }
       private$K <- K
       # create space for a random draw and populate it with mean
-#      private$.r <- rep(as.numeric(NA), times=K)
       private$.r <- self$mean()
       # return Distribution
       return(invisible(self))
@@ -99,13 +98,8 @@ Distribution <- R6::R6Class(
     #' variance-covariance matrix. 
     #' @return Standard deviation as a numeric value.
     SD = function() {
-      if (private$K != 1) {
-        rlang::abort(
-          "Function 'SD' not defined for multivariate distributions",
-          class = "SD_undefined"
-        )
-      }
-      return(as.numeric(NA))
+      rv <- rep(as.numeric(NA), times=private$K)
+      return(rv)
     },
     
     #' @description Variance-covariance matrix.

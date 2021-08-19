@@ -1,0 +1,10 @@
+digraph rdecision {
+  size="7,7" ;
+  rankdir=LR ;
+   "Well" -> "Well"  ;
+   "Dead" -> "Dead"  ;
+   "Disabled" -> "Disabled"  ;
+   "Well" -> "Disabled"  ;
+   "Well" -> "Dead"  ;
+   "Disabled" -> "Dead"  ;
+}

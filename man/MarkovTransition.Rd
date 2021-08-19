@@ -48,7 +48,7 @@ Andrew J. Sims \email{andrew.sims@newcastle.ac.uk}
 \subsection{Method \code{new()}}{
 Create an object of type \code{MarkovTransition}.
 \subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{MarkovTransition$new(source, target, r = NULL, cost = 0, label = "")}\if{html}{\out{</div>}}
+\if{html}{\out{<div class="r">}}\preformatted{MarkovTransition$new(source, target, r = as.numeric(NA), cost = 0, label = "")}\if{html}{\out{</div>}}
 }
 
 \subsection{Arguments}{
@@ -59,8 +59,9 @@ Create an object of type \code{MarkovTransition}.
 \item{\code{target}}{\code{MarkovState} to which the transition ends.}
 
 \item{\code{r}}{Instantaneous hazard rate in units of per patient per year.
-Exactly one of the outgoing transitions from each state must be NULL.
-Default value is NULL.}
+To meet the condition that the sum of the outgoing transition rates from
+each state is zero, one transition rate from a state may be set to NA
+when the model is defined. The default is NA.}
 
 \item{\code{cost}}{Cost associated with the transition.}
 
@@ -71,7 +72,7 @@ name of the event).}
 }
 \subsection{Details}{
 A hazard rate must be assigned to the transition. Optionally,
-a cost may be associated' with the transition.
+a cost may be associated with the transition.
 }
 
 \subsection{Returns}{
@@ -103,22 +104,17 @@ A list of \code{ModVar}s.
 \subsection{Method \code{set_rate()}}{
 Set the value of the transition rate
 \subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{MarkovTransition$set_rate(r = 0)}\if{html}{\out{</div>}}
+\if{html}{\out{<div class="r">}}\preformatted{MarkovTransition$set_rate(r = as.numeric(NA))}\if{html}{\out{</div>}}
 }
 
 \subsection{Arguments}{
 \if{html}{\out{<div class="arguments">}}
 \describe{
 \item{\code{r}}{Instantaneous hazard rate in units of per patient per year,
-or NULL; default value is zero.}
+or NA (the default).}
 }
 \if{html}{\out{</div>}}
 }
-\subsection{Details}{
-Exactly one of the outgoing transitions from each state must
-be NULL.
-}
-
 \subsection{Returns}{
 Updated \code{MarkovTransition} object.
 }

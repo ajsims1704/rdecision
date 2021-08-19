@@ -66,8 +66,8 @@ that applies to this model variable.}
 \if{html}{\out{</div>}}
 }
 \subsection{Details}{
-A ModVar is associated with an uncertainty distribution (a
-"has-a" relationship in object-oriented terminology). There can be a
+A \code{ModVar} is associated with an uncertainty distribution
+(a "has-a" relationship in object-oriented terminology). There can be a
 1-1 mapping of \code{ModVar}s to \code{Distribution}s, or several
 model variables can be linked to the same distribution in a
 many-1 mapping, e.g. when each transition probability from a Markov state
@@ -97,11 +97,15 @@ otherwise.
 \if{html}{\out{<a id="method-is_probabilistic"></a>}}
 \if{latex}{\out{\hypertarget{method-is_probabilistic}{}}}
 \subsection{Method \code{is_probabilistic()}}{
-Tests whether the model variable is probabilistic, i.e. a random
-variable that follows a distribution, or an expression involving
-random variables, some of which follow distributions.
+Is the model variable probabilistic?
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{ModVar$is_probabilistic()}\if{html}{\out{</div>}}
+}
+
+\subsection{Details}{
+Tests whether the model variable is probabilistic, i.e. a 
+random variable that follows a distribution, or an expression involving
+random variables, some of which follow distributions.
 }
 
 \subsection{Returns}{
@@ -138,10 +142,16 @@ Description of units as character string.
 \if{html}{\out{<a id="method-distribution"></a>}}
 \if{latex}{\out{\hypertarget{method-distribution}{}}}
 \subsection{Method \code{distribution()}}{
-Accessor function for the name of the uncertainty 
-distribution.
+Name and parameters of the uncertainty distribution.
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{ModVar$distribution()}\if{html}{\out{</div>}}
+}
+
+\subsection{Details}{
+If \eqn{K > 1} the dimension of the distribution associated 
+with this model variable is appended, e.g. \code{Dir(2,3)[1]} 
+means that the model variable is associated with the first dimension 
+of a 2D Dirichlet distribution with alpha parameters 2 and 3.
 }
 
 \subsection{Returns}{
@@ -152,7 +162,7 @@ Distribution name as character string.
 \if{html}{\out{<a id="method-mean"></a>}}
 \if{latex}{\out{\hypertarget{method-mean}{}}}
 \subsection{Method \code{mean()}}{
-Return the mean value of the model variable.
+Mean value of the model variable.
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{ModVar$mean()}\if{html}{\out{</div>}}
 }
@@ -165,11 +175,15 @@ Mean value as a numeric value.
 \if{html}{\out{<a id="method-mode"></a>}}
 \if{latex}{\out{\hypertarget{method-mode}{}}}
 \subsection{Method \code{mode()}}{
-Return the mode of the variable. By default returns \code{NA}, which 
-will be the case for most \code{ExprModVar} variables, because an 
-arbitrary expression is not guaranteed to be unimodal.
+The mode of the variable.
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{ModVar$mode()}\if{html}{\out{</div>}}
+}
+
+\subsection{Details}{
+By default returns \code{NA}, which will be the case for 
+most \code{ExprModVar} variables, because an arbitrary expression is 
+not guaranteed to be unimodal.
 }
 
 \subsection{Returns}{
@@ -180,7 +194,7 @@ Mode as a numeric value.
 \if{html}{\out{<a id="method-SD"></a>}}
 \if{latex}{\out{\hypertarget{method-SD}{}}}
 \subsection{Method \code{SD()}}{
-Return the standard deviation of the model variable.
+Standard deviation of the model variable.
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{ModVar$SD()}\if{html}{\out{</div>}}
 }
@@ -193,7 +207,7 @@ Standard deviation as a numeric value
 \if{html}{\out{<a id="method-quantile"></a>}}
 \if{latex}{\out{\hypertarget{method-quantile}{}}}
 \subsection{Method \code{quantile()}}{
-Find quantiles of the uncertainty distribution.
+Quantiles of the uncertainty distribution.
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{ModVar$quantile(probs)}\if{html}{\out{</div>}}
 }
@@ -231,9 +245,7 @@ A sample drawn at random.
 \if{html}{\out{<a id="method-set"></a>}}
 \if{latex}{\out{\hypertarget{method-set}{}}}
 \subsection{Method \code{set()}}{
-Sets the value of the \code{ModVar} that will be returned
-by subsequent
-calls to \code{get()} until \code{set()} is called again.
+Sets the value of the \code{ModVar}.
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{ModVar$set(what = "random", val = NULL)}\if{html}{\out{</div>}}
 }
@@ -253,6 +265,10 @@ ignored otherwise.}
 \if{html}{\out{</div>}}
 }
 \subsection{Details}{
+Defines what will be returned' by subsequent
+calls to \code{get()} until \code{set()} is called again.
+
+
 The \code{"current"} option is provided to support having common 
 functions to set (or leave alone) sets of model variables, depending on
 their use case and avoids additional if statements. Option \code{"value"}
@@ -269,10 +285,14 @@ Updated \code{ModVar}.
 \if{html}{\out{<a id="method-get"></a>}}
 \if{latex}{\out{\hypertarget{method-get}{}}}
 \subsection{Method \code{get()}}{
-Gets the value of the \code{ModVar} that was set by the most recent call
-to \code{set()}.
+Get the value of the \code{ModVar}.
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{ModVar$get()}\if{html}{\out{</div>}}
+}
+
+\subsection{Details}{
+Returns the value defined by the most recent call
+to \code{set()}.
 }
 
 \subsection{Returns}{

@@ -234,21 +234,34 @@ test_that("rates are calculated from probabilities correctly", {
     V = list(s.well, s.disabled, s.dead),
     E = list(e.ww, e.ss, e.dd, e.ws, e.wd, e.sd)
   )
-  # check that illegal arguments to set_rates are detected
+  # no Pt
   expect_error(M$set_rates(), class="invalid_Pt")
+  # Pt wrong size
   EPt <- matrix(c(1,0,0,0),nrow=2,byrow=TRUE)
   expect_error(M$set_rates(EPt), class="invalid_Pt")
+  # Pt with missing value
   EPt <- matrix(c(0.6,NA,0.2,0,0.6,0.4,0,0,1),nrow=3,byrow=TRUE)
   expect_error(M$set_rates(EPt), class="invalid_Pt")
+  # Pt has element > 1
   EPt <- matrix(c(0.6,2,0.2,0,0.6,0.4,0,0,1),nrow=3,byrow=TRUE)
   expect_error(M$set_rates(EPt), class="invalid_Pt")
+  # Pt has row sums exceeding 1
+  EPt <- matrix(c(0.6,0.2,0.3,0,0.6,0.4,0,0,1),nrow=3,byrow=TRUE)
+  expect_error(M$set_rates(EPt), class="invalid_Pt")
+  # Pt has non-zero probabilities for disallowed transitions
+  EPt <- matrix(c(0.6,0.2,0.2,0.2,0.4,0.4,0,0,1),nrow=3,byrow=TRUE)
+  expect_error(M$set_rates(EPt), class="invalid_Pt")
+  # Pt has no labels
   EPt <- matrix(c(0.6,0.2,0.2,0,0.6,0.4,0,0,1),nrow=3,byrow=TRUE)
   expect_error(M$set_rates(EPt), class="invalid_Pt")
+  # Pt has partly missing labels
   state.names <- c("Well", "Disabled", "Dead")
   dimnames(EPt) <- list(source=state.names, target=NULL)
   expect_error(M$set_rates(EPt), class="invalid_Pt")
   dimnames(EPt) <- list(source=NULL, target=state.names)
   expect_error(M$set_rates(EPt), class="invalid_Pt")
+  # check that illegal cycle times are detected
+  EPt <- matrix(c(0.6,0.2,0.2,0,0.6,0.4,0,0,1),nrow=3,byrow=TRUE)
   dimnames(EPt) <- list(source=state.names, target=state.names)
   expect_error(M$set_rates(EPt), class="invalid_tcycle")
   expect_error(M$set_rates(EPt,1), class="invalid_tcycle")
@@ -621,36 +634,46 @@ test_that("Welton and Ades (2005) 3-state model is replicated", {
 # -----------------------------------------------------------------------------
 # tests of model variables
 # -----------------------------------------------------------------------------
-test_that("Model variables are recognised, set and got", {
-  # create modvars
-  c.dis <- GammaModVar$new("Care cost", "GBP", shape=1000, scale=1/10)
-  u.dis <- BetaModVar$new("u.dis", "U", alpha=7, beta=3)
-  p.dis <- BetaModVar$new("p.disabled", "P", alpha=20, beta=80)
-  p.ded <- BetaModVar$new("p.dead", "P", alpha=40, beta=60)
-  # create states
-  s.well <- MarkovState$new(name="Well")
-  s.disabled <- MarkovState$new(name="Disabled", cost=c.dis, utility=u.dis)
-  s.dead <- MarkovState$new(name="Dead")
-  # create transitions
-  r.ws <- ExprModVar$new("r.ws", "HR", rlang::quo(-log(1-p.dis)/1))
-  r.wd <- ExprModVar$new("r.wd", "HR", rlang::quo(-log(1-p.dis)/1))
-  r.sd <- ExprModVar$new("r.sd", "HR", rlang::quo(-log(1-p.ded)/1))
-  E <- list(
-    MarkovTransition$new(s.well, s.well),
-    MarkovTransition$new(s.dead, s.dead),
-    MarkovTransition$new(s.disabled, s.disabled),
-    e.ws <- MarkovTransition$new(s.well, s.disabled, r=r.ws),
-    e.wd <- MarkovTransition$new(s.well, s.dead, r=r.wd),
-    e.sd <- MarkovTransition$new(s.disabled, s.dead, r=r.sd)
-  )
-  # create the Markov model
-  M <- CohortMarkovModel$new(V = list(s.well, s.disabled, s.dead), E)
-  # extract the model variables
-  MV <- M$modvars()
-  expect_equal(length(MV), 7)
+test_that("the rate uncertainty method of Welton & Ades (2005) is supported", {
+  # Exposure, E, and events, r (Table 1)
+  E1 <- 51
+  E2 <- 14
+  r12 <- 3
+  r13 <- 7
+  r23 <- 5
+  # cost and utility
+  c2 <- GammaModVar$new("C2", "GBP", shape=1000, scale=1/10)
+  u2 <- BetaModVar$new("U2", "U", alpha=7, beta=3)
+  # model (fig 3)
+  s1 <- MarkovState$new("State 1")
+  s2 <- MarkovState$new("State 2", cost=c2, utility=u2)
+  s3 <- MarkovState$new("State 3")
+  # model variables for rates and conditional probabilities
+  lambda1 <- GammaModVar$new("lambda1", "rate", shape=(r12+r13), scale=1/E1)
+  lambda2 <- GammaModVar$new("lambda2", "rate", shape=r23, scale=1/E2)
+  D1 <- DirichletDistribution$new(alpha=c(r12, r13))
+  rho12 <- ModVar$new("rho12", "p", D=D1, k=as.integer(1))
+  rho13 <- ModVar$new("rho13", "p", D=D1, k=as.integer(2))
+  g12 <- ExprModVar$new("g12", "rate", rlang::quo(lambda1*rho12))
+  g13 <- ExprModVar$new("g13", "rate", rlang::quo(lambda1*rho13))
+  g23 <- ExprModVar$new("g23", "rate", rlang::quo(lambda2))
+  # transitions
+  t11 <- MarkovTransition$new(s1,s1)#,r=g11)
+  t12 <- MarkovTransition$new(s1,s2,r=g12)
+  t13 <- MarkovTransition$new(s1,s3,r=g13)
+  t22 <- MarkovTransition$new(s2,s2)#,r=g22)
+  t23 <- MarkovTransition$new(s2,s3,r=g23)
+  # model
+  M <- CohortMarkovModel$new(V=list(s1,s2,s3),E=list(t11,t12,t13,t22,t23))
+  # check modvar count
+  mv <- M$modvars()
+  expect_equal(length(mv),7+2)
   # tabulate the input variables
   MVT <- M$modvar_table(expressions=FALSE)
-  expect_equal(nrow(MVT), 4)
+  expect_equal(nrow(MVT), 4+2)
+  # spot check values
+  expect_intol(lambda1$mean(), (r12+r13)/E1, tol=0.0001)
+  expect_equal(rho12$mean(), r12/(r12+r13))
 })
 
 # -----------------------------------------------------------------------------
@@ -669,9 +692,9 @@ test_that("rdecision replicates Sonnenberg & Beck, Fig 3", {
     MarkovTransition$new(s.well, s.well),
     MarkovTransition$new(s.dead, s.dead),
     MarkovTransition$new(s.disabled, s.disabled),
-    e.ws <- MarkovTransition$new(s.well, s.disabled),
-    e.wd <- MarkovTransition$new(s.well, s.dead),
-    e.sd <- MarkovTransition$new(s.disabled, s.dead)
+    MarkovTransition$new(s.well, s.disabled),
+    MarkovTransition$new(s.well, s.dead),
+    MarkovTransition$new(s.disabled, s.dead)
   )
   # create the model
   M <- CohortMarkovModel$new(V = list(s.well, s.disabled, s.dead), E)
@@ -694,11 +717,18 @@ test_that("rdecision replicates Sonnenberg & Beck, Fig 3", {
   expect_equal(round(RC$Well[RC$Cycle==2]), 3600)
   expect_equal(round(RC$Disabled[RC$Cycle==2]), 2400)
   expect_equal(round(RC$Dead[RC$Cycle==2]), 4000)
-  expect_true(TRUE)
 })
 
 # ---------------------------------------------------------------------------
 # Chancellor, 1997 (HIV) with PSA and Briggs exercises 2.5 and 4.7 
+# ** This is a bad example because Briggs et al have converted a table of
+# ** observed transitions (Table 2.5, p38) into probabilities. They should
+# ** have followed the method of Welton and Ades (2005) which describes how to
+# ** convert fully observed transitions into rates. It has the consequence of
+# ** an unusual usage of the Dirichlet distributions, which should have been
+# ** used only for the conditionals. For future releases, consider leaving
+# ** the validation case as a point estimate only and choosing a different
+# ** validation example for PSA.
 # ---------------------------------------------------------------------------
 test_that("redecision replicates Briggs' example 4.7", {
   #
@@ -731,7 +761,7 @@ test_that("redecision replicates Briggs' example 4.7", {
   cAc <- ExprModVar$new("cAc", "GBP", rlang::quo(dmca+ccca+cAZT+cLam))
   cBc <- ExprModVar$new("cBc", "GBP", rlang::quo(dmcb+cccb+cAZT+cLam))
   cCc <- ExprModVar$new("cCc", "GBP", rlang::quo(dmcc+cccc+cAZT+cLam))
-  #
+  #  
   # Markov model
   # ============
   # states (leave all costs as zero initially)
@@ -764,17 +794,12 @@ test_that("redecision replicates Briggs' example 4.7", {
     "Tx effect", "RR", p1=0.509, p2=(0.710-0.365)/(2*1.96), "LN7"
   )
   #
-  # Dirichlet distributions for transition probabilities
-  # ====================================================
-  # transitions from A
-  nA <- c(1251, 350, 116, 17)       # transitions, people per year
-  DA <- DirichletDistribution$new(nA)
-  # transitions from B
-  nB <- c(731,512,15)               # transitions, people per year
-  DB <- DirichletDistribution$new(nB)
-  # transitions from C
-  nC <- c(1312,437)                 # transitions, people per year
-  DC <- DirichletDistribution$new(nC)
+  # Dirichlet distributions for conditional probabilities
+  # =====================================================
+  DA <- DirichletDistribution$new(c(1251, 350, 116, 17)) # from A
+  DB <- DirichletDistribution$new(c(731,512,15))  # from B
+  DC <- DirichletDistribution$new(c(1312,437)) # from C
+  
   #
   # Function to estimate life years gained and costs
   # ================================================

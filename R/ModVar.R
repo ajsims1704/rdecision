@@ -28,8 +28,8 @@ ModVar <- R6::R6Class(
   public = list(
     
     #' @description Create an object of type \code{ModVar}.
-    #' @details A ModVar is associated with an uncertainty distribution (a
-    #' "has-a" relationship in object-oriented terminology). There can be a
+    #' @details A \code{ModVar} is associated with an uncertainty distribution
+    #' (a "has-a" relationship in object-oriented terminology). There can be a
     #' 1-1 mapping of \code{ModVar}s to \code{Distribution}s, or several
     #' model variables can be linked to the same distribution in a
     #' many-1 mapping, e.g. when each transition probability from a Markov state
@@ -98,17 +98,16 @@ ModVar <- R6::R6Class(
       return(invisible(self))
     },
 
-    #' @description 
-    #' Is this \code{ModVar} an expression?
+    #' @description Is this \code{ModVar} an expression?
     #' @return \code{TRUE} if it inherits from \code{ExprModVar}, \code{FALSE}
     #' otherwise.
     is_expression = function() {
       return(inherits(self, what="ExprModVar"))
     },
 
-    #' @description 
-    #' Tests whether the model variable is probabilistic, i.e. a random
-    #' variable that follows a distribution, or an expression involving
+    #' @description Is the model variable probabilistic?
+    #' @details Tests whether the model variable is probabilistic, i.e. a 
+    #' random variable that follows a distribution, or an expression involving
     #' random variables, some of which follow distributions. 
     #' @return \code{TRUE} if probabilistic
     is_probabilistic = function() {
@@ -127,40 +126,45 @@ ModVar <- R6::R6Class(
       return(private$.units)
     },
     
-    #' @description Accessor function for the name of the uncertainty 
-    #' distribution.
+    #' @description Name and parameters of the uncertainty distribution.
+    #' @details If \eqn{K > 1} the dimension of the distribution associated 
+    #' with this model variable is appended, e.g. \code{Dir(2,3)[1]} 
+    #' means that the model variable is associated with the first dimension 
+    #' of a 2D Dirichlet distribution with alpha parameters 2 and 3.
     #' @return Distribution name as character string.
     distribution = function() {
-      return(private$.D$distribution())
+      dname <- private$.D$distribution()
+      if (private$.D$order() > 1) {
+        dname <- paste(dname,"[",private$.k,"]",sep='')
+      }
+      return(dname)
     },
     
-    #' @description 
-    #' Return the mean value of the model variable. 
+    #' @description Mean value of the model variable. 
     #' @return Mean value as a numeric value.
     mean = function() {
       mvmean <- private$.D$mean()
       return(mvmean[private$.k])
     },
     
-    #' @description 
-    #' Return the mode of the variable. By default returns \code{NA}, which 
-    #' will be the case for most \code{ExprModVar} variables, because an 
-    #' arbitrary expression is not guaranteed to be unimodal.
+    #' @description The mode of the variable.
+    #' @details By default returns \code{NA}, which will be the case for 
+    #' most \code{ExprModVar} variables, because an arbitrary expression is 
+    #' not guaranteed to be unimodal.
     #' @return Mode as a numeric value.
     mode = function() {
       mvmode <- private$.D$mode()
       return(mvmode[private$.k])
     },
 
-    #' @description 
-    #' Return the standard deviation of the model variable. 
+    #' @description Standard deviation of the model variable. 
     #' @return Standard deviation as a numeric value
     SD = function() {
       mvsd <- private$.D$SD()
       return(mvsd[private$.k])
     },
     
-    #' @description Find quantiles of the uncertainty distribution. 
+    #' @description Quantiles of the uncertainty distribution. 
     #' @param probs Numeric vector of probabilities, each in range [0,1].
     #' @return Vector of numeric values of the same length as \code{probs}.
     quantile = function(probs) {
@@ -180,7 +184,6 @@ ModVar <- R6::R6Class(
     #' called to force a resample.
     #' @return A sample drawn at random.
     r = function() {
-#      .Deprecated("set('random')")
       # fetch the sample from the distribution
       rd <- private$.D$r()
       # get random sample for this dimension
@@ -193,8 +196,8 @@ ModVar <- R6::R6Class(
       return(rv)
     },
 
-    #' @description Sets the value of the \code{ModVar} that will be returned
-    #' by subsequent
+    #' @description Sets the value of the \code{ModVar}.
+    #' @details Defines what will be returned' by subsequent
     #' calls to \code{get()} until \code{set()} is called again. 
     #' @param what Character: one of \code{"random"} (samples from the 
     #' uncertainty distribution), \code{"expected"} (mean), \code{"q2.5"}
@@ -244,8 +247,8 @@ ModVar <- R6::R6Class(
       return(invisible(self))
     },
     
-    #' @description
-    #' Gets the value of the \code{ModVar} that was set by the most recent call
+    #' @description Get the value of the \code{ModVar}.
+    #' @details Returns the value defined by the most recent call
     #' to \code{set()}.
     #' @return Value determined by last \code{set()}.
     get = function() {
