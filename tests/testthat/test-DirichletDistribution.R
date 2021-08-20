@@ -49,6 +49,24 @@ test_that("SD is NA for a multivariate distribution", {
   expect_true(all(is.na(D$SD())))
 })
 
+test_that("quantile function checks inputs and has correct output", {
+  alpha <- c(3, 12, 9)
+  x <- DirichletDistribution$new(alpha=alpha)
+  probs <- c(0.1, 0.2, 0.5)
+  expect_silent(x$quantile(probs))
+  probs <- c(0.1, NA, 0.5)
+  expect_error(x$quantile(probs), class="probs_not_defined")
+  probs <- c(0.1, "boo", 0.5)
+  expect_error(x$quantile(probs), class="probs_not_numeric")
+  probs <- c(0.1, 0.4, 1.5)
+  expect_error(x$quantile(probs), class="probs_out_of_range")
+  probs <- c(0.1, 0.2, 0.5, 0.9)
+  q <- x$quantile(probs)
+  expect_true(is.matrix(q))
+  expect_equal(ncol(q),3)
+  expect_equal(nrow(q),4)
+})
+
 test_that("marginal quantiles are from Beta distributions", {
   # create distribution
   alpha <- c(3, 12, 9)

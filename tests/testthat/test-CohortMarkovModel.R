@@ -105,6 +105,34 @@ test_that("unconnected underlying graphs are detected", {
   )  
 })
 
+test_that("invalid discount rates are detected", {
+  s.well <- MarkovState$new("Well")
+  s.disabled <- MarkovState$new("Disabled")
+  s.dead <- MarkovState$new("Dead")
+  e.ww <- MarkovTransition$new(s.well, s.well)
+  e.wd <- MarkovTransition$new(s.well, s.dead)
+  e.ws <- MarkovTransition$new(s.well, s.disabled)
+  e.sd <- MarkovTransition$new(s.disabled, s.dead)
+  e.dd <- MarkovTransition$new(s.dead, s.dead)
+  expect_error(
+    CohortMarkovModel$new(
+      V = list(s.well, s.disabled, s.dead),
+      E = list(e.ww, e.wd, e.ws, e.sd, e.dd),
+      discount.cost = "0"
+    ), 
+    class="invalid_discount"
+  )  
+  expect_error(
+    CohortMarkovModel$new(
+      V = list(s.well, s.disabled, s.dead),
+      E = list(e.ww, e.wd, e.ws, e.sd, e.dd),
+      discount.utility = "0"
+    ), 
+    class="invalid_discount"
+  )  
+  
+})
+
 # ---------------------------------------------------------------------------
 # tests of setting and getting rates
 # ---------------------------------------------------------------------------
@@ -193,6 +221,8 @@ test_that("probabilities are calculated from rates correctly", {
   # check the transition rate matrix values
   EQ <- matrix(c(-2.6,2,0.5,0.1,0,0,0,0,0,0,0,0,0,0,0,0), nrow=4, byrow=TRUE)
   expect_true(all(abs(Q-EQ)<0.001))
+  # check that illegal cycle times are rejected
+  expect_error(M$transition_probability(42))
   # test the per-year probability
   tcycle <- as.difftime(365.25, units="days")
   Pt <- M$transition_probability(tcycle)
@@ -234,28 +264,35 @@ test_that("rates are calculated from probabilities correctly", {
     V = list(s.well, s.disabled, s.dead),
     E = list(e.ww, e.ss, e.dd, e.ws, e.wd, e.sd)
   )
+  # save state names for convenience
+  state.names <- c("Well", "Disabled", "Dead")
   # no Pt
   expect_error(M$set_rates(), class="invalid_Pt")
+  # non matrix
+  expect_error(M$set_rates(42), class="invalid_Pt")
   # Pt wrong size
   EPt <- matrix(c(1,0,0,0),nrow=2,byrow=TRUE)
   expect_error(M$set_rates(EPt), class="invalid_Pt")
   # Pt with missing value
   EPt <- matrix(c(0.6,NA,0.2,0,0.6,0.4,0,0,1),nrow=3,byrow=TRUE)
+  dimnames(EPt) <- list(source=state.names, target=state.names)
   expect_error(M$set_rates(EPt), class="invalid_Pt")
   # Pt has element > 1
   EPt <- matrix(c(0.6,2,0.2,0,0.6,0.4,0,0,1),nrow=3,byrow=TRUE)
+  dimnames(EPt) <- list(source=state.names, target=state.names)
   expect_error(M$set_rates(EPt), class="invalid_Pt")
   # Pt has row sums exceeding 1
   EPt <- matrix(c(0.6,0.2,0.3,0,0.6,0.4,0,0,1),nrow=3,byrow=TRUE)
+  dimnames(EPt) <- list(source=state.names, target=state.names)
   expect_error(M$set_rates(EPt), class="invalid_Pt")
   # Pt has non-zero probabilities for disallowed transitions
   EPt <- matrix(c(0.6,0.2,0.2,0.2,0.4,0.4,0,0,1),nrow=3,byrow=TRUE)
+  dimnames(EPt) <- list(source=state.names, target=state.names)
   expect_error(M$set_rates(EPt), class="invalid_Pt")
   # Pt has no labels
   EPt <- matrix(c(0.6,0.2,0.2,0,0.6,0.4,0,0,1),nrow=3,byrow=TRUE)
   expect_error(M$set_rates(EPt), class="invalid_Pt")
   # Pt has partly missing labels
-  state.names <- c("Well", "Disabled", "Dead")
   dimnames(EPt) <- list(source=state.names, target=NULL)
   expect_error(M$set_rates(EPt), class="invalid_Pt")
   dimnames(EPt) <- list(source=NULL, target=state.names)
@@ -412,6 +449,12 @@ test_that("model is cyclable", {
       "QALY")
   )
   expect_equal(nrow(DF),3)
+  # detect illegal parameters to cycle()
+  expect_error(M$cycle(tcycle=42), class="invalid_cycle_length")
+  expect_error(M$cycle(hcc.pop=3), class="invalid_hcc")
+  expect_error(M$cycle(hcc.cost=3), class="invalid_hcc")
+  expect_error(M$cycle(hcc.pop=FALSE,hcc.cost=TRUE), class="invalid_hcc")
+  
 })
 
 test_that("cycle time increments and resets correctly", {
@@ -698,6 +741,10 @@ test_that("rdecision replicates Sonnenberg & Beck, Fig 3", {
   )
   # create the model
   M <- CohortMarkovModel$new(V = list(s.well, s.disabled, s.dead), E)
+  # check the state tabulation
+  ST <- M$tabulate_states()
+  expect_setequal(names(ST), c("Name", "Cost", "Utility"))
+  expect_equal(nrow(ST),3)
   # create transition probability matrix
   snames <- c("Well","Disabled","Dead")
   EPt <- matrix(

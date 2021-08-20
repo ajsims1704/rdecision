@@ -1,11 +1,10 @@
 #' @title \verb{ModVar} class
 #' 
-#' @description An R6 class for a variable in an health economic model
+#' @description An R6 class for a variable in a health economic model
 #' 
 #' @details Base class for a variable used in a health economic model. The base 
-#' class, which is not intended to be directly instantiated by model
-#' applications, wraps a numerical value which is used in calculations.
-#' The base class provides a framework for creating classes of model
+#' class wraps a numerical value which is used in calculations.
+#' It provides a framework for creating classes of model
 #' variables whose uncertainties are described by statistical distributions
 #' parametrized with hyperparameters.
 #' 

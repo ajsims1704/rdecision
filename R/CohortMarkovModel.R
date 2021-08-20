@@ -192,13 +192,13 @@ CohortMarkovModel <- R6::R6Class(
       }
       # check and set discounts
       if (!is.numeric(discount.cost)) {
-        rlang.abort(
+        rlang::abort(
           "Discount rate must be numeric", class="invalid_discount"
         )
       }
       private$cmm.discost <- discount.cost
       if (!is.numeric(discount.utility)) {
-        rlang.abort(
+        rlang::abort(
           "Discount rate must be numeric", class="invalid_discount"
         )
       }
@@ -276,7 +276,12 @@ CohortMarkovModel <- R6::R6Class(
         rlang::abort("Pt is missing, without default", class="invalid_Pt")
       }
       if (!is.matrix(Pt)) {
-        rlang::abort("'Pt' must be a matrix")
+        rlang::abort("'Pt' must be a matrix", class="invalid_Pt")
+      }
+      if ((nrow(Pt)!=self$order() || ncol(Pt)!=self$order())) {
+        rlang::abort(
+          paste("'Pt' must have size", self$order(), "by", self$order()),
+          class = "invalid_Pt")
       }
       if (!setequal(self$get_statenames(), dimnames(Pt)[[1]])) {
         rlang::abort(

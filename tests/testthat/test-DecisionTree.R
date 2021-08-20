@@ -256,6 +256,10 @@ test_that("rdecision replicates Evans et al, Sumatriptan base case", {
     lambda=60839, tol=0.0001
   )
   expect_intol(pt, p.caffeine.relief+0.091, tol=0.02)
+  # tornado plot
+  TO <- dt$tornado(index=list(e17),ref=list(e18),outcome="ICER",draw=FALSE)
+  print("")
+  print(TO)
 })
 
 # -----------------------------------------------------------------------------

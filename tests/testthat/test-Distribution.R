@@ -62,6 +62,20 @@ test_that("sd has the correct length", {
   expect_length(D$SD(),1)
 })
 
+test_that("varcov matrix has correct properties", {
+  # univariate
+  D <- Distribution$new("Base", K=as.integer(1))
+  VC <- D$varcov()
+  expect_false(is.matrix(VC))
+  expect_true(is.numeric(VC))
+  # multivariate
+  D <- Distribution$new("Base", K=as.integer(3))
+  VC <- D$varcov()
+  expect_true(is.matrix(VC))
+  expect_equal(nrow(VC), 3)
+  expect_equal(ncol(VC), 3)
+})
+
 # --------------------------------------------------------------------------
 # tests of quantiles
 # --------------------------------------------------------------------------

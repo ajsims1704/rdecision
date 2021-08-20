@@ -141,6 +141,7 @@ test_that("modvars can be associated with a dimension of a multivariate dist", {
     stats::qbeta(p=0.5, shape1=1, shape2=9)
   )
   expect_equal(m1$distribution(), "Dir(1,9)[1]")
+  expect_equal(m1$r(), 1/10)   # initialized to mean()
   # create a ModVar and associate it with the second dimension
   m2 <- ModVar$new("p(failure)", "P", D=D, k=as.integer(2))
   expect_equal(m2$mean(), 9/10)
@@ -149,6 +150,7 @@ test_that("modvars can be associated with a dimension of a multivariate dist", {
     stats::qbeta(p=0.5, shape1=9, shape2=1)
   )
   expect_equal(m2$distribution(), "Dir(1,9)[2]")
+  expect_equal(m2$r(), 9/10)   # initialized to mean()
   # access distributional values via get()
   m1$set("expected")
   expect_equal(m1$get(), 1/10)

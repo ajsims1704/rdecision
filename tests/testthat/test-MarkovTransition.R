@@ -7,6 +7,7 @@ test_that("initialize parameters are checked", {
   expect_error(MarkovTransition$new(s1,s2,r,label=42), class="non-string_label")
   n1 <- Node$new()
   expect_error(MarkovTransition$new(n1,s2,r), class="invalid_source")
+  expect_error(MarkovTransition$new(s1,n1,r), class="invalid_target")
   expect_silent(MarkovTransition$new(s1,s2,r))
   expect_error(MarkovTransition$new(s1,s2,"0.5"), class="invalid_rate")
   expect_error(MarkovTransition$new(s1,s2,r,cost="200"), class="invalid_cost")
