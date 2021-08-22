@@ -66,7 +66,11 @@ test_that("random sampling is from a log normal distribution", {
   sigma <- 0.25
   n <- 1000
   ln <- LogNormModVar$new("ln", "GBP", mu, sigma, "LN1")
-  samp <- ln$r(n)
+  samp <- sapply(1:n, FUN=function(i) {
+    ln$set("random")
+    rv <- ln$get()
+    return(rv)
+  })
   expect_length(samp, n)
   # expect sample mean and sd to fall within 99.9% CI; test
   # expected to fail 0.1% of the time, exclude from CRAN

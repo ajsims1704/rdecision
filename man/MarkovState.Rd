@@ -4,12 +4,15 @@
 \name{MarkovState}
 \alias{MarkovState}
 \title{\verb{MarkovState} class}
+\value{
+Updated \code{MarkovState} object
+}
 \description{
 An R6 class for a state in a Markov model.
 }
 \details{
-Represents a single state in a Markov model. A Markov model is a digraph
-in which states are nodes and transitions are arrows.
+Represents a single state in a Markov model. A Markov model is 
+a digraph in which states are nodes and transitions are arrows.
 }
 \author{
 Andrew J. Sims \email{andrew.sims@newcastle.ac.uk}
@@ -21,10 +24,11 @@ Andrew J. Sims \email{andrew.sims@newcastle.ac.uk}
 \subsection{Public methods}{
 \itemize{
 \item \href{#method-new}{\code{MarkovState$new()}}
-\item \href{#method-get_name}{\code{MarkovState$get_name()}}
+\item \href{#method-name}{\code{MarkovState$name()}}
 \item \href{#method-set_cost}{\code{MarkovState$set_cost()}}
-\item \href{#method-get_cost}{\code{MarkovState$get_cost()}}
-\item \href{#method-get_utility}{\code{MarkovState$get_utility()}}
+\item \href{#method-cost}{\code{MarkovState$cost()}}
+\item \href{#method-utility}{\code{MarkovState$utility()}}
+\item \href{#method-modvars}{\code{MarkovState$modvars()}}
 \item \href{#method-clone}{\code{MarkovState$clone()}}
 }
 }
@@ -42,7 +46,7 @@ Andrew J. Sims \email{andrew.sims@newcastle.ac.uk}
 \subsection{Method \code{new()}}{
 Create an object of type \code{MarkovState}.
 \subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{MarkovState$new(name, cost = 0, utility = 1)}\if{html}{\out{</div>}}
+\if{html}{\out{<div class="r">}}\preformatted{MarkovState$new(name, cost = as.numeric(NA), utility = 1)}\if{html}{\out{</div>}}
 }
 
 \subsection{Arguments}{
@@ -50,23 +54,33 @@ Create an object of type \code{MarkovState}.
 \describe{
 \item{\code{name}}{The name of the state (character string).}
 
-\item{\code{cost}}{The annual cost of state occupancy.}
+\item{\code{cost}}{The annual cost of state occupancy (numeric or 
+\code{ModVar}). Set
+as \code{NA} by default to help distinguish costs to be set with 
+\code{set_cost} in future from those deliberately set to zero.}
 
-\item{\code{utility}}{The utility associated with being in the state.}
+\item{\code{utility}}{The utility associated with being in the state (numeric
+or \code{ModVar}).}
 }
 \if{html}{\out{</div>}}
 }
+\subsection{Details}{
+Utility must be in the range \code{[-Inf,1]}. If it is of type 
+numeric,
+the range is checked on object creation.
+}
+
 \subsection{Returns}{
 An object of type \code{MarkovState}.
 }
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-get_name"></a>}}
-\if{latex}{\out{\hypertarget{method-get_name}{}}}
-\subsection{Method \code{get_name()}}{
+\if{html}{\out{<a id="method-name"></a>}}
+\if{latex}{\out{\hypertarget{method-name}{}}}
+\subsection{Method \code{name()}}{
 Accessor function to retrieve the state name.
 \subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{MarkovState$get_name()}\if{html}{\out{</div>}}
+\if{html}{\out{<div class="r">}}\preformatted{MarkovState$name()}\if{html}{\out{</div>}}
 }
 
 \subsection{Returns}{
@@ -77,7 +91,7 @@ State name.
 \if{html}{\out{<a id="method-set_cost"></a>}}
 \if{latex}{\out{\hypertarget{method-set_cost}{}}}
 \subsection{Method \code{set_cost()}}{
-Sets the annual cost of state occupancy.
+Set the annual occupancy cost
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{MarkovState$set_cost(cost)}\if{html}{\out{</div>}}
 }
@@ -85,21 +99,18 @@ Sets the annual cost of state occupancy.
 \subsection{Arguments}{
 \if{html}{\out{<div class="arguments">}}
 \describe{
-\item{\code{cost}}{Annual cost of occupying the state; numeric.}
+\item{\code{cost}}{The annual cost of state occupancy}
 }
 \if{html}{\out{</div>}}
 }
-\subsection{Returns}{
-Updated MarkovState object.
-}
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-get_cost"></a>}}
-\if{latex}{\out{\hypertarget{method-get_cost}{}}}
-\subsection{Method \code{get_cost()}}{
+\if{html}{\out{<a id="method-cost"></a>}}
+\if{latex}{\out{\hypertarget{method-cost}{}}}
+\subsection{Method \code{cost()}}{
 Gets the annual cost of state occupancy.
 \subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{MarkovState$get_cost()}\if{html}{\out{</div>}}
+\if{html}{\out{<div class="r">}}\preformatted{MarkovState$cost()}\if{html}{\out{</div>}}
 }
 
 \subsection{Returns}{
@@ -107,16 +118,40 @@ Annual cost; numeric.
 }
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-get_utility"></a>}}
-\if{latex}{\out{\hypertarget{method-get_utility}{}}}
-\subsection{Method \code{get_utility()}}{
+\if{html}{\out{<a id="method-utility"></a>}}
+\if{latex}{\out{\hypertarget{method-utility}{}}}
+\subsection{Method \code{utility()}}{
 Gets the utility associated with the state.
 \subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{MarkovState$get_utility()}\if{html}{\out{</div>}}
+\if{html}{\out{<div class="r">}}\preformatted{MarkovState$utility()}\if{html}{\out{</div>}}
+}
+
+\subsection{Details}{
+If the state utility is a \code{ModVar} and its sampled
+value exceeds 1, a warning is issued.
 }
 
 \subsection{Returns}{
 Utility; numeric.
+}
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-modvars"></a>}}
+\if{latex}{\out{\hypertarget{method-modvars}{}}}
+\subsection{Method \code{modvars()}}{
+Find all the model variables.
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{MarkovState$modvars()}\if{html}{\out{</div>}}
+}
+
+\subsection{Details}{
+Find variables of type \code{ModVar} that have been 
+specified as values associated with this \code{MarkovState}. 
+Includes operands of these \code{ModVar}s, if they are expressions.
+}
+
+\subsection{Returns}{
+A list of \code{ModVar}s.
 }
 }
 \if{html}{\out{<hr>}}

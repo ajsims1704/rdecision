@@ -73,7 +73,11 @@ test_that("random sampling is from a Gamma distribution", {
   theta <- 0.5
   n <- 1000
   g <- GammaModVar$new("gamma", "GBP", k, theta)
-  samp <- g$r(n)
+  samp <- sapply(1:n, FUN=function(i) {
+    g$set("random")
+    rv <- g$get()
+    return(rv)
+  })
   expect_length(samp, n)
   # 99.9% confidence limits; expected test failure rate is 0.1%;
   # skip for CRAN

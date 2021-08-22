@@ -4,26 +4,24 @@
 \name{CohortMarkovModel}
 \alias{CohortMarkovModel}
 \title{\verb{CohortMarkovModel}}
-\value{
-A square matrix of size equal to the number of states. If all
-states are labelled, the dimnames take the names of the states.
-}
 \description{
 An R6 class for a Markov model with cohort simulation.
 }
 \details{
 A class to represent a Markov model, using cohort simulation. In 
 graph theory terms, a Markov model is a directed multidigraph permitting 
-loops (a loop multidigraph), optionally labelled, or \dfn{quiver}. It is a
+loops (a loop multidigraph), optionally labelled, or a \dfn{quiver}. It is a
 multidigraph because there are potentially two edges between each pair of
 nodes {A,B} representing the transition probabilities from A to B and 
 \emph{vice versa}. It is a directed graph because the transition
 rates refer to transitions in one direction. Each edge can be optionally
-labelled. It permits loops (edges whose source and target are the same node)
-to represent patients that remain in the same state between cycles.
+labelled. It permits self-loops (edges whose source and target are the same 
+node) to represent patients that remain in the same state between cycles.
 }
-\section{Probabilities and rates}{
+\section{Transition rates and probabilities}{
 
+
+\subsection{Two state, one transition models}{
 To calculate per-cycle probabilities from rates, Briggs (2002) and
 Sonnenberg & Beck (1993) use the expression \eqn{p = 1-\exp(-rt)}, where 
 \eqn{r} is an instantaneous rate
@@ -36,10 +34,55 @@ to this differential equation, i.e. \eqn{N(t) = N e^{-r t}}, where \eqn{r}
 is the rate, or the reciprocal of the time constant. The expected number of 
 events \eqn{\hat{K}} which occur in interval \eqn{t} from a starting 
 population of \eqn{N} is \eqn{\hat{K} = N - N e^{-r t}}, or 
-\eqn{\hat{K} = Np}, where \eqn{p = 1-\exp(-r t)} is the probability with 
+\eqn{\hat{K} = Np}, where \eqn{p = 1-\exp(-r t)}, the probability with 
 which events arise during interval \eqn{t}. If instead a per-interval 
 probability is known, the rate is derived from the inverse relationship 
-\eqn{r = -\ln(1-p)/t}.
+\eqn{r = -\ln(1-p)/t}. Further details are available in Miller & Homan (1994)
+and Fleurence & Hollenbeak (2007).
+}
+
+\subsection{Multi-state, multi-transition models}{
+Consider a model with a starting state A, which has a self-loop, and three 
+absorbing states, B, C and D, with allowed transitions from A to B, A to C 
+and A to D only. Assume the transition rates (in units of per patient per
+year) are \eqn{r_{AB}=2}, \eqn{r_{AC}=0.5} and \eqn{r_{AD}=0.1}. Rates
+are additive, and the total rate of patients leaving state A is 2.6. Thus,
+the probability of leaving state A in one year is 
+\eqn{p_A = 1-e^{-2.6}=0.9257},
+and the probability of leaving in one month is \eqn{1-e^{-2.6/12}=0.1948}; 
+i.e. 93\% of patients will leave state A within 1 year, and 19\% will leave
+within one month. However, the individual transition probabilities per cycle
+\eqn{p_{AB}}, \eqn{p_{AC}} and \eqn{p_{AD}} must be calculated from the
+total per cycle probability (\eqn{p_A}) and the conditional probability for
+each transition. For example in one year, \eqn{p_{AB} = p_A * 2/2.6 = 0.712},
+\eqn{p_{AC} = p_A * 0.5/2.6 = 0.178}, \eqn{p_{AD} = p_A * 0.1/2.6 = 0.036}, 
+with \eqn{p_{AA} = 1-0.9257 = 0.074}. Applying the inverse relationship 
+described in the previous section to calculate individual probabilities 
+from individual rates is incorrect (i.e. \eqn{p_{AB} \ne 1 - e^{-r_{AB}t}})
+because people can experience more than one type of event in a single cycle.
+Further, the solution described here does not work when there are multiple
+states with multiple outgoing transitions. For this general case, the 
+per-cycle transition probability is the solution to Kolmogorov's forward and
+backward equations, and is given by the matrix exponential of the transition
+rate matrix multiplied by the cycle time (Jones 2017, Welton 2005). In 
+\pkg{rdecision}, matrix exponentiation is uses the \pkg{expm} package.
+}
+
+\subsection{Uncertainty in rates}{
+Welton and Ades (2005) describe a method for converting observed counts of 
+transitions into transition rates. They also provide a method for modelling
+uncertainties. Firstly, the total number of transitions from each state in 
+each time interval follows a Poisson distribution, and the uncertainty in 
+the rate from each state is represented by a Gamma distribution (because 
+Gamma is the conjugate prior of the Poisson distribution). Secondly, the
+conditional probabilities of the transitions from each state are modelled
+by a Dirichlet distribution. This is the preferred method in \pkg{rdecision}:
+create \code{ModVar}s for each per-state rate (\eqn{\lambda_i}), create a 
+Dirichlet distribution for each state; create model variables for each
+conditional probability (\eqn{\rho_{ij}}) linked to an applicable Dirichlet
+distribution; and finally create expression model variables for each rate
+\eqn{g_{ij}}.
+}
 }
 
 \references{
@@ -47,8 +90,23 @@ probability is known, the rate is derived from the inverse relationship
   Briggs A, Claxton K, Sculpher M. Decision modelling for health economic 
   evaluation. Oxford, UK: Oxford University Press; 2006.
   
+  Fleurence RL and Hollenbeak CS. Rates and probabilities in economic 
+  modelling. \emph{PharmacoEconomics}, 2007;\strong{25}:3--6. 
+  
+  Jones E, Epstein D and García-Mochón L. A procedure for deriving 
+  formulas to convert transition rates to probabilities for multistate
+  Markov models. \emph{Medical Decision Making} 2017;\strong{37}:779–789.
+
+  Miller DK and Homan SM. Determining transition probabilities: confusion
+  and suggestions. \emph{Medical Decision Making} 1994;\strong{14}:52-58. 
+  
   Sonnenberg FA, Beck JR. Markov models in medical decision making: a
-  practical guide. \emph{Med Decis Making}, 1993:\strong{13}:322. 
+  practical guide. \emph{Medical Decision Making}, 1993:\strong{13}:322.
+  
+  Welton NJ and Ades A. Estimation of Markov chain transition probabilities
+  and rates from fully and partially observed data: uncertainty
+  propagation, evidence synthesis, and model calibration. 
+  \emph{Medical Decision Making}, 2005;\strong{25}:633-645.
 }
 }
 \author{
@@ -61,7 +119,19 @@ Andrew J. Sims \email{andrew.sims@newcastle.ac.uk}
 \subsection{Public methods}{
 \itemize{
 \item \href{#method-new}{\code{CohortMarkovModel$new()}}
-\item \href{#method-transition_matrix}{\code{CohortMarkovModel$transition_matrix()}}
+\item \href{#method-transition_rate}{\code{CohortMarkovModel$transition_rate()}}
+\item \href{#method-set_rates}{\code{CohortMarkovModel$set_rates()}}
+\item \href{#method-transition_probability}{\code{CohortMarkovModel$transition_probability()}}
+\item \href{#method-transition_cost}{\code{CohortMarkovModel$transition_cost()}}
+\item \href{#method-get_statenames}{\code{CohortMarkovModel$get_statenames()}}
+\item \href{#method-reset}{\code{CohortMarkovModel$reset()}}
+\item \href{#method-get_populations}{\code{CohortMarkovModel$get_populations()}}
+\item \href{#method-get_elapsed}{\code{CohortMarkovModel$get_elapsed()}}
+\item \href{#method-tabulate_states}{\code{CohortMarkovModel$tabulate_states()}}
+\item \href{#method-cycle}{\code{CohortMarkovModel$cycle()}}
+\item \href{#method-cycles}{\code{CohortMarkovModel$cycles()}}
+\item \href{#method-modvars}{\code{CohortMarkovModel$modvars()}}
+\item \href{#method-modvar_table}{\code{CohortMarkovModel$modvar_table()}}
 \item \href{#method-clone}{\code{CohortMarkovModel$clone()}}
 }
 }
@@ -101,7 +171,7 @@ Andrew J. Sims \email{andrew.sims@newcastle.ac.uk}
 \subsection{Method \code{new()}}{
 Creates a Markov model for cohort simulation.
 \subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{CohortMarkovModel$new(V, E, tcycle = as.difftime(365.25, units = "days"))}\if{html}{\out{</div>}}
+\if{html}{\out{<div class="r">}}\preformatted{CohortMarkovModel$new(V, E, discount.cost = 0, discount.utility = 0)}\if{html}{\out{</div>}}
 }
 
 \subsection{Arguments}{
@@ -111,36 +181,440 @@ Creates a Markov model for cohort simulation.
 
 \item{\code{E}}{A list of edges (\code{MarkovTransition}s).}
 
-\item{\code{tcycle}}{Cycle length, expressed as an R \code{difftime} object; 
-default 1 year.}
+\item{\code{discount.cost}}{Annual discount rate for future costs.}
+
+\item{\code{discount.utility}}{Annual discount rate for future incremental
+utility.}
 }
 \if{html}{\out{</div>}}
 }
 \subsection{Details}{
 A Markov model must meet the following conditions:
 \enumerate{
+  \item It must have at least one node and at least one edge.
   \item All nodes must be of class \code{MarkovState};
   \item All edges must be of class \code{MarkovTransition};
   \item The nodes and edges must form a digraph whose underlying
   graph is connected;
-  \item Each non-absorbing state must have one outgoing transition
-   whose hazard rate is NULL.
+  \item Each state must have at least one outgoing transition (which
+  can be a self-loop);
+  \item For each state the sum of outgoing transition rates must be zero.
+  This ensures that the row sums of the transition rate matrix (\eqn{Q}) 
+  are zero, as required to solve Kolmogorov's forward and backward
+  equations. For convenience, one outgoing transition rate from each 
+  state may be set to NA when the \code{MarkovTransition}s are defined,
+  and these will be replaced in \eqn{Q} with a value that ensures the
+  row sums are zero (typically, rates for self loops would be set to 
+  NA). Transition rates in \eqn{Q} associated with transitions that are
+  not defined as edges in the graph are zero. Rates can be changed
+  between cycles, and this condition is checked at the point of cycling,
+  not at the point of model creation.
+  \item No two edges may share the same source and target nodes (i.e. 
+  the digraph may not have multiple edges). This is to ensure that there
+  are no more transitions than cells in the transition matrix.
 }
 }
 
 \subsection{Returns}{
-A \code{CohortMarkovModel} object.
+A \code{CohortMarkovModel} object. The population of the first
+state is set to 1000.
 }
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-transition_matrix"></a>}}
-\if{latex}{\out{\hypertarget{method-transition_matrix}{}}}
-\subsection{Method \code{transition_matrix()}}{
-Return the per-cycle transition matrix for the model.
+\if{html}{\out{<a id="method-transition_rate"></a>}}
+\if{latex}{\out{\hypertarget{method-transition_rate}{}}}
+\subsection{Method \code{transition_rate()}}{
+Transition rate matrix.
 \subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{CohortMarkovModel$transition_matrix()}\if{html}{\out{</div>}}
+\if{html}{\out{<div class="r">}}\preformatted{CohortMarkovModel$transition_rate()}\if{html}{\out{</div>}}
 }
 
+\subsection{Details}{
+Usually written as \eqn{Q}, the matrix of rates
+(in units of events per person per year) for the model, assuming a
+continuous time Markov chain. As per convention, each row sums to zero.
+}
+
+\subsection{Returns}{
+A square matrix of size equal to the number of states. If all
+states are labelled, the \code{dimname}s take the names of the states
+and the dimensions are labelled \code{source} and \code{target}.
+}
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-set_rates"></a>}}
+\if{latex}{\out{\hypertarget{method-set_rates}{}}}
+\subsection{Method \code{set_rates()}}{
+Sets transition rates from per-cycle probabilities.
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{CohortMarkovModel$set_rates(Pt, tcycle)}\if{html}{\out{</div>}}
+}
+
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{Pt}}{Per-cycle transition probability matrix. Formally, the
+solution of Kolmogorov's forward and backward equations. The row and 
+column labels must be the state names and each row must sum to one.
+Non-zero probabilities for undefined transitions are not allowed.}
+
+\item{\code{tcycle}}{The cycle time, in years, as a \code{difftime} object.}
+}
+\if{html}{\out{</div>}}
+}
+\subsection{Details}{
+When the per-cycle probabilities are available, rather than
+the transition rates, this function calculates and sets rates from 
+probabilities using the matrix log of the probabilities, via 
+package \pkg{expm}. It has the consequence of setting (overwriting) the
+rates in each \code{MarkovTransition}.
+}
+
+\subsection{Returns}{
+Updated \code{CohortMarkovModel} object
+}
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-transition_probability"></a>}}
+\if{latex}{\out{\hypertarget{method-transition_probability}{}}}
+\subsection{Method \code{transition_probability()}}{
+Per-cycle transition probability matrix for the model.
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{CohortMarkovModel$transition_probability(tcycle)}\if{html}{\out{</div>}}
+}
+
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{tcycle}}{Cycle length, expressed as an R \code{difftime} object.}
+}
+\if{html}{\out{</div>}}
+}
+\subsection{Details}{
+Checks that each state has at least one outgoing transition and
+that exactly one outgoing transition rate whose rate is NULL. The 
+transition probability matrix, usually written \eqn{P_t} is the solution
+to Kolmogorov's forward
+and backward equations, and is computed from the transition rate
+matrix using matrix exponentiation with the \pkg{expm} package.
+}
+
+\subsection{Returns}{
+A square matrix of size equal to the number of states. If all
+states are labelled, the dimnames take the names of the states.
+}
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-transition_cost"></a>}}
+\if{latex}{\out{\hypertarget{method-transition_cost}{}}}
+\subsection{Method \code{transition_cost()}}{
+Return the per-cycle transition costs for the model.
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{CohortMarkovModel$transition_cost()}\if{html}{\out{</div>}}
+}
+
+\subsection{Returns}{
+A square matrix of size equal to the number of states. If all
+states are labelled, the dimnames take the names of the states.
+}
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-get_statenames"></a>}}
+\if{latex}{\out{\hypertarget{method-get_statenames}{}}}
+\subsection{Method \code{get_statenames()}}{
+Returns a character list of state names.
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{CohortMarkovModel$get_statenames()}\if{html}{\out{</div>}}
+}
+
+\subsection{Returns}{
+List of the names of each state.
+}
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-reset"></a>}}
+\if{latex}{\out{\hypertarget{method-reset}{}}}
+\subsection{Method \code{reset()}}{
+Resets the model counters.
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{CohortMarkovModel$reset(
+  populations = NULL,
+  icycle = as.integer(0),
+  elapsed = as.difftime(0, units = "days")
+)}\if{html}{\out{</div>}}
+}
+
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{populations}}{A named vector of populations for
+the start of the state. The names should be the state names. 
+Due to the R implementation of matrix algebra, \code{populations} 
+must be a numeric type and is not restricted to being an integer. If 
+NULL, the population of the first state is set to 1000 and the others
+to zero.}
+
+\item{\code{icycle}}{Cycle number at which to start/restart.}
+
+\item{\code{elapsed}}{Elapsed time since the index (reference) time used for
+discounting as an R \code{difftime} object.}
+}
+\if{html}{\out{</div>}}
+}
+\subsection{Details}{
+Resets the state populations, next cycle number and elapsed time
+of the model. By default the model is returned to its ground state (1000
+people in the first state and zero in the others; next cycle is labelled
+zero; elapsed time (years) is zero). Any or all of these can be set via 
+this function. \code{icycle} is simply an integer counter label for each 
+cycle, \code{elapsed} sets the elapsed time in years from the index time
+from which discounting is assumed to apply.
+}
+
+\subsection{Returns}{
+Updated \code{CohortMarkovModel} object.
+}
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-get_populations"></a>}}
+\if{latex}{\out{\hypertarget{method-get_populations}{}}}
+\subsection{Method \code{get_populations()}}{
+Gets the occupancy of each state
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{CohortMarkovModel$get_populations()}\if{html}{\out{</div>}}
+}
+
+\subsection{Returns}{
+A numeric vector of populations, named with state names.
+}
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-get_elapsed"></a>}}
+\if{latex}{\out{\hypertarget{method-get_elapsed}{}}}
+\subsection{Method \code{get_elapsed()}}{
+Gets the current elapsed time.
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{CohortMarkovModel$get_elapsed()}\if{html}{\out{</div>}}
+}
+
+\subsection{Details}{
+The elapsed time is defined as the difference between the 
+current time in the model and an index time used as the reference
+time for applying discounting. By default the elapsed time starts at
+zero. It can be set directly by calling \code{reset}. It is incremented
+after each call to \code{cycle} by the cycle duration to the time at the
+end of the cycle (even if half cycle correction is used). Thus, via the
+\code{reset} and \code{cycle} methods, the time of each cycle relative 
+to the discounting index and its duration can be controlled arbitrarily.
+}
+
+\subsection{Returns}{
+Elapsed time as an R \code{difftime} object.
+}
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-tabulate_states"></a>}}
+\if{latex}{\out{\hypertarget{method-tabulate_states}{}}}
+\subsection{Method \code{tabulate_states()}}{
+Tabulation of states
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{CohortMarkovModel$tabulate_states()}\if{html}{\out{</div>}}
+}
+
+\subsection{Details}{
+Creates a data frame summary of each state in the model.
+}
+
+\subsection{Returns}{
+A data frame with the following columns:
+\describe{
+\item{Name}{State name}
+\item{Cost}{Annual cost of occupying the state}
+\item{Utility}{Incremental utility associated with being in the state.}
+}
+}
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-cycle"></a>}}
+\if{latex}{\out{\hypertarget{method-cycle}{}}}
+\subsection{Method \code{cycle()}}{
+Applies one cycle of the model.
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{CohortMarkovModel$cycle(
+  tcycle = as.difftime(365.25, units = "days"),
+  hcc.pop = TRUE,
+  hcc.cost = TRUE
+)}\if{html}{\out{</div>}}
+}
+
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{tcycle}}{Cycle length, expressed as an R \code{difftime} object; 
+default 1 year.}
+
+\item{\code{hcc.pop}}{Boolean; whether to apply half cycle correction to the
+population and QALY. If TRUE, the correction is only applied to the 
+outputs of 
+functions \code{cycle} and \code{cycles}; the state population passed to
+the next cycle is the end cycle population, obtainable 
+with \code{get_populations}.}
+
+\item{\code{hcc.cost}}{Boolean; whether to apply half cycle correction to the
+costs. If true, the occupancy costs are computed using the population
+at half cycle; if false they are applied at the end of the cycle. 
+Applicable only if \code{hcc.pop} is TRUE.}
+}
+\if{html}{\out{</div>}}
+}
+\subsection{Returns}{
+Calculated values, one row per state, as a data frame with the
+following columns:
+\describe{
+\item{\code{State}}{Name of the state.}
+\item{\code{Cycle}}{The cycle number.}
+\item{\code{Time}}{Clock time, years.}
+\item{\code{Population}}{Population of the state at the end of 
+the cycle, or at mid-cycle if half-cycle correction is applied.}
+\item{\code{OccCost}}{Cost of the population occupying the state for 
+the cycle. Discount is applied, if the options are set. The costs are
+normalized by the model population. The cycle costs are derived from the
+annual occupancy costs of the \code{MarkovState}s. Applied to the end
+population, i.e. unaffected by half cycle correction, as per 
+Briggs \emph{et al}.}
+\item{\code{EntryCost}}{Cost of the transitions \emph{into} the state
+during the cycle. Discounting is applied, if the option is set. 
+The result is normalized by the model population. The cycle costs
+are derived from \code{MarkovTransition} costs.}
+\item{\code{Cost}}{Total cost, normalized by model population.}
+\item{\code{QALY}}{Quality adjusted life years gained by occupancy of 
+the states during the cycle. Half cycle correction and discounting are 
+applied, if these options are set. Normalized by the model population.}
+}
+}
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-cycles"></a>}}
+\if{latex}{\out{\hypertarget{method-cycles}{}}}
+\subsection{Method \code{cycles()}}{
+Applies multiple cycles of the model.
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{CohortMarkovModel$cycles(
+  ncycles = 2,
+  tcycle = as.difftime(365.25, units = "days"),
+  hcc.pop = TRUE,
+  hcc.cost = TRUE
+)}\if{html}{\out{</div>}}
+}
+
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{ncycles}}{Number of cycles to run; default is 2.}
+
+\item{\code{tcycle}}{Cycle length, expressed as an R \code{difftime} object; 
+default 1 year.}
+
+\item{\code{hcc.pop}}{Boolean; whether to apply half cycle correction to the
+population and QALY. If TRUE, the correction is only applied to the 
+outputs of functions \code{cycle} and \code{cycles}; the state 
+population passed to
+the next cycle is the end cycle population, obtainable 
+with \code{get_populations}.}
+
+\item{\code{hcc.cost}}{Boolean; whether to apply half cycle correction to the
+costs. If true, the occupancy costs are computed using the population
+at half cycle; if false they are applied at the end of the cycle.
+Applicable only if \code{hcc.pop} is TRUE.}
+}
+\if{html}{\out{</div>}}
+}
+\subsection{Details}{
+The starting populations are redistributed through the
+transition probabilities and the state occupancy costs are
+calculated, using function \code{cycle}. The end populations are
+then fed back into the model for a further cycle and the
+process is repeated. For each cycle, the state populations and
+the aggregated occupancy costs are saved in one row of the
+returned data frame, with the cycle number. If the cycle count
+for the model is zero when called, the first cycle reported
+will be cycle zero, i.e. the distribution of patients to starting
+states.
+}
+
+\subsection{Returns}{
+Data frame with cycle results.
+following columns:
+\describe{
+\item{\code{Cycle}}{The cycle number.}
+\item{\code{Time}}{Elapsed time at end of cycle, years}
+\item{\code{<name>}}{Population of state \code{<name} at the end of
+the cycle.}
+\item{\code{Cost}}{Cost associated with occupancy and transitions between
+states during the cycle.}
+\item{\code{QALY}}{Quality adjusted life years associated with occupancy
+of the states in the cycle.}
+}
+}
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-modvars"></a>}}
+\if{latex}{\out{\hypertarget{method-modvars}{}}}
+\subsection{Method \code{modvars()}}{
+Find all the model variables in the Markov model.
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{CohortMarkovModel$modvars()}\if{html}{\out{</div>}}
+}
+
+\subsection{Details}{
+Returns variables of type \code{ModVar} that have been 
+specified as values associated with transition rates and costs and
+the state occupancy costs and utilities.
+}
+
+\subsection{Returns}{
+A list of \code{ModVar}s.
+}
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-modvar_table"></a>}}
+\if{latex}{\out{\hypertarget{method-modvar_table}{}}}
+\subsection{Method \code{modvar_table()}}{
+Tabulate the model variables in the Markov model.
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{CohortMarkovModel$modvar_table(expressions = TRUE)}\if{html}{\out{</div>}}
+}
+
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{expressions}}{A logical that defines whether expression model
+variables should be included in the tabulation.}
+}
+\if{html}{\out{</div>}}
+}
+\subsection{Returns}{
+Data frame with one row per model variable, as follows:
+\describe{
+\item{\code{Description}}{As given at initialization.}
+\item{\code{Units}}{Units of the variable.}
+\item{\code{Distribution}}{Either the uncertainty distribution, if
+it is a regular model variable, or the expression used to create it,
+if it is an \code{ExprModVar}.}
+\item{\code{Mean}}{Mean; calculated from means of operands if
+an expression.}
+\item{\code{E}}{Expectation; estimated from random sample if expression, 
+mean otherwise.}
+\item{\code{SD}}{Standard deviation; estimated from random sample if
+expression, exact value otherwise.}
+\item{\code{Q2.5}}{p=0.025 quantile; estimated from random sample if
+expression, exact value otherwise.}
+\item{\code{Q97.5}}{p=0.975 quantile; estimated from random sample if
+expression, exact value otherwise.}
+\item{\code{Est}}{TRUE if the quantiles and SD have been estimated by 
+random sampling.}
+}
+}
 }
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-clone"></a>}}

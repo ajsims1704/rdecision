@@ -1,6 +1,30 @@
 
-# rdecision 1.0.4.9000
+# rdecision 1.1.0
 
+* Added elementary Markov model vignette (Chancellor).
+* Added narrative to `CohortMarkovModel` to explain how `rdecision` manages 
+  transition rates and per-cycle probabilities. Cited work of Jones et al
+  (2017) and Welton (2005) which motivated the approach taken.
+* Added `set_rates` method to `CohorMarkovModel` to set transition rates from
+  a per-cycle transition probability matrix. Uses `logm` from `expm` package.
+* Added dependency to the `expm` package which provides matrix exponentiation
+  in converting transition rates to per-cycle probabilities.
+* Added multivariate `DirichletDistribution` class, mainly to support
+  PSA in Markov models.
+* Refactored model variable classes into much smaller convenience classes
+  with an underlying distribution. For example `BetaModVar` has a
+  `BetaDistribution` uncertainty.
+* Refactored `ModVar` with a "has-a" relationship to an underlying uncertainty
+  distribution. Incorporated ability to link several model variables to a 
+  common underlying distribution (for use with multinomial Dirichlet etc.).
+* Added distribution class `DiracDistribution`. 
+* Added subclasses of `Distribution` for each of the currently
+  supported distributions (Beta, Normal, Log Normal, Gamma).
+* Added base class `Distribution` to represent multivariate distributions.
+* Added single/combined therapy HIV vignette.
+* Added class `CohortMarkovModel` and its test script.
+* Added class `MarkovTransition` (inherits from `Node`) and its test script.
+* Added class `MarkovState` (inherits from `Edge`) and its test script.
 * Self loops in digraphs have a value of zero in the incidence matrix.
 
 # rdecision 1.0.4

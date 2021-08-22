@@ -49,7 +49,11 @@ test_that("random sampling is from a Normal distribution", {
   sigma <- 1
   sn <- NormModVar$new("sn", "GBP", mu, sigma)
   n <- 1000
-  samp <- sn$r(n)
+  samp <- sapply(1:n, FUN=function(i) {
+    sn$set("random")
+    rv <- sn$get()
+    return(rv)
+  })
   expect_length(samp, n)
   # check sample mean and sd are within 99.9% CI based on CLT; this is exact
   # for a normal, and is expected to fail for 0.1% of tests; skip for CRAN

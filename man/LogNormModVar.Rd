@@ -9,41 +9,8 @@ An R6 class for a model variable with Log Normal uncertainty
 }
 \details{
 A model variable for which the uncertainty in the point estimate can
-be modelled with a Log Normal distribution. 
-Swat (2017) defined seven parametrizations of the log normal distribution. 
-These are linked, allowing the parameters of any one to be derived from any 
-other. All 7 parametrizations require two parameters; their meanings are as 
-follows:
-\describe{
-\item{LN1}{\eqn{p_1=\mu}, \eqn{p_2=\sigma}, where \eqn{\mu} and \eqn{\sigma} 
-are the mean and standard deviation, both on the log scale.}
-\item{LN2}{\eqn{p_1=\mu}, \eqn{p_2=v}, where \eqn{\mu} and \eqn{v} are the
-mean and variance, both on the log scale.}
-\item{LN3}{\eqn{p_1=m}, \eqn{p_2=\sigma}, where \eqn{m} is the median on the
-natural scale and \eqn{\sigma} is the standard deviation on the log scale.}
-\item{LN4}{\eqn{p_1=m}, \eqn{p_2=c_v}, where \eqn{m} is the median on the
-natural scale and \eqn{c_v} is the coefficient of variation on the natural
-scale.}
-\item{LN5}{\eqn{p_1=\mu}, \eqn{p_2=\tau}, where \eqn{\mu} is the mean on the
-log scale and \eqn{\tau} is the precision on the log scale.}
-\item{LN6}{\eqn{p_1=m}, \eqn{p_2=\sigma_g}, where \eqn{m} is the median on
-the natural scale and \eqn{\sigma_g} is the geometric standard deviation on 
-the natural scale.}
-\item{LN7}{\eqn{p_1=\mu_N}, \eqn{p_2=\sigma_N}, where \eqn{\mu_N} is the mean
-on the natural scale and \eqn{\sigma_N} is the standard deviation on the
-natural scale.}
-}
-}
-\note{
-The log normal distribution may be used to model the uncertainty in 
-an estimate of relative risk (Briggs 2006, p90). If a relative risk 
-estimate is available with a 95\% confidence interval, the \verb{"LN7"} 
-parametrization
-allows the uncertainty distribution to be specified directly. For example, 
-if RR = 0.67 with 95\% confidence interval 0.53 to 0.84 (Leaper, 2016), it 
-can be modelled with
-\code{LogNormModVar$new("rr", "RR", p1=0.67, 
-p2=(0.84-0.53)/(2*1.96)), "LN7")}.
+be modelled with a Log Normal distribution. One of seven parametrizations
+defined by Swat et al can be used.
 }
 \references{
 { 
@@ -71,21 +38,21 @@ Andrew J. Sims \email{andrew.sims@newcastle.ac.uk}
 \itemize{
 \item \href{#method-new}{\code{LogNormModVar$new()}}
 \item \href{#method-is_probabilistic}{\code{LogNormModVar$is_probabilistic()}}
-\item \href{#method-distribution}{\code{LogNormModVar$distribution()}}
-\item \href{#method-r}{\code{LogNormModVar$r()}}
-\item \href{#method-mean}{\code{LogNormModVar$mean()}}
-\item \href{#method-mode}{\code{LogNormModVar$mode()}}
-\item \href{#method-SD}{\code{LogNormModVar$SD()}}
-\item \href{#method-quantile}{\code{LogNormModVar$quantile()}}
 \item \href{#method-clone}{\code{LogNormModVar$clone()}}
 }
 }
 \if{html}{
-\out{<details open ><summary>Inherited methods</summary>}
+\out{<details ><summary>Inherited methods</summary>}
 \itemize{
+\item \out{<span class="pkg-link" data-pkg="rdecision" data-topic="ModVar" data-id="SD">}\href{../../rdecision/html/ModVar.html#method-SD}{\code{rdecision::ModVar$SD()}}\out{</span>}
 \item \out{<span class="pkg-link" data-pkg="rdecision" data-topic="ModVar" data-id="description">}\href{../../rdecision/html/ModVar.html#method-description}{\code{rdecision::ModVar$description()}}\out{</span>}
+\item \out{<span class="pkg-link" data-pkg="rdecision" data-topic="ModVar" data-id="distribution">}\href{../../rdecision/html/ModVar.html#method-distribution}{\code{rdecision::ModVar$distribution()}}\out{</span>}
 \item \out{<span class="pkg-link" data-pkg="rdecision" data-topic="ModVar" data-id="get">}\href{../../rdecision/html/ModVar.html#method-get}{\code{rdecision::ModVar$get()}}\out{</span>}
 \item \out{<span class="pkg-link" data-pkg="rdecision" data-topic="ModVar" data-id="is_expression">}\href{../../rdecision/html/ModVar.html#method-is_expression}{\code{rdecision::ModVar$is_expression()}}\out{</span>}
+\item \out{<span class="pkg-link" data-pkg="rdecision" data-topic="ModVar" data-id="mean">}\href{../../rdecision/html/ModVar.html#method-mean}{\code{rdecision::ModVar$mean()}}\out{</span>}
+\item \out{<span class="pkg-link" data-pkg="rdecision" data-topic="ModVar" data-id="mode">}\href{../../rdecision/html/ModVar.html#method-mode}{\code{rdecision::ModVar$mode()}}\out{</span>}
+\item \out{<span class="pkg-link" data-pkg="rdecision" data-topic="ModVar" data-id="quantile">}\href{../../rdecision/html/ModVar.html#method-quantile}{\code{rdecision::ModVar$quantile()}}\out{</span>}
+\item \out{<span class="pkg-link" data-pkg="rdecision" data-topic="ModVar" data-id="r">}\href{../../rdecision/html/ModVar.html#method-r}{\code{rdecision::ModVar$r()}}\out{</span>}
 \item \out{<span class="pkg-link" data-pkg="rdecision" data-topic="ModVar" data-id="set">}\href{../../rdecision/html/ModVar.html#method-set}{\code{rdecision::ModVar$set()}}\out{</span>}
 \item \out{<span class="pkg-link" data-pkg="rdecision" data-topic="ModVar" data-id="units">}\href{../../rdecision/html/ModVar.html#method-units}{\code{rdecision::ModVar$units()}}\out{</span>}
 }
@@ -135,99 +102,6 @@ random variables, some of which follow distributions.
 
 \subsection{Returns}{
 \code{TRUE} if probabilistic
-}
-}
-\if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-distribution"></a>}}
-\if{latex}{\out{\hypertarget{method-distribution}{}}}
-\subsection{Method \code{distribution()}}{
-Accessor function for the name of the uncertainty distribution.
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{LogNormModVar$distribution()}\if{html}{\out{</div>}}
-}
-
-\subsection{Returns}{
-Distribution name as character string (\verb{"LN1"}, \verb{"LN2"}
-etc.).
-}
-}
-\if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-r"></a>}}
-\if{latex}{\out{\hypertarget{method-r}{}}}
-\subsection{Method \code{r()}}{
-Draw a random sample from the model variable.
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{LogNormModVar$r(n = 1)}\if{html}{\out{</div>}}
-}
-
-\subsection{Arguments}{
-\if{html}{\out{<div class="arguments">}}
-\describe{
-\item{\code{n}}{Number of samples to draw.}
-}
-\if{html}{\out{</div>}}
-}
-\subsection{Returns}{
-A sample drawn at random.
-}
-}
-\if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-mean"></a>}}
-\if{latex}{\out{\hypertarget{method-mean}{}}}
-\subsection{Method \code{mean()}}{
-Return the expected value of the distribution.
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{LogNormModVar$mean()}\if{html}{\out{</div>}}
-}
-
-\subsection{Returns}{
-Expected value as a numeric value.
-}
-}
-\if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-mode"></a>}}
-\if{latex}{\out{\hypertarget{method-mode}{}}}
-\subsection{Method \code{mode()}}{
-Return the point estimate of the variable.
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{LogNormModVar$mode()}\if{html}{\out{</div>}}
-}
-
-\subsection{Returns}{
-Point estimate (mode) of the log normal distribution.
-}
-}
-\if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-SD"></a>}}
-\if{latex}{\out{\hypertarget{method-SD}{}}}
-\subsection{Method \code{SD()}}{
-Return the standard deviation of the distribution.
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{LogNormModVar$SD()}\if{html}{\out{</div>}}
-}
-
-\subsection{Returns}{
-Standard deviation as a numeric value
-}
-}
-\if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-quantile"></a>}}
-\if{latex}{\out{\hypertarget{method-quantile}{}}}
-\subsection{Method \code{quantile()}}{
-Return the quantiles of the log normal uncertainty distribution.
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{LogNormModVar$quantile(probs)}\if{html}{\out{</div>}}
-}
-
-\subsection{Arguments}{
-\if{html}{\out{<div class="arguments">}}
-\describe{
-\item{\code{probs}}{Vector of probabilities, in range [0,1].}
-}
-\if{html}{\out{</div>}}
-}
-\subsection{Returns}{
-Vector of quantiles.
 }
 }
 \if{html}{\out{<hr>}}

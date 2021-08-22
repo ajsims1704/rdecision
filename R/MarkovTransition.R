@@ -24,16 +24,18 @@ MarkovTransition <- R6::R6Class(
     
     #' @description Create an object of type \code{MarkovTransition}. 
     #' @details A hazard rate must be assigned to the transition. Optionally,
-    #' a cost may be associated' with the transition.
+    #' a cost may be associated with the transition.
     #' @param source \code{MarkovState} from which the transition starts.
     #' @param target \code{MarkovState} to which the transition ends.
     #' @param r Instantaneous hazard rate in units of per patient per year.
-    #' Exactly one of the outgoing transitions from each state must be NULL.
-    #' @param cost Cost associated with the transition.
+    #' To meet the condition that the sum of the outgoing transition rates from
+    #' each state is zero, one transition rate from a state may be set to NA
+    #' when the model is defined. The default is NA.
+    #' @param cost Cost associated with the transition. 
     #' @param label Character string containing a label for the transition (the
     #' name of the event).
     #' @return A new \code{MarkovTransition} object.
-    initialize = function(source, target, r=NULL, cost=0, label="") {
+    initialize = function(source, target, r=as.numeric(NA), cost=0, label="") {
       # initialize base class
       super$initialize(source=source, target=target, label=label)
       # check that source inherits from MarkovState
@@ -51,18 +53,7 @@ MarkovTransition <- R6::R6Class(
         )
       }
       # check and set r, ensuring initialization
-      if (!is.null(r)) {
-        if (inherits(r, what="numeric")) {
-          private$transition.rate <- r
-        } else if (inherits(r, "ModVar")) {
-          private$transition.rate <- r
-        } else {
-          rlang::abort("Argument 'r' must be of type 'numeric' or 'ModVar'.",
-                       class = "invalid_rate")
-        }
-      } else {
-        private$transition.rate <- NULL
-      }
+      self$set_rate(r)
       # check and set cost, ensuring initialization
       if (inherits(cost, what="numeric")) {
         private$transition.cost <- cost
@@ -99,13 +90,27 @@ MarkovTransition <- R6::R6Class(
       return(unique(ov))
     },
 
-    #' @description Return the current value of the hazard rate.
+    #' @description Set the value of the transition rate
+    #' @param r Instantaneous hazard rate in units of per patient per year,
+    #' or NA (the default).
+    #' @return Updated \code{MarkovTransition} object.
+    set_rate = function(r=as.numeric(NA)) {
+      # check r and set private variable
+      if (inherits(r, what="numeric")) {
+        private$transition.rate <- r
+      } else if (inherits(r, "ModVar")) {
+        private$transition.rate <- r
+      } else {
+        rlang::abort("Argument 'r' must be of type 'numeric' or 'ModVar'.",
+                     class = "invalid_rate")
+      }
+      return(invisible(self))
+    },
+    
+    #' @description Return the value of the hazard rate.
     #' @return Numeric value.
     rate = function() {
-      r <- NA
-      if (is.null(private$transition.rate)) {
-        r <- as.numeric(NA)
-      } else if (inherits(private$transition.rate, what="ModVar")) {
+      if (inherits(private$transition.rate, what="ModVar")) {
         r <- private$transition.rate$get()
       } else {
         r <- private$transition.rate
@@ -116,10 +121,10 @@ MarkovTransition <- R6::R6Class(
     #' @description Return the cost associated with traversing the edge.
     #' @return Cost.
     cost = function() {
-      if (inherits(private$edge.cost, what="ModVar")) {
-        rv <- private$edge.cost$get()
+      if (inherits(private$transition.cost, what="ModVar")) {
+        rv <- private$transition.cost$get()
       } else {
-        rv <- private$edge.cost
+        rv <- private$transition.cost
       }
       return(rv)
     }

@@ -1,0 +1,283 @@
+---
+title: "Markov Model with transition costs (Willits 2012)"
+subtitle: "Cost impact of the WatchBP Home A used in primary healthcare"
+author: "Andrew J. Sims"
+date: "May 2021"
+output: 
+  rmarkdown::html_vignette:
+    fig_width: 7
+    fig_height: 5
+    fig_caption: true
+vignette: >
+  %\VignetteIndexEntry{Markov Model with transition costs (Willits 2012)}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+bibliography: "../inst/REFERENCES.bib"
+csl: "../inst/national-institute-of-health-research.csl"
+---
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  echo = FALSE,
+  fig.keep = "last",
+  fig.align = "center",
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+```{r setup, echo=F}
+library("rdecision")
+library("knitr")
+library("pander")
+```
+
+# Introduction
+This vignette describes a Markov model that was used to evaluate the cost 
+consequences of opportunistic screening for atrial fibrillation (AF) during
+clinic visits involving blood pressure measurement. It was first developed
+for the assessment of the WatchBP oscillometric blood pressure measurement
+device by the National Institute of Health and Care Excellence (NICE)
+[@willits2014a] and is described fully in a report that was published during
+the guidance development process [@willits2012a].
+
+The guidance report followed two cohorts, those aged 65-74 and those aged 
+75-84, to account for the age dependency in risk of AF. This vignette
+focuses on the older cohort.
+
+# Diagnostic phase
+```{r tree-vars, echo=FALSE}
+# sens and spec of index and comparator tests
+Sn.I <- 0.967
+Sp.I <- 0.888
+Sn.C <- 0.872
+Sp.C <- 0.813
+# prevalence
+prev <- 0.072
+# cohort size
+N <- 100000
+```
+The diagnostic phase was modelled as a decision tree in which the
+diagnostic
+test accuracies of the index technology (WatchBP) and the comparator technology 
+(pulse palpation) were used to estimate the proportions of the cohort falling
+into the true positive (TP), true negative (TN), false positive (FP) and false
+negative (FN) categories. These proportions were used to define the starting
+populations in the management phase (a Markov model) with a cohort size 
+of `r N`. In the diagnostic phase the prevalance of AF was `r prev`; WatchBP 
+had a sensitivity of `r Sn.I` and a specificity of `r Sp.I`; pulse palpation had 
+a sensitivity of `r Sn.C` and a specificity of `r Sp.C`.
+
+```{r tree, echo=FALSE}
+# index test branch
+TP.I <- LeafNode$new("TP")
+FN.I <- LeafNode$new("FN")
+cP.I <- ChanceNode$new()
+eTP.I <- Reaction$new(cP.I, TP.I, p=Sn.I, label="Test +ve")
+eFN.I <- Reaction$new(cP.I, FN.I, p=1-Sn.I, label="Test -ve")
+FP.I <- LeafNode$new("FP")
+TN.I <- LeafNode$new("TN")
+cN.I <- ChanceNode$new()
+eFP.I <- Reaction$new(cN.I, FP.I, p=1-Sp.I, label="Test +ve")
+eTN.I <- Reaction$new(cN.I, TN.I, p=Sp.I, label="Test -ve")
+c.I <- ChanceNode$new()
+eP.I <- Reaction$new(c.I, cP.I, p=prev, label="Has AF")
+eN.I <- Reaction$new(c.I, cN.I, p=1-prev, label="Does not have AF")
+# comparator test branch
+TP.C <- LeafNode$new("TP")
+FN.C <- LeafNode$new("FN")
+cP.C <- ChanceNode$new()
+eTP.C <- Reaction$new(cP.C, TP.C, p=Sn.C, label="Test +ve")
+eFN.C <- Reaction$new(cP.C, FN.C, p=1-Sn.C, label="Test -ve")
+FP.C <- LeafNode$new("FP")
+TN.C <- LeafNode$new("TN")
+cN.C <- ChanceNode$new()
+eFP.C <- Reaction$new(cN.C, FP.C, p=1-Sp.C, label="Test +ve")
+eTN.C <- Reaction$new(cN.C, TN.C, p=Sp.C, label="Test -ve")
+c.C <- ChanceNode$new()
+eP.C <- Reaction$new(c.C, cP.C, p=prev, label="Has AF")
+eN.C <- Reaction$new(c.C, cN.C, p=1-prev, label="Does not have AF")
+# decision node
+d <- DecisionNode$new("Test")
+e.I <- Action$new(d,c.I,label="WatchBP")
+e.C <- Action$new(d,c.C,label="PP")
+# tree
+DT <- DecisionTree$new(
+  V = list(
+    TP.I,FP.I,FN.I,TN.I,cP.I,cN.I,c.I,
+    TP.C,FP.C,FN.C,TN.C,cP.C,cN.C,c.C,
+    d),
+  E = list(
+    eTP.I,eFP.I,eFN.I,eTN.I,eP.I,eN.I,e.I,
+    eTP.C,eFP.C,eFN.C,eTN.C,eP.C,eN.C,e.C
+  )
+)
+```
+
+The number of patients predicted to be in each of the four categories for each
+test is shown in the table below.
+```{r tree-calc, echo=FALSE}
+DF <- DT$evaluate(by="path")
+DF$Population <- DF$Probability*N
+keep <- c("Leaf", "Test", "Population")
+pander::pander(DF[,keep])
+```
+
+# Management phase
+
+```{r cohorts, echo=FALSE}
+# CHADS and medic
+COHORT <- data.frame(
+  CHADS2 = c(1,1,2,3,4,5,6),
+  Tx = c("Aspirin", rep("Anticoagulant", times=6)),
+  pB = c(1.6, rep(1.4, times=6)),
+  pS = c(2.8, 2.8, 4.0, 5.9, 8.5, 12.5, 18.2),
+  SMR = rep(5.93, times=7),
+  pF1 = rep(36.5, rep=7),
+  pFN = rep(10.0, rep=7),
+  rr.S = c(0.78, rep(0.32, times=6))
+)
+```
+
+
+## Model structure
+A Markov model was constructed with six states (Fig 1): AF, GI bleed, stroke
+(year 1), stroke (subsequent years), fatal stroke and dead. The GI bleed state 
+was a tunnel state, which patients occupied for 1 cycle before returning to the
+AF state. Patients in this state have AF, and thus the same risk of stroke and
+death as patients in the AF state. The fatal stroke and dead states were
+absorbing states. The stroke 
+in year 1 had no self loop and thus a maximum occupancy of 1 cycle. The 
+transition rates and costs that will be set for each cohort are set to zero
+when each edge is created.
+
+```{r cm, echo=TRUE}
+# AF state
+AF <- MarkovState$new("AF")
+# disease states
+GB <- MarkovState$new("GIbleed")
+S1 <- MarkovState$new("StrokeY1")
+SN <- MarkovState$new("StrokeY2+")
+SF <- MarkovState$new("FatalStroke")
+DD <- MarkovState$new("Dead")
+# transitions from AF
+e.AFAF <- MarkovTransition$new(AF, AF, r=NULL)
+e.AFGB <- MarkovTransition$new(AF, GB, r=0)
+e.AFDD <- MarkovTransition$new(AF, DD, r=0)
+e.AFS1 <- MarkovTransition$new(AF, S1, r=0, cost=1)
+# transitions from GI bleed
+e.GBAF <- MarkovTransition$new(GB, AF, r=NULL)
+e.GBS1 <- MarkovTransition$new(GB, S1, r=0)
+e.GBDD <- MarkovTransition$new(GB, DD, r=0)
+# transitions from stroke, year 1
+e.S1SN <- MarkovTransition$new(S1, SN, r=NULL)
+e.S1SF <- MarkovTransition$new(S1, SF, r=0)
+e.S1DD <- MarkovTransition$new(S1, DD, r=0)
+# transitions from stroke, subsequent years
+e.SNSN <- MarkovTransition$new(SN, SN, r=NULL)
+e.SNSF <- MarkovTransition$new(SN, SF, r=0)
+e.SNDD <- MarkovTransition$new(SN, DD, r=0)
+# transitions from absorbing states
+e.DDDD <- MarkovTransition$new(DD, DD)
+e.SFSF <- MarkovTransition$new(SF, SF)
+# create model
+CM <- CohortMarkovModel$new(
+  V = list(AF, GB, DD, S1, SN, SF),
+  E = list(e.AFAF, e.AFGB, e.AFDD, e.AFS1, e.GBAF, e.GBDD, e.GBS1,
+           e.S1SF, e.S1SN, e.S1DD, 
+           e.SNSN, e.SNSF, e.SNDD, e.DDDD, e.SFSF),
+  hcc = FALSE,
+  tcycle = as.difftime(365.25/12, units="days")
+)
+```
+
+```{r caption, echo=FALSE}
+f1c  <- paste("Figure 1. Markov model for management of atrial fibrillation")
+```
+```{r draw, fig.cap=f1c}
+DOT <- CM$as_DOT()
+writeLines(DOT, con="WatchBP.gv")
+system2(command="dot", args=c("-Tpng","-o","WatchBP.png","WatchBP.gv"))
+knitr::include_graphics(path="WatchBP.png")
+```
+
+## Cohorts
+The model was run for several sub-cohorts, each defined by their CHADS2 score 
+and medication. The variables used in the model were: the annual probability of
+a major GI bleed due to aspirin or oral anticoagulant medication (`pB`); the
+annual probability of a stroke, based on CHADS2 risk (`pS`); the annual 
+probability of death due to all causes (`SMR`) for the age at the centre of the
+range; the proportion of strokes that are fatal in the first year (`pF1`); the
+proportion of strokes that are fatal in subsequent years (`pFN`) and the relative
+risk of stroke associated with medication (`rr.S`). These are shown in
+the table below (probabilities shown as percentages).
+
+```{r print-cohorts, echo=FALSE}
+pander::pander(
+  COHORT,
+  caption = "Characteristics of each sub-cohort."
+)
+```
+
+## An example cohort
+The transition rates were computed from the annual transition probabilities
+and set for each cohort. To illustrate, for patients in the the 75-84 year
+cohort with a CHADS2 score of 2 and who were treated with anticoagulant, the
+rates were set as follows:
+```{r egcohort, echo=TRUE}
+idx <- 4
+e.AFGB$set_rate(-log(1-COHORT[idx,"pB"]/100))
+e.AFDD$set_rate(-log(1-COHORT[idx,"SMR"]/100))
+p.stroke <- (COHORT[idx,"pS"]/100) * COHORT[idx,"rr.S"]
+r.stroke <- -log(1-p.stroke)/1
+e.AFS1$set_rate(r.stroke)
+e.GBS1$set_rate(r.stroke)
+e.GBDD$set_rate(-log(1-COHORT[idx,"SMR"]/100))
+e.S1SF$set_rate(-log(1-COHORT[idx,"pF1"]/100))
+e.S1DD$set_rate(-log(1-COHORT[idx,"SMR"]/100))
+e.SNSF$set_rate(-log(1-COHORT[idx,"pFN"]/100))
+e.SNDD$set_rate(-log(1-COHORT[idx,"SMR"]/100))
+```
+
+The per-cycle (annual) transition probability matrix for this cohort is as 
+follows:
+```{r tm, echo=FALSE}
+TM <- CM$transition_probability()
+TM <- cbind(TM, rowSums(TM))
+pander::pander(TM, emphasize.rownames=FALSE) #, justify="lcccccc")
+rm(TM)
+```
+
+Over ten years, the Markov trace is as follows:
+```{r egcohort-trace, echo=FALSE}
+# set the population
+pop <- CM$get_populations()
+pop["AF"] <- 100000
+CM$set_populations(pop)
+# run 10 cycles
+MT <- CM$cycles(ncycles=10*12)
+# cumulative totals
+CT <- data.frame(
+  Years = MT$Years,
+  GIbleed = cumsum(MT$GIbleed),
+  Stroke = cumsum(MT$StrokeY1),
+  FatalStroke = MT$FatalStroke
+)
+MT <- rbind(MT, colSums(MT))
+# print it
+pander::pander(MT)
+```
+
+```{r egcohort-cumulative, echo=FALSE}
+# print it
+pander::pander(CT)
+```
+
+
+
+## Results
+
+
+
+
+
+# References

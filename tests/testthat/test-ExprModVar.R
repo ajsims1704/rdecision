@@ -96,8 +96,11 @@ test_that("set and get function as expected", {
   # check illegal input
   expect_error(z$set(TRUE), class="what_not_character")
   expect_error(z$set("red"), class="what_not_supported")
-  # check that set() is ignored for ExprModVar
-  expect_silent(z$set())
+  # check that set() is honoured for ExprModVar
+  z$set("q97.5")
+  v <- z$get()
+  expect_true(v>3.5)
+  z$set("expected")
   expect_equal(z$get(),0)
   # check that set() for operands affects get() for the expression
   y$set("expected")
@@ -128,13 +131,18 @@ test_that("modified expressions are created correctly", {
     0.05
   )
   expect_intol(q$mean(), 0.9, 0.05)
-  # check that pre-prepared r() method is present
-  rbeta <- q$r(1)
+  # check that random sampling is supported
+  q$set("random")
+  rbeta <- q$get()
   expect_true((rbeta>=0) && (rbeta <= 1))
   # check internally added methods; 99.9% confidence limits assuming CLT; expect
   # 0.1% test failure rate; skip for CRAN
   n <- 1000
-  samp <- q$r(n)
+  samp <- sapply(1:n, FUN=function(i) {
+    q$set("random")
+    rv <- q$get()
+    return(rv)
+  })
   expect_length(samp, n)
   skip_on_cran()
   ht <- ks.test(samp, rbeta(n,shape1=beta,shape2=alpha))
@@ -189,9 +197,32 @@ test_that("expression chi square from SN is correct", {
   expect_true(is.na(y$SD()))  # SD is undefined for ExprModVar
   skip_on_cran()
   n <- 1000
-  samp <- y$r(n)
+  samp <- sapply(1:n, FUN=function(i) {
+    y$set("random")
+    rv <- y$get()
+    return(rv)
+  })
   ht <- ks.test(samp, rchisq(n, df=1))
   expect_true(ht$p.value>0.001)
 })
 
-
+test_that("one Dirichlet matches a Beta and an expression", {
+  # p follows Beta(1,9) and q is 1-p
+  alpha <- 1
+  beta <- 9
+  p <- BetaModVar$new("P(success)", "P", alpha=alpha, beta=beta)
+  q <- ExprModVar$new("P(failure)", "P", rlang::quo(1-p))
+  # p and q are both derived from Dir(1,9) distribution
+  D <- DirichletDistribution$new(alpha=c(1,9))
+  p.d <- ModVar$new("P(success)", "P", D=D, k=as.integer(1))
+  q.d <- ModVar$new("P(failure)", "P", D=D, k=as.integer(2))
+  # compare means
+  expect_equal(p$mean(), p.d$mean())
+  expect_equal(q$mean(), q.d$mean())
+  # compare quantiles for p 
+  probs<- c(0.025, 0.975)
+  expect_setequal(unname(p$quantile(probs)), unname(p.d$quantile(probs)))
+  # quantiles defined for q.d but not q (an expression)
+  expect_true(all(is.na(q$quantile(probs))))
+  expect_true(all(!is.na(q.d$quantile(probs))))
+})

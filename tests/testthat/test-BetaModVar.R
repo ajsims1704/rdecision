@@ -40,7 +40,8 @@ test_that("set(current) works as intended", {
   B$set("random")
   x <- B$get()
   B$set("current")
-  expect_equal(x, B$get())
+  y <- B$get()
+  expect_equal(y, x)
 })
 
 test_that("set(value) works as intended", {
@@ -110,7 +111,11 @@ test_that("random sampling is from a Beta distribution", {
   beta <- 5
   n <- 1000
   b <- BetaModVar$new("beta", "GBP", alpha, beta)
-  osamp <- b$r(n)
+  osamp <- sapply(1:n, FUN=function(i){
+    b$set("random")
+    rv <- b$get()
+    return(rv)
+  })
   expect_length(osamp, n)
   # 99.9% confidence limits; expected test failure rate is 0.1%, 
   # skip for CRAN

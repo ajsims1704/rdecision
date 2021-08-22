@@ -1,0 +1,350 @@
+---
+title: "Elementary Markov Model (Chancellor 1997)"
+subtitle: "Monotherapy versus combination therapy for HIV"
+author: "Andrew J. Sims"
+date: "May 2021"
+output: 
+  rmarkdown::html_vignette:
+    fig_width: 7
+    fig_height: 5
+    fig_caption: true
+vignette: >
+  %\VignetteIndexEntry{Elementary Markov Model (Chancellor 1997)}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+bibliography: "../inst/REFERENCES.bib"
+csl: "../inst/national-institute-of-health-research.csl"
+---
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  echo = FALSE,
+  fig.keep = "last",
+  fig.align = "center",
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+```{r setup, echo=F}
+library("rdecision")
+library("knitr")
+library("pander")
+```
+
+# Introduction
+This vignette is an example of an elementary cohort Markov model using 
+the `rdecision` package. It is based on the example given by 
+Briggs *et al* [-@briggs2006] (Exercise 2.5) which itself is based on a Markov
+model described by Chancellor *et al* [@chancellor1997]. The model compares 
+a combination therapy of Lamivudine/Zidovudine versus Zidovudine monotherapy 
+in people with HIV infection.
+
+# Creating the model
+
+## Model variables
+The variables used in the model are all numerical constants, and are defined
+as follows. 
+```{r model-variables, echo=TRUE}
+# cycle time
+tcycle <- as.difftime(365.25, units="days")
+# transition counts
+nAA <- 1251
+nAB <- 350
+nAC <- 116
+nAD <- 17
+nBB <- 731
+nBC <- 512
+nBD <- 15
+nCC <- 1312
+nCD <- 437
+# Healthcare system costs
+dmca <- 1701 # direct medical costs associated with state A
+dmcb <- 1774 # direct medical costs associated with state B
+dmcc <- 6948 # direct medical costs associated with state C
+ccca <- 1055 # Community care costs associated with state A
+cccb <- 1278 # Community care costs associated with state B
+cccc <- 2059 # Community care costs associated with state C
+# Drug costs
+cAZT <- 2278 # zidovudine drug cost
+cLam <- 2087 # lamivudine drug cost
+# Treatment effect
+RR <- 0.509 
+# Discount rates
+cDR <- 6 # annual discount rate, costs (%)
+oDR <- 0 # annual discount rate, benefits (%)
+```
+
+## Model structure
+The model is constructed by forming a graph, with each state as a 
+node and each transition as an edge. Nodes (of class `MarkovState`) and edges
+(class `MarkovTransition`) may have various properties whose values reflect the
+variables of the model (costs, rates etc.). Because the model is intended to 
+evaluate survival, the utility of states A, B and C are set to 1 (by default) 
+and state D to zero. Thus the incremental quality adjusted life years gained per
+cycle is equivalent to the survival function. Transition rates will be set
+later from probabilities.
+```{r model, echo=TRUE}
+# create Markov states for monotherapy (zidovudine only)
+sAm <- MarkovState$new("A", cost=dmca+ccca+cAZT)
+sBm <- MarkovState$new("B", cost=dmcb+cccb+cAZT)
+sCm <- MarkovState$new("C", cost=dmcc+cccc+cAZT)
+sDm <- MarkovState$new("D", cost=0, utility=0)
+# create transitions
+tAAm <- MarkovTransition$new(sAm, sAm)
+tABm <- MarkovTransition$new(sAm, sBm)
+tACm <- MarkovTransition$new(sAm, sCm)
+tADm <- MarkovTransition$new(sAm, sDm)
+tBBm <- MarkovTransition$new(sBm, sBm)
+tBCm <- MarkovTransition$new(sBm, sCm)
+tBDm <- MarkovTransition$new(sBm, sDm)
+tCCm <- MarkovTransition$new(sCm, sCm)
+tCDm <- MarkovTransition$new(sCm, sDm)
+tDDm <- MarkovTransition$new(sDm, sDm)
+# construct the model
+m.mono <- CohortMarkovModel$new(
+  V = list(sAm, sBm, sCm, sDm),
+  E = list(tAAm, tABm, tACm, tADm, tBBm, tBCm, tBDm, tCCm, tCDm, tDDm),
+  discount.cost = cDR/100,
+  discount.utility = oDR/100
+)
+```
+
+## Transition rates and probabilities
+Briggs *et al* [-@briggs2006] interpreted the observed transition counts 
+in 1 year as 
+transition probabilities by dividing counts by the total transitions observed
+from each state. With this assumption, the annual (per-cycle)
+transition probabilities are calculated as follows. Via the `set_rates` 
+function, transition rates for the model can be set from the per cycle 
+transition probabilities.
+```{r setrates, echo=TRUE}
+nA <- nAA + nAB + nAC + nAD
+nB <- nBB + nBC + nBD
+nC <- nCC + nCD
+Pt <- matrix(
+  c(nAA/nA, nAB/nA, nAC/nA, nAD/nA, 
+         0, nBB/nB, nBC/nB, nBD/nB,
+         0,      0, nCC/nC, nCD/nC,
+         0,      0,      0,      1),
+  nrow=4, byrow=TRUE, 
+  dimnames=list(source=c("A","B","C","D"), target=c("A","B","C","D"))
+)
+m.mono$set_rates(Pt, tcycle)
+```
+
+More usually, fully observed transition counts are converted into 
+transition rates (rather than probabilities), as described by Welton and 
+Ades [-@welton2005]. This is
+because counting events and measuring total time at risk includes 
+individuals who make more than one transition during the observation time, and
+can lead to rates with values which exceed 1. In contrast, the difference
+between a census of the number 
+of individuals in each state at the start of the interval and another at the
+end is directly related to the per-cycle probability. Following the work of
+Miller and Homan [-@miller1994], Welton and Ades [-@welton2005], Jones *et al*
+[-@jones2017] and others, `rdecision` prefers rates to probabilities as input 
+to models. These can be specified when transitions are created, or by using
+the `set_rate` method of `MarkovTransition`. Per-cycle transition probabilities
+can be extracted for checking. The alternative approach of specifying per-cycle
+probabilities is supported via the `set_rates` method of `CohortMarkovModel` 
+(as in this example). Conversion between rates and probabilities for 
+multi-state Markov models is non-trivial [@jones2017] and it is recommended 
+to specify either rates or probabilities and not to mix them during input.
+
+# Checking the model
+
+## Diagram
+A representation of the model in DOT format ([Graphviz](https://graphviz.org))
+can be created using the `as_DOT` function of `CohortMarkovModel`. The function
+returns a character vector which can be saved in a file (`.gv` extension) for
+visualization with the `dot` tool of Graphviz, or plotted directly in R via
+the `DiagrammeR` package. The Markov model for monotherapy is shown in Figure 1.
+
+```{r caption, echo=FALSE}
+f1c  <- paste("Figure 1. Markov model for comparison of HIV therapy.", 
+              "A: 200 < cd4 < 500,", "B: cd4 < 200,", "C: AIDS,","D: Death.")
+```
+```{r draw,fig.cap=f1c,fig.asp=0.21}
+#DOT <- m.mono$as_DOT()
+#writeLines(DOT, con="mono.gv")
+#system2(command="dot", args=c("-Tpng","-o","mono.png","mono.gv"))
+knitr::include_graphics(path="mono.png")
+```
+
+## Model states
+The states in the model can be tabulated with the function `tabulate_states`.
+For the monotherapy model, the states are tabulated below. The cost of each
+state includes the annual cost of AZT (Zidovudine). 
+```{r echo=FALSE}
+DF <- m.mono$tabulate_states()
+pander::pander(DF[,c("Name", "Cost")], justify="lr")
+rm(DF)
+```
+
+## Per-cycle transition probabilities
+The per-cycle transition probabilities, which are the cells of the Markov
+transition matrix, can be extracted from the model via the function
+`transition_probability`. For the monotherapy model, the transition matrix is
+shown below. This is consistent with the Table 1 of 
+Chancellor *et al* [-@chancellor1997].
+```{r echo=FALSE}
+TM <- m.mono$transition_probability(tcycle)
+pander::pander(TM, emphasize.rownames=FALSE, justify="lcccc")
+rm(TM)
+```
+
+# Running the model
+Model function `cycle` applies one cycle of a Markov model to a defined 
+starting population in each state. It returns a table with one row per state, 
+and each row containing several columns, including the population at the end of
+the state and the cost of occupancy of states, normalized by the number of 
+patients in the cohort, with discounting applied.
+
+Multiple cycles are run by feeding the state populations at the end of
+one cycle into the next. Function `cycles` does this and returns a data frame 
+with one row per cycle, and each row containing the state populations and the
+aggregated cost of occupancy for all states, with discounting applied. This is
+done below for the first 20 cycles of the model for monotherapy, without half
+cycle correction, with discount. In addition, the proportion of patients alive 
+at each cycle (the Markov trace) is added to the table. The populations and
+discounted costs are consistent with Briggs *et al*, Table 2.3 [-@briggs2006], 
+and the QALY column is consistent with Table 2.4 (without half cycle
+correction). No discount was applied to the utilities.
+```{r monocycle, echo=TRUE}
+# create starting populations
+N <- 1000
+populations <- c(A = N, B = 0, C = 0, D = 0)
+m.mono$reset(populations)
+# run 20 cycles
+MT.mono <- m.mono$cycles(ncycles=20, hcc.pop=FALSE, hcc.cost=FALSE)
+```
+
+```{r print_monocycle}
+keep <- c("Years", "A", "B", "C", "D", "Cost", "QALY")
+pander::pander(MT.mono[,keep], row.names=FALSE, justify="rrrrrrr", 
+               round=c(2,0,0,0,0,0,3))
+```
+
+# Model results
+
+## Monotherapy
+```{r mon_results, echo=FALSE}
+el.mono <- sum(MT.mono$QALY)
+cost.mono <- sum(MT.mono$Cost)
+```
+The estimated life years is approximated by summing the proportions of patients
+left alive at each cycle (Briggs *et al* [@briggs2006], Exercise 2.5). This is 
+an approximation because it ignores the population who remain alive after 
+21 years, and assumes all deaths occurred at the start of each cycle. For
+monotherapy the expected life gained is `r round(el.mono,3)` years at a cost
+of `r format(cost.mono,digits=2,scientific=FALSE)` GBP.
+
+## Combination therapy
+For combination therapy, a similar model was created, with adjusted costs and 
+transition rates. Following Briggs *et al* [@briggs2006] the treatment effect
+was applied to the probabilities, and these were used as inputs to the model.
+More usually, treatment effects are applied to rates, rather than probabilities.
+```{r combo, echo=TRUE}
+# annual probabilities modified by treatment effect
+pAB <- RR*nAB/nA
+pAC <- RR*nAC/nC
+pAD <- RR*nAD/nA
+pBC <- RR*nBC/nB
+pBD <- RR*nBD/nB
+pCD <- RR*nCD/nC
+# annual transition probability matrix
+Ptc <- matrix(
+  c(1-pAB-pAC-pAD,         pAB,     pAC, pAD, 
+                0, (1-pBC-pBD),     pBC, pBD,
+                0,           0, (1-pCD), pCD,
+                0,           0,       0,   1),
+  nrow=4, byrow=TRUE, 
+  dimnames=list(source=c("A","B","C","D"), target=c("A","B","C","D"))
+)
+# create Markov states for combination therapy
+sAc <- MarkovState$new("A", cost=dmca+ccca+cAZT+cLam)
+sBc <- MarkovState$new("B", cost=dmcb+cccb+cAZT+cLam)
+sCc <- MarkovState$new("C", cost=dmcc+cccc+cAZT+cLam)
+sDc <- MarkovState$new("D", cost=0, utility=0)
+# create transitions
+tAAc <- MarkovTransition$new(sAc, sAc)
+tABc <- MarkovTransition$new(sAc, sBc)
+tACc <- MarkovTransition$new(sAc, sCc)
+tADc <- MarkovTransition$new(sAc, sDc)
+tBBc <- MarkovTransition$new(sBc, sBc)
+tBCc <- MarkovTransition$new(sBc, sCc)
+tBDc <- MarkovTransition$new(sBc, sDc)
+tCCc <- MarkovTransition$new(sCc, sCc)
+tCDc <- MarkovTransition$new(sCc, sDc)
+tDDc <- MarkovTransition$new(sDc, sDc)
+# construct the model
+m.comb <- CohortMarkovModel$new(
+  V = list(sAc, sBc, sCc, sDc),
+  E = list(tAAc, tABc, tACc, tADc, tBBc, tBCc, tBDc, tCCc, tCDc, tDDc),
+  discount.cost = cDR/100,
+  discount.utility = oDR/100
+)
+# set the rates by specifying probabilities
+m.comb$set_rates(Ptc, tcycle)
+```
+
+The per-cycle transition matrix for the combination therapy is as follows:
+```{r tmcombo, echo=FALSE}
+TM <- m.comb$transition_probability(tcycle)
+pander::pander(TM, emphasize.rownames=FALSE, justify="lcccc")
+rm(TM)
+```
+
+In this model, lamivudine is given for the first 2 years, with 
+the treatment effect assumed to persist for the same period. The
+state populations and cycle numbers are retained by the model between 
+calls to `cycle` or `cycles` and can be retrieved by calling `get_populations`.
+In this example, the combination therapy model is run for 2 cycles, then the
+population is used to continue with the monotherapy model for the remaining
+8 years. The `reset` function is used to set the cycle number and elapsed
+time of the new run of the mono model.
+```{r combo_run, echo=TRUE}
+# run combination therapy model for 2 years
+populations <- c('A'=N, 'B'=0, 'C'=0, 'D'=0)
+m.comb$reset(populations)
+# run 2 cycles
+MT.comb <- m.comb$cycles(2, hcc.pop=FALSE, hcc.cost=FALSE)
+# feed populations into mono model & reset cycle counter and time
+populations <- m.comb$get_populations()
+m.mono$reset(
+  populations, 
+  icycle=as.integer(2), 
+  elapsed=as.difftime(365.25*2, units="days")
+)
+# and run model for next 18 years
+MT.comb <- rbind(
+  MT.comb, m.mono$cycles(ncycles=18, hcc.pop=FALSE, hcc.cost=FALSE)
+)
+```
+
+The Markov trace for combination therapy is as follows:
+```{r echo=F}
+keep <- c("Years", "A", "B", "C", "D", "Cost", "QALY")
+pander::pander(MT.comb[,keep], row.names=FALSE, justify="rrrrrrr", 
+               round=c(2,0,0,0,0,0,3))
+```
+
+## Comparison of treatments
+```{r ICER, echo=FALSE}
+el.comb <- sum(MT.comb$QALY)
+cost.comb <- sum(MT.comb$Cost)
+icer <- (cost.comb-cost.mono)/(el.comb-el.mono)
+```
+The ICER is calculated by running both models and calculating the incremental
+cost per life year gained. Over the 20 year time horizon, the expected life
+years gained for monotherapy was `r round(el.mono,3)` years at a total cost
+per patient of `r format(cost.mono,digits=2,scientific=F,big.mark=',')` GBP.
+The expected life years gained with combination therapy  for two years was
+`r round(el.comb,3)` at a total cost per patient of 
+`r format(cost.comb,digits=2,scientific=F,big.mark=',')` GBP. The incremental 
+change in life years was `r round(el.comb-el.mono,3)` years at an incremental 
+cost of `r format(cost.comb-cost.mono,digits=2,scientific=F,big.mark=',')` GBP,
+giving an ICER of `r round(icer,2)` GBP/QALY. This is consistent with the
+result obtained by Briggs *et al* [-@briggs2006], within rounding error.
+
+# References

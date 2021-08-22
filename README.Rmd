@@ -23,11 +23,12 @@ knitr::opts_chunk$set(
 <!-- badges: end -->
 
 The goal of `rdecision` is to provide methods for assessing health care 
-interventions using cohort models (decision trees). Mechanisms are provided for 
-associating an uncertainty distribution with each source variable and for
-ensuring transparency of the mathematical relationships between variables.
-The package terminology follows Briggs *et al* "Decision Modelling for Health
-Economic Evaluation" [@briggs2006].
+interventions using cohort models (decision trees and Markov models) which can
+be constructed using only a few lines of R code. Mechanisms
+are provided for associating an uncertainty distribution with each source 
+variable and for ensuring transparency of the mathematical relationships between
+variables. The package terminology follows Briggs *et al* "Decision Modelling
+for Health Economic Evaluation" [@briggs2006].
 
 
 ## Installation
@@ -39,8 +40,9 @@ You can install the released version of rdecision from
 install.packages("rdecision")
 ```
 
-## Example
+## Examples
 
+### A decision tree with parameter uncertainty
 Consider the fictitious and idealized decision problem of choosing between
 providing two 
 forms of lifestyle advice, offered to people with vascular disease, which reduce
@@ -147,6 +149,77 @@ to `r round(quantile(RES$Difference, probs=c(0.975)),2)` GBP, with
 concluded that more evidence is required to be confident that the exercise
 programme is cost saving.
 
+## A three-state Markov model
+Sonnenberg and Beck [-@sonnenberg1993] introduced an illustrative example of a
+Markov process with three states: "Well", "Disabled" and "Dead" and one
+transition between each state, each with a per-cycle probability. In
+`rdecision` such a model is constructed as follows. Note that transitions
+from a state to itself must be specified if allowed, otherwise the state would
+be a tunnel state.
+
+```{r markoveg-model, echo=TRUE}
+# define the cycle time
+tcycle = as.difftime(365.25, units="days")
+# create states
+s.well <- MarkovState$new(name="Well", utility=1)
+s.disabled <- MarkovState$new(name="Disabled",utility=0.7)
+s.dead <- MarkovState$new(name="Dead",utility=0)
+# create transitions, leaving rates undefined
+E <- list(
+  MarkovTransition$new(s.well, s.well),
+  MarkovTransition$new(s.dead, s.dead),
+  MarkovTransition$new(s.disabled, s.disabled),
+  MarkovTransition$new(s.well, s.disabled),
+  MarkovTransition$new(s.well, s.dead),
+  MarkovTransition$new(s.disabled, s.dead)
+)
+# create the model
+M <- CohortMarkovModel$new(V = list(s.well, s.disabled, s.dead), E)
+# create transition probability matrix
+snames <- c("Well","Disabled","Dead")
+Pt <- matrix(
+  data = c(0.6, 0.2, 0.2, 0, 0.6, 0.4, 0, 0, 1),
+  nrow = 3, byrow = TRUE,
+  dimnames = list(source=snames, target=snames)
+)
+# set the transition rates from per-cycle probabilities
+M$set_rates(Pt, tcycle)
+```
+
+```{r sb,echo=FALSE,results="hide",fig.keep="last",fig.align="center"}
+#DOT <- M$as_DOT()
+#writeLines(DOT, con="man/figures/README-sb-1.gv")
+#system2(
+#  command="dot", 
+#  args=c("-Tpng","-o",
+#         "man/figures/README-sb-1.png",
+#         "man/figures/README-sb-1.gv"
+#         )
+#)
+#knitr::include_graphics("man/figures/README-sb-1.png")
+```
+<img src="man/figures/README-sb-1.png" width="75%" style="display: block; margin: auto;" />
+
+With a starting population of 10,000, the model can be run for 25 years as
+follows. The output of the `cycles` function is the Markov trace, shown
+below, which replicates Table 2 [@sonnenberg1993].
+```{r markoveg-cycle, echo=TRUE}
+# set the starting populations
+M$reset(c(Well=10000, Disabled=0, Dead=0)) 
+# cycle
+MT <- M$cycles(25, tcycle=tcycle, hcc.pop=FALSE, hcc.cost=FALSE)
+```
+
+```{r markoveg-trace, echo=FALSE}
+MT$CU <- cumsum(MT$QALY)
+keep <- c("Years", "Well", "Disabled", "Dead", "CU")
+rows <- c(1,2,3,4,24,25,26)
+pander::pander(
+  MT[rows,keep], row.names=FALSE, justify="rrrrr", round=c(2,0,0,0,3),
+  col.names=c("Years", "Well", "Disabled", "Dead", "Cumulative Utility")
+)
+```
+
 # Acknowledgements
 In addition to using base R [@rcoreteam2020], `redecision` relies heavily on
 the `R6` implementation of classes [@chang2020] and the `rlang` package for
@@ -160,10 +233,15 @@ algorithms from Gross *et al* [-@gross2013], the Wikipedia
 glossary [@wikipedia2021] and links therein. Topological sorting of graphs
 is based on Kahn's algorithm [-@kahn1962]. Some of the terminology for decision
 trees was based on the work of Kaminski *et al* [-@kaminski2018] and an 
-efficient tree drawing algorithm was based on the work of Walker [-@walker1989]. 
-Terminology for decision trees in health economic evaluation was based on
-the book by Briggs *et al* [-@briggs2006] and the output format and terminology 
-follows ISPOR recommendations [@briggs2012a]. 
+efficient tree drawing algorithm was based on the work of Walker [-@walker1989].
+In Markov models, matrix exponentiation for converting transition rates into
+per-cycle probabilities, and *vice versa*, relies on the `expm` 
+package [@goulet2021] and Markov model representations are exported in the
+DOT language [@gansner1993].
+
+Terminology for decision trees and Markov models in health economic evaluation
+was based on the book by Briggs *et al* [-@briggs2006] and the output format
+and terminology follows ISPOR recommendations [@briggs2012a,@siebert2012]. 
 
 Citations for examples used in vignettes are given in applicable vignette
 files. 

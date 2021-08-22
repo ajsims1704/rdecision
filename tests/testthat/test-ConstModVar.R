@@ -44,3 +44,13 @@ test_that("set and get function as expected", {
   expect_intol(mean(S), 42, 0.1)
   expect_intol(sd(S), 0, 0.01)
 })
+
+test_that("set('value') works as expected", {
+  x <- ConstModVar$new("x", "GBP", 42)
+  expect_equal(x$get(), 42)
+  x$set("value", 7)
+  expect_equal(x$get(), 7)
+  # but the hyperparameter should be unchanged
+  expect_equal(x$mean(), 42)
+})
+
