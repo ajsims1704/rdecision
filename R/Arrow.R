@@ -3,7 +3,7 @@
 #' @description
 #' An R6 class to represent an directed edge in a digraph.
 #' 
-#' @details Arrows are the formal term for links between pairs of nodes in a
+#' @details An arrow is the formal term for an edge between pairs of nodes in a
 #' directed graph. Inherits from class \code{Edge}.
 #' 
 #' @docType class

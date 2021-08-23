@@ -124,7 +124,7 @@ DirichletDistribution <- R6::R6Class(
     },
 
     #' @description Variance-covariance matrix.
-    #' @returns A positive definite symmetric matrix of size \code{K} by 
+    #' @return A positive definite symmetric matrix of size \code{K} by 
     #' \code{K}.
     varcov = function() {
       VC <- matrix(data=as.numeric(NA), nrow=private$K, ncol=private$K)
@@ -140,7 +140,7 @@ DirichletDistribution <- R6::R6Class(
     },
     
     #' @description Draw and hold a random sample from the distribution.
-    #' @returns Void; sample is retrieved with call to \code{r()}.
+    #' @return Void; sample is retrieved with call to \code{r()}.
     sample = function() {
       # sample from gamma distributions
       y <- sapply(1:private$K, FUN=function(i) {

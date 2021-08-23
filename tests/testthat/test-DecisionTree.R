@@ -139,9 +139,9 @@ test_that("simple decision trees are modelled correctly", {
 test_that("rdecision replicates Evans et al, Sumatriptan base case", {
   # Time horizon
   th <- as.difftime(24, units="hours")
-  # model variables
-  c.sumatriptan <- ConstModVar$new("Sumatriptan","CAD",16.10)
-  c.caffeine <- ConstModVar$new("Caffeine", "CAD", 1.32)
+  # model variables (include a couple of uncertainties for later tests)
+  c.sumatriptan <- GammaModVar$new("Sumatriptan","CAD",shape=16.10,scale=1)
+  c.caffeine <- GammaModVar$new("Caffeine", "CAD", shape=1.32,scale=1)
   c.ED <- 63.16
   c.admission <- 1093
   p.caffeine.relief <- 0.379
@@ -232,6 +232,34 @@ test_that("rdecision replicates Evans et al, Sumatriptan base case", {
   q.Caffeine <- RES$QALY.Caffeine[1]
   ICER <- (c.Sumatriptan-c.Caffeine)/(q.Sumatriptan-q.Caffeine)
   expect_intol(ICER, 29366, tol=100)
+  # check parameters of threshold function
+  expect_error(
+    dt$threshold(
+      index=list(e17), ref=list(e18), outcome="ICER", 
+      mvd=p.sumatriptan.relief$description(), 
+      a=0.5, b=0.6,
+      lambda=-1, tol=0.0001
+    ),
+    class = "invalid_lambda"
+  )
+  expect_error(
+    dt$threshold(
+      index=list(e17), ref=list(e18), outcome="ICER", 
+      mvd=p.sumatriptan.relief$description(), 
+      a=0.1, b=0.2,
+      lambda=29366, tol=0.0001
+    ),
+    class = "invalid_brackets"
+  )
+  expect_error(
+    dt$threshold(
+      index=list(e17), ref=list(e18), outcome="ICER", 
+      mvd=p.sumatriptan.relief$description(), 
+      a=0.5, b=0.6,
+      lambda=29366, tol=0.0001, nmax=5
+    ),
+    class = "convergence_failure"
+  )
   # mean relief rate threshold for ICER
   pt <- dt$threshold(
     index=list(e17), ref=list(e18), outcome="ICER", 
@@ -256,10 +284,44 @@ test_that("rdecision replicates Evans et al, Sumatriptan base case", {
     lambda=60839, tol=0.0001
   )
   expect_intol(pt, p.caffeine.relief+0.091, tol=0.02)
-  # tornado plot
+  # check ICER ranges in tornado diagram (branches B and G get 2nd dose)
   TO <- dt$tornado(index=list(e17),ref=list(e18),outcome="ICER",draw=FALSE)
-  print("")
-  print(TO)
+  dq <- (q.Sumatriptan-q.Caffeine)
+  c.sumatriptan$set("expected")
+  c.caffeine$set("expected")
+  p.sumatriptan.relief$set("expected")
+  x <- qgamma(p=0.025,shape=16.10,rate=1)
+  expect_intol(TO$LL[TO$Description=="Sumatriptan"], x,tol=0.01)
+  deltac <- (x-c.sumatriptan$get())*1.227
+  expect_intol(
+    TO$outcome.min[TO$Description=="Sumatriptan"],
+    (c.Sumatriptan-c.Caffeine+deltac)/dq,
+    tol=100
+  )
+  x <- qgamma(p=0.975,shape=16.10,rate=1)
+  expect_intol(TO$UL[TO$Description=="Sumatriptan"],x,tol=0.01)
+  deltac <- (x-c.sumatriptan$get())*1.227
+  expect_intol(
+    TO$outcome.max[TO$Description=="Sumatriptan"],
+    (c.Sumatriptan-c.Caffeine+deltac)/dq,
+    tol=100
+  )
+  x <- qgamma(p=0.025,shape=1.32,rate=1)
+  expect_intol(TO$LL[TO$Description=="Caffeine"], x,tol=0.01)
+  deltac <- (c.caffeine$get()-x)*1.113
+  expect_intol(
+    TO$outcome.min[TO$Description=="Caffeine"],
+    (c.Sumatriptan-c.Caffeine+deltac)/dq,
+    tol=100
+  )
+  x <- qgamma(p=0.975,shape=1.32, rate=1)
+  expect_intol(TO$UL[TO$Description=="Caffeine"],x,tol=0.01)
+  deltac <- (c.caffeine$get()-x)*1.113
+  expect_intol(
+    TO$outcome.max[TO$Description=="Caffeine"],
+    (c.Sumatriptan-c.Caffeine+deltac)/dq,
+    tol=100
+  )
 })
 
 # -----------------------------------------------------------------------------

@@ -61,7 +61,7 @@ Distribution <- R6::R6Class(
     },
     
     #' @description Order of the distribution
-    #' @returns Order (\code{K}).
+    #' @return Order (\code{K}).
     order = function() {
       return(private$K)
     }, 
@@ -83,8 +83,7 @@ Distribution <- R6::R6Class(
     
     #' @description Return the mode of the distribution. 
     #' @details By default returns \code{NA}, which will be the case for most
-    #' \code{ExprModVar} variables, because an arbitrary expression is not 
-    #' guaranteed to be unimodal.
+    #' because an arbitrary distribution is not guaranteed to be unimodal.
     #' @return Mode as a numeric scalar (\code{K=1}) or vector of 
     #' length \code{K}.
     mode = function() {
@@ -103,7 +102,7 @@ Distribution <- R6::R6Class(
     },
     
     #' @description Variance-covariance matrix.
-    #' @returns A positive definite symmetric matrix of size \code{K} by 
+    #' @return A positive definite symmetric matrix of size \code{K} by 
     #' \code{K}, or a scalar for \code{K=1}, equal to the variance.
     varcov = function() {
       rv <- NULL
@@ -126,7 +125,7 @@ Distribution <- R6::R6Class(
     #' for \code{K=2}, surfaces for \code{K=3}, etc. Thus, for example, the
     #' 2.5\% and 97.5\% marginal quantiles of a bivariate normal distribution
     #' define a rectangle in \eqn{x_1, x_2} space that will include more than
-    #' 95\% of the distribution, whereas the contour containing 95%% of the
+    #' 95\% of the distribution, whereas the contour containing 95\% of the
     #' distribution is an ellipse.
     #' @param probs Numeric vector of probabilities, each in range [0,1].
     #' @return For \code{K=1} a numeric vector of length equal to the length of
@@ -166,14 +165,14 @@ Distribution <- R6::R6Class(
     },
     
     #' @description Draw and hold a random sample from the distribution.
-    #' @returns Void
+    #' @return Void
     sample = function() {
       return(invisible(self)) 
     },
     
     #' @description Return a random sample drawn from the distribution.
     #' @details Returns the sample generated at the last call to \code{sample}. 
-    #' @returns A vector of length \code{K} representing one sample.
+    #' @return A vector of length \code{K} representing one sample.
     r = function() {
       # return the sample
       return(private$.r)

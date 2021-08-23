@@ -271,131 +271,6 @@ CohortMarkovModel <- R6::R6Class(
     #' @param tcycle The cycle time, in years, as a \code{difftime} object.
     #' @return Updated \code{CohortMarkovModel} object
     set_rates = function(Pt, tcycle) {
-      
-      # Inner function from package expm to compute the log of a matrix
-      # based on Higham's Algorithm. Andrew Sims apologises for copying this 
-      # code here, rather than using package expm, but - as of August 2021 - 
-      # expm proved difficult to install from source on all platforms,
-      # mainly due to its dependency on Fortran code. However, the conversions
-      # required by rdecision do not rely on the parts of package expm that
-      # use Fortran. Hence the decision to copy here. I hope to reverse this
-      # in future as expm matures, or is subsumed into Matrix. Appropriate 
-      # credit is given to the expm package.
-      #
-      ##------OVERVIEW---------------------------------------------------------
-      ## Input:  A; nxn Matrix, no eigenvalues <=0, not singular
-      ## Output: log(A); Matrixlogarithm; nxn Matrix
-      ## Function for Calculation of log(A) with the Inverse 
-      ## Scaling&Squaring Method
-      ## Step 0:    Schur Decompostion Tr
-      ## Step 1:    Scaling (root of Tr)
-      ## Step 2:    Padé-Approximation
-      ## Step 3:    Squaring
-      ## Step 4:    Reverse Schur Decomposition
-      ## R-Implementation of Higham's Algorithm from the Book
-      ## "Functions of Matrices - Theory and Computation", Chapter 11, 
-      # Algorithm 11.9
-      ##-------CODE------------------------------------------------------------
-      ## The coefficients for the Padé-approximation can be computed at install
-      ## time:
-      ## r: exponents are in  (-51):(-56)
-      ## p: exponents are in  c((-47):(-53), -56)
-      logm.H08.r <-
-        rbind(c(5003999585967230*2^(-54), 8006399337547537*2^(-54), 5/18, 0,0,0,0),
-              c(5640779706068081*2^(-51), 8899746432686114*2^(-53),
-                8767290225458872*2^(-54), 6733946100265013*2^(-55), 0,0,0),
-              c(5686538473148996*2^(-51), 4670441098084653*2^(-52),
-                5124095576030447*2^(-53), 5604406634440294*2^(-54),
-                8956332917077493*2^(-56), 0,0),
-              c(5712804453675980*2^(-51), 4795663223967718*2^(-52),
-                5535461316768070*2^(-53), 6805310445892841*2^(-54),
-                7824302940658783*2^(-55), 6388318485698934*2^(-56), 0),
-              c(5729264333934497*2^(-51), 4873628951352824*2^(-52),
-                5788422587681293*2^(-53), 7529283295392226*2^(-54),
-                4892742764696865*2^(-54), 5786545115272933*2^(-55),
-                4786997716777457*2^(-56)))
-      logm.H08.p <-
-        - rbind(c(7992072898328873*2^(-53), 1/2, 8121010851296995*2^(-56), 0,0,0,0),
-                c(8107950463991866*2^(-49), 6823439817291852*2^(-51),
-                  6721885580294475*2^(-52), 4839623620596807*2^(-52), 0,0,0),
-                c(6000309411699298*2^(-48),  4878981751356277*2^(-50), 2,
-                  5854649940415304*2^(-52), 4725262033344781*2^(-52),0,0),
-                c(8336234321115872*2^(-48), 6646582649377394*2^(-50),
-                  5915042177386279*2^(-51), 7271968136730531*2^(-52),
-                  5422073417188307*2^(-52), 4660978705505908*2^(-52), 0),
-                c(5530820008925390*2^(-47), 8712075454469181*2^(-50),
-                  7579841581383744*2^(-51), 4503599627370617*2^(-51),
-                  6406963985981958*2^(-52), 5171999978649488*2^(-52),
-                  4621190647118544*2^(-52)))
-      logm.Higham08 <- function(x) {
-        ## work with "Matrix" too: x<-as.matrix(x)
-        ##MM: No need to really check here; we get correct error msg later 
-        ##    anyway and don't need to compute det() here, in the good cases !
-        ##    if (det(x) == 0) stop("'x' is singular")
-        ##-------Step 0: Schur Decomposition------------------------------------
-        ## Schur() checks for square matrix also:
-        Sch.x <- Schur(Matrix(x, sparse=FALSE))
-        ## FIXME 'sparse=FALSE' is workaround - good as long Matrix has no 
-        ## sparse Schur()
-        ev <- Sch.x@EValues
-        if(getOption("verbose") && any(abs(Arg(ev) - pi) < 1e-7))
-          ## Let's see what works: temporarily *NOT* stop()ping :
-          message(sprintf("'x' has negative real eigenvalues; maybe ok for %s", 
-                          "logm()"))
-        n <- Sch.x@Dim[1]
-        Tr <- as.matrix(Sch.x@T)
-        Q  <- as.matrix(Sch.x@Q)
-        ##----- Step 1: [Inverse] Scaling --------------------------------------
-        I <- diag(n)
-        thMax <- 0.264
-        theta <- c(0.0162, 0.0539, 0.114, 0.187, thMax)
-        p <- k <- 0 ; t.o <- -1
-        ## NB: The following could loop forever, e.g., for logm(Diagonal(x=1:0))
-        repeat{
-          t <- norm(Tr - I, "1") # norm(x, .) : x is coerced to dgeMatrix
-          if(is.na(t)) {
-            warning(sprintf(ngettext(k,
-                                     "NA/NaN from %s after %d step.\n",
-                                     "NA/NaN from %s after %d steps.\n"),
-                            " || Tr - I || ", k),
-                    "The matrix logarithm may not exist for this matrix.")
-            return(array(t, dim=dim(Tr)))
-          }
-          if (t < thMax) {
-            ## FIXME: use findInterval()
-            j2 <- which.max( t <= theta)
-            j1 <- which.max( (t/2) <= theta)
-            if ((j2-j1 <= 1) || ((p <- p+1) == 2)) {
-              m <- j2 ## m := order of the Padé-approximation
-              break
-            }
-          } else if(k > 20 && abs(t.o - t) < 1e-7*t) {
-            ##
-            warning(sprintf("Inverse scaling did not work (t = %g).\n", t),
-                    "The matrix logarithm may not exist for this matrix.",
-                    "Setting m = 3 arbitrarily.")
-            m <- 3
-            break
-          }
-          Tr <- rootS(Tr)##--> Matrix Square root of Jordan T
-          ##    -----    [see below;  compare with ./sqrtm.R
-          t.o <- t
-          k <- k+1
-        }
-        if(getOption("verbose"))
-          message(sprintf("logm.Higham08() -> (k, m) = (%d, %d)", k,m))
-        ##------ Step 2: Padé-Approximation ------------------------------------
-        ## of order m :
-        r.m <- logm.H08.r[m,]
-        p.m <- logm.H08.p[m,]
-        X <- 0
-        Tr <- Tr-I
-        for (s in 1:(m+2)) {
-          X <- X + r.m[s]*solve(Tr - p.m[s]*I, Tr)
-        }
-        ##--- Step 3 & 4: Squaring & reverse Schur Decomposition ---------------
-        2^k* Q %*% X %*% solve(Q)
-      }
       # check Pt
       if (missing(Pt)) {
         rlang::abort("Pt is missing, without default", class="invalid_Pt")
@@ -474,7 +349,7 @@ CohortMarkovModel <- R6::R6Class(
       # calculate the transition rate matrix, Q
       # compute Pt using matrix exponentiation
       t <- as.numeric(tcycle, units="days")/365.25
-      Q <- logm.Higham08(Pt)/t
+      Q <- expm::logm(Pt)/t
       # set the rates for each transition
       for (ie in 1:self$size()) {
         e <- private$E[[ie]]
@@ -490,130 +365,13 @@ CohortMarkovModel <- R6::R6Class(
     #' @param tcycle Cycle length, expressed as an R \code{difftime} object.
     #' @details Checks that each state has at least one outgoing transition and
     #' that exactly one outgoing transition rate whose rate is NULL. The 
-    #' transition probability matrix, usually written \eqn{P_t} is the solution
+    #' transition probability matrix, usually written \eqn{P_t}, is the solution
     #' to Kolmogorov's forward
     #' and backward equations, and is computed from the transition rate
     #' matrix using matrix exponentiation with the \pkg{expm} package.
     #' @return A square matrix of size equal to the number of states. If all
     #' states are labelled, the dimnames take the names of the states.
     transition_probability = function(tcycle) {
-      
-      # Inner function from package expm to compute the exponential of a matrix
-      # based on Higham's Algorithm. Andrew Sims apologises for copying this 
-      # code here, rather than using package expm, but - as of August 2021 - 
-      # expm proved difficult to install from source on all platforms,
-      # mainly due to its dependency on Fortran code. However, the conversions
-      # required by rdecision do not rely on the parts of package expm that
-      # use Fortran. Hence the decision to copy here. I hope to reverse this
-      # in future as expm matures, or is subsumed into Matrix. Appropriate 
-      # credit is given to the expm package.
-      #
-      # Calculation of e^A with the Scaling & Squaring Method with Balancing
-      # according to Higham (2008)
-      #
-      # R-Implementation of Higham's Algorithm from the Book (2008)
-      # "Functions of Matrices - Theory and Computation", Chapter 10, 
-      # Algorithm 10.20
-      # Step 0:    Balancing
-      # Step 1:    Scaling
-      # Step 2:    Padé-Approximation
-      # Step 3:    Squaring
-      # Step 4:    Reverse Balancing
-      #
-      # author Martin Maechler
-      expm.Higham08 <- function(A, balancing=TRUE)
-      {
-        ## Check if A is square
-        d <- dim(A)
-        if(length(d) != 2 || d[1] != d[2]) stop("'A' must be a square matrix")
-        n <- d[1]
-        
-        if (n <= 1) return(exp(A))
-        
-        ## else  n >= 2 ... non-trivial case : -------------
-
-        ##---------STEP 0: BALANCING------------------------------------------------
-        ## if balancing is asked for, balance the matrix A
-        if (balancing) {
-          baP <- balance(A,     "P")# -> error for non-classical matrix
-          baS <- balance(baP$z, "S")
-          A <- baS$z
-        }
-        ##--------STEP 1 and STEP 2 SCALING & PADÉ APPROXIMATION--------------------
-        ## Informations about the given matrix
-        nA <- Matrix::norm(A, "1")
-        ## try to remain in the same matrix class system:
-        I <- if(is(A,"Matrix")) Diagonal(n) else diag(n)
-        ## If the norm is small enough, use the Padé-Approximation (PA) directly
-        if (nA <= 2.1) {
-          t <- c(0.015, 0.25, 0.95, 2.1)
-          ## the minimal m for the PA :
-          l <- which.max(nA <= t)
-          ## Calculate PA
-          C <- rbind(c(120,60,12,1,0,0,0,0,0,0),
-                     c(30240,15120,3360,420,30,1,0,0,0,0),
-                     c(17297280,8648640,1995840,277200,25200,1512,56,1,0,0),
-                     c(17643225600,8821612800,2075673600,302702400,30270240,
-                       2162160,110880,3960,90,1))
-          A2 <- A %*% A
-          P <- I
-          U <- C[l,2]*I
-          V <- C[l,1]*I
-          for (k in 1:l) {
-            P <- P %*% A2
-            U <- U + C[l,(2*k)+2]*P
-            V <- V + C[l,(2*k)+1]*P
-          }
-          U <- A %*% U
-          X <- solve(V-U,V+U)
-        }
-        ## Else, check if norm of A is small enough for m=13.
-        ## If not, scale the matrix
-        else {
-          s <- log2(nA/5.4)
-          B <- A
-          ## Scaling
-          if (s > 0) {
-            s <- ceiling(s)
-            B <- B/(2^s)
-          }
-          ## Calculate PA
-          c. <- c(64764752532480000,32382376266240000,7771770303897600,
-                  1187353796428800, 129060195264000,10559470521600, 670442572800,
-                  33522128640, 1323241920, 40840800,960960,16380, 182,1)
-          B2 <- B %*% B
-          B4 <- B2 %*% B2
-          B6 <- B2 %*% B4
-          U <- B %*% (B6 %*% (c.[14]*B6 + c.[12]*B4 + c.[10]*B2) +
-                        c.[8]*B6 + c.[6]*B4 + c.[4]*B2 + c.[2]*I)
-          V <- B6 %*% (c.[13]*B6 + c.[11]*B4 + c.[9]*B2) +
-            c.[7]*B6 + c.[5]*B4 + c.[3]*B2 + c.[1]*I
-          X <- solve(V-U,V+U)
-          ##---------------STEP 3 SQUARING----------------------------------------------
-          if (s > 0) for (t in 1:s) X <- X %*% X
-        }
-        ##-----------------STEP 4 REVERSE BALANCING---------------------------------
-        if (balancing) { ##	 reverse the balancing
-          d <- baS$scale
-          X <- X * (d * rep(1/d, each = n))
-          ## apply inverse permutation (of rows and columns):
-          pp <- as.integer(baP$scale)
-          if(baP$i1 > 1) {             ## The lower part
-            for(i in (baP$i1-1):1) { # 'p1' in *reverse* order
-              tt <- X[,i]; X[,i] <- X[,pp[i]]; X[,pp[i]] <- tt
-              tt <- X[i,]; X[i,] <- X[pp[i],]; X[pp[i],] <- tt
-            }
-          }
-          if(baP$i2 < n) {             ## The upper part
-            for(i in (baP$i2+1):n) { # 'p2' in *forward* order
-              ## swap	 i <-> pp[i]   both rows and columns
-              tt <- X[,i]; X[,i] <- X[,pp[i]]; X[,pp[i]] <- tt
-              tt <- X[i,]; X[i,] <- X[pp[i],]; X[pp[i],] <- tt
-            }
-          }
-        }
-        X
-      }
       # check that the cycle time is an interval
       if (class(tcycle) != "difftime") {
         rlang::abort(
@@ -625,7 +383,7 @@ CohortMarkovModel <- R6::R6Class(
       Q <- self$transition_rate()
       # compute Pt using matrix exponentiation
       t <- as.numeric(tcycle, units="days")/365.25
-      Pt <- expm.Higham08(Q*t)
+      Pt <- expm::expm(Q*t)
       # label the matrix
       state.names <- sapply(private$V, function(v) {v$label()})
       dimnames(Pt) <- list(source=state.names, target=state.names)
@@ -929,7 +687,7 @@ CohortMarkovModel <- R6::R6Class(
     #' \describe{
     #' \item{\code{Cycle}}{The cycle number.}
     #' \item{\code{Time}}{Elapsed time at end of cycle, years}
-    #' \item{\code{<name>}}{Population of state \code{<name} at the end of
+    #' \item{\code{<name>}}{Population of state \code{<name>} at the end of
     #' the cycle.}
     #' \item{\code{Cost}}{Cost associated with occupancy and transitions between
     #' states during the cycle.}

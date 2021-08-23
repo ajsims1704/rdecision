@@ -5,13 +5,12 @@
 \alias{ModVar}
 \title{\verb{ModVar} class}
 \description{
-An R6 class for a variable in an health economic model
+An R6 class for a variable in a health economic model
 }
 \details{
 Base class for a variable used in a health economic model. The base 
-class, which is not intended to be directly instantiated by model
-applications, wraps a numerical value which is used in calculations.
-The base class provides a framework for creating classes of model
+class wraps a numerical value which is used in calculations.
+It provides a framework for creating classes of model
 variables whose uncertainties are described by statistical distributions
 parametrized with hyperparameters.
 }
@@ -182,7 +181,7 @@ The mode of the variable.
 
 \subsection{Details}{
 By default returns \code{NA}, which will be the case for 
-most \code{ExprModVar} variables, because an arbitrary expression is 
+most \code{ModVar} variables, because an arbitrary distributions are 
 not guaranteed to be unimodal.
 }
 
@@ -265,11 +264,9 @@ ignored otherwise.}
 \if{html}{\out{</div>}}
 }
 \subsection{Details}{
-Defines what will be returned' by subsequent
-calls to \code{get()} until \code{set()} is called again.
-
-
-The \code{"current"} option is provided to support having common 
+Defines what will be returned by subsequent
+calls to \code{get()} until \code{set()} is called again. The 
+\code{"current"} option is provided to support having common 
 functions to set (or leave alone) sets of model variables, depending on
 their use case and avoids additional if statements. Option \code{"value"}
 is not recommended for normal usage because it allows the model variable

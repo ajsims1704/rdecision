@@ -18,8 +18,8 @@ Description: Classes and functions for modelling health care interventions
   Economic Evaluation" (2006, ISBN:978-0-19-852662-9).
 Depends: R (>= 3.1.0)
 Imports:
+  expm,
   grid,
-  Matrix,
   R6,
   rlang (>= 0.4.2),
   stats,
@@ -32,7 +32,6 @@ Suggests:
     testthat (>= 3.0.0),
     utf8
 License: GPL-3
-LazyData: false
 Language: en-GB
 Encoding: UTF-8
 RoxygenNote: 7.1.1

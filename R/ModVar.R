@@ -148,7 +148,7 @@ ModVar <- R6::R6Class(
     
     #' @description The mode of the variable.
     #' @details By default returns \code{NA}, which will be the case for 
-    #' most \code{ExprModVar} variables, because an arbitrary expression is 
+    #' most \code{ModVar} variables, because an arbitrary distributions are 
     #' not guaranteed to be unimodal.
     #' @return Mode as a numeric value.
     mode = function() {
@@ -196,8 +196,6 @@ ModVar <- R6::R6Class(
     },
 
     #' @description Sets the value of the \code{ModVar}.
-    #' @details Defines what will be returned' by subsequent
-    #' calls to \code{get()} until \code{set()} is called again. 
     #' @param what Character: one of \code{"random"} (samples from the 
     #' uncertainty distribution), \code{"expected"} (mean), \code{"q2.5"}
     #' (lower 95\% confidence limit), \code{"q50"} (median), \code{"q97.5"}
@@ -205,7 +203,9 @@ ModVar <- R6::R6Class(
     #' the value unchanged), \code{"value"} (sets the value explicitly). 
     #' @param val A numeric value, only used with \code{what}=\code{"value"}, 
     #' ignored otherwise.
-    #' @details The \code{"current"} option is provided to support having common 
+    #' @details Defines what will be returned by subsequent
+    #' calls to \code{get()} until \code{set()} is called again. The 
+    #' \code{"current"} option is provided to support having common 
     #' functions to set (or leave alone) sets of model variables, depending on
     #' their use case and avoids additional if statements. Option \code{"value"}
     #' is not recommended for normal usage because it allows the model variable

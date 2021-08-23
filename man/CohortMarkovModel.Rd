@@ -65,7 +65,7 @@ states with multiple outgoing transitions. For this general case, the
 per-cycle transition probability is the solution to Kolmogorov's forward and
 backward equations, and is given by the matrix exponential of the transition
 rate matrix multiplied by the cycle time (Jones 2017, Welton 2005). In 
-\pkg{rdecision}, matrix exponentiation is uses the \pkg{expm} package.
+\pkg{rdecision}, matrix exponentiation uses the \pkg{expm} package.
 }
 
 \subsection{Uncertainty in rates}{
@@ -266,7 +266,7 @@ Non-zero probabilities for undefined transitions are not allowed.}
 When the per-cycle probabilities are available, rather than
 the transition rates, this function calculates and sets rates from 
 probabilities using the matrix log of the probabilities, via 
-package \pkg{expm}. It has the consequence of setting (overwriting) the
+package \pkg{Matrix}. It has the consequence of setting (overwriting) the
 rates in each \code{MarkovTransition}.
 }
 
@@ -293,7 +293,7 @@ Per-cycle transition probability matrix for the model.
 \subsection{Details}{
 Checks that each state has at least one outgoing transition and
 that exactly one outgoing transition rate whose rate is NULL. The 
-transition probability matrix, usually written \eqn{P_t} is the solution
+transition probability matrix, usually written \eqn{P_t}, is the solution
 to Kolmogorov's forward
 and backward equations, and is computed from the transition rate
 matrix using matrix exponentiation with the \pkg{expm} package.
@@ -548,7 +548,7 @@ following columns:
 \describe{
 \item{\code{Cycle}}{The cycle number.}
 \item{\code{Time}}{Elapsed time at end of cycle, years}
-\item{\code{<name>}}{Population of state \code{<name} at the end of
+\item{\code{<name>}}{Population of state \code{<name>} at the end of
 the cycle.}
 \item{\code{Cost}}{Cost associated with occupancy and transitions between
 states during the cycle.}

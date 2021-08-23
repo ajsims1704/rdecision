@@ -320,7 +320,7 @@ Standard deviation as a numeric value.
 \if{html}{\out{<a id="method-q_hat"></a>}}
 \if{latex}{\out{\hypertarget{method-q_hat}{}}}
 \subsection{Method \code{q_hat()}}{
-' Return the estimated quantiles by sampling the variable.
+Return the estimated quantiles by sampling the variable.
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{ExprModVar$q_hat(probs, nest = 1000)}\if{html}{\out{</div>}}
 }

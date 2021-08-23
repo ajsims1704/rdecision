@@ -4,12 +4,6 @@
 \name{DirichletDistribution}
 \alias{DirichletDistribution}
 \title{\verb{DirichletDistribution} class}
-\value{
-A positive definite symmetric matrix of size \code{K} by 
-\code{K}.
-
-Void; sample is retrieved with call to \code{r()}.
-}
 \description{
 An R6 class for a multivariate Dirichlet distribution.
 }
@@ -147,6 +141,10 @@ Variance-covariance matrix.
 \if{html}{\out{<div class="r">}}\preformatted{DirichletDistribution$varcov()}\if{html}{\out{</div>}}
 }
 
+\subsection{Returns}{
+A positive definite symmetric matrix of size \code{K} by 
+\code{K}.
+}
 }
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-sample"></a>}}
@@ -157,6 +155,9 @@ Draw and hold a random sample from the distribution.
 \if{html}{\out{<div class="r">}}\preformatted{DirichletDistribution$sample()}\if{html}{\out{</div>}}
 }
 
+\subsection{Returns}{
+Void; sample is retrieved with call to \code{r()}.
+}
 }
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-clone"></a>}}

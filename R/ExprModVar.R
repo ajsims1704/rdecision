@@ -288,7 +288,7 @@ ExprModVar <- R6::R6Class(
       return(sd(S))
     },
 
-    #' @description' Return the estimated quantiles by sampling the variable. 
+    #' @description Return the estimated quantiles by sampling the variable. 
     #' @details This is computed by numerical simulation because there is, in 
     #' general, no closed form expressions for the quantiles of a function of 
     #' distributions.

@@ -4,16 +4,6 @@
 \name{Distribution}
 \alias{Distribution}
 \title{\verb{Distribution} class}
-\value{
-Order (\code{K}).
-
-A positive definite symmetric matrix of size \code{K} by 
-\code{K}, or a scalar for \code{K=1}, equal to the variance.
-
-Void
-
-A vector of length \code{K} representing one sample.
-}
 \description{
 An R6 class for a multivariate distribution.
 }
@@ -73,6 +63,9 @@ Order of the distribution
 \if{html}{\out{<div class="r">}}\preformatted{Distribution$order()}\if{html}{\out{</div>}}
 }
 
+\subsection{Returns}{
+Order (\code{K}).
+}
 }
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-distribution"></a>}}
@@ -116,8 +109,7 @@ Return the mode of the distribution.
 
 \subsection{Details}{
 By default returns \code{NA}, which will be the case for most
-\code{ExprModVar} variables, because an arbitrary expression is not 
-guaranteed to be unimodal.
+because an arbitrary distribution is not guaranteed to be unimodal.
 }
 
 \subsection{Returns}{
@@ -153,6 +145,10 @@ Variance-covariance matrix.
 \if{html}{\out{<div class="r">}}\preformatted{Distribution$varcov()}\if{html}{\out{</div>}}
 }
 
+\subsection{Returns}{
+A positive definite symmetric matrix of size \code{K} by 
+\code{K}, or a scalar for \code{K=1}, equal to the variance.
+}
 }
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-quantile"></a>}}
@@ -181,7 +177,7 @@ not the true quantiles of a multivariate distribution, which are contours
 for \code{K=2}, surfaces for \code{K=3}, etc. Thus, for example, the
 2.5\% and 97.5\% marginal quantiles of a bivariate normal distribution
 define a rectangle in \eqn{x_1, x_2} space that will include more than
-95\% of the distribution, whereas the contour containing 95%% of the
+95\% of the distribution, whereas the contour containing 95\% of the
 distribution is an ellipse.
 }
 
@@ -202,6 +198,9 @@ Draw and hold a random sample from the distribution.
 \if{html}{\out{<div class="r">}}\preformatted{Distribution$sample()}\if{html}{\out{</div>}}
 }
 
+\subsection{Returns}{
+Void
+}
 }
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-r"></a>}}
@@ -216,6 +215,9 @@ Return a random sample drawn from the distribution.
 Returns the sample generated at the last call to \code{sample}.
 }
 
+\subsection{Returns}{
+A vector of length \code{K} representing one sample.
+}
 }
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-clone"></a>}}
