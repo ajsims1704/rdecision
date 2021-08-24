@@ -19,6 +19,29 @@ test_that("initialize parameters are checked", {
   expect_equal(MT$cost(),20)
 })
 
+test_that("rates and costs can be modified", {
+  # default
+  s1 <- MarkovState$new("s1")
+  s2 <- MarkovState$new("s2")
+  t <- MarkovTransition$new(s1, s2)
+  expect_true(is.na(t$rate()))
+  expect_equal(t$cost(), 0)
+  # defined at creation
+  t <- MarkovTransition$new(s1, s2, cost=42)
+  expect_equal(t$cost(), 42)
+  t$set_rate(2)  
+  expect_equal(t$rate(), 2)
+  t$set_cost(1000)
+  expect_equal(t$cost(), 1000)
+  # modvars
+  c <- ConstModVar$new("c1", "GBP", 42)
+  t <- MarkovTransition$new(s1, s2, cost=c)
+  expect_equal(t$cost(), 42)
+  t <- MarkovTransition$new(s1, s2)
+  t$set_cost(c)
+  expect_equal(t$cost(), 42)
+})
+
 test_that("ModVars are identified and their values are returned", {
   s1 <- MarkovState$new("s1")
   s2 <- MarkovState$new("s2")

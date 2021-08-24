@@ -55,14 +55,7 @@ MarkovTransition <- R6::R6Class(
       # check and set r, ensuring initialization
       self$set_rate(r)
       # check and set cost, ensuring initialization
-      if (inherits(cost, what="numeric")) {
-        private$transition.cost <- cost
-      } else if (inherits(cost, "ModVar")) {
-        private$transition.cost <- cost
-      } else {
-        rlang::abort("Argument 'cost' must be of type 'numeric' or 'ModVar'.",
-                     class = "invalid_cost")
-      }
+      self$set_cost(cost)
       # Return reaction node
       return(invisible(self))
     },
@@ -116,6 +109,22 @@ MarkovTransition <- R6::R6Class(
         r <- private$transition.rate
       }
       return(r)
+    },
+    
+    #' @description Set the cost associated with the transition.
+    #' @param c Cost associated with the transition.
+    #' @return Updated \code{MarkovTransition} object.
+    set_cost = function(c=0) {
+      # check c and set private variable
+      if (inherits(c, what="numeric")) {
+        private$transition.cost <- c
+      } else if (inherits(c, "ModVar")) {
+        private$transition.cost <- c
+      } else {
+        rlang::abort("Argument 'c' must be of type 'numeric' or 'ModVar'.",
+                     class = "invalid_cost")
+      }
+      return(invisible(self))
     },
     
     #' @description Return the cost associated with traversing the edge.

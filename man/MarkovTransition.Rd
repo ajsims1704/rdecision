@@ -27,6 +27,7 @@ Andrew J. Sims \email{andrew.sims@newcastle.ac.uk}
 \item \href{#method-modvars}{\code{MarkovTransition$modvars()}}
 \item \href{#method-set_rate}{\code{MarkovTransition$set_rate()}}
 \item \href{#method-rate}{\code{MarkovTransition$rate()}}
+\item \href{#method-set_cost}{\code{MarkovTransition$set_cost()}}
 \item \href{#method-cost}{\code{MarkovTransition$cost()}}
 \item \href{#method-clone}{\code{MarkovTransition$clone()}}
 }
@@ -130,6 +131,26 @@ Return the value of the hazard rate.
 
 \subsection{Returns}{
 Numeric value.
+}
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-set_cost"></a>}}
+\if{latex}{\out{\hypertarget{method-set_cost}{}}}
+\subsection{Method \code{set_cost()}}{
+Set the cost associated with the transition.
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{MarkovTransition$set_cost(c = 0)}\if{html}{\out{</div>}}
+}
+
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{c}}{Cost associated with the transition.}
+}
+\if{html}{\out{</div>}}
+}
+\subsection{Returns}{
+Updated \code{MarkovTransition} object.
 }
 }
 \if{html}{\out{<hr>}}
