@@ -1,10 +1,9 @@
-#' @title \verb{BetaDistribution} class
+#' @title A parametrized Beta Distribution
 #' 
-#' @description
-#' An R6 class for a Beta distribution.
+#' @description An R6 class representing a Beta distribution with parameters.
 #' 
 #' @details A Beta distribution with hyperparameters for shape (\code{alpha}
-#' and \code{beta}). 
+#' and \code{beta}). Inherits from class \code{Distribution}. 
 #'
 #' @docType class
 #' @author Andrew J. Sims \email{andrew.sims@@newcastle.ac.uk}
@@ -20,8 +19,7 @@ BetaDistribution <- R6::R6Class(
   ),
   public = list(
     
-    #' @description 
-    #' Create an object of class \code{BetaDistribution}.
+    #' @description Create an object of class \code{BetaDistribution}.
     #' @param alpha parameter of the Beta distribution.
     #' @param beta parameter of the Beta distribution.
     #' @return An object of class \code{BetaDistribution}. 
@@ -62,23 +60,22 @@ BetaDistribution <- R6::R6Class(
       return(invisible(self))
     },
     
-    #' @description 
-    #' Accessor function for the name of the uncertainty distribution.
+    #' @description Accessor function for the name of the uncertainty 
+    #' distribution.
     #' @return Distribution name as character string.
     distribution = function() {
       rv <- paste('Be(', private$alpha, ',', private$beta, ')', sep='')
       return(rv)
     },
     
-    #' @description 
-    #' Return the expected value of the distribution. 
+    #' @description The expected value of the distribution. 
     #' @return Expected value as a numeric value.
     mean = function() {
       return(private$alpha/(private$alpha+private$beta))
     },
     
-    #' @description 
-    #' Return the mode of the distribution (if \code{alpha}, \code{beta} > 1) 
+    #' @description The mode of the distribution (if 
+    #' \code{alpha}, \code{beta} > 1) 
     #' @return mode as a numeric value.
     mode = function() {
       rv <- as.numeric(NA)
@@ -96,7 +93,7 @@ BetaDistribution <- R6::R6Class(
       return(rv)
     },
     
-    #' @description Return the standard deviation of the distribution. 
+    #' @description The standard deviation of the distribution. 
     #' @return Standard deviation as a numeric value
     SD = function() {
       a <- private$alpha
@@ -112,8 +109,7 @@ BetaDistribution <- R6::R6Class(
       return(invisible(self))
     },
     
-    #' @description
-    #' Return the quantiles of the Beta uncertainty distribution.
+    #' @description The quantiles of the Beta distribution.
     #' @param probs Vector of probabilities, in range [0,1].    
     #' @return Vector of quantiles.
     quantile = function(probs) {

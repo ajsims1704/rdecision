@@ -1,10 +1,11 @@
-#' @title \verb{LogNormModVar} class
+#' @title A model variable whose uncertainty follows a log Normal distribution
 #' 
-#' @description An R6 class for a model variable with Log Normal uncertainty
+#' @description An R6 class representing a model variable with log Normal 
+#' uncertainty.
 #' 
 #' @details A model variable for which the uncertainty in the point estimate can
-#' be modelled with a Log Normal distribution. One of seven parametrizations
-#' defined by Swat et al can be used.
+#' be modelled with a log Normal distribution. One of seven parametrizations
+#' defined by Swat \emph{et al} can be used. Inherits from \code{ModVar}.
 #' 
 #' @references{ 
 #'  Briggs A, Claxton K and Sculpher M. Decision Modelling for Health

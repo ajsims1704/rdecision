@@ -3,14 +3,15 @@
 \docType{class}
 \name{Arborescence}
 \alias{Arborescence}
-\title{\verb{Arborescence} class}
+\title{A rooted directed tree}
 \description{
-An R6 class to represent an \dfn{arborescence} (a rooted directed tree).
+An R6 class representing an \dfn{arborescence} (a rooted 
+directed tree).
 }
 \details{
-Class to encapsulate a directed rooted tree specialization of a digraph.
-An arborescence must be a directed tree with exactly one root and the
-directed paths from the root must be unique.
+Class to encapsulate a directed rooted tree specialization of a 
+digraph. An arborescence is a directed tree with exactly one root and 
+unique directed paths from the root. Inherits from class \code{Digraph}.
 }
 \references{
 {

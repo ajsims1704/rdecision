@@ -1,11 +1,12 @@
-#' @title \verb{BetaModVar} class
+#' @title A model variable whose uncertainty follows a Beta distribution
 #' 
-#' @description An R6 class for a model variable with Beta function uncertainty.
+#' @description An R6 class representing a model variable whose uncertainty
+#' is described by a Beta distribution.
 #' 
 #' @details A model variable for which the uncertainty in the point estimate can
 #' be modelled with a Beta distribution. The hyperparameters of the
 #' distribution are the shape parameters (\code{alpha} and \code{beta}) of
-#' the uncertainty distribution. 
+#' the uncertainty distribution. Inherits from class \code{ModVar}.
 #'
 #' @docType class
 #' @author Andrew J. Sims \email{andrew.sims@@newcastle.ac.uk}

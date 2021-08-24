@@ -1,6 +1,6 @@
-#' @title \verb{MarkovTransition} class
+#' @title A transition in a Markov model
 #' 
-#' @description An R6 class to represent a transition in a Markov model.
+#' @description An R6 class representing a transition in a Markov model.
 #' 
 #' @details A specialism of class \code{Arrow} which is used in a Markov model
 #' to represent a transition between two \code{MarkovState}s. The transition

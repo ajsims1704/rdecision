@@ -1,13 +1,11 @@
-#' @title \verb{ChanceNode} class
+#' @title A chance node in a decision tree
 #'
-#' @description 
-#' An R6 class to represent a chance node in a decision tree.
+#' @description An R6 class representing a chance node in a decision tree.
 #' 
-#' @details
-#' An R6 class to represent a chance node in a decision tree. 
-#' The node is associated with at least two branches to other nodes, each 
-#' of which has a conditional probability (the probability of following
-#' that branch given that the node has been reached). 
+#' @details A chance node is associated with at least two branches to other 
+#' nodes, each of which has a conditional probability (the probability of 
+#' following that branch given that the node has been reached). Inherits from
+#' class \code{Node}.
 #' 
 #' @docType class
 #' @author Andrew Sims \email{andrew.sims@@newcastle.ac.uk}
@@ -21,8 +19,7 @@ ChanceNode <- R6::R6Class(
   ),
   public = list(
     
-    #' @description
-    #' Create a new \code{ChanceNode} object
+    #' @description Create a new \code{ChanceNode} object
     #' @param label An optional label for the chance node.
     #' @return A new \code{ChanceNode} object
     initialize = function(label="") {

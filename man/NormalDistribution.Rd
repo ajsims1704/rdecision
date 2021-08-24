@@ -3,13 +3,13 @@
 \docType{class}
 \name{NormalDistribution}
 \alias{NormalDistribution}
-\title{\verb{NormalDistribution}}
+\title{A parametrized Normal distribution}
 \description{
-An R6 class for a parametrized Normal distribution
+An R6 class representing a parametrized Normal distribution.
 }
 \details{
 A Normal distribution with hyperparameters mean (\code{mu}) and 
-standard deviation (\code{sd}).
+standard deviation (\code{sd}). Inherits from class \code{Distribution}.
 }
 \author{
 Andrew J. Sims \email{andrew.sims@newcastle.ac.uk}

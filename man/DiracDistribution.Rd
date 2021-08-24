@@ -3,9 +3,9 @@
 \docType{class}
 \name{DiracDistribution}
 \alias{DiracDistribution}
-\title{\verb{DiracDistribution} class}
+\title{A Dirac delta function}
 \description{
-An R6 class for a Dirac Delta function distribution.
+An R6 class representing a Dirac Delta function.
 }
 \details{
 A distribution modelled by a Dirac delta function \eqn{\delta(x-c)}
@@ -14,7 +14,7 @@ probability 1 that the value will be equal to \eqn{c} and zero otherwise.
 The mode, mean, quantiles and random samples are all equal to \eqn{c}. It is
 acknowledged that there is debate over whether Dirac delta functions are 
 true distributions, but the assumption makes little practical difference in 
-this case.
+this case. Inherits from class \code{Distribution}.
 }
 \author{
 Andrew Sims \email{andrew.sims@newcastle.ac.uk}

@@ -3,13 +3,14 @@
 \docType{class}
 \name{DecisionNode}
 \alias{DecisionNode}
-\title{\verb{DecisionNode} class}
+\title{A decision node in a decision tree}
 \description{
-An R6 class for a decision node in a decision tree
+An R6 class representing a decision node in a decision tree.
 }
 \details{
 A class to represent a decision node in a decision tree. The node
-is associated with one or more branches to child nodes.
+is associated with one or more branches to child nodes. Inherits from class
+\code{Node}.
 }
 \author{
 Andrew J. Sims \email{andrew.sims@newcastle.ac.uk}

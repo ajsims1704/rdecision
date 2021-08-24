@@ -3,13 +3,13 @@
 \docType{class}
 \name{Digraph}
 \alias{Digraph}
-\title{\verb{Digraph} class}
+\title{A directed graph}
 \description{
-An R6 class to represent a digraph (a directed graph).
+An R6 class representing a digraph (a directed graph).
 }
 \details{
-Encapsulates and provides methods for computation and checking of directed
-graphs (digraphs). Inherits from class \code{Graph}.
+Encapsulates and provides methods for computation and checking of 
+directed graphs (digraphs). Inherits from class \code{Graph}.
 }
 \references{
 { 
@@ -110,7 +110,7 @@ cell is \code{{FALSE,TRUE}}.}
 \subsection{Details}{
 Each cell contains the number of edges from the row vertex to
 the column vertex, with the convention of self loops being counted once,
-unless \code{boolean} is \code{TRUE}' when cells are either \code{FALSE}
+unless \code{boolean} is \code{TRUE} when cells are either \code{FALSE}
 (not adjacent) or \code{TRUE} (adjacent).
 }
 

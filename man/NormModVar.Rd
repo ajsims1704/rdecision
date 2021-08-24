@@ -3,16 +3,17 @@
 \docType{class}
 \name{NormModVar}
 \alias{NormModVar}
-\title{\verb{NormModVar}}
+\title{A model variable whose uncertainty follows a Normal distribution}
 \description{
-An R6 class for a model variable with Normal uncertainty
+An R6 class representing a model variable with Normal 
+uncertainty.
 }
 \details{
-A model variable for which the uncertainty in the point estimate can
+A model variable for which the uncertainty in its point estimate can
 be modelled with a Normal distribution. The hyperparameters of the
 distribution are the mean (\code{mu}) and the standard deviation (\code{sd})
 of the uncertainty distribution. The value of \code{mu} is the expected value
-of the variable.
+of the variable. Inherits from class \code{ModVar}.
 }
 \author{
 Andrew J. Sims \email{andrew.sims@newcastle.ac.uk}

@@ -1,7 +1,8 @@
-#' @title \verb{MarkovState} class
-#' @description An R6 class for a state in a Markov model.
+#' @title A state in a Markov model
+#' @description An R6 class representing a state in a Markov model.
 #' @details  Represents a single state in a Markov model. A Markov model is 
-#' a digraph in which states are nodes and transitions are arrows. 
+#' a digraph in which states are nodes and transitions are arrows. Inherits 
+#' from class \code{Node}.
 #' @docType class
 #' @author Andrew J. Sims \email{andrew.sims@@newcastle.ac.uk}
 #' @export

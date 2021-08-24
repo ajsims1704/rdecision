@@ -1,6 +1,6 @@
-#' @title \verb{ModVar} class
+#' @title A model variable incorporating uncertainty
 #' 
-#' @description An R6 class for a variable in a health economic model
+#' @description An R6 class for a variable in a health economic model.
 #' 
 #' @details Base class for a variable used in a health economic model. The base 
 #' class wraps a numerical value which is used in calculations.
@@ -148,7 +148,7 @@ ModVar <- R6::R6Class(
     
     #' @description The mode of the variable.
     #' @details By default returns \code{NA}, which will be the case for 
-    #' most \code{ModVar} variables, because an arbitrary distributions are 
+    #' most \code{ModVar} variables, because arbitrary distributions are 
     #' not guaranteed to be unimodal.
     #' @return Mode as a numeric value.
     mode = function() {

@@ -1,12 +1,13 @@
-#' @title \verb{GammaModVar} class
+#' @title A model variable whose uncertainty follows a Gamma distribution
 #' 
-#' @description An R6 class for a model variable with Gamma uncertainty
+#' @description An R6 class for a model variable with Gamma uncertainty.
 #' 
 #' @details A model variable for which the uncertainty in the point estimate can
 #' be modelled with a Gamma distribution. The hyperparameters of the
 #' distribution are the shape (\code{k}) and the scale (\code{theta}). Note
 #' that although Briggs \emph{et al} (2006) use the shape, scale formulation,
-#' they use \code{alpha}, \code{beta} as parameter names.
+#' they use \code{alpha}, \code{beta} as parameter names. Inherits from
+#' class \code{ModVar}.
 #'  
 #' @references{
 #'   Briggs A, Claxton K, Sculpher M. Decision modelling for health

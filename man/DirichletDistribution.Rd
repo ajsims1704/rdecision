@@ -3,13 +3,14 @@
 \docType{class}
 \name{DirichletDistribution}
 \alias{DirichletDistribution}
-\title{\verb{DirichletDistribution} class}
+\title{A parametrized Dirichlet distribution}
 \description{
-An R6 class for a multivariate Dirichlet distribution.
+An R6 class representing a multivariate Dirichlet distribution.
 }
 \details{
 A multivariate Dirichlet distribution. See 
-\url{https://en.wikipedia.org/wiki/Dirichlet_distribution} for details.
+\url{https://en.wikipedia.org/wiki/Dirichlet_distribution} for details. 
+Inherits from class \code{Distribution}.
 }
 \author{
 Andrew J. Sims \email{andrew.sims@newcastle.ac.uk}

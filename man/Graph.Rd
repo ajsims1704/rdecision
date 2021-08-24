@@ -3,13 +3,14 @@
 \docType{class}
 \name{Graph}
 \alias{Graph}
-\title{\verb{Graph} class}
+\title{An undirected graph}
 \description{
 An R6 class to represent a graph (from discrete mathematics).
 }
 \details{
-Encapsulates and provides methods for computation and checking of undirected
-graphs. Graphs are systems of vertices connected in pairs by edges.
+Encapsulates and provides methods for computation and checking of 
+undirected graphs. Graphs are systems of vertices connected in pairs by 
+edges. A base class.
 }
 \references{
 { 

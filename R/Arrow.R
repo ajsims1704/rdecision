@@ -1,7 +1,6 @@
-#' @title \verb{Arrow} class
+#' @title A directed edge in a digraph
 #' 
-#' @description
-#' An R6 class to represent an directed edge in a digraph.
+#' @description An R6 class representing an directed edge in a digraph.
 #' 
 #' @details An arrow is the formal term for an edge between pairs of nodes in a
 #' directed graph. Inherits from class \code{Edge}.
@@ -17,8 +16,7 @@ Arrow <- R6::R6Class(
   ),
   public = list(
     
-    #' @description
-    #' Create an object of type \code{Arrow}.
+    #' @description Create an object of type \code{Arrow}.
     #' @param source Node from which the arrow leaves.
     #' @param target Node to which the arrow points.
     #' @param label Character string containing the arrow label.
@@ -29,15 +27,13 @@ Arrow <- R6::R6Class(
       return(invisible(self))
     },
 
-    #' @description
-    #' Access source node.
+    #' @description Access source node.
     #' @return Node from which the arrow leads.
     source = function() {
       return(private$v1)
     },
     
-    #' @description
-    #' Access target node.
+    #' @description Access target node.
     #' @return Node to which the arrow points.
     target = function() {
       return(private$v2)

@@ -1,9 +1,10 @@
-#' @title \verb{LogNormDistribution} class
+#' @title A parametrized log Normal probability distribution
 #' 
-#' @description An R6 class for Log Normal distribution
+#' @description An R6 class representing a log Normal distribution.
 #' 
-#' @details A parametrized Log Normal distribution. Swat (2017) defined seven 
-#' parametrizations of the log normal distribution. 
+#' @details A parametrized Log Normal distribution inheriting from class
+#' \code{Distribution}. Swat (2017) defined seven parametrizations of the log 
+#' normal distribution. 
 #' These are linked, allowing the parameters of any one to be derived from any 
 #' other. All 7 parametrizations require two parameters as follows:
 #' \describe{

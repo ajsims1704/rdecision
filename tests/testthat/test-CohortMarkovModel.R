@@ -105,6 +105,24 @@ test_that("unconnected underlying graphs are detected", {
   )  
 })
 
+test_that("non-unique state labels are detected", {
+  s.well <- MarkovState$new("Well")
+  s.disabled <- MarkovState$new("Well")
+  s.dead <- MarkovState$new("Dead")
+  e.ww <- MarkovTransition$new(s.well, s.well)
+  e.wd <- MarkovTransition$new(s.well, s.dead)
+  e.ws <- MarkovTransition$new(s.well, s.disabled)
+  e.sd <- MarkovTransition$new(s.disabled, s.dead)
+  e.dd <- MarkovTransition$new(s.dead, s.dead)
+  expect_error(
+    CohortMarkovModel$new(
+      V = list(s.well, s.disabled, s.dead),
+      E = list(e.ww, e.wd, e.ws, e.sd, e.dd)
+    ), 
+    class="invalid_state_names"
+  )  
+})  
+
 test_that("invalid discount rates are detected", {
   s.well <- MarkovState$new("Well")
   s.disabled <- MarkovState$new("Disabled")

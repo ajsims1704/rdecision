@@ -3,12 +3,13 @@
 \docType{class}
 \name{CohortMarkovModel}
 \alias{CohortMarkovModel}
-\title{\verb{CohortMarkovModel}}
+\title{A Markov model for cohort simulation}
 \description{
-An R6 class for a Markov model with cohort simulation.
+An R6 class representing a Markov model for cohort simulation.
 }
 \details{
-A class to represent a Markov model, using cohort simulation. In 
+A class to represent a continuous time Markov chain, modelled
+using cohort simulation. In 
 graph theory terms, a Markov model is a directed multidigraph permitting 
 loops (a loop multidigraph), optionally labelled, or a \dfn{quiver}. It is a
 multidigraph because there are potentially two edges between each pair of
@@ -212,6 +213,7 @@ A Markov model must meet the following conditions:
   \item No two edges may share the same source and target nodes (i.e. 
   the digraph may not have multiple edges). This is to ensure that there
   are no more transitions than cells in the transition matrix.
+  \item The node labels must be unique to the graph.
 }
 }
 

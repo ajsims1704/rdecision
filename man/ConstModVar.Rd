@@ -3,9 +3,9 @@
 \docType{class}
 \name{ConstModVar}
 \alias{ConstModVar}
-\title{\verb{ConstModVar} class}
+\title{A constant model variable}
 \description{
-An R6 class for a constant in a model.
+An R6 class representing a constant in a model.
 }
 \details{
 A \code{ModVar} with no uncertainty in its value. Its distribution 
@@ -13,7 +13,7 @@ is treated as a Dirac delta function \eqn{\delta(x-c)} where \eqn{c} is the
 hyperparameter (value of the constant). The benefit over 
 using a regular numeric variable in a model is that it will appear in 
 tabulations of the model variables associated with a model and therefore be
-explicitly documented as a model input.
+explicitly documented as a model input. Inherits from class \code{ModVar}.
 }
 \author{
 Andrew Sims \email{andrew.sims@newcastle.ac.uk}

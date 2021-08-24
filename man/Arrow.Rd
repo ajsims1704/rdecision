@@ -3,9 +3,9 @@
 \docType{class}
 \name{Arrow}
 \alias{Arrow}
-\title{\verb{Arrow} class}
+\title{A directed edge in a digraph}
 \description{
-An R6 class to represent an directed edge in a digraph.
+An R6 class representing an directed edge in a digraph.
 }
 \details{
 An arrow is the formal term for an edge between pairs of nodes in a

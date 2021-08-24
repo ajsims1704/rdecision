@@ -3,9 +3,9 @@
 \docType{class}
 \name{ModVar}
 \alias{ModVar}
-\title{\verb{ModVar} class}
+\title{A model variable incorporating uncertainty}
 \description{
-An R6 class for a variable in a health economic model
+An R6 class for a variable in a health economic model.
 }
 \details{
 Base class for a variable used in a health economic model. The base 
@@ -181,7 +181,7 @@ The mode of the variable.
 
 \subsection{Details}{
 By default returns \code{NA}, which will be the case for 
-most \code{ModVar} variables, because an arbitrary distributions are 
+most \code{ModVar} variables, because arbitrary distributions are 
 not guaranteed to be unimodal.
 }
 

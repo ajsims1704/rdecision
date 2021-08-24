@@ -3,13 +3,14 @@
 \docType{class}
 \name{LeafNode}
 \alias{LeafNode}
-\title{\verb{LeafNode} class}
+\title{A leaf node in a decision tree}
 \description{
-An R6 class for a leaf node in a decision tree representing a clinical state.
+An R6 class representing a leaf (terminal) node in a decision 
+tree.
 }
 \details{
 Represents a terminal state in a tree, and is associated with an
-incremental utility.
+incremental utility. Inherits from class \code{Node}.
 }
 \author{
 Andrew J. Sims \email{andrew.sims@newcastle.ac.uk}

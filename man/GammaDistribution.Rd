@@ -3,9 +3,9 @@
 \docType{class}
 \name{GammaDistribution}
 \alias{GammaDistribution}
-\title{\verb{GammaDistribution} class}
+\title{A parametrized Gamma distribution}
 \description{
-An R6 class for a Gamma distribution.
+An R6 class representing a Gamma distribution.
 }
 \details{
 An object representing a Gamma distribution with hyperparameters 
@@ -13,7 +13,8 @@ shape (\code{k}) and scale (\code{theta}). In econometrics this
 parametrization is more common but in Bayesian statistics the shape 
 (\code{alpha}) and rate (\code{beta}) parametrization is more usual. Note, 
 however, that although Briggs \emph{et al} (2006) use the shape, scale
-formulation, they use \code{alpha}, \code{beta} as parameter names.
+formulation, they use \code{alpha}, \code{beta} as parameter names. Inherits
+from class \code{Distribution}.
 }
 \references{
 {

@@ -1,11 +1,9 @@
-#' @title \verb{Digraph} class
+#' @title A directed graph
 #' 
-#' @description
-#' An R6 class to represent a digraph (a directed graph).
+#' @description An R6 class representing a digraph (a directed graph).
 #' 
-#' @details 
-#' Encapsulates and provides methods for computation and checking of directed
-#' graphs (digraphs). Inherits from class \code{Graph}. 
+#' @details Encapsulates and provides methods for computation and checking of 
+#' directed graphs (digraphs). Inherits from class \code{Graph}. 
 #'
 #' @references{ 
 #'   Gansner ER, Koutsofios E, North SC, Vo K-P. A technique for drawing
@@ -63,7 +61,7 @@ Digraph <- R6::R6Class(
     #' @description Compute the adjacency matrix for the digraph.
     #' @details Each cell contains the number of edges from the row vertex to
     #' the column vertex, with the convention of self loops being counted once,
-    #' unless \code{boolean} is \code{TRUE}' when cells are either \code{FALSE}
+    #' unless \code{boolean} is \code{TRUE} when cells are either \code{FALSE}
     #' (not adjacent) or \code{TRUE} (adjacent).
     #' @param boolean If \code{TRUE}, the adjacency matrix is logical, each 
     #' cell is \code{{FALSE,TRUE}}.

@@ -3,13 +3,12 @@
 \docType{class}
 \name{Node}
 \alias{Node}
-\title{\verb{Node} class}
+\title{A node in a graph}
 \description{
-An R6 class to represent a node in a decision tree
+An R6 class representing a node in a graph.
 }
 \details{
-Base class to represent a single node in a decision tree. Objects of base
-class \code{Node} are not expected to be created as model objects.
+A base class to represent a single node in a graph.
 }
 \author{
 Andrew Sims \email{andrew.sims@newcastle.ac.uk}

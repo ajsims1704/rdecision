@@ -1,10 +1,9 @@
-#' @title \verb{Edge} class
+#' @title An edge in a graph
 #' 
-#' @description
-#' An R6 class to represent an edge in a graph.
+#' @description An R6 class representing an edge in a graph.
 #' 
 #' @details Edges are the formal term for links between pairs of nodes in a
-#' graph. 
+#' graph. A base class.
 #' 
 #' @docType class
 #' @author Andrew J. Sims \email{andrew.sims@@newcastle.ac.uk}

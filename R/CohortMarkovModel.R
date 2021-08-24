@@ -1,8 +1,9 @@
-#' @title \verb{CohortMarkovModel}
+#' @title A Markov model for cohort simulation
 #' 
-#' @description An R6 class for a Markov model with cohort simulation.
+#' @description An R6 class representing a Markov model for cohort simulation.
 #' 
-#' @details A class to represent a Markov model, using cohort simulation. In 
+#' @details A class to represent a continuous time Markov chain, modelled
+#' using cohort simulation. In 
 #' graph theory terms, a Markov model is a directed multidigraph permitting 
 #' loops (a loop multidigraph), optionally labelled, or a \dfn{quiver}. It is a
 #' multidigraph because there are potentially two edges between each pair of
@@ -141,6 +142,7 @@ CohortMarkovModel <- R6::R6Class(
     #'   \item No two edges may share the same source and target nodes (i.e. 
     #'   the digraph may not have multiple edges). This is to ensure that there
     #'   are no more transitions than cells in the transition matrix.
+    #'   \item The node labels must be unique to the graph.
     #' }
     #' @param V A list of nodes (\code{MarkovState}s).
     #' @param E A list of edges (\code{MarkovTransition}s).
@@ -188,6 +190,13 @@ CohortMarkovModel <- R6::R6Class(
         rlang::abort(
           "The digraph must not have multiple edges",
           class = "multiple_edges"
+        )
+      }
+      # check that the node names are unique
+      if (length(unique(self$get_statenames()))!=self$order()) {
+        rlang::abort(
+          "State labels must be unique",
+          class = "invalid_state_names"
         )
       }
       # check and set discounts

@@ -1,10 +1,10 @@
-#' @title \verb{Reaction} class
+#' @title A reaction (chance) edge in a decision tree
 #' 
-#' @description
-#' An R6 class to represent a reaction (chance) edge in a decision tree.
+#' @description An R6 class representing a reaction (chance) edge in a decision 
+#' tree.
 #' 
 #' @details A specialism of class \code{Arrow} which is used in a decision tree
-#' to represent edges with source nodes joined to \code{ChanceNode}s.
+#' to represent edges whose source nodes are \code{ChanceNode}s.
 #' 
 #' @docType class
 #' @author Andrew J. Sims \email{andrew.sims@@newcastle.ac.uk}

@@ -3,13 +3,13 @@
 \docType{class}
 \name{Action}
 \alias{Action}
-\title{\verb{Action} class}
+\title{An action in a decision tree}
 \description{
-An R6 class to represent an action (choice) edge in a decision tree.
+R6 class representing an action (choice) edge.
 }
 \details{
 A specialism of class \code{Arrow} which is used in a decision tree
-to represent edges with source nodes joined to \code{DecisionNode}s.
+to represent an edge whose source node is a \code{DecisionNode}.
 }
 \author{
 Andrew J. Sims \email{andrew.sims@newcastle.ac.uk}

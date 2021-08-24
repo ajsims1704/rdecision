@@ -1,9 +1,10 @@
-#' @title \verb{DirichletDistribution} class
+#' @title A parametrized Dirichlet distribution
 #' 
-#' @description An R6 class for a multivariate Dirichlet distribution.
+#' @description An R6 class representing a multivariate Dirichlet distribution.
 #' 
 #' @details A multivariate Dirichlet distribution. See 
 #' \url{https://en.wikipedia.org/wiki/Dirichlet_distribution} for details. 
+#' Inherits from class \code{Distribution}.
 #'
 #' @docType class
 #' @author Andrew J. Sims \email{andrew.sims@@newcastle.ac.uk}

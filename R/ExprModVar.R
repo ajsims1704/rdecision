@@ -1,8 +1,7 @@
-#' @title \verb{ExprModVar} class
+#' @title A model variable constructed from an expression of other variables
 #' 
-#' @description 
-#' An R6 class for a model variable constructed from an expression
-#' involving other model variables.
+#' @description An R6 class representing a model variable constructed from an
+#' expression involving other variables.
 #' 
 #' @details A class to support expressions involving objects
 #' of base class \code{ModVar}, which itself behaves like a 
@@ -13,7 +12,8 @@
 #' \code{x <- 42*A/B + c}, because R cannot manipulate class
 #' variables using the same operators as regular variables. 
 #' But such forms of expression may be desirable in constructing a
-#' model and this class provides a mechanism for doing so.
+#' model and this class provides a mechanism for doing so. Inherits from
+#' class \code{ModVar}.
 #' 
 #' @references{
 #'   Briggs A, Claxton K, Sculpher M. Decision modelling for health

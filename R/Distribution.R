@@ -1,9 +1,8 @@
-#' @title \verb{Distribution} class
+#' @title A probability distribution
 #' 
-#' @description An R6 class for a multivariate distribution.
+#' @description An R6 class representing a (possibly multivariate) distribution.
 #' 
-#' @details This class is not intended to be instantiated by end-users of the
-#' package. It is the base class for particular univariate or multivariate
+#' @details The base class for particular univariate or multivariate 
 #' distributions. 
 #'
 #' @docType class

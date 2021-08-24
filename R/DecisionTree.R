@@ -1,13 +1,11 @@
-#' @title \verb{DecisionTree} class
+#' @title A decision tree
 #' 
-#' @description 
-#' An R6 class to represent a decision tree
+#' @description An R6 class to represent a decision tree model.
 #' 
-#' @details 
-#' A class to represent a decision tree. An object contains a tree of
+#' @details A class to represent a decision tree. An object contains a tree of
 #' decision nodes, chance nodes and leaf nodes, connected by edges
-#' (either actions or reactions) and which satisfies the following
-#' conditions:
+#' (either actions or reactions). It inherits from class \code{Arborescence} and
+#' satisfies the following conditions:
 #' \enumerate{
 #' \item{Nodes and edges must form a tree with a single root and
 #' there must be a unique path from the root to each node.

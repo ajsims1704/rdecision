@@ -3,13 +3,13 @@
 \docType{class}
 \name{BetaDistribution}
 \alias{BetaDistribution}
-\title{\verb{BetaDistribution} class}
+\title{A parametrized Beta Distribution}
 \description{
-An R6 class for a Beta distribution.
+An R6 class representing a Beta distribution with parameters.
 }
 \details{
 A Beta distribution with hyperparameters for shape (\code{alpha}
-and \code{beta}).
+and \code{beta}). Inherits from class \code{Distribution}.
 }
 \author{
 Andrew J. Sims \email{andrew.sims@newcastle.ac.uk}
@@ -65,7 +65,8 @@ An object of class \code{BetaDistribution}.
 \if{html}{\out{<a id="method-distribution"></a>}}
 \if{latex}{\out{\hypertarget{method-distribution}{}}}
 \subsection{Method \code{distribution()}}{
-Accessor function for the name of the uncertainty distribution.
+Accessor function for the name of the uncertainty 
+distribution.
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{BetaDistribution$distribution()}\if{html}{\out{</div>}}
 }
@@ -78,7 +79,7 @@ Distribution name as character string.
 \if{html}{\out{<a id="method-mean"></a>}}
 \if{latex}{\out{\hypertarget{method-mean}{}}}
 \subsection{Method \code{mean()}}{
-Return the expected value of the distribution.
+The expected value of the distribution.
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{BetaDistribution$mean()}\if{html}{\out{</div>}}
 }
@@ -91,7 +92,8 @@ Expected value as a numeric value.
 \if{html}{\out{<a id="method-mode"></a>}}
 \if{latex}{\out{\hypertarget{method-mode}{}}}
 \subsection{Method \code{mode()}}{
-Return the mode of the distribution (if \code{alpha}, \code{beta} > 1)
+The mode of the distribution (if 
+\code{alpha}, \code{beta} > 1)
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{BetaDistribution$mode()}\if{html}{\out{</div>}}
 }
@@ -104,7 +106,7 @@ mode as a numeric value.
 \if{html}{\out{<a id="method-SD"></a>}}
 \if{latex}{\out{\hypertarget{method-SD}{}}}
 \subsection{Method \code{SD()}}{
-Return the standard deviation of the distribution.
+The standard deviation of the distribution.
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{BetaDistribution$SD()}\if{html}{\out{</div>}}
 }
@@ -130,7 +132,7 @@ Updated distribution.
 \if{html}{\out{<a id="method-quantile"></a>}}
 \if{latex}{\out{\hypertarget{method-quantile}{}}}
 \subsection{Method \code{quantile()}}{
-Return the quantiles of the Beta uncertainty distribution.
+The quantiles of the Beta distribution.
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{BetaDistribution$quantile(probs)}\if{html}{\out{</div>}}
 }
