@@ -62,6 +62,17 @@
 #' \pkg{rdecision}, matrix exponentiation uses the \pkg{expm} package.
 #' }
 #' 
+#' \subsection{Tunnel states are not allowed}{
+#' Currently, models that include tunnel states (i.e. states without a self
+#' loop) are disallowed. This is because they violate the Markov assumption
+#' (i.e. models are memoryless). As defined by Sonnenberg and Beck (1993),
+#' patients who transition to a tunnel state remain there for exactly one
+#' cycle. This implies that the transition rate from that state is infinite
+#' to ensure that all occupants leave with a probability of one by the end
+#' of the cycle. A further undesirable consequence is that the result of the
+#' model depends on the chosen cycle duration. 
+#' }
+#' 
 #' \subsection{Uncertainty in rates}{
 #' Welton and Ades (2005) describe a method for converting observed counts of 
 #' transitions into transition rates. They also provide a method for modelling
@@ -128,6 +139,9 @@ CohortMarkovModel <- R6::R6Class(
     #'   graph is connected;
     #'   \item Each state must have at least one outgoing transition (which
     #'   can be a self-loop);
+    #'   \item Each state must have a self loop (i.e. tunnel states are
+    #'   not permitted because they violate the principle that Markov
+    #'   models are memoryless); 
     #'   \item For each state the sum of outgoing transition rates must be zero.
     #'   This ensures that the row sums of the transition rate matrix (\eqn{Q}) 
     #'   are zero, as required to solve Kolmogorov's forward and backward
@@ -190,6 +204,13 @@ CohortMarkovModel <- R6::R6Class(
         rlang::abort(
           "The digraph must not have multiple edges",
           class = "multiple_edges"
+        )
+      }
+      # check that all states have a self-loop
+      if (any(diag(A) != 1)) {
+        rlang::abort(
+          "Markov model is not memoryless (i.e. not all states have self loops",
+          class = "not_memoryless"
         )
       }
       # check that the node names are unique
@@ -271,7 +292,7 @@ CohortMarkovModel <- R6::R6Class(
     #' @details When the per-cycle probabilities are available, rather than
     #' the transition rates, this function calculates and sets rates from 
     #' probabilities using the matrix log of the probabilities, via 
-    #' package \pkg{Matrix}. It has the consequence of setting (overwriting) the
+    #' package \pkg{expm}. It has the consequence of setting (overwriting) the
     #' rates in each \code{MarkovTransition}.
     #' @param Pt Per-cycle transition probability matrix. Formally, the
     #' solution of Kolmogorov's forward and backward equations. The row and 

@@ -69,6 +69,17 @@ rate matrix multiplied by the cycle time (Jones 2017, Welton 2005). In
 \pkg{rdecision}, matrix exponentiation uses the \pkg{expm} package.
 }
 
+\subsection{Tunnel states are not allowed}{
+Currently, models that include tunnel states (i.e. states without a self
+loop) are disallowed. This is because they violate the Markov assumption
+(i.e. models are memoryless). As defined by Sonnenberg and Beck (1993),
+patients who transition to a tunnel state remain there for exactly one
+cycle. This implies that the transition rate from that state is infinite
+to ensure that all occupants leave with a probability of one by the end
+of the cycle. A further undesirable consequence is that the result of the
+model depends on the chosen cycle duration. 
+}
+
 \subsection{Uncertainty in rates}{
 Welton and Ades (2005) describe a method for converting observed counts of 
 transitions into transition rates. They also provide a method for modelling
@@ -199,6 +210,9 @@ A Markov model must meet the following conditions:
   graph is connected;
   \item Each state must have at least one outgoing transition (which
   can be a self-loop);
+  \item Each state must have a self loop (i.e. tunnel states are
+  not permitted because they violate the principle that Markov
+  models are memoryless); 
   \item For each state the sum of outgoing transition rates must be zero.
   This ensures that the row sums of the transition rate matrix (\eqn{Q}) 
   are zero, as required to solve Kolmogorov's forward and backward
@@ -268,7 +282,7 @@ Non-zero probabilities for undefined transitions are not allowed.}
 When the per-cycle probabilities are available, rather than
 the transition rates, this function calculates and sets rates from 
 probabilities using the matrix log of the probabilities, via 
-package \pkg{Matrix}. It has the consequence of setting (overwriting) the
+package \pkg{expm}. It has the consequence of setting (overwriting) the
 rates in each \code{MarkovTransition}.
 }
 

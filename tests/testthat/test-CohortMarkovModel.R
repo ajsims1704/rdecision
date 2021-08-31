@@ -112,12 +112,13 @@ test_that("non-unique state labels are detected", {
   e.ww <- MarkovTransition$new(s.well, s.well)
   e.wd <- MarkovTransition$new(s.well, s.dead)
   e.ws <- MarkovTransition$new(s.well, s.disabled)
+  e.ss <- MarkovTransition$new(s.disabled, s.disabled)
   e.sd <- MarkovTransition$new(s.disabled, s.dead)
   e.dd <- MarkovTransition$new(s.dead, s.dead)
   expect_error(
     CohortMarkovModel$new(
       V = list(s.well, s.disabled, s.dead),
-      E = list(e.ww, e.wd, e.ws, e.sd, e.dd)
+      E = list(e.ww, e.wd, e.ws, e.ss, e.sd, e.dd)
     ), 
     class="invalid_state_names"
   )  
@@ -131,11 +132,12 @@ test_that("invalid discount rates are detected", {
   e.wd <- MarkovTransition$new(s.well, s.dead)
   e.ws <- MarkovTransition$new(s.well, s.disabled)
   e.sd <- MarkovTransition$new(s.disabled, s.dead)
+  e.ss <- MarkovTransition$new(s.disabled, s.disabled)
   e.dd <- MarkovTransition$new(s.dead, s.dead)
   expect_error(
     CohortMarkovModel$new(
       V = list(s.well, s.disabled, s.dead),
-      E = list(e.ww, e.wd, e.ws, e.sd, e.dd),
+      E = list(e.ww, e.wd, e.ws, e.ss, e.sd, e.dd),
       discount.cost = "0"
     ), 
     class="invalid_discount"
@@ -143,7 +145,7 @@ test_that("invalid discount rates are detected", {
   expect_error(
     CohortMarkovModel$new(
       V = list(s.well, s.disabled, s.dead),
-      E = list(e.ww, e.wd, e.ws, e.sd, e.dd),
+      E = list(e.ww, e.wd, e.ws, e.ss, e.sd, e.dd),
       discount.utility = "0"
     ), 
     class="invalid_discount"
@@ -154,7 +156,7 @@ test_that("invalid discount rates are detected", {
 # ---------------------------------------------------------------------------
 # tests of setting and getting rates
 # ---------------------------------------------------------------------------
-test_that("states without one NULL rate are detected", {
+test_that("specification of rates is correct", {
   # cycle time
   tcycle = as.difftime(365.25, units="days")
   # create states
@@ -337,6 +339,47 @@ test_that("rates are calculated from probabilities correctly", {
   expect_true(is.matrix(Pt))
   # check the transition matrix values
   expect_true(all(abs(Pt-EPt)<0.010))
+})
+
+test_that("tunnel states are recognised", {
+  # create the states
+  s.a <- MarkovState$new("A")
+  s.b <- MarkovState$new("B")
+  # create the transitions
+  t.aa <- MarkovTransition$new(s.a, s.a)
+  t.ab <- MarkovTransition$new(s.a, s.b, r=1)
+  t.ba <- MarkovTransition$new(s.b, s.a)
+  # create the model 
+  expect_error(
+    M <- CohortMarkovModel$new(
+      V = list(s.a, s.b),
+      E = list(t.aa, t.ab, t.ba)
+    ),
+    class = "not_memoryless"
+  )
+})
+
+test_that("tunnel states with 2 sinks are recognised as memoryless", {
+  # create the states
+  s.a <- MarkovState$new("A")
+  s.b <- MarkovState$new("B") # tunnel state
+  s.c <- MarkovState$new("C")
+  s.d <- MarkovState$new("D")
+  # create the transitions
+  t.aa <- MarkovTransition$new(s.a, s.a)
+  t.cc <- MarkovTransition$new(s.c, s.c)
+  t.dd <- MarkovTransition$new(s.d, s.d)
+  t.ab <- MarkovTransition$new(s.a, s.b, r=1)  
+  t.bc <- MarkovTransition$new(s.b, s.c, r=0.5)  
+  t.bd <- MarkovTransition$new(s.b, s.d)  
+  # create the model
+  expect_error(
+    M <- CohortMarkovModel$new(
+      V = list(s.a, s.b, s.c, s.d),
+      E = list(t.aa, t.cc, t.dd, t.ab, t.bc, t.bd)
+    ),
+    class = "not_memoryless"
+  )
 })
 
 # -----------------------------------------------------------------------------
@@ -674,8 +717,9 @@ test_that("Welton and Ades (2005) 3-state model is replicated", {
   t13 <- MarkovTransition$new(s1,s3,r=g13)
   t22 <- MarkovTransition$new(s2,s2)
   t23 <- MarkovTransition$new(s2,s3,r=g23)
+  t33 <- MarkovTransition$new(s3,s3)
   # model
-  M <- CohortMarkovModel$new(V=list(s1,s2,s3),E=list(t11,t12,t13,t22,t23))
+  M <- CohortMarkovModel$new(V=list(s1,s2,s3),E=list(t11,t12,t13,t22,t23,t33))
   # check Q
   Q <- M$transition_rate()
   EQ <- matrix(c(-(g12+g13),g12,g13,0,-g23,g23,0,0,0),nrow=3,byrow=TRUE)
@@ -724,8 +768,9 @@ test_that("the rate uncertainty method of Welton & Ades (2005) is supported", {
   t13 <- MarkovTransition$new(s1,s3,r=g13)
   t22 <- MarkovTransition$new(s2,s2)#,r=g22)
   t23 <- MarkovTransition$new(s2,s3,r=g23)
+  t33 <- MarkovTransition$new(s3,s3)
   # model
-  M <- CohortMarkovModel$new(V=list(s1,s2,s3),E=list(t11,t12,t13,t22,t23))
+  M <- CohortMarkovModel$new(V=list(s1,s2,s3),E=list(t11,t12,t13,t22,t23,t33))
   # check modvar count
   mv <- M$modvars()
   expect_equal(length(mv),7+2)
