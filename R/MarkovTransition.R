@@ -30,7 +30,7 @@ MarkovTransition <- R6::R6Class(
     #' @param r Instantaneous hazard rate in units of per patient per year.
     #' To meet the condition that the sum of the outgoing transition rates from
     #' each state is zero, one transition rate from a state may be set to NA
-    #' when the model is defined. The default is NA.
+    #' when the model is defined. The default is NA. 
     #' @param cost Cost associated with the transition. 
     #' @param label Character string containing a label for the transition (the
     #' name of the event).
