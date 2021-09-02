@@ -4,21 +4,35 @@
 #' cohort simulation.
 #' 
 #' @details A class to represent a continuous time semi-Markov chain, modelled
-#' using cohort simulation. Semi Markov models may include tunnel states,
-#' which violate the Markov assumption od memorylessness, but have been used
-#' widely in health economic models.
+#' using cohort simulation. As interpeted in \pkg{rdecision}, semi Markov models
+#' may include tunnel states and transitions are defined by per-cycle
+#' probabilities. Although used widely in health economic modelling, the
+#' differences between semi-Markov models and Markov processes introduce
+#' some caveats for modellers:
+#' \itemize{
+#' \item{If there are tunnel states, the result will depend on cycle length.}
+#' \item{Transitions are specified by their conditional probability, which
+#' is a \emph{per-cycle} probability of making a jump; if the cycle length
+#' changes, the probabilities should change, too.}
+#' \item{Probabilities and rates cannot be linked by the Kolmogorov forward
+#' equation, where the per-cycle probabilities are given by the matrix 
+#' exponential of the transition rate matrix, because this equation breaks down
+#' if there are tunnel states. In creating semi-Markov models, it is the 
+#' modeller's task to estimate probabilities from published data on 
+#' event rates.}
+#' \item{The cycle time cannot be changed during the simulation.}
+#' }
 #'  
 #' @section Graph theory:
-#' A Markov model is a directed
-#' multidigraph permitting loops (a loop multidigraph), optionally labelled, or 
-#' a \dfn{quiver}. It is a
+#' A Markov model is a directed multidigraph permitting loops (a loop 
+#' multidigraph), optionally labelled, or a \dfn{quiver}. It is a
 #' multidigraph because there are potentially two edges between each pair of
 #' nodes {A,B} representing the transition probabilities from A to B and 
 #' \emph{vice versa}. It is a directed graph because the transition
 #' probabilities refer to transitions in one direction. Each edge can be 
-#' optionally
-#' labelled. It permits self-loops (edges whose source and target are the same 
-#' node) to represent patients that remain in the same state between cycles.
+#' optionally labelled. It permits self-loops (edges whose source and target 
+#' are the same node) to represent patients that remain in the same state 
+#' between cycles.
 #'
 #' @section Transition rates and probabilities:
 #' 
@@ -26,7 +40,7 @@
 #' Beck and Pauker (1983) and later Sonnenberg and Beck (1993) proposed the
 #' use of Markov processes to model the health economics of medical 
 #' interventions. Further, they introduced the additional concept of tunnel 
-#' states, in which patients who transition remain for exactly one cycle. This
+#' states, to which patients who transition remain for exactly one cycle. This
 #' breaks the principle of memorylessness required by the definition of a
 #' Markov process, and thus the underlying mathematical formalism, first
 #' developed by Kolmogorov, is not applicable. For example, ensuring that all
@@ -34,75 +48,21 @@
 #' Hence, such models are usually labelled as semi-Markov processes.
 #' }
 #' 
-#' \subsection{Two state, one transition models}{
-#' To calculate per-cycle probabilities from rates, Briggs (2002) and
-#' Sonnenberg & Beck (1993) use the expression \eqn{p = 1-\exp(-rt)}, where 
-#' \eqn{r} is an instantaneous rate
-#' and \eqn{t} is a time interval of interest. This is derived by assuming that 
-#' if there is a population of \eqn{N} patients the rate of events is
-#' proportional to the number of patients, i.e. that events occur independently:
-#' \eqn{\frac{dN}{dt} \propto N}. The number of patients, \eqn{N(t)} who have
-#' not experienced an event at time \eqn{t} is therefore given by the solution
-#' to this differential equation, i.e. \eqn{N(t) = N e^{-r t}}, where \eqn{r}
-#' is the rate, or the reciprocal of the time constant. The expected number of 
-#' events \eqn{\hat{K}} which occur in interval \eqn{t} from a starting 
-#' population of \eqn{N} is \eqn{\hat{K} = N - N e^{-r t}}, or 
-#' \eqn{\hat{K} = Np}, where \eqn{p = 1-\exp(-r t)}, the probability with 
-#' which events arise during interval \eqn{t}. If instead a per-interval 
-#' probability is known, the rate is derived from the inverse relationship 
-#' \eqn{r = -\ln(1-p)/t}. Further details are available in Miller & Homan (1994)
-#' and Fleurence & Hollenbeak (2007).
-#' }
-#' 
-#' \subsection{Multi-state, multi-transition models}{
-#' Consider a model with a starting state A, which has a self-loop, and three 
-#' absorbing states, B, C and D, with allowed transitions from A to B, A to C 
-#' and A to D only. Assume the transition rates (in units of per patient per
-#' year) are \eqn{r_{AB}=2}, \eqn{r_{AC}=0.5} and \eqn{r_{AD}=0.1}. Rates
-#' are additive, and the total rate of patients leaving state A is 2.6. Thus,
-#' the probability of leaving state A in one year is 
-#' \eqn{p_A = 1-e^{-2.6}=0.9257},
-#' and the probability of leaving in one month is \eqn{1-e^{-2.6/12}=0.1948}; 
-#' i.e. 93\% of patients will leave state A within 1 year, and 19\% will leave
-#' within one month. However, the individual transition probabilities per cycle
-#' \eqn{p_{AB}}, \eqn{p_{AC}} and \eqn{p_{AD}} must be calculated from the
-#' total per cycle probability (\eqn{p_A}) and the conditional probability for
-#' each transition. For example in one year, \eqn{p_{AB} = p_A * 2/2.6 = 0.712},
-#' \eqn{p_{AC} = p_A * 0.5/2.6 = 0.178}, \eqn{p_{AD} = p_A * 0.1/2.6 = 0.036}, 
-#' with \eqn{p_{AA} = 1-0.9257 = 0.074}. Applying the inverse relationship 
-#' described in the previous section to calculate individual probabilities 
-#' from individual rates is incorrect (i.e. \eqn{p_{AB} \ne 1 - e^{-r_{AB}t}})
-#' because people can experience more than one type of event in a single cycle.
-#' Further, the solution described here does not work when there are multiple
-#' states with multiple outgoing transitions. For this general case, the 
-#' per-cycle transition probability is the solution to Kolmogorov's forward and
-#' backward equations, and is given by the matrix exponential of the transition
-#' rate matrix multiplied by the cycle time (Jones 2017, Welton 2005). In 
-#' \pkg{rdecision}, matrix exponentiation uses the \pkg{expm} package.
-#' }
-#' 
-#' \subsection{Tunnel states are not allowed}{
-#' Currently, models that include tunnel states (i.e. states without a self
-#' loop) are disallowed. This is because they violate the Markov assumption
-#' (i.e. models are memoryless). As defined by Sonnenberg and Beck (1993),
-#' patients who transition to a tunnel state remain there for exactly one
-#' cycle. This implies that the transition rate from that state is infinite
-#' to ensure that all occupants leave with a probability of one by the end
-#' of the cycle. A further undesirable consequence is that the result of the
-#' model depends on the chosen cycle duration. 
+#' \subsection{Rates and probabilities}{
+#' Miller and Homan (1994) and Fleurence & Hollenbeak (2007) provide advice
+#' on estimating probabilities from rates. Jones (2017) and Welton (2005) 
+#' describe methods for estimating probabilities in multi-state, 
+#' multi-transition models, although those methods may not apply to 
+#' semi-Markov models with tunnel states. In particular note that the
+#' "simple" equation, \eqn{p = 1-e^{-rt}} (Briggs 2006) applies only in a 
+#' two-state, one transition model.
 #' }
 #' 
 #' \subsection{Uncertainty in rates}{
-#' Welton and Ades (2005) describe a method for converting observed counts of 
-#' transitions into transition rates. They also provide a method for modelling
-#' uncertainties. Firstly, the total number of transitions from each state in 
-#' each time interval follows a Poisson distribution, and the uncertainty in 
-#' the rate from each state is represented by a Gamma distribution (because 
-#' Gamma is the conjugate prior of the Poisson distribution). Secondly, the
-#' conditional probabilities of the transitions from each state are modelled
-#' by a Dirichlet distribution. This is the preferred method in \pkg{rdecision}:
-#' create \code{ModVar}s for each per-state rate (\eqn{\lambda_i}), create a 
-#' Dirichlet distribution for each state; create model variables for each
+#' In semi-Markov models, the conditional probabilities of the transitions 
+#' from each state are usually modelled by a Dirichlet distribution. In 
+#' \pkg{rdecision}, create \code{ModVar}s create a Dirichlet distribution for 
+#' each state; create model variables for each
 #' conditional probability (\eqn{\rho_{ij}}) linked to an applicable Dirichlet
 #' distribution; and finally create expression model variables for each rate
 #' \eqn{g_{ij}}.
@@ -138,56 +98,53 @@
 #' @author Andrew J. Sims \email{andrew.sims@@newcastle.ac.uk}
 #' @export 
 #' 
-CohortMarkovModel <- R6::R6Class(
-  classname = "CohortMarkovModel",
+SemiMarkovModel <- R6::R6Class(
+  classname = "SemiMarkovModel",
   lock_class = TRUE,
   inherit = Digraph,
   private = list(
-    cmm.discost = NULL,
-    cmm.disutil = NULL,
-    cmm.pop = NULL,
-    cmm.icycle = NULL,
-    cmm.elapsed = NULL
+    smm.tcycle = NULL,
+    smm.Pt = NULL,
+    smm.discost = NULL,
+    smm.disutil = NULL,
+    smm.pop = NULL,
+    smm.icycle = NULL,
+    smm.elapsed = NULL
   ),
   public = list(
     
-    #' @description Creates a Markov model for cohort simulation.
-    #' @details A Markov model must meet the following conditions:
+    #' @description Creates a semi-Markov model for cohort simulation.
+    #' @details A semi-Markov model must meet the following conditions:
     #' \enumerate{
     #'   \item It must have at least one node and at least one edge.
     #'   \item All nodes must be of class \code{MarkovState};
-    #'   \item All edges must be of class \code{MarkovTransition};
+    #'   \item All edges must be of class \code{Transition};
     #'   \item The nodes and edges must form a digraph whose underlying
     #'   graph is connected;
     #'   \item Each state must have at least one outgoing transition (which
     #'   can be a self-loop);
-    #'   \item Each state must have a self loop (i.e. tunnel states are
-    #'   not permitted because they violate the principle that Markov
-    #'   models are memoryless); 
-    #'   \item For each state the sum of outgoing transition rates must be zero.
-    #'   This ensures that the row sums of the transition rate matrix (\eqn{Q}) 
-    #'   are zero, as required to solve Kolmogorov's forward and backward
-    #'   equations. For convenience, one outgoing transition rate from each 
-    #'   state may be set to NA when the \code{MarkovTransition}s are defined,
-    #'   and these will be replaced in \eqn{Q} with a value that ensures the
-    #'   row sums are zero (typically, rates for self loops would be set to 
-    #'   NA). Transition rates in \eqn{Q} associated with transitions that are
-    #'   not defined as edges in the graph are zero. Rates can be changed
-    #'   between cycles, and this condition is checked at the point of cycling,
-    #'   not at the point of model creation.
+    #'   \item For each state the sum of outgoing conditional transition 
+    #'   probabilities must be one. For convenience, one outgoing transition 
+    #'   probability from each state may be set to NA when the 
+    #'   \code{Transition}s are defined. Typically, probabilities for self 
+    #'   loops would be set to NA). Transition probabilities in \eqn{Pt} 
+    #'   associated with transitions that are not defined as edges in the 
+    #'   graph are zero. Probabilities can be changed between cycles.
     #'   \item No two edges may share the same source and target nodes (i.e. 
     #'   the digraph may not have multiple edges). This is to ensure that there
     #'   are no more transitions than cells in the transition matrix.
     #'   \item The node labels must be unique to the graph.
     #' }
     #' @param V A list of nodes (\code{MarkovState}s).
-    #' @param E A list of edges (\code{MarkovTransition}s).
+    #' @param E A list of edges (\code{Transition}s).
+    #' @param tcycle Cycle length, expressed as an R \code{difftime} object.
     #' @param discount.cost Annual discount rate for future costs.
     #' @param discount.utility Annual discount rate for future incremental
     #' utility.
-    #' @return A \code{CohortMarkovModel} object. The population of the first
+    #' @return A \code{SemiMarkovModel} object. The population of the first
     #' state is set to 1000.
-    initialize = function(V, E, discount.cost=0, discount.utility=0) {
+    initialize = function(V, E, tcycle=as.difftime(365.25, units="days"), 
+                          discount.cost=0, discount.utility=0) {
       # initialize the base class(es)
       super$initialize(V,E)
       # check minimum number of nodes and edges
@@ -206,13 +163,13 @@ CohortMarkovModel <- R6::R6Class(
           "Each node must be a 'MarkovState'.", class="invalid_state"
         )
       }
-      # check that all edges inherit from MarkovTransition
+      # check that all edges inherit from Transition
       T <- which(
-        sapply(E, function(e){inherits(e,what="MarkovTransition")}),arr.ind=TRUE
+        sapply(E, function(e){inherits(e,what="Transition")}),arr.ind=TRUE
       )
       if (!setequal(seq_along(E),T)) {
         rlang::abort(
-          "Each edge must be a 'MarkovTransition'.", class="invalid_transition"
+          "Each edge must be a 'Transition'.", class="invalid_transition"
         )
       }
       # check that the underlying graph is connected
@@ -228,13 +185,6 @@ CohortMarkovModel <- R6::R6Class(
           class = "multiple_edges"
         )
       }
-      # check that all states have a self-loop
-      if (any(diag(A) != 1)) {
-        rlang::abort(
-          "Markov model is not memoryless (i.e. not all states have self loops",
-          class = "not_memoryless"
-        )
-      }
       # check that the node names are unique
       if (length(unique(self$get_statenames()))!=self$order()) {
         rlang::abort(
@@ -242,87 +192,39 @@ CohortMarkovModel <- R6::R6Class(
           class = "invalid_state_names"
         )
       }
+      # check that the cycle time is an interval
+      if (class(tcycle) != "difftime") {
+        rlang::abort(
+          "Argument 'tcycle' must be of class 'difftime'.",
+          class = "invalid_tcycle"
+        )
+      }
+      private$smm.tcycle <- tcycle
       # check and set discounts
       if (!is.numeric(discount.cost)) {
         rlang::abort(
           "Discount rate must be numeric", class="invalid_discount"
         )
       }
-      private$cmm.discost <- discount.cost
+      private$smm.discost <- discount.cost
       if (!is.numeric(discount.utility)) {
         rlang::abort(
           "Discount rate must be numeric", class="invalid_discount"
         )
       }
-      private$cmm.disutil <- discount.utility
+      private$smm.disutil <- discount.utility
       # reset the model to its ground state
       self$reset()
-      # return a new CohortMarkovModel object
+      # return a new SemiMarkovModel object
       return(invisible(self))
     },
     
-    #' @description Transition rate matrix.
-    #' @details Usually written as \eqn{Q}, the matrix of rates
-    #' (in units of events per person per year) for the model, assuming a
-    #' continuous time Markov chain. As per convention, each row sums to zero.
-    #' @return A square matrix of size equal to the number of states. If all
-    #' states are labelled, the \code{dimname}s take the names of the states
-    #' and the dimensions are labelled \code{source} and \code{target}.
-    transition_rate = function() {
-      # get the state names
-      state.names <- sapply(private$V, function(v) {v$label()})
-      # construct the rate matrix, Q, with all zeros
-      Q <- matrix(
-        data = 0, 
-        nrow = self$order(), ncol = self$order(),
-        dimnames = list(source=state.names, target=state.names)
-      )
-      # populate the cells with rates from transitions in the graph
-      for (ie in 1:self$size()) {
-        e <- private$E[[ie]]
-        is <- self$vertex_index(e$source())
-        it <- self$vertex_index(e$target())
-        Q[is,it] <- e$rate()
-      }
-      # check that there is at most 1 NA rate per state
-      nna <- rowSums(is.na(Q))
-      if (any(nna>1)) {
-        rlang::abort(
-          "Each state must have at most 1 outgoing transition rate set to NA",
-          class = "invalid_rate"
-        )
-      }
-      # replace NA rates to ensure row sums of Q are zero, or check if no NAs
-      sumQ <- rowSums(Q, na.rm=TRUE)
-      for (iv in 1:nrow(Q)) {
-        if (nna[iv] > 0) {
-          Q[iv,which(is.na(Q[iv,]))] <- -sumQ[iv]
-        } else {
-          if (abs(sumQ[iv]) > sqrt(.Machine$double.eps)) {
-            rlang::abort(
-              paste("Sum of rates from state", state.names[iv], "is not zero"),
-              class = "invalid_rate"
-            )
-          }
-        }
-      }
-      # return the matrix
-      return(Q)
-    },
-    
-    #' @description Sets transition rates from per-cycle probabilities.
-    #' @details When the per-cycle probabilities are available, rather than
-    #' the transition rates, this function calculates and sets rates from 
-    #' probabilities using the matrix log of the probabilities, via 
-    #' package \pkg{expm}. It has the consequence of setting (overwriting) the
-    #' rates in each \code{MarkovTransition}.
-    #' @param Pt Per-cycle transition probability matrix. Formally, the
-    #' solution of Kolmogorov's forward and backward equations. The row and 
+    #' @description Sets transition probabilities.
+    #' @param Pt Per-cycle transition probability matrix. The row and 
     #' column labels must be the state names and each row must sum to one.
     #' Non-zero probabilities for undefined transitions are not allowed. 
-    #' @param tcycle The cycle time, in years, as a \code{difftime} object.
-    #' @return Updated \code{CohortMarkovModel} object
-    set_rates = function(Pt, tcycle) {
+    #' @return Updated \code{SemiMarkovModel} object
+    set_probabilities = function(Pt) {
       # check Pt
       if (missing(Pt)) {
         rlang::abort("Pt is missing, without default", class="invalid_Pt")
@@ -384,62 +286,17 @@ CohortMarkovModel <- R6::R6Class(
           class = "invalid_Pt"
         )
       }
-      # check cycle time
-      if (missing(tcycle)) {
-        rlang::abort(
-          "'tcycle' is missing, without default", 
-          class="invalid_tcycle"
-        )
-      }
-      # check that the cycle time is an interval
-      if (class(tcycle) != "difftime") {
-        rlang::abort(
-          "Argument 'tcycle' must be of class 'difftime'.",
-          class = "invalid_tcycle"
-        )
-      }
-      # calculate the transition rate matrix, Q
-      # compute Pt using matrix exponentiation
-      t <- as.numeric(tcycle, units="days")/365.25
-      Q <- expm::logm(Pt)/t
-      # set the rates for each transition
-      for (ie in 1:self$size()) {
-        e <- private$E[[ie]]
-        is <- self$vertex_index(e$source())
-        it <- self$vertex_index(e$target())
-        e$set_rate(r=Q[is,it])
-      }
+      # set the class variable
+      private$smm.Pt <- Pt
       # return updated model
       return(invisible(self))
     },
     
     #' @description Per-cycle transition probability matrix for the model.
-    #' @param tcycle Cycle length, expressed as an R \code{difftime} object.
-    #' @details Checks that each state has at least one outgoing transition and
-    #' that exactly one outgoing transition rate whose rate is NULL. The 
-    #' transition probability matrix, usually written \eqn{P_t}, is the solution
-    #' to Kolmogorov's forward
-    #' and backward equations, and is computed from the transition rate
-    #' matrix using matrix exponentiation with the \pkg{expm} package.
     #' @return A square matrix of size equal to the number of states. If all
     #' states are labelled, the dimnames take the names of the states.
-    transition_probability = function(tcycle) {
-      # check that the cycle time is an interval
-      if (class(tcycle) != "difftime") {
-        rlang::abort(
-          "Argument 'tcycle' must be of class 'difftime'.",
-          class = "invalid_cycle_length"
-        )
-      }
-      # get the transition rate matrix
-      Q <- self$transition_rate()
-      # compute Pt using matrix exponentiation
-      t <- as.numeric(tcycle, units="days")/365.25
-      Pt <- expm::expm(Q*t)
-      # label the matrix
-      state.names <- sapply(private$V, function(v) {v$label()})
-      dimnames(Pt) <- list(source=state.names, target=state.names)
-      return(Pt)
+    transition_probability = function() {
+      return(private$smm.Pt)
     },
 
     #' @description Return the per-cycle transition costs for the model.
@@ -488,14 +345,14 @@ CohortMarkovModel <- R6::R6Class(
     #' @param icycle Cycle number at which to start/restart. 
     #' @param elapsed Elapsed time since the index (reference) time used for
     #' discounting as an R \code{difftime} object.
-    #' @return Updated \code{CohortMarkovModel} object.
+    #' @return Updated \code{SemiMarkovModel} object.
     reset = function(populations=NULL, icycle=as.integer(0), 
                      elapsed=as.difftime(0, units="days")) {
       # check that population is valid
       if (is.null(populations)) {
-        private$cmm.pop <- vector(mode="numeric", length=self$order())
-        names(private$cmm.pop) <- self$get_statenames()
-        private$cmm.pop[1] <- 1000
+        private$smm.pop <- vector(mode="numeric", length=self$order())
+        names(private$smm.pop) <- self$get_statenames()
+        private$smm.pop[1] <- 1000
       } else {
         if (length(populations) != self$order()) {
           rlang::abort(
@@ -519,7 +376,7 @@ CohortMarkovModel <- R6::R6Class(
         })
         # set the populations
         for (s in self$get_statenames()) {
-          private$cmm.pop[s] <- populations[s]
+          private$smm.pop[s] <- populations[s]
         }
       }
       # check and set the cycle number
@@ -536,7 +393,7 @@ CohortMarkovModel <- R6::R6Class(
         )
         
       }
-      private$cmm.icycle <- icycle
+      private$smm.icycle <- icycle
       # check and update the elapsed time
       if (class(elapsed) != "difftime") {
         rlang::abort(
@@ -544,7 +401,7 @@ CohortMarkovModel <- R6::R6Class(
           class = "invalid_elapsed"
         )
       }
-      private$cmm.elapsed <- elapsed
+      private$smm.elapsed <- elapsed
       # return updated object
       return(invisible(self))
     },
@@ -552,7 +409,7 @@ CohortMarkovModel <- R6::R6Class(
     #' @description Gets the occupancy of each state
     #' @return A numeric vector of populations, named with state names.
     get_populations = function() {
-      return(private$cmm.pop)
+      return(private$smm.pop)
     },
     
     #' @description Gets the current elapsed time.
@@ -566,7 +423,7 @@ CohortMarkovModel <- R6::R6Class(
     #' to the discounting index and its duration can be controlled arbitrarily.
     #' @return Elapsed time as an R \code{difftime} object.
     get_elapsed = function() {
-      return(private$cmm.elapsed)  
+      return(private$smm.elapsed)  
     },
  
     #' @description Tabulation of states
@@ -587,8 +444,6 @@ CohortMarkovModel <- R6::R6Class(
     },
     
     #' @description Applies one cycle of the model.
-    #' @param tcycle Cycle length, expressed as an R \code{difftime} object; 
-    #' default 1 year.
     #' @param hcc.pop Boolean; whether to apply half cycle correction to the
     #' population and QALY. If TRUE, the correction is only applied to the 
     #' outputs of 
@@ -616,21 +471,13 @@ CohortMarkovModel <- R6::R6Class(
     #' \item{\code{EntryCost}}{Cost of the transitions \emph{into} the state
     #' during the cycle. Discounting is applied, if the option is set. 
     #' The result is normalized by the model population. The cycle costs
-    #' are derived from \code{MarkovTransition} costs.}
+    #' are derived from \code{Transition} costs.}
     #' \item{\code{Cost}}{Total cost, normalized by model population.}
     #' \item{\code{QALY}}{Quality adjusted life years gained by occupancy of 
     #' the states during the cycle. Half cycle correction and discounting are 
     #' applied, if these options are set. Normalized by the model population.}
     #' }
-    cycle = function(tcycle=as.difftime(365.25, units="days"), hcc.pop=TRUE,
-                     hcc.cost=TRUE) {
-      # check that the cycle time is an interval
-      if (class(tcycle) != "difftime") {
-        rlang::abort(
-          "Argument 'tcycle' must be of class 'difftime'.",
-          class = "invalid_cycle_length"
-        )
-      }
+    cycle = function(hcc.pop=TRUE, hcc.cost=TRUE) {
       # check and set half cycle correction
       if (!is.logical(hcc.pop)) {
         rlang::abort(
@@ -652,22 +499,22 @@ CohortMarkovModel <- R6::R6Class(
       }
       # calculate cycle duration in years (dty), elapsed time at end cycle and 
       # discount factors (dfc, dfu)
-      dty <- as.numeric(tcycle, units="days")/365.25
-      elapsed <- as.numeric(private$cmm.elapsed, units="days")/365.25 + dty
-      dfc <- 1/(1+private$cmm.discost)^elapsed
-      dfu <- 1/(1+private$cmm.disutil)^elapsed
+      dty <- as.numeric(private$smm.tcycle, units="days")/365.25
+      elapsed <- as.numeric(private$smm.elapsed, units="days")/365.25 + dty
+      dfc <- 1/(1+private$smm.discost)^elapsed
+      dfu <- 1/(1+private$smm.disutil)^elapsed
       # transition costs, calculated as number of transitions between each
       # pair of states, multiplied by transition cost, summed by the state
       # being entered (entry costs)
       P <- matrix(
-        data=rep(private$cmm.pop,times=self$order()),
+        data=rep(private$smm.pop,times=self$order()),
         nrow = self$order(), ncol=self$order(),
         byrow = FALSE
       )
-      TC <- P*self$transition_probability(tcycle)*self$transition_cost()
+      TC <- P*self$transition_probability()*self$transition_cost()
       entry.costs <- colSums(TC)*dfc
       # Apply the transition probabilities to get the end state populations,
-      pop.end <- private$cmm.pop %*% self$transition_probability(tcycle)
+      pop.end <- private$smm.pop %*% self$transition_probability()
       pop.end <- drop(pop.end)
       # calculate annual costs of state occupancy
       state.costs <- sapply(private$V, function(x) {return(x$cost())})
@@ -677,11 +524,11 @@ CohortMarkovModel <- R6::R6Class(
       state.utilities <- state.utilities*dfu
       # half cycle correction (affects reporting only)
       if (hcc.pop) {
-        pop <- (private$cmm.pop + pop.end)/2
-        elapsed <- as.numeric(private$cmm.elapsed, units="days")/365.25 + dty/2
+        pop <- (private$smm.pop + pop.end)/2
+        elapsed <- as.numeric(private$smm.elapsed, units="days")/365.25 + dty/2
       } else {
         pop <- pop.end
-        elapsed <- as.numeric(private$cmm.elapsed, units="days")/365.25 + dty
+        elapsed <- as.numeric(private$smm.elapsed, units="days")/365.25 + dty
       }
       qaly <- pop*state.utilities*dty
       if (hcc.cost) {
@@ -690,21 +537,21 @@ CohortMarkovModel <- R6::R6Class(
         occupancy.costs <- pop.end*state.costs*dfc
       }
       # update the populations
-      private$cmm.pop <- pop.end
+      private$smm.pop <- pop.end
       # update cycle number
-      private$cmm.icycle <- private$cmm.icycle + 1
+      private$smm.icycle <- private$smm.icycle + 1
       # update elapsed time
-      private$cmm.elapsed <- private$cmm.elapsed + tcycle
+      private$smm.elapsed <- private$smm.elapsed + private$smm.tcycle
       # return calculated values, per state
       RC <- data.frame(
         State = self$get_statenames(),
-        Cycle = rep(private$cmm.icycle, times=length(self$order())),
+        Cycle = rep(private$smm.icycle, times=length(self$order())),
         Time = rep(elapsed, times=length(self$order())),
         Population = pop,
         OccCost = occupancy.costs/sum(self$order()),
         EntryCost = entry.costs/sum(self$order()),
-        Cost = (occupancy.costs+entry.costs)/sum(private$cmm.pop),
-        QALY = qaly / sum(private$cmm.pop),
+        Cost = (occupancy.costs+entry.costs)/sum(private$smm.pop),
+        QALY = qaly / sum(private$smm.pop),
         stringsAsFactors = F
       )
       return(RC)
@@ -722,8 +569,6 @@ CohortMarkovModel <- R6::R6Class(
     #' will be cycle zero, i.e. the distribution of patients to starting
     #' states.
     #' @param ncycles Number of cycles to run; default is 2.
-    #' @param tcycle Cycle length, expressed as an R \code{difftime} object; 
-    #' default 1 year.
     #' @param hcc.pop Boolean; whether to apply half cycle correction to the
     #' population and QALY. If TRUE, the correction is only applied to the 
     #' outputs of functions \code{cycle} and \code{cycles}; the state 
@@ -746,10 +591,9 @@ CohortMarkovModel <- R6::R6Class(
     #' \item{\code{QALY}}{Quality adjusted life years associated with occupancy
     #' of the states in the cycle.}
     #' } 
-    cycles = function(ncycles=2, tcycle=as.difftime(365.25, units="days"), 
-                      hcc.pop=TRUE, hcc.cost=TRUE) {
+    cycles = function(ncycles=2, hcc.pop=TRUE, hcc.cost=TRUE) {
       # show zero?
-      if (private$cmm.icycle==0) {
+      if (private$smm.icycle==0) {
         nzero <- 1
       } else {
         nzero <- 0
@@ -767,19 +611,19 @@ CohortMarkovModel <- R6::R6Class(
       if (nzero > 0) {
         DF[1,"Cycle"] <- 0
         DF["Years"] <- 0
-        DF[1, names(private$cmm.pop)] <- private$cmm.pop
+        DF[1, names(private$smm.pop)] <- private$smm.pop
         DF[1,"Cost"] <- 0
         DF[1,"QALY"] <- 0
       }
       # run the model
       for (i in (1+nzero):(ncycles+nzero)) {
         # single cycle
-        DF.cycle <- self$cycle(tcycle, hcc.pop, hcc.cost)
+        DF.cycle <- self$cycle(hcc.pop, hcc.cost)
         # set the cycle number
         DF[i, "Cycle"] <- DF.cycle$Cycle[1]
         DF[i, "Years"] <- DF.cycle$Time[1]
         # collect state populations and cycle sums into a single frame
-        DF[i, names(private$cmm.pop)] <- DF.cycle$Population
+        DF[i, names(private$smm.pop)] <- DF.cycle$Population
         # add normalized sum of costs for all states 
         DF[i,"Cost"] <- sum(DF.cycle$Cost)
         # add normalized sum of QALYs gained
@@ -799,7 +643,7 @@ CohortMarkovModel <- R6::R6Class(
       mv <- list()
       # find the ModVars in the transitions
       for (e in private$E) {
-        if (inherits(e, what=c("MarkovTransition"))) {
+        if (inherits(e, what=c("Transition"))) {
           mv <- c(mv, e$modvars())
         }
       }

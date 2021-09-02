@@ -1,5 +1,5 @@
 ---
-title: "Elementary Markov Model (Chancellor 1997)"
+title: "Elementary Semi-Markov Model (Chancellor 1997)"
 subtitle: "Monotherapy versus combination therapy for HIV"
 author: "Andrew J. Sims"
 date: "May 2021"
@@ -9,7 +9,7 @@ output:
     fig_height: 5
     fig_caption: true
 vignette: >
-  %\VignetteIndexEntry{Elementary Markov Model (Chancellor 1997)}
+  %\VignetteIndexEntry{Elementary Semi-Markov Model (Chancellor 1997)}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 bibliography: "../inst/REFERENCES.bib"
@@ -32,9 +32,9 @@ library("pander")
 ```
 
 # Introduction
-This vignette is an example of an elementary cohort Markov model using 
+This vignette is an example of an elementary semi-Markov model using 
 the `rdecision` package. It is based on the example given by 
-Briggs *et al* [-@briggs2006] (Exercise 2.5) which itself is based on a Markov
+Briggs *et al* [-@briggs2006] (Exercise 2.5) which itself is based on a
 model described by Chancellor *et al* [@chancellor1997]. The model compares 
 a combination therapy of Lamivudine/Zidovudine versus Zidovudine monotherapy 
 in people with HIV infection.
@@ -45,8 +45,6 @@ in people with HIV infection.
 The variables used in the model are all numerical constants, and are defined
 as follows. 
 ```{r model-variables, echo=TRUE}
-# cycle time
-tcycle <- as.difftime(365.25, units="days")
 # transition counts
 nAA <- 1251
 nAB <- 350
@@ -77,12 +75,11 @@ oDR <- 0 # annual discount rate, benefits (%)
 ## Model structure
 The model is constructed by forming a graph, with each state as a 
 node and each transition as an edge. Nodes (of class `MarkovState`) and edges
-(class `MarkovTransition`) may have various properties whose values reflect the
+(class `Transition`) may have various properties whose values reflect the
 variables of the model (costs, rates etc.). Because the model is intended to 
 evaluate survival, the utility of states A, B and C are set to 1 (by default) 
 and state D to zero. Thus the incremental quality adjusted life years gained per
-cycle is equivalent to the survival function. Transition rates will be set
-later from probabilities.
+cycle is equivalent to the survival function. 
 ```{r model, echo=TRUE}
 # create Markov states for monotherapy (zidovudine only)
 sAm <- MarkovState$new("A", cost=dmca+ccca+cAZT)
@@ -90,18 +87,18 @@ sBm <- MarkovState$new("B", cost=dmcb+cccb+cAZT)
 sCm <- MarkovState$new("C", cost=dmcc+cccc+cAZT)
 sDm <- MarkovState$new("D", cost=0, utility=0)
 # create transitions
-tAAm <- MarkovTransition$new(sAm, sAm)
-tABm <- MarkovTransition$new(sAm, sBm)
-tACm <- MarkovTransition$new(sAm, sCm)
-tADm <- MarkovTransition$new(sAm, sDm)
-tBBm <- MarkovTransition$new(sBm, sBm)
-tBCm <- MarkovTransition$new(sBm, sCm)
-tBDm <- MarkovTransition$new(sBm, sDm)
-tCCm <- MarkovTransition$new(sCm, sCm)
-tCDm <- MarkovTransition$new(sCm, sDm)
-tDDm <- MarkovTransition$new(sDm, sDm)
+tAAm <- Transition$new(sAm, sAm)
+tABm <- Transition$new(sAm, sBm)
+tACm <- Transition$new(sAm, sCm)
+tADm <- Transition$new(sAm, sDm)
+tBBm <- Transition$new(sBm, sBm)
+tBCm <- Transition$new(sBm, sCm)
+tBDm <- Transition$new(sBm, sDm)
+tCCm <- Transition$new(sCm, sCm)
+tCDm <- Transition$new(sCm, sDm)
+tDDm <- Transition$new(sDm, sDm)
 # construct the model
-m.mono <- CohortMarkovModel$new(
+m.mono <- SemiMarkovModel$new(
   V = list(sAm, sBm, sCm, sDm),
   E = list(tAAm, tABm, tACm, tADm, tBBm, tBCm, tBDm, tCCm, tCDm, tDDm),
   discount.cost = cDR/100,
@@ -111,13 +108,11 @@ m.mono <- CohortMarkovModel$new(
 
 ## Transition rates and probabilities
 Briggs *et al* [-@briggs2006] interpreted the observed transition counts 
-in 1 year as 
-transition probabilities by dividing counts by the total transitions observed
-from each state. With this assumption, the annual (per-cycle)
-transition probabilities are calculated as follows. Via the `set_rates` 
-function, transition rates for the model can be set from the per cycle 
-transition probabilities.
-```{r setrates, echo=TRUE}
+in 1 year as transition probabilities by dividing counts by the total 
+transitions observed from each state. With this assumption, the annual 
+(per-cycle) transition probabilities are calculated as follows and applied
+to the model via the `set_probabilities` function.
+```{r setprobs, echo=TRUE}
 nA <- nAA + nAB + nAC + nAD
 nB <- nBB + nBC + nBD
 nC <- nCC + nCD
@@ -129,7 +124,7 @@ Pt <- matrix(
   nrow=4, byrow=TRUE, 
   dimnames=list(source=c("A","B","C","D"), target=c("A","B","C","D"))
 )
-m.mono$set_rates(Pt, tcycle)
+m.mono$set_probabilities(Pt)
 ```
 
 More usually, fully observed transition counts are converted into 
@@ -140,16 +135,11 @@ individuals who make more than one transition during the observation time, and
 can lead to rates with values which exceed 1. In contrast, the difference
 between a census of the number 
 of individuals in each state at the start of the interval and another at the
-end is directly related to the per-cycle probability. Following the work of
-Miller and Homan [-@miller1994], Welton and Ades [-@welton2005], Jones *et al*
-[-@jones2017] and others, `rdecision` prefers rates to probabilities as input 
-to models. These can be specified when transitions are created, or by using
-the `set_rate` method of `MarkovTransition`. Per-cycle transition probabilities
-can be extracted for checking. The alternative approach of specifying per-cycle
-probabilities is supported via the `set_rates` method of `CohortMarkovModel` 
-(as in this example). Conversion between rates and probabilities for 
-multi-state Markov models is non-trivial [@jones2017] and it is recommended 
-to specify either rates or probabilities and not to mix them during input.
+end is directly related to the per-cycle probability. As Miller and Homan [-@miller1994], Welton and Ades [-@welton2005], Jones *et al*
+[-@jones2017] and others note, conversion between rates and probabilities for 
+multi-state Markov models is non-trivial [@jones2017] and care is needed
+when modellers calculate probabilities from published rates for use in
+`semiMarkoModel`s.
 
 # Checking the model
 
@@ -165,9 +155,9 @@ f1c  <- paste("Figure 1. Markov model for comparison of HIV therapy.",
               "A: 200 < cd4 < 500,", "B: cd4 < 200,", "C: AIDS,","D: Death.")
 ```
 ```{r draw,fig.cap=f1c,fig.asp=0.21}
-#DOT <- m.mono$as_DOT()
-#writeLines(DOT, con="mono.gv")
-#system2(command="dot", args=c("-Tpng","-o","mono.png","mono.gv"))
+DOT <- m.mono$as_DOT()
+writeLines(DOT, con="mono.gv")
+system2(command="dot", args=c("-Tpng","-o","mono.png","mono.gv"))
 knitr::include_graphics(path="mono.png")
 ```
 
@@ -188,7 +178,7 @@ transition matrix, can be extracted from the model via the function
 shown below. This is consistent with the Table 1 of 
 Chancellor *et al* [-@chancellor1997].
 ```{r echo=FALSE}
-TM <- m.mono$transition_probability(tcycle)
+TM <- m.mono$transition_probability()
 pander::pander(TM, emphasize.rownames=FALSE, justify="lcccc")
 rm(TM)
 ```
@@ -267,30 +257,30 @@ sBc <- MarkovState$new("B", cost=dmcb+cccb+cAZT+cLam)
 sCc <- MarkovState$new("C", cost=dmcc+cccc+cAZT+cLam)
 sDc <- MarkovState$new("D", cost=0, utility=0)
 # create transitions
-tAAc <- MarkovTransition$new(sAc, sAc)
-tABc <- MarkovTransition$new(sAc, sBc)
-tACc <- MarkovTransition$new(sAc, sCc)
-tADc <- MarkovTransition$new(sAc, sDc)
-tBBc <- MarkovTransition$new(sBc, sBc)
-tBCc <- MarkovTransition$new(sBc, sCc)
-tBDc <- MarkovTransition$new(sBc, sDc)
-tCCc <- MarkovTransition$new(sCc, sCc)
-tCDc <- MarkovTransition$new(sCc, sDc)
-tDDc <- MarkovTransition$new(sDc, sDc)
+tAAc <- Transition$new(sAc, sAc)
+tABc <- Transition$new(sAc, sBc)
+tACc <- Transition$new(sAc, sCc)
+tADc <- Transition$new(sAc, sDc)
+tBBc <- Transition$new(sBc, sBc)
+tBCc <- Transition$new(sBc, sCc)
+tBDc <- Transition$new(sBc, sDc)
+tCCc <- Transition$new(sCc, sCc)
+tCDc <- Transition$new(sCc, sDc)
+tDDc <- Transition$new(sDc, sDc)
 # construct the model
-m.comb <- CohortMarkovModel$new(
+m.comb <- SemiMarkovModel$new(
   V = list(sAc, sBc, sCc, sDc),
   E = list(tAAc, tABc, tACc, tADc, tBBc, tBCc, tBDc, tCCc, tCDc, tDDc),
   discount.cost = cDR/100,
   discount.utility = oDR/100
 )
-# set the rates by specifying probabilities
-m.comb$set_rates(Ptc, tcycle)
+# set the probabilities
+m.comb$set_probabilities(Ptc)
 ```
 
 The per-cycle transition matrix for the combination therapy is as follows:
 ```{r tmcombo, echo=FALSE}
-TM <- m.comb$transition_probability(tcycle)
+TM <- m.comb$transition_probability()
 pander::pander(TM, emphasize.rownames=FALSE, justify="lcccc")
 rm(TM)
 ```
