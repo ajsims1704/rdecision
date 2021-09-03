@@ -30,7 +30,6 @@ variable and for ensuring transparency of the mathematical relationships between
 variables. The package terminology follows Briggs *et al* "Decision Modelling
 for Health Economic Evaluation" [@briggs2006].
 
-
 ## Installation
 
 You can install the released version of rdecision from 
@@ -158,23 +157,21 @@ from a state to itself must be specified if allowed, otherwise the state would
 be a tunnel state.
 
 ```{r markoveg-model, echo=TRUE}
-# define the cycle time
-tcycle = as.difftime(365.25, units="days")
 # create states
 s.well <- MarkovState$new(name="Well", utility=1)
 s.disabled <- MarkovState$new(name="Disabled",utility=0.7)
 s.dead <- MarkovState$new(name="Dead",utility=0)
 # create transitions, leaving rates undefined
 E <- list(
-  MarkovTransition$new(s.well, s.well),
-  MarkovTransition$new(s.dead, s.dead),
-  MarkovTransition$new(s.disabled, s.disabled),
-  MarkovTransition$new(s.well, s.disabled),
-  MarkovTransition$new(s.well, s.dead),
-  MarkovTransition$new(s.disabled, s.dead)
+  Transition$new(s.well, s.well),
+  Transition$new(s.dead, s.dead),
+  Transition$new(s.disabled, s.disabled),
+  Transition$new(s.well, s.disabled),
+  Transition$new(s.well, s.dead),
+  Transition$new(s.disabled, s.dead)
 )
 # create the model
-M <- CohortMarkovModel$new(V = list(s.well, s.disabled, s.dead), E)
+M <- SemiMarkovModel$new(V = list(s.well, s.disabled, s.dead), E)
 # create transition probability matrix
 snames <- c("Well","Disabled","Dead")
 Pt <- matrix(
@@ -183,10 +180,10 @@ Pt <- matrix(
   dimnames = list(source=snames, target=snames)
 )
 # set the transition rates from per-cycle probabilities
-M$set_rates(Pt, tcycle)
+M$set_probabilities(Pt)
 ```
 
-```{r sb,echo=FALSE,results="hide",fig.keep="last",fig.align="center"}
+```{r sb,echo=FALSE,results="hide",fig.align="center"}
 #DOT <- M$as_DOT()
 #writeLines(DOT, con="man/figures/README-sb-1.gv")
 #system2(
@@ -207,7 +204,7 @@ below, which replicates Table 2 [@sonnenberg1993].
 # set the starting populations
 M$reset(c(Well=10000, Disabled=0, Dead=0)) 
 # cycle
-MT <- M$cycles(25, tcycle=tcycle, hcc.pop=FALSE, hcc.cost=FALSE)
+MT <- M$cycles(25, hcc.pop=FALSE, hcc.cost=FALSE)
 ```
 
 ```{r markoveg-trace, echo=FALSE}

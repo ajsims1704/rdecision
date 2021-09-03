@@ -153,6 +153,59 @@ test_that("invalid discount rates are detected", {
 })
 
 # -----------------------------------------------------------------------------
+# tests of setting transition probabilities
+# -----------------------------------------------------------------------------
+test_that("invalid transition probabilities are rejected", {
+  # create states
+  s.well <- MarkovState$new(name="Well")
+  s.disabled <- MarkovState$new(name="Disabled")
+  s.dead <- MarkovState$new(name="Dead")
+  # use S&B per-cycle transition probabilities and calculate rates
+  snames <- c("Well","Disabled","Dead")
+  Pt <- matrix(
+    data = c(0.6, 0.2, 0.2, 0, 0.6, 0.4, 0, 0, 1),
+    nrow = 3, byrow = TRUE,
+    dimnames = list(source=snames, target=snames)
+  )
+  # create transitions
+  E <- list(
+    Transition$new(s.well, s.well),
+    Transition$new(s.dead, s.dead),
+    Transition$new(s.disabled, s.disabled),
+    Transition$new(s.well, s.disabled),
+    Transition$new(s.well, s.dead),
+    Transition$new(s.disabled, s.dead)
+  )
+  # create model
+  M <- SemiMarkovModel$new(V = list(s.well, s.disabled, s.dead), E) 
+  # no probabilities
+  expect_error(
+    M$set_probabilities(), class = "invalid_Pt"
+  )
+  # probabilities not a matrix
+  expect_error(
+    M$set_probabilities(Pt=42), class = "invalid_Pt"
+  )
+  #  probability matrix of incorrect size
+  ePt <- matrix(c(1,0,0,1), nrow=2, byrow=TRUE)  
+  expect_error(
+    M$set_probabilities(Pt=ePt), class = "invalid_Pt"
+  )
+  # probability matrix has no state names
+  ePt <- matrix(
+    data = c(0.6, 0.2, 0.2, 0, 0.6, 0.4, 0, 0, 1),
+    nrow = 3, byrow = TRUE,
+    dimnames = list(source=c("a","b","c"), target=c("a","b","c"))
+  )
+  expect_error(
+    M$set_probabilities(Pt=ePt), class = "invalid_Pt"
+  )
+  
+  
+  
+})
+
+# -----------------------------------------------------------------------------
 # tests of resetting the model
 # -----------------------------------------------------------------------------
 test_that("invalid population vectors are rejected", {
@@ -411,7 +464,6 @@ test_that("redecision replicates Briggs' example 4.7", {
   DA <- DirichletDistribution$new(c(1251, 350, 116, 17)) # from A
   DB <- DirichletDistribution$new(c(731,512,15))  # from B
   DC <- DirichletDistribution$new(c(1312,437)) # from C
-  
   #
   # Function to estimate life years gained and costs
   # ================================================

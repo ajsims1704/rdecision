@@ -6,8 +6,8 @@
 \title{rdecision: Decision Analytic Modelling in Health Economics.}
 \description{
 The goal of `rdecision` is to provide methods for assessing health care 
-interventions using cohort models (decision trees and Markov models) which can
-be constructed using only a few lines of R code. Mechanisms
+interventions using cohort models (decision trees and semi-Markov models) 
+which can be constructed using only a few lines of R code. Mechanisms
 are provided for associating an uncertainty distribution with each source 
 variable and for ensuring transparency of the mathematical relationships 
 between

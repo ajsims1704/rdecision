@@ -45,4 +45,14 @@ test_that("ModVars are identified and their values are returned", {
   expect_equal(e$cost(), 42)
   mv <- e$modvars()
   expect_equal(length(mv),1)
+  # expression modvar
+  discount <- ConstModVar$new("discount", "rate", 0.1)
+  dcost <- ExprModVar$new(
+    "true cost", "GPB", 
+    rlang::quo(fortytwo*(1-discount))
+  )
+  e <- Transition$new(s1,s2,cost=dcost,label="label")
+  expect_equal(e$cost(), 42*0.9)
+  mv <- e$modvars()
+  expect_equal(length(mv),3)
 })

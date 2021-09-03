@@ -95,8 +95,6 @@ DT <- DecisionTree$new(
 )
 ```
 
-<img src="man/figures/README-treedraw-1.png" width="75%" style="display: block; margin: auto;" />
-
 The expected per-patient net cost of each option is obtained by
 evaluating the tree with expected values of all variables using
 `DT$evaluate()` and threshold values with `DT$threshold()`. Examination
@@ -113,7 +111,7 @@ evaluation of the tree, each time sampling from the uncertainty
 distribution of the two probabilities using, for example,
 `DT$evaluate(setvars="random", N=1000)` and inspecting the resulting
 data frame. From 1000 runs, the 95% confidence interval of the per
-patient cost saving is -510.86 GBP to 963.32 GBP, with 70.9% being cost
+patient cost saving is -530.59 GBP to 998.22 GBP, with 69.6% being cost
 saving, and it can be concluded that more evidence is required to be
 confident that the exercise programme is cost saving.
 
@@ -127,23 +125,21 @@ transitions from a state to itself must be specified if allowed,
 otherwise the state would be a tunnel state.
 
 ``` r
-# define the cycle time
-tcycle = as.difftime(365.25, units="days")
 # create states
 s.well <- MarkovState$new(name="Well", utility=1)
 s.disabled <- MarkovState$new(name="Disabled",utility=0.7)
 s.dead <- MarkovState$new(name="Dead",utility=0)
 # create transitions, leaving rates undefined
 E <- list(
-  MarkovTransition$new(s.well, s.well),
-  MarkovTransition$new(s.dead, s.dead),
-  MarkovTransition$new(s.disabled, s.disabled),
-  MarkovTransition$new(s.well, s.disabled),
-  MarkovTransition$new(s.well, s.dead),
-  MarkovTransition$new(s.disabled, s.dead)
+  Transition$new(s.well, s.well),
+  Transition$new(s.dead, s.dead),
+  Transition$new(s.disabled, s.disabled),
+  Transition$new(s.well, s.disabled),
+  Transition$new(s.well, s.dead),
+  Transition$new(s.disabled, s.dead)
 )
 # create the model
-M <- CohortMarkovModel$new(V = list(s.well, s.disabled, s.dead), E)
+M <- SemiMarkovModel$new(V = list(s.well, s.disabled, s.dead), E)
 # create transition probability matrix
 snames <- c("Well","Disabled","Dead")
 Pt <- matrix(
@@ -152,7 +148,7 @@ Pt <- matrix(
   dimnames = list(source=snames, target=snames)
 )
 # set the transition rates from per-cycle probabilities
-M$set_rates(Pt, tcycle)
+M$set_probabilities(Pt)
 ```
 
 <img src="man/figures/README-sb-1.png" width="75%" style="display: block; margin: auto;" />
@@ -165,7 +161,7 @@ shown below, which replicates Table 2.<sup>2</sup>
 # set the starting populations
 M$reset(c(Well=10000, Disabled=0, Dead=0)) 
 # cycle
-MT <- M$cycles(25, tcycle=tcycle, hcc.pop=FALSE, hcc.cost=FALSE)
+MT <- M$cycles(25, hcc.pop=FALSE, hcc.cost=FALSE)
 ```
 
 | Years |  Well | Disabled |  Dead | Cumulative Utility |
