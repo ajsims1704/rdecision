@@ -182,16 +182,16 @@ test_that("invalid transition probabilities are rejected", {
   expect_error(
     M$set_probabilities(), class = "invalid_Pt"
   )
-  # probabilities not a matrix
+  # probabilities are not a matrix
   expect_error(
     M$set_probabilities(Pt=42), class = "invalid_Pt"
   )
-  #  probability matrix of incorrect size
+  #  probability matrix is incorrect size
   ePt <- matrix(c(1,0,0,1), nrow=2, byrow=TRUE)  
   expect_error(
     M$set_probabilities(Pt=ePt), class = "invalid_Pt"
   )
-  # probability matrix has no state names
+  # probability matrix has incorrect state names
   ePt <- matrix(
     data = c(0.6, 0.2, 0.2, 0, 0.6, 0.4, 0, 0, 1),
     nrow = 3, byrow = TRUE,
@@ -200,9 +200,50 @@ test_that("invalid transition probabilities are rejected", {
   expect_error(
     M$set_probabilities(Pt=ePt), class = "invalid_Pt"
   )
-  
-  
-  
+  ePt <- matrix(
+    data = c(0.6, 0.2, 0.2, 0, 0.6, 0.4, 0, 0, 1),
+    nrow = 3, byrow = TRUE,
+    dimnames = list(source=snames, target=c("a","b","c"))
+  )
+  expect_error(
+    M$set_probabilities(Pt=ePt), class = "invalid_Pt"
+  )
+  # probability matrix contains NA
+  ePt <- matrix(
+    data = c(0.6, NA, 0.2, 0, 0.6, 0.4, 0, 0, 1),
+    nrow = 3, byrow = TRUE,
+    dimnames = list(source=snames, target=snames)
+  )
+  expect_error(
+    M$set_probabilities(Pt=ePt), class = "invalid_Pt"
+  )
+  # probability matrix contains values not in range [0,1]
+  ePt <- matrix(
+    data = c(0.6, 1.3, -0.9, 0, 0.6, 0.4, 0, 0, 1),
+    nrow = 3, byrow = TRUE,
+    dimnames = list(source=snames, target=snames)
+  )
+  expect_error(
+    M$set_probabilities(Pt=ePt), class = "invalid_Pt"
+  )
+  # probability matrix has non-zero values for undefined transitions
+  ePt <- matrix(
+    data = c(0.6, 0.2, 0.2, 0.1, 0.5, 0.4, 0, 0, 1),
+    nrow = 3, byrow = TRUE,
+    dimnames = list(source=snames, target=snames)
+  )
+  expect_error(
+    M$set_probabilities(Pt=ePt), class = "invalid_Pt"
+  )
+  # probability matrix has row sums > 1
+  ePt <- matrix(
+    data = c(0.6, 0.2, 0.2, 0.0, 0.7, 0.4, 0, 0, 1),
+    nrow = 3, byrow = TRUE,
+    dimnames = list(source=snames, target=snames)
+  )
+  expect_error(
+    M$set_probabilities(Pt=ePt), class = "invalid_Pt"
+  )
 })
 
 # -----------------------------------------------------------------------------
@@ -295,6 +336,58 @@ test_that("invalid elapsed times are rejected", {
   )
 })
 
+
+# -----------------------------------------------------------------------------
+# tests of model variables
+# -----------------------------------------------------------------------------
+test_that("model variables are detected", {
+  # example of monotherapy from Chancellor, 1997
+  # drug costs
+  cAZT <- 2278 # zidovudine drug cost
+  cLam <- 2087 # lamivudine drug cost
+  # direct medical and community costs (modelled as gamma distributions)
+  dmca <- GammaModVar$new("dmca", "GBP", shape=1, scale=1701)
+  dmcb <- GammaModVar$new("dmcb", "GBP", shape=1, scale=1774)
+  dmcc <- GammaModVar$new("dmcc", "GBP", shape=1, scale=6948)
+  ccca <- GammaModVar$new("ccca", "GBP", shape=1, scale=1055)
+  cccb <- GammaModVar$new("cccb", "GBP", shape=1, scale=1278)
+  cccc <- GammaModVar$new("cccc", "GBP", shape=1, scale=2059)
+  # occupancy costs with monotherapy
+  cAm <- ExprModVar$new("cA", "GBP", rlang::quo(dmca+ccca+cAZT))
+  cBm <- ExprModVar$new("cB", "GBP", rlang::quo(dmcb+cccb+cAZT))
+  cCm <- ExprModVar$new("cC", "GBP", rlang::quo(dmcc+cccc+cAZT))
+  # Markov model
+  # ============
+  # states (leave all costs as zero initially)
+  sA <- MarkovState$new("A", cost=cAm)
+  sB <- MarkovState$new("B", cost=cBm)
+  sC <- MarkovState$new("C", cost=cCm)
+  sD <- MarkovState$new("D", cost=0, utility=0)
+  # transitions 
+  tAA <- Transition$new(sA, sA)
+  tAB <- Transition$new(sA, sB)
+  tAC <- Transition$new(sA, sC)
+  tAD <- Transition$new(sA, sD)
+  tBB <- Transition$new(sB, sB)
+  tBC <- Transition$new(sB, sC)
+  tBD <- Transition$new(sB, sD)
+  tCC <- Transition$new(sC, sC)
+  tCD <- Transition$new(sC, sD)
+  tDD <- Transition$new(sD, sD)
+  # model
+  m <- SemiMarkovModel$new(
+    V = list(sA, sB, sC, sD),
+    E = list(tAA, tAB, tAC, tAD, tBB, tBC, tBD, tCC, tCD, tDD)
+  )
+  # check modvars
+  mv <- m$modvars()
+  expect_length(mv, 9)
+  mvt <- m$modvar_table()
+  expect_equal(nrow(mvt), 9)
+  mvt <- m$modvar_table(expressions=FALSE)
+  expect_equal(nrow(mvt), 6)
+})
+
 # -----------------------------------------------------------------------------
 # tests of cycling
 # -----------------------------------------------------------------------------
@@ -334,6 +427,7 @@ test_that("model is cyclable", {
   expect_error(M$cycle(hcc.pop=FALSE,hcc.cost=TRUE), class="invalid_hcc")
   # test cycles
   DF <- M$cycle()
+  expect_equal(M$get_elapsed(),as.difftime(365.25, units="days"))
   expect_true(is.data.frame(DF))
   expect_setequal(
     names(DF), 
@@ -382,6 +476,7 @@ test_that("rdecision replicates Sonnenberg & Beck, Fig 3", {
   M$reset(c(Well=10000, Disabled=0, Dead=0)) 
   # cycle
   RC <- M$cycles(25, hcc.pop=FALSE, hcc.cost=FALSE)
+  expect_equal(M$get_elapsed(), as.difftime(25*365.25, units="days"))
   expect_true(is.data.frame(RC))
   expect_equal(round(RC$Well[RC$Cycle==2]), 3600)
   expect_equal(round(RC$Disabled[RC$Cycle==2]), 2400)
@@ -390,14 +485,6 @@ test_that("rdecision replicates Sonnenberg & Beck, Fig 3", {
 
 # ---------------------------------------------------------------------------
 # Chancellor, 1997 (HIV) with PSA and Briggs exercises 2.5 and 4.7 
-# ** This is a bad example because Briggs et al have converted a table of
-# ** observed transitions (Table 2.5, p38) into probabilities. They should
-# ** have followed the method of Welton and Ades (2005) which describes how to
-# ** convert fully observed transitions into rates. It has the consequence of
-# ** an unusual usage of the Dirichlet distributions, which should have been
-# ** used only for the conditionals. For future releases, consider leaving
-# ** the validation case as a point estimate only and choosing a different
-# ** validation example for PSA.
 # ---------------------------------------------------------------------------
 test_that("redecision replicates Briggs' example 4.7", {
   #
@@ -469,9 +556,13 @@ test_that("redecision replicates Briggs' example 4.7", {
   # ================================================
   runmodel <- function(expected=TRUE, hcc.pop=FALSE, hcc.cost=FALSE) {
     # set variables
-    modvars <- m$modvars()
     if (expected) {
-      sapply(modvars, FUN=function(mv){mv$set("expected")})
+      cAm$set("expected")
+      cBm$set("expected")
+      cCm$set("expected")
+      cAc$set("expected")
+      cBc$set("expected")
+      cCc$set("expected")
       RR$set("expected")
       Pt <- matrix(
         c(DA$mean(), c(0, DB$mean()), c(0, 0, DC$mean()), c(0, 0, 0, 1)), 
@@ -480,7 +571,12 @@ test_that("redecision replicates Briggs' example 4.7", {
         dimnames = list(source=c("A","B","C","D"), target=c("A","B","C","D"))
       )
     } else {
-      sapply(modvars, FUN=function(mv){mv$set("random")})
+      cAm$set("random")
+      cBm$set("random")
+      cCm$set("random")
+      cAc$set("random")
+      cBc$set("random")
+      cCc$set("random")
       RR$set("random")
       Pt <- matrix(
         c(DA$r(), c(0, DB$r()), c(0, 0, DC$r()), c(0, 0, 0, 1)), 
