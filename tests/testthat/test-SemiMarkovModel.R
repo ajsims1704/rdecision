@@ -734,17 +734,17 @@ test_that("redecision replicates Briggs' example 4.7", {
   ODF$icer <- (ODF$cost.comb - ODF$cost.mono)/(ODF$el.comb - ODF$el.mono)
   # read 1000 ICER samples from Briggs solution to example 4.7, modified to
   # save individual runs
-  EDF <- read.csv("Ex47sol-rdecision.csv")
+  data(BriggsEx47, package="rdecision")
   # compare observed with expected
-  suppressWarnings(ht <- ks.test(ODF$el.mono, EDF$Mono.LYs))
+  suppressWarnings(ht <- ks.test(ODF$el.mono, BriggsEx47$Mono.LYs))
   expect_true(ht$p.value > 0.001)
-  suppressWarnings(ht <- ks.test(ODF$cost.mono, EDF$Mono.Cost))
+  suppressWarnings(ht <- ks.test(ODF$cost.mono, BriggsEx47$Mono.Cost))
   expect_true(ht$p.value > 0.001)
-  suppressWarnings(ht <- ks.test(ODF$el.comb, EDF$Comb.LYs))
+  suppressWarnings(ht <- ks.test(ODF$el.comb, BriggsEx47$Comb.LYs))
   expect_true(ht$p.value > 0.001)
-  suppressWarnings(ht <- ks.test(ODF$cost.comb, EDF$Comb.Cost))
+  suppressWarnings(ht <- ks.test(ODF$cost.comb, BriggsEx47$Comb.Cost))
   expect_true(ht$p.value > 0.001)
-  suppressWarnings(ht <- ks.test(ODF$icer, EDF$ICER))
+  suppressWarnings(ht <- ks.test(ODF$icer, BriggsEx47$ICER))
   expect_true(ht$p.value > 0.001)
   # visual (not run)
   #qqplot(ODF$icer, EDF$ICER)
