@@ -578,6 +578,9 @@ test_that("redecision replicates Briggs' example 4.7", {
       cBc$set("random")
       cCc$set("random")
       RR$set("random")
+      DA$sample()
+      DB$sample()
+      DC$sample()
       Pt <- matrix(
         c(DA$r(), c(0, DB$r()), c(0, 0, DC$r()), c(0, 0, 0, 1)), 
         byrow = TRUE,
@@ -720,122 +723,32 @@ test_that("redecision replicates Briggs' example 4.7", {
   # PSA
   # ===
   skip_on_cran()
-  n <- 100
-  DF <- sapply(1:n, FUN=function(i) {
+  n <- 1000
+  ODF <- sapply(1:n, FUN=function(i) {
     # run the model
     M <- runmodel(expected=FALSE, hcc.pop=TRUE, hcc.cost=FALSE)
     return(M)
   })
-  DF <- as.data.frame(t(DF))
-  # calculate ICER and compare with 100 ICER samples from Briggs spreadsheet, 
-  # example 4.7
-  DF$icer <- (DF$cost.comb - DF$cost.mono)/(DF$el.comb - DF$el.mono)
-  esamp <- scan(text=
-    "5301.35
-    9440.15
-    5744.259409
-    6389.097064
-    6392.624986
-    3994.719593
-    7172.362209
-    7911.346126
-    4532.492365
-    5624.510108
-    7661.375273
-    6994.758314
-    6443.136695
-    8415.490257
-    5867.107527
-    5233.06391
-    6622.541882
-    6437.612983
-    2911.766414
-    8913.801308
-    6520.597363
-    5578.340444
-    4729.782693
-    9504.301977
-    6146.588061
-    3765.76602  
-    6489.778374
-    8057.35546
-    11811.25017
-    5670.353086
-    3849.923114
-    4950.39429
-    4122.370475  
-    3821.724085
-    8336.515228
-    4198.215337
-    5253.411175
-    8011.172733
-    5638.448818
-    7453.423065
-    6658.135907
-    4499.134333
-    5201.390732
-    7122.874494
-    4876.858193 
-    4023.805442
-    5129.919089
-    4249.610465
-    12462.7631
-    7434.229976
-    7200.266514
-    7952.9198
-    6556.010328
-    3827.481732
-    5443.137027
-    6012.291712
-    7139.430982
-    6533.022468
-    6739.577098
-    6430.554141
-    5167.152795  
-    6904.27616
-    5573.823787
-    8202.449279
-    6268.396547
-    4602.761381
-    2471.876679
-    5973.696879
-    7414.062825
-    6541.740092
-    1793.977058
-    5224.207019
-    3769.477755
-    3660.149219
-    16972.62138
-    6229.749342
-    2105.755358
-    6150.607183
-    6088.493293
-    6090.582267
-    4299.749596
-    6894.101671
-    8711.266189
-    10316.17458
-    7869.832914
-    4949.493389
-    4319.858777
-    5084.068203
-    7047.4081
-    3261.818576
-    7305.940637
-    10060.60441
-    5851.727982
-    8271.551092
-    5398.198376
-    7150.231396
-    8151.732244
-    3949.116594
-    7574.593941
-    4027.405958",
-    quiet = TRUE
-  ) 
-  ht <- ks.test(DF$icer, esamp)
+  ODF <- as.data.frame(t(ODF))
+  # calculate ICER 
+  ODF$icer <- (ODF$cost.comb - ODF$cost.mono)/(ODF$el.comb - ODF$el.mono)
+  # read 1000 ICER samples from Briggs solution to example 4.7, modified to
+  # save individual runs
+  EDF <- read.csv("Ex47sol-rdecision.csv")
+  # compare observed with expected
+  suppressWarnings(ht <- ks.test(ODF$el.mono, EDF$Mono.LYs))
   expect_true(ht$p.value > 0.001)
-  
+  suppressWarnings(ht <- ks.test(ODF$cost.mono, EDF$Mono.Cost))
+  expect_true(ht$p.value > 0.001)
+  suppressWarnings(ht <- ks.test(ODF$el.comb, EDF$Comb.LYs))
+  expect_true(ht$p.value > 0.001)
+  suppressWarnings(ht <- ks.test(ODF$cost.comb, EDF$Comb.Cost))
+  expect_true(ht$p.value > 0.001)
+  suppressWarnings(ht <- ks.test(ODF$icer, EDF$ICER))
+  expect_true(ht$p.value > 0.001)
+  # visual (not run)
+  #qqplot(ODF$icer, EDF$ICER)
+  #abline(0,1,col="red")
 })
 
 
