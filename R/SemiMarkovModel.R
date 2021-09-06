@@ -5,19 +5,19 @@
 #' 
 #' @details A class to represent a continuous time semi-Markov chain, modelled
 #' using cohort simulation. As interpeted in \pkg{rdecision}, semi Markov models
-#' may include tunnel states and transitions are defined by per-cycle
+#' may include temporary states and transitions are defined by per-cycle
 #' probabilities. Although used widely in health economic modelling, the
 #' differences between semi-Markov models and Markov processes introduce
 #' some caveats for modellers:
 #' \itemize{
-#' \item{If there are tunnel states, the result will depend on cycle length.}
+#' \item{If there are temporary states, the result will depend on cycle length.}
 #' \item{Transitions are specified by their conditional probability, which
 #' is a \emph{per-cycle} probability of making a jump; if the cycle length
 #' changes, the probabilities should change, too.}
 #' \item{Probabilities and rates cannot be linked by the Kolmogorov forward
 #' equation, where the per-cycle probabilities are given by the matrix 
 #' exponential of the transition rate matrix, because this equation breaks down
-#' if there are tunnel states. In creating semi-Markov models, it is the 
+#' if there are temporary states. In creating semi-Markov models, it is the 
 #' modeller's task to estimate probabilities from published data on 
 #' event rates.}
 #' \item{The cycle time cannot be changed during the simulation.}
@@ -39,12 +39,12 @@
 #' \subsection{Why semi-Markov?}{
 #' Beck and Pauker (1983) and later Sonnenberg and Beck (1993) proposed the
 #' use of Markov processes to model the health economics of medical 
-#' interventions. Further, they introduced the additional concept of tunnel 
+#' interventions. Further, they introduced the additional concept of temporary 
 #' states, to which patients who transition remain for exactly one cycle. This
 #' breaks the principle of memorylessness required by the definition of a
 #' Markov process, and thus the underlying mathematical formalism, first
 #' developed by Kolmogorov, is not applicable. For example, ensuring that all
-#' patients leave a tunnel state requires its transition rate to be infinite.
+#' patients leave a temporary state requires its transition rate to be infinite.
 #' Hence, such models are usually labelled as semi-Markov processes.
 #' }
 #' 
@@ -53,7 +53,7 @@
 #' on estimating probabilities from rates. Jones (2017) and Welton (2005) 
 #' describe methods for estimating probabilities in multi-state, 
 #' multi-transition models, although those methods may not apply to 
-#' semi-Markov models with tunnel states. In particular note that the
+#' semi-Markov models with temporary states. In particular note that the
 #' "simple" equation, \eqn{p = 1-e^{-rt}} (Briggs 2006) applies only in a 
 #' two-state, one transition model.
 #' }

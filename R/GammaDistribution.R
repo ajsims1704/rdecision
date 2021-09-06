@@ -64,7 +64,7 @@ GammaDistribution <- R6::R6Class(
       }
       private$scale <- scale
       # initial sample
-      self$sample()
+      self$sample(TRUE)
       # return object
       return(invisible(self))
     },
@@ -107,9 +107,15 @@ GammaDistribution <- R6::R6Class(
     },
     
     #' @description Draw and hold a random sample from the distribution. 
+    #' @param expected If TRUE, sets the next value retrieved by a call to
+    #' \code{r()} to be the mean of the distribution.
     #' @return Updated distribution.
-    sample = function() {
-      private$.r[1] <- rgamma(n=1, shape=private$shape, scale=private$scale)
+    sample = function(expected=FALSE) {
+      if (!expected) {
+        private$.r[1] <- rgamma(n=1, shape=private$shape, scale=private$scale)
+      } else {
+        private$.r[1] <- self$mean()
+      }
       return(invisible(self))
     },
     

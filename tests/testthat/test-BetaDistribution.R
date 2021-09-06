@@ -69,10 +69,15 @@ test_that("Extreme mode values are defined", {
 })
 
 test_that("random sampling is from a Beta distribution", {
+  # create distribution
   alpha <- 2
   beta <- 5
-  n <- 1000
   b <- BetaDistribution$new(alpha, beta)
+  # sample mean
+  b$sample(TRUE)
+  expect_equal(b$r(), 2/7)
+  # random sampling
+  n <- 1000
   osamp <- sapply(1:n, FUN=function(i) {
     b$sample()
     rv <- b$r()

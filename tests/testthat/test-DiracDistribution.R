@@ -23,4 +23,6 @@ test_that("random sampling is correct", {
   x$sample()
   rv <- x$r()
   expect_equal(rv, 42)
+  x$sample(TRUE)
+  expect_equal(rv, 42)
 })

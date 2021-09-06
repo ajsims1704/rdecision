@@ -141,14 +141,20 @@ DirichletDistribution <- R6::R6Class(
     },
     
     #' @description Draw and hold a random sample from the distribution.
+    #' @param expected If TRUE, sets the next value retrieved by a call to
+    #' \code{r()} to be the mean of the distribution.
     #' @return Void; sample is retrieved with call to \code{r()}.
-    sample = function() {
-      # sample from gamma distributions
-      y <- sapply(1:private$K, FUN=function(i) {
-        stats::rgamma(n=1, shape=private$alpha[i], rate=1)
-      })
-      # normalize and hold
-      private$.r <- y / sum(y)
+    sample = function(expected=FALSE) {
+      if (!expected){
+        # sample from gamma distributions
+        y <- sapply(1:private$K, FUN=function(i) {
+          stats::rgamma(n=1, shape=private$alpha[i], rate=1)
+        })
+        # normalize and hold
+        private$.r <- y / sum(y)
+      } else {
+        private$.r <- self$mean()
+      }
       return(invisible(self)) 
     }
 

@@ -1,10 +1,7 @@
 
 # rdecision 1.1.0
 
-* Added data/BriggsEx47, as example 4.7 from Briggs et al, Decision Modelling
-  for Health Economic Evaluation, 2006. These data are 1000 runs of the PSA
-  example, captured from the accompanying spreadsheet solution via an Excel
-  macro. Used in the test script to validate semi-Markov models with PSA.
+* Added data/BriggsEx47, as example 4.7 from Briggs et al to /data.
 * Added elementary semi-Markov model vignette (Chancellor).
 * Added narrative to `SemitMarkovModel` as caution for converting between 
   transition rates and per-cycle probabilities. Cited work of Jones et al

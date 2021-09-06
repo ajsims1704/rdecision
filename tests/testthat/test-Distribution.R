@@ -34,7 +34,6 @@ test_that("Invalid base distributions are rejected", {
   expect_equal(D$order(), 3)
 })
 
-
 # --------------------------------------------------------------------------
 # tests of mean and mode
 # --------------------------------------------------------------------------
@@ -103,6 +102,11 @@ test_that("single sample has K dimensions", {
   expect_length(D$r(), 3)
   D$sample()
   expect_length(D$r(), 3)
+})
+
+test_that("invalid arguments to sample are detected", {
+  D <- Distribution$new("Base", K=as.integer(3))
+  expect_error(D$sample(42), class="invalid_expected")  
 })
 
 test_that("univariate samples are scalars", {

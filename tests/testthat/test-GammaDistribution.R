@@ -49,6 +49,10 @@ test_that("random sampling is from a Gamma distribution", {
   theta <- 0.5
   n <- 1000
   g <- GammaDistribution$new(k, theta)
+  # mean
+  g$sample(TRUE)
+  expect_equal(g$r(), 4.5)
+  # random sampling
   samp <- sapply(1:n, FUN=function(i) {
     g$sample()
     rv <- g$r()

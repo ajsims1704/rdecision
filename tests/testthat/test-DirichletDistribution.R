@@ -111,6 +111,11 @@ test_that("random sampling is from a Dirichlet distribution", {
   # test that means are provided at first call to r() without sampling
   samp <- D$r()
   expect_identical(samp, c(1/8, 1/2, 3/8))
+  # test that sample argument works
+  D$sample()
+  D$sample(expected=TRUE)
+  samp <- D$r()
+  expect_identical(samp, c(1/8, 1/2, 3/8))
   # sample from it
   n <- 1000
   osamp <- matrix(nrow=n, ncol=3)

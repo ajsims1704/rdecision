@@ -1,0 +1,23 @@
+#' @title Probabilistic results of HIV model
+#' @description A dataset containing PSA results of Briggs example 2.5.
+#' @details A dataset containing the results of probabilistic sensitivity 
+#' analysis of Briggs (2006) example 2.5 (HIV model), provided as Example 4.7 in
+#' the book. These data were generated from the solution spreadsheet 
+#' provided as a companion to the book (Exercise 4.7 solution) via an Excel
+#' macro written to record 1000 runs of the model.
+#' @references{
+#'   Briggs A, Claxton K, Sculpher M. Decision modelling for health economic 
+#'   evaluation. Oxford, UK: Oxford University Press; 2006.
+#' } 
+#' @format A data frame with 1000 rows and 7 columns:
+#' \describe{
+#'   \item{Mono.LYs}{Life years gained with monotherapy}
+#'   \item{Mono.Cost}{Incremental cost with monotherapy, in GBP}
+#'   \item{Comb.LYs}{Life years gained with combination therapy}
+#'   \item{Comb.Cost}{Incremental cost with combination therapy, in GBP}
+#'   \item{Diff.LYG}{Difference in life years gained}
+#'   \item{Diff.incCost}{Difference in incremental cost, GBP}
+#'   \item{ICER}{Incremental cost effectiveness ratio, GBP/QALY}
+#' }
+#' @source \url{https://www.herc.ox.ac.uk/downloads/decision-modelling-for-health-economic-evaluation/}
+"BriggsEx47"

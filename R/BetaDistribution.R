@@ -55,7 +55,7 @@ BetaDistribution <- R6::R6Class(
       }
       private$beta <- beta
       # initial sample
-      self$sample()
+      self$sample(expected=TRUE)
       # return BetaDistribution
       return(invisible(self))
     },
@@ -103,9 +103,15 @@ BetaDistribution <- R6::R6Class(
     },
     
     #' @description Draw and hold a random sample from the model variable. 
+    #' @param expected If TRUE, sets the next value retrieved by a call to
+    #' \code{r()} to be the mean of the distribution.
     #' @return Updated distribution.
-    sample = function() {
-      private$.r[1] <- rbeta(n=1, shape1=private$alpha, shape2=private$beta)
+    sample = function(expected=FALSE) {
+      if (!expected){
+        private$.r[1] <- rbeta(n=1, shape1=private$alpha, shape2=private$beta)
+      } else {
+        private$.r[1] <- self$mean()
+      }
       return(invisible(self))
     },
     
