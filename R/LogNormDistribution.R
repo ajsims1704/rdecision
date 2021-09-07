@@ -120,7 +120,7 @@ LogNormDistribution <- R6::R6Class(
         )
       }
       # initial sample
-      self$sample()
+      self$sample(TRUE)
       # return new object
       return(invisible(self))
     },
@@ -136,10 +136,15 @@ LogNormDistribution <- R6::R6Class(
     },
     
     #' @description Draw a random sample from the model variable. 
-    #' @param n Number of samples to draw.
-    #' @return A sample drawn at random.
-    sample = function() {
-      private$.r[1] <- rlnorm(n=1, mean=private$meanlog, sd=private$sdlog)
+    #' @param expected If TRUE, sets the next value retrieved by a call to
+    #' \code{r()} to be the mean of the distribution.
+    #' @return Updated \code{LogNormDistribution} object.
+    sample = function(expected=FALSE) {
+      if (!expected) {
+        private$.r[1] <- rlnorm(n=1, mean=private$meanlog, sd=private$sdlog)
+      } else {
+        private$.r[1] <- self$mean()
+      }
       return(invisible(self))
     },
     

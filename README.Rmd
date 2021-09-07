@@ -23,8 +23,8 @@ knitr::opts_chunk$set(
 <!-- badges: end -->
 
 The goal of `rdecision` is to provide methods for assessing health care 
-interventions using cohort models (decision trees and Markov models) which can
-be constructed using only a few lines of R code. Mechanisms
+interventions using cohort models (decision trees and semi-Markov models) which
+can be constructed using only a few lines of R code. Mechanisms
 are provided for associating an uncertainty distribution with each source 
 variable and for ensuring transparency of the mathematical relationships between
 variables. The package terminology follows Briggs *et al* "Decision Modelling
@@ -150,11 +150,11 @@ programme is cost saving.
 
 ## A three-state Markov model
 Sonnenberg and Beck [-@sonnenberg1993] introduced an illustrative example of a
-Markov process with three states: "Well", "Disabled" and "Dead" and one
+semi-Markov process with three states: "Well", "Disabled" and "Dead" and one
 transition between each state, each with a per-cycle probability. In
 `rdecision` such a model is constructed as follows. Note that transitions
 from a state to itself must be specified if allowed, otherwise the state would
-be a tunnel state.
+be a temporary state.
 
 ```{r markoveg-model, echo=TRUE}
 # create states
@@ -183,7 +183,7 @@ Pt <- matrix(
 M$set_probabilities(Pt)
 ```
 
-```{r sb,echo=FALSE,results="hide",fig.align="center"}
+```{r sb,echo=FALSE,results="hide",fig.align="center",fig.keep="all"}
 #DOT <- M$as_DOT()
 #writeLines(DOT, con="man/figures/README-sb-1.gv")
 #system2(
@@ -196,6 +196,7 @@ M$set_probabilities(Pt)
 #knitr::include_graphics("man/figures/README-sb-1.png")
 ```
 <img src="man/figures/README-sb-1.png" width="75%" style="display: block; margin: auto;" />
+
 
 With a starting population of 10,000, the model can be run for 25 years as
 follows. The output of the `cycles` function is the Markov trace, shown
@@ -231,9 +232,7 @@ glossary [@wikipedia2021] and links therein. Topological sorting of graphs
 is based on Kahn's algorithm [-@kahn1962]. Some of the terminology for decision
 trees was based on the work of Kaminski *et al* [-@kaminski2018] and an 
 efficient tree drawing algorithm was based on the work of Walker [-@walker1989].
-In Markov models, matrix exponentiation for converting transition rates into
-per-cycle probabilities, and *vice versa*, relies on the `expm` 
-package [@goulet2021] and Markov model representations are exported in the
+In semi-Markov models, representations are exported in the
 DOT language [@gansner1993].
 
 Terminology for decision trees and Markov models in health economic evaluation

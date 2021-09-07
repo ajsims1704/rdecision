@@ -194,9 +194,17 @@ labelled with quantiles and columns with the dimension (1, 2, etc).
 \subsection{Method \code{sample()}}{
 Draw and hold a random sample from the distribution.
 \subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{Distribution$sample()}\if{html}{\out{</div>}}
+\if{html}{\out{<div class="r">}}\preformatted{Distribution$sample(expected = FALSE)}\if{html}{\out{</div>}}
 }
 
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{expected}}{If TRUE, sets the next value retrieved by a call to
+\code{r()} to be the mean of the distribution.}
+}
+\if{html}{\out{</div>}}
+}
 \subsection{Returns}{
 Void
 }

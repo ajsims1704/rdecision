@@ -135,11 +135,12 @@ individuals who make more than one transition during the observation time, and
 can lead to rates with values which exceed 1. In contrast, the difference
 between a census of the number 
 of individuals in each state at the start of the interval and another at the
-end is directly related to the per-cycle probability. As Miller and Homan [-@miller1994], Welton and Ades [-@welton2005], Jones *et al*
+end is directly related to the per-cycle probability. As Miller and 
+Homan [-@miller1994], Welton and Ades [-@welton2005], Jones *et al*
 [-@jones2017] and others note, conversion between rates and probabilities for 
 multi-state Markov models is non-trivial [@jones2017] and care is needed
 when modellers calculate probabilities from published rates for use in
-`semiMarkoModel`s.
+`SemiMarkoModel`s.
 
 # Checking the model
 
@@ -154,10 +155,10 @@ the `DiagrammeR` package. The Markov model for monotherapy is shown in Figure 1.
 f1c  <- paste("Figure 1. Markov model for comparison of HIV therapy.", 
               "A: 200 < cd4 < 500,", "B: cd4 < 200,", "C: AIDS,","D: Death.")
 ```
-```{r draw,fig.cap=f1c,fig.asp=0.21}
-DOT <- m.mono$as_DOT()
-writeLines(DOT, con="mono.gv")
-system2(command="dot", args=c("-Tpng","-o","mono.png","mono.gv"))
+```{r draw,fig.cap=f1c,fig.asp=0.21,fig.keep="all"}
+#DOT <- m.mono$as_DOT()
+#writeLines(DOT, con="mono.gv")
+#system2(command="dot", args=c("-Tpng","-o","mono.png","mono.gv"))
 knitr::include_graphics(path="mono.png")
 ```
 
@@ -335,6 +336,7 @@ The expected life years gained with combination therapy  for two years was
 change in life years was `r round(el.comb-el.mono,3)` years at an incremental 
 cost of `r format(cost.comb-cost.mono,digits=2,scientific=F,big.mark=',')` GBP,
 giving an ICER of `r round(icer,2)` GBP/QALY. This is consistent with the
-result obtained by Briggs *et al* [-@briggs2006], within rounding error.
+result obtained by Briggs *et al* [-@briggs2006] (6276 GBP/QALY), within 
+rounding error.
 
 # References

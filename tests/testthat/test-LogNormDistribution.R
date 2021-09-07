@@ -51,6 +51,10 @@ test_that("random sampling is from a log normal distribution", {
   sigma <- 0.25
   n <- 1000
   ln <- LogNormDistribution$new(mu, sigma, "LN1")
+  # check mean
+  ln$sample(TRUE)
+  expect_equal(ln$r(), exp(mu+0.5*sigma^2))
+  # check sampling
   samp <- sapply(1:n, FUN=function(i) {
     ln$sample()
     rv <- ln$r()

@@ -18,7 +18,6 @@ Description: Classes and functions for modelling health care interventions
   Economic Evaluation" (2006, ISBN:978-0-19-852662-9).
 Depends: R (>= 3.1.0)
 Imports:
-  expm,
   grid,
   R6,
   rlang (>= 0.4.2),

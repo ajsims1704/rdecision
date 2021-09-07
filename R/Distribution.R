@@ -53,8 +53,8 @@ Distribution <- R6::R6Class(
         )
       }
       private$K <- K
-      # create space for a random draw and populate it with mean
-      private$.r <- self$mean()
+      # create space for a random draw and populate it with NA
+      private$.r <- rep(as.numeric(NA), times=K)
       # return Distribution
       return(invisible(self))
     },

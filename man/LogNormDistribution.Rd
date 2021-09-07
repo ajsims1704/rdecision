@@ -133,18 +133,19 @@ etc.).
 \subsection{Method \code{sample()}}{
 Draw a random sample from the model variable.
 \subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{LogNormDistribution$sample()}\if{html}{\out{</div>}}
+\if{html}{\out{<div class="r">}}\preformatted{LogNormDistribution$sample(expected = FALSE)}\if{html}{\out{</div>}}
 }
 
 \subsection{Arguments}{
 \if{html}{\out{<div class="arguments">}}
 \describe{
-\item{\code{n}}{Number of samples to draw.}
+\item{\code{expected}}{If TRUE, sets the next value retrieved by a call to
+\code{r()} to be the mean of the distribution.}
 }
 \if{html}{\out{</div>}}
 }
 \subsection{Returns}{
-A sample drawn at random.
+Updated \code{LogNormDistribution} object.
 }
 }
 \if{html}{\out{<hr>}}

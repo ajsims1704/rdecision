@@ -12,10 +12,10 @@ coverage](https://codecov.io/gh/ajsims1704/rdecision/branch/master/graph/badge.s
 <!-- badges: end -->
 
 The goal of `rdecision` is to provide methods for assessing health care
-interventions using cohort models (decision trees and Markov models)
-which can be constructed using only a few lines of R code. Mechanisms
-are provided for associating an uncertainty distribution with each
-source variable and for ensuring transparency of the mathematical
+interventions using cohort models (decision trees and semi-Markov
+models) which can be constructed using only a few lines of R code.
+Mechanisms are provided for associating an uncertainty distribution with
+each source variable and for ensuring transparency of the mathematical
 relationships between variables. The package terminology follows Briggs
 *et al* “Decision Modelling for Health Economic Evaluation”.<sup>1</sup>
 
@@ -111,18 +111,18 @@ evaluation of the tree, each time sampling from the uncertainty
 distribution of the two probabilities using, for example,
 `DT$evaluate(setvars="random", N=1000)` and inspecting the resulting
 data frame. From 1000 runs, the 95% confidence interval of the per
-patient cost saving is -530.59 GBP to 998.22 GBP, with 69.6% being cost
+patient cost saving is -507.18 GBP to 937.64 GBP, with 74.4% being cost
 saving, and it can be concluded that more evidence is required to be
 confident that the exercise programme is cost saving.
 
 ## A three-state Markov model
 
 Sonnenberg and Beck<sup>2</sup> introduced an illustrative example of a
-Markov process with three states: “Well”, “Disabled” and “Dead” and one
-transition between each state, each with a per-cycle probability. In
+semi-Markov process with three states: “Well”, “Disabled” and “Dead” and
+one transition between each state, each with a per-cycle probability. In
 `rdecision` such a model is constructed as follows. Note that
 transitions from a state to itself must be specified if allowed,
-otherwise the state would be a tunnel state.
+otherwise the state would be a temporary state.
 
 ``` r
 # create states
@@ -189,15 +189,13 @@ glossary<sup>12</sup> and links therein. Topological sorting of graphs
 is based on Kahn’s algorithm.<sup>13</sup> Some of the terminology for
 decision trees was based on the work of Kaminski *et al*<sup>14</sup>
 and an efficient tree drawing algorithm was based on the work of
-Walker.<sup>15</sup> In Markov models, matrix exponentiation for
-converting transition rates into per-cycle probabilities, and *vice
-versa*, relies on the `expm` package<sup>16</sup> and Markov model
-representations are exported in the DOT language.<sup>17</sup>
+Walker.<sup>15</sup> In semi-Markov models, representations are exported
+in the DOT language.<sup>16</sup>
 
 Terminology for decision trees and Markov models in health economic
 evaluation was based on the book by Briggs *et al*<sup>1</sup> and the
 output format and terminology follows ISPOR
-recommendations.<sup>19</sup>
+recommendations.<sup>18</sup>
 
 Citations for examples used in vignettes are given in applicable
 vignette files.
@@ -333,18 +331,9 @@ general trees*. Chapel Hill: University of North Carolina; 1989.</span>
 
 </div>
 
-<div id="ref-goulet2021" class="csl-entry">
-
-<span class="csl-left-margin">16 </span><span
-class="csl-right-inline">Goulet V, Dutang C, Maechler M, Firth D,
-Shapira M, Stadelmann M. *Expm: Matrix exponential, log, etc*.
-2021.</span>
-
-</div>
-
 <div id="ref-gansner1993" class="csl-entry">
 
-<span class="csl-left-margin">17 </span><span
+<span class="csl-left-margin">16 </span><span
 class="csl-right-inline">Gansner ER, Koutsofios E, North SC, Vo K-P. A
 technique for drawing directed graphs. *IEEE Transactions on Software
 Engineering* 1993;**19**:214–30.
@@ -354,7 +343,7 @@ Engineering* 1993;**19**:214–30.
 
 <div id="ref-briggs2012a" class="csl-entry">
 
-<span class="csl-left-margin">18 </span><span
+<span class="csl-left-margin">17 </span><span
 class="csl-right-inline">Briggs AH, Weinstein MC, Fenwick EAL, Karnon J,
 Sculpher MJ, Paltiel AD. Model Parameter Estimation and Uncertainty: A
 Report of the ISPOR-SMDM Modeling Good Research Practices Task Force-6.
@@ -365,7 +354,7 @@ Report of the ISPOR-SMDM Modeling Good Research Practices Task Force-6.
 
 <div id="ref-siebert2012" class="csl-entry">
 
-<span class="csl-left-margin">19 </span><span
+<span class="csl-left-margin">18 </span><span
 class="csl-right-inline">Siebert U, Alagoz O, Bayoumi AM, Jahn B, Owens
 DK, Cohen DJ, *et al.* State-Transition Modeling: A Report of the
 ISPOR-SMDM Modeling Good Research Practices Task Force-3. *Value in

@@ -4,7 +4,8 @@
 #' cohort simulation.
 #' 
 #' @details A class to represent a continuous time semi-Markov chain, modelled
-#' using cohort simulation. As interpeted in \pkg{rdecision}, semi Markov models
+#' using cohort simulation. As interpreted in \pkg{rdecision}, semi-Markov 
+#' models
 #' may include temporary states and transitions are defined by per-cycle
 #' probabilities. Although used widely in health economic modelling, the
 #' differences between semi-Markov models and Markov processes introduce
@@ -41,8 +42,8 @@
 #' use of Markov processes to model the health economics of medical 
 #' interventions. Further, they introduced the additional concept of temporary 
 #' states, to which patients who transition remain for exactly one cycle. This
-#' breaks the principle of memorylessness required by the definition of a
-#' Markov process, and thus the underlying mathematical formalism, first
+#' breaks the principle that Markov processes are memoryless
+#' and thus the underlying mathematical formalism, first
 #' developed by Kolmogorov, is not applicable. For example, ensuring that all
 #' patients leave a temporary state requires its transition rate to be infinite.
 #' Hence, such models are usually labelled as semi-Markov processes.
@@ -61,11 +62,9 @@
 #' \subsection{Uncertainty in rates}{
 #' In semi-Markov models, the conditional probabilities of the transitions 
 #' from each state are usually modelled by a Dirichlet distribution. In 
-#' \pkg{rdecision}, create \code{ModVar}s create a Dirichlet distribution for 
-#' each state; create model variables for each
-#' conditional probability (\eqn{\rho_{ij}}) linked to an applicable Dirichlet
-#' distribution; and finally create expression model variables for each rate
-#' \eqn{g_{ij}}.
+#' \pkg{rdecision}, create a Dirichlet distribution for each state and 
+#' optionally create model variables for each conditional probability 
+#' (\eqn{\rho_{ij}}) linked to an applicable Dirichlet distribution.
 #' }
 #' 
 #' @references{

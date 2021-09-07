@@ -521,7 +521,7 @@ test_that("redecision replicates Briggs' example 4.7", {
   sB <- MarkovState$new("B")
   sC <- MarkovState$new("C")
   sD <- MarkovState$new("D", cost=0, utility=0)
-  # transitions (leave all rates as NA initially)
+  # transitions 
   tAA <- Transition$new(sA, sA)
   tAB <- Transition$new(sA, sB)
   tAC <- Transition$new(sA, sC)
@@ -556,38 +556,23 @@ test_that("redecision replicates Briggs' example 4.7", {
   # ================================================
   runmodel <- function(expected=TRUE, hcc.pop=FALSE, hcc.cost=FALSE) {
     # set variables
-    if (expected) {
-      cAm$set("expected")
-      cBm$set("expected")
-      cCm$set("expected")
-      cAc$set("expected")
-      cBc$set("expected")
-      cCc$set("expected")
-      RR$set("expected")
-      Pt <- matrix(
-        c(DA$mean(), c(0, DB$mean()), c(0, 0, DC$mean()), c(0, 0, 0, 1)), 
-        byrow = TRUE,
-        nrow = 4,
-        dimnames = list(source=c("A","B","C","D"), target=c("A","B","C","D"))
-      )
-    } else {
-      cAm$set("random")
-      cBm$set("random")
-      cCm$set("random")
-      cAc$set("random")
-      cBc$set("random")
-      cCc$set("random")
-      RR$set("random")
-      DA$sample()
-      DB$sample()
-      DC$sample()
-      Pt <- matrix(
+    # =============
+    cAm$set(ifelse(expected, "expected", "random"))
+    cBm$set(ifelse(expected, "expected", "random"))
+    cCm$set(ifelse(expected, "expected", "random"))
+    cAc$set(ifelse(expected, "expected", "random"))
+    cBc$set(ifelse(expected, "expected", "random"))
+    cCc$set(ifelse(expected, "expected", "random"))
+    RR$set(ifelse(expected, "expected", "random"))
+    DA$sample(expected)
+    DB$sample(expected)
+    DC$sample(expected)
+    Pt <- matrix(
         c(DA$r(), c(0, DB$r()), c(0, 0, DC$r()), c(0, 0, 0, 1)), 
         byrow = TRUE,
         nrow = 4,
         dimnames = list(source=c("A","B","C","D"), target=c("A","B","C","D"))
-      )
-    }
+    )
     # 
     # Monotherapy
     # ===========

@@ -20,4 +20,5 @@
 #'   \item{ICER}{Incremental cost effectiveness ratio, GBP/QALY}
 #' }
 #' @source \url{https://www.herc.ox.ac.uk/downloads/decision-modelling-for-health-economic-evaluation/}
+#' @usage data(BriggsEx47)
 "BriggsEx47"

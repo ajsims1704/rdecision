@@ -49,6 +49,8 @@ DirichletDistribution <- R6::R6Class(
       private$alpha <- alpha
       # create subclass object and check parameter
       super$initialize("Dir", K=length(alpha))
+      # set random sample to mean
+      self$sample(TRUE)
       # return Dirichlet distribution object
       return(invisible(self))
     },

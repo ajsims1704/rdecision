@@ -11,7 +11,6 @@
 #'
 #' @docType package
 #' @name rdecision
-#' @import expm
 #' @import grid
 #' @import R6
 #' @import rlang

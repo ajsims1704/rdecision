@@ -42,7 +42,7 @@ NormalDistribution <- R6::R6Class(
       }
       private$sigma <- sigma
       # initial sample
-      self$sample()
+      self$sample(TRUE)
       # return
       return(invisible(self))
     },
@@ -59,9 +59,15 @@ NormalDistribution <- R6::R6Class(
     },
     
     #' @description Draw a random sample from the model variable. 
+    #' @param expected If TRUE, sets the next value retrieved by a call to
+    #' \code{r()} to be the mean of the distribution.
     #' @return A sample drawn at random.
-    sample = function() {
-      private$.r <- rnorm(n=1, mean=private$mu, sd=private$sigma)
+    sample = function(expected=FALSE) {
+      if (!expected) {
+        private$.r[1] <- rnorm(n=1, mean=private$mu, sd=private$sigma)
+      } else {
+        private$.r[1] <- self$mean()
+      }
       # return the updated object
       return(invisible(self))
     },

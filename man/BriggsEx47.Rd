@@ -20,7 +20,7 @@ A data frame with 1000 rows and 7 columns:
 \url{https://www.herc.ox.ac.uk/downloads/decision-modelling-for-health-economic-evaluation/}
 }
 \usage{
-BriggsEx47
+data(BriggsEx47)
 }
 \description{
 A dataset containing PSA results of Briggs example 2.5.

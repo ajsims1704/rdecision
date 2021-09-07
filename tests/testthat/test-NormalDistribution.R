@@ -40,6 +40,10 @@ test_that("random sampling is from a Normal distribution", {
   mu <- 0
   sigma <- 1
   sn <- NormalDistribution$new(mu, sigma)
+  # mean
+  sn$sample(TRUE)
+  expect_equal(sn$r(), 0)
+  # sample
   n <- 1000
   samp <- sapply(1:n, FUN=function(i) {
     sn$sample()
