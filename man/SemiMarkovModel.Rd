@@ -204,7 +204,7 @@ A semi-Markov model must meet the following conditions:
   \item For each state the sum of outgoing conditional transition 
   probabilities must be one. For convenience, one outgoing transition 
   probability from each state may be set to NA when the 
-  \code{Transition}s are defined. Typically, probabilities for self 
+  \code{probabilities}s are defined. Typically, probabilities for self 
   loops would be set to NA). Transition probabilities in \eqn{Pt} 
   associated with transitions that are not defined as edges in the 
   graph are zero. Probabilities can be changed between cycles.
@@ -217,7 +217,8 @@ A semi-Markov model must meet the following conditions:
 
 \subsection{Returns}{
 A \code{SemiMarkovModel} object. The population of the first
-state is set to 1000.
+state is set to 1000 and from each state there is an equal 
+conditional probability of each allowed transition.
 }
 }
 \if{html}{\out{<hr>}}
@@ -234,7 +235,8 @@ Sets transition probabilities.
 \describe{
 \item{\code{Pt}}{Per-cycle transition probability matrix. The row and 
 column labels must be the state names and each row must sum to one.
-Non-zero probabilities for undefined transitions are not allowed.}
+Non-zero probabilities for undefined transitions are not allowed. At
+most one \code{NA} may appear in each row.}
 }
 \if{html}{\out{</div>}}
 }

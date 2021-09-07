@@ -223,9 +223,9 @@ test_that("invalid transition probabilities are rejected", {
   expect_error(
     M$set_probabilities(Pt=ePt), class = "invalid_Pt"
   )
-  # probability matrix contains NA
+  # probability matrix contains multiple NA per row
   ePt <- matrix(
-    data = c(0.6, NA, 0.2, 0, 0.6, 0.4, 0, 0, 1),
+    data = c(0.6, NA, NA, 0, 0.6, 0.4, 0, 0, 1),
     nrow = 3, byrow = TRUE,
     dimnames = list(source=snames, target=snames)
   )
@@ -259,6 +259,38 @@ test_that("invalid transition probabilities are rejected", {
   expect_error(
     M$set_probabilities(Pt=ePt), class = "invalid_Pt"
   )
+})
+
+test_that("NAs are replaced in transition probability matrix", {
+  # create states
+  s.well <- MarkovState$new(name="Well")
+  s.disabled <- MarkovState$new(name="Disabled")
+  s.dead <- MarkovState$new(name="Dead")
+  # create transitions
+  E <- list(
+    Transition$new(s.well, s.well),
+    Transition$new(s.dead, s.dead),
+    Transition$new(s.disabled, s.disabled),
+    Transition$new(s.well, s.disabled),
+    Transition$new(s.well, s.dead),
+    Transition$new(s.disabled, s.dead)
+  )
+  # create model
+  M <- SemiMarkovModel$new(V = list(s.well, s.disabled, s.dead), E) 
+  # use S&B per-cycle transition probabilities
+  snames <- c("Well","Disabled","Dead")
+  EPt <- matrix(
+    data = c(0.6, 0.2, 0.2, 0, 0.6, 0.4, 0, 0, 1),
+    nrow = 3, byrow = TRUE,
+    dimnames = list(source=snames, target=snames)
+  )
+  Pt <- matrix(
+    data = c(0.6, NA, 0.2, 0, 0.6, 0.4, 0, 0, NA),
+    nrow = 3, byrow = TRUE,
+    dimnames = list(source=snames, target=snames)
+  )
+  M$set_probabilities(Pt)
+  expect_equal(M$transition_probabilities(), EPt)
 })
 
 # -----------------------------------------------------------------------------

@@ -126,7 +126,7 @@ SemiMarkovModel <- R6::R6Class(
     #'   \item For each state the sum of outgoing conditional transition 
     #'   probabilities must be one. For convenience, one outgoing transition 
     #'   probability from each state may be set to NA when the 
-    #'   \code{Transition}s are defined. Typically, probabilities for self 
+    #'   \code{probabilities}s are defined. Typically, probabilities for self 
     #'   loops would be set to NA). Transition probabilities in \eqn{Pt} 
     #'   associated with transitions that are not defined as edges in the 
     #'   graph are zero. Probabilities can be changed between cycles.
@@ -189,7 +189,7 @@ SemiMarkovModel <- R6::R6Class(
       # check that there is at least one outgoing transition from each state
       if (any(rowSums(A)<1)) {
         rlang::abort(
-          "Every state must have at leats one outgoing transition",
+          "Every state must have at least one outgoing transition",
           class = "missing_transition"
         )
       }
@@ -246,7 +246,8 @@ SemiMarkovModel <- R6::R6Class(
     #' @description Sets transition probabilities.
     #' @param Pt Per-cycle transition probability matrix. The row and 
     #' column labels must be the state names and each row must sum to one.
-    #' Non-zero probabilities for undefined transitions are not allowed. 
+    #' Non-zero probabilities for undefined transitions are not allowed. At
+    #' most one \code{NA} may appear in each row.
     #' @return Updated \code{SemiMarkovModel} object
     set_probabilities = function(Pt) {
       # check Pt
@@ -270,13 +271,22 @@ SemiMarkovModel <- R6::R6Class(
         rlang::abort(
           "Each column of 'Pt' must have a state name",
           class = "invalid_Pt")
-      }  
-      if (any(is.na(Pt))) {
+      }
+      # check NAs and replace them 
+      nNA <- rowSums(is.na(Pt))
+      if (any(nNA>1)) {
         rlang::abort(
-          "All elements of 'Pt' must be defined",
+          "No more than one NA per row is allowed",
           class = "invalid_Pt"
         )
       }
+      sumP <- rowSums(Pt, na.rm=TRUE)
+      for (r in 1:self$order()) {
+        if (nNA[r]>0) {
+          Pt[r,which(is.na(Pt[r,]))] <- 1-sumP[r]
+        }
+      }
+      # check that all cells are a probability
       if (any(Pt<0) | any(Pt>1)) {
         rlang::abort(
           "All elements of 'Pt' must be probabilities",
