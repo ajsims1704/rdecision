@@ -62,6 +62,14 @@ test_that("multiple digraph edges are rejected", {
   e.ww.bleed <- Transition$new(s.well, s.well)
   e.wd <- Transition$new(s.well, s.dead)
   e.dd <- Transition$new(s.dead, s.dead)
+  # no outgoing transition from dead
+  expect_error(
+    SemiMarkovModel$new(
+      V = list(s.well, s.dead), 
+      E = list(e.ww, e.wd)
+    ),
+    class = "missing_transition"
+  )
   # two self loops from well to well
   expect_error(
     SemiMarkovModel$new(
@@ -178,9 +186,13 @@ test_that("invalid transition probabilities are rejected", {
   )
   # create model
   M <- SemiMarkovModel$new(V = list(s.well, s.disabled, s.dead), E) 
-  # check that Pt is the identity
-  EPt <- M$transition_probabilities()
-  expect_true(all(EPt-diag(3)==0))
+  # check that initial state has equal probabilities
+  EPt <- matrix(
+    data = c(1/3,1/3,1/3,0,0.5,0.5,0,0,1),
+    nrow=3, byrow=TRUE,
+    dimnames=list(source=snames,target=snames)
+  )
+  expect_equal(M$transition_probabilities(), EPt)
   # no probabilities
   expect_error(
     M$set_probabilities(), class = "invalid_Pt"

@@ -142,7 +142,8 @@ SemiMarkovModel <- R6::R6Class(
     #' @param discount.utility Annual discount rate for future incremental
     #' utility.
     #' @return A \code{SemiMarkovModel} object. The population of the first
-    #' state is set to 1000.
+    #' state is set to 1000 and from each state there is an equal 
+    #' conditional probability of each allowed transition.
     initialize = function(V, E, tcycle=as.difftime(365.25, units="days"), 
                           discount.cost=0, discount.utility=0) {
       # initialize the base class(es)
@@ -185,6 +186,13 @@ SemiMarkovModel <- R6::R6Class(
           class = "multiple_edges"
         )
       }
+      # check that there is at least one outgoing transition from each state
+      if (any(rowSums(A)<1)) {
+        rlang::abort(
+          "Every state must have at leats one outgoing transition",
+          class = "missing_transition"
+        )
+      }
       # check that the node names are unique
       if (length(unique(self$get_statenames()))!=self$order()) {
         rlang::abort(
@@ -213,10 +221,21 @@ SemiMarkovModel <- R6::R6Class(
         )
       }
       private$smm.disutil <- discount.utility
-      # set the initial probability to the identity matrix
-      Pt <- diag(self$order())
-      rownames(Pt) <- self$get_statenames()
-      colnames(Pt) <- self$get_statenames()
+      # set the initial probability matrix (equal chance from each state)
+      Pt <- matrix(
+        data = 0, 
+        nrow = self$order(), ncol = self$order(),
+        dimnames = list(
+          source=self$get_statenames(), target=self$get_statenames()
+        )
+      )
+      for (ie in 1:self$size()) {
+        e <- private$E[[ie]]
+        is <- self$vertex_index(e$source())
+        it <- self$vertex_index(e$target())
+        Pt[is,it] <- 1
+      }
+      Pt <- Pt/rowSums(Pt)
       self$set_probabilities(Pt)
       # reset the model to its ground state
       self$reset()
