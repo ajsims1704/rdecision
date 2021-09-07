@@ -19,13 +19,14 @@ some caveats for modellers:
 \itemize{
 \item{If there are temporary states, the result will depend on cycle length.}
 \item{Transitions are specified by their conditional probability, which
-is a \emph{per-cycle} probability of making a jump; if the cycle length
-changes, the probabilities should change, too.}
+is a \emph{per-cycle} probability of starting a cycle in one state and
+ending it in another; if the cycle length changes, the probabilities should 
+change, too.}
 \item{Probabilities and rates cannot be linked by the Kolmogorov forward
 equation, where the per-cycle probabilities are given by the matrix 
-exponential of the transition rate matrix, because this equation breaks down
-if there are temporary states. In creating semi-Markov models, it is the 
-modeller's task to estimate probabilities from published data on 
+exponential of the transition rate matrix, because this equation does not
+apply if there are temporary states. In creating semi-Markov models, it is 
+the  modeller's task to estimate probabilities from published data on 
 event rates.}
 \item{The cycle time cannot be changed during the simulation.}
 }
@@ -115,7 +116,7 @@ Andrew J. Sims \email{andrew.sims@newcastle.ac.uk}
 \itemize{
 \item \href{#method-new}{\code{SemiMarkovModel$new()}}
 \item \href{#method-set_probabilities}{\code{SemiMarkovModel$set_probabilities()}}
-\item \href{#method-transition_probability}{\code{SemiMarkovModel$transition_probability()}}
+\item \href{#method-transition_probabilities}{\code{SemiMarkovModel$transition_probabilities()}}
 \item \href{#method-transition_cost}{\code{SemiMarkovModel$transition_cost()}}
 \item \href{#method-get_statenames}{\code{SemiMarkovModel$get_statenames()}}
 \item \href{#method-reset}{\code{SemiMarkovModel$reset()}}
@@ -242,12 +243,12 @@ Updated \code{SemiMarkovModel} object
 }
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-transition_probability"></a>}}
-\if{latex}{\out{\hypertarget{method-transition_probability}{}}}
-\subsection{Method \code{transition_probability()}}{
+\if{html}{\out{<a id="method-transition_probabilities"></a>}}
+\if{latex}{\out{\hypertarget{method-transition_probabilities}{}}}
+\subsection{Method \code{transition_probabilities()}}{
 Per-cycle transition probability matrix for the model.
 \subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{SemiMarkovModel$transition_probability()}\if{html}{\out{</div>}}
+\if{html}{\out{<div class="r">}}\preformatted{SemiMarkovModel$transition_probabilities()}\if{html}{\out{</div>}}
 }
 
 \subsection{Returns}{

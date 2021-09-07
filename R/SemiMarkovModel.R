@@ -13,13 +13,14 @@
 #' \itemize{
 #' \item{If there are temporary states, the result will depend on cycle length.}
 #' \item{Transitions are specified by their conditional probability, which
-#' is a \emph{per-cycle} probability of making a jump; if the cycle length
-#' changes, the probabilities should change, too.}
+#' is a \emph{per-cycle} probability of starting a cycle in one state and
+#' ending it in another; if the cycle length changes, the probabilities should 
+#' change, too.}
 #' \item{Probabilities and rates cannot be linked by the Kolmogorov forward
 #' equation, where the per-cycle probabilities are given by the matrix 
-#' exponential of the transition rate matrix, because this equation breaks down
-#' if there are temporary states. In creating semi-Markov models, it is the 
-#' modeller's task to estimate probabilities from published data on 
+#' exponential of the transition rate matrix, because this equation does not
+#' apply if there are temporary states. In creating semi-Markov models, it is 
+#' the  modeller's task to estimate probabilities from published data on 
 #' event rates.}
 #' \item{The cycle time cannot be changed during the simulation.}
 #' }
@@ -212,6 +213,11 @@ SemiMarkovModel <- R6::R6Class(
         )
       }
       private$smm.disutil <- discount.utility
+      # set the initial probability to the identity matrix
+      Pt <- diag(self$order())
+      rownames(Pt) <- self$get_statenames()
+      colnames(Pt) <- self$get_statenames()
+      self$set_probabilities(Pt)
       # reset the model to its ground state
       self$reset()
       # return a new SemiMarkovModel object
@@ -294,7 +300,7 @@ SemiMarkovModel <- R6::R6Class(
     #' @description Per-cycle transition probability matrix for the model.
     #' @return A square matrix of size equal to the number of states. If all
     #' states are labelled, the dimnames take the names of the states.
-    transition_probability = function() {
+    transition_probabilities = function() {
       return(private$smm.Pt)
     },
 
@@ -510,10 +516,10 @@ SemiMarkovModel <- R6::R6Class(
         nrow = self$order(), ncol=self$order(),
         byrow = FALSE
       )
-      TC <- P*self$transition_probability()*self$transition_cost()
+      TC <- P*self$transition_probabilities()*self$transition_cost()
       entry.costs <- colSums(TC)*dfc
       # Apply the transition probabilities to get the end state populations,
-      pop.end <- private$smm.pop %*% self$transition_probability()
+      pop.end <- private$smm.pop %*% self$transition_probabilities()
       pop.end <- drop(pop.end)
       # calculate annual costs of state occupancy
       state.costs <- sapply(private$V, function(x) {return(x$cost())})

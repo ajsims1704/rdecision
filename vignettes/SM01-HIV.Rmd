@@ -175,11 +175,11 @@ rm(DF)
 ## Per-cycle transition probabilities
 The per-cycle transition probabilities, which are the cells of the Markov
 transition matrix, can be extracted from the model via the function
-`transition_probability`. For the monotherapy model, the transition matrix is
+`transition_probabilities`. For the monotherapy model, the transition matrix is
 shown below. This is consistent with the Table 1 of 
 Chancellor *et al* [-@chancellor1997].
 ```{r echo=FALSE}
-TM <- m.mono$transition_probability()
+TM <- m.mono$transition_probabilities()
 pander::pander(TM, emphasize.rownames=FALSE, justify="lcccc")
 rm(TM)
 ```
@@ -281,7 +281,7 @@ m.comb$set_probabilities(Ptc)
 
 The per-cycle transition matrix for the combination therapy is as follows:
 ```{r tmcombo, echo=FALSE}
-TM <- m.comb$transition_probability()
+TM <- m.comb$transition_probabilities()
 pander::pander(TM, emphasize.rownames=FALSE, justify="lcccc")
 rm(TM)
 ```

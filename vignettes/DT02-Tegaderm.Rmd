@@ -283,7 +283,7 @@ DT <- DecisionTree$new(V,E)
 ```{r fig1.caption, echo=FALSE}
 f1c <- "Decision tree for the Tegaderm model"
 ```
-```{r draw,echo=FALSE,results="hide",fig.keep="last",fig.align="center",fig.cap=f1c}
+```{r draw,echo=FALSE,results="hide",fig.keep="all",fig.align="center",fig.cap=f1c}
 DT$draw(border=TRUE)
 ```
 
@@ -354,7 +354,7 @@ varied over their 95% confidence limits,
 ```{r fig2.caption, echo=FALSE}
 f2c <- "Tornado diagram for the Tegaderm model"
 ```
-```{r tornado,echo=FALSE,results="hide",fig.keep="last",fig.align="center",fig.cap=f2c}
+```{r tornado,echo=FALSE,results="hide",fig.keep="all",fig.align="center",fig.cap=f2c}
 DT$tornado(
   index=list(e10), ref=list(e9), draw=TRUE
 )

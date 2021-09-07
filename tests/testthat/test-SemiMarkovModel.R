@@ -178,6 +178,9 @@ test_that("invalid transition probabilities are rejected", {
   )
   # create model
   M <- SemiMarkovModel$new(V = list(s.well, s.disabled, s.dead), E) 
+  # check that Pt is the identity
+  EPt <- M$transition_probabilities()
+  expect_true(all(EPt-diag(3)==0))
   # no probabilities
   expect_error(
     M$set_probabilities(), class = "invalid_Pt"
@@ -470,7 +473,7 @@ test_that("rdecision replicates Sonnenberg & Beck, Fig 3", {
   )
   # set and check the transition probabilities
   M$set_probabilities(EPt)
-  Pt <- M$transition_probability()
+  Pt <- M$transition_probabilities()
   expect_true(all(EPt-Pt < sqrt(.Machine$double.eps)))
   # set the starting populations
   M$reset(c(Well=10000, Disabled=0, Dead=0)) 
@@ -584,7 +587,7 @@ test_that("redecision replicates Briggs' example 4.7", {
     # set transition probabilities
     m$set_probabilities(Pt)
     # check them
-    TM <- m$transition_probability()
+    TM <- m$transition_probabilities()
     if (expected) {
       E <- matrix(
         c(0.721, 0.202, 0.067, 0.010,  
@@ -629,7 +632,7 @@ test_that("redecision replicates Briggs' example 4.7", {
     # set transition rates from probabilities
     m$set_probabilities(Ptc)
     # check them
-    TC <- m$transition_probability()
+    TC <- m$transition_probabilities()
     if (expected) {
       E <- matrix(
         c(0.858, 0.103, 0.034, 0.005,  

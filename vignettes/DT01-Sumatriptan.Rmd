@@ -121,7 +121,7 @@ DT <- DecisionTree$new(V,E)
 ```{r caption, echo=FALSE}
 f1c  <- "Decision tree for the Sumatriptan model"
 ```
-```{r draw,echo=FALSE,results="hide",fig.keep="last",fig.align="center",fig.cap=f1c}
+```{r draw,echo=FALSE,results="hide",fig.keep="all",fig.align="center",fig.cap=f1c}
 DT$draw(border=TRUE)
 ```
 
