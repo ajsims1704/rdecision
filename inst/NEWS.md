@@ -1,9 +1,12 @@
+# rdecision 1.1.0.9000
+
+* Changed `CohortMarkovModel' to `SemiMarkovModel` in README. 
 
 # rdecision 1.1.0
 
 * Added data/BriggsEx47, as example 4.7 from Briggs et al to /data.
 * Added elementary semi-Markov model vignette (Chancellor).
-* Added narrative to `SemitMarkovModel` as caution for converting between 
+* Added narrative to `SemiMarkovModel` as caution for converting between 
   transition rates and per-cycle probabilities. Cited work of Jones et al
   (2017) and Welton (2005) which motivated the approach taken.
 * Added `set_probabilities` method to `SemiMarkovModel` to set transition 

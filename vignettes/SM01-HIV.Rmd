@@ -146,7 +146,7 @@ when modellers calculate probabilities from published rates for use in
 
 ## Diagram
 A representation of the model in DOT format ([Graphviz](https://graphviz.org))
-can be created using the `as_DOT` function of `CohortMarkovModel`. The function
+can be created using the `as_DOT` function of `SemiMarkovModel`. The function
 returns a character vector which can be saved in a file (`.gv` extension) for
 visualization with the `dot` tool of Graphviz, or plotted directly in R via
 the `DiagrammeR` package. The Markov model for monotherapy is shown in Figure 1.
