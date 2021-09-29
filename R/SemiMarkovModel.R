@@ -582,8 +582,8 @@ SemiMarkovModel <- R6::R6Class(
         Cycle = rep(private$smm.icycle, times=length(self$order())),
         Time = rep(elapsed, times=length(self$order())),
         Population = pop,
-        OccCost = occupancy.costs/sum(self$order()),
-        EntryCost = entry.costs/sum(self$order()),
+        OccCost = occupancy.costs/sum(private$smm.pop),
+        EntryCost = entry.costs/sum(private$smm.pop),
         Cost = (occupancy.costs+entry.costs)/sum(private$smm.pop),
         QALY = qaly / sum(private$smm.pop),
         stringsAsFactors = F

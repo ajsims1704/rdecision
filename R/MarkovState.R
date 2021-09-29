@@ -20,16 +20,14 @@ MarkovState <- R6::R6Class(
     #' @description Create an object of type \code{MarkovState}.
     #' @param name The name of the state (character string).
     #' @param cost The annual cost of state occupancy (numeric or 
-    #' \code{ModVar}). Set
-    #' as \code{NA} by default to help distinguish costs to be set with 
-    #' \code{set_cost} in future from those deliberately set to zero.
+    #' \code{ModVar}). Default 0.
     #' @param utility The utility associated with being in the state (numeric
     #' or \code{ModVar}).
     #' @details Utility must be in the range \code{[-Inf,1]}. If it is of type 
     #' numeric,
     #' the range is checked on object creation. 
     #' @return An object of type \code{MarkovState}.
-    initialize = function(name, cost=as.numeric(NA), utility=1) {
+    initialize = function(name, cost=0, utility=1) {
       # set the name
       if (missing(name) || is.na(name)) {
         rlang::abort(
@@ -91,7 +89,7 @@ MarkovState <- R6::R6Class(
     },
     
     #' @description Gets the annual cost of state occupancy.
-    #' @return Annual cost; numeric.
+    #' @return Annual cost; numeric. Returns zero if the cost was not set.
     cost = function() {
       if (inherits(private$state.cost, what="ModVar")) {
         rv <- private$state.cost$get()

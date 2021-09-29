@@ -294,6 +294,53 @@ test_that("NAs are replaced in transition probability matrix", {
 })
 
 # -----------------------------------------------------------------------------
+# tests of setting transition costs
+# -----------------------------------------------------------------------------
+test_that("transition cost matrix is correct", {
+  # create states
+  s.well <- MarkovState$new(name="Well")
+  s.disabled <- MarkovState$new(name="Disabled", cost=750)
+  s.dead <- MarkovState$new(name="Dead")
+  # create transitions
+  E <- list(
+    Transition$new(s.well, s.well),
+    Transition$new(s.dead, s.dead),
+    Transition$new(s.disabled, s.disabled),
+    Transition$new(s.well, s.disabled, cost=1000),
+    Transition$new(s.well, s.dead, cost=250),
+    Transition$new(s.disabled, s.dead, cost=500)
+  )
+  # create model
+  M <- SemiMarkovModel$new(V = list(s.well, s.disabled, s.dead), E) 
+  # use S&B per-cycle transition probabilities
+  snames <- c("Well","Disabled","Dead")
+  Pt <- matrix(
+    data = c(0.6, NA, 0.2, 0, 0.6, 0.4, 0, 0, NA),
+    nrow = 3, byrow = TRUE,
+    dimnames = list(source=snames, target=snames)
+  )
+  M$set_probabilities(Pt)
+  # check the transition cost matrix
+  ECt <- matrix(
+    data = c(0, 1000, 250, 0, 0, 500, 0, 0, 0),
+    nrow = 3, byrow = TRUE,
+    dimnames = list(source=snames, target=snames)
+  )
+  Ct <- M$transition_cost()
+  expect_equal(Ct, ECt)
+  # check that transition costs are accumulated
+  C1 <- M$cycle(hcc.pop=FALSE, hcc.cost=FALSE)
+  ec.disabled <- 0.2*1000
+  expect_equal(C1$EntryCost[C1$State=="Disabled"], ec.disabled)
+  ec.dead <- 0.2*250
+  expect_equal(C1$EntryCost[C1$State=="Dead"], ec.dead)
+  # check that entry costs and occupancy costs are added
+  oc.disabled <- 0.2*750
+  expect_equal(C1$Cost[C1$State=="Disabled"], oc.disabled+ec.disabled)
+  expect_equal(C1$Cost[C1$State=="Dead"], ec.dead)
+})
+
+# -----------------------------------------------------------------------------
 # tests of resetting the model
 # -----------------------------------------------------------------------------
 test_that("invalid population vectors are rejected", {
@@ -382,7 +429,6 @@ test_that("invalid elapsed times are rejected", {
     class="invalid_icycle"
   )
 })
-
 
 # -----------------------------------------------------------------------------
 # tests of model variables
@@ -755,6 +801,7 @@ test_that("redecision replicates Briggs' example 4.7", {
   # PSA
   # ===
   skip_on_cran()
+  #skip("Skipping Chancellor PSA test")
   n <- 1000
   ODF <- sapply(1:n, FUN=function(i) {
     # run the model

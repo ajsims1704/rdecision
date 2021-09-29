@@ -1,6 +1,9 @@
 # rdecision 1.1.0.9000
 
 * Changed `CohortMarkovModel' to `SemiMarkovModel` in README. 
+* Corrected OccCost and EntryCost columns in SemiMarkovModel$cycle to make them
+  per person costs.
+* Default occupancy cost per state set to zero in SemiMarkovModel.
 
 # rdecision 1.1.0
 
