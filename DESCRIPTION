@@ -9,7 +9,11 @@ Authors@R: c(
   person(given="Kim", family="Fairbairn", 
          email="kim.fairbairn@nhs.net", 
          role=c("aut"),
-         comment = c(ORCID="0000-0001-5108-6279")))
+         comment = c(ORCID="0000-0001-5108-6279")),
+  person(given="Paola", family="Cognigni",
+         email="paola.cognigni@nhs.net",
+         role=c("aut"),
+         comment = c(ORCID="0000-0001-5418-3103")))
 Description: Classes and functions for modelling health care interventions 
   using decision trees and semi-Markov models. Mechanisms are provided for 
   associating an uncertainty distribution with each source variable and for

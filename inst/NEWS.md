@@ -1,5 +1,8 @@
 # rdecision 1.1.0.9000
 
+* Added Paola to the package author list.
+* Added Paola's Decision Tree tutorial vignette **needs some further tidying**.
+* Added class `EmpiricalDistribution` and its test harness.
 * Changed `CohortMarkovModel' to `SemiMarkovModel` in README. 
 * Corrected OccCost and EntryCost columns in SemiMarkovModel$cycle to make them
   per person costs.

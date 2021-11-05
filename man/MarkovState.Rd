@@ -47,7 +47,7 @@ Andrew J. Sims \email{andrew.sims@newcastle.ac.uk}
 \subsection{Method \code{new()}}{
 Create an object of type \code{MarkovState}.
 \subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{MarkovState$new(name, cost = as.numeric(NA), utility = 1)}\if{html}{\out{</div>}}
+\if{html}{\out{<div class="r">}}\preformatted{MarkovState$new(name, cost = 0, utility = 1)}\if{html}{\out{</div>}}
 }
 
 \subsection{Arguments}{
@@ -56,9 +56,7 @@ Create an object of type \code{MarkovState}.
 \item{\code{name}}{The name of the state (character string).}
 
 \item{\code{cost}}{The annual cost of state occupancy (numeric or 
-\code{ModVar}). Set
-as \code{NA} by default to help distinguish costs to be set with 
-\code{set_cost} in future from those deliberately set to zero.}
+\code{ModVar}). Default 0.}
 
 \item{\code{utility}}{The utility associated with being in the state (numeric
 or \code{ModVar}).}
@@ -115,7 +113,7 @@ Gets the annual cost of state occupancy.
 }
 
 \subsection{Returns}{
-Annual cost; numeric.
+Annual cost; numeric. Returns zero if the cost was not set.
 }
 }
 \if{html}{\out{<hr>}}

@@ -1,0 +1,449 @@
+---
+title: "Introduction to the construction of decision trees"
+author: "Paola Cognigni"
+date: "October 2021"
+bibliography: "../inst/REFERENCES.bib"
+csl: "../inst/national-institute-of-health-research.csl"
+output: 
+  rmarkdown::html_vignette:
+    fig_width: 7
+    fig_height: 5
+    fig_caption: true
+vignette: >
+  %\VignetteIndexEntry{Introduction to the construction of decision trees}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+```{r setup, echo=FALSE}
+library(rdecision)
+```
+
+# Decision Tree representations
+
+A decision tree is a simple decision model that represents all possible pathways
+through sequences of events (**nodes**), which can be under the experimenter's 
+control (decisions) or not (chances). A decision tree can be represented 
+visually according to a standardised grammar:
+
+- **Decision nodes** (represented graphically by a square $\square$): these 
+represent alternative paths that the model should compare, for example different
+treatment plans. Each Decision node must be the source of two or more Actions. 
+A decision tree can have one or more Decision nodes, which determine the 
+possible strategies that the model compares. 
+- **Chance nodes** (represented graphically by a circle $\bigcirc$): these 
+represent alternative paths that are out of the experiment's control, for 
+example the probability of developing a certain side effect.  Each Chance node
+must be the source of one or more Reactions, each with a specified probability.
+The probability of Reactions originating from a single Chance node must sum 
+to 1.
+- **Leaf nodes** (represented graphically by a triangle $\lhd$): these represent
+the final outcomes of a path. No further Actions or Reactions can occur after a
+Leaf node. A Leaf node can have a utility value (to a maximum of 1, indicating
+perfect utility) and an interval over which the utility applies.
+
+Nodes are linked by **edges**:
+
+- **Actions** arise from Decision nodes, and
+- **Reactions** arise from Chance nodes.
+
+`rdecision` builds a Decision Tree model by defining these elements and their
+relationships. For example, consider the fictitious and idealized decision
+problem, introduced in the package README file, of choosing between providing 
+two forms of lifestyle advice, offered to
+people with vascular disease, which reduce the risk of needing an interventional
+procedure. The cost to a healthcare provider of the interventional procedure
+(e.g. inserting a stent) is 5000 GBP; the cost of providing the current form of
+lifestyle advice, an appointment with a dietician (“diet”), is 50 GBP and the
+cost of providing an alternative form, attendance at an exercise programme
+(“exercise”), is 750 GBP. If the advice programme is successful, there is no
+need for an interventional procedure.
+
+The model for this fictional scenario can be defined by the following elements:
+
+- Decision node: which programme to enrol the patient in.
+
+```{r decision-node}
+decision_node <- DecisionNode$new("Programme")
+```
+
+- Chance nodes: the chance that the patient will need an interventional 
+procedure. This is different for the two programmes, so two chance nodes must 
+be defined.
+
+```{r chance-nodes}
+chance_node_diet <- ChanceNode$new("Outcome")
+chance_node_exercise <- ChanceNode$new("Outcome")
+```
+
+- Leaf nodes: the possible final states of the model, depending both on the
+decision (which programme) and the chance of needing an intervention. Here, we
+assume that the model has a time horizon of 1 year, and that the utility is the
+same for all patients (the default values).
+
+```{r leaf-nodes}
+leaf_node_diet_no_stent <- LeafNode$new("No intervention")
+leaf_node_diet_stent <- LeafNode$new("Intervention")
+leaf_node_exercise_no_stent <- LeafNode$new("No intervention")
+leaf_node_exercise_stent <- LeafNode$new("Intervention")
+```
+
+These nodes can then be wired into a decision tree graph by defining the edges
+that link pairs of nodes:
+
+- Actions: the two programmes being tested. The cost of each action, as
+described in the example, is embedded into the action definition.
+
+```{r actions}
+action_diet <- Action$new(
+  decision_node, chance_node_diet, cost = 50, label = "Diet"
+)
+action_exercise <- Action$new(
+  decision_node, chance_node_exercise, cost = 750, label = "Exercise"
+)
+```
+
+- Reactions: the possible outcomes of each programme (success or failure), with
+their relevant probabilities. To continue our fictional example, in a small
+trial of the “diet” programme, 12 out of 68 patients (17.6%) avoided having a 
+procedure, and in a separate small trial of the “exercise” programme 18 out of 
+58 patients (31.0%) avoided the procedure (it is assumed that the baseline 
+characteristics in the two trials were comparable). These parameters, as well 
+as the cost associated with each outcome, can then be embedded into the reaction
+definition.
+
+```{r reactions}
+p.diet <- 12/68
+p.exercise <- 18/58
+
+reaction_diet_success <- Reaction$new(
+  chance_node_diet, leaf_node_diet_no_stent, 
+  p = p.diet, cost = 0, label = "Success")
+
+reaction_diet_failure <- Reaction$new(
+  chance_node_diet, leaf_node_diet_stent, 
+  p = 1 - p.diet, cost = 5000, label = "Failure")
+
+reaction_exercise_success <- Reaction$new(
+  chance_node_exercise, leaf_node_exercise_no_stent, 
+  p = p.exercise, cost = 0, label = "Success")
+
+reaction_exercise_failure <- Reaction$new(
+  chance_node_exercise, leaf_node_exercise_stent, 
+  p = 1 - p.exercise, cost = 5000, label = "Failure")
+```
+
+When all the elements are defined and satisfy the restrictions of a Decision
+Tree (see the documentation for the `DecisionTree` class for details), the whole
+model can be built:
+
+```{r decision-tree}
+DT <- DecisionTree$new(
+  V = list(decision_node, 
+           chance_node_diet, 
+           chance_node_exercise, 
+           leaf_node_diet_no_stent, 
+           leaf_node_diet_stent, 
+           leaf_node_exercise_no_stent, 
+           leaf_node_exercise_stent),
+  E = list(action_diet,
+           action_exercise,
+           reaction_diet_success,
+           reaction_diet_failure,
+           reaction_exercise_success,
+           reaction_exercise_failure)
+)
+```
+
+`rdecision` includes a `draw` method to generate a diagram of a defined
+Decision Tree.
+
+```{r decision-tree-draw}
+DT$draw()
+```
+
+# Evaluating a decision tree
+
+As a decision model, a Decision Tree takes into account the costs, probabilities
+and utilities encountered as each strategy is traversed from left to right. In
+this example, only two strategies (Diet or Exercise) exist in the model and can
+be compared using the `evaluate()` method.
+
+```{r evaluate}
+DT_evaluation <- DT$evaluate()
+knitr::kable(DT_evaluation)
+```
+
+Note that this approach aggregates multiple paths that belong to the same
+strategy (for example, the Success and Failure paths of the Diet strategy).
+The option `by = "path"` can be used to evaluate each path separately.
+
+```{r evaluate-by-path}
+knitr::kable(DT$evaluate(by = "path"))
+```
+
+From the evaluation of the two strategies, it is apparent that the Diet strategy
+is overall marginally cheaper by
+`r DT_evaluation$Cost[2] - DT_evaluation$Cost[1]` GBP. 
+
+However, cost is not the only consideration that can be modelled using a 
+Decision Tree. Suppose that requiring an intervention reduces the quality of
+life of patients, such that the utility of the Leaf nodes associated with a
+Failure is reduced from 1 to 0.75. 
+
+```{r lower-utility}
+leaf_node_diet_stent_reduced <- LeafNode$new("Intervention", utility = 0.75)
+leaf_node_exercise_stent_reduced <- LeafNode$new("Intervention", utility = 0.75)
+
+reaction_diet_failure_reduced <- Reaction$new(
+  chance_node_diet, leaf_node_diet_stent_reduced, 
+  p = 1 - p.diet, cost = 5000, label = "Failure")
+
+reaction_exercise_failure_reduced <- Reaction$new(
+  chance_node_exercise, leaf_node_exercise_stent_reduced, 
+  p = 1 - p.exercise, cost = 5000, label = "Failure")
+
+DT_reduced <- DecisionTree$new(
+  V = list(decision_node, 
+           chance_node_diet, 
+           chance_node_exercise, 
+           leaf_node_diet_no_stent, 
+           leaf_node_diet_stent_reduced, 
+           leaf_node_exercise_no_stent, 
+           leaf_node_exercise_stent_reduced),
+  E = list(action_diet,
+           action_exercise,
+           reaction_diet_success,
+           reaction_diet_failure_reduced,
+           reaction_exercise_success,
+           reaction_exercise_failure_reduced)
+)
+
+DT_reduced_evaluation <- DT_reduced$evaluate()
+knitr::kable(DT_reduced_evaluation)
+```
+
+In this case, while the Diet strategy is preferred from a cost perspective, 
+the utility of the Exercise strategy is superior. `rdecision` also calculates 
+Quality-adjusted life-years (QALYs) taking into account the time horizon of 
+the model (in this case, the default of one year was used, and therefore 
+QALYs correspond to the Utility values). From these figures, the Incremental 
+cost-effectiveness ration (ICER) can be easily calculated:
+
+```{r icer}
+ICER <- diff(DT_reduced_evaluation$Cost)/diff(DT_reduced_evaluation$Utility)
+```
+
+resulting in a cost of `r round(ICER, 2)` GBP per QALY gained in choosing the 
+more effective Exercise strategy over the cheaper Diet strategy.
+
+
+# Introducing probabilistic elements
+
+The model shown above uses a fixed value for each parameter, resulting in a 
+single point estimate for each model result. However, parameters may be 
+affected by uncertainty: for example, the success probability of each strategy
+is extracted from a small trial of few patients. This uncertainty can be
+incorporated into the Decision Tree model by representing individual parameters
+with a statistical distribution, then repeating the evaluation of the model
+multiple times with each run randomly drawing parameters from these defined
+distributions.
+
+In `rdecision`, model variables that are described by a distribution are
+represented by `ModVar` objects. Many commonly used distributions, such as the
+Normal, Log-Normal, Gamma and Beta distributions are included in the package,
+and additional distributions can be easily implemented from the generic 
+`ModVar` class. Additionally, model variables that are calculated from other
+r probabilistic variables using an expression can be represented as `ExprModVar`
+objects.
+
+In our simplified example, the probability of success of each strategy should
+include the uncertainty associated with the small sample that they are based on.
+This can be represented statistically by a Beta distribution, a probability
+distribution constrained to the interval [0, 1]. A Beta distribution that
+captures the results of the trials can be defined by the _alpha_ (observed
+successes) and _beta_ (observed failures) parameters. 
+
+```{r beta-mod-vars}
+# Diet: 12 successes / 68 total
+p.diet_beta <- BetaModVar$new(
+  alpha = 12, beta = 68-12, description = "P(diet)", units = ""
+)
+# Exercise: 18 successes / 58 total
+p.exercise_beta <- BetaModVar$new(
+  alpha = 18, beta = 58-18, description = "P(exercise)", units = ""
+)
+```
+
+These distributions describe the probability of success of each strategy; by
+the constraints of a Decision Tree, the sum of all probabilities associated
+with a chance node must be 1, so the probability of failure should be
+calculated as 1 - p(Success). This can be represented by an `ExprModVar`.
+
+```{r expr-mod-vars}
+q.diet_beta <- ExprModVar$new(
+  rlang::quo(1-p.diet_beta), description = "1-P(diet)", units = ""
+)
+q.exercise_beta <- ExprModVar$new(
+  rlang::quo(1-p.exercise_beta), description = "1-P(exercise)", units = ""
+)
+```
+
+Fixed costs can be left as numerical values, or also be represented by `ModVar`s
+- this ensures that they are included in variable tabulations.
+
+```{r const-vars}
+cost_diet <- ConstModVar$new("Cost of diet programme", "GBP", 50)
+cost_exercise <- ConstModVar$new("Cost of exercise programme", "GBP", 750)
+cost_stent <- ConstModVar$new("Cost of stent intervention", "GBP", 5000)
+```
+
+The newly defined `ModVars` can be incorporated into the Decision Tree model
+using the same grammar as the non-probabilistic model:
+
+```{r DT-probabilistic}
+
+action_diet_prob <- Action$new(
+  decision_node, chance_node_diet,
+  cost = cost_diet, label = "Diet")
+
+action_exercise_prob <- Action$new(
+  decision_node, chance_node_exercise, 
+  cost = cost_exercise, label = "Exercise")
+
+reaction_diet_success_prob <- Reaction$new(
+  chance_node_diet, leaf_node_diet_no_stent, 
+  p = p.diet_beta, cost = 0, label = "Success")
+
+reaction_diet_failure_prob <- Reaction$new(
+  chance_node_diet, leaf_node_diet_stent, 
+  p = q.diet_beta, cost = cost_stent, label = "Failure")
+
+reaction_exercise_success_prob <- Reaction$new(
+  chance_node_exercise, leaf_node_exercise_no_stent, 
+  p = p.exercise_beta, cost = 0, label = "Success")
+
+reaction_exercise_failure_prob <- Reaction$new(
+  chance_node_exercise, leaf_node_exercise_stent, 
+  p = q.exercise_beta, cost = cost_stent, label = "Failure")
+```
+
+The probabilistic Decision Tree is built in the same way as before, but it now
+provides additional functionalities.
+
+```{r decision-tree-prob}
+DT_prob <- DecisionTree$new(
+  V = list(decision_node, 
+           chance_node_diet, 
+           chance_node_exercise, 
+           leaf_node_diet_no_stent, 
+           leaf_node_diet_stent, 
+           leaf_node_exercise_no_stent, 
+           leaf_node_exercise_stent),
+  E = list(action_diet_prob,
+           action_exercise_prob,
+           reaction_diet_success_prob,
+           reaction_diet_failure_prob,
+           reaction_exercise_success_prob,
+           reaction_exercise_failure_prob)
+)
+```
+
+All the probabilistic variables included in the model can be tabulated using
+the `modvar_table()` method, which details the distribution definition and
+some useful parameters, such as mean, SD and 95% CI.
+
+```{r modvar-table}
+knitr::kable(DT_prob$modvar_table(), digits = 3)
+```
+
+A call to the `evaluate()` method with the default settings uses the expected
+(mean) value of each variable, and so replicates the point estimate above.
+
+```{r dt-evaluate-expected}
+knitr::kable(DT_prob$evaluate())
+```
+
+However, because each variable is described by a distribution, it is now
+possible to explore the range of possible values consistent with the model.
+For example, a lower and upper bound can be estimated by setting each variable
+to its 2.5-th or 97.5-th percentile:
+
+```{r dt-evaluate-quantiles}
+knitr::kable(data.frame(
+  "Q2.5" = DT_prob$evaluate(setvars = "q2.5")$Cost,
+  "Q97.5" = DT_prob$evaluate(setvars = "q97.5")$Cost,
+  row.names = c("Diet", "Exercise")
+))
+```
+
+To sample the possible outcomes in a completely probabilistic way, the
+`setvar = "random"` option can be used, which draws a random value from the
+distribution of each variable. Repeating this process a sufficiently large
+number of times builds a collection of results compatible with the model
+definition, which can then be used to calculate ranges and confidence intervals
+of the estimated values.
+
+```{r dt-evaluate-random}
+N = 1000
+DT_evaluation_random <- DT_prob$evaluate(setvars="random", by="run", N=N)
+plot(DT_evaluation_random$Cost.Diet, DT_evaluation_random$Cost.Exercise, pch=20, 
+     xlab="Cost Diet", ylab="Cost Exercise", 
+     main=paste(N, "simulations of vascular disease prevention model"))
+knitr::kable(summary(DT_evaluation_random[,c(3,8)]))
+```
+
+The variables can be further manipulated, for example calculating the 
+difference in cost between the two strategies for each run of the 
+randomised model:
+
+```{r dt-difference}
+DT_evaluation_random$Difference <- 
+  DT_evaluation_random$Cost.Diet - DT_evaluation_random$Cost.Exercise
+hist(DT_evaluation_random$Difference, 100)
+knitr::kable(DT_evaluation_random[1:10,c(1,3,8,12)])
+CI <- quantile(DT_evaluation_random$Difference, c(0.025, 0.975))
+```
+
+Plotting the distribution of the difference of the two costs reveals that, in
+this model, the uncertainties in the input parameters are large enough that
+either strategy could be cheaper, within a 95% confidence interval
+[`r CI[1]` - `r CI[2]`].
+
+**TODO: add distribution for utilities in order to be able to plot cost effectiveness plane? **
+
+**TODO: Tornado plot**
+
+## Univariate threshold analysis
+
+**Note: I was trying to include this earlier (before the probabilistic section) by using ConstModVars for costs, but couldn't get it to work**
+
+`rdecision` provides a `threshold` method to compare two strategies and
+identify, for a given variable, the value at which one strategy becomes
+preferable over the other:
+
+```{r threshold}
+cost_threshold <- DT_prob$threshold(
+  index = list(action_exercise_prob),
+  ref = list(action_diet_prob),
+  mvd = cost_exercise$description(),
+  a = 0, b = 5000, tol = 0.1
+)
+
+success_threshold <- DT_prob$threshold(
+  index = list(action_exercise_prob),
+  ref = list(action_diet_prob),
+  mvd = p.exercise_beta$description(),
+  a = 0, b = 1, tol = 0.001
+)
+```
+
+By univariate threshold analysis, the exercise program will be cost saving 
+when its cost of delivery is less than `r round(cost_threshold,2)` GBP or when
+its success rate is greater than `r round(100*success_threshold,1)`%.
