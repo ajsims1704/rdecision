@@ -27,7 +27,7 @@ library(rdecision)
 
 # Decision Tree representations
 
-A decision tree is a simple decision model that represents all possible pathways
+A decision tree is a decision model that represents all possible pathways
 through sequences of events (**nodes**), which can be under the experimenter's 
 control (decisions) or not (chances). A decision tree can be represented 
 visually according to a standardised grammar:
@@ -177,7 +177,7 @@ be compared using the `evaluate()` method.
 
 ```{r evaluate}
 DT_evaluation <- DT$evaluate()
-knitr::kable(DT_evaluation)
+knitr::kable(DT_evaluation, digits=2)
 ```
 
 Note that this approach aggregates multiple paths that belong to the same
@@ -185,12 +185,12 @@ strategy (for example, the Success and Failure paths of the Diet strategy).
 The option `by = "path"` can be used to evaluate each path separately.
 
 ```{r evaluate-by-path}
-knitr::kable(DT$evaluate(by = "path"))
+knitr::kable(DT$evaluate(by = "path"), digits=c(NA,NA,3,2,3,3,3,1))
 ```
 
 From the evaluation of the two strategies, it is apparent that the Diet strategy
 is overall marginally cheaper by
-`r DT_evaluation$Cost[2] - DT_evaluation$Cost[1]` GBP. 
+`r round(DT_evaluation$Cost[2] - DT_evaluation$Cost[1],2)` GBP. 
 
 However, cost is not the only consideration that can be modelled using a 
 Decision Tree. Suppose that requiring an intervention reduces the quality of
@@ -226,7 +226,7 @@ DT_reduced <- DecisionTree$new(
 )
 
 DT_reduced_evaluation <- DT_reduced$evaluate()
-knitr::kable(DT_reduced_evaluation)
+knitr::kable(DT_reduced_evaluation, digits=2)
 ```
 
 In this case, while the Diet strategy is preferred from a cost perspective, 
@@ -367,7 +367,7 @@ A call to the `evaluate()` method with the default settings uses the expected
 (mean) value of each variable, and so replicates the point estimate above.
 
 ```{r dt-evaluate-expected}
-knitr::kable(DT_prob$evaluate())
+knitr::kable(DT_prob$evaluate(), digits=2)
 ```
 
 However, because each variable is described by a distribution, it is now
@@ -380,7 +380,7 @@ knitr::kable(data.frame(
   "Q2.5" = DT_prob$evaluate(setvars = "q2.5")$Cost,
   "Q97.5" = DT_prob$evaluate(setvars = "q97.5")$Cost,
   row.names = c("Diet", "Exercise")
-))
+), digits=2)
 ```
 
 To sample the possible outcomes in a completely probabilistic way, the
@@ -394,8 +394,9 @@ of the estimated values.
 N = 1000
 DT_evaluation_random <- DT_prob$evaluate(setvars="random", by="run", N=N)
 plot(DT_evaluation_random$Cost.Diet, DT_evaluation_random$Cost.Exercise, pch=20, 
-     xlab="Cost Diet", ylab="Cost Exercise", 
+     xlab="Cost Diet (GBP)", ylab="Cost Exercise (GBP)", 
      main=paste(N, "simulations of vascular disease prevention model"))
+abline(a=0,b=1,col="red")
 knitr::kable(summary(DT_evaluation_random[,c(3,8)]))
 ```
 
@@ -406,23 +407,18 @@ randomised model:
 ```{r dt-difference}
 DT_evaluation_random$Difference <- 
   DT_evaluation_random$Cost.Diet - DT_evaluation_random$Cost.Exercise
-hist(DT_evaluation_random$Difference, 100)
-knitr::kable(DT_evaluation_random[1:10,c(1,3,8,12)])
+hist(DT_evaluation_random$Difference, 100, main="Distribution of saving",
+     xlab="Saving (GBP)")
+knitr::kable(DT_evaluation_random[1:10,c(1,3,8,12)], digits=2)
 CI <- quantile(DT_evaluation_random$Difference, c(0.025, 0.975))
 ```
 
 Plotting the distribution of the difference of the two costs reveals that, in
 this model, the uncertainties in the input parameters are large enough that
 either strategy could be cheaper, within a 95% confidence interval
-[`r CI[1]` - `r CI[2]`].
-
-**TODO: add distribution for utilities in order to be able to plot cost effectiveness plane? **
-
-**TODO: Tornado plot**
+[`r round(CI[1],2)` - `r round(CI[2],2)`].
 
 ## Univariate threshold analysis
-
-**Note: I was trying to include this earlier (before the probabilistic section) by using ConstModVars for costs, but couldn't get it to work**
 
 `rdecision` provides a `threshold` method to compare two strategies and
 identify, for a given variable, the value at which one strategy becomes

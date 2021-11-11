@@ -14,18 +14,26 @@ EmpiricalDistribution <- R6::R6Class(
   lock_class = TRUE,
   inherit = Distribution,
   private = list(
-    x = NULL
+    x = NULL,
+    interpolate.sample = NULL
   ),
   public = list(
     
     #' @description Create an object of class \code{EmpiricalDistribution}.
-    #' @param x a sample of at least 1000 numerical values from the population
+    #' @details Empirical distributions based on very small sample sizes are
+    #' supported, but not recommended. 
+    #' @param x a sample of at least 1 numerical value from the population
     #' of interest.
+    #' @param interpolate.sample Logical; if true, each call to \code{sample()}
+    #' make a random draw from \eqn{U_{0,1}} to find a \eqn{p} value, then
+    #' finds that quantile of the sample, using the \code{quantile} function
+    #' in R, via interpolation from the eCDF. If false, the \code{sample()}
+    #' function makes a random draw from \code{x}.
     #' @return An object of class \code{EmpiricalDistribution}. 
-    initialize = function(x) {
+    initialize = function(x, interpolate.sample=TRUE) {
       # initialize the base class
       super$initialize("Empirical", K=as.integer(1))
-      # check the parameters
+      # check the sample
       if (!is.numeric(x)) {
         rlang::abort(
           "Argument 'x' must be numeric", class="x_not_numeric"
@@ -37,13 +45,21 @@ EmpiricalDistribution <- R6::R6Class(
           class = "x_not_supported"
         )
       }
-      if (length(x) < 1000) {
+      if (length(x) < 1) {
         rlang::abort(
-          "Argument x must not have less than 1000 elements", 
+          "Argument x must not have at least 1 element", 
           class="x_too_small"
         )
       }
       private$x <- x
+      # check the sample method
+      if (!is.logical(interpolate.sample)) {
+        rlang::abort(
+          "Argument 'interpolate.sample' must be logical", 
+          class = "interpolate.sample_not_supported"
+        )
+      }
+      private$interpolate.sample <- interpolate.sample
       # initial sample
       self$sample(TRUE)
       # return object
@@ -80,17 +96,20 @@ EmpiricalDistribution <- R6::R6Class(
     },
     
     #' @description Draw and hold a random sample from the distribution. 
-    #' @details Performs interpolated sampling, by first sampling from 
-    #' \eqn{U_{0,1}} to get \eqn{p} then finding the quantile corresponding
-    #' to \eqn{p}. This approach uses a continuous sample interpolation
-    #' provided by R's \code{quantile} function. 
+    #' @details Samples with interpolation or by random draw from the
+    #' supplied distribution (see parameter \code{interpolate.sample} in
+    #' \code{new()}).
     #' @param expected If TRUE, sets the next value retrieved by a call to
     #' \code{r()} to be the mean of the distribution.
     #' @return Updated distribution.
     sample = function(expected=FALSE) {
       if (!expected) {
-        p <- stats::runif(n=1)
-        private$.r[1] <- stats::quantile(x=private$x, probs=p, type=7)
+        if (private$interpolate.sample) {
+          p <- stats::runif(n=1)
+          private$.r[1] <- stats::quantile(x=private$x, probs=p, type=7)
+        } else {
+          private$.r[1] <- base::sample(x=private$x, size=1)
+        }
       } else {
         private$.r[1] <- self$mean()
       }

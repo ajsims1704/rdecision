@@ -5,8 +5,14 @@ test_that("illegal initializations are rejected", {
   expect_error(EmpiricalDistribution$new(x), class="x_not_numeric")
   x <- c(1,2,NA,4,5)
   expect_error(EmpiricalDistribution$new(x), class="x_not_supported")
-  x <- c(1,2,3,4,5)
+  x <- vector(mode="numeric", length=0)
   expect_error(EmpiricalDistribution$new(x), class="x_too_small")
+  x <- c(42)
+  expect_silent(EmpiricalDistribution$new(x))
+  expect_error(
+    EmpiricalDistribution$new(x,42), 
+    class="interpolate.sample_not_supported"
+  )
   x <- seq(from=1,to=1000)
   expect_silent(EmpiricalDistribution$new(x))
 })
@@ -46,8 +52,24 @@ test_that("quantile function checks inputs and has correct output", {
   probs <- c(0.1, 0.2, 0.5)
   expect_length(e$quantile(probs),3)
 })
- 
-test_that("random sampling from a supplied Gamma distribution", {
+
+test_that("random draw sampling is from the supplied distribution", {
+  x <- seq(5,15)
+  # build the empirical distribution
+  e <- EmpiricalDistribution$new(x, interpolate.sample=FALSE)
+  # random sampling
+  n <- 20
+  samp <- sapply(1:n, FUN=function(i) {
+    e$sample()
+    rv <- e$r()
+    return(rv)
+  })
+  expect_length(samp, n)
+  # test all values are from x
+  expect_true(all(samp %in% x))
+})
+
+test_that("random interpolated sampling is from a supplied Gamma dist", {
   # create the gamma distribution
   k <- 9
   theta <- 0.5
@@ -65,6 +87,7 @@ test_that("random sampling from a supplied Gamma distribution", {
   # 99.9% confidence limits; expected test failure rate is 0.1%;
   # skip for CRAN
   skip_on_cran()
-  ht <- ks.test(samp, stats::rgamma(n,shape=k,scale=theta))
+  ht <- stats::ks.test(samp, stats::rgamma(n,shape=k,scale=theta))
   expect_true(ht$p.value > 0.001)
 })
+

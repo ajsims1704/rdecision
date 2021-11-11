@@ -825,6 +825,7 @@ test_that("readme example is correct, with thresholds", {
                  tol=-2),
     class = "invalid_tol"
   )
+  # threshold analysis on cost of the new programme
   c.exercise.t <- DT$threshold(
     index=list(e.e), ref=list(e.d), mvd=c.exercise$description(),
     a=c.exercise$mean(), b=1000, tol=1

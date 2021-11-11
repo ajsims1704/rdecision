@@ -85,6 +85,19 @@ test_that("operands are identified correctly", {
     return(v$description())
   })
   expect_setequal(d, c("e1", "e2", "y", "z"))
+  # deeper nesting
+  e4 <- ExprModVar$new("e4", "", quo=rlang::quo(2*e3))
+  mv <- e4$operands()
+  d <- sapply(mv, function(v) {
+    return(v$description())
+  })
+  expect_setequal(d, c("e1", "e2", "e3", "y", "z"))
+  # nesting without recursion
+  mv <- e3$operands(recursive=FALSE)
+  d <- sapply(mv, function(v) {
+    return(v$description())
+  })
+  expect_setequal(d, c("e1", "e2"))
 })
 
 test_that("set and get function as expected", {
@@ -96,23 +109,31 @@ test_that("set and get function as expected", {
   # check illegal input
   expect_error(z$set(TRUE), class="what_not_character")
   expect_error(z$set("red"), class="what_not_supported")
-  # check that set() is honoured for ExprModVar
+  # skip remaining tests on CRAN because they rely on sampling
+  skip_on_cran()
+  # check quantile, estimated from empirical distribution
   z$set("q97.5")
   v <- z$get()
   expect_true(v>3.5)
+  # check mean is within 3 std errors
   z$set("expected")
-  expect_equal(z$get(),0)
+  se <- 2/sqrt(1000)
+  expect_intol(z$get(),0,3*se)
   # check that set() for operands affects get() for the expression
+  y$set("q97.5")
+  z$set("current")
+  expect_true(z$get()>3.5)
   y$set("expected")
-  expect_intol(z$get(), 0, 0.01)
+  expect_intol(z$get(), 0, 3*se)
+  # check that a random sample from z is from a SN*2, despite setting y 
   n <- 1000
   S <- vector(mode="numeric", length=n)
   for (i in 1:n) {
-    y$set()
+    y$set("q97.5")
+    z$set("random")
     S[i] <- z$get() 
   } 
   # 99.9% confidence limits; expected 0.1% test failure rate; skip for CRAN
-  skip_on_cran()
   ht <- ks.test(S, rnorm(n,mean=0,sd=2))
   expect_true(ht$p.value>0.001)
 })
@@ -153,15 +174,24 @@ test_that("illegal sample sizes for estimating parameters are rejected", {
   x <- 3
   y <- NormModVar$new("y", "GBP", mu=0, sigma=1)
   z <- ExprModVar$new("z", "GBP", quo=rlang::quo(x*y))
-  expect_error(z$mu_hat("100"), class="nest_not_numeric")
-  expect_error(z$mu_hat(3), class="nest_too_small")
-  expect_error(z$mu_hat(999.5), class="nest_too_small")
-  expect_silent(z$mu_hat())
-  expect_silent(z$mu_hat(10000))
-  expect_error(z$sigma_hat("100"), class="nest_not_numeric")
-  expect_error(z$sigma_hat(3), class="nest_too_small")
-  expect_error(z$sigma_hat(999.5), class="nest_too_small")
-  expect_silent(z$sigma_hat(10000))
+  expect_error(
+    ExprModVar$new("z", "GBP", quo=rlang::quo(x*y), "100"), 
+    class="nemp_not_numeric"
+  )
+  expect_error(
+    ExprModVar$new("z", "GBP", quo=rlang::quo(x*y), 100),
+    class="nemp_too_small"
+  )
+  expect_error(
+    ExprModVar$new("z", "GBP", quo=rlang::quo(x*y), 999.5), 
+    class="nemp_too_small"
+  )
+  expect_silent(
+    ExprModVar$new("z", "GBP", quo=rlang::quo(x*y))
+  )
+  expect_silent(
+    ExprModVar$new("z", "GBP", quo=rlang::quo(x*y), 10000)
+  )
 })
 
 test_that("quantile estimation checks inputs and has correct output", {
@@ -177,25 +207,61 @@ test_that("quantile estimation checks inputs and has correct output", {
   expect_error(q$q_hat(probs), class="probs_out_of_range")
   probs <- c(0.1, 0.2, 0.5)
   expect_equal(length(q$q_hat(probs)),3)
-  expect_error(q$q_hat(probs,"1000"), class="nest_not_numeric")
-  expect_error(q$q_hat(probs,42), class="nest_too_small")
 })
 
-test_that("scoping rules for mu_hat in nested expressions are obeyed", {
-  x <- NormModVar$new("SN", "m", mu=0, sigma=1)
-  y <- ExprModVar$new("SN2","m", rlang::quo(2*x))
-  b <- ExprModVar$new("z","m^2",rlang::quo(x*y))
-  expect_silent(b$mu_hat())
+test_that("nested expressions are evaluated correctly", {
+  # skip test on cran because it involves sampling
+  skip_on_cran()
+  # standard normal and an expression with an identity operator
+  sn1 <- NormModVar$new("sn1", "", mu=0, sigma=1)
+  s1 <- ExprModVar$new("s1", "", rlang::quo(1*sn1))
+  # standard error
+  se <- 1/sqrt(1000)
+  # check that all 3 products have a mean of 1 (chisq with 1 dof)   
+  p1 <- ExprModVar$new("p1", "", rlang::quo(sn1*sn1))
+  expect_intol(p1$mu_hat(), 1, 3*se)
+  p2 <- ExprModVar$new("p2", "", rlang::quo(s1*s1))
+  expect_intol(p2$mu_hat(), 1, 3*se)
+  p3 <- ExprModVar$new("p3", "", rlang::quo(s1*sn1))
+  expect_intol(p3$mu_hat(), 1, 3*se)
+})
+
+test_that("autocorrelation in nested expressions is preserved", {
+  # skip test on cran because it involves sampling
+  skip_on_cran()
+  # create expressions to wrap standard normals
+  sn1 <- NormModVar$new("sn1", "", mu=0, sigma=1)
+  s1 <- ExprModVar$new("s1", "", rlang::quo(1*sn1))
+  sn2 <- NormModVar$new("sn2", "", mu=0, sigma=1)
+  s2 <- ExprModVar$new("s2", "", rlang::quo(1*sn2))
+  x <- ExprModVar$new("x", "", rlang::quo(1*s1))
+  y <- ExprModVar$new("y", "", rlang::quo(1*s2))
+  # create nested correlated and nested uncorrelated expressions
+  zc <- ExprModVar$new("zc", "", rlang::quo(x*s1))
+  zu <- ExprModVar$new("zu", "", rlang::quo(y*s1))
+  # compute approx standard error of the mean, for tolerance
+  se <- 1/sqrt(1000)
+  # zc is a chi-squared with 1 dof
+  expect_intol(zc$mu_hat(), 1, 3*se)
+  # zu is a modified Bessel function with mean 0 and sd 1
+  expect_intol(zu$mu_hat(), 0, 3*se)
 })
 
 test_that("expression chi square from SN is correct", {
-  # x = N(0,1), y = x^2 = Chisq(k=1)
-  x <- NormModVar$new("SN", "m", mu=0, sigma=1)
-  y <- ExprModVar$new("z","m^2",rlang::quo(x^2))
-  expect_equal(y$mean(), 0)  # true mean is k=1, expression at mean inputs is 0
-  expect_true(is.na(y$mode()))  # mode is undefined for ExprModVar
-  expect_true(is.na(y$SD()))  # SD is undefined for ExprModVar
+  # skip on cran because tests involve sampling
   skip_on_cran()
+  # x ~ N(0,1), y = x^2 ~ Chisq(k=1)
+  k <- 1
+  x <- NormModVar$new("x", "", mu=0, sigma=1)
+  y <- ExprModVar$new("y","",rlang::quo(x^2))
+  # standard error
+  se <- sqrt(2*k)/sqrt(1000)
+  expect_equal(y$mean(), 0)          # product of operand means is 0
+  expect_intol(y$mu_hat(), k, 3*se)  # true mean is k=1
+  expect_true(is.na(y$mode()))  # mode is undefined for ExprModVar
+  median <- k*(1-2/(9*k))^3
+  expect_intol(y$q_hat(p=0.5), median, 3*se)
+  # generate a distribution and check it
   n <- 1000
   samp <- sapply(1:n, FUN=function(i) {
     y$set("random")
@@ -207,6 +273,8 @@ test_that("expression chi square from SN is correct", {
 })
 
 test_that("one Dirichlet matches a Beta and an expression", {
+  # skip on cran because tests inovolve sampling
+  skip_on_cran()
   # p follows Beta(1,9) and q is 1-p
   alpha <- 1
   beta <- 9
@@ -216,13 +284,16 @@ test_that("one Dirichlet matches a Beta and an expression", {
   D <- DirichletDistribution$new(alpha=c(1,9))
   p.d <- ModVar$new("P(success)", "P", D=D, k=as.integer(1))
   q.d <- ModVar$new("P(failure)", "P", D=D, k=as.integer(2))
+  # approx standard error
+  sd <- sqrt((alpha*beta)/((alpha+beta)^2 * (alpha+beta+1)))
+  se <- sd / sqrt(1000)
   # compare means
   expect_equal(p$mean(), p.d$mean())
-  expect_equal(q$mean(), q.d$mean())
+  expect_intol(q$mean(), q.d$mean(), 3*se)
   # compare quantiles for p 
   probs<- c(0.025, 0.975)
   expect_setequal(unname(p$quantile(probs)), unname(p.d$quantile(probs)))
-  # quantiles defined for q.d but not q (an expression)
+  # quantiles defined for q.d but not q 
   expect_true(all(is.na(q$quantile(probs))))
   expect_true(all(!is.na(q.d$quantile(probs))))
 })

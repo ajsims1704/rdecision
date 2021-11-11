@@ -102,7 +102,7 @@ DT <- DecisionTree$new(
 )
 ```
 
-```{r treedraw,echo=FALSE,results="hide",fig.keep="last",fig.align="center"}
+```{r treedraw,echo=FALSE,results="hide",fig.align="center"}
 DT$draw(border = TRUE)
 ```
 
@@ -183,7 +183,7 @@ Pt <- matrix(
 M$set_probabilities(Pt)
 ```
 
-```{r sb,echo=FALSE,results="hide",fig.align="center",fig.keep="all"}
+```{r sb,echo=FALSE,fig.align="center"}
 #DOT <- M$as_DOT()
 #writeLines(DOT, con="man/figures/README-sb-1.gv")
 #system2(
@@ -196,7 +196,6 @@ M$set_probabilities(Pt)
 #knitr::include_graphics("man/figures/README-sb-1.png")
 ```
 <img src="man/figures/README-sb-1.png" width="75%" style="display: block; margin: auto;" />
-
 
 With a starting population of 10,000, the model can be run for 25 years as
 follows. The output of the `cycles` function is the Markov trace, shown

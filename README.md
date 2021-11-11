@@ -95,6 +95,8 @@ DT <- DecisionTree$new(
 )
 ```
 
+<img src="man/figures/README-treedraw-1.png" width="75%" style="display: block; margin: auto;" />
+
 The expected per-patient net cost of each option is obtained by
 evaluating the tree with expected values of all variables using
 `DT$evaluate()` and threshold values with `DT$threshold()`. Examination
@@ -111,7 +113,7 @@ evaluation of the tree, each time sampling from the uncertainty
 distribution of the two probabilities using, for example,
 `DT$evaluate(setvars="random", N=1000)` and inspecting the resulting
 data frame. From 1000 runs, the 95% confidence interval of the per
-patient cost saving is -507.18 GBP to 937.64 GBP, with 74.4% being cost
+patient cost saving is -517.42 GBP to 940.59 GBP, with 71.6% being cost
 saving, and it can be concluded that more evidence is required to be
 confident that the exercise programme is cost saving.
 
@@ -150,8 +152,6 @@ Pt <- matrix(
 # set the transition rates from per-cycle probabilities
 M$set_probabilities(Pt)
 ```
-
-<img src="man/figures/README-sb-1.png" width="75%" style="display: block; margin: auto;" />
 
 With a starting population of 10,000, the model can be run for 25 years
 as follows. The output of the `cycles` function is the Markov trace,

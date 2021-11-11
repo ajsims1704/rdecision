@@ -252,28 +252,34 @@ Sets the value of the \code{ModVar}.
 \subsection{Arguments}{
 \if{html}{\out{<div class="arguments">}}
 \describe{
-\item{\code{what}}{Character: one of \code{"random"} (samples from the 
-uncertainty distribution), \code{"expected"} (mean), \code{"q2.5"}
-(lower 95\% confidence limit), \code{"q50"} (median), \code{"q97.5"}
-(upper 95\% confidence limit), \code{"current"} (leaves
-the value unchanged), \code{"value"} (sets the value explicitly).}
+\item{\code{what}}{Until \code{set} is called again, subsequent calls to 
+\code{get} will return a value determined by the \code{what} parameter
+as follows:
+\describe{
+\item{\code{"random"}}{a random sample is drawn from the uncertainty 
+distribution;}
+\item{\code{"expected"}}{the mean of the uncertainty distribution;}
+\item{\code{"q2.5"}}{the lower 95\% confidence limit of the uncertainty 
+distribution, i.e. the 2.5th percentile;}
+\item{\code{"q50"}}{the median of the uncertainty distribution;}
+\item{\code{"q97.5"}}{the upper 95\% confidence limit of the uncertainty 
+distribution, i.e. the 97.5th percentile;}
+\item{\code{"current"}}{leaves the \code{what} parameter of method 
+\code{set} unchanged, i.e. the call to \code{set} has no effect on the
+subsequent values returned by \code{get}. It is provided as an option to
+help use cases in which the \code{what} parameter is a variable;}
+\item{\code{"value"}}{sets the value explicitly to be equal to parameter 
+\code{val}. This is not recommended for normal usage because it allows
+the model variable to be set to an implausible value, based on its 
+defined uncertainty. An example of where this may be needed is in 
+threshold finding.} 
+}}
 
 \item{\code{val}}{A numeric value, only used with \code{what}=\code{"value"}, 
 ignored otherwise.}
 }
 \if{html}{\out{</div>}}
 }
-\subsection{Details}{
-Defines what will be returned by subsequent
-calls to \code{get()} until \code{set()} is called again. The 
-\code{"current"} option is provided to support having common 
-functions to set (or leave alone) sets of model variables, depending on
-their use case and avoids additional if statements. Option \code{"value"}
-is not recommended for normal usage because it allows the model variable
-to be set to an implausible value, based on its defined uncertainty. An 
-example of where this may be needed is in threshold finding.
-}
-
 \subsection{Returns}{
 Updated \code{ModVar}.
 }

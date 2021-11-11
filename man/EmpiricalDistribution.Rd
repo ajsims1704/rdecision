@@ -45,17 +45,28 @@ Andrew J. Sims \email{andrew.sims@newcastle.ac.uk}
 \subsection{Method \code{new()}}{
 Create an object of class \code{EmpiricalDistribution}.
 \subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{EmpiricalDistribution$new(x)}\if{html}{\out{</div>}}
+\if{html}{\out{<div class="r">}}\preformatted{EmpiricalDistribution$new(x, interpolate.sample = TRUE)}\if{html}{\out{</div>}}
 }
 
 \subsection{Arguments}{
 \if{html}{\out{<div class="arguments">}}
 \describe{
-\item{\code{x}}{a sample of at least 1000 numerical values from the population
+\item{\code{x}}{a sample of at least 1 numerical value from the population
 of interest.}
+
+\item{\code{interpolate.sample}}{Logical; if true, each call to \code{sample()}
+make a random draw from \eqn{U_{0,1}} to find a \eqn{p} value, then
+finds that quantile of the sample, using the \code{quantile} function
+in R, via interpolation from the eCDF. If false, the \code{sample()}
+function makes a random draw from \code{x}.}
 }
 \if{html}{\out{</div>}}
 }
+\subsection{Details}{
+Empirical distributions based on very small sample sizes are
+supported, but not recommended.
+}
+
 \subsection{Returns}{
 An object of class \code{EmpiricalDistribution}.
 }
@@ -131,10 +142,9 @@ Draw and hold a random sample from the distribution.
 \if{html}{\out{</div>}}
 }
 \subsection{Details}{
-Performs interpolated sampling, by first sampling from 
-\eqn{U_{0,1}} to get \eqn{p} then finding the quantile corresponding
-to \eqn{p}. This approach uses a continuous sample interpolation
-provided by R's \code{quantile} function.
+Samples with interpolation or by random draw from the
+supplied distribution (see parameter \code{interpolate.sample} in
+\code{new()}).
 }
 
 \subsection{Returns}{

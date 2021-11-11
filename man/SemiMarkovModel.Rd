@@ -486,13 +486,13 @@ Data frame with cycle results.
 following columns:
 \describe{
 \item{\code{Cycle}}{The cycle number.}
-\item{\code{Time}}{Elapsed time at end of cycle, years}
-\item{\code{<name>}}{Population of state \code{<name>} at the end of
-the cycle.}
+\item{\code{Years}}{Elapsed time at end of cycle, years}
 \item{\code{Cost}}{Cost associated with occupancy and transitions between
 states during the cycle.}
 \item{\code{QALY}}{Quality adjusted life years associated with occupancy
 of the states in the cycle.}
+\item{\code{<name>}}{Population of state \code{<name>} at the end of
+the cycle.}
 }
 }
 }

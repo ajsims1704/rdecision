@@ -91,6 +91,11 @@ ModVar <- R6::R6Class(
       # set the .value vector members
       private$.value <- rep(as.numeric(NA), times=length(private$.whats))
       names(private$.value) <- private$.whats
+      # save the components of .value that do not change
+      private$.value["expected"] <- self$mean() 
+      private$.value["q2.5"] <- self$quantile(0.025)
+      private$.value["q50"] <- self$quantile(0.5)
+      private$.value["q97.5"] <- self$quantile(0.975)
       # value to return on first get
       private$.whatnext <- "expected"
       # return new object
@@ -186,31 +191,41 @@ ModVar <- R6::R6Class(
       # fetch the sample from the distribution
       rd <- private$.D$r()
       # get random sample for this dimension
-      if (private$.D$order() > 1) {
-        rv <- rd[private$.k]
-      } else {
-        rv <- rd
-      }
+      rv <- rd[private$.k]
+      # if (private$.D$order() > 1) {
+      #   rv <- rd[private$.k]
+      # } else {
+      #   rv <- rd
+      # }
       # return the sample
       return(rv)
     },
 
     #' @description Sets the value of the \code{ModVar}.
-    #' @param what Character: one of \code{"random"} (samples from the 
-    #' uncertainty distribution), \code{"expected"} (mean), \code{"q2.5"}
-    #' (lower 95\% confidence limit), \code{"q50"} (median), \code{"q97.5"}
-    #' (upper 95\% confidence limit), \code{"current"} (leaves
-    #' the value unchanged), \code{"value"} (sets the value explicitly). 
+    #' @param what Until \code{set} is called again, subsequent calls to 
+    #' \code{get} will return a value determined by the \code{what} parameter
+    #' as follows:
+    #' \describe{
+    #' \item{\code{"random"}}{a random sample is drawn from the uncertainty 
+    #' distribution;}
+    #' \item{\code{"expected"}}{the mean of the uncertainty distribution;}
+    #' \item{\code{"q2.5"}}{the lower 95\% confidence limit of the uncertainty 
+    #' distribution, i.e. the 2.5th percentile;}
+    #' \item{\code{"q50"}}{the median of the uncertainty distribution;}
+    #' \item{\code{"q97.5"}}{the upper 95\% confidence limit of the uncertainty 
+    #' distribution, i.e. the 97.5th percentile;}
+    #' \item{\code{"current"}}{leaves the \code{what} parameter of method 
+    #' \code{set} unchanged, i.e. the call to \code{set} has no effect on the
+    #' subsequent values returned by \code{get}. It is provided as an option to
+    #' help use cases in which the \code{what} parameter is a variable;}
+    #' \item{\code{"value"}}{sets the value explicitly to be equal to parameter 
+    #' \code{val}. This is not recommended for normal usage because it allows
+    #' the model variable to be set to an implausible value, based on its 
+    #' defined uncertainty. An example of where this may be needed is in 
+    #' threshold finding.} 
+    #' }
     #' @param val A numeric value, only used with \code{what}=\code{"value"}, 
     #' ignored otherwise.
-    #' @details Defines what will be returned by subsequent
-    #' calls to \code{get()} until \code{set()} is called again. The 
-    #' \code{"current"} option is provided to support having common 
-    #' functions to set (or leave alone) sets of model variables, depending on
-    #' their use case and avoids additional if statements. Option \code{"value"}
-    #' is not recommended for normal usage because it allows the model variable
-    #' to be set to an implausible value, based on its defined uncertainty. An 
-    #' example of where this may be needed is in threshold finding. 
     #' @return Updated \code{ModVar}.
     set = function(what="random", val=NULL) {
       # check argument
@@ -221,11 +236,10 @@ ModVar <- R6::R6Class(
         )
       }
       if (!(what %in% c(private$.whats, "current"))) {
-        rlang::abort(
-          paste("'what' must be one of", "'random',", "'expected',", 
-                "'q2.5',", "'q50',", "'97.5',", "'current',", "'value'"), 
-          class ="what_not_supported"
-        )
+          rlang::abort(
+            paste("'what' must be one of", paste(private$.whats, collapse="|")),
+            class ="what_not_supported"
+          )
       }
       # if random, make a new draw from the distribution
       if (what == "random") {
@@ -251,23 +265,16 @@ ModVar <- R6::R6Class(
     #' to \code{set()}.
     #' @return Value determined by last \code{set()}.
     get = function() {
-      # if random, save the sample
+      # if random, fetch the sample
       if (private$.whatnext == "random") {
-        private$.value["random"] <- self$r()
-      } else if (private$.whatnext == "expected") {
-        private$.value["expected"] <- self$mean()
-      } else if (private$.whatnext == "q2.5") {
-        private$.value["q2.5"] <- self$quantile(0.025)
-      } else if (private$.whatnext == "q50") {
-        private$.value["q50"] <- self$quantile(0.5)
-      } else if (private$.whatnext == "q97.5") {
-        private$.value["q97.5"] <- self$quantile(0.975)
+        rv <- self$r()
+        private$.value["random"] <- rv
+      } else {
+        rv <- private$.value[[private$.whatnext]]
       }
-      # return the required value
-      v <- unname(private$.value[private$.whatnext])
-      return(v)
+      # return the stored value
+      return(rv)
     }
 
-    
   )
 )

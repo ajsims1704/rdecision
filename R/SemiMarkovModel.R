@@ -551,7 +551,7 @@ SemiMarkovModel <- R6::R6Class(
       pop.end <- private$smm.pop %*% self$transition_probabilities()
       pop.end <- drop(pop.end)
       # calculate annual costs of state occupancy
-      state.costs <- sapply(private$V, function(x) {return(x$cost())})
+      state.costs <- sapply(private$V, function(x){x$cost()})
       state.costs <- state.costs * dty
       # calculate QALYs gained from state occupancy
       state.utilities <- sapply(private$V, FUN=function(v){v$utility()})
@@ -576,18 +576,26 @@ SemiMarkovModel <- R6::R6Class(
       private$smm.icycle <- private$smm.icycle + 1
       # update elapsed time
       private$smm.elapsed <- private$smm.elapsed + private$smm.tcycle
-      # return calculated values, per state
-      RC <- data.frame(
-        State = self$get_statenames(),
-        Cycle = rep(private$smm.icycle, times=length(self$order())),
-        Time = rep(elapsed, times=length(self$order())),
-        Population = pop,
-        OccCost = occupancy.costs/sum(private$smm.pop),
-        EntryCost = entry.costs/sum(private$smm.pop),
-        Cost = (occupancy.costs+entry.costs)/sum(private$smm.pop),
-        QALY = qaly / sum(private$smm.pop),
-        stringsAsFactors = F
+      # create matrix with numerical results
+      nstates <- self$order()
+      rcm <- matrix(
+        nrow = nstates, ncol = 7, 
+        dimnames=list(
+          self$get_statenames(), 
+          c("Cycle","Time","Population","OccCost","EntryCost","Cost","QALY")
+        )
       )
+      N <- sum(private$smm.pop)
+      rcm[,"Cycle"] <- rep(private$smm.icycle, times=nstates)
+      rcm[,"Time"] <- rep(elapsed, times=nstates)
+      rcm[,"Population"] <- pop
+      rcm[,"OccCost"] <- occupancy.costs/N
+      rcm[,"EntryCost"] <- entry.costs/N
+      rcm[,"Cost"] <- (occupancy.costs+entry.costs)/N
+      rcm[,"QALY"] <- qaly/N
+      # convert to data frame (note: it is more efficient to leave as a matrix
+      # with state names as the rownames)
+      RC <- cbind(State=self$get_statenames(), as.data.frame(rcm))
       return(RC)
     },
     
@@ -613,56 +621,42 @@ SemiMarkovModel <- R6::R6Class(
     #' costs. If true, the occupancy costs are computed using the population
     #' at half cycle; if false they are applied at the end of the cycle.
     #' Applicable only if \code{hcc.pop} is TRUE.
-    #' @return Data frame with cycle results.
-    #' following columns:
+    #' @return Data frame with cycle results, with the following columns:
     #' \describe{
     #' \item{\code{Cycle}}{The cycle number.}
-    #' \item{\code{Time}}{Elapsed time at end of cycle, years}
-    #' \item{\code{<name>}}{Population of state \code{<name>} at the end of
-    #' the cycle.}
+    #' \item{\code{Years}}{Elapsed time at end of cycle, years}
     #' \item{\code{Cost}}{Cost associated with occupancy and transitions between
     #' states during the cycle.}
     #' \item{\code{QALY}}{Quality adjusted life years associated with occupancy
     #' of the states in the cycle.}
+    #' \item{\code{<name>}}{Population of state \code{<name>} at the end of
+    #' the cycle.}
     #' } 
     cycles = function(ncycles=2, hcc.pop=TRUE, hcc.cost=TRUE) {
       # show zero?
-      if (private$smm.icycle==0) {
-        nzero <- 1
-      } else {
-        nzero <- 0
-      }
-      # data frame for cycle summaries
-      DF <- data.frame(
-        Cycle = integer(length=ncycles+nzero),
-        Cost = numeric(length=ncycles+nzero)
-      )
+      nzero <- ifelse(private$smm.icycle==0, 1, 0)
+      # list of state names
       statenames <- self$get_statenames()
-      POP <- matrix(data=NA, nrow=ncycles+nzero, ncol=length(statenames))
-      colnames(POP) <- statenames
-      DF <- cbind(DF, POP)
+      # construct output matrix
+      RM <- matrix(
+        nrow=ncycles+nzero, ncol=4+length(statenames),
+        dimnames = list(NULL, c("Cycle", "Years", "Cost", "QALY", statenames))
+      )
       # add zero
       if (nzero > 0) {
-        DF[1,"Cycle"] <- 0
-        DF["Years"] <- 0
-        DF[1, names(private$smm.pop)] <- private$smm.pop
-        DF[1,"Cost"] <- 0
-        DF[1,"QALY"] <- 0
+        RM[1,] <- c(0,0,0,0,private$smm.pop)
       }
       # run the model
       for (i in (1+nzero):(ncycles+nzero)) {
         # single cycle
-        DF.cycle <- self$cycle(hcc.pop, hcc.cost)
-        # set the cycle number
-        DF[i, "Cycle"] <- DF.cycle$Cycle[1]
-        DF[i, "Years"] <- DF.cycle$Time[1]
-        # collect state populations and cycle sums into a single frame
-        DF[i, names(private$smm.pop)] <- DF.cycle$Population
-        # add normalized sum of costs for all states 
-        DF[i,"Cost"] <- sum(DF.cycle$Cost)
-        # add normalized sum of QALYs gained
-        DF[i,"QALY"] <- sum(DF.cycle$QALY)
+        CYC <- self$cycle(hcc.pop, hcc.cost)
+        # write the cycle summary
+        RM[i,] <- c(
+          CYC$Cycle[1],CYC$Time[1],sum(CYC$Cost),sum(CYC$QALY), CYC$Population
+        )
       }
+      # convert to data frame (note: it is more efficient to return as a matrix)
+      DF <- as.data.frame(RM)
       # return summary data frame
       return(DF)
     },

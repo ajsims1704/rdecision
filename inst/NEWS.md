@@ -1,12 +1,23 @@
 # rdecision 1.1.0.9000
 
+* Improved code efficiency in `SemiMarkovModel$cycle()` by generating 
+  intermediate results as matrices.
 * Added Paola to the package author list.
-* Added Paola's Decision Tree tutorial vignette **needs some further tidying**.
-* Added class `EmpiricalDistribution` and its test harness.
-* Changed `CohortMarkovModel' to `SemiMarkovModel` in README. 
-* Corrected OccCost and EntryCost columns in SemiMarkovModel$cycle to make them
-  per person costs.
-* Default occupancy cost per state set to zero in SemiMarkovModel.
+* Added Paola's Decision Tree tutorial vignette.
+* Added extra tests to the test harness for `ExprModVar` to check that nested
+  autocorrelation is supported (i.e. when at least one model variable appears
+  twice or more as an operand of an expression, when it is evaluated
+  recursively).
+* Clarified the meanings of the options to `set` for `ModVar` and `ExprModVar`
+  in the documentation for those classes.
+* Each `ExprModVar` now has an empirical distribution, which is sampled on 
+  creation, to optimize functions `mu_hat`, `sigma_hat` and `q_hat`, at Paola's
+  suggestion.
+* Added class `EmpiricalDistribution` and its test harness. 
+* Changed `CohortMarkovModel` to `SemiMarkovModel` in README. 
+* Corrected `OccCost` and `EntryCost` columns in `SemiMarkovModel$cycle` to make
+  them per person costs.
+* Default occupancy cost per state set to zero in `SemiMarkovModel`.
 
 # rdecision 1.1.0
 
