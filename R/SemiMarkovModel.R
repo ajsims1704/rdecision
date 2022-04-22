@@ -247,7 +247,8 @@ SemiMarkovModel <- R6::R6Class(
     #' @param Pt Per-cycle transition probability matrix. The row and 
     #' column labels must be the state names and each row must sum to one.
     #' Non-zero probabilities for undefined transitions are not allowed. At
-    #' most one \code{NA} may appear in each row.
+    #' most one \code{NA} may appear in each row. If an NA is present in a row,
+    #' it is replaced by 1 minus the sum of the defined probabilities.
     #' @return Updated \code{SemiMarkovModel} object
     set_probabilities = function(Pt) {
       # check Pt
