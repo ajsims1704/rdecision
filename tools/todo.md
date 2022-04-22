@@ -6,7 +6,7 @@
 * In documentation for SemiMarkovModel, define units for discounts (it is a
   rate, not a percentage, e.g. 0.035 for 3.5%)
 * In documentation for SemiMarkovModel$set_probabilities(), clarify that 
-  each NA is replaced with one minus the sum of the defined values.
+  each NA is replaced with one minus the sum of the defined values. DONE.
 * In MarkovState, annual occupancy cost should default to zero (check if already
   changed).
 * In GammaModVar, add an option to fit from an estimate of mean and sd, by the
