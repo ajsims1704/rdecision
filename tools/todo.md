@@ -16,5 +16,5 @@
   source) can be tabulated.
 * In SemiMarkovModel$transition_cost, generate more informative error message
   if `e$cost()` is NA in `Ic[is,it] <- e$cost()`.
-* In LogNormModVar, add an optionto fit using erfi function and quantiles given
+* In LogNormModVar, add an option to fit using erfi function and quantiles given
   an observed mean and 95% CI.

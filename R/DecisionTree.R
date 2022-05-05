@@ -769,7 +769,6 @@ DecisionTree <- R6::R6Class(
     #' \describe{
     #' \item{\code{by="path"}}{
     #'   \describe{
-    #'     \item{}{}
     #'     \item{\code{Leaf}}{The label of terminating leaf node}
     #'     \item{\code{<label of first decision node>}}{label of action leaving 
     #'           the node}
@@ -785,7 +784,6 @@ DecisionTree <- R6::R6Class(
     #' 
     #' \item{\code{by="strategy"}}{
     #'   \describe{
-    #'     \item{}{}
     #'     \item{\code{<label of first decision node>}}{label of action leaving 
     #'           the node}
     #'     \item{\code{<label of second decision node (etc)}}{label of action}
@@ -800,7 +798,6 @@ DecisionTree <- R6::R6Class(
     #' 
     #' \item{\code{by="run"}}{
     #'   \describe{
-    #'     \item{}{}
     #'     \item{\code{Run}}{Run number}
     #'     \item{\code{Probability.<S>}}{Probability for strategy S}
     #'     \item{\code{Cost.<S>}}{Cost for strategy S}

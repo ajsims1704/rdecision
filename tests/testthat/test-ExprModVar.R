@@ -216,7 +216,7 @@ test_that("nested expressions are evaluated correctly", {
   sn1 <- NormModVar$new("sn1", "", mu=0, sigma=1)
   s1 <- ExprModVar$new("s1", "", rlang::quo(1*sn1))
   # standard error
-  se <- 1/sqrt(1000)
+  se <- sqrt(2)/sqrt(1000)
   # check that all 3 products have a mean of 1 (chisq with 1 dof)   
   p1 <- ExprModVar$new("p1", "", rlang::quo(sn1*sn1))
   expect_intol(p1$mu_hat(), 1, 3*se)
@@ -240,7 +240,7 @@ test_that("autocorrelation in nested expressions is preserved", {
   zc <- ExprModVar$new("zc", "", rlang::quo(x*s1))
   zu <- ExprModVar$new("zu", "", rlang::quo(y*s1))
   # compute approx standard error of the mean, for tolerance
-  se <- 1/sqrt(1000)
+  se <- sqrt(2)/sqrt(1000)
   # zc is a chi-squared with 1 dof
   expect_intol(zc$mu_hat(), 1, 3*se)
   # zu is a modified Bessel function with mean 0 and sd 1

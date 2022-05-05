@@ -1,5 +1,6 @@
 # rdecision 1.1.0.9000
 
+* Removed empty labels in \describe blocks for DecisionTRee$evaluate().
 * Improved code efficiency in `SemiMarkovModel$cycle()` by generating 
   intermediate results as matrices.
 * Added Paola to the package author list.
