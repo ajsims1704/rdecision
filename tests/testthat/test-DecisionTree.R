@@ -330,7 +330,7 @@ test_that("rdecision replicates Evans et al, Sumatriptan base case", {
 test_that("rdecision replicates Kaminski et al, fig 7", {
   # nodes
   d1 <- DecisionNode$new("d1")
-  d2 <- DecisionNode$new("d2")
+  d2 <- DecisionNode$new("d 2")  # replaced with "d.2"
   d3 <- DecisionNode$new("d3")
   c1 <- ChanceNode$new("c1")
   c2 <- ChanceNode$new("c2")
@@ -382,6 +382,10 @@ test_that("rdecision replicates Kaminski et al, fig 7", {
   )
   S <- DT$strategy_table("label")
   expect_setequal(
+    colnames(S),
+    list("d1", "d.2", "d3")
+  )
+  expect_setequal(
     rownames(S),
     list("sell_sell_sell", "sell_sell_dig", "sell_dig_sell", "sell_dig_dig",
          "dig_sell_sell", "dig_sell_dig", "dig_dig_sell", "dig_dig_dig",
@@ -390,7 +394,7 @@ test_that("rdecision replicates Kaminski et al, fig 7", {
   )
   expect_equal(nrow(S),12)
   expect_equal(sum(S$d1=="sell"),4)
-  expect_equal(sum(S$d2=="sell"),6)
+  expect_equal(sum(S$d.2=="sell"),6)
   expect_equal(sum(S$d3=="sell"),6)
   # single strategy
   s <- list(E[[1]], E[[7]], E[[12]]) # sell/sell/sell
@@ -398,7 +402,7 @@ test_that("rdecision replicates Kaminski et al, fig 7", {
   S <- DT$strategy_table("label", select=s)
   expect_equal(nrow(S),1)
   expect_identical(S$d1[1],"sell")
-  expect_identical(S$d2[1],"sell")
+  expect_identical(S$d.2[1],"sell")
   expect_identical(S$d3[1],"sell")
   # test incorrect strategy prescription
   expect_false(DT$is_strategy(list(E[[1]],E[[5]],E[[7]])))
@@ -421,7 +425,7 @@ test_that("rdecision replicates Kaminski et al, fig 7", {
   # evaluate one strategy (test/sell/sell)
   RES <- DT$evaluate()
   expect_true(is.data.frame(RES))
-  itss <- which(RES$d1=="test" & RES$d2=="sell" & RES$d3=="sell")
+  itss <- which(RES$d1=="test" & RES$d.2=="sell" & RES$d3=="sell")
   expect_intol(sum(RES$Probability[itss]),1,0.01)
   expect_intol(sum(RES$Cost[itss]),50,5)
   expect_intol(sum(RES$Benefit[itss]),888,5)
@@ -429,7 +433,7 @@ test_that("rdecision replicates Kaminski et al, fig 7", {
   RES <- DT$evaluate()
   expect_equal(nrow(RES),12)
   imax <- which.max(RES$Benefit-RES$Cost)
-  popt <- paste(RES$d1[imax], RES$d2[imax], RES$d3[imax], sep="_")
+  popt <- paste(RES$d1[imax], RES$d.2[imax], RES$d3[imax], sep="_")
   expect_identical(popt, "test_sell_dig")
 })
 
@@ -742,6 +746,9 @@ test_that("redecision replicates Jenks et al, 2016", {
 
 })
 
+# ----------------------------------------------------------------------------
+# README example
+# ----------------------------------------------------------------------------
 test_that("readme example is correct, with thresholds", {
   # inputs
   c.diet <- 50

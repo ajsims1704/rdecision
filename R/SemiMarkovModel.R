@@ -138,9 +138,11 @@ SemiMarkovModel <- R6::R6Class(
     #' @param V A list of nodes (\code{MarkovState}s).
     #' @param E A list of edges (\code{Transition}s).
     #' @param tcycle Cycle length, expressed as an R \code{difftime} object.
-    #' @param discount.cost Annual discount rate for future costs.
+    #' @param discount.cost Annual discount rate for future costs. Note this
+    #' is a rate, not a probability (i.e. use 0.035 for 3.5\%).
     #' @param discount.utility Annual discount rate for future incremental
-    #' utility.
+    #' utility. Note this is a rate, not a probability (i.e. use 0.035 
+    #' for 3.5\%).
     #' @return A \code{SemiMarkovModel} object. The population of the first
     #' state is set to 1000 and from each state there is an equal 
     #' conditional probability of each allowed transition.

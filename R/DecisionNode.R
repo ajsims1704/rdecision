@@ -24,7 +24,7 @@ DecisionNode <- R6::R6Class(
     #' used in tabulation of strategies. The label is automatically converted
     #' to a syntactically valid (in R) name to ensure it can be used as a column
     #' name in a data frame.
-    #' @return A new \code{DecisionNode} object
+    #' @return A new \code{DecisionNode} object.
     initialize = function(label) {
       # check there is a label
       if (rlang::is_missing(label)) {
