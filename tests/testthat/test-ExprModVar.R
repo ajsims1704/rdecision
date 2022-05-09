@@ -115,16 +115,16 @@ test_that("set and get function as expected", {
   z$set("q97.5")
   v <- z$get()
   expect_true(v>3.5)
-  # check mean is within 3 std errors
+  # check mean is within 3.29 std errors (roughly 0.1%)
   z$set("expected")
-  se <- 2/sqrt(1000)
-  expect_intol(z$get(),0,3*se)
+  tol <- 3.29*2/sqrt(1000)
+  expect_intol(z$get(), 0, tol)
   # check that set() for operands affects get() for the expression
   y$set("q97.5")
   z$set("current")
   expect_true(z$get()>3.5)
   y$set("expected")
-  expect_intol(z$get(), 0, 3*se)
+  expect_intol(z$get(), 0, tol)
   # check that a random sample from z is from a SN*2, despite setting y 
   n <- 1000
   S <- vector(mode="numeric", length=n)
@@ -215,15 +215,15 @@ test_that("nested expressions are evaluated correctly", {
   # standard normal and an expression with an identity operator
   sn1 <- NormModVar$new("sn1", "", mu=0, sigma=1)
   s1 <- ExprModVar$new("s1", "", rlang::quo(1*sn1))
-  # standard error
-  se <- sqrt(2)/sqrt(1000)
+  # tolerance is 3.29 * standard error (roughly 0.1%)
+  tol <- 3.29*sqrt(2)/sqrt(1000)
   # check that all 3 products have a mean of 1 (chisq with 1 dof)   
   p1 <- ExprModVar$new("p1", "", rlang::quo(sn1*sn1))
-  expect_intol(p1$mu_hat(), 1, 3*se)
+  expect_intol(p1$mu_hat(), 1, tol)
   p2 <- ExprModVar$new("p2", "", rlang::quo(s1*s1))
-  expect_intol(p2$mu_hat(), 1, 3*se)
+  expect_intol(p2$mu_hat(), 1, tol)
   p3 <- ExprModVar$new("p3", "", rlang::quo(s1*sn1))
-  expect_intol(p3$mu_hat(), 1, 3*se)
+  expect_intol(p3$mu_hat(), 1, tol)
 })
 
 test_that("autocorrelation in nested expressions is preserved", {
@@ -239,12 +239,12 @@ test_that("autocorrelation in nested expressions is preserved", {
   # create nested correlated and nested uncorrelated expressions
   zc <- ExprModVar$new("zc", "", rlang::quo(x*s1))
   zu <- ExprModVar$new("zu", "", rlang::quo(y*s1))
-  # compute approx standard error of the mean, for tolerance
-  se <- sqrt(2)/sqrt(1000)
+  # tolerance is 3.29 * standard error (roughly 0.1%)
+  tol <- 3.29*sqrt(2)/sqrt(1000)
   # zc is a chi-squared with 1 dof
-  expect_intol(zc$mu_hat(), 1, 3*se)
+  expect_intol(zc$mu_hat(), 1, tol)
   # zu is a modified Bessel function with mean 0 and sd 1
-  expect_intol(zu$mu_hat(), 0, 3*se)
+  expect_intol(zu$mu_hat(), 0, tol)
 })
 
 test_that("expression chi square from SN is correct", {
@@ -254,13 +254,13 @@ test_that("expression chi square from SN is correct", {
   k <- 1
   x <- NormModVar$new("x", "", mu=0, sigma=1)
   y <- ExprModVar$new("y","",rlang::quo(x^2))
-  # standard error
-  se <- sqrt(2*k)/sqrt(1000)
+  # tolerance is 3.29 * standard error (roughly 0.1%)
+  tol <- 3.29*sqrt(2*k)/sqrt(1000)
   expect_equal(y$mean(), 0)          # product of operand means is 0
-  expect_intol(y$mu_hat(), k, 3*se)  # true mean is k=1
+  expect_intol(y$mu_hat(), k, tol)  # true mean is k=1
   expect_true(is.na(y$mode()))  # mode is undefined for ExprModVar
   median <- k*(1-2/(9*k))^3
-  expect_intol(y$q_hat(p=0.5), median, 3*se)
+  expect_intol(y$q_hat(p=0.5), median, tol)
   # generate a distribution and check it
   n <- 1000
   samp <- sapply(1:n, FUN=function(i) {
@@ -273,7 +273,7 @@ test_that("expression chi square from SN is correct", {
 })
 
 test_that("one Dirichlet matches a Beta and an expression", {
-  # skip on cran because tests inovolve sampling
+  # skip on cran because tests involve sampling
   skip_on_cran()
   # p follows Beta(1,9) and q is 1-p
   alpha <- 1
@@ -284,12 +284,12 @@ test_that("one Dirichlet matches a Beta and an expression", {
   D <- DirichletDistribution$new(alpha=c(1,9))
   p.d <- ModVar$new("P(success)", "P", D=D, k=as.integer(1))
   q.d <- ModVar$new("P(failure)", "P", D=D, k=as.integer(2))
-  # approx standard error
+  # tolerance is 3.29 standard errors (approx 0.1%)
   sd <- sqrt((alpha*beta)/((alpha+beta)^2 * (alpha+beta+1)))
-  se <- sd / sqrt(1000)
+  tol <- 3.29 * sd / sqrt(1000)
   # compare means
   expect_equal(p$mean(), p.d$mean())
-  expect_intol(q$mean(), q.d$mean(), 3*se)
+  expect_intol(q$mean(), q.d$mean(), tol)
   # compare quantiles for p 
   probs<- c(0.025, 0.975)
   expect_setequal(unname(p$quantile(probs)), unname(p.d$quantile(probs)))

@@ -192,11 +192,6 @@ ModVar <- R6::R6Class(
       rd <- private$.D$r()
       # get random sample for this dimension
       rv <- rd[private$.k]
-      # if (private$.D$order() > 1) {
-      #   rv <- rd[private$.k]
-      # } else {
-      #   rv <- rd
-      # }
       # return the sample
       return(rv)
     },

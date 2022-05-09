@@ -1,6 +1,7 @@
-# rdecision 1.1.0.9000
+# rdecision 1.1.1
 
-* Removed empty labels in \describe blocks for DecisionTree$evaluate().
+* Removed empty labels in \describe blocks for DecisionTree$evaluate(), as per
+  new CRAN warnings.
 * Improved code efficiency in `SemiMarkovModel$cycle()` by generating 
   intermediate results as matrices.
 * Added Paola to the package author list.
@@ -11,6 +12,8 @@
   recursively).
 * Clarified the meanings of the options to `set` for `ModVar` and `ExprModVar`
   in the documentation for those classes.
+* Each test in test-ExprModVar that involves sampling has an expected failure
+  rate of around 0.1% and is excluded from CRAN.
 * Each `ExprModVar` now has an empirical distribution, which is sampled on 
   creation, to optimize functions `mu_hat`, `sigma_hat` and `q_hat`, at Paola's
   suggestion.

@@ -119,9 +119,7 @@ Andrew J. Sims \email{andrew.sims@newcastle.ac.uk}
 \if{html}{\out{<a id="method-new"></a>}}
 \if{latex}{\out{\hypertarget{method-new}{}}}
 \subsection{Method \code{new()}}{
-Create a new decision tree. The tree must consist of a set of
-nodes and a set of edges which satisfy the conditions given
-in the details section of this class.
+Create a new decision tree.
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{DecisionTree$new(V, E)}\if{html}{\out{</div>}}
 }
@@ -135,6 +133,11 @@ in the details section of this class.
 }
 \if{html}{\out{</div>}}
 }
+\subsection{Details}{
+The tree must consist of a set of nodes and a set of edges 
+which satisfy the conditions given in the details section of this class.
+}
+
 \subsection{Returns}{
 A \code{DecisionTree} object
 }
@@ -203,7 +206,8 @@ the decision nodes (for what="index").
 \if{html}{\out{<a id="method-actions"></a>}}
 \if{latex}{\out{\hypertarget{method-actions}{}}}
 \subsection{Method \code{actions()}}{
-Return the edges that have the specified decision node as their source.
+Find the edges that have the specified decision node as 
+their source.
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{DecisionTree$actions(d)}\if{html}{\out{</div>}}
 }
@@ -223,10 +227,14 @@ A list of \code{Action} edges.
 \if{html}{\out{<a id="method-modvars"></a>}}
 \if{latex}{\out{\hypertarget{method-modvars}{}}}
 \subsection{Method \code{modvars()}}{
-Find all the model variables of type \code{ModVar} that have been 
-specified as values associated with the nodes and edges of the tree.
+Find all the model variables of type \code{ModVar}.
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{DecisionTree$modvars()}\if{html}{\out{</div>}}
+}
+
+\subsection{Details}{
+Find \code{ModVar}s that have been specified as values 
+associated with the nodes and edges of the tree.
 }
 
 \subsection{Returns}{
@@ -277,9 +285,7 @@ random sampling.}
 \if{html}{\out{<a id="method-draw"></a>}}
 \if{latex}{\out{\hypertarget{method-draw}{}}}
 \subsection{Method \code{draw()}}{
-Draw the decision tree to the current graphics output. Uses
-the algorithm of Walker (1989) to distribute the nodes compactly (see
-the \link{Arborescence} class help for details).
+Draw the decision tree to the current graphics output.
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{DecisionTree$draw(border = FALSE)}\if{html}{\out{</div>}}
 }
@@ -291,6 +297,11 @@ the \link{Arborescence} class help for details).
 }
 \if{html}{\out{</div>}}
 }
+\subsection{Details}{
+Uses the algorithm of Walker (1989) to distribute the nodes 
+compactly (see the \link{Arborescence} class help for details).
+}
+
 \subsection{Returns}{
 No return value.
 }
@@ -299,9 +310,7 @@ No return value.
 \if{html}{\out{<a id="method-is_strategy"></a>}}
 \if{latex}{\out{\hypertarget{method-is_strategy}{}}}
 \subsection{Method \code{is_strategy()}}{
-Tests whether a strategy (a unanimous prescription of an
-action in each decision node, specified as a list of nodes) is a valid
-strategy for this decision tree.
+Tests whether a strategy is valid.
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{DecisionTree$is_strategy(strategy)}\if{html}{\out{</div>}}
 }
@@ -313,6 +322,12 @@ strategy for this decision tree.
 }
 \if{html}{\out{</div>}}
 }
+\subsection{Details}{
+A strategy is a unanimous prescription of an action in each 
+decision node, specified as a list of actions.  This checks whether the
+strategy is valid for this decision tree.
+}
+
 \subsection{Returns}{
 TRUE if the strategy is valid for this tree. Returns
 FALSE if the list of Action edges are not a valid strategy.
@@ -322,10 +337,7 @@ FALSE if the list of Action edges are not a valid strategy.
 \if{html}{\out{<a id="method-strategy_table"></a>}}
 \if{latex}{\out{\hypertarget{method-strategy_table}{}}}
 \subsection{Method \code{strategy_table()}}{
-Find all potential strategies for the decision tree. A
-strategy is a unanimous prescription of the actions at each decision 
-node. If there are decision nodes that are descendants of other nodes
-in the tree, the strategies returned will not necessarily be unique.
+Find all potential strategies for the decision tree.
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{DecisionTree$strategy_table(what = "index", select = NULL)}\if{html}{\out{</div>}}
 }
@@ -343,6 +355,13 @@ single strategy into a readable form.}
 }
 \if{html}{\out{</div>}}
 }
+\subsection{Details}{
+A strategy is a unanimous prescription of the actions at each
+decision node. If there are decision nodes that are descendants of other
+nodes in the tree, the strategies returned will not necessarily
+be unique.
+}
+
 \subsection{Returns}{
 A data frame where each row is a potential strategy 
 and each column is a Decision Node. Values are either the index of each
@@ -354,12 +373,15 @@ strategy, concatenated with underscores.
 \if{html}{\out{<a id="method-strategy_paths"></a>}}
 \if{latex}{\out{\hypertarget{method-strategy_paths}{}}}
 \subsection{Method \code{strategy_paths()}}{
-Find all paths walked in each possible strategy. A strategy 
-is a unanimous prescription of an action in each decision node. Some 
-paths can be walked in more than one strategy, if there exist paths
-that do not pass a decision node.
+Find all paths walked in each possible strategy.
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{DecisionTree$strategy_paths()}\if{html}{\out{</div>}}
+}
+
+\subsection{Details}{
+A strategy is a unanimous prescription of an action in each 
+decision node. Some paths can be walked in more than one strategy, if
+there exist paths that do not pass a decision node.
 }
 
 \subsection{Returns}{
@@ -373,9 +395,8 @@ each path, and there is one row for each path in each strategy.
 \if{html}{\out{<a id="method-evaluate_walks"></a>}}
 \if{latex}{\out{\hypertarget{method-evaluate_walks}{}}}
 \subsection{Method \code{evaluate_walks()}}{
-Evaluate the components of pay-off associated with a set of walks in the
-decision tree. For each walk, probability, cost, benefit and utility are
-calculated.
+Evaluate the components of pay-off associated with a set of
+walks in the decision tree.
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{DecisionTree$evaluate_walks(W)}\if{html}{\out{</div>}}
 }
@@ -390,9 +411,10 @@ paths in a tree.}
 \if{html}{\out{</div>}}
 }
 \subsection{Details}{
-There is minimal checking of the argument because this function 
-is intended to be called repeatedly during tree evaluation, including
-PSA.
+For each walk, probability, cost, benefit and utility are
+calculated. There is minimal checking of the argument because this
+function is intended to be called repeatedly during tree evaluation, 
+including PSA.
 }
 
 \subsection{Returns}{
@@ -424,10 +446,7 @@ pathway.}
 \if{html}{\out{<a id="method-evaluate"></a>}}
 \if{latex}{\out{\hypertarget{method-evaluate}{}}}
 \subsection{Method \code{evaluate()}}{
-Evaluate each strategy. Starting with the root, the function
-works though all possible paths to leaf nodes and computes the 
-probability, cost, benefit and utility of each, then optionally 
-aggregates by strategy or run.
+Evaluate each strategy.
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{DecisionTree$evaluate(setvars = "expected", N = 1, by = "strategy")}\if{html}{\out{</div>}}
 }
@@ -457,11 +476,13 @@ for each strategy.}
 \if{html}{\out{</div>}}
 }
 \subsection{Details}{
+Starting with the root, the function works though all possible
+paths to leaf nodes and computes the probability, cost, benefit and 
+utility of each, then optionally aggregates by strategy or run.   
 The columns of the returned data frame are:
 \describe{
 \item{\code{by="path"}}{
   \describe{
-    \item{}{}
     \item{\code{Leaf}}{The label of terminating leaf node}
     \item{\code{<label of first decision node>}}{label of action leaving 
           the node}
@@ -477,7 +498,6 @@ The columns of the returned data frame are:
 
 \item{\code{by="strategy"}}{
   \describe{
-    \item{}{}
     \item{\code{<label of first decision node>}}{label of action leaving 
           the node}
     \item{\code{<label of second decision node (etc)}}{label of action}
@@ -492,7 +512,6 @@ The columns of the returned data frame are:
 
 \item{\code{by="run"}}{
   \describe{
-    \item{}{}
     \item{\code{Run}}{Run number}
     \item{\code{Probability.<S>}}{Probability for strategy S}
     \item{\code{Cost.<S>}}{Cost for strategy S}
@@ -515,9 +534,7 @@ A data frame whose columns depend on \code{by}; see "Details".
 \if{html}{\out{<a id="method-tornado"></a>}}
 \if{latex}{\out{\hypertarget{method-tornado}{}}}
 \subsection{Method \code{tornado()}}{
-Create a "tornado" diagram to compare two strategies for traversing
-the decision tree. A strategy is a unanimous prescription of the actions
-at each decision node.
+Create a "tornado" diagram.
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{DecisionTree$tornado(
   index,
@@ -555,8 +572,10 @@ data frame silently.}
 \if{html}{\out{</div>}}
 }
 \subsection{Details}{
-The extreme values of each input variable are the upper and 
-lower 95\% confidence limits of the uncertainty distributions of each 
+Used to compare two strategies for traversing the decision tree.
+A strategy is a unanimous prescription of the actions at each 
+decision node. The extreme values of each input variable are the upper 
+and lower 95\% confidence limits of the uncertainty distributions of each 
 variable. This ensures that the range of each input is defensible 
 (Briggs 2012).
 }

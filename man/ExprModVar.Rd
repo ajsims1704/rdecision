@@ -9,17 +9,14 @@ An R6 class representing a model variable constructed from an
 expression involving other variables.
 }
 \details{
-A class to support expressions involving objects
-of base class \code{ModVar}, which itself behaves like a 
-model variable. For example, if \code{A} and
-\code{B} are variables with base class \code{ModVar}
-and \code{c} is a variable of type \code{numeric}, then
-it is not possible to write, for example, 
-\code{x <- 42*A/B + c}, because R cannot manipulate class
-variables using the same operators as regular variables. 
-But such forms of expression may be desirable in constructing a
-model and this class provides a mechanism for doing so. Inherits from
-class \code{ModVar}.
+A class to support expressions involving objects of base class 
+\code{ModVar}, which itself behaves like a model variable. For example, if
+\code{A} and \code{B} are variables with base class \code{ModVar} and 
+\code{c} is a variable of type \code{numeric}, then it is not possible to 
+write, for example, \code{x <- 42*A/B + c}, because R cannot manipulate class
+variables using the same operators as regular variables. But such forms of 
+expression may be desirable in constructing a model and this class provides 
+a mechanism for doing so. Inherits from class \code{ModVar}.
 }
 \note{
 For many expressions involving model variables there will 

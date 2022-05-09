@@ -184,10 +184,12 @@ Creates a semi-Markov model for cohort simulation.
 
 \item{\code{tcycle}}{Cycle length, expressed as an R \code{difftime} object.}
 
-\item{\code{discount.cost}}{Annual discount rate for future costs.}
+\item{\code{discount.cost}}{Annual discount rate for future costs. Note this
+is a rate, not a probability (i.e. use 0.035 for 3.5\%).}
 
 \item{\code{discount.utility}}{Annual discount rate for future incremental
-utility.}
+utility. Note this is a rate, not a probability (i.e. use 0.035 
+for 3.5\%).}
 }
 \if{html}{\out{</div>}}
 }
@@ -199,13 +201,13 @@ A semi-Markov model must meet the following conditions:
   \item All edges must be of class \code{Transition};
   \item The nodes and edges must form a digraph whose underlying
   graph is connected;
-  \item Each state must have at least one outgoing transition (which
-  can be a self-loop);
+  \item Each state must have at least one outgoing transition (for 
+  absorbing states this is a self-loop);
   \item For each state the sum of outgoing conditional transition 
   probabilities must be one. For convenience, one outgoing transition 
   probability from each state may be set to NA when the 
-  \code{probabilities}s are defined. Typically, probabilities for self 
-  loops would be set to NA). Transition probabilities in \eqn{Pt} 
+  probabilities are defined. Typically, probabilities for self 
+  loops would be set to NA. Transition probabilities in \eqn{Pt} 
   associated with transitions that are not defined as edges in the 
   graph are zero. Probabilities can be changed between cycles.
   \item No two edges may share the same source and target nodes (i.e. 
@@ -236,7 +238,8 @@ Sets transition probabilities.
 \item{\code{Pt}}{Per-cycle transition probability matrix. The row and 
 column labels must be the state names and each row must sum to one.
 Non-zero probabilities for undefined transitions are not allowed. At
-most one \code{NA} may appear in each row.}
+most one \code{NA} may appear in each row. If an NA is present in a row,
+it is replaced by 1 minus the sum of the defined probabilities.}
 }
 \if{html}{\out{</div>}}
 }
@@ -482,8 +485,7 @@ states.
 }
 
 \subsection{Returns}{
-Data frame with cycle results.
-following columns:
+Data frame with cycle results, with the following columns:
 \describe{
 \item{\code{Cycle}}{The cycle number.}
 \item{\code{Years}}{Elapsed time at end of cycle, years}

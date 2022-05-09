@@ -121,13 +121,13 @@ SemiMarkovModel <- R6::R6Class(
     #'   \item All edges must be of class \code{Transition};
     #'   \item The nodes and edges must form a digraph whose underlying
     #'   graph is connected;
-    #'   \item Each state must have at least one outgoing transition (which
-    #'   can be a self-loop);
+    #'   \item Each state must have at least one outgoing transition (for 
+    #'   absorbing states this is a self-loop);
     #'   \item For each state the sum of outgoing conditional transition 
     #'   probabilities must be one. For convenience, one outgoing transition 
     #'   probability from each state may be set to NA when the 
-    #'   \code{probabilities}s are defined. Typically, probabilities for self 
-    #'   loops would be set to NA). Transition probabilities in \eqn{Pt} 
+    #'   probabilities are defined. Typically, probabilities for self 
+    #'   loops would be set to NA. Transition probabilities in \eqn{Pt} 
     #'   associated with transitions that are not defined as edges in the 
     #'   graph are zero. Probabilities can be changed between cycles.
     #'   \item No two edges may share the same source and target nodes (i.e. 

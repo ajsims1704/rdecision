@@ -65,8 +65,7 @@ or \code{ModVar}).}
 }
 \subsection{Details}{
 Utility must be in the range \code{[-Inf,1]}. If it is of type 
-numeric,
-the range is checked on object creation.
+numeric, the range is checked on object creation.
 }
 
 \subsection{Returns}{
@@ -113,7 +112,7 @@ Gets the annual cost of state occupancy.
 }
 
 \subsection{Returns}{
-Annual cost; numeric. Returns zero if the cost was not set.
+Annual cost; numeric.
 }
 }
 \if{html}{\out{<hr>}}
