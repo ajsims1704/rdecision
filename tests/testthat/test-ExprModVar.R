@@ -109,6 +109,11 @@ test_that("set and get function as expected", {
   # check illegal input
   expect_error(z$set(TRUE), class="what_not_character")
   expect_error(z$set("red"), class="what_not_supported")
+  expect_error(z$set("value"), class="invalid_val")
+  expect_error(z$set("value", val=TRUE), class="invalid_val")
+  # check value setting
+  z$set("value", 10)
+  expect_equal(z$get(),10)
   # skip remaining tests on CRAN because they rely on sampling
   skip_on_cran()
   # check quantile, estimated from empirical distribution
@@ -254,11 +259,13 @@ test_that("expression chi square from SN is correct", {
   k <- 1
   x <- NormModVar$new("x", "", mu=0, sigma=1)
   y <- ExprModVar$new("y","",rlang::quo(x^2))
+  # check that mode and SD are undefined
+  expect_true(is.na(y$mode()))  # mode is undefined for ExprModVar
+  expect_true(is.na(y$SD()))  # SD is undefined for ExprModVar
   # tolerance is 3.29 * standard error (roughly 0.1%)
   tol <- 3.29*sqrt(2*k)/sqrt(1000)
   expect_equal(y$mean(), 0)          # product of operand means is 0
   expect_intol(y$mu_hat(), k, tol)  # true mean is k=1
-  expect_true(is.na(y$mode()))  # mode is undefined for ExprModVar
   median <- k*(1-2/(9*k))^3
   expect_intol(y$q_hat(p=0.5), median, tol)
   # generate a distribution and check it

@@ -4,7 +4,7 @@ subtitle: "Sumatriptan versus caffeine for migraine"
 author: "Andrew J. Sims"
 date: "April 2020"
 bibliography: "../inst/REFERENCES.bib"
-csl: "../inst/national-institute-of-health-research.csl"
+csl: "../inst/nature-no-et-al.csl"
 output: 
   rmarkdown::html_vignette:
     fig_width: 7

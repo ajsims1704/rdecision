@@ -1,5 +1,10 @@
 # rdecision 1.1.1
 
+* Edited codecov badge reference in readme.Rmd with revised preferred URL.
+* Changed citation style to one that does not write DOIs (which sometimes
+  cause errors on CRAN checks).
+* Changed difftime class checks to use inherits(), not class(), as per CRAN
+  checks.
 * Removed empty labels in \describe blocks for DecisionTree$evaluate(), as per
   new CRAN warnings.
 * Improved code efficiency in `SemiMarkovModel$cycle()` by generating 

@@ -1,4 +1,13 @@
 
+# rdecision 1.1.1
+* Updated readme.md (devtools::build_readme())
+* Spell check (devtools::spell_check())
+* Uploaded test coverage report to codecov (covr::codecov())
+* Checked package in rhub (devtools::check_rhub())
+* Built and checked manual
+* Checked .tar.gz package from cmd line with R CMD check x.tar.gz
+* Uploaded to CRAN (devtools::release())
+
 # rdecision 1.0.2
 
 * `devtools:check_rhub()` failed on the windows development servers with a 

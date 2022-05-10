@@ -203,7 +203,7 @@ SemiMarkovModel <- R6::R6Class(
         )
       }
       # check that the cycle time is an interval
-      if (class(tcycle) != "difftime") {
+      if (!inherits(tcycle, what="difftime")) {
         rlang::abort(
           "Argument 'tcycle' must be of class 'difftime'.",
           class = "invalid_tcycle"
@@ -432,7 +432,7 @@ SemiMarkovModel <- R6::R6Class(
       }
       private$smm.icycle <- icycle
       # check and update the elapsed time
-      if (class(elapsed) != "difftime") {
+      if (!inherits(elapsed, what="difftime")) {
         rlang::abort(
           "Argument 'elapsed' must be of class 'difftime'.",
           class = "invalid_elapsed"

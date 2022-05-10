@@ -3,7 +3,7 @@ title: "Introduction to the construction of decision trees"
 author: "Paola Cognigni"
 date: "October 2021"
 bibliography: "../inst/REFERENCES.bib"
-csl: "../inst/national-institute-of-health-research.csl"
+csl: "../inst/nature-no-et-al.csl"
 output: 
   rmarkdown::html_vignette:
     fig_width: 7

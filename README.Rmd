@@ -1,7 +1,7 @@
 ---
 output: github_document
 bibliography: "inst/REFERENCES.bib"
-csl: "inst/national-institute-of-health-research.csl"
+csl: "inst/nature-no-et-al.csl"
 ---
 
 <!-- README.md is generated from README.Rmd. Please edit that file -->
@@ -19,7 +19,7 @@ knitr::opts_chunk$set(
 
 <!-- badges: start -->
 [![CRAN status](https://www.r-pkg.org/badges/version/rdecision)](https://CRAN.R-project.org/package=rdecision)
-[![Codecov test coverage](https://codecov.io/gh/ajsims1704/rdecision/branch/master/graph/badge.svg)](https://codecov.io/gh/ajsims1704/rdecision?branch=master)
+[![codecov](https://codecov.io/github/ajsims1704/rdecision/branch/master/graph/badge.svg?token=HHZXK56ZAR)](https://codecov.io/github/ajsims1704/rdecision)
 <!-- badges: end -->
 
 The goal of `rdecision` is to provide methods for assessing health care 

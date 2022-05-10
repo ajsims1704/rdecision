@@ -13,7 +13,7 @@ vignette: >
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 bibliography: "../inst/REFERENCES.bib"
-csl: "../inst/national-institute-of-health-research.csl"
+csl: "../inst/nature-no-et-al.csl"
 ---
 ```{r, include = FALSE}
 knitr::opts_chunk$set(

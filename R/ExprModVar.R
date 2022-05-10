@@ -379,7 +379,7 @@ ExprModVar <- R6::R6Class(
       # if value, check and save the supplied number
       if (what == "value") {
         if (is.null(val) | !is.numeric(val)) {
-          rlang::abort("'v' must be numeric", class = "invalid_val")
+          rlang::abort("'val' must be numeric", class = "invalid_val")
         } else {
           private$.value["value"] <- val
         }

@@ -79,7 +79,7 @@ LeafNode <- R6::R6Class(
         )
       }
       # check and set the interval
-      if (class(interval) != "difftime") {
+      if (!inherits(interval, what="difftime")) {
         rlang::abort(
           "Argument 'interval' must be of class 'difftime'.",
           class = "invalid_interval"
