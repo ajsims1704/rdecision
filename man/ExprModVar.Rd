@@ -63,36 +63,36 @@ Andrew J. Sims \email{andrew.sims@newcastle.ac.uk}
 \section{Methods}{
 \subsection{Public methods}{
 \itemize{
-\item \href{#method-new}{\code{ExprModVar$new()}}
-\item \href{#method-add_method}{\code{ExprModVar$add_method()}}
-\item \href{#method-is_probabilistic}{\code{ExprModVar$is_probabilistic()}}
-\item \href{#method-operands}{\code{ExprModVar$operands()}}
-\item \href{#method-distribution}{\code{ExprModVar$distribution()}}
-\item \href{#method-mean}{\code{ExprModVar$mean()}}
-\item \href{#method-mode}{\code{ExprModVar$mode()}}
-\item \href{#method-SD}{\code{ExprModVar$SD()}}
-\item \href{#method-quantile}{\code{ExprModVar$quantile()}}
-\item \href{#method-mu_hat}{\code{ExprModVar$mu_hat()}}
-\item \href{#method-sigma_hat}{\code{ExprModVar$sigma_hat()}}
-\item \href{#method-q_hat}{\code{ExprModVar$q_hat()}}
-\item \href{#method-set}{\code{ExprModVar$set()}}
-\item \href{#method-get}{\code{ExprModVar$get()}}
-\item \href{#method-clone}{\code{ExprModVar$clone()}}
+\item \href{#method-ExprModVar-new}{\code{ExprModVar$new()}}
+\item \href{#method-ExprModVar-add_method}{\code{ExprModVar$add_method()}}
+\item \href{#method-ExprModVar-is_probabilistic}{\code{ExprModVar$is_probabilistic()}}
+\item \href{#method-ExprModVar-operands}{\code{ExprModVar$operands()}}
+\item \href{#method-ExprModVar-distribution}{\code{ExprModVar$distribution()}}
+\item \href{#method-ExprModVar-mean}{\code{ExprModVar$mean()}}
+\item \href{#method-ExprModVar-mode}{\code{ExprModVar$mode()}}
+\item \href{#method-ExprModVar-SD}{\code{ExprModVar$SD()}}
+\item \href{#method-ExprModVar-quantile}{\code{ExprModVar$quantile()}}
+\item \href{#method-ExprModVar-mu_hat}{\code{ExprModVar$mu_hat()}}
+\item \href{#method-ExprModVar-sigma_hat}{\code{ExprModVar$sigma_hat()}}
+\item \href{#method-ExprModVar-q_hat}{\code{ExprModVar$q_hat()}}
+\item \href{#method-ExprModVar-set}{\code{ExprModVar$set()}}
+\item \href{#method-ExprModVar-get}{\code{ExprModVar$get()}}
+\item \href{#method-ExprModVar-clone}{\code{ExprModVar$clone()}}
 }
 }
-\if{html}{
-\out{<details open ><summary>Inherited methods</summary>}
-\itemize{
-\item \out{<span class="pkg-link" data-pkg="rdecision" data-topic="ModVar" data-id="description">}\href{../../rdecision/html/ModVar.html#method-description}{\code{rdecision::ModVar$description()}}\out{</span>}
-\item \out{<span class="pkg-link" data-pkg="rdecision" data-topic="ModVar" data-id="is_expression">}\href{../../rdecision/html/ModVar.html#method-is_expression}{\code{rdecision::ModVar$is_expression()}}\out{</span>}
-\item \out{<span class="pkg-link" data-pkg="rdecision" data-topic="ModVar" data-id="r">}\href{../../rdecision/html/ModVar.html#method-r}{\code{rdecision::ModVar$r()}}\out{</span>}
-\item \out{<span class="pkg-link" data-pkg="rdecision" data-topic="ModVar" data-id="units">}\href{../../rdecision/html/ModVar.html#method-units}{\code{rdecision::ModVar$units()}}\out{</span>}
-}
-\out{</details>}
-}
+\if{html}{\out{
+<details open><summary>Inherited methods</summary>
+<ul>
+<li><span class="pkg-link" data-pkg="rdecision" data-topic="ModVar" data-id="description"><a href='../../rdecision/html/ModVar.html#method-ModVar-description'><code>rdecision::ModVar$description()</code></a></span></li>
+<li><span class="pkg-link" data-pkg="rdecision" data-topic="ModVar" data-id="is_expression"><a href='../../rdecision/html/ModVar.html#method-ModVar-is_expression'><code>rdecision::ModVar$is_expression()</code></a></span></li>
+<li><span class="pkg-link" data-pkg="rdecision" data-topic="ModVar" data-id="r"><a href='../../rdecision/html/ModVar.html#method-ModVar-r'><code>rdecision::ModVar$r()</code></a></span></li>
+<li><span class="pkg-link" data-pkg="rdecision" data-topic="ModVar" data-id="units"><a href='../../rdecision/html/ModVar.html#method-ModVar-units'><code>rdecision::ModVar$units()</code></a></span></li>
+</ul>
+</details>
+}}
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-new"></a>}}
-\if{latex}{\out{\hypertarget{method-new}{}}}
+\if{html}{\out{<a id="method-ExprModVar-new"></a>}}
+\if{latex}{\out{\hypertarget{method-ExprModVar-new}{}}}
 \subsection{Method \code{new()}}{
 Create a \code{ModVar} formed from an expression involving 
 other model variables.
@@ -124,8 +124,8 @@ An object of type \code{ExprModVar}
 }
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-add_method"></a>}}
-\if{latex}{\out{\hypertarget{method-add_method}{}}}
+\if{html}{\out{<a id="method-ExprModVar-add_method"></a>}}
+\if{latex}{\out{\hypertarget{method-ExprModVar-add_method}{}}}
 \subsection{Method \code{add_method()}}{
 Create a new \verb{quosure} from that supplied in 
 \code{new()} but with each \code{ModVar}
@@ -157,8 +157,8 @@ specified in the quosure supplied in new().
 }
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-is_probabilistic"></a>}}
-\if{latex}{\out{\hypertarget{method-is_probabilistic}{}}}
+\if{html}{\out{<a id="method-ExprModVar-is_probabilistic"></a>}}
+\if{latex}{\out{\hypertarget{method-ExprModVar-is_probabilistic}{}}}
 \subsection{Method \code{is_probabilistic()}}{
 Tests whether the model variable is probabilistic, i.e. 
 a random variable that follows a distribution, or an expression involving
@@ -172,8 +172,8 @@ random variables, at least one of which follows a distribution.
 }
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-operands"></a>}}
-\if{latex}{\out{\hypertarget{method-operands}{}}}
+\if{html}{\out{<a id="method-ExprModVar-operands"></a>}}
+\if{latex}{\out{\hypertarget{method-ExprModVar-operands}{}}}
 \subsection{Method \code{operands()}}{
 Return a list of operands.
 \subsection{Usage}{
@@ -198,8 +198,8 @@ A list of model variables.
 }
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-distribution"></a>}}
-\if{latex}{\out{\hypertarget{method-distribution}{}}}
+\if{html}{\out{<a id="method-ExprModVar-distribution"></a>}}
+\if{latex}{\out{\hypertarget{method-ExprModVar-distribution}{}}}
 \subsection{Method \code{distribution()}}{
 Accessor function for the name of the expression model 
 variable.
@@ -213,8 +213,8 @@ having been removed.
 }
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-mean"></a>}}
-\if{latex}{\out{\hypertarget{method-mean}{}}}
+\if{html}{\out{<a id="method-ExprModVar-mean"></a>}}
+\if{latex}{\out{\hypertarget{method-ExprModVar-mean}{}}}
 \subsection{Method \code{mean()}}{
 Return the value of the expression when its operands take
 their mean value (i.e. value returned by call to \code{mean} or their
@@ -228,8 +228,8 @@ Mean value as a numeric value.
 }
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-mode"></a>}}
-\if{latex}{\out{\hypertarget{method-mode}{}}}
+\if{html}{\out{<a id="method-ExprModVar-mode"></a>}}
+\if{latex}{\out{\hypertarget{method-ExprModVar-mode}{}}}
 \subsection{Method \code{mode()}}{
 Return the mode of the variable. By default returns
 \code{NA}, which will be the case for most \code{ExprModVar} variables,
@@ -243,8 +243,8 @@ Mode as a numeric value.
 }
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-SD"></a>}}
-\if{latex}{\out{\hypertarget{method-SD}{}}}
+\if{html}{\out{<a id="method-ExprModVar-SD"></a>}}
+\if{latex}{\out{\hypertarget{method-ExprModVar-SD}{}}}
 \subsection{Method \code{SD()}}{
 Return the standard deviation of the distribution as 
 \code{NA} because the variance is not available as a closed form for
@@ -258,8 +258,8 @@ Standard deviation as a numeric value
 }
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-quantile"></a>}}
-\if{latex}{\out{\hypertarget{method-quantile}{}}}
+\if{html}{\out{<a id="method-ExprModVar-quantile"></a>}}
+\if{latex}{\out{\hypertarget{method-ExprModVar-quantile}{}}}
 \subsection{Method \code{quantile()}}{
 Find quantiles of the uncertainty distribution. Not 
 available as a closed form, and returned as \code{NA}.
@@ -279,8 +279,8 @@ Vector of numeric values of the same length as \code{probs}.
 }
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-mu_hat"></a>}}
-\if{latex}{\out{\hypertarget{method-mu_hat}{}}}
+\if{html}{\out{<a id="method-ExprModVar-mu_hat"></a>}}
+\if{latex}{\out{\hypertarget{method-ExprModVar-mu_hat}{}}}
 \subsection{Method \code{mu_hat()}}{
 Return the estimated expected value of the variable.
 \subsection{Usage}{
@@ -299,8 +299,8 @@ Expected value as a numeric value.
 }
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-sigma_hat"></a>}}
-\if{latex}{\out{\hypertarget{method-sigma_hat}{}}}
+\if{html}{\out{<a id="method-ExprModVar-sigma_hat"></a>}}
+\if{latex}{\out{\hypertarget{method-ExprModVar-sigma_hat}{}}}
 \subsection{Method \code{sigma_hat()}}{
 Return the estimated standard deviation of the distribution.
 \subsection{Usage}{
@@ -319,8 +319,8 @@ Standard deviation as a numeric value.
 }
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-q_hat"></a>}}
-\if{latex}{\out{\hypertarget{method-q_hat}{}}}
+\if{html}{\out{<a id="method-ExprModVar-q_hat"></a>}}
+\if{latex}{\out{\hypertarget{method-ExprModVar-q_hat}{}}}
 \subsection{Method \code{q_hat()}}{
 Return the estimated quantiles by sampling the variable.
 \subsection{Usage}{
@@ -346,8 +346,8 @@ Vector of quantiles.
 }
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-set"></a>}}
-\if{latex}{\out{\hypertarget{method-set}{}}}
+\if{html}{\out{<a id="method-ExprModVar-set"></a>}}
+\if{latex}{\out{\hypertarget{method-ExprModVar-set}{}}}
 \subsection{Method \code{set()}}{
 Sets the value of the \code{ExprModVar}.
 \subsection{Usage}{
@@ -392,7 +392,7 @@ to be re-evaluated at subsequent calls to \code{get}. Thus, after calling
 \code{set} has been called for one or more operands in the meantime;} 
 \item{\code{"value"}}{sets the value of the expression to be equal to 
 parameter \code{val}. This is not recommended for normal usage because it
-allows the model variable to be set to an implausible value, based on its 
+allows the model variable to be set to an implausible value, based on its
 defined uncertainty. An example of where this may be needed is in 
 threshold finding.} 
 }}
@@ -415,8 +415,8 @@ Updated \code{ExprModVar}.
 }
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-get"></a>}}
-\if{latex}{\out{\hypertarget{method-get}{}}}
+\if{html}{\out{<a id="method-ExprModVar-get"></a>}}
+\if{latex}{\out{\hypertarget{method-ExprModVar-get}{}}}
 \subsection{Method \code{get()}}{
 Gets the value of the \code{ExprModVar} that was set by the most recent
 call to \code{set()}.
@@ -429,8 +429,8 @@ Value determined by last \code{set()}.
 }
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-clone"></a>}}
-\if{latex}{\out{\hypertarget{method-clone}{}}}
+\if{html}{\out{<a id="method-ExprModVar-clone"></a>}}
+\if{latex}{\out{\hypertarget{method-ExprModVar-clone}{}}}
 \subsection{Method \code{clone()}}{
 The objects of this class are cloneable with this method.
 \subsection{Usage}{

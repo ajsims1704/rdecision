@@ -17,16 +17,16 @@ Andrew J. Sims \email{andrew.sims@newcastle.ac.uk}
 \section{Methods}{
 \subsection{Public methods}{
 \itemize{
-\item \href{#method-new}{\code{Edge$new()}}
-\item \href{#method-is_same_edge}{\code{Edge$is_same_edge()}}
-\item \href{#method-endpoints}{\code{Edge$endpoints()}}
-\item \href{#method-label}{\code{Edge$label()}}
-\item \href{#method-clone}{\code{Edge$clone()}}
+\item \href{#method-Edge-new}{\code{Edge$new()}}
+\item \href{#method-Edge-is_same_edge}{\code{Edge$is_same_edge()}}
+\item \href{#method-Edge-endpoints}{\code{Edge$endpoints()}}
+\item \href{#method-Edge-label}{\code{Edge$label()}}
+\item \href{#method-Edge-clone}{\code{Edge$clone()}}
 }
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-new"></a>}}
-\if{latex}{\out{\hypertarget{method-new}{}}}
+\if{html}{\out{<a id="method-Edge-new"></a>}}
+\if{latex}{\out{\hypertarget{method-Edge-new}{}}}
 \subsection{Method \code{new()}}{
 Create an object of type \code{Edge}.
 \subsection{Usage}{
@@ -49,8 +49,8 @@ A new \code{Edge} object.
 }
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-is_same_edge"></a>}}
-\if{latex}{\out{\hypertarget{method-is_same_edge}{}}}
+\if{html}{\out{<a id="method-Edge-is_same_edge"></a>}}
+\if{latex}{\out{\hypertarget{method-Edge-is_same_edge}{}}}
 \subsection{Method \code{is_same_edge()}}{
 Is this edge the same as the argument?
 \subsection{Usage}{
@@ -69,8 +69,8 @@ Is this edge the same as the argument?
 }
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-endpoints"></a>}}
-\if{latex}{\out{\hypertarget{method-endpoints}{}}}
+\if{html}{\out{<a id="method-Edge-endpoints"></a>}}
+\if{latex}{\out{\hypertarget{method-Edge-endpoints}{}}}
 \subsection{Method \code{endpoints()}}{
 Retrieve the endpoints of the edge.
 \subsection{Usage}{
@@ -82,8 +82,8 @@ List of two nodes to which the edge is connected.
 }
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-label"></a>}}
-\if{latex}{\out{\hypertarget{method-label}{}}}
+\if{html}{\out{<a id="method-Edge-label"></a>}}
+\if{latex}{\out{\hypertarget{method-Edge-label}{}}}
 \subsection{Method \code{label()}}{
 Access label.
 \subsection{Usage}{
@@ -95,8 +95,8 @@ Label of the edge; character string.
 }
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-clone"></a>}}
-\if{latex}{\out{\hypertarget{method-clone}{}}}
+\if{html}{\out{<a id="method-Edge-clone"></a>}}
+\if{latex}{\out{\hypertarget{method-Edge-clone}{}}}
 \subsection{Method \code{clone()}}{
 The objects of this class are cloneable with this method.
 \subsection{Usage}{

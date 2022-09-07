@@ -44,42 +44,67 @@ test_that("basic graph properties are set and got", {
   G <- Graph$new(V, E)
   expect_equal(G$order(), 0)
   expect_equal(G$size(), 0)
-  # 2 nodes and an edge
+  expect_equal(length(G$vertex_along()), 0)
+  expect_equal(length(G$edge_along()), 0)
+  # a graph with 2 nodes and an edge
   V <- list(n1,n2)
   E <- list(e1)
   G <- Graph$new(V, E)
   expect_equal(G$order(), length(V))
   expect_equal(G$size(), length(E))
+  expect_equal(length(G$vertex_along()), 2)
+  expect_equal(length(G$edge_along()), 1)
   # a graph with one node
   V <- list(n1)
   E <- list()
   G <- Graph$new(V, E)
   expect_equal(G$order(), 1)
   expect_equal(G$size(), 0)
+  expect_equal(length(G$vertex_along()), 1)
+  expect_equal(length(G$edge_along()), 0)
 })
 
 # tests of vertex and edge properties
 test_that("vertex and edge properties are set and got", {
+  # create graph
   n1 <- Node$new()
   n2 <- Node$new()
   n3 <- Node$new()
   e1 <- Edge$new(n1, n2)
-  G <- Graph$new(V=list(n1,n2), E=list(e1))
-  #
-  expect_error(G$has_vertex(42), class="invalid_vertex")
+  e2 <- Edge$new(n1, n3)
+  G <- Graph$new(V = list(n1, n2), E = list(e1))
+  # check that valid vertices in the graph are identified
+  expect_false(G$has_vertex(42))
   expect_true(G$has_vertex(n1))
   expect_true(G$has_vertex(n2))
-  expect_true(G$has_edge(e1))
   expect_false(G$has_vertex(n3))
-  #
-  expect_equal(G$vertex_index(n1),1)
-  expect_equal(G$vertex_index(n2),2)
-  expect_equal(G$edge_index(e1),1)
-  #
-  expect_error(G$edge_index(42), class="invalid_edge")
-  #
+  # check that valid edges in the graph are identified
+  expect_false(G$has_edge(42))
+  expect_true(G$has_edge(e1))
+  # tests of vertex indices
+  in1 <- G$vertex_index(n1)
+  expect_identical(G$vertex_at(in1), n1)
+  in2 <- G$vertex_index(n2)
+  expect_identical(G$vertex_at(in2), n2)
+  in3 <- G$vertex_index(n3)
+  expect_true(is.na(in3))
+  expect_error(G$vertex_at(in3), class = "invalid_index")
+  expect_error(G$vertex_at(42), class = "invalid_index")
+  expect_error(G$vertex_at("42"), class = "invalid_index")
+  expect_equal(length(G$vertex_along()), 2)
+  # tests of edge indexes
+  ie1 <- G$edge_index(e1)
+  expect_identical(G$edge_at(ie1), e1)
+  ie2 <- G$edge_index(e2)
+  expect_true(is.na(ie2))
+  ie3 <- G$edge_index(42)
+  expect_true(is.na(ie3))
+  expect_error(G$edge_at(42), class = "invalid_index")
+  expect_error(G$edge_at("42"), class = "invalid_index")
+  expect_error(G$edge_at(ie2), class = "invalid_index")
+  # tests of degree function
   expect_error(G$degree(42), class="invalid_vertex")
-  expect_error(G$degree(n3), class="not_in_graph")
+  expect_error(G$degree(n3), class="invalid_vertex")
   expect_error(G$degree(e1), class="invalid_vertex")
   expect_equal(G$degree(n1), 1)
 })
@@ -101,13 +126,17 @@ test_that("adjacency matrix has correct properties", {
   expect_equal(nrow(A),1)
   expect_equal(ncol(A),1)
   expect_equal(A[1,1],0)
-  # named nodes
+  # graph with some labelled nodes should have indices as labels
   n1 <- Node$new("n1")
   n2 <- Node$new()
   e1 <- Edge$new(n1,n2)
   G <- Graph$new(V=list(n1,n2),E=list(e1))
   A <- G$graph_adjacency_matrix()
-  expect_null(dimnames(A)) 
+  dn <- dimnames(A)
+  expect_setequal(names(dn), c("out.node", "in.node"))
+  expect_setequal(dn$out.node, as.character(G$vertex_along()))
+  expect_setequal(dn$in.node, as.character(G$vertex_along()))
+  # graph with all nodes named should have node names as labels
   n1 <- Node$new("n1")
   n2 <- Node$new("n2")
   e1 <- Edge$new(n1,n2)

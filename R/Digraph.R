@@ -174,7 +174,7 @@ Digraph <- R6::R6Class(
       L <- Stack$new()
       # S is a stack of all vertexes with no incoming edge
       S <- Stack$new()
-      for (n in 1:ncol(AA)) {
+      for (n in seq_len(ncol(AA))) {
         if (sum(AA[,n])==0) {
           S$push(n)
         }
@@ -275,15 +275,15 @@ Digraph <- R6::R6Class(
     #' @return A list of nodes or an empty list if the specified
     #' node has no successors.
     direct_successors = function(v) {
-      successors <- list()
-      if (self$has_vertex(v)) {
-        AA <- self$digraph_adjacency_matrix(boolean=TRUE)
-        iv <- self$vertex_index(v)
-        iw <- which(AA[iv,],arr.ind=TRUE)
-        successors <- private$V[iw]
-      } else {
-        rlang::abort("Argument 'v' is not in graph", class="not_in_graph")
-      }
+      iv <- self$vertex_index(v)
+      abortifnot(
+        !is.na(iv),
+        message = "Argument 'v' is not in graph", 
+        class = "not_in_graph"
+      )
+      AA <- self$digraph_adjacency_matrix()
+      iw <- which(AA[iv, ] >= 1, arr.ind = TRUE)
+      successors <- private$V[iw]
       return(successors)
     },
       
@@ -292,15 +292,15 @@ Digraph <- R6::R6Class(
     #' @return A list of nodes or an empty list if the specified
     #' node has no predecessors.
     direct_predecessors = function(v) {
-      pred <- list()
-      if (self$has_vertex(v)) {
-        AA <- self$digraph_adjacency_matrix(boolean=TRUE)
-        iv <- self$vertex_index(v)
-        iw <- which(AA[,iv],arr.ind=TRUE)
-        pred <- private$V[iw]
-      } else {
-        rlang::abort("Argument 'v' is not in graph", class="not_in_graph")
-      }
+      iv <- self$vertex_index(v)
+      abortifnot(
+        !is.na(iv),
+        message = "Argument 'v' is not in graph", 
+        class = "not_in_graph"
+      )
+      AA <- self$digraph_adjacency_matrix()
+      iw <- which(AA[, iv] >= 1, arr.ind = TRUE)
+      pred <- private$V[iw]
       return(pred)
     },
 
@@ -353,22 +353,26 @@ Digraph <- R6::R6Class(
     
     #' @description Sequence of edges which join the specified path.
     #' @param P A list of Nodes
-    #' @return A list of Edges
-    walk = function(P) {
+    #' @param what One of "edge" or "index".
+    #' @return A list of Edges for \code{what = "edge"} or a list of Edge
+    #' indices for \code{what = "index"}.
+    walk = function(P, what = "edge") {
+      # check 'what' argument
+      abortifnot(
+        what %in% c("edge", "index"),
+        message = "'what' must be one of 'edge' or 'index'",
+        class = "invalid_argument"
+      )
       # check vertexes and get index of each
-      p <- vapply(X=P, FUN.VALUE=1, FUN=function(n) {
-        # get the vertex indexes
-        index <- self$vertex_index(n)
-        # reject if vertex is not in the graph
-        if (is.na(index)) {
-          rlang::abort(
-            "At least one Node is not in graph", 
-            class="not_in_graph"
-          )
-        }
-        return(index)
-      })
+      p <- vapply(X = P, FUN.VALUE = 1, FUN = function(n) self$vertex_index(n))
+      # check all the vertices are in the graph
+      abortifnot(
+        all(!is.na(p)),
+        message = "At least one node is not in graph",
+        class = "not_in_graph"
+      )
       # loop through the ordered vertexes
+      W <- list()
       if (length(P) > 1) {
         pairs <- data.frame(
           s = p[1:(length(P)-1)],
@@ -378,20 +382,20 @@ Digraph <- R6::R6Class(
         W <- apply(pairs, MARGIN=1, function(r) {
           # look for edges leaving s and entering t
           e <- which((B[r[1],]==-1) & (B[r[2],]==1), arr.ind=TRUE)
-          if (length(e)>=1) {
-            return(e[1])
-          } else {
-            rlang::abort("There must be an edge between adjacent nodes in 'P'",
-                         class="missing_edge")
-          }
+          abortifnot(
+            length(e) >= 1,
+            message = "There must be an edge between adjacent nodes in 'P'",
+            class = "missing_edge"
+          )
+          return(e[1])
         })
-      } else {
-        W <- list()
       }
-      # convert edge indices into edges before returning
-      E <- lapply(W, function(e){private$E[[e]]})
+      # convert edge indices into edges, if required
+      if (what == "edge") {
+        W <- lapply(W, function(ie) self$edge_at(ie))
+      }
       # return the walk 
-      return(E)
+      return(W)
     },
     
     #' @description Exports the digraph in DOT notation.

@@ -24,26 +24,26 @@ Andrew J. Sims \email{andrew.sims@newcastle.ac.uk}
 \section{Methods}{
 \subsection{Public methods}{
 \itemize{
-\item \href{#method-new}{\code{MarkovState$new()}}
-\item \href{#method-name}{\code{MarkovState$name()}}
-\item \href{#method-set_cost}{\code{MarkovState$set_cost()}}
-\item \href{#method-cost}{\code{MarkovState$cost()}}
-\item \href{#method-utility}{\code{MarkovState$utility()}}
-\item \href{#method-modvars}{\code{MarkovState$modvars()}}
-\item \href{#method-clone}{\code{MarkovState$clone()}}
+\item \href{#method-MarkovState-new}{\code{MarkovState$new()}}
+\item \href{#method-MarkovState-name}{\code{MarkovState$name()}}
+\item \href{#method-MarkovState-set_cost}{\code{MarkovState$set_cost()}}
+\item \href{#method-MarkovState-cost}{\code{MarkovState$cost()}}
+\item \href{#method-MarkovState-utility}{\code{MarkovState$utility()}}
+\item \href{#method-MarkovState-modvars}{\code{MarkovState$modvars()}}
+\item \href{#method-MarkovState-clone}{\code{MarkovState$clone()}}
 }
 }
-\if{html}{
-\out{<details open ><summary>Inherited methods</summary>}
-\itemize{
-\item \out{<span class="pkg-link" data-pkg="rdecision" data-topic="Node" data-id="label">}\href{../../rdecision/html/Node.html#method-label}{\code{rdecision::Node$label()}}\out{</span>}
-\item \out{<span class="pkg-link" data-pkg="rdecision" data-topic="Node" data-id="type">}\href{../../rdecision/html/Node.html#method-type}{\code{rdecision::Node$type()}}\out{</span>}
-}
-\out{</details>}
-}
+\if{html}{\out{
+<details open><summary>Inherited methods</summary>
+<ul>
+<li><span class="pkg-link" data-pkg="rdecision" data-topic="Node" data-id="label"><a href='../../rdecision/html/Node.html#method-Node-label'><code>rdecision::Node$label()</code></a></span></li>
+<li><span class="pkg-link" data-pkg="rdecision" data-topic="Node" data-id="type"><a href='../../rdecision/html/Node.html#method-Node-type'><code>rdecision::Node$type()</code></a></span></li>
+</ul>
+</details>
+}}
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-new"></a>}}
-\if{latex}{\out{\hypertarget{method-new}{}}}
+\if{html}{\out{<a id="method-MarkovState-new"></a>}}
+\if{latex}{\out{\hypertarget{method-MarkovState-new}{}}}
 \subsection{Method \code{new()}}{
 Create an object of type \code{MarkovState}.
 \subsection{Usage}{
@@ -73,8 +73,8 @@ An object of type \code{MarkovState}.
 }
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-name"></a>}}
-\if{latex}{\out{\hypertarget{method-name}{}}}
+\if{html}{\out{<a id="method-MarkovState-name"></a>}}
+\if{latex}{\out{\hypertarget{method-MarkovState-name}{}}}
 \subsection{Method \code{name()}}{
 Accessor function to retrieve the state name.
 \subsection{Usage}{
@@ -86,8 +86,8 @@ State name.
 }
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-set_cost"></a>}}
-\if{latex}{\out{\hypertarget{method-set_cost}{}}}
+\if{html}{\out{<a id="method-MarkovState-set_cost"></a>}}
+\if{latex}{\out{\hypertarget{method-MarkovState-set_cost}{}}}
 \subsection{Method \code{set_cost()}}{
 Set the annual occupancy cost
 \subsection{Usage}{
@@ -103,8 +103,8 @@ Set the annual occupancy cost
 }
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-cost"></a>}}
-\if{latex}{\out{\hypertarget{method-cost}{}}}
+\if{html}{\out{<a id="method-MarkovState-cost"></a>}}
+\if{latex}{\out{\hypertarget{method-MarkovState-cost}{}}}
 \subsection{Method \code{cost()}}{
 Gets the annual cost of state occupancy.
 \subsection{Usage}{
@@ -116,17 +116,12 @@ Annual cost; numeric.
 }
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-utility"></a>}}
-\if{latex}{\out{\hypertarget{method-utility}{}}}
+\if{html}{\out{<a id="method-MarkovState-utility"></a>}}
+\if{latex}{\out{\hypertarget{method-MarkovState-utility}{}}}
 \subsection{Method \code{utility()}}{
 Gets the utility associated with the state.
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{MarkovState$utility()}\if{html}{\out{</div>}}
-}
-
-\subsection{Details}{
-If the state utility is a \code{ModVar} and its sampled
-value exceeds 1, a warning is issued.
 }
 
 \subsection{Returns}{
@@ -134,8 +129,8 @@ Utility; numeric.
 }
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-modvars"></a>}}
-\if{latex}{\out{\hypertarget{method-modvars}{}}}
+\if{html}{\out{<a id="method-MarkovState-modvars"></a>}}
+\if{latex}{\out{\hypertarget{method-MarkovState-modvars}{}}}
 \subsection{Method \code{modvars()}}{
 Find all the model variables.
 \subsection{Usage}{
@@ -153,8 +148,8 @@ A list of \code{ModVar}s.
 }
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-clone"></a>}}
-\if{latex}{\out{\hypertarget{method-clone}{}}}
+\if{html}{\out{<a id="method-MarkovState-clone"></a>}}
+\if{latex}{\out{\hypertarget{method-MarkovState-clone}{}}}
 \subsection{Method \code{clone()}}{
 The objects of this class are cloneable with this method.
 \subsection{Usage}{

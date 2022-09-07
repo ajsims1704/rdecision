@@ -29,7 +29,7 @@ test_that("ExprModVar obeys scoping rules" , {
   expect_identical(z$distribution(), "x + y")
   expect_intol(z$mean(), 5, 0.1)
   # operands in different function environments
-  f = function() {
+  f <- function() {
     y <- 4
     z <- ExprModVar$new("z", "Z", quo=rlang::quo(x+y))
     expect_intol(z$mean(), 6, 0.1)
@@ -266,7 +266,7 @@ test_that("expression chi square from SN is correct", {
   tol <- 3.29*sqrt(2*k)/sqrt(1000)
   expect_equal(y$mean(), 0)          # product of operand means is 0
   expect_intol(y$mu_hat(), k, tol)  # true mean is k=1
-  median <- k*(1-2/(9*k))^3
+  median <- k * (1 - 2 / (9 * k)) ^ 3
   expect_intol(y$q_hat(p=0.5), median, tol)
   # generate a distribution and check it
   n <- 1000
@@ -292,7 +292,7 @@ test_that("one Dirichlet matches a Beta and an expression", {
   p.d <- ModVar$new("P(success)", "P", D=D, k=as.integer(1))
   q.d <- ModVar$new("P(failure)", "P", D=D, k=as.integer(2))
   # tolerance is 3.29 standard errors (approx 0.1%)
-  sd <- sqrt((alpha*beta)/((alpha+beta)^2 * (alpha+beta+1)))
+  sd <- sqrt( (alpha * beta) / ( (alpha + beta) ^ 2 * (alpha + beta + 1) ) )
   tol <- 3.29 * sd / sqrt(1000)
   # compare means
   expect_equal(p$mean(), p.d$mean())

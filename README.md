@@ -16,7 +16,7 @@ models) which can be constructed using only a few lines of R code.
 Mechanisms are provided for associating an uncertainty distribution with
 each source variable and for ensuring transparency of the mathematical
 relationships between variables. The package terminology follows Briggs
-*et al* “Decision Modelling for Health Economic Evaluation”.<sup>1</sup>
+*et al* “Decision Modelling for Health Economic Evaluation”<sup>1</sup>.
 
 ## Installation
 
@@ -112,7 +112,7 @@ evaluation of the tree, each time sampling from the uncertainty
 distribution of the two probabilities using, for example,
 `DT$evaluate(setvars="random", N=1000)` and inspecting the resulting
 data frame. From 1000 runs, the 95% confidence interval of the per
-patient cost saving is -473.76 GBP to 909.83 GBP, with 73.9% being cost
+patient cost saving is -529.95 GBP to 1006.12 GBP, with 71.6% being cost
 saving, and it can be concluded that more evidence is required to be
 confident that the exercise programme is cost saving.
 
@@ -156,7 +156,7 @@ M$set_probabilities(Pt)
 
 With a starting population of 10,000, the model can be run for 25 years
 as follows. The output of the `cycles` function is the Markov trace,
-shown below, which replicates Table 2.<sup>2</sup>
+shown below, which replicates Table 2<sup>2</sup>.
 
 ``` r
 # set the starting populations
@@ -177,26 +177,26 @@ MT <- M$cycles(25, hcc.pop=FALSE, hcc.cost=FALSE)
 
 # Acknowledgements
 
-In addition to using base R,<sup>3</sup> `redecision` relies heavily on
+In addition to using base R<sup>3</sup>, `redecision` relies heavily on
 the `R6` implementation of classes<sup>4</sup> and the `rlang` package
 for error handling and non-standard evaluation used in expression model
-variables.<sup>5</sup> Building the package vignettes and documentation
-relies on the `testthat` package,<sup>6</sup> the `devtools`
-package<sup>7</sup> and `rmarkdown`.<sup>10</sup>
+variables<sup>5</sup>. Building the package vignettes and documentation
+relies on the `testthat` package<sup>6</sup>, the `devtools`
+package<sup>7</sup> and `rmarkdown`<sup>10</sup>.
 
 Underpinning graph theory is based on terminology, definitions and
-algorithms from Gross *et al*,<sup>11</sup> the Wikipedia
+algorithms from Gross *et al*<sup>11</sup>, the Wikipedia
 glossary<sup>12</sup> and links therein. Topological sorting of graphs
-is based on Kahn’s algorithm.<sup>13</sup> Some of the terminology for
+is based on Kahn’s algorithm<sup>13</sup>. Some of the terminology for
 decision trees was based on the work of Kaminski *et al*<sup>14</sup>
 and an efficient tree drawing algorithm was based on the work of
-Walker.<sup>15</sup> In semi-Markov models, representations are exported
-in the DOT language.<sup>16</sup>
+Walker<sup>15</sup>. In semi-Markov models, representations are exported
+in the DOT language<sup>16</sup>.
 
 Terminology for decision trees and Markov models in health economic
 evaluation was based on the book by Briggs *et al*<sup>1</sup> and the
 output format and terminology follows ISPOR
-recommendations.<sup>18</sup>
+recommendations<sup>18</sup>.
 
 Citations for examples used in vignettes are given in applicable
 vignette files.
@@ -217,9 +217,10 @@ Press, 2006).</span>
 <div id="ref-sonnenberg1993" class="csl-entry">
 
 <span class="csl-left-margin">2. </span><span
-class="csl-right-inline">Sonnenberg, F. A. & Beck, J. R. Markov Models
-in Medical Decision Making: A Practical Guide. *Medical Decision Making*
-**13,** 322–338 (1993).</span>
+class="csl-right-inline">Sonnenberg, F. A. & Beck, J. R. [Markov Models
+in Medical Decision Making: A Practical
+Guide](https://doi.org/10.1177/0272989X9301300409). *Medical Decision
+Making* **13,** 322–338 (1993).</span>
 
 </div>
 
@@ -253,7 +254,8 @@ base types and core r and ’tidyverse’ features*. (2020). at
 <div id="ref-wickham2011" class="csl-entry">
 
 <span class="csl-left-margin">6. </span><span
-class="csl-right-inline">Wickham, H. Testthat: Get started with testing.
+class="csl-right-inline">Wickham, H. [Testthat: Get started with
+testing](https://journal.r-project.org/archive/2011-1/RJournal_2011-1_Wickham.pdf).
 *The R Journal* **3,** 5–10 (2011).</span>
 
 </div>
@@ -316,16 +318,18 @@ class="csl-right-inline">Wikipedia. Glossary of graph theory.
 <div id="ref-kahn1962" class="csl-entry">
 
 <span class="csl-left-margin">13. </span><span
-class="csl-right-inline">Kahn, A. B. Topological sorting of large
-networks. *Communications of the ACM* **5,** 558–562 (1962).</span>
+class="csl-right-inline">Kahn, A. B. [Topological sorting of large
+networks](https://doi.org/10.1145/368996.369025). *Communications of the
+ACM* **5,** 558–562 (1962).</span>
 
 </div>
 
 <div id="ref-kaminski2018" class="csl-entry">
 
 <span class="csl-left-margin">14. </span><span
-class="csl-right-inline">Kamiński, B., Jakubczyk, M. & Szufel, P. A
-framework for sensitivity analysis of decision trees. *Central European
+class="csl-right-inline">Kamiński, B., Jakubczyk, M. & Szufel, P. [A
+framework for sensitivity analysis of decision
+trees](https://doi.org/10.1007/s10100-017-0479-6). *Central European
 Journal of Operational Research* **26,** 135–159 (2018).</span>
 
 </div>
@@ -343,7 +347,8 @@ general trees*. (University of North Carolina, 1989). at
 
 <span class="csl-left-margin">16. </span><span
 class="csl-right-inline">Gansner, E. R., Koutsofios, E., North, S. C. &
-Vo, K.-P. A technique for drawing directed graphs. *IEEE Transactions on
+Vo, K.-P. [A technique for drawing directed
+graphs](https://doi.org/10.1109/32.221135). *IEEE Transactions on
 Software Engineering* **19,** 214–230 (1993).</span>
 
 </div>
@@ -352,10 +357,11 @@ Software Engineering* **19,** 214–230 (1993).</span>
 
 <span class="csl-left-margin">17. </span><span
 class="csl-right-inline">Briggs, A. H., Weinstein, M. C., Fenwick, E. A.
-L., Karnon, J., Sculpher, M. J. & Paltiel, A. D. Model Parameter
+L., Karnon, J., Sculpher, M. J. & Paltiel, A. D. [Model Parameter
 Estimation and Uncertainty: A Report of the ISPOR-SMDM Modeling Good
-Research Practices Task Force-6. *Value in Health* **15,** 835–842
-(2012).</span>
+Research Practices Task
+Force-6](https://doi.org/10.1016/j.jval.2012.04.014). *Value in Health*
+**15,** 835–842 (2012).</span>
 
 </div>
 
@@ -363,9 +369,10 @@ Research Practices Task Force-6. *Value in Health* **15,** 835–842
 
 <span class="csl-left-margin">18. </span><span
 class="csl-right-inline">Siebert, U., Alagoz, O., Bayoumi, A. M., Jahn,
-B., Owens, D. K., Cohen, D. J. & Kuntz, K. M. State-Transition Modeling:
-A Report of the ISPOR-SMDM Modeling Good Research Practices Task
-Force-3. *Value in Health* **15,** 812–820 (2012).</span>
+B., Owens, D. K., Cohen, D. J. & Kuntz, K. M. [State-Transition
+Modeling: A Report of the ISPOR-SMDM Modeling Good Research Practices
+Task Force-3](https://doi.org/10.1016/j.jval.2012.06.014). *Value in
+Health* **15,** 812–820 (2012).</span>
 
 </div>
 

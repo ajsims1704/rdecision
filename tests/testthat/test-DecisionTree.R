@@ -79,59 +79,157 @@ test_that("arborescences that are not decision trees are rejected", {
   expect_error(DT$evaluate(N="forty two"), class = "N_not_numeric")
   expect_error(DT$evaluate(by=42), class = "by_not_character")
   expect_error(DT$evaluate(by="forty two"), class = "by_invalid")
-  # tornado
-  expect_null(DT$tornado(index=list(e1),ref=list(e4)))
+  # tornado with no model variables
+  pdf(file = NULL)
+  expect_null(DT$tornado(index=list(e1), ref=list(e4)))
+  dev.off()
 })
 
 # tests of basic tree properties (Kaminski et al CEJOR 2018;26:135-139, fig 1)
 test_that("simple decision trees are modelled correctly", {
-  # nodes & edges
+  # nodes and edges
   d1 <- DecisionNode$new("d1")
   c1 <- ChanceNode$new("c1")
   t1 <- LeafNode$new("t1")
   t2 <- LeafNode$new("t2")
   t3 <- LeafNode$new("t3")
-  e1 <- Action$new(d1,c1,benefit=10,label="e1")
-  e2 <- Reaction$new(c1,t1,p=0.75,benefit=20,label="e2")
-  e3 <- Reaction$new(c1,t2,p=0.25,label="e3")
-  e4 <- Action$new(d1,t3,benefit=20,label="e4")
+  e1 <- Action$new(d1, c1, benefit = 10, label = "e1")
+  e2 <- Reaction$new(c1, t1, p = 0.75, cost = 42, benefit = 20, label = "e2")
+  e3 <- Reaction$new(c1, t2, p = 0.25, label = "e3")
+  e4 <- Action$new(d1, t3, benefit = 20, label = "e4")
   # tree
-  V <- list(d1,c1,t1,t2,t3)
-  E <- list(e1,e2,e3,e4)
-  expect_silent(DT <- DecisionTree$new(V,E))
+  V <- list(d1, c1, t1, t2, t3)
+  E <- list(e1, e2, e3, e4)
+  expect_silent(DT <- DecisionTree$new(V, E))
   # properties
   A <- DT$actions(d1)
-  expect_setequal(sapply(A,function(a){a$label()}),c("e1","e4"))
+  expect_setequal(
+    sapply(A, function(a) {
+      a$label()
+    }),
+    c("e1", "e4")
+  )
   expect_setequal(DT$decision_nodes("label"), c("d1"))
+  # edge property matrix
+  ep <- DT$edge_properties()
+  expect_equal(nrow(ep), 4)
+  expect_equal(ncol(ep), 4)
+  expect_true(is.matrix(ep))
+  expect_setequal(colnames(ep), c("index", "probability", "cost", "benefit"))
+  expect_setequal(rownames(ep), c("e1", "e2", "e3", "e4"))
+  expect_equal(ep["e1", "probability"], 1)
+  expect_intol(ep["e2", "cost"], 42, 0.1)
+  expect_intol(ep["e3", "probability"], 0.25, 0.01)
+  expect_intol(ep[4, "benefit"], 20, 0.1)
   # draw it
   pdf(NULL)
-  expect_silent(DT$draw(border=TRUE))
+  expect_silent(DT$draw(border = TRUE))
   dev.off()
   # strategy validity
-  expect_false(DT$is_strategy(list(e2,e3)))
+  expect_false(DT$is_strategy(list(e2, e3)))
   expect_false(DT$is_strategy(list()))
-  expect_false(DT$is_strategy(list(e1,e4)))
+  expect_false(DT$is_strategy(list(e1, e4)))
   # strategy paths
   P <- DT$root_to_leaf_paths()
-  expect_length(P,3)
+  expect_length(P, 3)
   expect_false(DT$is_strategy(list(e2)))
-  expect_false(DT$is_strategy(list(e1,e4)))
+  expect_false(DT$is_strategy(list(e1, e4)))
   PS <- DT$strategy_paths()
-  expect_equal(nrow(PS),3)
+  expect_equal(nrow(PS), 3)
   # strategies
-  expect_error(DT$strategy_table(42), class="unknown_what_value")
+  expect_error(DT$strategy_table(42), class = "unknown_what_value")
   expect_error(
-    DT$strategy_table(select=list(e2,e3)), class="invalid_strategy"
+    DT$strategy_table(select = list(e2, e3)), class = "invalid_strategy"
   )
   S <- DT$strategy_table()
-  expect_equal(nrow(S),2)
-  expect_setequal(rownames(S), c("e1","e4"))
-  S <- DT$strategy_table("label", select=list(e1))
-  expect_identical(S$d1[1],"e1")
+  expect_equal(nrow(S), 2)
+  expect_setequal(rownames(S), c("e1", "e4"))
+  S <- DT$strategy_table("label", select = list(e1))
+  expect_identical(S$d1[1], "e1")
   expect_setequal(rownames(S), c("e1"))
+  # evaluate valid walks
+  paths <- DT$root_to_leaf_paths()
+  walks <- sapply(X = paths, FUN = function(p) DT$walk(p))
+  expect_equal(length(walks), 3)
+  result <- DT$evaluate_walks(walks)
+  expect_equal(nrow(result), 3)
+  # invalid walks should fail gracefully
+  walks <- list()
+  result <- DT$evaluate_walks(walks)
+  expect_equal(nrow(result), 0)
+  expect_error(DT$evaluate_walks(paths))  
   # evaluations
-  RES <- DT$evaluate(by="path")
-  expect_intol(RES[RES$Leaf=="t1","Benefit"], 22.5, 0.05)
+  RES <- DT$evaluate(by = "path")
+  expect_intol(RES[RES$Leaf == "t1", "Benefit"], 22.5, 0.05)
+})
+
+# test with utility > 1
+test_that("decision trees with utility > 1 are supported", {
+  # fictitious scenario
+  u_normdel <- ConstModVar$new("Utility for pregancy", "", const = 2)
+  u_miscarriage <- 0.8
+  c_normdel <- 100
+  c_miscarriage <- 1000
+  p_miscarriage_notest <- 0.010
+  p_miscarriage_test <- 0.005
+  c_test <- 50
+  # construct model
+  ta1 <- LeafNode$new(label = "normdelivery", utility = u_normdel)
+  ta2 <- LeafNode$new(label = "miscarriage", utility = u_miscarriage)
+  ca <- ChanceNode$new()
+  ra1 <- Reaction$new(
+    source = ca, 
+    target = ta1, 
+    p = 1 - p_miscarriage_notest, 
+    cost = c_normdel
+  )
+  ra2 <- Reaction$new(
+    source = ca, 
+    target = ta2, 
+    p = p_miscarriage_notest,
+    cost = c_miscarriage
+  )
+  tb1 <- LeafNode$new(label = "normdelivery", utility = u_normdel)
+  tb2 <- LeafNode$new(label = "miscarriage", utility = u_miscarriage)
+  cb <- ChanceNode$new()
+  rb1 <- Reaction$new(
+    source = cb, 
+    target = tb1, 
+    p = 1 - p_miscarriage_test, 
+    cost = c_normdel
+  )
+  rb2 <- Reaction$new(
+    source = cb, 
+    target = tb2, 
+    p = p_miscarriage_test, 
+    cost = c_miscarriage
+  )
+  d1 <- DecisionNode$new("PE")
+  a1 <- Action$new(source = d1, target = ca, cost = 0, label = "notest")
+  a2 <- Action$new(source = d1, target = cb, cost = c_test, label = "PEtest")
+  dt <- DecisionTree$new(
+    V = list(d1, ca, cb, ta1, ta2, tb1, tb2),
+    E = list(a1, a2, ra1, ra2, rb1, rb2)
+  )
+  # evaluate it
+  ev <- dt$evaluate()
+  cn <- ev$Cost[ev$PE == "notest"]
+  ct <- ev$Cost[ev$PE == "PEtest"]
+  un <- ev$QALY[ev$PE == "notest"]
+  ut <- ev$QALY[ev$PE == "PEtest"]
+  oicer <- (ct - cn) / (ut - un)
+  cn <- c_normdel * (1 - p_miscarriage_notest) + 
+        c_miscarriage * p_miscarriage_notest
+  ct <- c_normdel * (1 - p_miscarriage_test) + 
+        c_miscarriage * p_miscarriage_test + 
+        c_test
+  un <- u_normdel$get() * (1 - p_miscarriage_notest) +
+        u_miscarriage * p_miscarriage_notest
+  ut <- u_normdel$get() * (1 - p_miscarriage_test) +
+        u_miscarriage * p_miscarriage_test
+  eicer <- (ct - cn) / (ut - un)
+  expect_intol(oicer, eicer, 100)
+  expect_true(TRUE)
 })
 
 # Evans et al, Pharmacoeconomics, 1997;12:565-577, Sumatriptan for migraine
@@ -230,7 +328,7 @@ test_that("rdecision replicates Evans et al, Sumatriptan base case", {
   # check ICER
   q.Sumatriptan <- RES$QALY.Sumatriptan[1]
   q.Caffeine <- RES$QALY.Caffeine[1]
-  ICER <- (c.Sumatriptan-c.Caffeine)/(q.Sumatriptan-q.Caffeine)
+  ICER <- (c.Sumatriptan-c.Caffeine) / (q.Sumatriptan-q.Caffeine)
   expect_intol(ICER, 29366, tol=100)
   # check parameters of threshold function
   expect_error(
@@ -364,13 +462,13 @@ test_that("rdecision replicates Kaminski et al, fig 7", {
     Reaction$new(c2,d2,p=p.ntest,label="negative"),
     Action$new(d2,t4,"sell",benefit=600),
     Action$new(d2,c3,"dig",cost=300),
-    Reaction$new(c3,t5,p=p.gas.ntest,benefit=2500,label="gas"),
-    Reaction$new(c3,t6,p=(1-p.gas.ntest),label="no gas"),
+    Reaction$new(c3, t5, p = p.gas.ntest, benefit = 2500, label = "gas"),
+    Reaction$new(c3, t6, p = (1 - p.gas.ntest), label = "no gas"),
     Reaction$new(c2,d3,p=p.ptest,label="positive"),
     Action$new(d3,t7,"sell",benefit=1000),
     Action$new(d3,c4,"dig",cost=300),
     Reaction$new(c4,t8,p=p.gas.ptest,benefit=2500,label="gas"),
-    Reaction$new(c4,t9,p=(1-p.gas.ptest),label="no gas")
+    Reaction$new(c4, t9, p = (1 - p.gas.ptest), label = "no gas")
   )
   # tree
   V <- list(d1,d2,d3, c1,c2,c3,c4, t1,t2,t3,t4,t5,t6,t7,t8,t9)
@@ -397,7 +495,7 @@ test_that("rdecision replicates Kaminski et al, fig 7", {
   expect_equal(sum(S$d.2=="sell"),6)
   expect_equal(sum(S$d3=="sell"),6)
   # single strategy
-  s <- list(E[[1]], E[[7]], E[[12]]) # sell/sell/sell
+  s <- list(E[[1]], E[[7]], E[[12]]) # sell sell sell
   expect_true(DT$is_strategy(s))
   S <- DT$strategy_table("label", select=s)
   expect_equal(nrow(S),1)
@@ -408,9 +506,14 @@ test_that("rdecision replicates Kaminski et al, fig 7", {
   expect_false(DT$is_strategy(list(E[[1]],E[[5]],E[[7]])))
   # evaluate all root-to-leaf paths
   P <- DT$root_to_leaf_paths()
-  W <- sapply(P,function(p){DT$walk(p)})
+  W <- sapply(
+    P,
+    function(p) {
+      DT$walk(p)
+    }
+  )
   expect_length(W,9)
-  WX <- sapply(P,function(p){
+  WX <- sapply(P,function(p) {
     pp <- p
     if (length(pp)>2) {
       pp[[length(pp)]] <- NULL
@@ -484,7 +587,7 @@ test_that("redecision replicates Jenks et al, 2016", {
   
   # clinical variables
   r.CRBSI <- NormModVar$new(
-    'Baseline CRBSI rate', '/1000 catheter days', mu=1.48, sigma=0.074
+    "Baseline CRBSI rate", "/1000 catheter days", mu=1.48, sigma=0.074
   )
   hr.CRBSI <- LogNormModVar$new(
     "Tegaderm CRBSI HR", "HR", p1=-0.911, p2=0.393, "LN1"
@@ -493,23 +596,23 @@ test_that("redecision replicates Jenks et al, 2016", {
     "Tegaderm LSI HR", "HR", p1=-0.911, p2=0.393, "LN1"
   )
   r.Dermatitis <- NormModVar$new(
-    'Baseline dermatitis risk', '/catheter', mu=0.0026, sigma=0.00026
+    "Baseline dermatitis risk", "/catheter", mu=0.0026, sigma=0.00026
   )
   rr.Dermatitis <- LogNormModVar$new(
     "Tegaderm Dermatitis RR", "RR", p1=1.482, p2=0.490, "LN1"
   )
   # cost variables
   c.CRBSI <- GammaModVar$new(
-    'CRBSI cost', 'GBP', shape=198.0, scale=50
+    "CRBSI cost", "GBP", shape=198.0, scale=50
   )
   c.Dermatitis <- GammaModVar$new(
-    'Dermatitis cost', 'GBP', shape=30, scale=5
+    "Dermatitis cost", "GBP", shape=30, scale=5
   )
   c.LSI <- GammaModVar$new(
-    'LSI cost', 'GBP', shape=50, scale=5
+    "LSI cost", "GBP", shape=50, scale=5
   )
   n.catheters <- NormModVar$new(
-    'No. catheters', 'catheters', mu=3, sigma=0.3 
+    "No. catheters", "catheters", mu=3, sigma=0.3 
   )
   c.Tegaderm <- ExprModVar$new(
     "Tegaderm CHG cost", "GBP", rlang::quo(6.21*n.catheters)
@@ -518,48 +621,48 @@ test_that("redecision replicates Jenks et al, 2016", {
     "Standard dressing cost", "GBP", rlang::quo(1.34*n.catheters)
   )
   n.cathdays <- NormModVar$new(
-    'No. days with catheter', 'days', mu=10, sigma=2
+    "No. days with catheter", "days", mu=10, sigma=2
   )  
   # probabilities
   p.Dermatitis.S <- ExprModVar$new(
-    'P(dermatitis|standard dressing)', 'P', 
+    "P(dermatitis|standard dressing)", "P", 
     rlang::quo(r.Dermatitis*n.catheters)
   )
   q.Dermatitis.S <- ExprModVar$new(
-    'Q(dermatitis|standard dressing)', '1-P', 
+    "Q(dermatitis|standard dressing)", "1-P", 
     rlang::quo(1-p.Dermatitis.S)
   )
   p.Dermatitis.T <- ExprModVar$new(
-    'P(dermatitis|Tegaderm)', 'P', 
+    "P(dermatitis|Tegaderm)", "P", 
     rlang::quo(r.Dermatitis*rr.Dermatitis*n.catheters)
   )
   q.Dermatitis.T <- ExprModVar$new(
-    'Q(dermatitis|Tegaderm)', '1-P', 
+    "Q(dermatitis|Tegaderm)", "1-P", 
     rlang::quo(1-p.Dermatitis.T)
   )
   p.LSI.S <- NormModVar$new(
-    'P(LSI|Standard)', '/patient', mu=0.1, sigma=0.01 
+    "P(LSI|Standard)", "/patient", mu=0.1, sigma=0.01 
   )
   q.LSI.S <- ExprModVar$new(
-    'Q(LSI|Standard)', '1-P', rlang::quo(1-p.LSI.S) 
+    "Q(LSI|Standard)", "1-P", rlang::quo(1-p.LSI.S) 
   )
   p.LSI.T <- ExprModVar$new(
-    'P(LSI|Tegaderm)', 'P', rlang::quo(1-(1-p.LSI.S)^hr.LSI)
+    "P(LSI|Tegaderm)", "P", rlang::quo(1 - (1 - p.LSI.S) ^ hr.LSI)
   )
   q.LSI.T <- ExprModVar$new(
-    'Q(LSI|Tegaderm)', '1-P', rlang::quo(1-p.LSI.T)
+    "Q(LSI|Tegaderm)", "1-P", rlang::quo(1-p.LSI.T)
   )
   p.CRBSI.S <- ExprModVar$new(
-    'P(CRBSI|standard dressing)', 'P',  rlang::quo(r.CRBSI*n.cathdays/1000)
+    "P(CRBSI|standard dressing)", "P",  rlang::quo(r.CRBSI*n.cathdays/1000)
   )
   q.CRBSI.S <- ExprModVar$new(
-    'Q(CRBSI|standard dressing)', '1-P',  rlang::quo(1-p.CRBSI.S)
+    "Q(CRBSI|standard dressing)", "1-P",  rlang::quo(1-p.CRBSI.S)
   )
   p.CRBSI.T <- ExprModVar$new(
-    'P(CRBSI|Tegaderm)', 'P', rlang::quo(1-(1-p.CRBSI.S)^hr.CRBSI)
+    "P(CRBSI|Tegaderm)", "P", rlang::quo(1 - (1 - p.CRBSI.S) ^ hr.CRBSI)
   )
   q.CRBSI.T <- ExprModVar$new(
-    'Q(CRBSI|Tegaderm)', '1-P', rlang::quo(1-p.CRBSI.T)
+    "Q(CRBSI|Tegaderm)", "1-P", rlang::quo(1-p.CRBSI.T)
   )
   # create decision tree
   th <- as.difftime(7, units="days")
@@ -662,9 +765,9 @@ test_that("redecision replicates Jenks et al, 2016", {
   c.derm <- 150
   c.std <- 1.34*n.cath+c.crbsi*p.crbsi+c.lsi*p.lsi+c.derm*p.derm
   hr.crbsi <- 0.434
-  p.crbsi <- 1-((1-p.crbsi)^hr.crbsi)
+  p.crbsi <- 1 - ((1 - p.crbsi) ^ hr.crbsi)
   hr.lsi <- 0.434
-  p.lsi <- 1-((1-p.lsi)^hr.lsi)
+  p.lsi <- 1 - ((1 - p.lsi) ^ hr.lsi)
   rr.derm <- 4.963
   p.derm <- rr.derm*r.derm*n.cath
   c.teg <- 6.21*n.cath+c.crbsi*p.crbsi+c.lsi*p.lsi+c.derm*p.derm
@@ -692,7 +795,7 @@ test_that("redecision replicates Jenks et al, 2016", {
   expect_silent(DT$evaluate(setvars="current"))
   
   # tornado (diagram)
-  pdf(NULL)
+  pdf(file = NULL)
   # tornado
   expect_error(DT$tornado(), class="missing_strategy")
   expect_error(
@@ -738,7 +841,7 @@ test_that("redecision replicates Jenks et al, 2016", {
   
   # PSA (skip on CRAN)
   skip_on_cran()
-  PSA <- DT$evaluate(setvars="random",by="run",N=250)
+  PSA <- DT$evaluate(setvars = "random", by = "run", N = 250)
   PSA$Difference <- PSA$Cost.Standard - PSA$Cost.Tegaderm
   expect_intol(mean(PSA$Difference), 77.76, 10.00)
   expect_intol(mean(PSA$Cost.Standard), 176.89, 10.00)
@@ -788,9 +891,9 @@ test_that("readme example is correct, with thresholds", {
   # evaluate
   RES <- DT$evaluate()
   # direct calculation of costs
-  cost.diet <- c.diet + c.stent*(diet.f/(diet.s+diet.f))
+  cost.diet <- c.diet + c.stent * (diet.f / (diet.s + diet.f))
   cost.exercise <- c.exercise$mean() + 
-                   c.stent*(exercise.f/(exercise.s+exercise.f))
+                   c.stent * (exercise.f / (exercise.s + exercise.f))
   expect_intol(RES$Cost[RES$Programme=="Exercise"], cost.exercise, 5)
   expect_intol(RES$Cost[RES$Programme=="Diet"], cost.diet, 5)
   # threshold analysis on cost of new programme
@@ -837,15 +940,15 @@ test_that("readme example is correct, with thresholds", {
     index=list(e.e), ref=list(e.d), mvd=c.exercise$description(),
     a=c.exercise$mean(), b=1000, tol=1
   )
-  c.exercise.t.e <- c.diet + c.stent*(diet.f/(diet.s+diet.f)) - 
-                    c.stent*(exercise.f/(exercise.s+exercise.f))
+  c.exercise.t.e <- c.diet + c.stent * (diet.f / (diet.s + diet.f)) - 
+                    c.stent * (exercise.f / (exercise.s + exercise.f))
   expect_intol(c.exercise.t, c.exercise.t.e, 5)
   # threshold analysis on success of new programme
   p.ex.t <- DT$threshold(
     index=list(e.e), ref=list(e.d), mvd=p.exercise$description(),
     a=0, b=p.exercise$mean(), tol=0.001
   )
-  p.ex.t.e <- (c.exercise$mean()-c.diet)/c.stent - (diet.f/(diet.f+diet.s)) + 1
+  p.ex.t.e <- (c.exercise$mean() - c.diet) / c.stent - 
+              (diet.f / (diet.f + diet.s)) + 1
   expect_intol(p.ex.t, p.ex.t.e, 0.03)
 })
-

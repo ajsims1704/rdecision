@@ -61,63 +61,68 @@ Andrew J. Sims \email{andrew.sims@newcastle.ac.uk}
 \section{Methods}{
 \subsection{Public methods}{
 \itemize{
-\item \href{#method-new}{\code{DecisionTree$new()}}
-\item \href{#method-decision_nodes}{\code{DecisionTree$decision_nodes()}}
-\item \href{#method-chance_nodes}{\code{DecisionTree$chance_nodes()}}
-\item \href{#method-leaf_nodes}{\code{DecisionTree$leaf_nodes()}}
-\item \href{#method-actions}{\code{DecisionTree$actions()}}
-\item \href{#method-modvars}{\code{DecisionTree$modvars()}}
-\item \href{#method-modvar_table}{\code{DecisionTree$modvar_table()}}
-\item \href{#method-draw}{\code{DecisionTree$draw()}}
-\item \href{#method-is_strategy}{\code{DecisionTree$is_strategy()}}
-\item \href{#method-strategy_table}{\code{DecisionTree$strategy_table()}}
-\item \href{#method-strategy_paths}{\code{DecisionTree$strategy_paths()}}
-\item \href{#method-evaluate_walks}{\code{DecisionTree$evaluate_walks()}}
-\item \href{#method-evaluate}{\code{DecisionTree$evaluate()}}
-\item \href{#method-tornado}{\code{DecisionTree$tornado()}}
-\item \href{#method-threshold}{\code{DecisionTree$threshold()}}
-\item \href{#method-clone}{\code{DecisionTree$clone()}}
+\item \href{#method-DecisionTree-new}{\code{DecisionTree$new()}}
+\item \href{#method-DecisionTree-decision_nodes}{\code{DecisionTree$decision_nodes()}}
+\item \href{#method-DecisionTree-chance_nodes}{\code{DecisionTree$chance_nodes()}}
+\item \href{#method-DecisionTree-leaf_nodes}{\code{DecisionTree$leaf_nodes()}}
+\item \href{#method-DecisionTree-actions}{\code{DecisionTree$actions()}}
+\item \href{#method-DecisionTree-modvars}{\code{DecisionTree$modvars()}}
+\item \href{#method-DecisionTree-modvar_table}{\code{DecisionTree$modvar_table()}}
+\item \href{#method-DecisionTree-draw}{\code{DecisionTree$draw()}}
+\item \href{#method-DecisionTree-is_strategy}{\code{DecisionTree$is_strategy()}}
+\item \href{#method-DecisionTree-strategy_table}{\code{DecisionTree$strategy_table()}}
+\item \href{#method-DecisionTree-strategy_paths}{\code{DecisionTree$strategy_paths()}}
+\item \href{#method-DecisionTree-edge_properties}{\code{DecisionTree$edge_properties()}}
+\item \href{#method-DecisionTree-evaluate_walks}{\code{DecisionTree$evaluate_walks()}}
+\item \href{#method-DecisionTree-evaluate}{\code{DecisionTree$evaluate()}}
+\item \href{#method-DecisionTree-tornado}{\code{DecisionTree$tornado()}}
+\item \href{#method-DecisionTree-threshold}{\code{DecisionTree$threshold()}}
+\item \href{#method-DecisionTree-clone}{\code{DecisionTree$clone()}}
 }
 }
-\if{html}{
-\out{<details ><summary>Inherited methods</summary>}
-\itemize{
-\item \out{<span class="pkg-link" data-pkg="rdecision" data-topic="Graph" data-id="degree">}\href{../../rdecision/html/Graph.html#method-degree}{\code{rdecision::Graph$degree()}}\out{</span>}
-\item \out{<span class="pkg-link" data-pkg="rdecision" data-topic="Graph" data-id="edge_index">}\href{../../rdecision/html/Graph.html#method-edge_index}{\code{rdecision::Graph$edge_index()}}\out{</span>}
-\item \out{<span class="pkg-link" data-pkg="rdecision" data-topic="Graph" data-id="graph_adjacency_matrix">}\href{../../rdecision/html/Graph.html#method-graph_adjacency_matrix}{\code{rdecision::Graph$graph_adjacency_matrix()}}\out{</span>}
-\item \out{<span class="pkg-link" data-pkg="rdecision" data-topic="Graph" data-id="has_edge">}\href{../../rdecision/html/Graph.html#method-has_edge}{\code{rdecision::Graph$has_edge()}}\out{</span>}
-\item \out{<span class="pkg-link" data-pkg="rdecision" data-topic="Graph" data-id="has_vertex">}\href{../../rdecision/html/Graph.html#method-has_vertex}{\code{rdecision::Graph$has_vertex()}}\out{</span>}
-\item \out{<span class="pkg-link" data-pkg="rdecision" data-topic="Graph" data-id="is_simple">}\href{../../rdecision/html/Graph.html#method-is_simple}{\code{rdecision::Graph$is_simple()}}\out{</span>}
-\item \out{<span class="pkg-link" data-pkg="rdecision" data-topic="Graph" data-id="neighbours">}\href{../../rdecision/html/Graph.html#method-neighbours}{\code{rdecision::Graph$neighbours()}}\out{</span>}
-\item \out{<span class="pkg-link" data-pkg="rdecision" data-topic="Graph" data-id="order">}\href{../../rdecision/html/Graph.html#method-order}{\code{rdecision::Graph$order()}}\out{</span>}
-\item \out{<span class="pkg-link" data-pkg="rdecision" data-topic="Graph" data-id="size">}\href{../../rdecision/html/Graph.html#method-size}{\code{rdecision::Graph$size()}}\out{</span>}
-\item \out{<span class="pkg-link" data-pkg="rdecision" data-topic="Graph" data-id="vertex_index">}\href{../../rdecision/html/Graph.html#method-vertex_index}{\code{rdecision::Graph$vertex_index()}}\out{</span>}
-\item \out{<span class="pkg-link" data-pkg="rdecision" data-topic="Digraph" data-id="as_DOT">}\href{../../rdecision/html/Digraph.html#method-as_DOT}{\code{rdecision::Digraph$as_DOT()}}\out{</span>}
-\item \out{<span class="pkg-link" data-pkg="rdecision" data-topic="Digraph" data-id="digraph_adjacency_matrix">}\href{../../rdecision/html/Digraph.html#method-digraph_adjacency_matrix}{\code{rdecision::Digraph$digraph_adjacency_matrix()}}\out{</span>}
-\item \out{<span class="pkg-link" data-pkg="rdecision" data-topic="Digraph" data-id="digraph_incidence_matrix">}\href{../../rdecision/html/Digraph.html#method-digraph_incidence_matrix}{\code{rdecision::Digraph$digraph_incidence_matrix()}}\out{</span>}
-\item \out{<span class="pkg-link" data-pkg="rdecision" data-topic="Digraph" data-id="direct_predecessors">}\href{../../rdecision/html/Digraph.html#method-direct_predecessors}{\code{rdecision::Digraph$direct_predecessors()}}\out{</span>}
-\item \out{<span class="pkg-link" data-pkg="rdecision" data-topic="Digraph" data-id="direct_successors">}\href{../../rdecision/html/Digraph.html#method-direct_successors}{\code{rdecision::Digraph$direct_successors()}}\out{</span>}
-\item \out{<span class="pkg-link" data-pkg="rdecision" data-topic="Digraph" data-id="is_acyclic">}\href{../../rdecision/html/Digraph.html#method-is_acyclic}{\code{rdecision::Digraph$is_acyclic()}}\out{</span>}
-\item \out{<span class="pkg-link" data-pkg="rdecision" data-topic="Digraph" data-id="is_arborescence">}\href{../../rdecision/html/Digraph.html#method-is_arborescence}{\code{rdecision::Digraph$is_arborescence()}}\out{</span>}
-\item \out{<span class="pkg-link" data-pkg="rdecision" data-topic="Digraph" data-id="is_connected">}\href{../../rdecision/html/Digraph.html#method-is_connected}{\code{rdecision::Digraph$is_connected()}}\out{</span>}
-\item \out{<span class="pkg-link" data-pkg="rdecision" data-topic="Digraph" data-id="is_polytree">}\href{../../rdecision/html/Digraph.html#method-is_polytree}{\code{rdecision::Digraph$is_polytree()}}\out{</span>}
-\item \out{<span class="pkg-link" data-pkg="rdecision" data-topic="Digraph" data-id="is_tree">}\href{../../rdecision/html/Digraph.html#method-is_tree}{\code{rdecision::Digraph$is_tree()}}\out{</span>}
-\item \out{<span class="pkg-link" data-pkg="rdecision" data-topic="Digraph" data-id="is_weakly_connected">}\href{../../rdecision/html/Digraph.html#method-is_weakly_connected}{\code{rdecision::Digraph$is_weakly_connected()}}\out{</span>}
-\item \out{<span class="pkg-link" data-pkg="rdecision" data-topic="Digraph" data-id="paths">}\href{../../rdecision/html/Digraph.html#method-paths}{\code{rdecision::Digraph$paths()}}\out{</span>}
-\item \out{<span class="pkg-link" data-pkg="rdecision" data-topic="Digraph" data-id="topological_sort">}\href{../../rdecision/html/Digraph.html#method-topological_sort}{\code{rdecision::Digraph$topological_sort()}}\out{</span>}
-\item \out{<span class="pkg-link" data-pkg="rdecision" data-topic="Digraph" data-id="walk">}\href{../../rdecision/html/Digraph.html#method-walk}{\code{rdecision::Digraph$walk()}}\out{</span>}
-\item \out{<span class="pkg-link" data-pkg="rdecision" data-topic="Arborescence" data-id="is_leaf">}\href{../../rdecision/html/Arborescence.html#method-is_leaf}{\code{rdecision::Arborescence$is_leaf()}}\out{</span>}
-\item \out{<span class="pkg-link" data-pkg="rdecision" data-topic="Arborescence" data-id="is_parent">}\href{../../rdecision/html/Arborescence.html#method-is_parent}{\code{rdecision::Arborescence$is_parent()}}\out{</span>}
-\item \out{<span class="pkg-link" data-pkg="rdecision" data-topic="Arborescence" data-id="postree">}\href{../../rdecision/html/Arborescence.html#method-postree}{\code{rdecision::Arborescence$postree()}}\out{</span>}
-\item \out{<span class="pkg-link" data-pkg="rdecision" data-topic="Arborescence" data-id="root">}\href{../../rdecision/html/Arborescence.html#method-root}{\code{rdecision::Arborescence$root()}}\out{</span>}
-\item \out{<span class="pkg-link" data-pkg="rdecision" data-topic="Arborescence" data-id="root_to_leaf_paths">}\href{../../rdecision/html/Arborescence.html#method-root_to_leaf_paths}{\code{rdecision::Arborescence$root_to_leaf_paths()}}\out{</span>}
-\item \out{<span class="pkg-link" data-pkg="rdecision" data-topic="Arborescence" data-id="siblings">}\href{../../rdecision/html/Arborescence.html#method-siblings}{\code{rdecision::Arborescence$siblings()}}\out{</span>}
-}
-\out{</details>}
-}
+\if{html}{\out{
+<details><summary>Inherited methods</summary>
+<ul>
+<li><span class="pkg-link" data-pkg="rdecision" data-topic="Graph" data-id="degree"><a href='../../rdecision/html/Graph.html#method-Graph-degree'><code>rdecision::Graph$degree()</code></a></span></li>
+<li><span class="pkg-link" data-pkg="rdecision" data-topic="Graph" data-id="edge_along"><a href='../../rdecision/html/Graph.html#method-Graph-edge_along'><code>rdecision::Graph$edge_along()</code></a></span></li>
+<li><span class="pkg-link" data-pkg="rdecision" data-topic="Graph" data-id="edge_at"><a href='../../rdecision/html/Graph.html#method-Graph-edge_at'><code>rdecision::Graph$edge_at()</code></a></span></li>
+<li><span class="pkg-link" data-pkg="rdecision" data-topic="Graph" data-id="edge_index"><a href='../../rdecision/html/Graph.html#method-Graph-edge_index'><code>rdecision::Graph$edge_index()</code></a></span></li>
+<li><span class="pkg-link" data-pkg="rdecision" data-topic="Graph" data-id="graph_adjacency_matrix"><a href='../../rdecision/html/Graph.html#method-Graph-graph_adjacency_matrix'><code>rdecision::Graph$graph_adjacency_matrix()</code></a></span></li>
+<li><span class="pkg-link" data-pkg="rdecision" data-topic="Graph" data-id="has_edge"><a href='../../rdecision/html/Graph.html#method-Graph-has_edge'><code>rdecision::Graph$has_edge()</code></a></span></li>
+<li><span class="pkg-link" data-pkg="rdecision" data-topic="Graph" data-id="has_vertex"><a href='../../rdecision/html/Graph.html#method-Graph-has_vertex'><code>rdecision::Graph$has_vertex()</code></a></span></li>
+<li><span class="pkg-link" data-pkg="rdecision" data-topic="Graph" data-id="is_simple"><a href='../../rdecision/html/Graph.html#method-Graph-is_simple'><code>rdecision::Graph$is_simple()</code></a></span></li>
+<li><span class="pkg-link" data-pkg="rdecision" data-topic="Graph" data-id="neighbours"><a href='../../rdecision/html/Graph.html#method-Graph-neighbours'><code>rdecision::Graph$neighbours()</code></a></span></li>
+<li><span class="pkg-link" data-pkg="rdecision" data-topic="Graph" data-id="order"><a href='../../rdecision/html/Graph.html#method-Graph-order'><code>rdecision::Graph$order()</code></a></span></li>
+<li><span class="pkg-link" data-pkg="rdecision" data-topic="Graph" data-id="size"><a href='../../rdecision/html/Graph.html#method-Graph-size'><code>rdecision::Graph$size()</code></a></span></li>
+<li><span class="pkg-link" data-pkg="rdecision" data-topic="Graph" data-id="vertex_along"><a href='../../rdecision/html/Graph.html#method-Graph-vertex_along'><code>rdecision::Graph$vertex_along()</code></a></span></li>
+<li><span class="pkg-link" data-pkg="rdecision" data-topic="Graph" data-id="vertex_at"><a href='../../rdecision/html/Graph.html#method-Graph-vertex_at'><code>rdecision::Graph$vertex_at()</code></a></span></li>
+<li><span class="pkg-link" data-pkg="rdecision" data-topic="Graph" data-id="vertex_index"><a href='../../rdecision/html/Graph.html#method-Graph-vertex_index'><code>rdecision::Graph$vertex_index()</code></a></span></li>
+<li><span class="pkg-link" data-pkg="rdecision" data-topic="Digraph" data-id="as_DOT"><a href='../../rdecision/html/Digraph.html#method-Digraph-as_DOT'><code>rdecision::Digraph$as_DOT()</code></a></span></li>
+<li><span class="pkg-link" data-pkg="rdecision" data-topic="Digraph" data-id="digraph_adjacency_matrix"><a href='../../rdecision/html/Digraph.html#method-Digraph-digraph_adjacency_matrix'><code>rdecision::Digraph$digraph_adjacency_matrix()</code></a></span></li>
+<li><span class="pkg-link" data-pkg="rdecision" data-topic="Digraph" data-id="digraph_incidence_matrix"><a href='../../rdecision/html/Digraph.html#method-Digraph-digraph_incidence_matrix'><code>rdecision::Digraph$digraph_incidence_matrix()</code></a></span></li>
+<li><span class="pkg-link" data-pkg="rdecision" data-topic="Digraph" data-id="direct_predecessors"><a href='../../rdecision/html/Digraph.html#method-Digraph-direct_predecessors'><code>rdecision::Digraph$direct_predecessors()</code></a></span></li>
+<li><span class="pkg-link" data-pkg="rdecision" data-topic="Digraph" data-id="direct_successors"><a href='../../rdecision/html/Digraph.html#method-Digraph-direct_successors'><code>rdecision::Digraph$direct_successors()</code></a></span></li>
+<li><span class="pkg-link" data-pkg="rdecision" data-topic="Digraph" data-id="is_acyclic"><a href='../../rdecision/html/Digraph.html#method-Digraph-is_acyclic'><code>rdecision::Digraph$is_acyclic()</code></a></span></li>
+<li><span class="pkg-link" data-pkg="rdecision" data-topic="Digraph" data-id="is_arborescence"><a href='../../rdecision/html/Digraph.html#method-Digraph-is_arborescence'><code>rdecision::Digraph$is_arborescence()</code></a></span></li>
+<li><span class="pkg-link" data-pkg="rdecision" data-topic="Digraph" data-id="is_connected"><a href='../../rdecision/html/Digraph.html#method-Digraph-is_connected'><code>rdecision::Digraph$is_connected()</code></a></span></li>
+<li><span class="pkg-link" data-pkg="rdecision" data-topic="Digraph" data-id="is_polytree"><a href='../../rdecision/html/Digraph.html#method-Digraph-is_polytree'><code>rdecision::Digraph$is_polytree()</code></a></span></li>
+<li><span class="pkg-link" data-pkg="rdecision" data-topic="Digraph" data-id="is_tree"><a href='../../rdecision/html/Digraph.html#method-Digraph-is_tree'><code>rdecision::Digraph$is_tree()</code></a></span></li>
+<li><span class="pkg-link" data-pkg="rdecision" data-topic="Digraph" data-id="is_weakly_connected"><a href='../../rdecision/html/Digraph.html#method-Digraph-is_weakly_connected'><code>rdecision::Digraph$is_weakly_connected()</code></a></span></li>
+<li><span class="pkg-link" data-pkg="rdecision" data-topic="Digraph" data-id="paths"><a href='../../rdecision/html/Digraph.html#method-Digraph-paths'><code>rdecision::Digraph$paths()</code></a></span></li>
+<li><span class="pkg-link" data-pkg="rdecision" data-topic="Digraph" data-id="topological_sort"><a href='../../rdecision/html/Digraph.html#method-Digraph-topological_sort'><code>rdecision::Digraph$topological_sort()</code></a></span></li>
+<li><span class="pkg-link" data-pkg="rdecision" data-topic="Digraph" data-id="walk"><a href='../../rdecision/html/Digraph.html#method-Digraph-walk'><code>rdecision::Digraph$walk()</code></a></span></li>
+<li><span class="pkg-link" data-pkg="rdecision" data-topic="Arborescence" data-id="is_leaf"><a href='../../rdecision/html/Arborescence.html#method-Arborescence-is_leaf'><code>rdecision::Arborescence$is_leaf()</code></a></span></li>
+<li><span class="pkg-link" data-pkg="rdecision" data-topic="Arborescence" data-id="is_parent"><a href='../../rdecision/html/Arborescence.html#method-Arborescence-is_parent'><code>rdecision::Arborescence$is_parent()</code></a></span></li>
+<li><span class="pkg-link" data-pkg="rdecision" data-topic="Arborescence" data-id="postree"><a href='../../rdecision/html/Arborescence.html#method-Arborescence-postree'><code>rdecision::Arborescence$postree()</code></a></span></li>
+<li><span class="pkg-link" data-pkg="rdecision" data-topic="Arborescence" data-id="root"><a href='../../rdecision/html/Arborescence.html#method-Arborescence-root'><code>rdecision::Arborescence$root()</code></a></span></li>
+<li><span class="pkg-link" data-pkg="rdecision" data-topic="Arborescence" data-id="root_to_leaf_paths"><a href='../../rdecision/html/Arborescence.html#method-Arborescence-root_to_leaf_paths'><code>rdecision::Arborescence$root_to_leaf_paths()</code></a></span></li>
+<li><span class="pkg-link" data-pkg="rdecision" data-topic="Arborescence" data-id="siblings"><a href='../../rdecision/html/Arborescence.html#method-Arborescence-siblings'><code>rdecision::Arborescence$siblings()</code></a></span></li>
+</ul>
+</details>
+}}
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-new"></a>}}
-\if{latex}{\out{\hypertarget{method-new}{}}}
+\if{html}{\out{<a id="method-DecisionTree-new"></a>}}
+\if{latex}{\out{\hypertarget{method-DecisionTree-new}{}}}
 \subsection{Method \code{new()}}{
 Create a new decision tree.
 \subsection{Usage}{
@@ -143,8 +148,8 @@ A \code{DecisionTree} object
 }
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-decision_nodes"></a>}}
-\if{latex}{\out{\hypertarget{method-decision_nodes}{}}}
+\if{html}{\out{<a id="method-DecisionTree-decision_nodes"></a>}}
+\if{latex}{\out{\hypertarget{method-DecisionTree-decision_nodes}{}}}
 \subsection{Method \code{decision_nodes()}}{
 Find the decision nodes in the tree.
 \subsection{Usage}{
@@ -166,8 +171,8 @@ the decision nodes (for what="index").
 }
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-chance_nodes"></a>}}
-\if{latex}{\out{\hypertarget{method-chance_nodes}{}}}
+\if{html}{\out{<a id="method-DecisionTree-chance_nodes"></a>}}
+\if{latex}{\out{\hypertarget{method-DecisionTree-chance_nodes}{}}}
 \subsection{Method \code{chance_nodes()}}{
 Find the chance nodes in the tree.
 \subsection{Usage}{
@@ -179,8 +184,8 @@ A list of \code{ChanceNode} objects.
 }
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-leaf_nodes"></a>}}
-\if{latex}{\out{\hypertarget{method-leaf_nodes}{}}}
+\if{html}{\out{<a id="method-DecisionTree-leaf_nodes"></a>}}
+\if{latex}{\out{\hypertarget{method-DecisionTree-leaf_nodes}{}}}
 \subsection{Method \code{leaf_nodes()}}{
 Find the leaf nodes in the tree.
 \subsection{Usage}{
@@ -203,8 +208,8 @@ the decision nodes (for what="index").
 }
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-actions"></a>}}
-\if{latex}{\out{\hypertarget{method-actions}{}}}
+\if{html}{\out{<a id="method-DecisionTree-actions"></a>}}
+\if{latex}{\out{\hypertarget{method-DecisionTree-actions}{}}}
 \subsection{Method \code{actions()}}{
 Find the edges that have the specified decision node as 
 their source.
@@ -224,8 +229,8 @@ A list of \code{Action} edges.
 }
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-modvars"></a>}}
-\if{latex}{\out{\hypertarget{method-modvars}{}}}
+\if{html}{\out{<a id="method-DecisionTree-modvars"></a>}}
+\if{latex}{\out{\hypertarget{method-DecisionTree-modvars}{}}}
 \subsection{Method \code{modvars()}}{
 Find all the model variables of type \code{ModVar}.
 \subsection{Usage}{
@@ -242,8 +247,8 @@ A list of \code{ModVar}s.
 }
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-modvar_table"></a>}}
-\if{latex}{\out{\hypertarget{method-modvar_table}{}}}
+\if{html}{\out{<a id="method-DecisionTree-modvar_table"></a>}}
+\if{latex}{\out{\hypertarget{method-DecisionTree-modvar_table}{}}}
 \subsection{Method \code{modvar_table()}}{
 Tabulate the model variables.
 \subsection{Usage}{
@@ -282,8 +287,8 @@ random sampling.}
 }
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-draw"></a>}}
-\if{latex}{\out{\hypertarget{method-draw}{}}}
+\if{html}{\out{<a id="method-DecisionTree-draw"></a>}}
+\if{latex}{\out{\hypertarget{method-DecisionTree-draw}{}}}
 \subsection{Method \code{draw()}}{
 Draw the decision tree to the current graphics output.
 \subsection{Usage}{
@@ -307,8 +312,8 @@ No return value.
 }
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-is_strategy"></a>}}
-\if{latex}{\out{\hypertarget{method-is_strategy}{}}}
+\if{html}{\out{<a id="method-DecisionTree-is_strategy"></a>}}
+\if{latex}{\out{\hypertarget{method-DecisionTree-is_strategy}{}}}
 \subsection{Method \code{is_strategy()}}{
 Tests whether a strategy is valid.
 \subsection{Usage}{
@@ -334,8 +339,8 @@ FALSE if the list of Action edges are not a valid strategy.
 }
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-strategy_table"></a>}}
-\if{latex}{\out{\hypertarget{method-strategy_table}{}}}
+\if{html}{\out{<a id="method-DecisionTree-strategy_table"></a>}}
+\if{latex}{\out{\hypertarget{method-DecisionTree-strategy_table}{}}}
 \subsection{Method \code{strategy_table()}}{
 Find all potential strategies for the decision tree.
 \subsection{Usage}{
@@ -370,8 +375,8 @@ strategy, concatenated with underscores.
 }
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-strategy_paths"></a>}}
-\if{latex}{\out{\hypertarget{method-strategy_paths}{}}}
+\if{html}{\out{<a id="method-DecisionTree-strategy_paths"></a>}}
+\if{latex}{\out{\hypertarget{method-DecisionTree-strategy_paths}{}}}
 \subsection{Method \code{strategy_paths()}}{
 Find all paths walked in each possible strategy.
 \subsection{Usage}{
@@ -392,21 +397,51 @@ each path, and there is one row for each path in each strategy.
 }
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-evaluate_walks"></a>}}
-\if{latex}{\out{\hypertarget{method-evaluate_walks}{}}}
+\if{html}{\out{<a id="method-DecisionTree-edge_properties"></a>}}
+\if{latex}{\out{\hypertarget{method-DecisionTree-edge_properties}{}}}
+\subsection{Method \code{edge_properties()}}{
+Properties of all actions and reactions as a matrix.
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{DecisionTree$edge_properties()}\if{html}{\out{</div>}}
+}
+
+\subsection{Details}{
+Gets the properties (probability, cost, benefit) of each 
+action and reaction in the decision tree in matrix form.
+}
+
+\subsection{Returns}{
+A numeric matrix with one row per edge, and with four columns:
+the index of the edge, the conditional probability of traversing the 
+edge, the cost of traversing the edge and the benefit associated with
+traversing the edge. The column names are \code{index},
+\code{probability}, \code{cost}, \code{benefit} and the row names are 
+the labels of the edges.
+}
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-DecisionTree-evaluate_walks"></a>}}
+\if{latex}{\out{\hypertarget{method-DecisionTree-evaluate_walks}{}}}
 \subsection{Method \code{evaluate_walks()}}{
 Evaluate the components of pay-off associated with a set of
 walks in the decision tree.
 \subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{DecisionTree$evaluate_walks(W)}\if{html}{\out{</div>}}
+\if{html}{\out{<div class="r">}}\preformatted{DecisionTree$evaluate_walks(W = NULL, Wi = NULL)}\if{html}{\out{</div>}}
 }
 
 \subsection{Arguments}{
 \if{html}{\out{<div class="arguments">}}
 \describe{
-\item{\code{W}}{A list of root-to-leaf walks. Each walk must start with the
-root node and end with a leaf node. Normally this is all the root to leaf
-paths in a tree.}
+\item{\code{W}}{A list of root-to-leaf walks. A walk is a sequence of edges
+(actions and reactions), stored as a list. Each walk must start with an
+edge whose source is the root node and end with an edge whose target is
+a leaf node. The list of walks is normally the walks associated with all
+the root to leaf paths in a tree.}
+
+\item{\code{Wi}}{As \var{W} but with edge indices instead of Edge objects. One
+of \var{W} and \var{Wi} must be NULL. It is more efficient to provide 
+\var{Wi} during PSA, where the paths do not change between cycles, to
+avoid repeated conversion of edges to indices.}
 }
 \if{html}{\out{</div>}}
 }
@@ -431,7 +466,7 @@ index of the terminal (leaf) node.}
       node).}
 \item{\code{Path.QALY}}{The QALYs associated with the outcome (leaf 
       node).}
-\item{\code{Cost}}{\code{Path.Cost} \eqn{*} probability of traversing the 
+\item{\code{Cost}}{\code{Path.Cost} \eqn{*} probability of traversing the
       pathway.}
 \item{\code{Benefit}}{\code{Path.Benefit} \eqn{*} probability of 
 traversing the pathway.}
@@ -443,8 +478,8 @@ pathway.}
 }
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-evaluate"></a>}}
-\if{latex}{\out{\hypertarget{method-evaluate}{}}}
+\if{html}{\out{<a id="method-DecisionTree-evaluate"></a>}}
+\if{latex}{\out{\hypertarget{method-DecisionTree-evaluate}{}}}
 \subsection{Method \code{evaluate()}}{
 Evaluate each strategy.
 \subsection{Usage}{
@@ -531,8 +566,8 @@ A data frame whose columns depend on \code{by}; see "Details".
 }
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-tornado"></a>}}
-\if{latex}{\out{\hypertarget{method-tornado}{}}}
+\if{html}{\out{<a id="method-DecisionTree-tornado"></a>}}
+\if{latex}{\out{\hypertarget{method-DecisionTree-tornado}{}}}
 \subsection{Method \code{tornado()}}{
 Create a "tornado" diagram.
 \subsection{Usage}{
@@ -575,7 +610,7 @@ data frame silently.}
 Used to compare two strategies for traversing the decision tree.
 A strategy is a unanimous prescription of the actions at each 
 decision node. The extreme values of each input variable are the upper 
-and lower 95\% confidence limits of the uncertainty distributions of each 
+and lower 95\% confidence limits of the uncertainty distributions of each
 variable. This ensures that the range of each input is defensible 
 (Briggs 2012).
 }
@@ -588,8 +623,8 @@ if there are no \code{ModVar}s.
 }
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-threshold"></a>}}
-\if{latex}{\out{\hypertarget{method-threshold}{}}}
+\if{html}{\out{<a id="method-DecisionTree-threshold"></a>}}
+\if{latex}{\out{\hypertarget{method-DecisionTree-threshold}{}}}
 \subsection{Method \code{threshold()}}{
 Find the threshold value of a model variable at which
 the cost difference is zero or the ICER is equal to a threshold, for an
@@ -661,8 +696,8 @@ Value of the model variable of interest at the threshold.
 }
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-clone"></a>}}
-\if{latex}{\out{\hypertarget{method-clone}{}}}
+\if{html}{\out{<a id="method-DecisionTree-clone"></a>}}
+\if{latex}{\out{\hypertarget{method-DecisionTree-clone}{}}}
 \subsection{Method \code{clone()}}{
 The objects of this class are cloneable with this method.
 \subsection{Usage}{

@@ -36,111 +36,54 @@ Graph <- R6::R6Class(
     #' @return A \code{Graph} object.
     initialize = function(V, E) {
       # check and set nodes
-      if (!is.list(V)) {
-        rlang::abort("V must be a list", class="non-list_vertices")
-      }
-      sapply(V, FUN=function(v) {
-        if (!inherits(v, what="Node")) {
-          rlang::abort("Each V must be a Node", class="non-Node_vertex")
-        }
+      abortifnot(
+        is.list(V), 
+        message = "V must be a list", 
+        class = "non-list_vertices"
+      )
+      sapply(V, FUN = function(v) {
+        abortifnot(
+          inherits(v, what = "Node"),
+          message = "Each V must be a Node", 
+          class = "non-Node_vertex"
+        )
       })
-      if (length(unique(V)) != length(V)) {
-        rlang::abort("Each V must be unique", class="repeated_nodes")
-      }
+      abortifnot(
+        length(unique(V)) == length(V),
+        message = "Each V must be unique", 
+        class = "repeated_nodes"
+      )
       private$V <- V
       # check and set edges
-      if (!is.list(E)) {
-        rlang::abort("E must be a list", class="non-list_edges")
-      }
+      abortifnot(
+        is.list(E),
+        message = "E must be a list", 
+        class = "non-list_edges"
+      )
       sapply(E, FUN=function(e) {
-        if (!inherits(e, what="Edge")) {
-          rlang::abort("Each E must be an Edge", class="non-Edge_edge")
-        }
-        sapply(e$endpoints(), function(w){
-          if (!self$has_vertex(w)) {
-            rlang::abort(
-              "All edge vertexes must be in graph", 
-              class = "not_in_graph"
-            )
-          }  
+        abortifnot(
+          inherits(e, what = "Edge"), 
+          message = "Each E must be an Edge", 
+          class = "non-Edge_edge"
+        )
+        sapply(e$endpoints(), function(w) {
+          abortifnot(
+            self$has_vertex(w),
+            message = "All edge vertexes must be in graph", 
+            class = "not_in_graph"
+          )
         })
       })
-      if (length(unique(E)) != length(E)) {
-        rlang::abort("Each E must be unique", class="repeated_edges")
-      }
+      abortifnot(
+        length(unique(E)) == length(E),
+        message = "Each E must be unique", 
+        class = "repeated_edges"
+      )
       private$E <- E
       # calculate the adjacency matrix 
       private$AG <- self$graph_adjacency_matrix(FALSE)
       # return new graph object
       return(invisible(self))
-    },
-
-    #' @description Find the index of a vertex in the graph.
-    #' @param v Subject vertex
-    #' @return Index of \code{v}. The vertexes are normally stored in the same
-    #' order they are specified in \code{new}, but this cannot be guaranteed. 
-    #' This' function returns the same index as used in the adjacency matrix and 
-    #' \code{NA} if the vertex is not in the graph.
-    vertex_index = function(v) {
-      # check argument
-      if (!inherits(v, what="Node")) {
-        rlang::abort(
-          "Argument 'v' must be a Node", 
-          class="invalid_vertex"
-        )
-      }
-      # find v in V
-      index <- NA
-      for (i in 1:length(private$V)) {
-        if (identical(private$V[[i]],v)) {
-          index <- i
-          break
-        }
-      }
-      return(index)
-    }, 
-  
-    #' @description Test whether a vertex is an element of the graph.
-    #' @param v Subject vertex.
-    #' @return TRUE if v is an element of V(G).
-    has_vertex = function(v) {
-      # vertex_index checks v is a node
-      index <- self$vertex_index(v)
-      return(!is.na(index))
-    },
-
-    #' @description Find the index of an edge in a graph.
-    #' @param e Subject edge.
-    #' @return Index of \code{e}. The edges are normally stored in the same order
-    #' they are specified in \code{new}, but this cannot be guaranteed. This
-    #' function returns the same index returned in other functions and \code{NA}
-    #' if the edge is not in the graph.
-    edge_index = function(e) {
-      # check argument
-      if (!inherits(e, what="Edge")) {
-        rlang::abort(
-          "Argument 'e' must be an edge", 
-          class="invalid_edge"
-        )
-      } 
-      # find e in E
-      index <- NA
-      for (i in 1:length(private$E)) {
-        if (identical(private$E[[i]],e)) {
-          index <- i
-          break
-        }
-      }
-      return(index)
-    },
-
-    #' @description Test whether an edge is element of the graph.
-    #' @param e Subject edge.
-    #' @return \code{TRUE} if \code{e} is an element of \eqn{E(G)}.
-    has_edge = function(e) {
-      # edge_index checks argument
-      index <- self$edge_index(e)
-      return(!is.na(index))
     },
 
     #' @description Return the order of the graph (number of vertices).
@@ -154,6 +97,128 @@ Graph <- R6::R6Class(
     size = function() {
       return(length(private$E))  
     },
+    
+    #' @description Sequence of vertex indices.
+    #' @details Similar to \code{base::seq_along}, this function provides
+    #' the indices of the vertices in the graph. It is intended for use by 
+    #' graph algorithms which iterate vertices.
+    #' @return A numeric vector.
+    vertex_along = function() {
+      return(seq_along(private$V))
+    },
+    
+    #' @description Find the index of a vertex in the graph.
+    #' @param v A vertex.
+    #' @return Index of \var{v}. The vertices are normally stored in the same
+    #' order they are specified in \code{new}, but this cannot be guaranteed. 
+    #' This function returns the same index as used in the adjacency matrix and 
+    #' \code{NA} if \var{v} is not a vertex, or is a vertex that is not in 
+    #' the graph.
+    vertex_index = function(v) {
+      # find v in V
+      index <- NA
+      i <- 1
+      for (vv in private$V) {
+        if (identical(vv, v)) {
+          index <- i
+          break
+        }
+        i <- i + 1
+      }
+      return(index)
+    }, 
+    
+    #' @description Find the vertex at a given index.
+    #' @details The inverse of function \code{vertex_index}. The function will
+    #' raise an abort signal if the supplied index is not a vertex.
+    #' @param index Index of a vertex in the graph, as an integer. The indices
+    #' of the vertices normally run from 1 to the order of the graph, and are
+    #' normally in the same sequence as the list of vertices, \var{V}, supplied
+    #' when the graph was created. However, these assumptions are not
+    #' guaranteed to hold for future versions of the package, and it is
+    #' recommended to supply an index value that has been provided by another
+    #' class function such as \code{vertex_index}, \code{vertex_along} and
+    #' \code{graph_adjacency_matrix}.
+    #' @return the node (vertex) with the specified index.
+    vertex_at = function(index) {
+      if (length(index) == 1 && index %in% self$vertex_along()) {
+        return(private$V[[index]])
+      } 
+      abortifnot(
+        FALSE,
+        message = "There is no vertex with the supplied index.",
+        class = "invalid_index"
+      )
+    },
+    
+    #' @description Test whether a vertex is an element of the graph.
+    #' @param v Subject vertex.
+    #' @return TRUE if v is an element of V(G).
+    has_vertex = function(v) {
+      # vertex_index checks if v is a node
+      index <- self$vertex_index(v)
+      return(!is.na(index))
+    },
+
+    #' @description Sequence of edge indices.
+    #' @details Similar to \code{base::seq_along}, this function provides
+    #' the indices of the  edges in the graph. It is intended for use by 
+    #' graph algorithms which iterate edges.
+    #' @return A numeric vector.
+    edge_along = function() {
+      return(seq_along(private$E))
+    },
+
+    #' @description Find the index of an edge in a graph.
+    #' @param e Subject edge.
+    #' @return Index of \code{e}. The edges are normally stored in the same
+    #' order they are specified in \code{new}, but this cannot be guaranteed. 
+    #' This function returns the same index returned in other functions and 
+    #' \code{NA} if the edge is not in the graph.
+    edge_index = function(e) {
+      # find e in E
+      index <- NA
+      i <- 1
+      for (ee in private$E) {
+        if (identical(ee, e)) {
+          index <- i
+          break
+        }
+        i <- i + 1
+      }
+      return(index)
+    },
+
+    #' @description Find the edge at a given index.
+    #' @details The inverse of function \code{dge_index}. The function will
+    #' raise an abort signal if the supplied index is not an edge.
+    #' @param index Index of a edge in the graph, as an integer. The indices
+    #' of the edges normally run from 1 to the size of the graph, and are
+    #' normally in the same sequence as the list of edges, \var{E}, supplied
+    #' when the graph was created. However, these assumptions are not
+    #' guaranteed to hold for future versions of the package, and it is
+    #' recommended to supply an index value that has been provided by another
+    #' class function such as \code{edge_index} and \code{edge_along}.
+    #' @return the edge with the specified index.
+    edge_at = function(index) {
+      if (length(index) == 1 && index %in% self$edge_along()) {
+        return(private$E[[index]])
+      } 
+      abortifnot(
+        FALSE,
+        message = "There is no edge with the supplied index.",
+        class = "invalid_index"
+      )
+    },
+    
+    #' @description Test whether an edge is element of the graph.
+    #' @param e Subject edge.
+    #' @return \code{TRUE} if \code{e} is an element of \eqn{E(G)}.
+    has_edge = function(e) {
+      # edge_index checks argument
+      index <- self$edge_index(e)
+      return(!is.na(index))
+    },
 
     #' @description Compute the adjacency matrix for the graph. 
     #' @details Each cell contains the
@@ -161,37 +226,39 @@ Graph <- R6::R6Class(
     #' self loops being counted twice, unless \code{binary} is \code{TRUE} when
     #' cells are either 0 (not adjacent) or 1 (adjacent).
     #' @param boolean If \code{TRUE}, the adjacency matrix is logical, each
-    #' cell is {\code{FALSE},\code{TRUE}}.
+    #' cell is {\code{FALSE}, \code{TRUE}}.
     #' @return A square numeric matrix with the number of rows and columns
-    #' equal to the order of the graph. The rows and columns are in the
-    #' same order as \code{V}. If the nodes have defined and unique labels the
-    #' \code{dimnames} of the matrix are the labels of the nodes. 
-    graph_adjacency_matrix = function(boolean=FALSE) {
+    #' equal to the order of the graph. The rows and columns are labelled
+    #' with the node labels, if all the nodes in the graph have labels, or the
+    #' node indices if not. 
+    graph_adjacency_matrix = function(boolean = FALSE) {
       # check argument
-      if (!is.logical(boolean)) {
-        rlang::abort(
-          "Argument 'boolean' must be 'logical'.",
-          class = "non-logical_boolean")
-      }
+      abortifnot(
+        is.logical(boolean),
+        message = "Argument 'boolean' must be 'logical'.",
+        class = "non-logical_boolean"
+      )
       # if the matrix is not null, create it. This assumes the graph is 
       # immutable (no edges or vertexes added or removed since its creation)
       if (is.null(private$AG)) {
         # create matrix
-        L <- sapply(private$V,function(v){v$label()})
-        n <- self$order()
-        if (length(unique(L))==length(L) && all(nchar(L)>0)) {
-          A <- matrix(rep(0,times=n*n), nrow=n, 
-                      dimnames=list(out.node=L,in.node=L))
-        } else {
-          A <- matrix(rep(0,times=n*n), nrow=n)
+        L <- sapply(private$V, function(v) v$label())
+        if (length(unique(L)) != length(L) || any(nchar(L) == 0)) {
+          L <- as.character(self$vertex_along())
         }
+        n <- self$order()
+        A <- matrix(
+          rep(0, times = n * n), 
+          nrow = n, 
+          dimnames = list(out.node = L, in.node = L)
+        )
         # populate it
         for (e in private$E) {
           W <- e$endpoints()
           iv1 <- self$vertex_index(W[[1]])
           iv2 <- self$vertex_index(W[[2]])
-          A[iv1,iv2] <- A[iv1,iv2]+1
-          A[iv2,iv1] <- A[iv2,iv1]+1
+          A[iv1, iv2] <- A[iv1, iv2] + 1
+          A[iv2, iv1] <- A[iv2, iv1] + 1
         }
         # save it
         private$AG <- A
@@ -326,14 +393,14 @@ Graph <- R6::R6Class(
     #' @param v The subject node.
     #' @return Degree of the vertex, integer.
     degree = function(v) {
-      d <- NA
-      if (self$has_vertex(v)) {
-        A <- self$graph_adjacency_matrix()
-        iv <- self$vertex_index(v)
-        d <- sum(A[iv,])
-      } else {
-        rlang::abort("Argument 'v' is not in graph", class="not_in_graph")
-      }
+      abortifnot(
+        self$has_vertex(v),
+        message = "Argument 'v' is not in graph", 
+        class="invalid_vertex"
+      )
+      A <- self$graph_adjacency_matrix()
+      iv <- self$vertex_index(v)
+      d <- sum(A[iv,])
       return(d)
     },
 
@@ -343,16 +410,16 @@ Graph <- R6::R6Class(
     #' @param v The subject node. 
     #' @return A list of nodes which are joined to the subject.
     neighbours = function(v) {
-      n <- list()
-      if (self$has_vertex(v)) {
-        A <- self$graph_adjacency_matrix()
-        diag(A) <- 0
-        iv <- self$vertex_index(v)
-        ni <- which(A[iv,]>0, arr.ind=TRUE)
-        n <- private$V[ni]
-      } else {
-        rlang::abort("Argument 'v' is not in graph", class="not_in_graph")
-      }     
+      abortifnot(
+        self$has_vertex(v),
+        message = "Argument 'v' is not in graph", 
+        class = "not_in_graph"        
+      )
+      A <- self$graph_adjacency_matrix()
+      diag(A) <- 0
+      iv <- self$vertex_index(v)
+      ni <- which(A[iv,]>0, arr.ind=TRUE)
+      n <- private$V[ni]
       return(n)
     },
 
@@ -364,14 +431,14 @@ Graph <- R6::R6Class(
     #' for saving as a text file.
     as_DOT = function() {
       # check whether all nodes have labels
-      nodelab <- all(sapply(private$V, function(v){nchar(v$label())>0}))
+      nodelab <- all(sapply(private$V, function(v) nchar(v$label())>0))
       # create stream vector (header+edges+footer)
       indent <- "  "
       o <- vector(mode = "character", length = 0)
       # write header
       o[length(o)+1] <- "graph rdecision {"
       o[length(o)+1] <- paste0(indent, 'size="7,7" ;')
-      o[length(o)+1] <- paste0(indent, 'rankdir=LR ;')
+      o[length(o)+1] <- paste0(indent, "rankdir=LR ;")
       # write edges
       for (e in private$E) {
         ep <- e$endpoints()
@@ -398,5 +465,3 @@ Graph <- R6::R6Class(
 
   )
 )
-
-    

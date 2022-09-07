@@ -20,28 +20,28 @@ Andrew J. Sims \email{andrew.sims@newcastle.ac.uk}
 \section{Methods}{
 \subsection{Public methods}{
 \itemize{
-\item \href{#method-new}{\code{BetaDistribution$new()}}
-\item \href{#method-distribution}{\code{BetaDistribution$distribution()}}
-\item \href{#method-mean}{\code{BetaDistribution$mean()}}
-\item \href{#method-mode}{\code{BetaDistribution$mode()}}
-\item \href{#method-SD}{\code{BetaDistribution$SD()}}
-\item \href{#method-sample}{\code{BetaDistribution$sample()}}
-\item \href{#method-quantile}{\code{BetaDistribution$quantile()}}
-\item \href{#method-clone}{\code{BetaDistribution$clone()}}
+\item \href{#method-BetaDistribution-new}{\code{BetaDistribution$new()}}
+\item \href{#method-BetaDistribution-distribution}{\code{BetaDistribution$distribution()}}
+\item \href{#method-BetaDistribution-mean}{\code{BetaDistribution$mean()}}
+\item \href{#method-BetaDistribution-mode}{\code{BetaDistribution$mode()}}
+\item \href{#method-BetaDistribution-SD}{\code{BetaDistribution$SD()}}
+\item \href{#method-BetaDistribution-sample}{\code{BetaDistribution$sample()}}
+\item \href{#method-BetaDistribution-quantile}{\code{BetaDistribution$quantile()}}
+\item \href{#method-BetaDistribution-clone}{\code{BetaDistribution$clone()}}
 }
 }
-\if{html}{
-\out{<details open ><summary>Inherited methods</summary>}
-\itemize{
-\item \out{<span class="pkg-link" data-pkg="rdecision" data-topic="Distribution" data-id="order">}\href{../../rdecision/html/Distribution.html#method-order}{\code{rdecision::Distribution$order()}}\out{</span>}
-\item \out{<span class="pkg-link" data-pkg="rdecision" data-topic="Distribution" data-id="r">}\href{../../rdecision/html/Distribution.html#method-r}{\code{rdecision::Distribution$r()}}\out{</span>}
-\item \out{<span class="pkg-link" data-pkg="rdecision" data-topic="Distribution" data-id="varcov">}\href{../../rdecision/html/Distribution.html#method-varcov}{\code{rdecision::Distribution$varcov()}}\out{</span>}
-}
-\out{</details>}
-}
+\if{html}{\out{
+<details open><summary>Inherited methods</summary>
+<ul>
+<li><span class="pkg-link" data-pkg="rdecision" data-topic="Distribution" data-id="order"><a href='../../rdecision/html/Distribution.html#method-Distribution-order'><code>rdecision::Distribution$order()</code></a></span></li>
+<li><span class="pkg-link" data-pkg="rdecision" data-topic="Distribution" data-id="r"><a href='../../rdecision/html/Distribution.html#method-Distribution-r'><code>rdecision::Distribution$r()</code></a></span></li>
+<li><span class="pkg-link" data-pkg="rdecision" data-topic="Distribution" data-id="varcov"><a href='../../rdecision/html/Distribution.html#method-Distribution-varcov'><code>rdecision::Distribution$varcov()</code></a></span></li>
+</ul>
+</details>
+}}
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-new"></a>}}
-\if{latex}{\out{\hypertarget{method-new}{}}}
+\if{html}{\out{<a id="method-BetaDistribution-new"></a>}}
+\if{latex}{\out{\hypertarget{method-BetaDistribution-new}{}}}
 \subsection{Method \code{new()}}{
 Create an object of class \code{BetaDistribution}.
 \subsection{Usage}{
@@ -62,8 +62,8 @@ An object of class \code{BetaDistribution}.
 }
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-distribution"></a>}}
-\if{latex}{\out{\hypertarget{method-distribution}{}}}
+\if{html}{\out{<a id="method-BetaDistribution-distribution"></a>}}
+\if{latex}{\out{\hypertarget{method-BetaDistribution-distribution}{}}}
 \subsection{Method \code{distribution()}}{
 Accessor function for the name of the uncertainty 
 distribution.
@@ -76,8 +76,8 @@ Distribution name as character string.
 }
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-mean"></a>}}
-\if{latex}{\out{\hypertarget{method-mean}{}}}
+\if{html}{\out{<a id="method-BetaDistribution-mean"></a>}}
+\if{latex}{\out{\hypertarget{method-BetaDistribution-mean}{}}}
 \subsection{Method \code{mean()}}{
 The expected value of the distribution.
 \subsection{Usage}{
@@ -89,8 +89,8 @@ Expected value as a numeric value.
 }
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-mode"></a>}}
-\if{latex}{\out{\hypertarget{method-mode}{}}}
+\if{html}{\out{<a id="method-BetaDistribution-mode"></a>}}
+\if{latex}{\out{\hypertarget{method-BetaDistribution-mode}{}}}
 \subsection{Method \code{mode()}}{
 The mode of the distribution (if 
 \code{alpha}, \code{beta} > 1)
@@ -103,8 +103,8 @@ mode as a numeric value.
 }
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-SD"></a>}}
-\if{latex}{\out{\hypertarget{method-SD}{}}}
+\if{html}{\out{<a id="method-BetaDistribution-SD"></a>}}
+\if{latex}{\out{\hypertarget{method-BetaDistribution-SD}{}}}
 \subsection{Method \code{SD()}}{
 The standard deviation of the distribution.
 \subsection{Usage}{
@@ -116,8 +116,8 @@ Standard deviation as a numeric value
 }
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-sample"></a>}}
-\if{latex}{\out{\hypertarget{method-sample}{}}}
+\if{html}{\out{<a id="method-BetaDistribution-sample"></a>}}
+\if{latex}{\out{\hypertarget{method-BetaDistribution-sample}{}}}
 \subsection{Method \code{sample()}}{
 Draw and hold a random sample from the model variable.
 \subsection{Usage}{
@@ -137,8 +137,8 @@ Updated distribution.
 }
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-quantile"></a>}}
-\if{latex}{\out{\hypertarget{method-quantile}{}}}
+\if{html}{\out{<a id="method-BetaDistribution-quantile"></a>}}
+\if{latex}{\out{\hypertarget{method-BetaDistribution-quantile}{}}}
 \subsection{Method \code{quantile()}}{
 The quantiles of the Beta distribution.
 \subsection{Usage}{
@@ -157,8 +157,8 @@ Vector of quantiles.
 }
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-clone"></a>}}
-\if{latex}{\out{\hypertarget{method-clone}{}}}
+\if{html}{\out{<a id="method-BetaDistribution-clone"></a>}}
+\if{latex}{\out{\hypertarget{method-BetaDistribution-clone}{}}}
 \subsection{Method \code{clone()}}{
 The objects of this class are cloneable with this method.
 \subsection{Usage}{

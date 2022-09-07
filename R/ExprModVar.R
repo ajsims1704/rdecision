@@ -102,7 +102,7 @@ ExprModVar <- R6::R6Class(
       # create an empirical distribution, accounting for nested autocorrelation
       samp <- sapply(1:nemp, FUN=function(i) {
         # set each operand to return a random sample
-        for (o in private$.operands) {o$set("random")}
+        for (o in private$.operands) o$set("random")
         # compute the value using the random value for each operand
         # using the pre-packaged expression
         rv <- rlang::eval_tidy(private$q.get)
@@ -113,11 +113,11 @@ ExprModVar <- R6::R6Class(
       super$initialize(description, units, D=D)
       # save the components of .value that do not change
       private$.value["expected"] <- self$mean() 
-      for (o in private$.operands) {o$set("q2.5")}
+      for (o in private$.operands) o$set("q2.5")
       private$.value["q2.5"] <- rlang::eval_tidy(private$q.get)
-      for (o in private$.operands) {o$set("q50")}
+      for (o in private$.operands) o$set("q50")
       private$.value["q50"] <- rlang::eval_tidy(private$q.get)
-      for (o in private$.operands) {o$set("q97.5")}
+      for (o in private$.operands) o$set("q97.5")
       private$.value["q97.5"] <- rlang::eval_tidy(private$q.get)
       # return
       return(invisible(self))
@@ -148,10 +148,9 @@ ExprModVar <- R6::R6Class(
       mv <- list()
       for (v in all.vars(private$expr)) {
         # build replacement string if necessary
-        if (inherits(eval(str2lang(v), envir=private$env), what='ModVar')) {
-          rep <- gsub(v, paste(v, method, sep='$'), v)
-        }
-        else {
+        if (inherits(eval(str2lang(v), envir=private$env), what="ModVar")) {
+          rep <- gsub(v, paste(v, method, sep="$"), v)
+        } else {
           rep <- v
         }
         # create symbol from the modified string
@@ -350,7 +349,7 @@ ExprModVar <- R6::R6Class(
     #' \code{set} has been called for one or more operands in the meantime;} 
     #' \item{\code{"value"}}{sets the value of the expression to be equal to 
     #' parameter \code{val}. This is not recommended for normal usage because it
-    #' allows the model variable to be set to an implausible value, based on its 
+    #' allows the model variable to be set to an implausible value, based on its
     #' defined uncertainty. An example of where this may be needed is in 
     #' threshold finding.} 
     #' }
@@ -374,7 +373,7 @@ ExprModVar <- R6::R6Class(
       # if random, make a new draw from the distribution
       if (what == "random") {
         # set the operands to return a random sample
-        for (o in private$.operands) {o$set("random")}
+        for (o in private$.operands) o$set("random")
       }
       # if value, check and save the supplied number
       if (what == "value") {

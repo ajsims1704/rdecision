@@ -9,6 +9,7 @@
 ^.*\.Rproj$
 ^\.Rproj\.user$
 ^\.Rhistory$
+^\.lintr$
 ^cran-comments\.md$
 ^CRAN-RELEASE$
 ^README\.Rmd$

@@ -16,15 +16,15 @@ Andrew Sims \email{andrew.sims@newcastle.ac.uk}
 \section{Methods}{
 \subsection{Public methods}{
 \itemize{
-\item \href{#method-new}{\code{Node$new()}}
-\item \href{#method-label}{\code{Node$label()}}
-\item \href{#method-type}{\code{Node$type()}}
-\item \href{#method-clone}{\code{Node$clone()}}
+\item \href{#method-Node-new}{\code{Node$new()}}
+\item \href{#method-Node-label}{\code{Node$label()}}
+\item \href{#method-Node-type}{\code{Node$type()}}
+\item \href{#method-Node-clone}{\code{Node$clone()}}
 }
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-new"></a>}}
-\if{latex}{\out{\hypertarget{method-new}{}}}
+\if{html}{\out{<a id="method-Node-new"></a>}}
+\if{latex}{\out{\hypertarget{method-Node-new}{}}}
 \subsection{Method \code{new()}}{
 Create new \code{Node} object.
 \subsection{Usage}{
@@ -43,8 +43,8 @@ A new \code{Node} object.
 }
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-label"></a>}}
-\if{latex}{\out{\hypertarget{method-label}{}}}
+\if{html}{\out{<a id="method-Node-label"></a>}}
+\if{latex}{\out{\hypertarget{method-Node-label}{}}}
 \subsection{Method \code{label()}}{
 Return the label of the node.
 \subsection{Usage}{
@@ -56,8 +56,8 @@ Label as a character string.
 }
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-type"></a>}}
-\if{latex}{\out{\hypertarget{method-type}{}}}
+\if{html}{\out{<a id="method-Node-type"></a>}}
+\if{latex}{\out{\hypertarget{method-Node-type}{}}}
 \subsection{Method \code{type()}}{
 node type
 \subsection{Usage}{
@@ -69,8 +69,8 @@ node type
 }
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-clone"></a>}}
-\if{latex}{\out{\hypertarget{method-clone}{}}}
+\if{html}{\out{<a id="method-Node-clone"></a>}}
+\if{latex}{\out{\hypertarget{method-Node-clone}{}}}
 \subsection{Method \code{clone()}}{
 The objects of this class are cloneable with this method.
 \subsection{Usage}{

@@ -23,27 +23,27 @@ Andrew J. Sims \email{andrew.sims@newcastle.ac.uk}
 \section{Methods}{
 \subsection{Public methods}{
 \itemize{
-\item \href{#method-new}{\code{Transition$new()}}
-\item \href{#method-modvars}{\code{Transition$modvars()}}
-\item \href{#method-set_cost}{\code{Transition$set_cost()}}
-\item \href{#method-cost}{\code{Transition$cost()}}
-\item \href{#method-clone}{\code{Transition$clone()}}
+\item \href{#method-Transition-new}{\code{Transition$new()}}
+\item \href{#method-Transition-modvars}{\code{Transition$modvars()}}
+\item \href{#method-Transition-set_cost}{\code{Transition$set_cost()}}
+\item \href{#method-Transition-cost}{\code{Transition$cost()}}
+\item \href{#method-Transition-clone}{\code{Transition$clone()}}
 }
 }
-\if{html}{
-\out{<details open ><summary>Inherited methods</summary>}
-\itemize{
-\item \out{<span class="pkg-link" data-pkg="rdecision" data-topic="Edge" data-id="endpoints">}\href{../../rdecision/html/Edge.html#method-endpoints}{\code{rdecision::Edge$endpoints()}}\out{</span>}
-\item \out{<span class="pkg-link" data-pkg="rdecision" data-topic="Edge" data-id="is_same_edge">}\href{../../rdecision/html/Edge.html#method-is_same_edge}{\code{rdecision::Edge$is_same_edge()}}\out{</span>}
-\item \out{<span class="pkg-link" data-pkg="rdecision" data-topic="Edge" data-id="label">}\href{../../rdecision/html/Edge.html#method-label}{\code{rdecision::Edge$label()}}\out{</span>}
-\item \out{<span class="pkg-link" data-pkg="rdecision" data-topic="Arrow" data-id="source">}\href{../../rdecision/html/Arrow.html#method-source}{\code{rdecision::Arrow$source()}}\out{</span>}
-\item \out{<span class="pkg-link" data-pkg="rdecision" data-topic="Arrow" data-id="target">}\href{../../rdecision/html/Arrow.html#method-target}{\code{rdecision::Arrow$target()}}\out{</span>}
-}
-\out{</details>}
-}
+\if{html}{\out{
+<details open><summary>Inherited methods</summary>
+<ul>
+<li><span class="pkg-link" data-pkg="rdecision" data-topic="Edge" data-id="endpoints"><a href='../../rdecision/html/Edge.html#method-Edge-endpoints'><code>rdecision::Edge$endpoints()</code></a></span></li>
+<li><span class="pkg-link" data-pkg="rdecision" data-topic="Edge" data-id="is_same_edge"><a href='../../rdecision/html/Edge.html#method-Edge-is_same_edge'><code>rdecision::Edge$is_same_edge()</code></a></span></li>
+<li><span class="pkg-link" data-pkg="rdecision" data-topic="Edge" data-id="label"><a href='../../rdecision/html/Edge.html#method-Edge-label'><code>rdecision::Edge$label()</code></a></span></li>
+<li><span class="pkg-link" data-pkg="rdecision" data-topic="Arrow" data-id="source"><a href='../../rdecision/html/Arrow.html#method-Arrow-source'><code>rdecision::Arrow$source()</code></a></span></li>
+<li><span class="pkg-link" data-pkg="rdecision" data-topic="Arrow" data-id="target"><a href='../../rdecision/html/Arrow.html#method-Arrow-target'><code>rdecision::Arrow$target()</code></a></span></li>
+</ul>
+</details>
+}}
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-new"></a>}}
-\if{latex}{\out{\hypertarget{method-new}{}}}
+\if{html}{\out{<a id="method-Transition-new"></a>}}
+\if{latex}{\out{\hypertarget{method-Transition-new}{}}}
 \subsection{Method \code{new()}}{
 Create an object of type \code{MarkovTransition}.
 \subsection{Usage}{
@@ -69,8 +69,8 @@ A new \code{Transition} object.
 }
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-modvars"></a>}}
-\if{latex}{\out{\hypertarget{method-modvars}{}}}
+\if{html}{\out{<a id="method-Transition-modvars"></a>}}
+\if{latex}{\out{\hypertarget{method-Transition-modvars}{}}}
 \subsection{Method \code{modvars()}}{
 Find all the model variables.
 \subsection{Usage}{
@@ -88,8 +88,8 @@ A list of \code{ModVar}s.
 }
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-set_cost"></a>}}
-\if{latex}{\out{\hypertarget{method-set_cost}{}}}
+\if{html}{\out{<a id="method-Transition-set_cost"></a>}}
+\if{latex}{\out{\hypertarget{method-Transition-set_cost}{}}}
 \subsection{Method \code{set_cost()}}{
 Set the cost associated with the transition.
 \subsection{Usage}{
@@ -108,8 +108,8 @@ Updated \code{Transition} object.
 }
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-cost"></a>}}
-\if{latex}{\out{\hypertarget{method-cost}{}}}
+\if{html}{\out{<a id="method-Transition-cost"></a>}}
+\if{latex}{\out{\hypertarget{method-Transition-cost}{}}}
 \subsection{Method \code{cost()}}{
 Return the cost associated with traversing the edge.
 \subsection{Usage}{
@@ -121,8 +121,8 @@ Cost.
 }
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-clone"></a>}}
-\if{latex}{\out{\hypertarget{method-clone}{}}}
+\if{html}{\out{<a id="method-Transition-clone"></a>}}
+\if{latex}{\out{\hypertarget{method-Transition-clone}{}}}
 \subsection{Method \code{clone()}}{
 The objects of this class are cloneable with this method.
 \subsection{Usage}{

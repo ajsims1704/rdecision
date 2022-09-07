@@ -21,28 +21,28 @@ Andrew J. Sims \email{andrew.sims@newcastle.ac.uk}
 \section{Methods}{
 \subsection{Public methods}{
 \itemize{
-\item \href{#method-new}{\code{Reaction$new()}}
-\item \href{#method-modvars}{\code{Reaction$modvars()}}
-\item \href{#method-p}{\code{Reaction$p()}}
-\item \href{#method-cost}{\code{Reaction$cost()}}
-\item \href{#method-benefit}{\code{Reaction$benefit()}}
-\item \href{#method-clone}{\code{Reaction$clone()}}
+\item \href{#method-Reaction-new}{\code{Reaction$new()}}
+\item \href{#method-Reaction-modvars}{\code{Reaction$modvars()}}
+\item \href{#method-Reaction-p}{\code{Reaction$p()}}
+\item \href{#method-Reaction-cost}{\code{Reaction$cost()}}
+\item \href{#method-Reaction-benefit}{\code{Reaction$benefit()}}
+\item \href{#method-Reaction-clone}{\code{Reaction$clone()}}
 }
 }
-\if{html}{
-\out{<details open ><summary>Inherited methods</summary>}
-\itemize{
-\item \out{<span class="pkg-link" data-pkg="rdecision" data-topic="Edge" data-id="endpoints">}\href{../../rdecision/html/Edge.html#method-endpoints}{\code{rdecision::Edge$endpoints()}}\out{</span>}
-\item \out{<span class="pkg-link" data-pkg="rdecision" data-topic="Edge" data-id="is_same_edge">}\href{../../rdecision/html/Edge.html#method-is_same_edge}{\code{rdecision::Edge$is_same_edge()}}\out{</span>}
-\item \out{<span class="pkg-link" data-pkg="rdecision" data-topic="Edge" data-id="label">}\href{../../rdecision/html/Edge.html#method-label}{\code{rdecision::Edge$label()}}\out{</span>}
-\item \out{<span class="pkg-link" data-pkg="rdecision" data-topic="Arrow" data-id="source">}\href{../../rdecision/html/Arrow.html#method-source}{\code{rdecision::Arrow$source()}}\out{</span>}
-\item \out{<span class="pkg-link" data-pkg="rdecision" data-topic="Arrow" data-id="target">}\href{../../rdecision/html/Arrow.html#method-target}{\code{rdecision::Arrow$target()}}\out{</span>}
-}
-\out{</details>}
-}
+\if{html}{\out{
+<details open><summary>Inherited methods</summary>
+<ul>
+<li><span class="pkg-link" data-pkg="rdecision" data-topic="Edge" data-id="endpoints"><a href='../../rdecision/html/Edge.html#method-Edge-endpoints'><code>rdecision::Edge$endpoints()</code></a></span></li>
+<li><span class="pkg-link" data-pkg="rdecision" data-topic="Edge" data-id="is_same_edge"><a href='../../rdecision/html/Edge.html#method-Edge-is_same_edge'><code>rdecision::Edge$is_same_edge()</code></a></span></li>
+<li><span class="pkg-link" data-pkg="rdecision" data-topic="Edge" data-id="label"><a href='../../rdecision/html/Edge.html#method-Edge-label'><code>rdecision::Edge$label()</code></a></span></li>
+<li><span class="pkg-link" data-pkg="rdecision" data-topic="Arrow" data-id="source"><a href='../../rdecision/html/Arrow.html#method-Arrow-source'><code>rdecision::Arrow$source()</code></a></span></li>
+<li><span class="pkg-link" data-pkg="rdecision" data-topic="Arrow" data-id="target"><a href='../../rdecision/html/Arrow.html#method-Arrow-target'><code>rdecision::Arrow$target()</code></a></span></li>
+</ul>
+</details>
+}}
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-new"></a>}}
-\if{latex}{\out{\hypertarget{method-new}{}}}
+\if{html}{\out{<a id="method-Reaction-new"></a>}}
+\if{latex}{\out{\hypertarget{method-Reaction-new}{}}}
 \subsection{Method \code{new()}}{
 Create an object of type \code{Reaction}. A probability must be assigned
 to the edge. Optionally, a cost and a benefit may be associated
@@ -75,8 +75,8 @@ A new \code{Reaction} object.
 }
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-modvars"></a>}}
-\if{latex}{\out{\hypertarget{method-modvars}{}}}
+\if{html}{\out{<a id="method-Reaction-modvars"></a>}}
+\if{latex}{\out{\hypertarget{method-Reaction-modvars}{}}}
 \subsection{Method \code{modvars()}}{
 Find all the model variables of type \code{ModVar} that have been 
 specified
@@ -91,8 +91,8 @@ A list of \code{ModVar}s.
 }
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-p"></a>}}
-\if{latex}{\out{\hypertarget{method-p}{}}}
+\if{html}{\out{<a id="method-Reaction-p"></a>}}
+\if{latex}{\out{\hypertarget{method-Reaction-p}{}}}
 \subsection{Method \code{p()}}{
 Return the current value of the edge probability, i.e. the conditional
 probability of traversing the edge.
@@ -105,8 +105,8 @@ Numeric value in range [0,1].
 }
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-cost"></a>}}
-\if{latex}{\out{\hypertarget{method-cost}{}}}
+\if{html}{\out{<a id="method-Reaction-cost"></a>}}
+\if{latex}{\out{\hypertarget{method-Reaction-cost}{}}}
 \subsection{Method \code{cost()}}{
 Return the cost associated with traversing the edge.
 \subsection{Usage}{
@@ -118,8 +118,8 @@ Cost.
 }
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-benefit"></a>}}
-\if{latex}{\out{\hypertarget{method-benefit}{}}}
+\if{html}{\out{<a id="method-Reaction-benefit"></a>}}
+\if{latex}{\out{\hypertarget{method-Reaction-benefit}{}}}
 \subsection{Method \code{benefit()}}{
 Return the benefit associated with traversing the edge.
 \subsection{Usage}{
@@ -131,8 +131,8 @@ Benefit.
 }
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-clone"></a>}}
-\if{latex}{\out{\hypertarget{method-clone}{}}}
+\if{html}{\out{<a id="method-Reaction-clone"></a>}}
+\if{latex}{\out{\hypertarget{method-Reaction-clone}{}}}
 \subsection{Method \code{clone()}}{
 The objects of this class are cloneable with this method.
 \subsection{Usage}{

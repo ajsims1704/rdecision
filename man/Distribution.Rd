@@ -17,22 +17,22 @@ Andrew J. Sims \email{andrew.sims@newcastle.ac.uk}
 \section{Methods}{
 \subsection{Public methods}{
 \itemize{
-\item \href{#method-new}{\code{Distribution$new()}}
-\item \href{#method-order}{\code{Distribution$order()}}
-\item \href{#method-distribution}{\code{Distribution$distribution()}}
-\item \href{#method-mean}{\code{Distribution$mean()}}
-\item \href{#method-mode}{\code{Distribution$mode()}}
-\item \href{#method-SD}{\code{Distribution$SD()}}
-\item \href{#method-varcov}{\code{Distribution$varcov()}}
-\item \href{#method-quantile}{\code{Distribution$quantile()}}
-\item \href{#method-sample}{\code{Distribution$sample()}}
-\item \href{#method-r}{\code{Distribution$r()}}
-\item \href{#method-clone}{\code{Distribution$clone()}}
+\item \href{#method-Distribution-new}{\code{Distribution$new()}}
+\item \href{#method-Distribution-order}{\code{Distribution$order()}}
+\item \href{#method-Distribution-distribution}{\code{Distribution$distribution()}}
+\item \href{#method-Distribution-mean}{\code{Distribution$mean()}}
+\item \href{#method-Distribution-mode}{\code{Distribution$mode()}}
+\item \href{#method-Distribution-SD}{\code{Distribution$SD()}}
+\item \href{#method-Distribution-varcov}{\code{Distribution$varcov()}}
+\item \href{#method-Distribution-quantile}{\code{Distribution$quantile()}}
+\item \href{#method-Distribution-sample}{\code{Distribution$sample()}}
+\item \href{#method-Distribution-r}{\code{Distribution$r()}}
+\item \href{#method-Distribution-clone}{\code{Distribution$clone()}}
 }
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-new"></a>}}
-\if{latex}{\out{\hypertarget{method-new}{}}}
+\if{html}{\out{<a id="method-Distribution-new"></a>}}
+\if{latex}{\out{\hypertarget{method-Distribution-new}{}}}
 \subsection{Method \code{new()}}{
 Create an object of class \code{Distribution}.
 \subsection{Usage}{
@@ -54,8 +54,8 @@ An object of class \code{Distribution}.
 }
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-order"></a>}}
-\if{latex}{\out{\hypertarget{method-order}{}}}
+\if{html}{\out{<a id="method-Distribution-order"></a>}}
+\if{latex}{\out{\hypertarget{method-Distribution-order}{}}}
 \subsection{Method \code{order()}}{
 Order of the distribution
 \subsection{Usage}{
@@ -67,8 +67,8 @@ Order (\code{K}).
 }
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-distribution"></a>}}
-\if{latex}{\out{\hypertarget{method-distribution}{}}}
+\if{html}{\out{<a id="method-Distribution-distribution"></a>}}
+\if{latex}{\out{\hypertarget{method-Distribution-distribution}{}}}
 \subsection{Method \code{distribution()}}{
 Description of the uncertainty distribution.
 \subsection{Usage}{
@@ -84,8 +84,8 @@ Distribution name and parameters as character string.
 }
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-mean"></a>}}
-\if{latex}{\out{\hypertarget{method-mean}{}}}
+\if{html}{\out{<a id="method-Distribution-mean"></a>}}
+\if{latex}{\out{\hypertarget{method-Distribution-mean}{}}}
 \subsection{Method \code{mean()}}{
 Mean value of the distribution.
 \subsection{Usage}{
@@ -98,8 +98,8 @@ length \code{K}.
 }
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-mode"></a>}}
-\if{latex}{\out{\hypertarget{method-mode}{}}}
+\if{html}{\out{<a id="method-Distribution-mode"></a>}}
+\if{latex}{\out{\hypertarget{method-Distribution-mode}{}}}
 \subsection{Method \code{mode()}}{
 Return the mode of the distribution.
 \subsection{Usage}{
@@ -117,8 +117,8 @@ length \code{K}.
 }
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-SD"></a>}}
-\if{latex}{\out{\hypertarget{method-SD}{}}}
+\if{html}{\out{<a id="method-Distribution-SD"></a>}}
+\if{latex}{\out{\hypertarget{method-Distribution-SD}{}}}
 \subsection{Method \code{SD()}}{
 Return the standard deviation of a univariate distribution.
 \subsection{Usage}{
@@ -136,8 +136,8 @@ Standard deviation as a numeric value.
 }
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-varcov"></a>}}
-\if{latex}{\out{\hypertarget{method-varcov}{}}}
+\if{html}{\out{<a id="method-Distribution-varcov"></a>}}
+\if{latex}{\out{\hypertarget{method-Distribution-varcov}{}}}
 \subsection{Method \code{varcov()}}{
 Variance-covariance matrix.
 \subsection{Usage}{
@@ -150,8 +150,8 @@ A positive definite symmetric matrix of size \code{K} by
 }
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-quantile"></a>}}
-\if{latex}{\out{\hypertarget{method-quantile}{}}}
+\if{html}{\out{<a id="method-Distribution-quantile"></a>}}
+\if{latex}{\out{\hypertarget{method-Distribution-quantile}{}}}
 \subsection{Method \code{quantile()}}{
 Marginal quantiles of the distribution.
 \subsection{Usage}{
@@ -189,8 +189,8 @@ labelled with quantiles and columns with the dimension (1, 2, etc).
 }
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-sample"></a>}}
-\if{latex}{\out{\hypertarget{method-sample}{}}}
+\if{html}{\out{<a id="method-Distribution-sample"></a>}}
+\if{latex}{\out{\hypertarget{method-Distribution-sample}{}}}
 \subsection{Method \code{sample()}}{
 Draw and hold a random sample from the distribution.
 \subsection{Usage}{
@@ -210,8 +210,8 @@ Void
 }
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-r"></a>}}
-\if{latex}{\out{\hypertarget{method-r}{}}}
+\if{html}{\out{<a id="method-Distribution-r"></a>}}
+\if{latex}{\out{\hypertarget{method-Distribution-r}{}}}
 \subsection{Method \code{r()}}{
 Return a random sample drawn from the distribution.
 \subsection{Usage}{
@@ -227,8 +227,8 @@ A vector of length \code{K} representing one sample.
 }
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-clone"></a>}}
-\if{latex}{\out{\hypertarget{method-clone}{}}}
+\if{html}{\out{<a id="method-Distribution-clone"></a>}}
+\if{latex}{\out{\hypertarget{method-Distribution-clone}{}}}
 \subsection{Method \code{clone()}}{
 The objects of this class are cloneable with this method.
 \subsection{Usage}{

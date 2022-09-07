@@ -34,43 +34,47 @@ Andrew Sims \email{andrew.sims@newcastle.ac.uk}
 \section{Methods}{
 \subsection{Public methods}{
 \itemize{
-\item \href{#method-new}{\code{Digraph$new()}}
-\item \href{#method-digraph_adjacency_matrix}{\code{Digraph$digraph_adjacency_matrix()}}
-\item \href{#method-digraph_incidence_matrix}{\code{Digraph$digraph_incidence_matrix()}}
-\item \href{#method-topological_sort}{\code{Digraph$topological_sort()}}
-\item \href{#method-is_connected}{\code{Digraph$is_connected()}}
-\item \href{#method-is_weakly_connected}{\code{Digraph$is_weakly_connected()}}
-\item \href{#method-is_acyclic}{\code{Digraph$is_acyclic()}}
-\item \href{#method-is_tree}{\code{Digraph$is_tree()}}
-\item \href{#method-is_polytree}{\code{Digraph$is_polytree()}}
-\item \href{#method-is_arborescence}{\code{Digraph$is_arborescence()}}
-\item \href{#method-direct_successors}{\code{Digraph$direct_successors()}}
-\item \href{#method-direct_predecessors}{\code{Digraph$direct_predecessors()}}
-\item \href{#method-paths}{\code{Digraph$paths()}}
-\item \href{#method-walk}{\code{Digraph$walk()}}
-\item \href{#method-as_DOT}{\code{Digraph$as_DOT()}}
-\item \href{#method-clone}{\code{Digraph$clone()}}
+\item \href{#method-Digraph-new}{\code{Digraph$new()}}
+\item \href{#method-Digraph-digraph_adjacency_matrix}{\code{Digraph$digraph_adjacency_matrix()}}
+\item \href{#method-Digraph-digraph_incidence_matrix}{\code{Digraph$digraph_incidence_matrix()}}
+\item \href{#method-Digraph-topological_sort}{\code{Digraph$topological_sort()}}
+\item \href{#method-Digraph-is_connected}{\code{Digraph$is_connected()}}
+\item \href{#method-Digraph-is_weakly_connected}{\code{Digraph$is_weakly_connected()}}
+\item \href{#method-Digraph-is_acyclic}{\code{Digraph$is_acyclic()}}
+\item \href{#method-Digraph-is_tree}{\code{Digraph$is_tree()}}
+\item \href{#method-Digraph-is_polytree}{\code{Digraph$is_polytree()}}
+\item \href{#method-Digraph-is_arborescence}{\code{Digraph$is_arborescence()}}
+\item \href{#method-Digraph-direct_successors}{\code{Digraph$direct_successors()}}
+\item \href{#method-Digraph-direct_predecessors}{\code{Digraph$direct_predecessors()}}
+\item \href{#method-Digraph-paths}{\code{Digraph$paths()}}
+\item \href{#method-Digraph-walk}{\code{Digraph$walk()}}
+\item \href{#method-Digraph-as_DOT}{\code{Digraph$as_DOT()}}
+\item \href{#method-Digraph-clone}{\code{Digraph$clone()}}
 }
 }
-\if{html}{
-\out{<details ><summary>Inherited methods</summary>}
-\itemize{
-\item \out{<span class="pkg-link" data-pkg="rdecision" data-topic="Graph" data-id="degree">}\href{../../rdecision/html/Graph.html#method-degree}{\code{rdecision::Graph$degree()}}\out{</span>}
-\item \out{<span class="pkg-link" data-pkg="rdecision" data-topic="Graph" data-id="edge_index">}\href{../../rdecision/html/Graph.html#method-edge_index}{\code{rdecision::Graph$edge_index()}}\out{</span>}
-\item \out{<span class="pkg-link" data-pkg="rdecision" data-topic="Graph" data-id="graph_adjacency_matrix">}\href{../../rdecision/html/Graph.html#method-graph_adjacency_matrix}{\code{rdecision::Graph$graph_adjacency_matrix()}}\out{</span>}
-\item \out{<span class="pkg-link" data-pkg="rdecision" data-topic="Graph" data-id="has_edge">}\href{../../rdecision/html/Graph.html#method-has_edge}{\code{rdecision::Graph$has_edge()}}\out{</span>}
-\item \out{<span class="pkg-link" data-pkg="rdecision" data-topic="Graph" data-id="has_vertex">}\href{../../rdecision/html/Graph.html#method-has_vertex}{\code{rdecision::Graph$has_vertex()}}\out{</span>}
-\item \out{<span class="pkg-link" data-pkg="rdecision" data-topic="Graph" data-id="is_simple">}\href{../../rdecision/html/Graph.html#method-is_simple}{\code{rdecision::Graph$is_simple()}}\out{</span>}
-\item \out{<span class="pkg-link" data-pkg="rdecision" data-topic="Graph" data-id="neighbours">}\href{../../rdecision/html/Graph.html#method-neighbours}{\code{rdecision::Graph$neighbours()}}\out{</span>}
-\item \out{<span class="pkg-link" data-pkg="rdecision" data-topic="Graph" data-id="order">}\href{../../rdecision/html/Graph.html#method-order}{\code{rdecision::Graph$order()}}\out{</span>}
-\item \out{<span class="pkg-link" data-pkg="rdecision" data-topic="Graph" data-id="size">}\href{../../rdecision/html/Graph.html#method-size}{\code{rdecision::Graph$size()}}\out{</span>}
-\item \out{<span class="pkg-link" data-pkg="rdecision" data-topic="Graph" data-id="vertex_index">}\href{../../rdecision/html/Graph.html#method-vertex_index}{\code{rdecision::Graph$vertex_index()}}\out{</span>}
-}
-\out{</details>}
-}
+\if{html}{\out{
+<details><summary>Inherited methods</summary>
+<ul>
+<li><span class="pkg-link" data-pkg="rdecision" data-topic="Graph" data-id="degree"><a href='../../rdecision/html/Graph.html#method-Graph-degree'><code>rdecision::Graph$degree()</code></a></span></li>
+<li><span class="pkg-link" data-pkg="rdecision" data-topic="Graph" data-id="edge_along"><a href='../../rdecision/html/Graph.html#method-Graph-edge_along'><code>rdecision::Graph$edge_along()</code></a></span></li>
+<li><span class="pkg-link" data-pkg="rdecision" data-topic="Graph" data-id="edge_at"><a href='../../rdecision/html/Graph.html#method-Graph-edge_at'><code>rdecision::Graph$edge_at()</code></a></span></li>
+<li><span class="pkg-link" data-pkg="rdecision" data-topic="Graph" data-id="edge_index"><a href='../../rdecision/html/Graph.html#method-Graph-edge_index'><code>rdecision::Graph$edge_index()</code></a></span></li>
+<li><span class="pkg-link" data-pkg="rdecision" data-topic="Graph" data-id="graph_adjacency_matrix"><a href='../../rdecision/html/Graph.html#method-Graph-graph_adjacency_matrix'><code>rdecision::Graph$graph_adjacency_matrix()</code></a></span></li>
+<li><span class="pkg-link" data-pkg="rdecision" data-topic="Graph" data-id="has_edge"><a href='../../rdecision/html/Graph.html#method-Graph-has_edge'><code>rdecision::Graph$has_edge()</code></a></span></li>
+<li><span class="pkg-link" data-pkg="rdecision" data-topic="Graph" data-id="has_vertex"><a href='../../rdecision/html/Graph.html#method-Graph-has_vertex'><code>rdecision::Graph$has_vertex()</code></a></span></li>
+<li><span class="pkg-link" data-pkg="rdecision" data-topic="Graph" data-id="is_simple"><a href='../../rdecision/html/Graph.html#method-Graph-is_simple'><code>rdecision::Graph$is_simple()</code></a></span></li>
+<li><span class="pkg-link" data-pkg="rdecision" data-topic="Graph" data-id="neighbours"><a href='../../rdecision/html/Graph.html#method-Graph-neighbours'><code>rdecision::Graph$neighbours()</code></a></span></li>
+<li><span class="pkg-link" data-pkg="rdecision" data-topic="Graph" data-id="order"><a href='../../rdecision/html/Graph.html#method-Graph-order'><code>rdecision::Graph$order()</code></a></span></li>
+<li><span class="pkg-link" data-pkg="rdecision" data-topic="Graph" data-id="size"><a href='../../rdecision/html/Graph.html#method-Graph-size'><code>rdecision::Graph$size()</code></a></span></li>
+<li><span class="pkg-link" data-pkg="rdecision" data-topic="Graph" data-id="vertex_along"><a href='../../rdecision/html/Graph.html#method-Graph-vertex_along'><code>rdecision::Graph$vertex_along()</code></a></span></li>
+<li><span class="pkg-link" data-pkg="rdecision" data-topic="Graph" data-id="vertex_at"><a href='../../rdecision/html/Graph.html#method-Graph-vertex_at'><code>rdecision::Graph$vertex_at()</code></a></span></li>
+<li><span class="pkg-link" data-pkg="rdecision" data-topic="Graph" data-id="vertex_index"><a href='../../rdecision/html/Graph.html#method-Graph-vertex_index'><code>rdecision::Graph$vertex_index()</code></a></span></li>
+</ul>
+</details>
+}}
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-new"></a>}}
-\if{latex}{\out{\hypertarget{method-new}{}}}
+\if{html}{\out{<a id="method-Digraph-new"></a>}}
+\if{latex}{\out{\hypertarget{method-Digraph-new}{}}}
 \subsection{Method \code{new()}}{
 Create a new \code{Digraph} object from sets of nodes and edges.
 \subsection{Usage}{
@@ -91,8 +95,8 @@ A Digraph object.
 }
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-digraph_adjacency_matrix"></a>}}
-\if{latex}{\out{\hypertarget{method-digraph_adjacency_matrix}{}}}
+\if{html}{\out{<a id="method-Digraph-digraph_adjacency_matrix"></a>}}
+\if{latex}{\out{\hypertarget{method-Digraph-digraph_adjacency_matrix}{}}}
 \subsection{Method \code{digraph_adjacency_matrix()}}{
 Compute the adjacency matrix for the digraph.
 \subsection{Usage}{
@@ -122,8 +126,8 @@ dimnames of the matrix are the labels of the nodes.
 }
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-digraph_incidence_matrix"></a>}}
-\if{latex}{\out{\hypertarget{method-digraph_incidence_matrix}{}}}
+\if{html}{\out{<a id="method-Digraph-digraph_incidence_matrix"></a>}}
+\if{latex}{\out{\hypertarget{method-Digraph-digraph_incidence_matrix}{}}}
 \subsection{Method \code{digraph_incidence_matrix()}}{
 Compute the incidence matrix for the digraph.
 \subsection{Usage}{
@@ -143,8 +147,8 @@ The incidence matrix.
 }
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-topological_sort"></a>}}
-\if{latex}{\out{\hypertarget{method-topological_sort}{}}}
+\if{html}{\out{<a id="method-Digraph-topological_sort"></a>}}
+\if{latex}{\out{\hypertarget{method-Digraph-topological_sort}{}}}
 \subsection{Method \code{topological_sort()}}{
 Topologically sort the vertexes in the digraph.
 \subsection{Usage}{
@@ -162,8 +166,8 @@ in the graph, but no error will be raised.
 }
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-is_connected"></a>}}
-\if{latex}{\out{\hypertarget{method-is_connected}{}}}
+\if{html}{\out{<a id="method-Digraph-is_connected"></a>}}
+\if{latex}{\out{\hypertarget{method-Digraph-is_connected}{}}}
 \subsection{Method \code{is_connected()}}{
 Test whether the graph is connected.
 \subsection{Usage}{
@@ -181,8 +185,8 @@ calculates whether the underlying graph is connected.
 }
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-is_weakly_connected"></a>}}
-\if{latex}{\out{\hypertarget{method-is_weakly_connected}{}}}
+\if{html}{\out{<a id="method-Digraph-is_weakly_connected"></a>}}
+\if{latex}{\out{\hypertarget{method-Digraph-is_weakly_connected}{}}}
 \subsection{Method \code{is_weakly_connected()}}{
 Test whether the digraph is weakly connected, i.e. if the
 underlying graph is connected.
@@ -195,8 +199,8 @@ underlying graph is connected.
 }
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-is_acyclic"></a>}}
-\if{latex}{\out{\hypertarget{method-is_acyclic}{}}}
+\if{html}{\out{<a id="method-Digraph-is_acyclic"></a>}}
+\if{latex}{\out{\hypertarget{method-Digraph-is_acyclic}{}}}
 \subsection{Method \code{is_acyclic()}}{
 Checks for the presence of a cycle in the graph.
 \subsection{Usage}{
@@ -214,8 +218,8 @@ overrides \code{is_acyclic} in \code{Graph}.
 }
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-is_tree"></a>}}
-\if{latex}{\out{\hypertarget{method-is_tree}{}}}
+\if{html}{\out{<a id="method-Digraph-is_tree"></a>}}
+\if{latex}{\out{\hypertarget{method-Digraph-is_tree}{}}}
 \subsection{Method \code{is_tree()}}{
 Is the digraph's underlying graph a tree?
 \subsection{Usage}{
@@ -232,8 +236,8 @@ if not.
 }
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-is_polytree"></a>}}
-\if{latex}{\out{\hypertarget{method-is_polytree}{}}}
+\if{html}{\out{<a id="method-Digraph-is_polytree"></a>}}
+\if{latex}{\out{\hypertarget{method-Digraph-is_polytree}{}}}
 \subsection{Method \code{is_polytree()}}{
 Is the digraph's underlying graph a polytree?
 \subsection{Usage}{
@@ -252,8 +256,8 @@ if not.
 }
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-is_arborescence"></a>}}
-\if{latex}{\out{\hypertarget{method-is_arborescence}{}}}
+\if{html}{\out{<a id="method-Digraph-is_arborescence"></a>}}
+\if{latex}{\out{\hypertarget{method-Digraph-is_arborescence}{}}}
 \subsection{Method \code{is_arborescence()}}{
 Is the digraph an arborescence?
 \subsection{Usage}{
@@ -271,8 +275,8 @@ if not.
 }
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-direct_successors"></a>}}
-\if{latex}{\out{\hypertarget{method-direct_successors}{}}}
+\if{html}{\out{<a id="method-Digraph-direct_successors"></a>}}
+\if{latex}{\out{\hypertarget{method-Digraph-direct_successors}{}}}
 \subsection{Method \code{direct_successors()}}{
 Find the direct successors of a node.
 \subsection{Usage}{
@@ -292,8 +296,8 @@ node has no successors.
 }
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-direct_predecessors"></a>}}
-\if{latex}{\out{\hypertarget{method-direct_predecessors}{}}}
+\if{html}{\out{<a id="method-Digraph-direct_predecessors"></a>}}
+\if{latex}{\out{\hypertarget{method-Digraph-direct_predecessors}{}}}
 \subsection{Method \code{direct_predecessors()}}{
 Find the direct predecessors of a node.
 \subsection{Usage}{
@@ -313,8 +317,8 @@ node has no predecessors.
 }
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-paths"></a>}}
-\if{latex}{\out{\hypertarget{method-paths}{}}}
+\if{html}{\out{<a id="method-Digraph-paths"></a>}}
+\if{latex}{\out{\hypertarget{method-Digraph-paths}{}}}
 \subsection{Method \code{paths()}}{
 Find all directed simple paths from source to target.
 \subsection{Usage}{
@@ -340,28 +344,31 @@ A list of ordered node lists.
 }
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-walk"></a>}}
-\if{latex}{\out{\hypertarget{method-walk}{}}}
+\if{html}{\out{<a id="method-Digraph-walk"></a>}}
+\if{latex}{\out{\hypertarget{method-Digraph-walk}{}}}
 \subsection{Method \code{walk()}}{
 Sequence of edges which join the specified path.
 \subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{Digraph$walk(P)}\if{html}{\out{</div>}}
+\if{html}{\out{<div class="r">}}\preformatted{Digraph$walk(P, what = "edge")}\if{html}{\out{</div>}}
 }
 
 \subsection{Arguments}{
 \if{html}{\out{<div class="arguments">}}
 \describe{
 \item{\code{P}}{A list of Nodes}
+
+\item{\code{what}}{One of "edge" or "index".}
 }
 \if{html}{\out{</div>}}
 }
 \subsection{Returns}{
-A list of Edges
+A list of Edges for \code{what = "edge"} or a list of Edge
+indices for \code{what = "index"}.
 }
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-as_DOT"></a>}}
-\if{latex}{\out{\hypertarget{method-as_DOT}{}}}
+\if{html}{\out{<a id="method-Digraph-as_DOT"></a>}}
+\if{latex}{\out{\hypertarget{method-Digraph-as_DOT}{}}}
 \subsection{Method \code{as_DOT()}}{
 Exports the digraph in DOT notation.
 \subsection{Usage}{
@@ -381,8 +388,8 @@ for saving as a text file.
 }
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-clone"></a>}}
-\if{latex}{\out{\hypertarget{method-clone}{}}}
+\if{html}{\out{<a id="method-Digraph-clone"></a>}}
+\if{latex}{\out{\hypertarget{method-Digraph-clone}{}}}
 \subsection{Method \code{clone()}}{
 The objects of this class are cloneable with this method.
 \subsection{Usage}{

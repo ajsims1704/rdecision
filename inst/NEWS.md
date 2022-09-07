@@ -1,3 +1,35 @@
+# rdecision 1.1.2
+
+* Confirmed that utilities > 1 are supported in semi Markov models and added
+  an example to the test suite to check it. See similar notes on `DecisionTree`.
+* Removed the warning issued if a utility value of > 1 is sampled via function
+  `MarkovState$utility`.
+* Confirmed that utilities > 1 are supported in decision trees and added a
+  fictitious model to the test suite to check it. To achieve this, the
+  utility should be defined as a model variable, e.g. 
+  `u <- ConstModVar$new("utility", const = 2)` and passed as the `utility`
+  argument to `LeafNode`. Scalar arguments remain subject to range checking
+  in [-Inf,1] for normal usage and to retain the previous behaviour. 
+* Added vectorised function `as_value` to return the value of an object if
+  it is a `ModVar` (via its `get()` method) or if it is a numeric object.
+  Intended as an internal function to avoid type testing on polymorphic 
+  variables.
+* Added vectorised function `is_ModVar` to test whether an object is a model
+  variable. Intended as an internal function to the package.
+* Added function `abortifnot` (a replacement for `stopifnot` using rlang but 
+  with limited capability). It is a non-exported function intended
+  for use in checking function arguments without increasing the cyclomatic
+  complexity of the function itself.
+* Clarified the documentation for argument `W` (list of walks) for 
+  `DecisionTree$evaluate_walks`. Added the alternative argument `Wi` in 
+  which the indices of edges in each walk are provided, to improve efficiency
+  in avoiding repeated conversion between edges and indices during PSA. Added 
+  function `edge_properties` to collect information for computing path products
+  and sums without repeated tree walking.
+* Added functions `vertex_along`, `edge_along`, `vertex_at` and `edge_at` to
+  class `Graph` to clarify the relationship between nodes and edges and their
+  indices, and to help optimise iterations in graph algorithms.
+
 # rdecision 1.1.1
 
 * Edited codecov badge reference in readme.Rmd with revised preferred URL.

@@ -21,17 +21,17 @@ Andrew Sims \email{andrew.sims@newcastle.ac.uk}
 \section{Methods}{
 \subsection{Public methods}{
 \itemize{
-\item \href{#method-new}{\code{Stack$new()}}
-\item \href{#method-push}{\code{Stack$push()}}
-\item \href{#method-pop}{\code{Stack$pop()}}
-\item \href{#method-size}{\code{Stack$size()}}
-\item \href{#method-as_list}{\code{Stack$as_list()}}
-\item \href{#method-clone}{\code{Stack$clone()}}
+\item \href{#method-Stack-new}{\code{Stack$new()}}
+\item \href{#method-Stack-push}{\code{Stack$push()}}
+\item \href{#method-Stack-pop}{\code{Stack$pop()}}
+\item \href{#method-Stack-size}{\code{Stack$size()}}
+\item \href{#method-Stack-as_list}{\code{Stack$as_list()}}
+\item \href{#method-Stack-clone}{\code{Stack$clone()}}
 }
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-new"></a>}}
-\if{latex}{\out{\hypertarget{method-new}{}}}
+\if{html}{\out{<a id="method-Stack-new"></a>}}
+\if{latex}{\out{\hypertarget{method-Stack-new}{}}}
 \subsection{Method \code{new()}}{
 Create a stack.
 \subsection{Usage}{
@@ -43,8 +43,8 @@ A new \code{Stack} object.
 }
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-push"></a>}}
-\if{latex}{\out{\hypertarget{method-push}{}}}
+\if{html}{\out{<a id="method-Stack-push"></a>}}
+\if{latex}{\out{\hypertarget{method-Stack-push}{}}}
 \subsection{Method \code{push()}}{
 Push an item onto the stack.
 \subsection{Usage}{
@@ -65,8 +65,8 @@ An updated \code{Stack} object
 }
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-pop"></a>}}
-\if{latex}{\out{\hypertarget{method-pop}{}}}
+\if{html}{\out{<a id="method-Stack-pop"></a>}}
+\if{latex}{\out{\hypertarget{method-Stack-pop}{}}}
 \subsection{Method \code{pop()}}{
 Pop an item from the stack. Stack underflow and raises error.
 \subsection{Usage}{
@@ -78,8 +78,8 @@ The item previously at the top of the stack.
 }
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-size"></a>}}
-\if{latex}{\out{\hypertarget{method-size}{}}}
+\if{html}{\out{<a id="method-Stack-size"></a>}}
+\if{latex}{\out{\hypertarget{method-Stack-size}{}}}
 \subsection{Method \code{size()}}{
 Gets the number of items on the stack.
 \subsection{Usage}{
@@ -91,8 +91,8 @@ Number of items.
 }
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-as_list"></a>}}
-\if{latex}{\out{\hypertarget{method-as_list}{}}}
+\if{html}{\out{<a id="method-Stack-as_list"></a>}}
+\if{latex}{\out{\hypertarget{method-Stack-as_list}{}}}
 \subsection{Method \code{as_list()}}{
 Inspect items in the stack.
 \subsection{Usage}{
@@ -104,8 +104,8 @@ A list of items.
 }
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-clone"></a>}}
-\if{latex}{\out{\hypertarget{method-clone}{}}}
+\if{html}{\out{<a id="method-Stack-clone"></a>}}
+\if{latex}{\out{\hypertarget{method-Stack-clone}{}}}
 \subsection{Method \code{clone()}}{
 The objects of this class are cloneable with this method.
 \subsection{Usage}{

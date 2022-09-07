@@ -21,25 +21,25 @@ Andrew J. Sims \email{andrew.sims@newcastle.ac.uk}
 \section{Methods}{
 \subsection{Public methods}{
 \itemize{
-\item \href{#method-new}{\code{LeafNode$new()}}
-\item \href{#method-modvars}{\code{LeafNode$modvars()}}
-\item \href{#method-utility}{\code{LeafNode$utility()}}
-\item \href{#method-interval}{\code{LeafNode$interval()}}
-\item \href{#method-QALY}{\code{LeafNode$QALY()}}
-\item \href{#method-clone}{\code{LeafNode$clone()}}
+\item \href{#method-LeafNode-new}{\code{LeafNode$new()}}
+\item \href{#method-LeafNode-modvars}{\code{LeafNode$modvars()}}
+\item \href{#method-LeafNode-utility}{\code{LeafNode$utility()}}
+\item \href{#method-LeafNode-interval}{\code{LeafNode$interval()}}
+\item \href{#method-LeafNode-QALY}{\code{LeafNode$QALY()}}
+\item \href{#method-LeafNode-clone}{\code{LeafNode$clone()}}
 }
 }
-\if{html}{
-\out{<details open ><summary>Inherited methods</summary>}
-\itemize{
-\item \out{<span class="pkg-link" data-pkg="rdecision" data-topic="Node" data-id="label">}\href{../../rdecision/html/Node.html#method-label}{\code{rdecision::Node$label()}}\out{</span>}
-\item \out{<span class="pkg-link" data-pkg="rdecision" data-topic="Node" data-id="type">}\href{../../rdecision/html/Node.html#method-type}{\code{rdecision::Node$type()}}\out{</span>}
-}
-\out{</details>}
-}
+\if{html}{\out{
+<details open><summary>Inherited methods</summary>
+<ul>
+<li><span class="pkg-link" data-pkg="rdecision" data-topic="Node" data-id="label"><a href='../../rdecision/html/Node.html#method-Node-label'><code>rdecision::Node$label()</code></a></span></li>
+<li><span class="pkg-link" data-pkg="rdecision" data-topic="Node" data-id="type"><a href='../../rdecision/html/Node.html#method-Node-type'><code>rdecision::Node$type()</code></a></span></li>
+</ul>
+</details>
+}}
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-new"></a>}}
-\if{latex}{\out{\hypertarget{method-new}{}}}
+\if{html}{\out{<a id="method-LeafNode-new"></a>}}
+\if{latex}{\out{\hypertarget{method-LeafNode-new}{}}}
 \subsection{Method \code{new()}}{
 Create a new \code{LeafNode} object; synonymous with a clinical outcome.
 \subsection{Usage}{
@@ -59,8 +59,11 @@ converted to a syntactically valid (in R) name to ensure it can be used
 as a column name in a data frame.}
 
 \item{\code{utility}}{The incremental utility that a user associates with
-being in the health state (range \code{-Inf} to 1) for the interval.
-Intended for use with cost benefit analysis.}
+being in the health state for the interval.
+Intended for use with cost benefit analysis. Can be \code{numeric} or 
+a type of \code{ModVar}. If the type is \code{numeric}, the allowed 
+range is \code{-Inf} to 1; if it is of type \code{ModVar}, it is 
+unchecked.}
 
 \item{\code{interval}}{The time interval over which the \code{utility}
 parameter applies, expressed as an R \code{difftime} object; default 
@@ -73,8 +76,8 @@ A new \code{LeafNode} object
 }
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-modvars"></a>}}
-\if{latex}{\out{\hypertarget{method-modvars}{}}}
+\if{html}{\out{<a id="method-LeafNode-modvars"></a>}}
+\if{latex}{\out{\hypertarget{method-LeafNode-modvars}{}}}
 \subsection{Method \code{modvars()}}{
 Find all the model variables of type \code{ModVar} that have been 
 specified as values associated with this \code{LeafNode}. Includes 
@@ -88,11 +91,11 @@ A list of \code{ModVar}s.
 }
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-utility"></a>}}
-\if{latex}{\out{\hypertarget{method-utility}{}}}
+\if{html}{\out{<a id="method-LeafNode-utility"></a>}}
+\if{latex}{\out{\hypertarget{method-LeafNode-utility}{}}}
 \subsection{Method \code{utility()}}{
-Return the incremental utility associated with being in the state for
-the interval.
+Return the incremental utility associated with being in the
+state for the interval.
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{LeafNode$utility()}\if{html}{\out{</div>}}
 }
@@ -102,8 +105,8 @@ Incremental utility (numeric value).
 }
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-interval"></a>}}
-\if{latex}{\out{\hypertarget{method-interval}{}}}
+\if{html}{\out{<a id="method-LeafNode-interval"></a>}}
+\if{latex}{\out{\hypertarget{method-LeafNode-interval}{}}}
 \subsection{Method \code{interval()}}{
 Return the interval associated with being in the state.
 \subsection{Usage}{
@@ -115,11 +118,11 @@ Interval (as a \code{difftime}).
 }
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-QALY"></a>}}
-\if{latex}{\out{\hypertarget{method-QALY}{}}}
+\if{html}{\out{<a id="method-LeafNode-QALY"></a>}}
+\if{latex}{\out{\hypertarget{method-LeafNode-QALY}{}}}
 \subsection{Method \code{QALY()}}{
-Return the quality adjusted life years associated with being in 
-the state.
+Return the quality adjusted life years associated with 
+being in the state.
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{LeafNode$QALY()}\if{html}{\out{</div>}}
 }
@@ -129,8 +132,8 @@ the state.
 }
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-clone"></a>}}
-\if{latex}{\out{\hypertarget{method-clone}{}}}
+\if{html}{\out{<a id="method-LeafNode-clone"></a>}}
+\if{latex}{\out{\hypertarget{method-LeafNode-clone}{}}}
 \subsection{Method \code{clone()}}{
 The objects of this class are cloneable with this method.
 \subsection{Usage}{

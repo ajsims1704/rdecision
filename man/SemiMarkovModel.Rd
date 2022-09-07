@@ -114,55 +114,59 @@ Andrew J. Sims \email{andrew.sims@newcastle.ac.uk}
 \section{Methods}{
 \subsection{Public methods}{
 \itemize{
-\item \href{#method-new}{\code{SemiMarkovModel$new()}}
-\item \href{#method-set_probabilities}{\code{SemiMarkovModel$set_probabilities()}}
-\item \href{#method-transition_probabilities}{\code{SemiMarkovModel$transition_probabilities()}}
-\item \href{#method-transition_cost}{\code{SemiMarkovModel$transition_cost()}}
-\item \href{#method-get_statenames}{\code{SemiMarkovModel$get_statenames()}}
-\item \href{#method-reset}{\code{SemiMarkovModel$reset()}}
-\item \href{#method-get_populations}{\code{SemiMarkovModel$get_populations()}}
-\item \href{#method-get_elapsed}{\code{SemiMarkovModel$get_elapsed()}}
-\item \href{#method-tabulate_states}{\code{SemiMarkovModel$tabulate_states()}}
-\item \href{#method-cycle}{\code{SemiMarkovModel$cycle()}}
-\item \href{#method-cycles}{\code{SemiMarkovModel$cycles()}}
-\item \href{#method-modvars}{\code{SemiMarkovModel$modvars()}}
-\item \href{#method-modvar_table}{\code{SemiMarkovModel$modvar_table()}}
-\item \href{#method-clone}{\code{SemiMarkovModel$clone()}}
+\item \href{#method-SemiMarkovModel-new}{\code{SemiMarkovModel$new()}}
+\item \href{#method-SemiMarkovModel-set_probabilities}{\code{SemiMarkovModel$set_probabilities()}}
+\item \href{#method-SemiMarkovModel-transition_probabilities}{\code{SemiMarkovModel$transition_probabilities()}}
+\item \href{#method-SemiMarkovModel-transition_cost}{\code{SemiMarkovModel$transition_cost()}}
+\item \href{#method-SemiMarkovModel-get_statenames}{\code{SemiMarkovModel$get_statenames()}}
+\item \href{#method-SemiMarkovModel-reset}{\code{SemiMarkovModel$reset()}}
+\item \href{#method-SemiMarkovModel-get_populations}{\code{SemiMarkovModel$get_populations()}}
+\item \href{#method-SemiMarkovModel-get_elapsed}{\code{SemiMarkovModel$get_elapsed()}}
+\item \href{#method-SemiMarkovModel-tabulate_states}{\code{SemiMarkovModel$tabulate_states()}}
+\item \href{#method-SemiMarkovModel-cycle}{\code{SemiMarkovModel$cycle()}}
+\item \href{#method-SemiMarkovModel-cycles}{\code{SemiMarkovModel$cycles()}}
+\item \href{#method-SemiMarkovModel-modvars}{\code{SemiMarkovModel$modvars()}}
+\item \href{#method-SemiMarkovModel-modvar_table}{\code{SemiMarkovModel$modvar_table()}}
+\item \href{#method-SemiMarkovModel-clone}{\code{SemiMarkovModel$clone()}}
 }
 }
-\if{html}{
-\out{<details ><summary>Inherited methods</summary>}
-\itemize{
-\item \out{<span class="pkg-link" data-pkg="rdecision" data-topic="Graph" data-id="degree">}\href{../../rdecision/html/Graph.html#method-degree}{\code{rdecision::Graph$degree()}}\out{</span>}
-\item \out{<span class="pkg-link" data-pkg="rdecision" data-topic="Graph" data-id="edge_index">}\href{../../rdecision/html/Graph.html#method-edge_index}{\code{rdecision::Graph$edge_index()}}\out{</span>}
-\item \out{<span class="pkg-link" data-pkg="rdecision" data-topic="Graph" data-id="graph_adjacency_matrix">}\href{../../rdecision/html/Graph.html#method-graph_adjacency_matrix}{\code{rdecision::Graph$graph_adjacency_matrix()}}\out{</span>}
-\item \out{<span class="pkg-link" data-pkg="rdecision" data-topic="Graph" data-id="has_edge">}\href{../../rdecision/html/Graph.html#method-has_edge}{\code{rdecision::Graph$has_edge()}}\out{</span>}
-\item \out{<span class="pkg-link" data-pkg="rdecision" data-topic="Graph" data-id="has_vertex">}\href{../../rdecision/html/Graph.html#method-has_vertex}{\code{rdecision::Graph$has_vertex()}}\out{</span>}
-\item \out{<span class="pkg-link" data-pkg="rdecision" data-topic="Graph" data-id="is_simple">}\href{../../rdecision/html/Graph.html#method-is_simple}{\code{rdecision::Graph$is_simple()}}\out{</span>}
-\item \out{<span class="pkg-link" data-pkg="rdecision" data-topic="Graph" data-id="neighbours">}\href{../../rdecision/html/Graph.html#method-neighbours}{\code{rdecision::Graph$neighbours()}}\out{</span>}
-\item \out{<span class="pkg-link" data-pkg="rdecision" data-topic="Graph" data-id="order">}\href{../../rdecision/html/Graph.html#method-order}{\code{rdecision::Graph$order()}}\out{</span>}
-\item \out{<span class="pkg-link" data-pkg="rdecision" data-topic="Graph" data-id="size">}\href{../../rdecision/html/Graph.html#method-size}{\code{rdecision::Graph$size()}}\out{</span>}
-\item \out{<span class="pkg-link" data-pkg="rdecision" data-topic="Graph" data-id="vertex_index">}\href{../../rdecision/html/Graph.html#method-vertex_index}{\code{rdecision::Graph$vertex_index()}}\out{</span>}
-\item \out{<span class="pkg-link" data-pkg="rdecision" data-topic="Digraph" data-id="as_DOT">}\href{../../rdecision/html/Digraph.html#method-as_DOT}{\code{rdecision::Digraph$as_DOT()}}\out{</span>}
-\item \out{<span class="pkg-link" data-pkg="rdecision" data-topic="Digraph" data-id="digraph_adjacency_matrix">}\href{../../rdecision/html/Digraph.html#method-digraph_adjacency_matrix}{\code{rdecision::Digraph$digraph_adjacency_matrix()}}\out{</span>}
-\item \out{<span class="pkg-link" data-pkg="rdecision" data-topic="Digraph" data-id="digraph_incidence_matrix">}\href{../../rdecision/html/Digraph.html#method-digraph_incidence_matrix}{\code{rdecision::Digraph$digraph_incidence_matrix()}}\out{</span>}
-\item \out{<span class="pkg-link" data-pkg="rdecision" data-topic="Digraph" data-id="direct_predecessors">}\href{../../rdecision/html/Digraph.html#method-direct_predecessors}{\code{rdecision::Digraph$direct_predecessors()}}\out{</span>}
-\item \out{<span class="pkg-link" data-pkg="rdecision" data-topic="Digraph" data-id="direct_successors">}\href{../../rdecision/html/Digraph.html#method-direct_successors}{\code{rdecision::Digraph$direct_successors()}}\out{</span>}
-\item \out{<span class="pkg-link" data-pkg="rdecision" data-topic="Digraph" data-id="is_acyclic">}\href{../../rdecision/html/Digraph.html#method-is_acyclic}{\code{rdecision::Digraph$is_acyclic()}}\out{</span>}
-\item \out{<span class="pkg-link" data-pkg="rdecision" data-topic="Digraph" data-id="is_arborescence">}\href{../../rdecision/html/Digraph.html#method-is_arborescence}{\code{rdecision::Digraph$is_arborescence()}}\out{</span>}
-\item \out{<span class="pkg-link" data-pkg="rdecision" data-topic="Digraph" data-id="is_connected">}\href{../../rdecision/html/Digraph.html#method-is_connected}{\code{rdecision::Digraph$is_connected()}}\out{</span>}
-\item \out{<span class="pkg-link" data-pkg="rdecision" data-topic="Digraph" data-id="is_polytree">}\href{../../rdecision/html/Digraph.html#method-is_polytree}{\code{rdecision::Digraph$is_polytree()}}\out{</span>}
-\item \out{<span class="pkg-link" data-pkg="rdecision" data-topic="Digraph" data-id="is_tree">}\href{../../rdecision/html/Digraph.html#method-is_tree}{\code{rdecision::Digraph$is_tree()}}\out{</span>}
-\item \out{<span class="pkg-link" data-pkg="rdecision" data-topic="Digraph" data-id="is_weakly_connected">}\href{../../rdecision/html/Digraph.html#method-is_weakly_connected}{\code{rdecision::Digraph$is_weakly_connected()}}\out{</span>}
-\item \out{<span class="pkg-link" data-pkg="rdecision" data-topic="Digraph" data-id="paths">}\href{../../rdecision/html/Digraph.html#method-paths}{\code{rdecision::Digraph$paths()}}\out{</span>}
-\item \out{<span class="pkg-link" data-pkg="rdecision" data-topic="Digraph" data-id="topological_sort">}\href{../../rdecision/html/Digraph.html#method-topological_sort}{\code{rdecision::Digraph$topological_sort()}}\out{</span>}
-\item \out{<span class="pkg-link" data-pkg="rdecision" data-topic="Digraph" data-id="walk">}\href{../../rdecision/html/Digraph.html#method-walk}{\code{rdecision::Digraph$walk()}}\out{</span>}
-}
-\out{</details>}
-}
+\if{html}{\out{
+<details><summary>Inherited methods</summary>
+<ul>
+<li><span class="pkg-link" data-pkg="rdecision" data-topic="Graph" data-id="degree"><a href='../../rdecision/html/Graph.html#method-Graph-degree'><code>rdecision::Graph$degree()</code></a></span></li>
+<li><span class="pkg-link" data-pkg="rdecision" data-topic="Graph" data-id="edge_along"><a href='../../rdecision/html/Graph.html#method-Graph-edge_along'><code>rdecision::Graph$edge_along()</code></a></span></li>
+<li><span class="pkg-link" data-pkg="rdecision" data-topic="Graph" data-id="edge_at"><a href='../../rdecision/html/Graph.html#method-Graph-edge_at'><code>rdecision::Graph$edge_at()</code></a></span></li>
+<li><span class="pkg-link" data-pkg="rdecision" data-topic="Graph" data-id="edge_index"><a href='../../rdecision/html/Graph.html#method-Graph-edge_index'><code>rdecision::Graph$edge_index()</code></a></span></li>
+<li><span class="pkg-link" data-pkg="rdecision" data-topic="Graph" data-id="graph_adjacency_matrix"><a href='../../rdecision/html/Graph.html#method-Graph-graph_adjacency_matrix'><code>rdecision::Graph$graph_adjacency_matrix()</code></a></span></li>
+<li><span class="pkg-link" data-pkg="rdecision" data-topic="Graph" data-id="has_edge"><a href='../../rdecision/html/Graph.html#method-Graph-has_edge'><code>rdecision::Graph$has_edge()</code></a></span></li>
+<li><span class="pkg-link" data-pkg="rdecision" data-topic="Graph" data-id="has_vertex"><a href='../../rdecision/html/Graph.html#method-Graph-has_vertex'><code>rdecision::Graph$has_vertex()</code></a></span></li>
+<li><span class="pkg-link" data-pkg="rdecision" data-topic="Graph" data-id="is_simple"><a href='../../rdecision/html/Graph.html#method-Graph-is_simple'><code>rdecision::Graph$is_simple()</code></a></span></li>
+<li><span class="pkg-link" data-pkg="rdecision" data-topic="Graph" data-id="neighbours"><a href='../../rdecision/html/Graph.html#method-Graph-neighbours'><code>rdecision::Graph$neighbours()</code></a></span></li>
+<li><span class="pkg-link" data-pkg="rdecision" data-topic="Graph" data-id="order"><a href='../../rdecision/html/Graph.html#method-Graph-order'><code>rdecision::Graph$order()</code></a></span></li>
+<li><span class="pkg-link" data-pkg="rdecision" data-topic="Graph" data-id="size"><a href='../../rdecision/html/Graph.html#method-Graph-size'><code>rdecision::Graph$size()</code></a></span></li>
+<li><span class="pkg-link" data-pkg="rdecision" data-topic="Graph" data-id="vertex_along"><a href='../../rdecision/html/Graph.html#method-Graph-vertex_along'><code>rdecision::Graph$vertex_along()</code></a></span></li>
+<li><span class="pkg-link" data-pkg="rdecision" data-topic="Graph" data-id="vertex_at"><a href='../../rdecision/html/Graph.html#method-Graph-vertex_at'><code>rdecision::Graph$vertex_at()</code></a></span></li>
+<li><span class="pkg-link" data-pkg="rdecision" data-topic="Graph" data-id="vertex_index"><a href='../../rdecision/html/Graph.html#method-Graph-vertex_index'><code>rdecision::Graph$vertex_index()</code></a></span></li>
+<li><span class="pkg-link" data-pkg="rdecision" data-topic="Digraph" data-id="as_DOT"><a href='../../rdecision/html/Digraph.html#method-Digraph-as_DOT'><code>rdecision::Digraph$as_DOT()</code></a></span></li>
+<li><span class="pkg-link" data-pkg="rdecision" data-topic="Digraph" data-id="digraph_adjacency_matrix"><a href='../../rdecision/html/Digraph.html#method-Digraph-digraph_adjacency_matrix'><code>rdecision::Digraph$digraph_adjacency_matrix()</code></a></span></li>
+<li><span class="pkg-link" data-pkg="rdecision" data-topic="Digraph" data-id="digraph_incidence_matrix"><a href='../../rdecision/html/Digraph.html#method-Digraph-digraph_incidence_matrix'><code>rdecision::Digraph$digraph_incidence_matrix()</code></a></span></li>
+<li><span class="pkg-link" data-pkg="rdecision" data-topic="Digraph" data-id="direct_predecessors"><a href='../../rdecision/html/Digraph.html#method-Digraph-direct_predecessors'><code>rdecision::Digraph$direct_predecessors()</code></a></span></li>
+<li><span class="pkg-link" data-pkg="rdecision" data-topic="Digraph" data-id="direct_successors"><a href='../../rdecision/html/Digraph.html#method-Digraph-direct_successors'><code>rdecision::Digraph$direct_successors()</code></a></span></li>
+<li><span class="pkg-link" data-pkg="rdecision" data-topic="Digraph" data-id="is_acyclic"><a href='../../rdecision/html/Digraph.html#method-Digraph-is_acyclic'><code>rdecision::Digraph$is_acyclic()</code></a></span></li>
+<li><span class="pkg-link" data-pkg="rdecision" data-topic="Digraph" data-id="is_arborescence"><a href='../../rdecision/html/Digraph.html#method-Digraph-is_arborescence'><code>rdecision::Digraph$is_arborescence()</code></a></span></li>
+<li><span class="pkg-link" data-pkg="rdecision" data-topic="Digraph" data-id="is_connected"><a href='../../rdecision/html/Digraph.html#method-Digraph-is_connected'><code>rdecision::Digraph$is_connected()</code></a></span></li>
+<li><span class="pkg-link" data-pkg="rdecision" data-topic="Digraph" data-id="is_polytree"><a href='../../rdecision/html/Digraph.html#method-Digraph-is_polytree'><code>rdecision::Digraph$is_polytree()</code></a></span></li>
+<li><span class="pkg-link" data-pkg="rdecision" data-topic="Digraph" data-id="is_tree"><a href='../../rdecision/html/Digraph.html#method-Digraph-is_tree'><code>rdecision::Digraph$is_tree()</code></a></span></li>
+<li><span class="pkg-link" data-pkg="rdecision" data-topic="Digraph" data-id="is_weakly_connected"><a href='../../rdecision/html/Digraph.html#method-Digraph-is_weakly_connected'><code>rdecision::Digraph$is_weakly_connected()</code></a></span></li>
+<li><span class="pkg-link" data-pkg="rdecision" data-topic="Digraph" data-id="paths"><a href='../../rdecision/html/Digraph.html#method-Digraph-paths'><code>rdecision::Digraph$paths()</code></a></span></li>
+<li><span class="pkg-link" data-pkg="rdecision" data-topic="Digraph" data-id="topological_sort"><a href='../../rdecision/html/Digraph.html#method-Digraph-topological_sort'><code>rdecision::Digraph$topological_sort()</code></a></span></li>
+<li><span class="pkg-link" data-pkg="rdecision" data-topic="Digraph" data-id="walk"><a href='../../rdecision/html/Digraph.html#method-Digraph-walk'><code>rdecision::Digraph$walk()</code></a></span></li>
+</ul>
+</details>
+}}
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-new"></a>}}
-\if{latex}{\out{\hypertarget{method-new}{}}}
+\if{html}{\out{<a id="method-SemiMarkovModel-new"></a>}}
+\if{latex}{\out{\hypertarget{method-SemiMarkovModel-new}{}}}
 \subsection{Method \code{new()}}{
 Creates a semi-Markov model for cohort simulation.
 \subsection{Usage}{
@@ -224,8 +228,8 @@ conditional probability of each allowed transition.
 }
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-set_probabilities"></a>}}
-\if{latex}{\out{\hypertarget{method-set_probabilities}{}}}
+\if{html}{\out{<a id="method-SemiMarkovModel-set_probabilities"></a>}}
+\if{latex}{\out{\hypertarget{method-SemiMarkovModel-set_probabilities}{}}}
 \subsection{Method \code{set_probabilities()}}{
 Sets transition probabilities.
 \subsection{Usage}{
@@ -248,8 +252,8 @@ Updated \code{SemiMarkovModel} object
 }
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-transition_probabilities"></a>}}
-\if{latex}{\out{\hypertarget{method-transition_probabilities}{}}}
+\if{html}{\out{<a id="method-SemiMarkovModel-transition_probabilities"></a>}}
+\if{latex}{\out{\hypertarget{method-SemiMarkovModel-transition_probabilities}{}}}
 \subsection{Method \code{transition_probabilities()}}{
 Per-cycle transition probability matrix for the model.
 \subsection{Usage}{
@@ -262,8 +266,8 @@ states are labelled, the dimnames take the names of the states.
 }
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-transition_cost"></a>}}
-\if{latex}{\out{\hypertarget{method-transition_cost}{}}}
+\if{html}{\out{<a id="method-SemiMarkovModel-transition_cost"></a>}}
+\if{latex}{\out{\hypertarget{method-SemiMarkovModel-transition_cost}{}}}
 \subsection{Method \code{transition_cost()}}{
 Return the per-cycle transition costs for the model.
 \subsection{Usage}{
@@ -276,8 +280,8 @@ states are labelled, the dimnames take the names of the states.
 }
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-get_statenames"></a>}}
-\if{latex}{\out{\hypertarget{method-get_statenames}{}}}
+\if{html}{\out{<a id="method-SemiMarkovModel-get_statenames"></a>}}
+\if{latex}{\out{\hypertarget{method-SemiMarkovModel-get_statenames}{}}}
 \subsection{Method \code{get_statenames()}}{
 Returns a character list of state names.
 \subsection{Usage}{
@@ -289,8 +293,8 @@ List of the names of each state.
 }
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-reset"></a>}}
-\if{latex}{\out{\hypertarget{method-reset}{}}}
+\if{html}{\out{<a id="method-SemiMarkovModel-reset"></a>}}
+\if{latex}{\out{\hypertarget{method-SemiMarkovModel-reset}{}}}
 \subsection{Method \code{reset()}}{
 Resets the model counters.
 \subsection{Usage}{
@@ -333,8 +337,8 @@ Updated \code{SemiMarkovModel} object.
 }
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-get_populations"></a>}}
-\if{latex}{\out{\hypertarget{method-get_populations}{}}}
+\if{html}{\out{<a id="method-SemiMarkovModel-get_populations"></a>}}
+\if{latex}{\out{\hypertarget{method-SemiMarkovModel-get_populations}{}}}
 \subsection{Method \code{get_populations()}}{
 Gets the occupancy of each state
 \subsection{Usage}{
@@ -346,8 +350,8 @@ A numeric vector of populations, named with state names.
 }
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-get_elapsed"></a>}}
-\if{latex}{\out{\hypertarget{method-get_elapsed}{}}}
+\if{html}{\out{<a id="method-SemiMarkovModel-get_elapsed"></a>}}
+\if{latex}{\out{\hypertarget{method-SemiMarkovModel-get_elapsed}{}}}
 \subsection{Method \code{get_elapsed()}}{
 Gets the current elapsed time.
 \subsection{Usage}{
@@ -370,8 +374,8 @@ Elapsed time as an R \code{difftime} object.
 }
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-tabulate_states"></a>}}
-\if{latex}{\out{\hypertarget{method-tabulate_states}{}}}
+\if{html}{\out{<a id="method-SemiMarkovModel-tabulate_states"></a>}}
+\if{latex}{\out{\hypertarget{method-SemiMarkovModel-tabulate_states}{}}}
 \subsection{Method \code{tabulate_states()}}{
 Tabulation of states
 \subsection{Usage}{
@@ -392,8 +396,8 @@ A data frame with the following columns:
 }
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-cycle"></a>}}
-\if{latex}{\out{\hypertarget{method-cycle}{}}}
+\if{html}{\out{<a id="method-SemiMarkovModel-cycle"></a>}}
+\if{latex}{\out{\hypertarget{method-SemiMarkovModel-cycle}{}}}
 \subsection{Method \code{cycle()}}{
 Applies one cycle of the model.
 \subsection{Usage}{
@@ -444,8 +448,8 @@ applied, if these options are set. Normalized by the model population.}
 }
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-cycles"></a>}}
-\if{latex}{\out{\hypertarget{method-cycles}{}}}
+\if{html}{\out{<a id="method-SemiMarkovModel-cycles"></a>}}
+\if{latex}{\out{\hypertarget{method-SemiMarkovModel-cycles}{}}}
 \subsection{Method \code{cycles()}}{
 Applies multiple cycles of the model.
 \subsection{Usage}{
@@ -499,8 +503,8 @@ the cycle.}
 }
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-modvars"></a>}}
-\if{latex}{\out{\hypertarget{method-modvars}{}}}
+\if{html}{\out{<a id="method-SemiMarkovModel-modvars"></a>}}
+\if{latex}{\out{\hypertarget{method-SemiMarkovModel-modvars}{}}}
 \subsection{Method \code{modvars()}}{
 Find all the model variables in the Markov model.
 \subsection{Usage}{
@@ -518,8 +522,8 @@ A list of \code{ModVar}s.
 }
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-modvar_table"></a>}}
-\if{latex}{\out{\hypertarget{method-modvar_table}{}}}
+\if{html}{\out{<a id="method-SemiMarkovModel-modvar_table"></a>}}
+\if{latex}{\out{\hypertarget{method-SemiMarkovModel-modvar_table}{}}}
 \subsection{Method \code{modvar_table()}}{
 Tabulate the model variables in the Markov model.
 \subsection{Usage}{
@@ -558,8 +562,8 @@ random sampling.}
 }
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-clone"></a>}}
-\if{latex}{\out{\hypertarget{method-clone}{}}}
+\if{html}{\out{<a id="method-SemiMarkovModel-clone"></a>}}
+\if{latex}{\out{\hypertarget{method-SemiMarkovModel-clone}{}}}
 \subsection{Method \code{clone()}}{
 The objects of this class are cloneable with this method.
 \subsection{Usage}{

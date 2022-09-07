@@ -173,6 +173,10 @@ test_that("arborescences are detected", {
 # tests of topological sorting
 # (https://www.cs.hmc.edu/~keller/courses/cs60/s98/examples/acyclic/)
 test_that("topological sorting is correct", {
+  # attempt to sort an empty graph
+  g <- Digraph$new(V = list(), A <- list())
+  l <- g$topological_sort()
+  expect_equal(length(l), 0)
   # non-trivial DAG with one sort order
   n1 <- Node$new("1")
   n2 <- Node$new("2")
@@ -234,6 +238,15 @@ test_that("all paths in a 4-node graph with cycle are discovered", {
     }
   }
   expect_equal(nmatch,3)
+  # check that walks for one path in edge and index form are as expected
+  p <- list(n2, n1, n3)
+  w <- G$walk(p)
+  expect_length(w, 2)
+  expect_R6setequal(w, list(ee, ef))
+  w <- G$walk(p, what = "index")
+  expect_length(w, 2)
+  expect_setequal(w, list(G$edge_index(ee), G$edge_index(ef)))
+  expect_error(G$walk(p, "42"), class = "invalid_argument")
 })
 
 # example (Wikipedia Directed Graph page, "Basic Terminology" example
@@ -255,14 +268,14 @@ test_that("example of 4 node digraph with cycle has correct properties", {
   expect_equal(G$order(), 4)
   expect_equal(G$size(), 4)
   #
-  expect_error(G$direct_successors(42), class="invalid_vertex")
+  expect_error(G$direct_successors(42), class="not_in_graph")
   e <- Node$new('e')
   expect_error(G$direct_successors(e), class="not_in_graph")
   expect_R6setequal(G$direct_successors(a), list(b,d))
   expect_R6setequal(G$direct_successors(c), list(a))
   expect_true(length(G$direct_successors(d))==0)
   #
-  expect_error(G$direct_predecessors(42), class="invalid_vertex")
+  expect_error(G$direct_predecessors(42), class="not_in_graph")
   expect_error(G$direct_predecessors(e), class="not_in_graph")
   expect_R6setequal(G$direct_predecessors(a), list(c))
   expect_R6setequal(G$direct_predecessors(c), list(b))
@@ -314,8 +327,8 @@ test_that("rdecision solves New Scientist Puzzle 62", {
   # count and tabulate how many special edges each walk traverses
   BB <- c("V11", "H22", "V25", "H33", "V32", "H44", "V43")
   nw <- sapply(W, function(w) {
-  lv <- sapply(w, function(e) {e$label() %in% BB})
-   return(sum(lv))
+    lv <- sapply(w, function(e) {e$label() %in% BB})
+    return(sum(lv))
   })
   ct <- as.data.frame(table(nw))
   # check that 23 paths traverse one special edge

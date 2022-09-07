@@ -36,12 +36,11 @@ Action <- R6::R6Class(
     #' @return A new \code{Action} object.
     initialize = function(source, target, label, cost=0, benefit=0) {
       # check label
-      if (!is.character(label)) {
-        rlang::abort(
-          "Argument label must be a string", 
-          class="invalid_label"
-        )
-      }
+      abortifnot(
+        is.character(label),
+        message = "Argument label must be a string", 
+        class = "invalid_label"
+      )
       if (nchar(label)==0) {
         rlang::abort("Argument label must be defined", class="empty_label")
       }

@@ -20,25 +20,25 @@ Andrew Sims \email{andrew.sims@newcastle.ac.uk}
 \section{Methods}{
 \subsection{Public methods}{
 \itemize{
-\item \href{#method-new}{\code{ModVar$new()}}
-\item \href{#method-is_expression}{\code{ModVar$is_expression()}}
-\item \href{#method-is_probabilistic}{\code{ModVar$is_probabilistic()}}
-\item \href{#method-description}{\code{ModVar$description()}}
-\item \href{#method-units}{\code{ModVar$units()}}
-\item \href{#method-distribution}{\code{ModVar$distribution()}}
-\item \href{#method-mean}{\code{ModVar$mean()}}
-\item \href{#method-mode}{\code{ModVar$mode()}}
-\item \href{#method-SD}{\code{ModVar$SD()}}
-\item \href{#method-quantile}{\code{ModVar$quantile()}}
-\item \href{#method-r}{\code{ModVar$r()}}
-\item \href{#method-set}{\code{ModVar$set()}}
-\item \href{#method-get}{\code{ModVar$get()}}
-\item \href{#method-clone}{\code{ModVar$clone()}}
+\item \href{#method-ModVar-new}{\code{ModVar$new()}}
+\item \href{#method-ModVar-is_expression}{\code{ModVar$is_expression()}}
+\item \href{#method-ModVar-is_probabilistic}{\code{ModVar$is_probabilistic()}}
+\item \href{#method-ModVar-description}{\code{ModVar$description()}}
+\item \href{#method-ModVar-units}{\code{ModVar$units()}}
+\item \href{#method-ModVar-distribution}{\code{ModVar$distribution()}}
+\item \href{#method-ModVar-mean}{\code{ModVar$mean()}}
+\item \href{#method-ModVar-mode}{\code{ModVar$mode()}}
+\item \href{#method-ModVar-SD}{\code{ModVar$SD()}}
+\item \href{#method-ModVar-quantile}{\code{ModVar$quantile()}}
+\item \href{#method-ModVar-r}{\code{ModVar$r()}}
+\item \href{#method-ModVar-set}{\code{ModVar$set()}}
+\item \href{#method-ModVar-get}{\code{ModVar$get()}}
+\item \href{#method-ModVar-clone}{\code{ModVar$clone()}}
 }
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-new"></a>}}
-\if{latex}{\out{\hypertarget{method-new}{}}}
+\if{html}{\out{<a id="method-ModVar-new"></a>}}
+\if{latex}{\out{\hypertarget{method-ModVar-new}{}}}
 \subsection{Method \code{new()}}{
 Create an object of type \code{ModVar}.
 \subsection{Usage}{
@@ -79,8 +79,8 @@ A new \verb{ModVar} object.
 }
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-is_expression"></a>}}
-\if{latex}{\out{\hypertarget{method-is_expression}{}}}
+\if{html}{\out{<a id="method-ModVar-is_expression"></a>}}
+\if{latex}{\out{\hypertarget{method-ModVar-is_expression}{}}}
 \subsection{Method \code{is_expression()}}{
 Is this \code{ModVar} an expression?
 \subsection{Usage}{
@@ -93,8 +93,8 @@ otherwise.
 }
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-is_probabilistic"></a>}}
-\if{latex}{\out{\hypertarget{method-is_probabilistic}{}}}
+\if{html}{\out{<a id="method-ModVar-is_probabilistic"></a>}}
+\if{latex}{\out{\hypertarget{method-ModVar-is_probabilistic}{}}}
 \subsection{Method \code{is_probabilistic()}}{
 Is the model variable probabilistic?
 \subsection{Usage}{
@@ -112,8 +112,8 @@ random variables, some of which follow distributions.
 }
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-description"></a>}}
-\if{latex}{\out{\hypertarget{method-description}{}}}
+\if{html}{\out{<a id="method-ModVar-description"></a>}}
+\if{latex}{\out{\hypertarget{method-ModVar-description}{}}}
 \subsection{Method \code{description()}}{
 Accessor function for the description.
 \subsection{Usage}{
@@ -125,8 +125,8 @@ Description of model variable as character string.
 }
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-units"></a>}}
-\if{latex}{\out{\hypertarget{method-units}{}}}
+\if{html}{\out{<a id="method-ModVar-units"></a>}}
+\if{latex}{\out{\hypertarget{method-ModVar-units}{}}}
 \subsection{Method \code{units()}}{
 Accessor function for units.
 \subsection{Usage}{
@@ -138,8 +138,8 @@ Description of units as character string.
 }
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-distribution"></a>}}
-\if{latex}{\out{\hypertarget{method-distribution}{}}}
+\if{html}{\out{<a id="method-ModVar-distribution"></a>}}
+\if{latex}{\out{\hypertarget{method-ModVar-distribution}{}}}
 \subsection{Method \code{distribution()}}{
 Name and parameters of the uncertainty distribution.
 \subsection{Usage}{
@@ -158,8 +158,8 @@ Distribution name as character string.
 }
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-mean"></a>}}
-\if{latex}{\out{\hypertarget{method-mean}{}}}
+\if{html}{\out{<a id="method-ModVar-mean"></a>}}
+\if{latex}{\out{\hypertarget{method-ModVar-mean}{}}}
 \subsection{Method \code{mean()}}{
 Mean value of the model variable.
 \subsection{Usage}{
@@ -171,8 +171,8 @@ Mean value as a numeric value.
 }
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-mode"></a>}}
-\if{latex}{\out{\hypertarget{method-mode}{}}}
+\if{html}{\out{<a id="method-ModVar-mode"></a>}}
+\if{latex}{\out{\hypertarget{method-ModVar-mode}{}}}
 \subsection{Method \code{mode()}}{
 The mode of the variable.
 \subsection{Usage}{
@@ -190,8 +190,8 @@ Mode as a numeric value.
 }
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-SD"></a>}}
-\if{latex}{\out{\hypertarget{method-SD}{}}}
+\if{html}{\out{<a id="method-ModVar-SD"></a>}}
+\if{latex}{\out{\hypertarget{method-ModVar-SD}{}}}
 \subsection{Method \code{SD()}}{
 Standard deviation of the model variable.
 \subsection{Usage}{
@@ -203,8 +203,8 @@ Standard deviation as a numeric value
 }
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-quantile"></a>}}
-\if{latex}{\out{\hypertarget{method-quantile}{}}}
+\if{html}{\out{<a id="method-ModVar-quantile"></a>}}
+\if{latex}{\out{\hypertarget{method-ModVar-quantile}{}}}
 \subsection{Method \code{quantile()}}{
 Quantiles of the uncertainty distribution.
 \subsection{Usage}{
@@ -223,8 +223,8 @@ Vector of numeric values of the same length as \code{probs}.
 }
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-r"></a>}}
-\if{latex}{\out{\hypertarget{method-r}{}}}
+\if{html}{\out{<a id="method-ModVar-r"></a>}}
+\if{latex}{\out{\hypertarget{method-ModVar-r}{}}}
 \subsection{Method \code{r()}}{
 Draw a random sample from the model variable.
 \subsection{Usage}{
@@ -241,8 +241,8 @@ A sample drawn at random.
 }
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-set"></a>}}
-\if{latex}{\out{\hypertarget{method-set}{}}}
+\if{html}{\out{<a id="method-ModVar-set"></a>}}
+\if{latex}{\out{\hypertarget{method-ModVar-set}{}}}
 \subsection{Method \code{set()}}{
 Sets the value of the \code{ModVar}.
 \subsection{Usage}{
@@ -285,8 +285,8 @@ Updated \code{ModVar}.
 }
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-get"></a>}}
-\if{latex}{\out{\hypertarget{method-get}{}}}
+\if{html}{\out{<a id="method-ModVar-get"></a>}}
+\if{latex}{\out{\hypertarget{method-ModVar-get}{}}}
 \subsection{Method \code{get()}}{
 Get the value of the \code{ModVar}.
 \subsection{Usage}{
@@ -303,8 +303,8 @@ Value determined by last \code{set()}.
 }
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-clone"></a>}}
-\if{latex}{\out{\hypertarget{method-clone}{}}}
+\if{html}{\out{<a id="method-ModVar-clone"></a>}}
+\if{latex}{\out{\hypertarget{method-ModVar-clone}{}}}
 \subsection{Method \code{clone()}}{
 The objects of this class are cloneable with this method.
 \subsection{Usage}{

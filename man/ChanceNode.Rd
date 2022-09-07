@@ -22,21 +22,21 @@ Andrew Sims \email{andrew.sims@newcastle.ac.uk}
 \section{Methods}{
 \subsection{Public methods}{
 \itemize{
-\item \href{#method-new}{\code{ChanceNode$new()}}
-\item \href{#method-clone}{\code{ChanceNode$clone()}}
+\item \href{#method-ChanceNode-new}{\code{ChanceNode$new()}}
+\item \href{#method-ChanceNode-clone}{\code{ChanceNode$clone()}}
 }
 }
-\if{html}{
-\out{<details open ><summary>Inherited methods</summary>}
-\itemize{
-\item \out{<span class="pkg-link" data-pkg="rdecision" data-topic="Node" data-id="label">}\href{../../rdecision/html/Node.html#method-label}{\code{rdecision::Node$label()}}\out{</span>}
-\item \out{<span class="pkg-link" data-pkg="rdecision" data-topic="Node" data-id="type">}\href{../../rdecision/html/Node.html#method-type}{\code{rdecision::Node$type()}}\out{</span>}
-}
-\out{</details>}
-}
+\if{html}{\out{
+<details open><summary>Inherited methods</summary>
+<ul>
+<li><span class="pkg-link" data-pkg="rdecision" data-topic="Node" data-id="label"><a href='../../rdecision/html/Node.html#method-Node-label'><code>rdecision::Node$label()</code></a></span></li>
+<li><span class="pkg-link" data-pkg="rdecision" data-topic="Node" data-id="type"><a href='../../rdecision/html/Node.html#method-Node-type'><code>rdecision::Node$type()</code></a></span></li>
+</ul>
+</details>
+}}
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-new"></a>}}
-\if{latex}{\out{\hypertarget{method-new}{}}}
+\if{html}{\out{<a id="method-ChanceNode-new"></a>}}
+\if{latex}{\out{\hypertarget{method-ChanceNode-new}{}}}
 \subsection{Method \code{new()}}{
 Create a new \code{ChanceNode} object
 \subsection{Usage}{
@@ -55,8 +55,8 @@ A new \code{ChanceNode} object
 }
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-clone"></a>}}
-\if{latex}{\out{\hypertarget{method-clone}{}}}
+\if{html}{\out{<a id="method-ChanceNode-clone"></a>}}
+\if{latex}{\out{\hypertarget{method-ChanceNode-clone}{}}}
 \subsection{Method \code{clone()}}{
 The objects of this class are cloneable with this method.
 \subsection{Usage}{

@@ -21,28 +21,28 @@ Andrew J. Sims \email{andrew.sims@newcastle.ac.uk}
 \section{Methods}{
 \subsection{Public methods}{
 \itemize{
-\item \href{#method-new}{\code{DirichletDistribution$new()}}
-\item \href{#method-distribution}{\code{DirichletDistribution$distribution()}}
-\item \href{#method-mean}{\code{DirichletDistribution$mean()}}
-\item \href{#method-mode}{\code{DirichletDistribution$mode()}}
-\item \href{#method-quantile}{\code{DirichletDistribution$quantile()}}
-\item \href{#method-varcov}{\code{DirichletDistribution$varcov()}}
-\item \href{#method-sample}{\code{DirichletDistribution$sample()}}
-\item \href{#method-clone}{\code{DirichletDistribution$clone()}}
+\item \href{#method-DirichletDistribution-new}{\code{DirichletDistribution$new()}}
+\item \href{#method-DirichletDistribution-distribution}{\code{DirichletDistribution$distribution()}}
+\item \href{#method-DirichletDistribution-mean}{\code{DirichletDistribution$mean()}}
+\item \href{#method-DirichletDistribution-mode}{\code{DirichletDistribution$mode()}}
+\item \href{#method-DirichletDistribution-quantile}{\code{DirichletDistribution$quantile()}}
+\item \href{#method-DirichletDistribution-varcov}{\code{DirichletDistribution$varcov()}}
+\item \href{#method-DirichletDistribution-sample}{\code{DirichletDistribution$sample()}}
+\item \href{#method-DirichletDistribution-clone}{\code{DirichletDistribution$clone()}}
 }
 }
-\if{html}{
-\out{<details open ><summary>Inherited methods</summary>}
-\itemize{
-\item \out{<span class="pkg-link" data-pkg="rdecision" data-topic="Distribution" data-id="SD">}\href{../../rdecision/html/Distribution.html#method-SD}{\code{rdecision::Distribution$SD()}}\out{</span>}
-\item \out{<span class="pkg-link" data-pkg="rdecision" data-topic="Distribution" data-id="order">}\href{../../rdecision/html/Distribution.html#method-order}{\code{rdecision::Distribution$order()}}\out{</span>}
-\item \out{<span class="pkg-link" data-pkg="rdecision" data-topic="Distribution" data-id="r">}\href{../../rdecision/html/Distribution.html#method-r}{\code{rdecision::Distribution$r()}}\out{</span>}
-}
-\out{</details>}
-}
+\if{html}{\out{
+<details open><summary>Inherited methods</summary>
+<ul>
+<li><span class="pkg-link" data-pkg="rdecision" data-topic="Distribution" data-id="SD"><a href='../../rdecision/html/Distribution.html#method-Distribution-SD'><code>rdecision::Distribution$SD()</code></a></span></li>
+<li><span class="pkg-link" data-pkg="rdecision" data-topic="Distribution" data-id="order"><a href='../../rdecision/html/Distribution.html#method-Distribution-order'><code>rdecision::Distribution$order()</code></a></span></li>
+<li><span class="pkg-link" data-pkg="rdecision" data-topic="Distribution" data-id="r"><a href='../../rdecision/html/Distribution.html#method-Distribution-r'><code>rdecision::Distribution$r()</code></a></span></li>
+</ul>
+</details>
+}}
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-new"></a>}}
-\if{latex}{\out{\hypertarget{method-new}{}}}
+\if{html}{\out{<a id="method-DirichletDistribution-new"></a>}}
+\if{latex}{\out{\hypertarget{method-DirichletDistribution-new}{}}}
 \subsection{Method \code{new()}}{
 Create an object of class \code{DirichletDistribution}.
 \subsection{Usage}{
@@ -62,8 +62,8 @@ An object of class \code{DirichletDistribution}.
 }
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-distribution"></a>}}
-\if{latex}{\out{\hypertarget{method-distribution}{}}}
+\if{html}{\out{<a id="method-DirichletDistribution-distribution"></a>}}
+\if{latex}{\out{\hypertarget{method-DirichletDistribution-distribution}{}}}
 \subsection{Method \code{distribution()}}{
 Accessor function for the name of the distribution.
 \subsection{Usage}{
@@ -75,8 +75,8 @@ Distribution name as character string.
 }
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-mean"></a>}}
-\if{latex}{\out{\hypertarget{method-mean}{}}}
+\if{html}{\out{<a id="method-DirichletDistribution-mean"></a>}}
+\if{latex}{\out{\hypertarget{method-DirichletDistribution-mean}{}}}
 \subsection{Method \code{mean()}}{
 Mean value of each dimension of the distribution.
 \subsection{Usage}{
@@ -88,8 +88,8 @@ A numerical vector of length K.
 }
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-mode"></a>}}
-\if{latex}{\out{\hypertarget{method-mode}{}}}
+\if{html}{\out{<a id="method-DirichletDistribution-mode"></a>}}
+\if{latex}{\out{\hypertarget{method-DirichletDistribution-mode}{}}}
 \subsection{Method \code{mode()}}{
 Return the mode of the distribution.
 \subsection{Usage}{
@@ -105,8 +105,8 @@ Mode as a vector of length \code{K}.
 }
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-quantile"></a>}}
-\if{latex}{\out{\hypertarget{method-quantile}{}}}
+\if{html}{\out{<a id="method-DirichletDistribution-quantile"></a>}}
+\if{latex}{\out{\hypertarget{method-DirichletDistribution-quantile}{}}}
 \subsection{Method \code{quantile()}}{
 Quantiles of the univariate marginal distributions.
 \subsection{Usage}{
@@ -134,8 +134,8 @@ are labelled with quantiles and columns with the dimension (1, 2, etc).
 }
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-varcov"></a>}}
-\if{latex}{\out{\hypertarget{method-varcov}{}}}
+\if{html}{\out{<a id="method-DirichletDistribution-varcov"></a>}}
+\if{latex}{\out{\hypertarget{method-DirichletDistribution-varcov}{}}}
 \subsection{Method \code{varcov()}}{
 Variance-covariance matrix.
 \subsection{Usage}{
@@ -148,8 +148,8 @@ A positive definite symmetric matrix of size \code{K} by
 }
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-sample"></a>}}
-\if{latex}{\out{\hypertarget{method-sample}{}}}
+\if{html}{\out{<a id="method-DirichletDistribution-sample"></a>}}
+\if{latex}{\out{\hypertarget{method-DirichletDistribution-sample}{}}}
 \subsection{Method \code{sample()}}{
 Draw and hold a random sample from the distribution.
 \subsection{Usage}{
@@ -169,8 +169,8 @@ Void; sample is retrieved with call to \code{r()}.
 }
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-clone"></a>}}
-\if{latex}{\out{\hypertarget{method-clone}{}}}
+\if{html}{\out{<a id="method-DirichletDistribution-clone"></a>}}
+\if{latex}{\out{\hypertarget{method-DirichletDistribution-clone}{}}}
 \subsection{Method \code{clone()}}{
 The objects of this class are cloneable with this method.
 \subsection{Usage}{

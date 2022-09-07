@@ -28,27 +28,31 @@ Andrew Sims \email{andrew.sims@newcastle.ac.uk}
 \section{Methods}{
 \subsection{Public methods}{
 \itemize{
-\item \href{#method-new}{\code{Graph$new()}}
-\item \href{#method-vertex_index}{\code{Graph$vertex_index()}}
-\item \href{#method-has_vertex}{\code{Graph$has_vertex()}}
-\item \href{#method-edge_index}{\code{Graph$edge_index()}}
-\item \href{#method-has_edge}{\code{Graph$has_edge()}}
-\item \href{#method-order}{\code{Graph$order()}}
-\item \href{#method-size}{\code{Graph$size()}}
-\item \href{#method-graph_adjacency_matrix}{\code{Graph$graph_adjacency_matrix()}}
-\item \href{#method-is_simple}{\code{Graph$is_simple()}}
-\item \href{#method-is_connected}{\code{Graph$is_connected()}}
-\item \href{#method-is_acyclic}{\code{Graph$is_acyclic()}}
-\item \href{#method-is_tree}{\code{Graph$is_tree()}}
-\item \href{#method-degree}{\code{Graph$degree()}}
-\item \href{#method-neighbours}{\code{Graph$neighbours()}}
-\item \href{#method-as_DOT}{\code{Graph$as_DOT()}}
-\item \href{#method-clone}{\code{Graph$clone()}}
+\item \href{#method-Graph-new}{\code{Graph$new()}}
+\item \href{#method-Graph-order}{\code{Graph$order()}}
+\item \href{#method-Graph-size}{\code{Graph$size()}}
+\item \href{#method-Graph-vertex_along}{\code{Graph$vertex_along()}}
+\item \href{#method-Graph-vertex_index}{\code{Graph$vertex_index()}}
+\item \href{#method-Graph-vertex_at}{\code{Graph$vertex_at()}}
+\item \href{#method-Graph-has_vertex}{\code{Graph$has_vertex()}}
+\item \href{#method-Graph-edge_along}{\code{Graph$edge_along()}}
+\item \href{#method-Graph-edge_index}{\code{Graph$edge_index()}}
+\item \href{#method-Graph-edge_at}{\code{Graph$edge_at()}}
+\item \href{#method-Graph-has_edge}{\code{Graph$has_edge()}}
+\item \href{#method-Graph-graph_adjacency_matrix}{\code{Graph$graph_adjacency_matrix()}}
+\item \href{#method-Graph-is_simple}{\code{Graph$is_simple()}}
+\item \href{#method-Graph-is_connected}{\code{Graph$is_connected()}}
+\item \href{#method-Graph-is_acyclic}{\code{Graph$is_acyclic()}}
+\item \href{#method-Graph-is_tree}{\code{Graph$is_tree()}}
+\item \href{#method-Graph-degree}{\code{Graph$degree()}}
+\item \href{#method-Graph-neighbours}{\code{Graph$neighbours()}}
+\item \href{#method-Graph-as_DOT}{\code{Graph$as_DOT()}}
+\item \href{#method-Graph-clone}{\code{Graph$clone()}}
 }
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-new"></a>}}
-\if{latex}{\out{\hypertarget{method-new}{}}}
+\if{html}{\out{<a id="method-Graph-new"></a>}}
+\if{latex}{\out{\hypertarget{method-Graph-new}{}}}
 \subsection{Method \code{new()}}{
 Create a new \code{Graph} object from sets of nodes 
 and edges.
@@ -70,8 +74,53 @@ A \code{Graph} object.
 }
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-vertex_index"></a>}}
-\if{latex}{\out{\hypertarget{method-vertex_index}{}}}
+\if{html}{\out{<a id="method-Graph-order"></a>}}
+\if{latex}{\out{\hypertarget{method-Graph-order}{}}}
+\subsection{Method \code{order()}}{
+Return the order of the graph (number of vertices).
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{Graph$order()}\if{html}{\out{</div>}}
+}
+
+\subsection{Returns}{
+Order of the graph (integer).
+}
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-Graph-size"></a>}}
+\if{latex}{\out{\hypertarget{method-Graph-size}{}}}
+\subsection{Method \code{size()}}{
+Return the size of the graph (number of edges).
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{Graph$size()}\if{html}{\out{</div>}}
+}
+
+\subsection{Returns}{
+Size of the graph (integer).
+}
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-Graph-vertex_along"></a>}}
+\if{latex}{\out{\hypertarget{method-Graph-vertex_along}{}}}
+\subsection{Method \code{vertex_along()}}{
+Sequence of vertex indices.
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{Graph$vertex_along()}\if{html}{\out{</div>}}
+}
+
+\subsection{Details}{
+Similar to \code{base::seq_along}, this function provides
+the indices of the vertices in the graph. It is intended for use by 
+graph algorithms which iterate vertices.
+}
+
+\subsection{Returns}{
+A numeric vector.
+}
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-Graph-vertex_index"></a>}}
+\if{latex}{\out{\hypertarget{method-Graph-vertex_index}{}}}
 \subsection{Method \code{vertex_index()}}{
 Find the index of a vertex in the graph.
 \subsection{Usage}{
@@ -81,20 +130,53 @@ Find the index of a vertex in the graph.
 \subsection{Arguments}{
 \if{html}{\out{<div class="arguments">}}
 \describe{
-\item{\code{v}}{Subject vertex}
+\item{\code{v}}{A vertex.}
 }
 \if{html}{\out{</div>}}
 }
 \subsection{Returns}{
-Index of \code{v}. The vertexes are normally stored in the same
+Index of \var{v}. The vertices are normally stored in the same
 order they are specified in \code{new}, but this cannot be guaranteed. 
-This' function returns the same index as used in the adjacency matrix and 
-\code{NA} if the vertex is not in the graph.
+This function returns the same index as used in the adjacency matrix and 
+\code{NA} if \var{v} is not a vertex, or is a vertex that is not in 
+the graph.
 }
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-has_vertex"></a>}}
-\if{latex}{\out{\hypertarget{method-has_vertex}{}}}
+\if{html}{\out{<a id="method-Graph-vertex_at"></a>}}
+\if{latex}{\out{\hypertarget{method-Graph-vertex_at}{}}}
+\subsection{Method \code{vertex_at()}}{
+Find the vertex at a given index.
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{Graph$vertex_at(index)}\if{html}{\out{</div>}}
+}
+
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{index}}{Index of a vertex in the graph, as an integer. The indices
+of the vertices normally run from 1 to the order of the graph, and are
+normally in the same sequence as the list of vertices, \var{V}, supplied
+when the graph was created. However, these assumptions are not
+guaranteed to hold for future versions of the package, and it is
+recommended to supply an index value that has been provided by another
+class function such as \code{vertex_index}, \code{vertex_along} and
+\code{graph_adjacency_matrix}.}
+}
+\if{html}{\out{</div>}}
+}
+\subsection{Details}{
+The inverse of function \code{vertex_index}. The function will
+raise an abort signal if the supplied index is not a vertex.
+}
+
+\subsection{Returns}{
+the node (vertex) with the specified index.
+}
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-Graph-has_vertex"></a>}}
+\if{latex}{\out{\hypertarget{method-Graph-has_vertex}{}}}
 \subsection{Method \code{has_vertex()}}{
 Test whether a vertex is an element of the graph.
 \subsection{Usage}{
@@ -113,8 +195,27 @@ TRUE if v is an element of V(G).
 }
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-edge_index"></a>}}
-\if{latex}{\out{\hypertarget{method-edge_index}{}}}
+\if{html}{\out{<a id="method-Graph-edge_along"></a>}}
+\if{latex}{\out{\hypertarget{method-Graph-edge_along}{}}}
+\subsection{Method \code{edge_along()}}{
+Sequence of edge indices.
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{Graph$edge_along()}\if{html}{\out{</div>}}
+}
+
+\subsection{Details}{
+Similar to \code{base::seq_along}, this function provides
+the indices of the  edges in the graph. It is intended for use by 
+graph algorithms which iterate edges.
+}
+
+\subsection{Returns}{
+A numeric vector.
+}
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-Graph-edge_index"></a>}}
+\if{latex}{\out{\hypertarget{method-Graph-edge_index}{}}}
 \subsection{Method \code{edge_index()}}{
 Find the index of an edge in a graph.
 \subsection{Usage}{
@@ -129,15 +230,46 @@ Find the index of an edge in a graph.
 \if{html}{\out{</div>}}
 }
 \subsection{Returns}{
-Index of \code{e}. The edges are normally stored in the same order
-they are specified in \code{new}, but this cannot be guaranteed. This
-function returns the same index returned in other functions and \code{NA}
-if the edge is not in the graph.
+Index of \code{e}. The edges are normally stored in the same
+order they are specified in \code{new}, but this cannot be guaranteed. 
+This function returns the same index returned in other functions and 
+\code{NA} if the edge is not in the graph.
 }
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-has_edge"></a>}}
-\if{latex}{\out{\hypertarget{method-has_edge}{}}}
+\if{html}{\out{<a id="method-Graph-edge_at"></a>}}
+\if{latex}{\out{\hypertarget{method-Graph-edge_at}{}}}
+\subsection{Method \code{edge_at()}}{
+Find the edge at a given index.
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{Graph$edge_at(index)}\if{html}{\out{</div>}}
+}
+
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{index}}{Index of a edge in the graph, as an integer. The indices
+of the edges normally run from 1 to the size of the graph, and are
+normally in the same sequence as the list of edges, \var{E}, supplied
+when the graph was created. However, these assumptions are not
+guaranteed to hold for future versions of the package, and it is
+recommended to supply an index value that has been provided by another
+class function such as \code{edge_index} and \code{edge_along}.}
+}
+\if{html}{\out{</div>}}
+}
+\subsection{Details}{
+The inverse of function \code{dge_index}. The function will
+raise an abort signal if the supplied index is not an edge.
+}
+
+\subsection{Returns}{
+the edge with the specified index.
+}
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-Graph-has_edge"></a>}}
+\if{latex}{\out{\hypertarget{method-Graph-has_edge}{}}}
 \subsection{Method \code{has_edge()}}{
 Test whether an edge is element of the graph.
 \subsection{Usage}{
@@ -156,34 +288,8 @@ Test whether an edge is element of the graph.
 }
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-order"></a>}}
-\if{latex}{\out{\hypertarget{method-order}{}}}
-\subsection{Method \code{order()}}{
-Return the order of the graph (number of vertices).
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{Graph$order()}\if{html}{\out{</div>}}
-}
-
-\subsection{Returns}{
-Order of the graph (integer).
-}
-}
-\if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-size"></a>}}
-\if{latex}{\out{\hypertarget{method-size}{}}}
-\subsection{Method \code{size()}}{
-Return the size of the graph (number of edges).
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{Graph$size()}\if{html}{\out{</div>}}
-}
-
-\subsection{Returns}{
-Size of the graph (integer).
-}
-}
-\if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-graph_adjacency_matrix"></a>}}
-\if{latex}{\out{\hypertarget{method-graph_adjacency_matrix}{}}}
+\if{html}{\out{<a id="method-Graph-graph_adjacency_matrix"></a>}}
+\if{latex}{\out{\hypertarget{method-Graph-graph_adjacency_matrix}{}}}
 \subsection{Method \code{graph_adjacency_matrix()}}{
 Compute the adjacency matrix for the graph.
 \subsection{Usage}{
@@ -194,7 +300,7 @@ Compute the adjacency matrix for the graph.
 \if{html}{\out{<div class="arguments">}}
 \describe{
 \item{\code{boolean}}{If \code{TRUE}, the adjacency matrix is logical, each
-cell is {\code{FALSE},\code{TRUE}}.}
+cell is {\code{FALSE}, \code{TRUE}}.}
 }
 \if{html}{\out{</div>}}
 }
@@ -207,14 +313,14 @@ cells are either 0 (not adjacent) or 1 (adjacent).
 
 \subsection{Returns}{
 A square numeric matrix with the number of rows and columns
-equal to the order of the graph. The rows and columns are in the
-same order as \code{V}. If the nodes have defined and unique labels the
-\code{dimnames} of the matrix are the labels of the nodes.
+equal to the order of the graph. The rows and columns are labelled
+with the node labels, if all the nodes in the graph have labels, or the
+node indices if not.
 }
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-is_simple"></a>}}
-\if{latex}{\out{\hypertarget{method-is_simple}{}}}
+\if{html}{\out{<a id="method-Graph-is_simple"></a>}}
+\if{latex}{\out{\hypertarget{method-Graph-is_simple}{}}}
 \subsection{Method \code{is_simple()}}{
 Is this a simple graph?
 \subsection{Usage}{
@@ -230,8 +336,8 @@ A simple graph has no self loops or multi-edges.
 }
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-is_connected"></a>}}
-\if{latex}{\out{\hypertarget{method-is_connected}{}}}
+\if{html}{\out{<a id="method-Graph-is_connected"></a>}}
+\if{latex}{\out{\hypertarget{method-Graph-is_connected}{}}}
 \subsection{Method \code{is_connected()}}{
 Test whether the graph is connected.
 \subsection{Usage}{
@@ -250,8 +356,8 @@ search.
 }
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-is_acyclic"></a>}}
-\if{latex}{\out{\hypertarget{method-is_acyclic}{}}}
+\if{html}{\out{<a id="method-Graph-is_acyclic"></a>}}
+\if{latex}{\out{\hypertarget{method-Graph-is_acyclic}{}}}
 \subsection{Method \code{is_acyclic()}}{
 Checks for the presence of a cycle in the graph.
 \subsection{Usage}{
@@ -270,8 +376,8 @@ node of the current one.
 }
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-is_tree"></a>}}
-\if{latex}{\out{\hypertarget{method-is_tree}{}}}
+\if{html}{\out{<a id="method-Graph-is_tree"></a>}}
+\if{latex}{\out{\hypertarget{method-Graph-is_tree}{}}}
 \subsection{Method \code{is_tree()}}{
 Compute whether the graph is connected and acyclic.
 \subsection{Usage}{
@@ -283,8 +389,8 @@ Compute whether the graph is connected and acyclic.
 }
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-degree"></a>}}
-\if{latex}{\out{\hypertarget{method-degree}{}}}
+\if{html}{\out{<a id="method-Graph-degree"></a>}}
+\if{latex}{\out{\hypertarget{method-Graph-degree}{}}}
 \subsection{Method \code{degree()}}{
 The degree of a vertex in the graph.
 \subsection{Usage}{
@@ -307,8 +413,8 @@ Degree of the vertex, integer.
 }
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-neighbours"></a>}}
-\if{latex}{\out{\hypertarget{method-neighbours}{}}}
+\if{html}{\out{<a id="method-Graph-neighbours"></a>}}
+\if{latex}{\out{\hypertarget{method-Graph-neighbours}{}}}
 \subsection{Method \code{neighbours()}}{
 Find the neighbours of a node.
 \subsection{Usage}{
@@ -332,8 +438,8 @@ A list of nodes which are joined to the subject.
 }
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-as_DOT"></a>}}
-\if{latex}{\out{\hypertarget{method-as_DOT}{}}}
+\if{html}{\out{<a id="method-Graph-as_DOT"></a>}}
+\if{latex}{\out{\hypertarget{method-Graph-as_DOT}{}}}
 \subsection{Method \code{as_DOT()}}{
 Export a representation of the graph in DOT format.
 \subsection{Usage}{
@@ -352,8 +458,8 @@ for saving as a text file.
 }
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-clone"></a>}}
-\if{latex}{\out{\hypertarget{method-clone}{}}}
+\if{html}{\out{<a id="method-Graph-clone"></a>}}
+\if{latex}{\out{\hypertarget{method-Graph-clone}{}}}
 \subsection{Method \code{clone()}}{
 The objects of this class are cloneable with this method.
 \subsection{Usage}{

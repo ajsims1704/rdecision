@@ -168,13 +168,8 @@ test_that("invalid transition probabilities are rejected", {
   s.well <- MarkovState$new(name="Well")
   s.disabled <- MarkovState$new(name="Disabled")
   s.dead <- MarkovState$new(name="Dead")
-  # use S&B per-cycle transition probabilities and calculate rates
+  # state names 
   snames <- c("Well","Disabled","Dead")
-  Pt <- matrix(
-    data = c(0.6, 0.2, 0.2, 0, 0.6, 0.4, 0, 0, 1),
-    nrow = 3, byrow = TRUE,
-    dimnames = list(source=snames, target=snames)
-  )
   # create transitions
   E <- list(
     Transition$new(s.well, s.well),
@@ -259,6 +254,22 @@ test_that("invalid transition probabilities are rejected", {
   expect_error(
     M$set_probabilities(Pt=ePt), class = "invalid_Pt"
   )
+  # Sonnenberg and Beck probability matrix
+  pt_sb <- matrix(
+    data = c(0.6, 0.2, 0.2, 0, 0.6, 0.4, 0, 0, 1),
+    nrow = 3, byrow = TRUE,
+    dimnames = list(source=snames, target=snames)
+  )
+  expect_silent(M$set_probabilities(Pt = pt_sb))
+  # Sonnenberg and Beck probability matrix with NAs - check if NAs replaced
+  pt_sb_na <- matrix(
+    data = c(NA, 0.2, 0.2, NA, 0.6, 0.4, 0, 0, NA),
+    nrow = 3, byrow = TRUE,
+    dimnames = list(source=snames, target=snames)
+  )
+  expect_silent(M$set_probabilities(Pt = pt_sb_na))
+  ept_sb <- M$transition_probabilities()
+  expect_equal(ept_sb, pt_sb)
 })
 
 test_that("NAs are replaced in transition probability matrix", {
@@ -530,6 +541,33 @@ test_that("model is cyclable", {
   expect_equal(nrow(DF),3)
 })
 
+# cyclng with utilities > 1
+test_that("utilities > 1 are supported via model variables", {
+  cv <- ConstModVar$new(description = "", units = "", const = 2)
+  a <- MarkovState$new(name = "A", cost = 0, utility = 0.9)
+  b <- MarkovState$new(name = "B", cost = 0, utility = 0.8)
+  c <- MarkovState$new(name = "C", cost = 0, utility = cv)
+  aa <- Transition$new(source = a, target = a, cost = 0)
+  ab <- Transition$new(source = a, target = b, cost = 0)
+  ac <- Transition$new(source = a, target = c, cost = 0)
+  bb <- Transition$new(source = b, target = b, cost = 0)
+  cc <- Transition$new(source = c, target = c, cost = 0)
+  m <- SemiMarkovModel$new(V = list(a, b, c), E = list(aa, ab, ac, bb, cc))
+  pt <- matrix(
+    data = c(NA, 0.2, 0.1, 0, NA, 0, 0, 0, NA),
+    nrow = 3,
+    byrow = TRUE,
+    dimnames = list(source = c("A", "B", "C"), target = c("A", "B", "C"))
+  )
+  m$set_probabilities(pt)
+  trace <- m$cycle(hcc.pop = FALSE, hcc.cost = FALSE)
+  expect_intol(
+    trace$QALY[trace$State == "C" & trace$Cycle == 1], 
+    (1000 * 0.1 * 2) / 1000,
+    0.01
+  )
+})
+
 # -----------------------------------------------------------------------------
 # Sonnenberg & Beck, Med Decis Making, 1993;13:322, Fig 3
 # (prosthetic heart valve)
@@ -636,7 +674,7 @@ test_that("redecision replicates Briggs' example 4.7", {
   # Treatment effect (modelled as a log normal distribution)
   # ========================================================
   RR <- LogNormModVar$new(
-    "Tx effect", "RR", p1=0.509, p2=(0.710-0.365)/(2*1.96), "LN7"
+    "Tx effect", "RR", p1 = 0.509, p2 = (0.710-0.365) / (2*1.96), "LN7"
   )
   #
   # Dirichlet distributions for conditional probabilities
@@ -710,7 +748,7 @@ test_that("redecision replicates Briggs' example 4.7", {
     sB$set_cost(cBc)
     sC$set_cost(cCc)
     sD$set_cost(0)
-    # create Pt for combination therapy (Briggs applied the RR to the transition 
+    # create Pt for combination therapy (Briggs applied the RR to the transition
     # probabilities - not recommended, but done here for reproducibility).
     Ptc <- Pt
     for (i in 1:4) {
@@ -734,7 +772,7 @@ test_that("redecision replicates Briggs' example 4.7", {
       expect_true(all(TC-E < 0.01))
     }
     # run combination therapy model for 2 years
-    populations <- c('A'=N, 'B'=0, 'C'=0, 'D'=0)
+    populations <- c("A" = N, "B" = 0, "C" = 0, "D" = 0)
     m$reset(populations)
     # run 2 cycles
     MT.comb <- m$cycles(
@@ -783,7 +821,7 @@ test_that("redecision replicates Briggs' example 4.7", {
   expect_intol(M["cost.mono"], 44663, 100) # rounding errors in book
   expect_intol(M["el.comb"], 8.937, tolerance=0.02) # 8.937 from spreadsheet
   expect_intol(M["cost.comb"], 50602, 100) # rounding errors in book
-  icer <- (M["cost.comb"]-M["cost.mono"])/(M["el.comb"]-M["el.mono"])
+  icer <- (M["cost.comb"]-M["cost.mono"]) / (M["el.comb"]-M["el.mono"])
   expect_intol(icer, 6276, 10) # rounding errors in book
   #
   # Point estimate (with population half-cycle correction)
@@ -795,13 +833,12 @@ test_that("redecision replicates Briggs' example 4.7", {
   expect_intol(M["cost.mono"], 44663, 100) # rounding errors in book
   expect_intol(M["el.comb"], 9.42, tolerance=0.02) 
   expect_intol(M["cost.comb"], 50602, 100) # rounding errors in book
-  icer <- (M["cost.comb"]-M["cost.mono"])/(M["el.comb"]-M["el.mono"])
+  icer <- (M["cost.comb"]-M["cost.mono"]) / (M["el.comb"]-M["el.mono"])
   expect_intol(icer, 6306, 10) # rounding errors in book
   #
   # PSA
   # ===
   skip_on_cran()
-  #skip("Skipping Chancellor PSA test")
   n <- 1000
   ODF <- sapply(1:n, FUN=function(i) {
     # run the model
@@ -810,7 +847,7 @@ test_that("redecision replicates Briggs' example 4.7", {
   })
   ODF <- as.data.frame(t(ODF))
   # calculate ICER 
-  ODF$icer <- (ODF$cost.comb - ODF$cost.mono)/(ODF$el.comb - ODF$el.mono)
+  ODF$icer <- (ODF$cost.comb - ODF$cost.mono) / (ODF$el.comb - ODF$el.mono)
   # read 1000 ICER samples from Briggs solution to example 4.7, modified to
   # save individual runs
   data(BriggsEx47, package="rdecision")
@@ -825,9 +862,4 @@ test_that("redecision replicates Briggs' example 4.7", {
   expect_true(ht$p.value > 0.001)
   suppressWarnings(ht <- ks.test(ODF$icer, BriggsEx47$ICER))
   expect_true(ht$p.value > 0.001)
-  # visual (not run)
-  #qqplot(ODF$icer, EDF$ICER)
-  #abline(0,1,col="red")
 })
-
-

@@ -24,31 +24,31 @@ Andrew J. Sims \email{andrew.sims@newcastle.ac.uk}
 \section{Methods}{
 \subsection{Public methods}{
 \itemize{
-\item \href{#method-new}{\code{NormModVar$new()}}
-\item \href{#method-is_probabilistic}{\code{NormModVar$is_probabilistic()}}
-\item \href{#method-clone}{\code{NormModVar$clone()}}
+\item \href{#method-NormModVar-new}{\code{NormModVar$new()}}
+\item \href{#method-NormModVar-is_probabilistic}{\code{NormModVar$is_probabilistic()}}
+\item \href{#method-NormModVar-clone}{\code{NormModVar$clone()}}
 }
 }
-\if{html}{
-\out{<details ><summary>Inherited methods</summary>}
-\itemize{
-\item \out{<span class="pkg-link" data-pkg="rdecision" data-topic="ModVar" data-id="SD">}\href{../../rdecision/html/ModVar.html#method-SD}{\code{rdecision::ModVar$SD()}}\out{</span>}
-\item \out{<span class="pkg-link" data-pkg="rdecision" data-topic="ModVar" data-id="description">}\href{../../rdecision/html/ModVar.html#method-description}{\code{rdecision::ModVar$description()}}\out{</span>}
-\item \out{<span class="pkg-link" data-pkg="rdecision" data-topic="ModVar" data-id="distribution">}\href{../../rdecision/html/ModVar.html#method-distribution}{\code{rdecision::ModVar$distribution()}}\out{</span>}
-\item \out{<span class="pkg-link" data-pkg="rdecision" data-topic="ModVar" data-id="get">}\href{../../rdecision/html/ModVar.html#method-get}{\code{rdecision::ModVar$get()}}\out{</span>}
-\item \out{<span class="pkg-link" data-pkg="rdecision" data-topic="ModVar" data-id="is_expression">}\href{../../rdecision/html/ModVar.html#method-is_expression}{\code{rdecision::ModVar$is_expression()}}\out{</span>}
-\item \out{<span class="pkg-link" data-pkg="rdecision" data-topic="ModVar" data-id="mean">}\href{../../rdecision/html/ModVar.html#method-mean}{\code{rdecision::ModVar$mean()}}\out{</span>}
-\item \out{<span class="pkg-link" data-pkg="rdecision" data-topic="ModVar" data-id="mode">}\href{../../rdecision/html/ModVar.html#method-mode}{\code{rdecision::ModVar$mode()}}\out{</span>}
-\item \out{<span class="pkg-link" data-pkg="rdecision" data-topic="ModVar" data-id="quantile">}\href{../../rdecision/html/ModVar.html#method-quantile}{\code{rdecision::ModVar$quantile()}}\out{</span>}
-\item \out{<span class="pkg-link" data-pkg="rdecision" data-topic="ModVar" data-id="r">}\href{../../rdecision/html/ModVar.html#method-r}{\code{rdecision::ModVar$r()}}\out{</span>}
-\item \out{<span class="pkg-link" data-pkg="rdecision" data-topic="ModVar" data-id="set">}\href{../../rdecision/html/ModVar.html#method-set}{\code{rdecision::ModVar$set()}}\out{</span>}
-\item \out{<span class="pkg-link" data-pkg="rdecision" data-topic="ModVar" data-id="units">}\href{../../rdecision/html/ModVar.html#method-units}{\code{rdecision::ModVar$units()}}\out{</span>}
-}
-\out{</details>}
-}
+\if{html}{\out{
+<details><summary>Inherited methods</summary>
+<ul>
+<li><span class="pkg-link" data-pkg="rdecision" data-topic="ModVar" data-id="SD"><a href='../../rdecision/html/ModVar.html#method-ModVar-SD'><code>rdecision::ModVar$SD()</code></a></span></li>
+<li><span class="pkg-link" data-pkg="rdecision" data-topic="ModVar" data-id="description"><a href='../../rdecision/html/ModVar.html#method-ModVar-description'><code>rdecision::ModVar$description()</code></a></span></li>
+<li><span class="pkg-link" data-pkg="rdecision" data-topic="ModVar" data-id="distribution"><a href='../../rdecision/html/ModVar.html#method-ModVar-distribution'><code>rdecision::ModVar$distribution()</code></a></span></li>
+<li><span class="pkg-link" data-pkg="rdecision" data-topic="ModVar" data-id="get"><a href='../../rdecision/html/ModVar.html#method-ModVar-get'><code>rdecision::ModVar$get()</code></a></span></li>
+<li><span class="pkg-link" data-pkg="rdecision" data-topic="ModVar" data-id="is_expression"><a href='../../rdecision/html/ModVar.html#method-ModVar-is_expression'><code>rdecision::ModVar$is_expression()</code></a></span></li>
+<li><span class="pkg-link" data-pkg="rdecision" data-topic="ModVar" data-id="mean"><a href='../../rdecision/html/ModVar.html#method-ModVar-mean'><code>rdecision::ModVar$mean()</code></a></span></li>
+<li><span class="pkg-link" data-pkg="rdecision" data-topic="ModVar" data-id="mode"><a href='../../rdecision/html/ModVar.html#method-ModVar-mode'><code>rdecision::ModVar$mode()</code></a></span></li>
+<li><span class="pkg-link" data-pkg="rdecision" data-topic="ModVar" data-id="quantile"><a href='../../rdecision/html/ModVar.html#method-ModVar-quantile'><code>rdecision::ModVar$quantile()</code></a></span></li>
+<li><span class="pkg-link" data-pkg="rdecision" data-topic="ModVar" data-id="r"><a href='../../rdecision/html/ModVar.html#method-ModVar-r'><code>rdecision::ModVar$r()</code></a></span></li>
+<li><span class="pkg-link" data-pkg="rdecision" data-topic="ModVar" data-id="set"><a href='../../rdecision/html/ModVar.html#method-ModVar-set'><code>rdecision::ModVar$set()</code></a></span></li>
+<li><span class="pkg-link" data-pkg="rdecision" data-topic="ModVar" data-id="units"><a href='../../rdecision/html/ModVar.html#method-ModVar-units'><code>rdecision::ModVar$units()</code></a></span></li>
+</ul>
+</details>
+}}
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-new"></a>}}
-\if{latex}{\out{\hypertarget{method-new}{}}}
+\if{html}{\out{<a id="method-NormModVar-new"></a>}}
+\if{latex}{\out{\hypertarget{method-NormModVar-new}{}}}
 \subsection{Method \code{new()}}{
 Create a model variable with normal uncertainty.
 \subsection{Usage}{
@@ -75,8 +75,8 @@ A \code{NormModVar} object.
 }
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-is_probabilistic"></a>}}
-\if{latex}{\out{\hypertarget{method-is_probabilistic}{}}}
+\if{html}{\out{<a id="method-NormModVar-is_probabilistic"></a>}}
+\if{latex}{\out{\hypertarget{method-NormModVar-is_probabilistic}{}}}
 \subsection{Method \code{is_probabilistic()}}{
 Tests whether the model variable is probabilistic.
 \subsection{Usage}{
@@ -88,8 +88,8 @@ Tests whether the model variable is probabilistic.
 }
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-clone"></a>}}
-\if{latex}{\out{\hypertarget{method-clone}{}}}
+\if{html}{\out{<a id="method-NormModVar-clone"></a>}}
+\if{latex}{\out{\hypertarget{method-NormModVar-clone}{}}}
 \subsection{Method \code{clone()}}{
 The objects of this class are cloneable with this method.
 \subsection{Usage}{

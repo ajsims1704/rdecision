@@ -167,10 +167,10 @@ SemiMarkovModel <- R6::R6Class(
         )
       }
       # check that all edges inherit from Transition
-      T <- which(
-        sapply(E, function(e){inherits(e,what="Transition")}),arr.ind=TRUE
+      tedges <- which(
+        sapply(E, function(e) inherits(e,what = "Transition")), arr.ind = TRUE
       )
-      if (!setequal(seq_along(E),T)) {
+      if (!setequal(seq_along(E), tedges)) {
         rlang::abort(
           "Each edge must be a 'Transition'.", class="invalid_transition"
         )
@@ -405,7 +405,7 @@ SemiMarkovModel <- R6::R6Class(
         }  
         # check that all populations are of type numeric
         sapply(populations, function(x) {
-          if (is.numeric(x)==F){
+          if (is.numeric(x) == FALSE) {
             rlang::abort(
               "Each element of 'populations' must be of type numeric",
               class="non-numeric_state_population")

@@ -68,28 +68,28 @@ Andrew J. Sims \email{andrew.sims@newcastle.ac.uk}
 \section{Methods}{
 \subsection{Public methods}{
 \itemize{
-\item \href{#method-new}{\code{LogNormDistribution$new()}}
-\item \href{#method-distribution}{\code{LogNormDistribution$distribution()}}
-\item \href{#method-sample}{\code{LogNormDistribution$sample()}}
-\item \href{#method-mean}{\code{LogNormDistribution$mean()}}
-\item \href{#method-mode}{\code{LogNormDistribution$mode()}}
-\item \href{#method-SD}{\code{LogNormDistribution$SD()}}
-\item \href{#method-quantile}{\code{LogNormDistribution$quantile()}}
-\item \href{#method-clone}{\code{LogNormDistribution$clone()}}
+\item \href{#method-LogNormDistribution-new}{\code{LogNormDistribution$new()}}
+\item \href{#method-LogNormDistribution-distribution}{\code{LogNormDistribution$distribution()}}
+\item \href{#method-LogNormDistribution-sample}{\code{LogNormDistribution$sample()}}
+\item \href{#method-LogNormDistribution-mean}{\code{LogNormDistribution$mean()}}
+\item \href{#method-LogNormDistribution-mode}{\code{LogNormDistribution$mode()}}
+\item \href{#method-LogNormDistribution-SD}{\code{LogNormDistribution$SD()}}
+\item \href{#method-LogNormDistribution-quantile}{\code{LogNormDistribution$quantile()}}
+\item \href{#method-LogNormDistribution-clone}{\code{LogNormDistribution$clone()}}
 }
 }
-\if{html}{
-\out{<details open ><summary>Inherited methods</summary>}
-\itemize{
-\item \out{<span class="pkg-link" data-pkg="rdecision" data-topic="Distribution" data-id="order">}\href{../../rdecision/html/Distribution.html#method-order}{\code{rdecision::Distribution$order()}}\out{</span>}
-\item \out{<span class="pkg-link" data-pkg="rdecision" data-topic="Distribution" data-id="r">}\href{../../rdecision/html/Distribution.html#method-r}{\code{rdecision::Distribution$r()}}\out{</span>}
-\item \out{<span class="pkg-link" data-pkg="rdecision" data-topic="Distribution" data-id="varcov">}\href{../../rdecision/html/Distribution.html#method-varcov}{\code{rdecision::Distribution$varcov()}}\out{</span>}
-}
-\out{</details>}
-}
+\if{html}{\out{
+<details open><summary>Inherited methods</summary>
+<ul>
+<li><span class="pkg-link" data-pkg="rdecision" data-topic="Distribution" data-id="order"><a href='../../rdecision/html/Distribution.html#method-Distribution-order'><code>rdecision::Distribution$order()</code></a></span></li>
+<li><span class="pkg-link" data-pkg="rdecision" data-topic="Distribution" data-id="r"><a href='../../rdecision/html/Distribution.html#method-Distribution-r'><code>rdecision::Distribution$r()</code></a></span></li>
+<li><span class="pkg-link" data-pkg="rdecision" data-topic="Distribution" data-id="varcov"><a href='../../rdecision/html/Distribution.html#method-Distribution-varcov'><code>rdecision::Distribution$varcov()</code></a></span></li>
+</ul>
+</details>
+}}
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-new"></a>}}
-\if{latex}{\out{\hypertarget{method-new}{}}}
+\if{html}{\out{<a id="method-LogNormDistribution-new"></a>}}
+\if{latex}{\out{\hypertarget{method-LogNormDistribution-new}{}}}
 \subsection{Method \code{new()}}{
 Create a log normal distribution.
 \subsection{Usage}{
@@ -114,8 +114,8 @@ A \code{LogNormDistribution} object.
 }
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-distribution"></a>}}
-\if{latex}{\out{\hypertarget{method-distribution}{}}}
+\if{html}{\out{<a id="method-LogNormDistribution-distribution"></a>}}
+\if{latex}{\out{\hypertarget{method-LogNormDistribution-distribution}{}}}
 \subsection{Method \code{distribution()}}{
 Accessor function for the name of the distribution.
 \subsection{Usage}{
@@ -128,8 +128,8 @@ etc.).
 }
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-sample"></a>}}
-\if{latex}{\out{\hypertarget{method-sample}{}}}
+\if{html}{\out{<a id="method-LogNormDistribution-sample"></a>}}
+\if{latex}{\out{\hypertarget{method-LogNormDistribution-sample}{}}}
 \subsection{Method \code{sample()}}{
 Draw a random sample from the model variable.
 \subsection{Usage}{
@@ -149,8 +149,8 @@ Updated \code{LogNormDistribution} object.
 }
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-mean"></a>}}
-\if{latex}{\out{\hypertarget{method-mean}{}}}
+\if{html}{\out{<a id="method-LogNormDistribution-mean"></a>}}
+\if{latex}{\out{\hypertarget{method-LogNormDistribution-mean}{}}}
 \subsection{Method \code{mean()}}{
 Return the expected value of the distribution.
 \subsection{Usage}{
@@ -162,8 +162,8 @@ Expected value as a numeric value.
 }
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-mode"></a>}}
-\if{latex}{\out{\hypertarget{method-mode}{}}}
+\if{html}{\out{<a id="method-LogNormDistribution-mode"></a>}}
+\if{latex}{\out{\hypertarget{method-LogNormDistribution-mode}{}}}
 \subsection{Method \code{mode()}}{
 Return the point estimate of the variable.
 \subsection{Usage}{
@@ -175,8 +175,8 @@ Point estimate (mode) of the log normal distribution.
 }
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-SD"></a>}}
-\if{latex}{\out{\hypertarget{method-SD}{}}}
+\if{html}{\out{<a id="method-LogNormDistribution-SD"></a>}}
+\if{latex}{\out{\hypertarget{method-LogNormDistribution-SD}{}}}
 \subsection{Method \code{SD()}}{
 Return the standard deviation of the distribution.
 \subsection{Usage}{
@@ -188,8 +188,8 @@ Standard deviation as a numeric value
 }
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-quantile"></a>}}
-\if{latex}{\out{\hypertarget{method-quantile}{}}}
+\if{html}{\out{<a id="method-LogNormDistribution-quantile"></a>}}
+\if{latex}{\out{\hypertarget{method-LogNormDistribution-quantile}{}}}
 \subsection{Method \code{quantile()}}{
 Return the quantiles of the log normal distribution.
 \subsection{Usage}{
@@ -208,8 +208,8 @@ Vector of quantiles.
 }
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-clone"></a>}}
-\if{latex}{\out{\hypertarget{method-clone}{}}}
+\if{html}{\out{<a id="method-LogNormDistribution-clone"></a>}}
+\if{latex}{\out{\hypertarget{method-LogNormDistribution-clone}{}}}
 \subsection{Method \code{clone()}}{
 The objects of this class are cloneable with this method.
 \subsection{Usage}{

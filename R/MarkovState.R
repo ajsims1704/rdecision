@@ -26,39 +26,29 @@ MarkovState <- R6::R6Class(
     #' @details Utility must be in the range \code{[-Inf,1]}. If it is of type 
     #' numeric, the range is checked on object creation. 
     #' @return An object of type \code{MarkovState}.
-    initialize = function(name, cost=0, utility=1) {
-      # set the name
-      if (missing(name) || is.na(name)) {
-        rlang::abort(
-          "State name must not be missing", 
-          class="missing_state_name"
-        )
-      }
-      if (!is.character(name)) {
-        rlang::abort(
-          "State name must be a string", 
-          class="non-string_state_name"
-        )
-      }
+    initialize = function(name, cost = 0, utility = 1) {
+      # check and set the name
+      abortifnot(
+        !(missing(name) || is.na(name)),
+        message = "State name must not be missing", 
+        class = "missing_state_name"
+      )
+      abortifnot(
+        is.character(name), 
+        message = "State name must be a string", 
+        class = "non-string_state_name"
+      )
       # ensure base class is initialized
       super$initialize(name)
       # check that annual cost is numeric, then set it
       self$set_cost(cost)
-      # check the utility is numeric, and in range[-Inf,1], and set it
-      if (inherits(utility, what="numeric")) {
-        if (utility > 1) {
-          rlang::abort("Utility must be in the range [-Inf,1]",
-                       class="utility_out_of_range")
-        }
-        private$state.utility <- utility
-      } else if (inherits(utility, what="ModVar")) {
-        private$state.utility <- utility
-      } else {
-        rlang::abort(
-          "Argument 'utility' must be numeric or ModVar", 
-          class="invalid_utility"
-        )
-      }
+      # check the utility, and in range[-Inf,1] if numeric
+      abortifnot(
+        (is.numeric(utility) && utility <= 1) || is_ModVar(utility),
+        message = "If utility is numeric it must be in the range [-Inf,1]",
+        class = "invalid_utility"
+      )
+      private$state.utility <- utility
       # return invisible MarkovState object
       return(invisible(self))
     },
@@ -73,47 +63,27 @@ MarkovState <- R6::R6Class(
     #' @param cost The annual cost of state occupancy
     #' @returns Updated \code{MarkovState} object
     set_cost = function(cost) {
-      # check that annual cost is numeric, then set it
-      if (inherits(cost, what="numeric")){
-        private$state.cost <- cost
-      } else if (inherits(cost, what="ModVar")) {
-        private$state.cost <- cost
-      } else {
-        rlang::abort(
-          "'cost' must be of type 'numeric' or 'ModVar'",
-          class="invalid_annual_cost"
-        )
-      }
+      # check that annual cost, then set it
+      abortifnot(
+        is.numeric(cost) || is_ModVar(cost),
+        message = "'cost' must be of type 'numeric' or 'ModVar'",
+        class = "invalid_annual_cost"
+      )
+      private$state.cost <- cost
       return(invisible(self))
     },
     
     #' @description Gets the annual cost of state occupancy.
     #' @return Annual cost; numeric. 
     cost = function() {
-      if (inherits(private$state.cost, what="ModVar")) {
-        rv <- private$state.cost$get()
-      } else {
-        rv <- private$state.cost
-      }
+      rv <- as_value(private$state.cost)
       return(rv)
     },
     
     #' @description Gets the utility associated with the state.
-    #' @details If the state utility is a \code{ModVar} and its sampled
-    #' value exceeds 1, a warning is issued. 
     #' @return Utility; numeric.
     utility = function() {
-      if (inherits(private$state.utility, what="ModVar")) {
-        rv <- private$state.utility$get()
-        if (rv > 1) {
-          rlang::warn(
-            "Utility must be in the range [-Inf,1]",
-            class="utility_out_of_range"
-          )
-        }
-      } else {
-        rv <- private$state.utility
-      }
+      rv <- as_value(private$state.utility)
       return(rv)
     },
     
@@ -127,7 +97,7 @@ MarkovState <- R6::R6Class(
       iv <- c(private$state.cost, private$state.utility)
       ov <- list()
       for (v in iv) {
-        if (inherits(v, what="ModVar")) {
+        if (is_ModVar(v)) {
           ov <- c(ov, v)
           if (inherits(v, what="ExprModVar")) {
             for (o in v$operands()) {
@@ -139,6 +109,5 @@ MarkovState <- R6::R6Class(
       # return the unique list
       return(unique(ov))
     }
-    
   )
 )

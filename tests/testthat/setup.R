@@ -13,22 +13,22 @@ R6setequal <- function(A,B) {
 # custom expectation to compare two sets of R6 objects
 expect_R6setequal <- function(object, eset) {
   # capture object and label
-  act <- quasi_label(rlang::enquo(object), arg = "object")
+  act <- testthat::quasi_label(rlang::enquo(object), arg = "object")
   # object must be a list of R6 objects
   if (!is.list(act$val)) {
-    expect(
+    testthat::expect(
       ok = FALSE,
       sprintf("%s must be a list", act$lab)
     )
   }
   if (!all(sapply(act$val, function(r){inherits(r,what="R6")}))) {
-    expect(
+    testthat::expect(
       ok = FALSE,
       sprintf("%s must be a list of R6 objects", act$lab)
     )
   }
   # compare sets 
-  expect(
+  testthat::expect(
     ok = R6setequal(act$val, eset),
     sprintf("%s is not equal to to the expected set", act$lab)
   )
@@ -42,16 +42,16 @@ expect_R6setequal <- function(object, eset) {
 # version any specified tolerance is permitted.
 expect_intol <- function(object, E, tolerance) {
   # capture object and label
-  act <- quasi_label(rlang::enquo(object), arg = "object")
+  act <- testthat::quasi_label(rlang::enquo(object), arg = "object")
   # object must be numeric
   if (!is.numeric(act$val)) {
-    expect(
+    testthat::expect(
       ok = FALSE,
       sprintf("%s must be numeric", act$lab)
     )
   }
   # test if object value is equal to E within tolerance
-  expect(
+  testthat::expect(
     ok = (abs(act$val - E) <= tolerance),
     sprintf("%s (%f) is not within %f of %f", act$lab, act$val, tolerance, E)
   )
@@ -62,9 +62,9 @@ expect_intol <- function(object, E, tolerance) {
 # expectation that object, lies in an interval (including its limits).
 expect_between <- function(object, lower, upper) {
   # capture object and label
-  act <- quasi_label(rlang::enquo(object), arg = "object")
+  act <- testthat::quasi_label(rlang::enquo(object), arg = "object")
   # test
-  expect(
+  testthat::expect(
     ok = ((act$val>=lower) && (act$val<=upper)),
     sprintf(
       "%s (%f) does not lie in the interval [%f,%f]",
@@ -74,5 +74,3 @@ expect_between <- function(object, lower, upper) {
   # Invisibly return the value
   invisible(act$val)    
 }
-
-
