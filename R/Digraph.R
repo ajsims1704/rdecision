@@ -40,14 +40,16 @@ Digraph <- R6::R6Class(
     #' @return A Digraph object.
     initialize = function(V, A) {
       # check and set arrows
-      if (!is.list(A)) {
-        rlang::abort("A must be a list", class="non-list_arrows")
-      }
-      sapply(A, FUN=function(a) {
-        if (!inherits(a, what="Arrow")) {
-          rlang::abort("Each A must be an Arrow", class="non-Arrow_edge")
-        }
-      })
+      abortifnot(
+        is.list(A),
+        message = "A must be a list", 
+        class="non-list_arrows"
+      )
+      abortifnot(
+        all(is_Arrow(A)),
+        message = "Each 'A' must be an Arrow",
+        class = "non-Arrow_edge"
+      )
       # initialize the base Graph class (also checks V)
       super$initialize(V, A)
       # compute and save the adjacency matrix
@@ -80,16 +82,16 @@ Digraph <- R6::R6Class(
       # create if not saved
       if (is.null(private$AD)) {
         # create matrix
-        L <- vapply(X=private$V,FUN.VALUE="x",FUN=function(v){v$label()})
+        L <- vapply(X = private$V, FUN.VALUE = "x", FUN = function(v) v$label())
         n <- self$order()
-        if (length(unique(L))==length(L) && all(nchar(L)>0)) {
+        if (anyDuplicated(L) == 0L && all(nchar(L) > 0L)) {
           A <- matrix(
-            rep(0,times=n*n), 
+            rep(0L, times=n*n), 
             nrow=n, 
-            dimnames=list(out.node=L,in.node=L)
+            dimnames=list(out.node = L, in.node = L)
           )
         } else {
-          A <- matrix(rep(0,times=n*n), nrow=n)
+          A <- matrix(rep(0L, times=n*n), nrow=n)
         }
         # populate it
         for (e in private$E) {

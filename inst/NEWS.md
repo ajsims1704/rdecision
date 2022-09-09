@@ -7,9 +7,10 @@
 * Confirmed that utilities > 1 are supported in decision trees and added a
   fictitious model to the test suite to check it. To achieve this, the
   utility should be defined as a model variable, e.g. 
-  `u <- ConstModVar$new("utility", const = 2)` and passed as the `utility`
-  argument to `LeafNode`. Scalar arguments remain subject to range checking
-  in [-Inf,1] for normal usage and to retain the previous behaviour. 
+  `u <- ConstModVar$new(description = "", units = "", const = 2)` and passed as
+  the `utility` argument to `LeafNode`. Scalar arguments remain subject to 
+  range checking in [-Inf,1] for normal usage and to retain the previous 
+  behaviour. 
 * Added vectorised function `as_value` to return the value of an object if
   it is a `ModVar` (via its `get()` method) or if it is a numeric object.
   Intended as an internal function to avoid type testing on polymorphic 

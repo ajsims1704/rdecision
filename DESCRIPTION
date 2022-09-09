@@ -1,6 +1,6 @@
 Package: rdecision
 Title: Decision Analytic Modelling in Health Economics
-Version: 1.1.2
+Version: 1.1.2.9000
 Authors@R: c(
   person(given="Andrew", family="Sims", 
          email = "andrew.sims@newcastle.ac.uk", 

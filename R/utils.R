@@ -45,15 +45,17 @@ as_value <- function(x) {
   return(rv)
 }
 
-#' @title Is an object a model variable?
-#' @description Tests whether an object inherits from class \class{ModVar} or a
-#' class derived from \class{ModVar}. Intended for internal use with 
-#' \pkg{rdecision}.
+#' @title Is an object of a given class?
+#' @description Tests whether an object inherits from a given class, as 
+#' detectable via \code{inherits}. Intended for internal use with 
+#' \pkg{rdecision} and is the template for specific \var{is_X} convenience
+#' functions. 
 #' @param x An object to test, possibly a vector.
+#' @param class_name A character string giving the name of the class.
 #' @return A logical vector of the same length as \var{x} with TRUE values if
-#' the corresponding element of \var{x} inherits from class \code{ModVar}.
+#' the corresponding element of \var{x} inherits from \code{classname}.
 #' @noRd
-is_ModVar <- function(x) {
+is_class <- function(x, class_name) {
   # if scalar, coerce to a vector
   if (!is.vector(x)) {
     x <- c(x)
@@ -62,7 +64,29 @@ is_ModVar <- function(x) {
   rv <- vector(mode = "logical", length = length(x))
   # test each element
   for (i in seq_along(x)) {
-    rv[i] <- inherits(x[[i]], what = "ModVar")
+    rv[i] <- inherits(x[[i]], what = class_name)
   }
   return(rv)
+}
+
+#' @title Is an object an Arrow?
+#' @description Tests whether an object inherits from class \class{Arrow} or a
+#' class derived from it. Intended for internal use with \pkg{rdecision}.
+#' @param x An object to test, possibly a vector.
+#' @return A logical vector of the same length as \var{x} with TRUE values if
+#' the corresponding element of \var{x} inherits from class \code{Arrow}.
+#' @noRd
+is_Arrow <- function(x) {
+  return(is_class(x, "Arrow"))
+}
+
+#' @title Is an object a model variable?
+#' @description Tests whether an object inherits from class \class{ModVar} or a
+#' class derived from it. Intended for internal use with \pkg{rdecision}.
+#' @param x An object to test, possibly a vector.
+#' @return A logical vector of the same length as \var{x} with TRUE values if
+#' the corresponding element of \var{x} inherits from class \code{ModVar}.
+#' @noRd
+is_ModVar <- function(x) {
+  return(is_class(x, "ModVar"))
 }

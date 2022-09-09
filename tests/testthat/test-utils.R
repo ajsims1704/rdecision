@@ -71,8 +71,10 @@ test_that("as_value detects ModVar and derived objects", {
   expect_equal(xo[4], 42)
 })
 
-test_that("is_ModVar detects a missing argument", {
-  expect_error(is_ModVar())
+test_that("is_class detects missing arguments", {
+  expect_error(is_class())
+  expect_error(is_class(42))
+  expect_error(is_class(class_name = "ModVar"))
 })
 
 test_that("is_ModVar detects non ModVar objects", {
@@ -108,4 +110,12 @@ test_that("is_ModVar detects ModVar and derived objects", {
   y <- is_ModVar(x)
   expect_length(y, 5)
   expect_equal(y, c(FALSE, TRUE, FALSE, TRUE, FALSE))
+})
+
+test_that("is_Arrow detects objects of type Arrow", {
+  s <- Node$new()
+  t <- Node$new()
+  a <- Arrow$new(s, t)
+  expect_false(is_Arrow(s))
+  expect_true(is_Arrow(a))
 })

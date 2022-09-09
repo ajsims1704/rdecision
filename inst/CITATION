@@ -4,7 +4,8 @@ note <- sprintf("R package version %s", meta$Version)
 bibentry(bibtype = "Manual",
          title = "{rdecision}: Decision Analytic Modelling In Health Economics",
          author = c(person("Andrew", "Sims"),
-                    person("Kim", "Fairbairn")),
+                    person("Kim", "Fairbairn"),
+                    person("Paola", "Cognigni")),
          year = year,
          note = note,
          url = "https://CRAN.R-project.org/package=rdecision")

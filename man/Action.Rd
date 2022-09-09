@@ -43,21 +43,20 @@ Andrew J. Sims \email{andrew.sims@newcastle.ac.uk}
 \if{html}{\out{<a id="method-Action-new"></a>}}
 \if{latex}{\out{\hypertarget{method-Action-new}{}}}
 \subsection{Method \code{new()}}{
-Create an object of type \code{Action}. Optionally, a cost and a benefit 
-may 
-be associated with traversing the edge. A \dfn{pay-off} (benefit minus 
-cost)  is sometimes used in edges of decision trees; the parametrization
-used here is more general.
+Create an object of type \code{Action}. Optionally, a cost
+and a benefit may be associated with traversing the edge. A \dfn{pay-off}
+(benefit minus cost)  is sometimes used in edges of decision trees; the
+parametrization used here is more general.
 \subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{Action$new(source, target, label, cost = 0, benefit = 0)}\if{html}{\out{</div>}}
+\if{html}{\out{<div class="r">}}\preformatted{Action$new(source_node, target_node, label, cost = 0, benefit = 0)}\if{html}{\out{</div>}}
 }
 
 \subsection{Arguments}{
 \if{html}{\out{<div class="arguments">}}
 \describe{
-\item{\code{source}}{Decision node from which the arrow leaves.}
+\item{\code{source_node}}{Decision node from which the arrow leaves.}
 
-\item{\code{target}}{Node to which the arrow points.}
+\item{\code{target_node}}{Node to which the arrow points.}
 
 \item{\code{label}}{Character string containing the arrow label. This
 must be defined for an action because the label is used in
