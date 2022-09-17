@@ -1,11 +1,11 @@
 
 # setequal function for R6 objects
 R6setequal <- function(A,B) {
-  AinB <- all(sapply(A, function(a) {
-    return(any(sapply(B, function(b){identical(a,b)})))
+  AinB <- all(vapply(A, FUN.VALUE = TRUE, FUN = function(a) {
+    return(any(vapply(B, FUN.VALUE = TRUE, FUN = function(b) identical(a, b))))
   }))
-  BinA <- all(sapply(B, function(b) {
-    return(any(sapply(A, function(a){identical(a,b)})))
+  BinA <- all(vapply(B, FUN.VALUE = TRUE, FUN = function(b) {
+    return(any(vapply(A, FUN.VALUE = TRUE, function(a) identical(a,b))))
   }))
   return(AinB & BinA)
 }
@@ -21,7 +21,10 @@ expect_R6setequal <- function(object, eset) {
       sprintf("%s must be a list", act$lab)
     )
   }
-  if (!all(sapply(act$val, function(r){inherits(r,what="R6")}))) {
+  is_s6 <- vapply(act$val, FUN.VALUE = TRUE, FUN = function(r) {
+    inherits(r, what = "R6")
+  })
+  if (!all(is_s6)) {
     testthat::expect(
       ok = FALSE,
       sprintf("%s must be a list of R6 objects", act$lab)

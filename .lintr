@@ -6,6 +6,7 @@ linters: linters_with_tags(
   object_name_linter = NULL,
   trailing_whitespace_linter = NULL
   )
-exclusions: list(  
+exclusions: list(
+    "tests/testthat.R"
   )
 

@@ -1,3 +1,10 @@
+# rdecision 1.1.2.9001
+
+* Various internal improvements suggested by linter to increase efficiency
+  and maintainability.
+* Changed the name of function `as_value` to `as_numeric` to more accurately
+  reflect its behaviour.
+
 # rdecision 1.1.2
 
 * Confirmed that utilities > 1 are supported in semi Markov models and added

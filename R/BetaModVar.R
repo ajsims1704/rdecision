@@ -1,17 +1,13 @@
 #' @title A model variable whose uncertainty follows a Beta distribution
-#' 
 #' @description An R6 class representing a model variable whose uncertainty
 #' is described by a Beta distribution.
-#' 
 #' @details A model variable for which the uncertainty in the point estimate can
 #' be modelled with a Beta distribution. The hyperparameters of the
 #' distribution are the shape parameters (\code{alpha} and \code{beta}) of
 #' the uncertainty distribution. Inherits from class \code{ModVar}.
-#'
 #' @docType class
 #' @author Andrew J. Sims \email{andrew.sims@@newcastle.ac.uk}
 #' @export
-#' 
 BetaModVar <- R6::R6Class(
   classname = "BetaModVar",
   lock_class = TRUE,
@@ -30,7 +26,7 @@ BetaModVar <- R6::R6Class(
       # create Beta distribution (also checks arguments)
       D <- BetaDistribution$new(alpha=alpha, beta=beta)
       # create BetaModVar
-      super$initialize(description, units, D=D, k=as.integer(1))
+      super$initialize(description, units, D = D, k = 1L)
       # return BetaModVar
       return(invisible(self))
     },
@@ -42,6 +38,5 @@ BetaModVar <- R6::R6Class(
     is_probabilistic = function() {
       return(TRUE)
     }
-    
   )
 )

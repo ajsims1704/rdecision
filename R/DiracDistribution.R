@@ -1,7 +1,5 @@
 #' @title A Dirac delta function
-#' 
 #' @description An R6 class representing a Dirac Delta function.
-#' 
 #' @details A distribution modelled by a Dirac delta function \eqn{\delta(x-c)}
 #' where \eqn{c} is the hyperparameter (value of the constant). It has 
 #' probability 1 that the value will be equal to \eqn{c} and zero otherwise. 
@@ -9,11 +7,9 @@
 #' acknowledged that there is debate over whether Dirac delta functions are 
 #' true distributions, but the assumption makes little practical difference in 
 #' this case. Inherits from class \code{Distribution}.
-#' 
 #' @docType class
 #' @author Andrew Sims \email{andrew.sims@@newcastle.ac.uk}
 #' @export
-#' 
 DiracDistribution <- R6::R6Class(
   classname = "DiracDistributon",
   lock_class = TRUE,
@@ -28,17 +24,15 @@ DiracDistribution <- R6::R6Class(
     #' @return A new \code{DiracDistribution} object.
     initialize = function(const) {
       # initialize the base class
-      super$initialize("Dirac", K=as.integer(1))
+      super$initialize("Dirac", K = 1L)
       # check the argument
-      if (!is.numeric(const)) {
-        rlang::abort(
-          "Argument 'const' must be numeric", 
-          class="const_not_numeric"
-        )
-      }
+      abortifnot(is.numeric(const),
+        message = "Argument 'const' must be numeric", 
+        class = "const_not_numeric"
+      )
       private$c <- const
       # initial sample
-      self$sample(expected=TRUE)
+      self$sample(expected = TRUE)
       # return object
       return(invisible(self))
     },
@@ -46,9 +40,9 @@ DiracDistribution <- R6::R6Class(
     #' @description Accessor function for the name of the distribution.
     #' @return Distribution name as character string.
     distribution = function() {
-      rv <- paste('Const(', 
-                  format(private$c, digits=4, scientific=F),
-                  ')', sep='')
+      rv <- paste0(
+        "Const(", format(private$c, digits = 4L, scientific = FALSE), ")"
+      )
       return(rv)
     },
     
@@ -67,7 +61,7 @@ DiracDistribution <- R6::R6Class(
     #' @description  Return the standard deviation of the distribution. 
     #' @return Standard deviation as a numeric value
     SD = function() {
-      return(0)
+      return(0.0)
     },
     
     #' @description Quantiles of the distribution.
@@ -77,21 +71,22 @@ DiracDistribution <- R6::R6Class(
     #' @return Vector of numeric values of the same length as \code{probs}.
     quantile = function(probs) {
       # test argument
-      sapply(probs, FUN=function(x) {
-        if (is.na(x)) {
-          rlang::abort("All elements of 'probs' must be defined",
-                       class="probs_not_defined")
-        }
-        if (!is.numeric(x)) {
-          rlang::abort("Argument 'probs' must be a numeric vector",
-                       class="probs_not_numeric")
-        }
-        if (x<0 || x>1) {
-          rlang::abort("Elements of 'probs' must be in range[0,1]",
-                       class="probs_out_of_range")
-        }
+      vapply(probs, FUN.VALUE = TRUE, FUN=function(x) {
+        abortifnot(!is.na(x),
+          message = "All elements of 'probs' must be defined",
+          class = "probs_not_defined"
+        )
+        abortifnot(is.numeric(x),
+          message = "Argument 'probs' must be a numeric vector",
+          class = "probs_not_numeric"
+        )
+        abortifnot(x >= 0.0 && x <= 1.0,
+          message = "Elements of 'probs' must be in range[0,1]",
+          class = "probs_out_of_range"
+        )
+        return(TRUE)
       })
-      q <- rep(private$c, times=length(probs))
+      q <- rep(private$c, times = length(probs))
       return(q)
     },
     
@@ -99,11 +94,11 @@ DiracDistribution <- R6::R6Class(
     #' @param expected If TRUE, sets the next value retrieved by a call to
     #' \code{r()} to be the mean of the distribution.
     #' @return Updated distribution.
-    sample = function(expected=FALSE) {
+    sample = function(expected = FALSE) {
       if (!expected) {
-        private$.r[1] <- private$c
+        private$.r[[1L]] <- private$c
       } else {
-        private$.r[1] <- self$mean()
+        private$.r[[1L]] <- self$mean()
       }
       return(invisible(self))
     }

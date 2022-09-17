@@ -40,7 +40,7 @@ DecisionNode <- R6::R6Class(
           class="non-string_label"
         )
       }
-      if (nchar(label)==0) {
+      if (nchar(label) == 0L) {
         rlang::abort("Argument label must be defined", class="empty_label")
       }
       label <- make.names(label)

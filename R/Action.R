@@ -97,14 +97,14 @@ Action <- R6::R6Class(
     #' @description Return the cost associated with traversing the edge.
     #' @return Cost.
     cost = function() {
-      rv <- as_value(private$edge.cost)
+      rv <- as_numeric(private$edge.cost)
       return(rv)
     },
     
     #' @description Return the benefit associated with traversing the edge.
     #' @return Benefit.
     benefit = function() {
-      rv <- as_value(private$edge.benefit)
+      rv <- as_numeric(private$edge.benefit)
       return(rv)
     }  
   )

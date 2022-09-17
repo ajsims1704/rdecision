@@ -1,14 +1,10 @@
 #' @title A parametrized Beta Distribution
-#' 
 #' @description An R6 class representing a Beta distribution with parameters.
-#' 
 #' @details A Beta distribution with hyperparameters for shape (\code{alpha}
 #' and \code{beta}). Inherits from class \code{Distribution}. 
-#'
 #' @docType class
 #' @author Andrew J. Sims \email{andrew.sims@@newcastle.ac.uk}
 #' @export
-#' 
 BetaDistribution <- R6::R6Class(
   classname = "BetaDistribution",
   lock_class = TRUE,
@@ -25,37 +21,29 @@ BetaDistribution <- R6::R6Class(
     #' @return An object of class \code{BetaDistribution}. 
     initialize = function(alpha, beta) {
       # initialize the base class
-      super$initialize("Beta", K=as.integer(1))
+      super$initialize("Beta", K = 1L)
       # check alpha parameter
-      if (!is.numeric(alpha)) {
-        rlang::abort(
-          "Argument 'alpha' must be numeric", 
-          class="alpha_not_numeric"
-        )
-      }
-      if (alpha <= 0) {
-        rlang::abort(
-          "Argument 'alpha' must be > 0", 
-          class="alpha_not_supported"
-        )
-      }
+      abortifnot(is.numeric(alpha),
+        message = "Argument 'alpha' must be numeric", 
+        class = "alpha_not_numeric"
+      )
+      abortifnot(alpha > 0.0,
+        message = "Argument 'alpha' must be > 0", 
+        class = "alpha_not_supported"
+      )
       private$alpha <- alpha
       # check beta parameter
-      if (!is.numeric(beta)) {
-        rlang::abort(
-          "Argument 'beta must be numeric", 
-          class="beta_not_numeric"
-        )
-      }
-      if (beta <= 0) {
-        rlang::abort(
-          "Argument 'beta' must be > 0", 
-          class="beta_not_supported"
-        )
-      }
+      abortifnot(is.numeric(beta),
+        message = "Argument 'beta must be numeric", 
+        class = "beta_not_numeric"
+      )
+      abortifnot(beta > 0.0,
+        message = "Argument 'beta' must be > 0", 
+        class = "beta_not_supported"
+      )
       private$beta <- beta
       # initial sample
-      self$sample(expected=TRUE)
+      self$sample(expected = TRUE)
       # return BetaDistribution
       return(invisible(self))
     },
@@ -64,31 +52,31 @@ BetaDistribution <- R6::R6Class(
     #' distribution.
     #' @return Distribution name as character string.
     distribution = function() {
-      rv <- paste('Be(', private$alpha, ',', private$beta, ')', sep='')
+      rv <- paste0("Be(", private$alpha, ",", private$beta, ")")
       return(rv)
     },
     
     #' @description The expected value of the distribution. 
     #' @return Expected value as a numeric value.
     mean = function() {
-      return(private$alpha/(private$alpha+private$beta))
+      return(private$alpha / (private$alpha + private$beta))
     },
     
     #' @description The mode of the distribution (if 
     #' \code{alpha}, \code{beta} > 1) 
     #' @return mode as a numeric value.
     mode = function() {
-      rv <- as.numeric(NA)
-      if (private$alpha==1 && private$beta==1) {
+      rv <- NA_real_
+      if (private$alpha == 1.0 && private$beta == 1.0) {
         rv <- 0.5
-      } else if (private$alpha<1 && private$beta < 1) {
-        rv <- as.numeric(NA) # bimodal
-      } else if (private$alpha<=1 && private$beta>1) {
-        rv <- 0
-      } else if (private$alpha>1 && private$beta<=1) {
-        rv <- 1
+      } else if (private$alpha < 1.0 && private$beta < 1.0) {
+        rv <- NA_real_ # bimodal
+      } else if (private$alpha <= 1.0 && private$beta > 1.0) {
+        rv <- 0.0
+      } else if (private$alpha > 1.0 && private$beta <= 1.0) {
+        rv <- 1.0
       } else {
-        rv <- (private$alpha-1)/(private$alpha+private$beta-2) 
+        rv <- (private$alpha - 1.0) / (private$alpha + private$beta - 2.0) 
       }
       return(rv)
     },
@@ -98,7 +86,7 @@ BetaDistribution <- R6::R6Class(
     SD = function() {
       a <- private$alpha
       b <- private$beta
-      v <- (a*b) / ( (a+b)^2 * (a+b+1) )
+      v <- (a * b) / ((a + b) ^ 2L * (a + b + 1L))
       return(sqrt(v))
     },
     
@@ -106,11 +94,13 @@ BetaDistribution <- R6::R6Class(
     #' @param expected If TRUE, sets the next value retrieved by a call to
     #' \code{r()} to be the mean of the distribution.
     #' @return Updated distribution.
-    sample = function(expected=FALSE) {
-      if (!expected){
-        private$.r[1] <- rbeta(n=1, shape1=private$alpha, shape2=private$beta)
+    sample = function(expected = FALSE) {
+      if (!expected) {
+        private$.r[[1L]] <- rbeta(
+          n = 1L, shape1 = private$alpha, shape2 = private$beta
+        )
       } else {
-        private$.r[1] <- self$mean()
+        private$.r[[1L]] <- self$mean()
       }
       return(invisible(self))
     },
@@ -120,24 +110,24 @@ BetaDistribution <- R6::R6Class(
     #' @return Vector of quantiles.
     quantile = function(probs) {
       # test argument
-      sapply(probs, FUN=function(x) {
-        if (is.na(x)) {
-          rlang::abort("All elements of 'probs' must be defined",
-                       class="probs_not_defined")
-        }
-        if (!is.numeric(x)) {
-          rlang::abort("Argument 'probs' must be a numeric vector",
-                       class="probs_not_numeric")
-        }
-        if (x<0 || x>1) {
-          rlang::abort("Elements of 'probs' must be in range[0,1]",
-                       class="probs_out_of_range")
-        }
+      vapply(probs, FUN.VALUE = TRUE, FUN=function(x) {
+        abortifnot(!is.na(x),
+          message = "All elements of 'probs' must be defined",
+          class = "probs_not_defined"
+        )
+        abortifnot(is.numeric(x),
+          message = "Argument 'probs' must be a numeric vector",
+          class = "probs_not_numeric"
+        )
+        abortifnot(x >= 0.0 && x <= 1.0,
+          message = "Elements of 'probs' must be in range[0,1]",
+          class = "probs_out_of_range"
+        )
+        return(TRUE)
       })
-      q <- qbeta(probs, shape1=private$alpha, shape2=private$beta)
+      q <- qbeta(probs, shape1 = private$alpha, shape2 = private$beta)
       names(q) <- probs
       return(q)
     }
-    
   )
 )

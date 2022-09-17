@@ -76,14 +76,14 @@ MarkovState <- R6::R6Class(
     #' @description Gets the annual cost of state occupancy.
     #' @return Annual cost; numeric. 
     cost = function() {
-      rv <- as_value(private$state.cost)
+      rv <- as_numeric(private$state.cost)
       return(rv)
     },
     
     #' @description Gets the utility associated with the state.
     #' @return Utility; numeric.
     utility = function() {
-      rv <- as_value(private$state.utility)
+      rv <- as_numeric(private$state.utility)
       return(rv)
     },
     

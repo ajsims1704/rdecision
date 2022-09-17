@@ -17,13 +17,13 @@ Arrow <- R6::R6Class(
   public = list(
     
     #' @description Create an object of type \code{Arrow}.
-    #' @param source Node from which the arrow leaves.
-    #' @param target Node to which the arrow points.
+    #' @param source_node Node from which the arrow leaves.
+    #' @param target_node Node to which the arrow points.
     #' @param label Character string containing the arrow label.
     #' @return A new \code{Arrow} object.
-    initialize = function(source, target, label="") {
+    initialize = function(source_node, target_node, label = "") {
       # base class
-      super$initialize(v1=source, v2=target, label=label)
+      super$initialize(v1 = source_node, v2 = target_node, label = label)
       return(invisible(self))
     },
 

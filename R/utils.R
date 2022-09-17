@@ -16,13 +16,15 @@ abortifnot <- function(cond, message = NULL, class = NULL) {
 
 #' @title The numeric value of a \code{ModVar} or numeric object
 #' @description Intended as an internal function to \pkg{rdecision}.
+#' @details The function has similar behaviour to \code{base:is.numeric}, in
+#' that it coerces values of type \code{integer} to \code{numeric}.
 #' @param x An object, possibly a vector.
 #' @return A numeric vector of the same length as \var{x}, with each element
 #' equal to the value from the \code{get} method if the corresponding element
-#' of \var{x} is a \code{ModVar}, its value if \var{x} is numeric or \code{NA}
-#' otherwise.
+#' of \var{x} is a \code{ModVar}, its numeric value if \var{x} is \code{numeric}
+#' or \code{integer} and \code{NA} otherwise.
 #' @noRd
-as_value <- function(x) {
+as_numeric <- function(x) {
   # coerce argument to a vector
   if (!is.vector(x)) {
     x <- c(x)
@@ -39,7 +41,7 @@ as_value <- function(x) {
     } else if (is.numeric(xi)) {
       rv[[i]] <- xi
     } else {
-      rv[[i]] <- as.numeric(NA)
+      rv[[i]] <- NA_real_
     }
   }
   return(rv)
