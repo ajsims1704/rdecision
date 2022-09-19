@@ -41,15 +41,15 @@ Andrew J. Sims \email{andrew.sims@newcastle.ac.uk}
 \subsection{Method \code{new()}}{
 Create an object of type \code{Arrow}.
 \subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{Arrow$new(source, target, label = "")}\if{html}{\out{</div>}}
+\if{html}{\out{<div class="r">}}\preformatted{Arrow$new(source_node, target_node, label = "")}\if{html}{\out{</div>}}
 }
 
 \subsection{Arguments}{
 \if{html}{\out{<div class="arguments">}}
 \describe{
-\item{\code{source}}{Node from which the arrow leaves.}
+\item{\code{source_node}}{Node from which the arrow leaves.}
 
-\item{\code{target}}{Node to which the arrow points.}
+\item{\code{target_node}}{Node to which the arrow points.}
 
 \item{\code{label}}{Character string containing the arrow label.}
 }

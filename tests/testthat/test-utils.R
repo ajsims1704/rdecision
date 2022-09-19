@@ -1,3 +1,16 @@
+test_that("abortif raises an error condition as expected", {
+  x <- 1L
+  expect_silent(abortif(x > 1L, class = "no"))
+  expect_error(abortif(x == 1L, class = "no"), class = "no")
+  expect_error(abortif(x == 1L))
+})
+
+test_that("abortif behaves correctly with non-boolean conditions", {
+  expect_error(abortif("42"))
+  expect_error(abortif(42L))
+  expect_error(abortif("x"))
+})
+
 test_that("abortifnot raises an error condition as expected", {
   x <- 1L
   expect_silent(abortifnot(x == 1L, class = "no"))
@@ -8,7 +21,7 @@ test_that("abortifnot raises an error condition as expected", {
 test_that("abortifnot behaves correctly with non-boolean conditions", {
   expect_error(abortifnot("42"))
   expect_error(abortifnot(42L))
-  expect_error(abortifnot(x))
+  expect_error(abortif("x"))
 })
 
 test_that("as_numeric missing argument is detected correctly", {
@@ -19,7 +32,7 @@ test_that("as_numeric identifies non ModVar objects", {
   # numeric scalar
   xi <- 42.0
   xo <- as_numeric(xi)
-  expect_intol(xo, 42L, 0.01)
+  expect_intol(xo, 42.0, 0.01)
   # numeric vector with integers, which should be coerced to numeric
   xi <- c(1L, 2L, 3L)
   xo <- as_numeric(xi)

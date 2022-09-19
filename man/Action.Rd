@@ -77,10 +77,9 @@ A new \code{Action} object.
 \if{html}{\out{<a id="method-Action-modvars"></a>}}
 \if{latex}{\out{\hypertarget{method-Action-modvars}{}}}
 \subsection{Method \code{modvars()}}{
-Find all the model variables of type \code{ModVar} that have been 
-specified
-as values associated with this \code{Action}. Includes operands of these
-\code{ModVar}s, if they are expressions.
+Find all the model variables of type \code{ModVar} that have
+been specified as values associated with this \code{Action}. Includes
+operands of these \code{ModVar}s, if they are expressions.
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{Action$modvars()}\if{html}{\out{</div>}}
 }
@@ -93,8 +92,8 @@ A list of \code{ModVar}s.
 \if{html}{\out{<a id="method-Action-p"></a>}}
 \if{latex}{\out{\hypertarget{method-Action-p}{}}}
 \subsection{Method \code{p()}}{
-Return the current value of the edge probability, i.e. the conditional
-probability of traversing the edge.
+Return the current value of the edge probability, i.e. the
+conditional probability of traversing the edge.
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{Action$p()}\if{html}{\out{</div>}}
 }

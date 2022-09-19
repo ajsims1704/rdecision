@@ -1,3 +1,19 @@
+#' @title rlang analogue of base::stopifnot with negated condition
+#' @description If the value of a condition is TRUE, execution is halted
+#' via the \code{rlang::abort} system. There is minimal checking of the 
+#' arguments because this function is intended to be used internally to the 
+#' package.
+#' @param cond A boolean value or expression which should be FALSE. If cond
+#' does not evaluate to a boolean value, it will be treated as TRUE. 
+#' @param message The message to display.
+#' @param class Subclass of the condition
+#' @noRd
+abortif <- function(cond, message = NULL, class = NULL) {
+  if (!rlang::is_logical(cond) || cond) {
+    rlang::abort(message = message, class = class)
+  }
+}
+
 #' @title rlang analogue of base::stopifnot
 #' @description If the value of a condition is not TRUE, execution is halted
 #' via the \code{rlang::abort} system. There is minimal checking of the 

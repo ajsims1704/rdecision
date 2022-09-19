@@ -11,7 +11,7 @@
 #' @author Andrew Sims \email{andrew.sims@@newcastle.ac.uk}
 #' @export
 DiracDistribution <- R6::R6Class(
-  classname = "DiracDistributon",
+  classname = "DiracDistribution",
   lock_class = TRUE,
   inherit = Distribution,
   private = list(

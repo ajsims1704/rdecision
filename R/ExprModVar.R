@@ -77,30 +77,30 @@ ExprModVar <- R6::R6Class(
     #' associated with the expression, and used to estimate values for 
     #' \code{mu_hat}, \code{sigma_hat} and \code{q_hat}. 
     #' @return An object of type \code{ExprModVar}
-    initialize = function(description, units, quo, nemp=1000) {
+    initialize = function(description, units, quo, nemp = 1000L) {
       # check, split and save the quosure
-      if (!rlang::is_quosure(quo)) {
-        rlang::abort("Argument quo must be a quosure", class="quo_not_quosure")
-      }
+      abortifnot(rlang::is_quosure(quo),
+        message = "Argument quo must be a quosure", 
+        class = "quo_not_quosure"
+      )
       private$expr <- rlang::quo_get_expr(quo)
       private$env <- rlang::quo_get_env(quo)
       # create pre-packaged evaluable quosures to optimize calculations
       private$q.mean <- self$add_method("mean()")
       private$q.get <- self$add_method("get()")
       # check and process the sample estimation size
-      if (!is.numeric(nemp)) {
-        rlang::abort("Argument nemp must be numeric", class="nemp_not_numeric")
-      }
-      if (nemp < 1000) {
-        rlang::abort(
-          "Argument nemp must not be less than 1000", 
-          class="nemp_too_small"
-        )
-      }
+      abortifnot(is.integer(nemp),
+        message = "Argument 'nemp' must be an integer", 
+        class = "nemp_not_integer"
+      )
+      abortifnot(nemp >= 1000L,
+        message = "Argument nemp must not be less than 1000", 
+        class = "nemp_too_small"
+      )
       # create and keep a list of (non-recursive) operands, for optimisation
-      private$.operands <- self$operands(recursive=FALSE)
+      private$.operands <- self$operands(recursive = FALSE)
       # create an empirical distribution, accounting for nested autocorrelation
-      samp <- sapply(1:nemp, FUN=function(i) {
+      samp <- vapply(seq_len(nemp), FUN.VALUE = 1.0, FUN=function(i) {
         # set each operand to return a random sample
         for (o in private$.operands) o$set("random")
         # compute the value using the random value for each operand
@@ -108,17 +108,17 @@ ExprModVar <- R6::R6Class(
         rv <- rlang::eval_tidy(private$q.get)
         return(rv)
       })
-      D <- EmpiricalDistribution$new(x=samp)
+      D <- EmpiricalDistribution$new(x = samp)
       # initialize the base class
-      super$initialize(description, units, D=D)
+      super$initialize(description, units, D = D)
       # save the components of .value that do not change
-      private$.value["expected"] <- self$mean() 
+      private$.value[["expected"]] <- self$mean() 
       for (o in private$.operands) o$set("q2.5")
-      private$.value["q2.5"] <- rlang::eval_tidy(private$q.get)
+      private$.value[["q2.5"]] <- rlang::eval_tidy(private$q.get)
       for (o in private$.operands) o$set("q50")
-      private$.value["q50"] <- rlang::eval_tidy(private$q.get)
+      private$.value[["q50"]] <- rlang::eval_tidy(private$q.get)
       for (o in private$.operands) o$set("q97.5")
-      private$.value["q97.5"] <- rlang::eval_tidy(private$q.get)
+      private$.value[["q97.5"]] <- rlang::eval_tidy(private$q.get)
       # return
       return(invisible(self))
     },
@@ -138,27 +138,25 @@ ExprModVar <- R6::R6Class(
     #' syntactically checked or evaluated before it is returned.
     add_method = function(method="mean()") {
       # check argument
-      if (!is.character(method)) {
-        rlang::abort(
-          "Argument 'method' must be a character string",
-          class = "method_not_character"
-        )
-      }
+      abortifnot(is.character(method),
+        message = "Argument 'method' must be a character string",
+        class = "method_not_character"
+      )
       # substitute model variable names with call to method
       mv <- list()
-      for (v in all.vars(private$expr)) {
+      for (v in base::all.vars(private$expr)) {
+        vv <- rlang::eval_bare(expr = rlang::sym(v), env = private$env)
+        rep <- v
         # build replacement string if necessary
-        if (inherits(eval(str2lang(v), envir=private$env), what="ModVar")) {
-          rep <- gsub(v, paste(v, method, sep="$"), v)
-        } else {
-          rep <- v
+        if (is_ModVar(vv)) {
+          rep <- gsub(v, paste(v, method, sep = "$"), v)
         }
         # create symbol from the modified string
         mv[[v]] <- str2lang(rep)
       }
       emod <- eval(substitute(substitute(e, env=mv), env=list(e=private$expr)))
       # create new quosure
-      q <- rlang::new_quosure(expr=emod, env=private$env)
+      q <- rlang::new_quosure(expr = emod, env = private$env)
       # return the quosure
       return(q)
     },
@@ -169,36 +167,38 @@ ExprModVar <- R6::R6Class(
     #' @return \code{TRUE} if probabilistic
     is_probabilistic = function() {
       # test each operand for whether it is probabilistic
-      lv <- sapply(base::all.vars(private$expr), FUN=function(v) {
-        rv <- as.logical(NA)
-        vv <- rlang::eval_bare(expr=rlang::sym(v), env=private$env) 
-        if (inherits(vv, what="ModVar")) {
-          rv <- vv$is_probabilistic()
-        } else if (inherits(vv, what="numeric")) {
+      lv <- vapply(
+        base::all.vars(private$expr), 
+        FUN.VALUE = TRUE, 
+        FUN = function(v) {
           rv <- FALSE
+          vv <- rlang::eval_bare(expr = rlang::sym(v), env = private$env) 
+          if (is_ModVar(vv)) {
+            rv <- vv$is_probabilistic()
+          }
+          return(rv)
         }
-        return(rv)
-      })
+      )
       return(any(lv))
     },
 
     #' @description Return a list of operands.
     #' @details Finds operands that are themselves \code{ModVar}s in the
-    #' expression. if \code{recursive=TRUE}, the list includes all 
-    #' \code{ModVar}s that are operands of expression operands, recursively. 
+    #' expression. if \code{recursive=TRUE}, the list includes all
+    #' \code{ModVar}s that are operands of expression operands, recursively.
     #' @param recursive Whether to include nested variables in the list.
     #' @return A list of model variables.
-    operands = function(recursive=TRUE) {
+    operands = function(recursive = TRUE) {
       # filter the expression variables that are ModVars
       mvlist <- list()
       for (v in all.vars(private$expr)) {
-        vv <- rlang::eval_bare(expr=rlang::sym(v), env=private$env) 
-        if (inherits(vv, what="ModVar")) {
+        vv <- rlang::eval_bare(expr=rlang::sym(v), env=private$env)
+        if (inherits(vv, what = "ModVar")) {
           # add the variable to the list
           mvlist <- c(mvlist, vv)
           # recurse, if required
           if (recursive) {
-            if (inherits(vv, what="ExprModVar")) {
+            if (inherits(vv, what = "ExprModVar")) {
               for (o in vv$operands(recursive)) {
                 mvlist <- c(mvlist, o)
               }
@@ -240,7 +240,7 @@ ExprModVar <- R6::R6Class(
     #' because an arbitrary expression is not guaranteed to be unimodal.
     #' @return Mode as a numeric value.
     mode = function() {
-      return(as.numeric(NA))
+      return(NA_real_)
     },
 
     #' @description Return the standard deviation of the distribution as 
@@ -248,7 +248,7 @@ ExprModVar <- R6::R6Class(
     #' all functions of distributions. 
     #' @return Standard deviation as a numeric value
     SD = function() {
-      return(as.numeric(NA))
+      return(NA_real_)
     },
     
     #' @description Find quantiles of the uncertainty distribution. Not 
@@ -257,21 +257,22 @@ ExprModVar <- R6::R6Class(
     #' @return Vector of numeric values of the same length as \code{probs}.
     quantile = function(probs) {
       # test argument
-      sapply(probs, FUN=function(x) {
-        if (is.na(x)) {
-          rlang::abort("All elements of 'probs' must be defined",
-                       class="probs_not_defined")
-        }
-        if (!is.numeric(x)) {
-          rlang::abort("Argument 'probs' must be a numeric vector",
-                       class="probs_not_numeric")
-        }
-        if (x<0 || x>1) {
-          rlang::abort("Elements of 'probs' must be in range[0,1]",
-                       class="probs_out_of_range")
-        }
+      vapply(probs, FUN.VALUE = TRUE, FUN=function(x) {
+        abortif(is.na(x),
+          message = "All elements of 'probs' must be defined",
+          class = "probs_not_defined"
+        )
+        abortifnot(is.numeric(x),
+          message = "Argument 'probs' must be a numeric vector",
+          class = "probs_not_numeric"
+        )
+        abortifnot(x >= 0.0 && x <= 1.0,
+          message = "Elements of 'probs' must be in range[0,1]",
+          class = "probs_out_of_range"
+        )
+        return(TRUE)
       })
-      return(rep(as.numeric(NA),length(probs)))
+      return(rep(NA_real_, length(probs)))
     },
 
     #' @description Return the estimated expected value of the variable.
@@ -358,30 +359,25 @@ ExprModVar <- R6::R6Class(
     #' @return Updated \code{ExprModVar}.
     set = function(what="random", val=NULL) {
       # check argument
-      if (!is.character(what)) {
-        rlang::abort(
-          "Argument 'what' must be a character",
-          class = "what_not_character"
-        )
-      }
-      if (!(what %in% c(private$.whats,"current"))) {
-        rlang::abort(
-          paste("'what' must be one of", paste(private$.whats, collapse="|")),
-          class ="what_not_supported"
-        )
-      }
+      abortifnot(is.character(what),
+        message = "Argument 'what' must be a character",
+        class = "what_not_character"
+      )
+      abortifnot(what %in% c(private$.whats, "current"),
+        paste("'what' must be one of", paste(private$.whats, collapse="|")),
+        class = "what_not_supported"
+      )
       # if random, make a new draw from the distribution
       if (what == "random") {
         # set the operands to return a random sample
         for (o in private$.operands) o$set("random")
-      }
-      # if value, check and save the supplied number
-      if (what == "value") {
-        if (is.null(val) | !is.numeric(val)) {
-          rlang::abort("'val' must be numeric", class = "invalid_val")
-        } else {
-          private$.value["value"] <- val
-        }
+      } else if (what == "value") {
+        # if value, check and save the supplied number
+        abortif(is.null(val) || !is.numeric(val),
+          message = "'val' must be numeric", 
+          class = "invalid_val"
+        )
+        private$.value[["value"]] <- val
       }
       # update the whatnext field
       private$.whatnext <- what
@@ -396,7 +392,7 @@ ExprModVar <- R6::R6Class(
     get = function() {
       if (private$.whatnext == "random") {
         rv <- rlang::eval_tidy(private$q.get)
-        private$.value["random"] <- rv
+        private$.value[["random"]] <- rv
       } else if (private$.whatnext == "current") {
         rv <- rlang::eval_tidy(private$q.get)
       } else {
@@ -405,6 +401,5 @@ ExprModVar <- R6::R6Class(
       # return it
       return(rv)
     }
-
   )
 )

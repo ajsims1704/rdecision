@@ -1,14 +1,11 @@
 #' @title A stack
-#' 
 #' @description An R6 class representing a stack of objects of any type. 
-#' 
 #' @details Conventional implementation of a stack. Used extensively in graph 
 #' algorithms and offered as a separate class for ease of programming and to 
 #' ensure that implementations of stacks are optimized. By intention, there is 
 #' only minimal checking of method arguments. This is to maximize performance 
 #' and because the class is mainly intended for use internally to
 #' \pkg{rdecision}.
-#' 
 #' @docType class
 #' @author Andrew Sims \email{andrew.sims@@newcastle.ac.uk}
 #' @export
@@ -34,18 +31,22 @@ Stack <- R6::R6Class(
     #' checked.
     #' @return An updated \code{Stack} object
     push = function(x) {
-      private$items[[length(private$items)+1]] <- x
+      private$items[[length(private$items) + 1L]] <- x
       return(invisible(self))
     },
     
-    #' @description Pop an item from the stack. Stack underflow and raises error.
+    #' @description Pop an item from the stack. Stack underflow and 
+    #' raises an error.
     #' @return The item previously at the top of the stack.
     pop = function() {
-      if (length(private$items)>0) {
+      if (length(private$items) > 0L) {
         x <- private$items[[length(private$items)]]  
         private$items[[length(private$items)]] <- NULL
       } else {
-        rlang::abort("Stack underflow", class="underflow")
+        abortifnot(FALSE,
+          message = "Stack underflow", 
+          class = "underflow"
+        )
       }
       return(x)
     },
@@ -61,6 +62,5 @@ Stack <- R6::R6Class(
     as_list = function() {
       return(private$items)
     }
-  
   )
 )

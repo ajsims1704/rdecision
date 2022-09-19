@@ -10,7 +10,7 @@ test_that("illegal arguments are rejected", {
 
 test_that("properties are set correctly", {
   v <- ModVar$new("dummy", "m")
-  expect_true(is.na(v$is_probabilistic()))
+  expect_false(v$is_probabilistic())
   expect_false(v$is_expression())
 })
 

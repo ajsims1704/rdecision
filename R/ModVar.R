@@ -115,7 +115,7 @@ ModVar <- R6::R6Class(
     #' random variables, some of which follow distributions. 
     #' @return \code{TRUE} if probabilistic
     is_probabilistic = function() {
-      return(as.logical(NA))
+      return(FALSE)
     },
     
     #' @description Accessor function for the description.

@@ -1,14 +1,10 @@
 #' @title An empirical distribution
-#' 
 #' @description An R6 class representing an empirical (1D) distribution.
-#' 
 #' @details An object representing an empirical distribution. It inherits
 #' from class \code{Distribution}.
-#'  
 #' @docType class
 #' @author Andrew J. Sims \email{andrew.sims@@newcastle.ac.uk}
 #' @export
-#' 
 EmpiricalDistribution <- R6::R6Class(
   classname = "EmpiricalDistribution",
   lock_class = TRUE,
@@ -30,35 +26,28 @@ EmpiricalDistribution <- R6::R6Class(
     #' in R, via interpolation from the eCDF. If false, the \code{sample()}
     #' function makes a random draw from \code{x}.
     #' @return An object of class \code{EmpiricalDistribution}. 
-    initialize = function(x, interpolate.sample=TRUE) {
+    initialize = function(x, interpolate.sample = TRUE) {
       # initialize the base class
-      super$initialize("Empirical", K=as.integer(1))
+      super$initialize("Empirical", K = 1L)
       # check the sample
-      if (!is.numeric(x)) {
-        rlang::abort(
-          "Argument 'x' must be numeric", class="x_not_numeric"
-        )
-      }
-      if (any(is.na(x))) {
-        rlang::abort(
-          "Argument 'x' must have no missing values", 
-          class = "x_not_supported"
-        )
-      }
-      if (length(x) < 1) {
-        rlang::abort(
-          "Argument x must not have at least 1 element", 
-          class="x_too_small"
-        )
-      }
+      abortifnot(is.numeric(x), 
+        message = "Argument 'x' must be numeric", 
+        class = "x_not_numeric"
+      )
+      abortif(anyNA(x),
+        message = "Argument 'x' must have no missing values", 
+        class = "x_not_supported"
+      )
+      abortifnot(length(x) >= 1L,
+        message = "Argument x must not have at least 1 element", 
+        class = "x_too_small"
+      )
       private$x <- x
       # check the sample method
-      if (!is.logical(interpolate.sample)) {
-        rlang::abort(
-          "Argument 'interpolate.sample' must be logical", 
-          class = "interpolate.sample_not_supported"
-        )
-      }
+      abortifnot(is.logical(interpolate.sample),
+        message = "Argument 'interpolate.sample' must be logical", 
+        class = "interpolate.sample_not_supported"
+      )
       private$interpolate.sample <- interpolate.sample
       # initial sample
       self$sample(TRUE)
@@ -84,7 +73,7 @@ EmpiricalDistribution <- R6::R6Class(
     #' @return NA because an empirical distribution is not guaranteed to be
     #' unimodal.
     mode = function() {
-      rv <- as.numeric(NA)
+      rv <- NA_real_
       return(rv)
     },
     
@@ -105,13 +94,16 @@ EmpiricalDistribution <- R6::R6Class(
     sample = function(expected=FALSE) {
       if (!expected) {
         if (private$interpolate.sample) {
-          p <- stats::runif(n=1)
-          private$.r[1] <- stats::quantile(x=private$x, probs=p, type=7)
+          private$.r[[1L]] <- stats::quantile(
+            x = private$x, 
+            probs = stats::runif(n = 1L), 
+            type = 7L
+          )
         } else {
-          private$.r[1] <- base::sample(x=private$x, size=1)
+          private$.r[[1L]] <- base::sample(x = private$x, size = 1L)
         }
       } else {
-        private$.r[1] <- self$mean()
+        private$.r[[1L]] <- self$mean()
       }
       return(invisible(self))
     },
@@ -122,23 +114,23 @@ EmpiricalDistribution <- R6::R6Class(
     #' @return Vector of quantiles.
     quantile = function(probs) {
       # test argument
-      sapply(probs, FUN=function(x) {
-        if (is.na(x)) {
-          rlang::abort("All elements of 'probs' must be defined",
-                       class="probs_not_defined")
-        }
-        if (!is.numeric(x)) {
-          rlang::abort("Argument 'probs' must be a numeric vector",
-                       class="probs_not_numeric")
-        }
-        if (x<0 || x>1) {
-          rlang::abort("Elements of 'probs' must be in range[0,1]",
-                       class="probs_out_of_range")
-        }
+      vapply(probs, FUN.VALUE = TRUE, FUN=function(x) {
+        abortif(is.na(x),
+          message = "All elements of 'probs' must be defined",
+          class = "probs_not_defined"
+        )
+        abortifnot(is.numeric(x),
+          message = "Argument 'probs' must be a numeric vector",
+          class = "probs_not_numeric"
+        )
+        abortifnot(x >= 0.0 && x <= 1.0,
+          message = "Elements of 'probs' must be in range[0,1]",
+          class = "probs_out_of_range"
+        )
+        return(TRUE)
       })
       q <- stats::quantile(x=private$x, probs, names=FALSE)
       return(q)
     }
-    
   )
 )

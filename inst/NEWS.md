@@ -1,5 +1,15 @@
-# rdecision 1.1.2.9001
 
+
+
+
+# rdecision 1.1.2.9002
+
+* The sample size of the empirical distribution associated with an expression
+  model variable must be specified as an integer.
+* Function `is_probabilistic` for `ExprModVar` now returns correct result if
+  the expression involves integers (previously and erroneously it returned NA).
+* Function `is_probabilistic` for base class `ModVar` now returns `FALSE`
+  rather then `NA`.
 * Various internal improvements suggested by linter to increase efficiency
   and maintainability.
 * Changed the name of function `as_value` to `as_numeric` to more accurately

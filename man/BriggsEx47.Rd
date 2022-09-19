@@ -17,7 +17,8 @@ A data frame with 1000 rows and 7 columns:
 }
 }
 \source{
-\url{https://www.herc.ox.ac.uk/downloads/decision-modelling-for-health-economic-evaluation/}
+\url{https://www.herc.ox.ac.uk/downloads/
+decision-modelling-for-health-economic-evaluation/}
 }
 \usage{
 data(BriggsEx47)

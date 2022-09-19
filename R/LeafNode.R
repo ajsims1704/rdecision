@@ -6,7 +6,6 @@
 #' @docType class
 #' @author Andrew J. Sims \email{andrew.sims@@newcastle.ac.uk}
 #' @export
-#' 
 LeafNode <- R6::R6Class(
   classname = "LeafNode",
   lock_class = TRUE,
@@ -34,7 +33,7 @@ LeafNode <- R6::R6Class(
     #' 1 year.
     #' @return A new \code{LeafNode} object
     initialize = function(
-      label, utility=1, interval=as.difftime(365.25, units="days")
+      label, utility = 1.0, interval = as.difftime(365.25, units = "days")
     ) {
       # check there is a label
       abortifnot(
@@ -49,7 +48,7 @@ LeafNode <- R6::R6Class(
         class = "non-string_label"
       )
       abortifnot(
-        nchar(label) > 0,
+        nchar(label) > 0L,
         message = "Argument label must be defined", 
         class = "empty_label"
       )
@@ -59,7 +58,7 @@ LeafNode <- R6::R6Class(
       # check and set utility
       if (is.numeric(utility)) {
         abortifnot(
-          utility <= 1,
+          utility <= 1.0,
           message = "Argument 'utility' must be in the range [-Inf,1].",
           class = "invalid_utility"
         )
