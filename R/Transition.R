@@ -1,17 +1,13 @@
 #' @title A transition in a semi-Markov model
-#' 
 #' @description An R6 class representing a transition in a semi-Markov model.
-#' 
 #' @details A specialism of class \code{Arrow} which is used in a semi-Markov
 #' model to represent a transition between two \code{MarkovState}s. The 
 #' transition is optionally associated with a cost. The transition probability
 #' is associated with the model (\code{SemiMarkovModel}) rather than the
 #' transition.
-#' 
 #' @docType class
 #' @author Andrew J. Sims \email{andrew.sims@@newcastle.ac.uk}
 #' @export
-#'  
 Transition <- R6::R6Class(
   classname = "Transition",
   lock_class = TRUE,
@@ -22,29 +18,27 @@ Transition <- R6::R6Class(
   public = list(
     
     #' @description Create an object of type \code{MarkovTransition}. 
-    #' @param source \code{MarkovState} from which the transition starts.
-    #' @param target \code{MarkovState} to which the transition ends.
+    #' @param source_state \code{MarkovState} from which the transition starts.
+    #' @param target_state \code{MarkovState} to which the transition ends.
     #' @param cost Cost associated with the transition. 
     #' @param label Character string containing a label for the transition (the
     #' name of the event).
     #' @return A new \code{Transition} object.
-    initialize = function(source, target, cost=0, label="") {
+    initialize = function(source_state, target_state, cost = 0.0, label = "") {
       # initialize base class
-      super$initialize(source=source, target=target, label=label)
+      super$initialize(
+        source_node = source_state, target_node = target_state, label = label
+      )
       # check that source inherits from MarkovState
-      if (!inherits(source, what="MarkovState")) {
-        rlang::abort(
-          "Node 'source' must be a MarkovState", 
-          class="invalid_source"
-        )
-      }
+      abortifnot(inherits(source_state, what = "MarkovState"),
+        message = "Node 'source_state' must be a MarkovState", 
+        class = "invalid_source"
+      )
       # check that target inherits from MarkovState
-      if (!inherits(target, what="MarkovState")) {
-        rlang::abort(
-          "Node 'target' must be a MarkovState", 
-          class="invalid_target"
-        )
-      }
+      abortifnot(inherits(target_state, what = "MarkovState"),
+        message = "Node 'target_state' must be a MarkovState", 
+        class = "invalid_target"
+      )
       # check and set cost, ensuring initialization
       self$set_cost(cost)
       # Return reaction node
@@ -77,29 +71,20 @@ Transition <- R6::R6Class(
     #' @description Set the cost associated with the transition.
     #' @param c Cost associated with the transition.
     #' @return Updated \code{Transition} object.
-    set_cost = function(c=0) {
-      # check c and set private variable
-      if (inherits(c, what="numeric")) {
-        private$transition.cost <- c
-      } else if (inherits(c, "ModVar")) {
-        private$transition.cost <- c
-      } else {
-        rlang::abort("Argument 'c' must be of type 'numeric' or 'ModVar'.",
-                     class = "invalid_cost")
-      }
+    set_cost = function(c = 0.0) {
+      abortifnot(inherits(c, what= c("numeric", "ModVar")),
+        message = "Argument 'c' must be of type 'numeric' or 'ModVar'.",
+        class = "invalid_cost"
+      )
+      private$transition.cost <- c
       return(invisible(self))
     },
     
     #' @description Return the cost associated with traversing the edge.
     #' @return Cost.
     cost = function() {
-      if (inherits(private$transition.cost, what="ModVar")) {
-        rv <- private$transition.cost$get()
-      } else {
-        rv <- private$transition.cost
-      }
+      rv <- as_numeric(private$transition.cost)
       return(rv)
     }
-    
   )
 )

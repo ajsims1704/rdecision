@@ -22,7 +22,7 @@ distribution is the conjugate prior of a Poisson distribution, and the shape
 and scale relate directly to the number of intervals from which the mean
 count has been estimated. Specifically, the shape (\eqn{k}) is equal to the 
 total count of events in \eqn{1/\theta} intervals, where \eqn{\theta} is the
-scale. For example, if 200 counts were observed in a sample of 100 intervals, 
+scale. For example, if 200 counts were observed in a sample of 100 intervals,
 setting \code{shape=200} and \code{scale=1/100} gives a Gamma distribution 
 with a mean of 2 and a 95\% confidence interval from 1.73 to 2.29.
 }

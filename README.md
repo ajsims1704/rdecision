@@ -60,14 +60,14 @@ associated with each chance node is one.
 ``` r
 library("rdecision")
 # probabilities of programme success & failure
-p.diet <- BetaModVar$new("P(diet)", "", alpha=12, beta=68-12)
-p.exercise <- BetaModVar$new("P(exercise)", "", alpha=18, beta=58-18)
-q.diet <- ExprModVar$new("1-P(diet)", "", rlang::quo(1-p.diet))
-q.exercise <- ExprModVar$new("1-P(exercise)", "", rlang::quo(1-p.exercise))
-# costs
-c.diet <- 50
-c.exercise <- ConstModVar$new("Cost of exercise programme", "GBP", 500)
-c.stent <- 5000
+p.diet <- BetaModVar$new("P(diet)", "", alpha = 12L, beta = 68L - 12L)
+p.exercise <- BetaModVar$new("P(exercise)", "", alpha = 18L, beta = 58L - 18L)
+q.diet <- ExprModVar$new("1-P(diet)", "", rlang::quo(1.0 - p.diet))
+q.exercise <- ExprModVar$new("1-P(exercise)", "", rlang::quo(1.0 - p.exercise))
+# costs 
+c.diet <- 50.0
+c.exercise <- ConstModVar$new("Cost of exercise programme", "GBP", 500.0)
+c.stent <- 5000.0
 ```
 
 The decision tree is constructed from nodes and edges as follows:
@@ -83,10 +83,12 @@ d <- DecisionNode$new("Programme")
 
 e.d <- Action$new(d, c.d, cost=c.diet, label = "Diet")
 e.e <- Action$new(d, c.e, cost=c.exercise, label = "Exercise")
-e.ds <- Reaction$new(c.d, t.ds, p=p.diet, cost = 0, label = "success")
-e.df <- Reaction$new(c.d, t.df, p=q.diet, cost=c.stent, label="failure")
-e.es <- Reaction$new(c.e, t.es, p=p.exercise, cost=0, label="success")
-e.ef <- Reaction$new(c.e, t.ef, p=q.exercise, cost=c.stent, label="failure")
+e.ds <- Reaction$new(c.d, t.ds, p = p.diet, cost = 0.0, label = "success")
+e.df <- Reaction$new(c.d, t.df, p = q.diet, cost = c.stent, label="failure")
+e.es <- Reaction$new(c.e, t.es, p = p.exercise, cost = 0.0, label="success")
+e.ef <- Reaction$new(
+  c.e, t.ef, p = q.exercise, cost = c.stent, label = "failure"
+)
 
 DT <- DecisionTree$new(
   V = list(d, c.d, c.e, t.ds, t.df, t.es, t.ef),
@@ -112,7 +114,7 @@ evaluation of the tree, each time sampling from the uncertainty
 distribution of the two probabilities using, for example,
 `DT$evaluate(setvars="random", N=1000)` and inspecting the resulting
 data frame. From 1000 runs, the 95% confidence interval of the per
-patient cost saving is -529.95 GBP to 1006.12 GBP, with 71.6% being cost
+patient cost saving is -563.42 GBP to 1032.17 GBP, with 70.9% being cost
 saving, and it can be concluded that more evidence is required to be
 confident that the exercise programme is cost saving.
 
@@ -127,9 +129,9 @@ otherwise the state would be a temporary state.
 
 ``` r
 # create states
-s.well <- MarkovState$new(name="Well", utility=1)
-s.disabled <- MarkovState$new(name="Disabled",utility=0.7)
-s.dead <- MarkovState$new(name="Dead",utility=0)
+s.well <- MarkovState$new(name = "Well", utility = 1.0)
+s.disabled <- MarkovState$new(name = "Disabled", utility = 0.7)
+s.dead <- MarkovState$new(name = "Dead", utility = 0.0)
 # create transitions, leaving rates undefined
 E <- list(
   Transition$new(s.well, s.well),
@@ -144,15 +146,15 @@ M <- SemiMarkovModel$new(V = list(s.well, s.disabled, s.dead), E)
 # create transition probability matrix
 snames <- c("Well","Disabled","Dead")
 Pt <- matrix(
-  data = c(0.6, 0.2, 0.2, 0, 0.6, 0.4, 0, 0, 1),
-  nrow = 3, byrow = TRUE,
+  data = c(0.6, 0.2, 0.2, 0.0, 0.6, 0.4, 0.0, 0.0, 1.0),
+  nrow = 3L, byrow = TRUE,
   dimnames = list(source=snames, target=snames)
 )
 # set the transition rates from per-cycle probabilities
-M$set_probabilities(Pt)
+M$set_probabilities(Pt) 
 ```
 
-<img src="man/figures/README-sb-1.png" width="75%" style="display: block; margin: auto;" />
+<img src="man/figures/README-sb.png" width="75%" style="display: block; margin: auto;" />
 
 With a starting population of 10,000, the model can be run for 25 years
 as follows. The output of the `cycles` function is the Markov trace,
@@ -160,9 +162,9 @@ shown below, which replicates Table 2<sup>2</sup>.
 
 ``` r
 # set the starting populations
-M$reset(c(Well=10000, Disabled=0, Dead=0)) 
+M$reset(c(Well = 10000L, Disabled = 0L, Dead = 0L)) 
 # cycle
-MT <- M$cycles(25, hcc.pop=FALSE, hcc.cost=FALSE)
+MT <- M$cycles(25L, hcc.pop = FALSE, hcc.cost = FALSE)
 ```
 
 | Years |  Well | Disabled |  Dead | Cumulative Utility |

@@ -67,18 +67,16 @@ Digraph <- R6::R6Class(
     #' (not adjacent) or \code{TRUE} (adjacent).
     #' @param boolean If \code{TRUE}, the adjacency matrix is logical, each 
     #' cell is \code{{FALSE,TRUE}}.
-    #' @return A square numeric matrix with the number of rows and columns
+    #' @return A square integer matrix with the number of rows and columns
     #' equal to the order of the graph. The rows and columns are in the
     #' same order as \code{V}. If the nodes have defined and unique labels the
     #' dimnames of the matrix are the labels of the nodes. 
-    digraph_adjacency_matrix = function(boolean=FALSE) {
+    digraph_adjacency_matrix = function(boolean = FALSE) {
       # check argument
-      if (!is.logical(boolean)) {
-        rlang::abort(
-          "Argument 'boolean' must be 'logical'.", 
-          class="non-logical_boolean"
-        )
-      }
+      abortifnot(is.logical(boolean),
+        message = "Argument 'boolean' must be 'logical'.", 
+        class="non-logical_boolean"
+      )
       # create if not saved
       if (is.null(private$AD)) {
         # create matrix
@@ -86,18 +84,18 @@ Digraph <- R6::R6Class(
         n <- self$order()
         if (anyDuplicated(L) == 0L && all(nchar(L) > 0L)) {
           A <- matrix(
-            rep(0L, times=n*n), 
+            rep(0L, times=n * n), 
             nrow=n, 
             dimnames=list(out.node = L, in.node = L)
           )
         } else {
-          A <- matrix(rep(0L, times=n*n), nrow=n)
+          A <- matrix(rep(0L, times=n * n), nrow=n)
         }
         # populate it
         for (e in private$E) {
           s <- self$vertex_index(e$source())
           t <- self$vertex_index(e$target())
-          A[s,t] <- A[s,t]+1
+          A[[s, t]] <- A[[s, t]] + 1L
         }
         # save it 
         private$AD <- A
@@ -107,7 +105,7 @@ Digraph <- R6::R6Class(
       }
       # convert to logical, if required
       if (boolean) {
-        A <- A>=1
+        A <- A >= 1L
       }
       return(A)
     },
@@ -118,40 +116,38 @@ Digraph <- R6::R6Class(
     #' self loops have value 0 (1-1). If all vertexes have defined and unique 
     #' labels and all edges have defined and unique labels, the dimnames of the
     #' matrix are the labels of the vertexes and edges.
-    #' @return The incidence matrix.
+    #' @return The incidence matrix of integers.
     digraph_incidence_matrix = function() {
       # create, if NULL
       if (is.null(private$BD)) {
         # create matrix
-        LV <- sapply(private$V,function(v){v$label()})
-        LE <- sapply(private$E,function(e){e$label()})
+        LV <- vapply(private$V, FUN.VALUE = "x", FUN = function(v) v$label())
+        LE <- vapply(private$E, FUN.VALUE = "x", FUN = function(e) e$label())
         nv <- self$order()
         ne <- self$size()
-        if (
-          (length(unique(LV))==length(LV)) && 
-          (length(unique(LE))==length(LE)) &&
-          all(nchar(LV)>0) && all(nchar(LE)>0)
+        if (anyDuplicated(LV) == 0L && anyDuplicated(LE) == 0L &&
+            all(nchar(LV) > 0L) && all(nchar(LE) > 0L)
         ) {
           B <- matrix(
-            rep(0,times=nv*ne), 
-            nrow=nv, 
-            dimnames=list(vertex=LV,edge=LE)
+            rep(0L, times = nv * ne), 
+            nrow = nv, 
+            dimnames = list(vertex = LV, edge = LE)
           )
         } else {
-          B <- matrix(rep(0,times=nv*ne), nrow=nv)
+          B <- matrix(rep(0L, times = nv * ne), nrow = nv)
         }
         # populate it
         for (e in private$E) {
           s <- self$vertex_index(e$source())
           t <- self$vertex_index(e$target())
           ei <- self$edge_index(e)
-          if (s==t) {
+          if (s == t) {
             # self loop
-            B[s,ei] <- 0
+            B[[s, ei]] <- 0L
           } else {
             # not self loop
-            B[s,ei] <- -1
-            B[t,ei] <- 1
+            B[[s, ei]] <- -1L
+            B[[t, ei]] <- 1L
           }
         }
         # save it
@@ -177,28 +173,28 @@ Digraph <- R6::R6Class(
       # S is a stack of all vertexes with no incoming edge
       S <- Stack$new()
       for (n in seq_len(ncol(AA))) {
-        if (sum(AA[,n])==0) {
+        if (sum(AA[,n]) == 0L) {
           S$push(n)
         }
       }
       # while S is not empty
-      while(S$size()>0) {
+      while (S$size() > 0L) {
         # remove a vertex n from S
         n <- S$pop()
         # add n to tail of L
         L$push(n)
         # for each node m with an edge e from n to m
-        for (m in which(AA[n,]>0,arr.ind=TRUE)) {
+        for (m in which(AA[n,] > 0L, arr.ind = TRUE)) {
           # remove edge e from graph
-          AA[n,m] <- 0
+          AA[[n,m]] <- 0L
           # if m has no other incoming edges, insert m into S
-          if (sum(AA[,m])==0) {
+          if (sum(AA[, m]) == 0L) {
             S$push(m)
           }
         }
       }
       # return list of nodes indexed by L
-      LL <- sapply(L$as_list(), function(l) {private$V[[l]]})
+      LL <- lapply(L$as_list(), function(l) private$V[[l]])
       return(LL)
     },
 
@@ -256,16 +252,20 @@ Digraph <- R6::R6Class(
     is_arborescence = function() {
       # there must be one and only one root vertex
       B <- self$digraph_incidence_matrix()
-      u <- which(apply(B, MARGIN=1, function(r){!any(r>0)}),arr.ind=TRUE)
-      if (length(u) != 1) {
+      u <- which(apply(B, MARGIN = 1L, function(r) !any(r > 0L)), arr.ind=TRUE)
+      if (length(u) != 1L) {
         return(FALSE)
       }
       # there must be exactly one path from the root to all other vertexes
-      np <- sapply(setdiff(seq(length(private$V)),u), function(v) {
-        P <- self$paths(private$V[[u]], private$V[[v]])
-        return(length(P))
-      })
-      if (any(np != 1)) {
+      np <- vapply(
+        setdiff(seq_along(private$V), u), 
+        FUN.VAL = 1L, 
+        function(v) {
+          P <- self$paths(private$V[[u]], private$V[[v]])
+          return(length(P))
+        }
+      )
+      if (any(np != 1L)) {
         return(FALSE)
       }
       # otherwise return TRUE
@@ -284,7 +284,7 @@ Digraph <- R6::R6Class(
         class = "not_in_graph"
       )
       AA <- self$digraph_adjacency_matrix()
-      iw <- which(AA[iv, ] >= 1, arr.ind = TRUE)
+      iw <- which(AA[iv, ] >= 1L, arr.ind = TRUE)
       successors <- private$V[iw]
       return(successors)
     },
@@ -301,7 +301,7 @@ Digraph <- R6::R6Class(
         class = "not_in_graph"
       )
       AA <- self$digraph_adjacency_matrix()
-      iw <- which(AA[, iv] >= 1, arr.ind = TRUE)
+      iw <- which(AA[, iv] >= 1L, arr.ind = TRUE)
       pred <- private$V[iw]
       return(pred)
     },
@@ -347,8 +347,8 @@ Digraph <- R6::R6Class(
       }
       dfs(is)
       # convert vertex indices into vertices before returning
-      VPL <- lapply(PLS$as_list(), function(p){
-        vp <- lapply(p, function(v) {private$V[[v]]})
+      VPL <- lapply(PLS$as_list(), function(p) {
+        vp <- lapply(p, function(v) private$V[[v]])
       })
       return(VPL)
     },
@@ -366,30 +366,30 @@ Digraph <- R6::R6Class(
         class = "invalid_argument"
       )
       # check vertexes and get index of each
-      p <- vapply(X = P, FUN.VALUE = 1, FUN = function(n) self$vertex_index(n))
+      p <- vapply(X = P, FUN.VALUE = 1L, FUN = function(n) self$vertex_index(n))
       # check all the vertices are in the graph
-      abortifnot(
-        all(!is.na(p)),
+      abortif(
+        anyNA(p),
         message = "At least one node is not in graph",
         class = "not_in_graph"
       )
       # loop through the ordered vertexes
       W <- list()
-      if (length(P) > 1) {
+      if (length(P) > 1L) {
         pairs <- data.frame(
-          s = p[1:(length(P)-1)],
-          t = p[2:length(P)]
+          s = p[1L : (length(P) - 1L)],
+          t = p[2L : length(P)]
         )
         B <- self$digraph_incidence_matrix()
-        W <- apply(pairs, MARGIN=1, function(r) {
+        W <- apply(pairs, MARGIN = 1L, function(r) {
           # look for edges leaving s and entering t
-          e <- which((B[r[1],]==-1) & (B[r[2],]==1), arr.ind=TRUE)
+          e <- which((B[r[1L], ] == -1L) & (B[r[2L], ] == 1L), arr.ind = TRUE)
           abortifnot(
-            length(e) >= 1,
+            length(e) >= 1L,
             message = "There must be an edge between adjacent nodes in 'P'",
             class = "missing_edge"
           )
-          return(e[1])
+          return(e[[1L]])
         })
       }
       # convert edge indices into edges, if required
@@ -409,25 +409,31 @@ Digraph <- R6::R6Class(
     #' for saving as a text file.
     as_DOT = function() {
       # check whether all nodes have labels
-      nodelab <- all(sapply(private$V, function(v){nchar(v$label())>0}))
+      nodelab <- all(
+        vapply(
+          private$V, 
+          FUN.VALUE = TRUE, 
+          FUN = function(v) nchar(v$label()) > 0L
+        )
+      )
       # create stream vector (header+edges+footer)
       indent <- "  "
-      o <- vector(mode = "character", length = 0)
+      o <- vector(mode = "character", length = 0L)
       # write header
-      o[length(o)+1] <- "digraph rdecision {"
-      o[length(o)+1] <- paste0(indent, 'size="7,7" ;')
-      o[length(o)+1] <- paste0(indent, 'rankdir=LR ;')
+      o[[length(o) + 1L]] <- "digraph rdecision {"
+      o[[length(o) + 1L]] <- paste0(indent, 'size="7,7" ;')
+      o[[length(o) + 1L]] <- paste0(indent, "rankdir=LR ;")
       # write edges
       for (e in private$E) {
         s <- e$source()
         t <- e$target()
-        o[length(o)+1] <- paste(
+        o[[length(o) + 1L]] <- paste(
           indent,
           ifelse(nodelab, paste0('"',s$label(),'"'), self$vertex_index(s)),
           "->",
           ifelse(nodelab, paste0('"',t$label(),'"'), self$vertex_index(t)),
           ifelse(
-            nchar(e$label())>0, 
+            nchar(e$label()) > 0L, 
             paste("[", "label = ", paste0('"', e$label(), '"'), "]"),
             ""
           ), 
@@ -435,10 +441,9 @@ Digraph <- R6::R6Class(
         )  
       }
       # footer
-      o[length(o)+1] <- "}"
+      o[[length(o) + 1L]] <- "}"
       # return the stream
       return(o)
     }
   ) 
 )
-

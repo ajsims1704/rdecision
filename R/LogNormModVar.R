@@ -1,12 +1,9 @@
 #' @title A model variable whose uncertainty follows a log Normal distribution
-#' 
 #' @description An R6 class representing a model variable with log Normal 
 #' uncertainty.
-#' 
 #' @details A model variable for which the uncertainty in the point estimate can
 #' be modelled with a log Normal distribution. One of seven parametrizations
 #' defined by Swat \emph{et al} can be used. Inherits from \code{ModVar}.
-#' 
 #' @references{ 
 #'  Briggs A, Claxton K and Sculpher M. Decision Modelling for Health
 #'  Economic Evaluation. Oxford 2006, ISBN 978-0-19-852662-9.
@@ -20,11 +17,9 @@
 #'  (ProbOnto 2.5), 13 January 2017, 
 #'  \url{https://sites.google.com/site/probonto/download}.
 #' }
-#' 
 #' @docType class
 #' @author Andrew J. Sims \email{andrew.sims@@newcastle.ac.uk}
 #' @export
-#' 
 LogNormModVar <- R6::R6Class(
   classname = "LogNormModVar",
   lock_class = TRUE,
@@ -43,11 +38,11 @@ LogNormModVar <- R6::R6Class(
     #' @param parametrization A character string taking one of the values
     #' \verb{"LN1"} (default) through \verb{"LN7"} (see \emph{Details}).
     #' @return A \code{LogNormModVar} object.
-    initialize = function(description, units, p1, p2, parametrization='LN1') {
+    initialize = function(description, units, p1, p2, parametrization = "LN1") {
       # create a log normal distribution and check parameters
       D <- LogNormDistribution$new(p1=p1, p2=p2, parametrization)
       # initialize the base class
-      super$initialize(description, units, D=D, k=as.integer(1))
+      super$initialize(description, units, D = D, k = 1L)
       # return new object
       return(invisible(self))
     },
@@ -60,7 +55,5 @@ LogNormModVar <- R6::R6Class(
     is_probabilistic = function() {
       return(TRUE)
     }
-
-
   )
 )

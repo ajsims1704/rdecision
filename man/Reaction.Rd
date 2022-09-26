@@ -44,21 +44,22 @@ Andrew J. Sims \email{andrew.sims@newcastle.ac.uk}
 \if{html}{\out{<a id="method-Reaction-new"></a>}}
 \if{latex}{\out{\hypertarget{method-Reaction-new}{}}}
 \subsection{Method \code{new()}}{
-Create an object of type \code{Reaction}. A probability must be assigned
+Create an object of type \code{Reaction}. A probability 
+must be assigned
 to the edge. Optionally, a cost and a benefit may be associated
 with traversing the edge. A \dfn{pay-off} (benefit-cost) is sometimes
 used in edges of decision trees; the parametrization used here is more
 general.
 \subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{Reaction$new(source, target, p, cost = 0, benefit = 0, label = "")}\if{html}{\out{</div>}}
+\if{html}{\out{<div class="r">}}\preformatted{Reaction$new(source_node, target_node, p, cost = 0, benefit = 0, label = "")}\if{html}{\out{</div>}}
 }
 
 \subsection{Arguments}{
 \if{html}{\out{<div class="arguments">}}
 \describe{
-\item{\code{source}}{Chance node from which the arrow leaves.}
+\item{\code{source_node}}{Chance node from which the reaction leaves.}
 
-\item{\code{target}}{Node which the arrow enters.}
+\item{\code{target_node}}{Node which the reaction enters.}
 
 \item{\code{p}}{Probability}
 
@@ -66,7 +67,7 @@ general.
 
 \item{\code{benefit}}{Benefit associated with traversal of the edge.}
 
-\item{\code{label}}{Character string containing the arrow label.}
+\item{\code{label}}{Character string containing the reaction label.}
 }
 \if{html}{\out{</div>}}
 }
@@ -78,10 +79,9 @@ A new \code{Reaction} object.
 \if{html}{\out{<a id="method-Reaction-modvars"></a>}}
 \if{latex}{\out{\hypertarget{method-Reaction-modvars}{}}}
 \subsection{Method \code{modvars()}}{
-Find all the model variables of type \code{ModVar} that have been 
-specified
-as values associated with this Action. Includes operands of these
-\code{ModVar}s, if they are expressions.
+Find all the model variables of type \code{ModVar} that 
+have been specified as values associated with this Action. Includes 
+operands of these \code{ModVar}s, if they are expressions.
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{Reaction$modvars()}\if{html}{\out{</div>}}
 }
@@ -94,8 +94,8 @@ A list of \code{ModVar}s.
 \if{html}{\out{<a id="method-Reaction-p"></a>}}
 \if{latex}{\out{\hypertarget{method-Reaction-p}{}}}
 \subsection{Method \code{p()}}{
-Return the current value of the edge probability, i.e. the conditional
-probability of traversing the edge.
+Return the current value of the edge probability, i.e. the
+conditional' probability of traversing the edge.
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{Reaction$p()}\if{html}{\out{</div>}}
 }

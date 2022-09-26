@@ -1,18 +1,14 @@
 #' @title A model variable whose uncertainty follows a Normal distribution
-#' 
 #' @description An R6 class representing a model variable with Normal 
 #' uncertainty.
-#' 
 #' @details A model variable for which the uncertainty in its point estimate can
 #' be modelled with a Normal distribution. The hyperparameters of the
 #' distribution are the mean (\code{mu}) and the standard deviation (\code{sd})
 #' of the uncertainty distribution. The value of \code{mu} is the expected value
 #' of the variable. Inherits from class \code{ModVar}.
-#' 
 #' @docType class
 #' @author Andrew J. Sims \email{andrew.sims@@newcastle.ac.uk}
 #' @export
-#' 
 NormModVar <- R6::R6Class(
   classname = "NormModVar",
   lock_class = TRUE,
@@ -33,7 +29,7 @@ NormModVar <- R6::R6Class(
       # create a normal distribution and check arguments
       D <- NormalDistribution$new(mu, sigma)
       # initialize the base class
-      super$initialize(description, units, D=D, k=as.integer(1))
+      super$initialize(description, units, D = D, k = 1L)
       # return
       return(invisible(self))
     },
@@ -43,7 +39,5 @@ NormModVar <- R6::R6Class(
     is_probabilistic = function() {
       return(TRUE)
     }
-
-
   )
 )

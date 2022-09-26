@@ -1,35 +1,35 @@
 test_that("illegal initializations are rejected", {
-  k <- 9
+  k <- 9.0
   theta <- 0.5
   expect_silent(GammaDistribution$new(k,theta))
   expect_error(GammaDistribution$new("9",theta), class="shape_not_numeric")
   expect_error(GammaDistribution$new(k,"0.5"), class="scale_not_numeric")
-  expect_error(GammaDistribution$new(-1,theta), class="shape_not_supported")
-  expect_error(GammaDistribution$new(k,0), class="scale_not_supported")
+  expect_error(GammaDistribution$new(-1.0, theta), class="shape_not_supported")
+  expect_error(GammaDistribution$new(k, 0.0), class="scale_not_supported")
 })
 
 test_that("distribution name is correct", {
-  k <- 9
+  k <- 9.0
   theta <- 0.5
   g <- GammaDistribution$new(k, theta)
   expect_identical(g$distribution(), "Ga(9,0.5)")
 })
 
 test_that("mean, mode, sd and quantiles are returned correctly", {
-  k <- 9
+  k <- 9.0
   theta <- 0.5
   g <- GammaDistribution$new(k, theta)
   expect_intol(g$mean(), k*theta, 0.01)
   expect_intol(g$SD(), sqrt(k)*theta, 0.01)
-  expect_intol(g$mode(), (k-1)*theta, 0.01)
+  expect_intol(g$mode(), (k - 1.0) * theta, 0.01)
   probs <- c(0.025, 0.975)
   q <- g$quantile(probs)
-  expect_intol(q[1], 2.06, 0.01)
-  expect_intol(q[2], 7.88, 0.01)
+  expect_intol(q[[1L]], 2.06, 0.01)
+  expect_intol(q[[2L]], 7.88, 0.01)
 })
 
 test_that("quantile function checks inputs and has correct output", {
-  k <- 9
+  k <- 9.0
   theta <- 0.5
   g <- GammaDistribution$new(k, theta)
   probs <- c(0.1, 0.2, 0.5)
@@ -41,19 +41,19 @@ test_that("quantile function checks inputs and has correct output", {
   probs <- c(0.1, 0.4, 1.5)
   expect_error(g$quantile(probs), class="probs_out_of_range")
   probs <- c(0.1, 0.2, 0.5)
-  expect_length(g$quantile(probs),3)
+  expect_length(g$quantile(probs), 3L)
 })
 
 test_that("random sampling is from a Gamma distribution", {
-  k <- 9
+  k <- 9.0
   theta <- 0.5
-  n <- 1000
+  n <- 1000L
   g <- GammaDistribution$new(k, theta)
   # mean
   g$sample(TRUE)
   expect_equal(g$r(), 4.5)
   # random sampling
-  samp <- sapply(1:n, FUN=function(i) {
+  samp <- vapply(seq_len(n), FUN.VALUE = 1.0, FUN=function(i) {
     g$sample()
     rv <- g$r()
     return(rv)
@@ -63,5 +63,5 @@ test_that("random sampling is from a Gamma distribution", {
   # skip for CRAN
   skip_on_cran()
   ht <- ks.test(samp, stats::rgamma(n,shape=k,scale=theta))
-  expect_true(ht$p.value > 0.001)
+  expect_gt(ht$p.value, 0.001)
 })

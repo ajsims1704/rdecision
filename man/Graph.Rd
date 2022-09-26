@@ -312,7 +312,7 @@ cells are either 0 (not adjacent) or 1 (adjacent).
 }
 
 \subsection{Returns}{
-A square numeric matrix with the number of rows and columns
+A square integer matrix with the number of rows and columns
 equal to the order of the graph. The rows and columns are labelled
 with the node labels, if all the nodes in the graph have labels, or the
 node indices if not.

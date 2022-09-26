@@ -45,13 +45,13 @@ types of edge: actions (whose sources are decision nodes) and reactions
 
 ```{r echo=TRUE}
 # Time horizon
-th <- as.difftime(48, units="hours")
+th <- as.difftime(48L, units="hours")
 
 # model variables for cost
 c.sumatriptan <- 16.10
 c.caffeine <- 1.32
 c.ED <- 63.16
-c.admission <- 1093
+c.admission <- 1093.0
 
 # Sumatriptan branch
 ta <- LeafNode$new("A", utility=1.0, interval=th)
@@ -102,7 +102,7 @@ e16 <- Reaction$new(c2, c6, p=0.621, label="No relief")
 # decision node
 d1 <- DecisionNode$new("d1")
 e17 <- Action$new(d1, c1, cost=c.sumatriptan, label="Sumatriptan")
-e18 <- Action$new(d1, c2, cost=c.caffeine, label="Caffeine/Ergotamine")
+e18 <- Action$new(d1, c2, cost=c.caffeine, label="Caffeine-Ergotamine")
  
 # create lists of nodes and edges
 V <- list(
@@ -147,7 +147,7 @@ local({
   RES <- DT$evaluate(by="path")
   RES$Benefit <- NULL
   RES$Run <- NULL
-  knitr::kable(RES, row.names=FALSE, digits=c(NA,NA,2,2,2,4))
+  knitr::kable(RES, row.names = FALSE, digits = c(NA, NA, 2L, 2L, 2L, 4L))
 })
 ```
 
@@ -164,7 +164,7 @@ local({
   SUM$Run <- NULL
   SUM$Probability <- NULL
   SUM$Benefit <- NULL
-  knitr::kable(SUM, row.names=FALSE, digits=c(NA,2,5,5))
+  knitr::kable(SUM, row.names = FALSE, digits = c(NA, 2L, 5L, 5L))
 })
 ```
 

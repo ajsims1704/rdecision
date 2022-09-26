@@ -26,7 +26,7 @@ MarkovState <- R6::R6Class(
     #' @details Utility must be in the range \code{[-Inf,1]}. If it is of type 
     #' numeric, the range is checked on object creation. 
     #' @return An object of type \code{MarkovState}.
-    initialize = function(name, cost = 0, utility = 1) {
+    initialize = function(name, cost = 0.0, utility = 1.0) {
       # check and set the name
       abortifnot(
         !(missing(name) || is.na(name)),
@@ -44,7 +44,7 @@ MarkovState <- R6::R6Class(
       self$set_cost(cost)
       # check the utility, and in range[-Inf,1] if numeric
       abortifnot(
-        (is.numeric(utility) && utility <= 1) || is_ModVar(utility),
+        (is.numeric(utility) && utility <= 1.0) || is_ModVar(utility),
         message = "If utility is numeric it must be in the range [-Inf,1]",
         class = "invalid_utility"
       )

@@ -1,7 +1,5 @@
 #' @title A parametrized Gamma distribution
-#' 
 #' @description An R6 class representing a Gamma distribution.
-#' 
 #' @details An object representing a Gamma distribution with hyperparameters 
 #' shape (\code{k}) and scale (\code{theta}). In econometrics this
 #' parametrization is more common but in Bayesian statistics the shape 
@@ -9,12 +7,10 @@
 #' however, that although Briggs \emph{et al} (2006) use the shape, scale
 #' formulation, they use \code{alpha}, \code{beta} as parameter names. Inherits
 #' from class \code{Distribution}.
-#'  
 #' @references{
 #'   Briggs A, Claxton K, Sculpher M. Decision modelling for health
 #'   economic evaluation. Oxford, UK: Oxford University Press; 2006. 
 #' }
-#' 
 #' @docType class
 #' @author Andrew J. Sims \email{andrew.sims@@newcastle.ac.uk}
 #' @export
@@ -35,33 +31,25 @@ GammaDistribution <- R6::R6Class(
     #' @return An object of class \code{GammaDistribution}. 
     initialize = function(shape, scale) {
       # initialize the base class
-      super$initialize("Gamma", K=as.integer(1))
+      super$initialize("Gamma", K = 1L)
       # check the parameters
-      if (!is.numeric(shape)) {
-        rlang::abort(
-          "Argument 'shape' must be numeric", 
-          class="shape_not_numeric"
-        )
-      }
-      if (shape <= 0) {
-        rlang::abort(
-          "Argument 'shape' must be > 0", 
-          class="shape_not_supported"
-        )
-      }
+      abortifnot(is.numeric(shape),
+        message = "Argument 'shape' must be numeric", 
+        class = "shape_not_numeric"
+      )
+      abortifnot(shape > 0.0,
+        message = "Argument 'shape' must be > 0", 
+        class = "shape_not_supported"
+      )
       private$shape <- shape
-      if (!is.numeric(scale)) {
-        rlang::abort(
-          "Argument 'scale' must be numeric", 
-          class="scale_not_numeric"
-        )
-      }
-      if (scale <= 0) {
-        rlang::abort(
-          "Argument 'scale' must be > 0", 
-          class="scale_not_supported"
-        )
-      }
+      abortifnot(is.numeric(scale),
+        message = "Argument 'scale' must be numeric", 
+        class = "scale_not_numeric"
+      )
+      abortifnot(scale > 0.0,
+        message = "Argument 'scale' must be > 0", 
+        class = "scale_not_supported"
+      )
       private$scale <- scale
       # initial sample
       self$sample(TRUE)
@@ -72,11 +60,10 @@ GammaDistribution <- R6::R6Class(
     #' @description Accessor function for the name of the distribution.
     #' @return Distribution name as character string.
     distribution = function() {
-      rv <- paste(
-        'Ga(', 
-        round(private$shape,3), ',', 
-        round(private$scale,3), ')', 
-        sep=''
+      rv <- paste0(
+        "Ga(", 
+        round(private$shape, digits = 3L), ",", 
+        round(private$scale, digits = 3L), ")" 
       )
       return(rv)
     },
@@ -92,9 +79,9 @@ GammaDistribution <- R6::R6Class(
     #' Return the mode of the distribution (if \code{shape} >= 1) 
     #' @return mode as a numeric value.
     mode = function() {
-      rv <- as.numeric(NA)
-      if (private$shape>=1) {
-        rv <- (private$shape-1)*private$scale 
+      rv <- NA_real_
+      if (private$shape >= 1.0) {
+        rv <- (private$shape - 1.0)*private$scale 
       }
       return(rv)
     },
@@ -112,9 +99,13 @@ GammaDistribution <- R6::R6Class(
     #' @return Updated distribution.
     sample = function(expected=FALSE) {
       if (!expected) {
-        private$.r[1] <- rgamma(n=1, shape=private$shape, scale=private$scale)
+        private$.r[[1L]] <- rgamma(
+          n = 1L, 
+          shape=private$shape, 
+          scale=private$scale
+        )
       } else {
-        private$.r[1] <- self$mean()
+        private$.r[[1L]] <- self$mean()
       }
       return(invisible(self))
     },
@@ -125,23 +116,23 @@ GammaDistribution <- R6::R6Class(
     #' @return Vector of quantiles.
     quantile = function(probs) {
       # test argument
-      sapply(probs, FUN=function(x) {
-        if (is.na(x)) {
-          rlang::abort("All elements of 'probs' must be defined",
-                       class="probs_not_defined")
-        }
-        if (!is.numeric(x)) {
-          rlang::abort("Argument 'probs' must be a numeric vector",
-                       class="probs_not_numeric")
-        }
-        if (x<0 || x>1) {
-          rlang::abort("Elements of 'probs' must be in range[0,1]",
-                       class="probs_out_of_range")
-        }
+      vapply(probs, FUN.VALUE = TRUE, FUN=function(x) {
+        abortif(is.na(x),
+          message = "All elements of 'probs' must be defined",
+          class = "probs_not_defined"
+        )
+        abortifnot(is.numeric(x),
+          message = "Argument 'probs' must be a numeric vector",
+          class = "probs_not_numeric"
+        )
+        abortifnot(x >= 0.0 && x <= 1.0,
+          message = "Elements of 'probs' must be in range[0,1]",
+          class = "probs_out_of_range"
+        )
+        return(TRUE)
       })
       q <- qgamma(probs, shape=private$shape, scale=private$scale)
       return(q)
     }
-    
   )
 )

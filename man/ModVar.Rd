@@ -42,7 +42,7 @@ Andrew Sims \email{andrew.sims@newcastle.ac.uk}
 \subsection{Method \code{new()}}{
 Create an object of type \code{ModVar}.
 \subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{ModVar$new(description, units, D = NULL, k = as.integer(1))}\if{html}{\out{</div>}}
+\if{html}{\out{<div class="r">}}\preformatted{ModVar$new(description, units, D = NULL, k = 1L)}\if{html}{\out{</div>}}
 }
 
 \subsection{Arguments}{

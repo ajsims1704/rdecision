@@ -47,15 +47,15 @@ Andrew J. Sims \email{andrew.sims@newcastle.ac.uk}
 \subsection{Method \code{new()}}{
 Create an object of type \code{MarkovTransition}.
 \subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{Transition$new(source, target, cost = 0, label = "")}\if{html}{\out{</div>}}
+\if{html}{\out{<div class="r">}}\preformatted{Transition$new(source_state, target_state, cost = 0, label = "")}\if{html}{\out{</div>}}
 }
 
 \subsection{Arguments}{
 \if{html}{\out{<div class="arguments">}}
 \describe{
-\item{\code{source}}{\code{MarkovState} from which the transition starts.}
+\item{\code{source_state}}{\code{MarkovState} from which the transition starts.}
 
-\item{\code{target}}{\code{MarkovState} to which the transition ends.}
+\item{\code{target_state}}{\code{MarkovState} to which the transition ends.}
 
 \item{\code{cost}}{Cost associated with the transition.}
 

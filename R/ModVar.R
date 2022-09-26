@@ -1,17 +1,13 @@
 #' @title A model variable incorporating uncertainty
-#' 
 #' @description An R6 class for a variable in a health economic model.
-#' 
 #' @details Base class for a variable used in a health economic model. The base 
 #' class wraps a numerical value which is used in calculations.
 #' It provides a framework for creating classes of model
 #' variables whose uncertainties are described by statistical distributions
 #' parametrized with hyperparameters.
-#' 
 #' @docType class
 #' @author Andrew Sims \email{andrew.sims@@newcastle.ac.uk}
 #' @export 
-#' 
 ModVar <- R6::R6Class(
   classname = "ModVar",
   lock_class = TRUE,
@@ -45,51 +41,45 @@ ModVar <- R6::R6Class(
     #' @param k The index of the dimension of the multivariate distribution
     #' that applies to this model variable. 
     #' @return A new \verb{ModVar} object.
-    initialize = function(description, units, D=NULL, k=as.integer(1)) {
+    initialize = function(description, units, D = NULL, k = 1L) {
       # test and set description
-      if (!is.character(description)) {
-        rlang::abort("Argument 'description' must be a string", 
-                     class="description_not_string")
-      }
+      abortifnot(is.character(description),
+        message = "Argument 'description' must be a string", 
+        class = "description_not_string"
+      )
       private$.description <- description
       # test and set units
-      if (!is.character(units)) {
-        rlang::abort("Argument 'units' must be a string", 
-                     class="units_not_string")
-      }
+      abortifnot(is.character(units),
+        message = "Argument 'units' must be a string", 
+        class = "units_not_string"
+      )
       private$.units <- units
       # test and set distribution
       if (!is.null(D)) {
-        if (!inherits(D, what="Distribution")) {
-          rlang::abort(
-            "'D' must inherit from Distribution",
-            class = "invalid_distribution"
-          )
-        }
+        abortifnot(inherits(D, what="Distribution"),
+          message = "'D' must inherit from Distribution",
+          class = "invalid_distribution"
+        )
         private$.D <- D
       } else {
         private$.D <- Distribution$new("Undefined")
       }
       # test and set dimension
-      if (!is.integer(k)) {
-        rlang::abort(
-          "'k' must be an integer",
-          class = "invalid_index"
-        )
-      }
-      if ((k <= 0) || (k > private$.D$order())) {
-        rlang::abort(
-          "'k' must not exceed the order of 'D'",
-          class = "invalid_index"
-        )
-      }
+      abortifnot(is.integer(k),
+        message = "'k' must be an integer",
+        class = "invalid_index"
+      )
+      abortif(k <= 0L || k > private$.D$order(),
+        message = "'k' must not exceed the order of 'D'",
+        class = "invalid_index"
+      )
       private$.k <- k
       # set possible "what" values for get()
       private$.whats <- c(
         "random", "expected", "q2.5", "q50", "q97.5", "value"
       )
       # set the .value vector members
-      private$.value <- rep(as.numeric(NA), times=length(private$.whats))
+      private$.value <- rep(NA_real_, times = length(private$.whats))
       names(private$.value) <- private$.whats
       # save the components of .value that do not change
       private$.value["expected"] <- self$mean() 
@@ -138,8 +128,8 @@ ModVar <- R6::R6Class(
     #' @return Distribution name as character string.
     distribution = function() {
       dname <- private$.D$distribution()
-      if (private$.D$order() > 1) {
-        dname <- paste(dname,"[",private$.k,"]",sep='')
+      if (private$.D$order() > 1L) {
+        dname <- paste0(dname, "[", private$.k, "]")
       }
       return(dname)
     },
@@ -175,7 +165,7 @@ ModVar <- R6::R6Class(
       # matrix for multivariate, vector for univariate distributions; argument
       # is checked in .D$quantiles()
       q <- private$.D$quantile(probs)
-      if (private$.D$order() > 1) {
+      if (private$.D$order() > 1L) {
         rv <- q[,private$.k]
       } else {
         rv <- q
@@ -224,28 +214,27 @@ ModVar <- R6::R6Class(
     #' @return Updated \code{ModVar}.
     set = function(what="random", val=NULL) {
       # check argument
-      if (!is.character(what)) {
-        rlang::abort(
-          "'what' must be a a character string", 
-          class="what_not_character"
-        )
-      }
-      if (!(what %in% c(private$.whats, "current"))) {
-          rlang::abort(
-            paste("'what' must be one of", paste(private$.whats, collapse="|")),
-            class ="what_not_supported"
-          )
-      }
+      abortifnot(is.character(what),
+        "'what' must be a a character string", 
+        class = "what_not_character"
+      )
+      abortifnot(what %in% c(private$.whats, "current"),
+        message = paste(
+          "'what' must be one of", 
+          paste(private$.whats, collapse="|")
+        ),
+        class = "what_not_supported"
+      )
       # if random, make a new draw from the distribution
       if (what == "random") {
         private$.D$sample()
       # if value, check and save the supplied number
       } else if (what == "value") {
-        if (is.null(val) | !is.numeric(val)) {
-          rlang::abort("'v' must be numeric", class = "invalid_val")
-        } else {
-          private$.value["value"] <- val
-        }
+        abortif(is.null(val) | !is.numeric(val),
+          message = "'v' must be numeric", 
+          class = "invalid_val"
+        )
+        private$.value["value"] <- val
       }
       # set whatnext for next call to get(), unless required to leave unchanged
       if (what != "current") {
@@ -270,6 +259,5 @@ ModVar <- R6::R6Class(
       # return the stored value
       return(rv)
     }
-
   )
 )

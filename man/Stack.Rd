@@ -68,7 +68,8 @@ An updated \code{Stack} object
 \if{html}{\out{<a id="method-Stack-pop"></a>}}
 \if{latex}{\out{\hypertarget{method-Stack-pop}{}}}
 \subsection{Method \code{pop()}}{
-Pop an item from the stack. Stack underflow and raises error.
+Pop an item from the stack. Stack underflow and 
+raises an error.
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{Stack$pop()}\if{html}{\out{</div>}}
 }

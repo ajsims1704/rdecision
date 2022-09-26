@@ -1,11 +1,8 @@
 #' @title An undirected graph
-#' 
 #' @description An R6 class to represent a graph (from discrete mathematics).
-#' 
 #' @details Encapsulates and provides methods for computation and checking of 
 #' undirected graphs. Graphs are systems of vertices connected in pairs by 
 #' edges. A base class.
-#'
 #' @references{ 
 #'   Gansner ER, Koutsofios E, North SC, Vo K-P. A technique for drawing
 #'   directed graphs. \emph{IEEE Transactions on Software Engineering},
@@ -14,11 +11,9 @@
 #'   Gross JL, Yellen J, Zhang P. Handbook of Graph Theory. Second edition, 
 #'   Chapman and Hall/CRC.; 2013, \doi{10.1201/b16132}
 #' }
-#'  
 #' @docType class
 #' @author Andrew Sims \email{andrew.sims@@newcastle.ac.uk}
 #' @export
-#' 
 Graph <- R6::R6Class(
   classname = "Graph",
   lock_class = TRUE,
@@ -41,15 +36,16 @@ Graph <- R6::R6Class(
         message = "V must be a list", 
         class = "non-list_vertices"
       )
-      sapply(V, FUN = function(v) {
+      vapply(V, FUN.VALUE = TRUE, FUN = function(v) {
         abortifnot(
           inherits(v, what = "Node"),
           message = "Each V must be a Node", 
           class = "non-Node_vertex"
         )
+        return(TRUE)
       })
       abortifnot(
-        length(unique(V)) == length(V),
+        anyDuplicated(V) == 0L,
         message = "Each V must be unique", 
         class = "repeated_nodes"
       )
@@ -60,22 +56,24 @@ Graph <- R6::R6Class(
         message = "E must be a list", 
         class = "non-list_edges"
       )
-      sapply(E, FUN=function(e) {
+      vapply(E, FUN.VALUE = TRUE, FUN=function(e) {
         abortifnot(
           inherits(e, what = "Edge"), 
           message = "Each E must be an Edge", 
           class = "non-Edge_edge"
         )
-        sapply(e$endpoints(), function(w) {
+        vapply(e$endpoints(), FUN.VALUE = TRUE, FUN = function(w) {
           abortifnot(
             self$has_vertex(w),
             message = "All edge vertexes must be in graph", 
             class = "not_in_graph"
           )
+          return(TRUE)
         })
+        return(TRUE)
       })
       abortifnot(
-        length(unique(E)) == length(E),
+        anyDuplicated(E) == 0L,
         message = "Each E must be unique", 
         class = "repeated_edges"
       )
@@ -116,14 +114,14 @@ Graph <- R6::R6Class(
     #' the graph.
     vertex_index = function(v) {
       # find v in V
-      index <- NA
-      i <- 1
+      index <- NA_integer_
+      i <- 1L
       for (vv in private$V) {
         if (identical(vv, v)) {
           index <- i
           break
         }
-        i <- i + 1
+        i <- i + 1L
       }
       return(index)
     }, 
@@ -141,7 +139,7 @@ Graph <- R6::R6Class(
     #' \code{graph_adjacency_matrix}.
     #' @return the node (vertex) with the specified index.
     vertex_at = function(index) {
-      if (length(index) == 1 && index %in% self$vertex_along()) {
+      if (length(index) == 1L && index %in% self$vertex_along()) {
         return(private$V[[index]])
       } 
       abortifnot(
@@ -177,14 +175,14 @@ Graph <- R6::R6Class(
     #' \code{NA} if the edge is not in the graph.
     edge_index = function(e) {
       # find e in E
-      index <- NA
-      i <- 1
+      index <- NA_integer_
+      i <- 1L
       for (ee in private$E) {
         if (identical(ee, e)) {
           index <- i
           break
         }
-        i <- i + 1
+        i <- i + 1L
       }
       return(index)
     },
@@ -201,7 +199,7 @@ Graph <- R6::R6Class(
     #' class function such as \code{edge_index} and \code{edge_along}.
     #' @return the edge with the specified index.
     edge_at = function(index) {
-      if (length(index) == 1 && index %in% self$edge_along()) {
+      if (length(index) == 1L && index %in% self$edge_along()) {
         return(private$E[[index]])
       } 
       abortifnot(
@@ -227,7 +225,7 @@ Graph <- R6::R6Class(
     #' cells are either 0 (not adjacent) or 1 (adjacent).
     #' @param boolean If \code{TRUE}, the adjacency matrix is logical, each
     #' cell is {\code{FALSE}, \code{TRUE}}.
-    #' @return A square numeric matrix with the number of rows and columns
+    #' @return A square integer matrix with the number of rows and columns
     #' equal to the order of the graph. The rows and columns are labelled
     #' with the node labels, if all the nodes in the graph have labels, or the
     #' node indices if not. 
@@ -242,23 +240,23 @@ Graph <- R6::R6Class(
       # immutable (no edges or vertexes added or removed since its creation)
       if (is.null(private$AG)) {
         # create matrix
-        L <- sapply(private$V, function(v) v$label())
-        if (length(unique(L)) != length(L) || any(nchar(L) == 0)) {
+        L <- vapply(private$V, FUN.VALUE = "x", FUN = function(v) v$label())
+        if (anyDuplicated(L) != 0L || any(nchar(L) == 0L)) {
           L <- as.character(self$vertex_along())
         }
         n <- self$order()
         A <- matrix(
-          rep(0, times = n * n), 
+          rep(0L, times = n * n), 
           nrow = n, 
           dimnames = list(out.node = L, in.node = L)
         )
         # populate it
         for (e in private$E) {
           W <- e$endpoints()
-          iv1 <- self$vertex_index(W[[1]])
-          iv2 <- self$vertex_index(W[[2]])
-          A[iv1, iv2] <- A[iv1, iv2] + 1
-          A[iv2, iv1] <- A[iv2, iv1] + 1
+          iv1 <- self$vertex_index(W[[1L]])
+          iv2 <- self$vertex_index(W[[2L]])
+          A[[iv1, iv2]] <- A[[iv1, iv2]] + 1L
+          A[[iv2, iv1]] <- A[[iv2, iv1]] + 1L
         }
         # save it
         private$AG <- A
@@ -267,7 +265,7 @@ Graph <- R6::R6Class(
       }
       # convert to boolean, if required
       if (boolean) {
-        A <- A>=1
+        A <- A >= 1L
       }
       return(A)
     },
@@ -278,11 +276,11 @@ Graph <- R6::R6Class(
     is_simple = function() {
       simple <- TRUE
       A <- self$graph_adjacency_matrix()
-      if (nrow(A) > 0) {
-        if (sum(diag(A))>0) {
+      if (nrow(A) > 0L) {
+        if (sum(diag(A)) > 0L) {
           simple <- FALSE
         }
-        if (max(A)>1) {
+        if (max(A) > 1L) {
           simple <- FALSE
         }
       }
@@ -297,9 +295,9 @@ Graph <- R6::R6Class(
     #' @return \code{TRUE} if connected, \code{FALSE} if not.
     is_connected = function() {
       connected <- FALSE
-      if (self$order()==0) {
+      if (self$order() == 0L) {
         connected <- FALSE
-      } else if (self$order()==1) {
+      } else if (self$order() == 1L) {
         connected <- TRUE
       } else {
         # get the adjacency matrix
@@ -309,16 +307,16 @@ Graph <- R6::R6Class(
         # S is a stack of nodes being processed
         S <- Stack$new()
         # start with first vertex
-        S$push(1)
+        S$push(1L)
         # while S is not empty, do
-        while (S$size()>0) {
+        while (S$size() > 0L) {
           s <- S$pop()
           # if s is not labelled as discovered then
           if (!D[s]) {
             # label s as discovered
             D[s] <- TRUE
             # for all edges from s to n
-            for (n in which(A[s,], arr.ind=TRUE)) {
+            for (n in which(A[s,], arr.ind = TRUE)) {
               S$push(n)
             }
           }
@@ -338,7 +336,7 @@ Graph <- R6::R6Class(
     #' @return \code{TRUE} if no cycles detected.
     is_acyclic = function() {
       # acyclic if trivial
-      if (self$order()==0) {
+      if (self$order() == 0L) {
         return(TRUE)
       }
       # not acyclic if there are self loops or multi-edges
@@ -348,7 +346,7 @@ Graph <- R6::R6Class(
       # get the adjacency matrix
       A <- self$graph_adjacency_matrix(boolean=TRUE)
       # DFS from each vertex
-      for (v in 1:self$order()) {
+      for (v in seq_len(self$order())) {
         # D marks nodes as discovered
         D <- vector(mode="logical", length=self$order())
         # S is a stack of nodes being processed
@@ -356,9 +354,9 @@ Graph <- R6::R6Class(
         S$push(v)
         # P (element p) is a stack of parents of nodes being processed
         P <- Stack$new()
-        P$push(as.integer(NA))
+        P$push(NA_integer_)
         # DFS
-        while (S$size()>0) {
+        while (S$size() > 0L) {
           # get next node to be processed from the stack
           s <- S$pop()
           # and get its parent
@@ -416,9 +414,9 @@ Graph <- R6::R6Class(
         class = "not_in_graph"        
       )
       A <- self$graph_adjacency_matrix()
-      diag(A) <- 0
+      diag(A) <- 0L
       iv <- self$vertex_index(v)
-      ni <- which(A[iv,]>0, arr.ind=TRUE)
+      ni <- which(A[iv,] > 0L, arr.ind = TRUE)
       n <- private$V[ni]
       return(n)
     },
@@ -431,26 +429,31 @@ Graph <- R6::R6Class(
     #' for saving as a text file.
     as_DOT = function() {
       # check whether all nodes have labels
-      nodelab <- all(sapply(private$V, function(v) nchar(v$label())>0))
+      nodelab <- all(
+        vapply(private$V, 
+          FUN.VALUE = TRUE, 
+          FUN = function(v) nchar(v$label()) > 0L
+        )
+      )
       # create stream vector (header+edges+footer)
       indent <- "  "
-      o <- vector(mode = "character", length = 0)
+      o <- vector(mode = "character", length = 0L)
       # write header
-      o[length(o)+1] <- "graph rdecision {"
-      o[length(o)+1] <- paste0(indent, 'size="7,7" ;')
-      o[length(o)+1] <- paste0(indent, "rankdir=LR ;")
+      o[[length(o) + 1L]] <- "graph rdecision {"
+      o[[length(o) + 1L]] <- paste0(indent, 'size="7,7" ;')
+      o[[length(o) + 1L]] <- paste0(indent, "rankdir=LR ;")
       # write edges
       for (e in private$E) {
         ep <- e$endpoints()
-        s <- ep[[1]]
-        t <- ep[[2]]
-        o[length(o)+1] <- paste(
+        s <- ep[[1L]]
+        t <- ep[[2L]]
+        o[[length(o) + 1L]] <- paste(
           indent,
           ifelse(nodelab, paste0('"',s$label(),'"'), self$vertex_index(s)),
           "--",
           ifelse(nodelab, paste0('"',t$label(),'"'), self$vertex_index(t)),
           ifelse(
-            nchar(e$label())>0,
+            nchar(e$label()) > 0L,
             paste("[", "label = ", paste0('"', e$label(), '"'), "]"),
             ""
           ),
@@ -458,10 +461,9 @@ Graph <- R6::R6Class(
         )
       }
       # footer
-      o[length(o)+1] <- "}"
+      o[[length(o) + 1L]] <- "}"
       # return the stream
       return(o)
     }
-
   )
 )

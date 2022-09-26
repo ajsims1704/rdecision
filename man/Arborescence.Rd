@@ -76,7 +76,8 @@ Andrew Sims \email{andrew.sims@newcastle.ac.uk}
 \if{html}{\out{<a id="method-Arborescence-new"></a>}}
 \if{latex}{\out{\hypertarget{method-Arborescence-new}{}}}
 \subsection{Method \code{new()}}{
-Create a new \code{Arborescence} object from sets of nodes and edges.
+Create a new \code{Arborescence} object from sets of nodes
+and edges.
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{Arborescence$new(V, A)}\if{html}{\out{</div>}}
 }
@@ -172,7 +173,8 @@ A (possibly empty) list of siblings.
 \if{html}{\out{<a id="method-Arborescence-root_to_leaf_paths"></a>}}
 \if{latex}{\out{\hypertarget{method-Arborescence-root_to_leaf_paths}{}}}
 \subsection{Method \code{root_to_leaf_paths()}}{
-Find all directed paths from the root of the tree to the leaves.
+Find all directed paths from the root of the tree to the
+leaves.
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{Arborescence$root_to_leaf_paths()}\if{html}{\out{</div>}}
 }

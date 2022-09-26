@@ -50,7 +50,49 @@ DecisionTree <- R6::R6Class(
   lock_class = TRUE,
   inherit = Arborescence,
   private = list(
+
+    # @description Find the nodes of a particular type in the tree.
+    # @param type A character string with the name of the type of node of
+    # interest (\code{DecisionNode}, \code{ChanceNode} or \code{LeafNode}).
+    # @param what A character string defining what to return. Must be one
+    # of "node", "label" or "index".
+    # @return A list of \code{ChanceNode} objects (for what = "node"); a list
+    # of character strings (for what = "label"), or an integer vector with
+    # indexes of the decision nodes (for what = "index").
+    nodes_of_type = function(type = "DecisionNode", what = "node") {
+      # check arguments
+      abortifnot(
+        what %in% c("node", "index", "label"),
+        message = "Argument 'what' must be one of 'node', 'label' or 'index'.",
+        class = "unknown_what_value"
+      )
+      abortifnot(
+        type %in% c("DecisionNode", "ChanceNode", "LeafNode"),
+        message = paste0(
+          "Argument 'what' must be one of 'DecisionNode'", 
+          "'ChanceNode' or 'LeafNode'."
+        ),
+        class = "unknown_type_value"
+      )
+      # find which of the vertex indices are decision node indices
+      vi <- self$vertex_along()
+      ci <- vi[vapply(vi, FUN.VALUE = TRUE, FUN = function(i) {
+        inherits(self$vertex_at(i), what = type)
+      })]
+      rv <- ci
+      # find node objects or labels if required 
+      if (what == "node") {
+        rv <- lapply(ci, function(i) self$vertex_at(i))
+      } else if (what == "label") {
+        rv <- vapply(ci, FUN.VALUE = "x", FUN = function(i) {
+          v <- self$vertex_at(i)
+          v$label()
+        })
+      }
+      return(rv)      
+    }
   ),
+  
   public = list(
     
     #' @description Create a new decision tree. 
@@ -59,64 +101,56 @@ DecisionTree <- R6::R6Class(
     #' @param V A list of nodes.
     #' @param E A list of edges.
     #' @return A \code{DecisionTree} object
-    initialize = function(V,E) {
+    initialize = function(V, E) {
       # initialize the base class(es); checks that {V,E} form an arborescence
-      super$initialize(V,E)
-      # check that V is a disjoint union of {D,C,L} nodes
-      D <- which(
-        sapply(V, function(v) inherits(v, what = "DecisionNode")), 
-        arr.ind = TRUE
-      )
-      C <- which(
-        sapply(V, function(v) inherits(v, what = "ChanceNode")),
-        arr.ind = TRUE
-      )
-      L <- which(
-        sapply(V, function(v) inherits(v, what = "LeafNode")), 
-        arr.ind = TRUE
-      )
+      super$initialize(V, E)
+      D <- self$decision_nodes(what = "index")
+      C <- self$chance_nodes(what = "index")
+      L <- self$leaf_nodes(what = "index")
       W <- union(D, union(C, L))
-      if (!setequal(seq_along(V), W)) {
-        rlang::abort(
-          "Each node must be a 'DecisionNode', 'ChanceNode' or 'LeafNode'.",
-          class="incorrect_node_type")
-      }
+      abortifnot(setequal(self$vertex_along(), W),
+        message = "Each node must be a decision, chance or leaf node.",
+        class = "incorrect_node_type"
+      )
       # all and only leaf nodes must have no children
-      P <- which(sapply(V, function(v) self$is_parent(v)), arr.ind = TRUE)
-      if (!setequal(P,union(D,C))) {
-        rlang::abort("All and only leaf nodes must have no children",
-                     class = "leaf_non-child_sets_unequal")
-      }  
+      vi <- self$vertex_along()
+      P <- vi[vapply(vi, FUN.VALUE = TRUE, FUN = function(i) {
+        v <- self$vertex_at(i)
+        self$is_parent(v)
+      })]
+      abortifnot(setequal(P, union(D, C)),
+        message = "All and only leaf nodes must have no children",
+        class = "leaf_non-child_sets_unequal"
+      )
       # each edge must inherit from action or reaction
-      lv <- sapply(E, function(e) inherits(e, what = c("Action", "Reaction")))
-      if (!all(lv)) {
-        rlang::abort("Each edge must inherit from Action or Reaction", 
-                     class="incorrect_edge_type")
-      }
-      # DecisionNode labels must be unique and all their Action labels
-      # must be unique
-      D.lab <- sapply(D, function(d) {
-        v <- private$V[[d]]
+      lv <- vapply(self$edge_along(), FUN.VALUE = TRUE, FUN = function(i) {
+        e <- self$edge_at(i)
+        inherits(e, what = c("Action", "Reaction"))
+      })
+      abortifnot(all(lv),
+        message = "Each edge must inherit from Action or Reaction", 
+        class = "incorrect_edge_type"
+      )     
+      # DecisionNode labels must be unique and the labels of the Actions from
+      # each decision node must be unique
+      D.lab <- vapply(D, FUN.VALUE = "x", FUN = function(d) {
+        v <- self$vertex_at(d)
         K <- self$direct_successors(v)
-        choices <- sapply(K, function(k) {
-          w <- self$walk(list(v,k))
-          e <- w[[1]]
+        choices <- vapply(K, FUN.VALUE = "x", FUN = function(k) {
+          w <- self$walk(list(v, k))
+          e <- w[[1L]]
           return(e$label())
         })
-        if (length(choices) != length(unique(choices))) {
-          rlang::abort(
-            "Labels of actions with a common source node must be unique",
-            class="non_unique_labels"
-          )
-        }
-        return(v$label())
-      })
-      if (length(D.lab) != length(unique(D.lab))) {
-        rlang::abort(
-          "Labels of DecisionNodes must be unique", 
+        abortifnot(anyDuplicated(choices) == 0L,
+          message = "Labels of actions with common source node must be unique",
           class = "non_unique_labels"
         )
-      }
+        return(v$label())
+      })
+      abortifnot(anyDuplicated(D.lab) == 0L,
+        message = "Labels of DecisionNodes must be unique", 
+        class = "non_unique_labels"
+      )
       # return a new DecisionTree object
       return(invisible(self))
     },
@@ -124,67 +158,32 @@ DecisionTree <- R6::R6Class(
     #' @description Find the decision nodes in the tree.
     #' @param what A character string defining what to return. Must be one
     #' of "node", "label" or "index".
-    #' @return A list of \code{DecisionNode} objects (for what="node"); a list
-    #' of character strings (for what="label"); or a list of integer indexes of 
-    #' the decision nodes (for what="index").
-    decision_nodes = function(what="node") {
-      # find the vertex IDs
-      id <- which(
-        sapply(private$V, function(v) inherits(v, what = "DecisionNode")),
-        arr.ind = TRUE
-      )
-      if (what=="node") {
-        rc <- private$V[id]
-      } else if (what=="label") {
-        rc <- sapply(id, function(iv) private$V[[iv]]$label())
-      } else if (what=="index") {
-        rc <- id
-      } else {
-        rlang::abort(
-          "Argument 'what' must be one of 'node', 'label' or 'index'.",
-          class="unknown_what_value"
-        )
-      }
-      return(rc)      
+    #' @return A list of \code{DecisionNode} objects (for what = "node"); a list
+    #' of character strings (for what = "label"), or an integer vector with
+    #' indexes of the decision nodes (for what = "index").
+    decision_nodes = function(what = "node") {
+      return(private$nodes_of_type(type = "DecisionNode", what = what))
     },
 
     #' @description Find the chance nodes in the tree.
-    #' @return A list of \code{ChanceNode} objects.
-    chance_nodes = function() {
-      ic <- which(
-        sapply(private$V, function(v) inherits(v, what = "ChanceNode")),
-        arr.ind = TRUE
-      )
-      return(private$V[ic])      
+    #' @param what A character string defining what to return. Must be one
+    #' of "node", "label" or "index".
+    #' @return A list of \code{ChanceNode} objects (for what = "node"); a list
+    #' of character strings (for what = "label"), or an integer vector with
+    #' indexes of the decision nodes (for what = "index").
+    chance_nodes = function(what = "node") {
+      return(private$nodes_of_type(type = "ChanceNode", what = what))
     },
-    
+
     #' @description Find the leaf nodes in the tree.
     #' @param what One of "node" (returns Node objects), "label" (returns the
     #' leaf node labels) or "index" (returns the vertex indexes of the leaf
     #' nodes).
-    #' @return A list of \code{LeafNode} objects (for what="node"); a list
-    #' of character strings (for what="label"); or a list of integer indexes of 
-    #' the decision nodes (for what="index").
+    #' @return A list of \code{LeafNode} objects (for what = "node"); a list
+    #' of character strings (for what = "label"); or an integer vector of 
+    #' leaf node indexes (for what = "index").
     leaf_nodes = function(what = "node") {
-      il <- which(
-        vapply(X = private$V, FUN.VALUE = TRUE, FUN = function(v) {
-          inherits(v, what = "LeafNode")
-        }),
-        arr.ind = TRUE
-      )
-      if (what=="node") {
-        rc <- private$V[il]
-      } else if (what=="label") {
-        rc <- sapply(il, function(iv) private$V[[iv]]$label())
-      } else if (what=="index") {
-        rc <- il
-      } else {
-        rlang::abort(
-          "Argument 'what' must be one of 'node', 'label' or 'index'.",
-          class="unknown_what_value"
-        )
-      }
-      return(rc)      
+      return(private$nodes_of_type(type = "LeafNode", what = what))
     },
 
     #' @description Find the edges that have the specified decision node as 
@@ -193,28 +192,22 @@ DecisionTree <- R6::R6Class(
     #' @return A list of \code{Action} edges.
     actions = function(d) {
       # check argument
-      if (missing(d)) {
-        rlang::abort(
-          "Node 'd' must be defined", 
-          class="decision_node_not_defined"
-        )
-      }
-      if (!self$has_vertex(d)) {
-        rlang::abort(
-          "Node 'd' is not in the Decision Tree", 
-          class="not_in_tree"
-        )
-      }
-      if (!inherits(d, what="DecisionNode")) {
-        rlang::abort(
-          "Node 'd' is not a Decision Node", 
-          class="not_decision_node"
-        )
-      }
+      abortif(missing(d),
+        message = "Node 'd' must be defined", 
+        class = "decision_node_not_defined"
+      )
+      abortifnot(self$has_vertex(d),
+        message = "Node 'd' is not in the Decision Tree", 
+        class = "not_in_tree"
+      )
+      abortifnot(inherits(d, what = "DecisionNode"),
+        message = "Node 'd' is not a Decision Node", 
+        class = "not_decision_node"
+      )
       id <- self$vertex_index(d)
       # find the edges with d as their source 
       B <- self$digraph_incidence_matrix()
-      ie <- which(B[id,]==-1,arr.ind=TRUE)
+      ie <- which(B[id,] == -1L, arr.ind=TRUE)
       return(private$E[ie])
     },
     
@@ -233,7 +226,7 @@ DecisionTree <- R6::R6Class(
       }
       # find the modvars in leaf nodes
       for (v in private$V){
-        if (inherits(v, what=c("LeafNode"))) {
+        if (inherits(v, what = "LeafNode")) {
           mv <- c(mv, v$modvars())
         }
       }
@@ -264,57 +257,59 @@ DecisionTree <- R6::R6Class(
     #' \item{\code{Est}}{TRUE if the quantiles and SD have been estimated by 
     #' random sampling.}
     #' }
-    modvar_table = function(expressions=TRUE) {
+    modvar_table = function(expressions = TRUE) {
       # create list of model variables in this decision tree, excluding
       # expressions if not wanted
       mvlist <- self$modvars()
       if (!expressions) {
-        mvlist <- mvlist[sapply(mvlist, FUN = function(v) !v$is_expression())]
+        mvlist <- mvlist[vapply(mvlist, FUN.VALUE = TRUE, FUN = function(v) {
+          !v$is_expression()
+        })]
       }
       # create a data frame of model variables
       DF <- data.frame(
-        Description = sapply(mvlist, FUN=function(x) {
+        Description = vapply(mvlist, FUN.VALUE = "x", FUN = function(x) {
           rv <- x$description()
           return(rv)
         }),
-        Units = sapply(mvlist, FUN=function(x) {
+        Units = vapply(mvlist, FUN.VALUE = "x", FUN = function(x) {
           rv <- x$units()
           return(rv)
         }),
-        Distribution = sapply(mvlist, FUN=function(x) {
+        Distribution = vapply(mvlist, FUN.VALUE = "x", FUN = function(x) {
           rv <- x$distribution()
           return(rv)
         }),
-        Mean = sapply(mvlist, FUN=function(x) {
+        Mean = vapply(mvlist, FUN.VALUE = 1.0, FUN = function(x) {
           rv <- x$mean()
           return(rv)
         }),
-        E = sapply(mvlist, FUN=function(x) {
+        E = vapply(mvlist, FUN.VALUE = 1.0, FUN = function(x) {
           rv <- ifelse(x$is_expression(), x$mu_hat(), x$mean())
           return(rv)
         }),
-        SD = sapply(mvlist, FUN=function(x) {
+        SD = vapply(mvlist, FUN.VALUE = 1.0, FUN = function(x) {
           rv <- ifelse(x$is_expression(), x$sigma_hat(), x$SD())
           return(rv)
         }),
-        Q2.5 = sapply(mvlist, FUN=function(x) {
+        Q2.5 = vapply(mvlist, FUN.VALUE = 1.0, FUN = function(x) {
           rv <- ifelse(
             x$is_expression(), 
-            x$q_hat(probs=c(0.025)), 
-            x$quantile(probs=c(0.025))
+            x$q_hat(probs = 0.025), 
+            x$quantile(probs = 0.025)
           )
           return(rv)
         }),
-        Q97.5 = sapply(mvlist, FUN=function(x) {
+        Q97.5 = vapply(mvlist, FUN.VALUE = 1.0, FUN=function(x) {
           rv <- ifelse(
             x$is_expression(), 
-            x$q_hat(probs=c(0.975)), 
-            x$quantile(probs=c(0.975))
+            x$q_hat(probs = 0.975), 
+            x$quantile(probs = 0.975)
           )
           return(rv)
         }),
-        Est = sapply(mvlist, FUN=function(exp) {
-          rv <- ifelse(exp$is_expression(),TRUE,FALSE)
+        Est = vapply(mvlist, FUN.VALUE = TRUE, FUN = function(exp) {
+          rv <- exp$is_expression()
           return(rv)
         })
       )
@@ -327,24 +322,24 @@ DecisionTree <- R6::R6Class(
     #' compactly (see the \link{Arborescence} class help for details).
     #' @param border If TRUE draw a light grey border around the plot area.
     #' @return No return value.
-    draw = function(border=FALSE) {
+    draw = function(border = FALSE) {
       # margin widths (in tree space)
-      lmargin <- 4
-      rmargin <- 2
-      tmargin <- 4
-      bmargin <- 2
+      lmargin <- 4.0
+      rmargin <- 2.0
+      tmargin <- 4.0
+      bmargin <- 2.0
       # node size (in tree space); the radius of a chance node. All node
       # shapes are scaled to have same area (pi*node.size^2).
       node.size <- 0.75
       # fontsize for labels
-      fontsize <- 8
+      fontsize <- 8.0
       # fraction of edge that slopes after leading parent (range 0,1)
       fs <- 0.20
       # find the aspect ratio (width/height) of the current figure area
       fig.size <- dev.size("cm")
-      fig.asp <- fig.size[1]/fig.size[2]
+      fig.asp <- fig.size[[1L]] / fig.size[[2L]]
       # find the (x,y) coordinates of nodes using Walker's algorithm
-      LevelSeparation <- 1
+      LevelSeparation <- 1.0
       XY <- self$postree(
         RootOrientation="EAST", 
         LevelSeparation=LevelSeparation
@@ -371,13 +366,13 @@ DecisionTree <- R6::R6Class(
       tw <- (xmax-xmin) + (lmargin+rmargin)
       th <- (ymax-ymin) + (bmargin+tmargin)
       # calculate scale factor
-      scale <- max(tw/fig.size[1], th/fig.size[2])
+      scale <- max(tw / fig.size[[1L]], th / fig.size[[2L]])
       # find centre of drawing in tree space
-      cx <- tw/2 + (xmin-lmargin)
-      cy <- th/2 + (ymin-bmargin)
+      cx <- tw / 2.0 + (xmin - lmargin)
+      cy <- th / 2.0 + (ymin - bmargin)
       # centre of the figure space
-      cx.f <- fig.size[1]/2
-      cy.f <- fig.size[2]/2
+      cx.f <- fig.size[[1L]] / 2.0
+      cy.f <- fig.size[[2L]] / 2.0
       # functions to transform coordinates and distances in tree space 
       # to grid space (cm)
       gx <- function(xtree) {
@@ -397,15 +392,16 @@ DecisionTree <- R6::R6Class(
       # viewport rectangle (border)
       if (border) {
         grid::grid.rect(
-          x=grid::unit(0.5,"npc"), 
-          y=grid::unit(0.5,"npc"), 
-          width = grid::unit(1,"npc"), 
-          height = grid::unit(1,"npc"),
-          gp = grid::gpar(col="lightgray")
+          x=grid::unit(0.5, "npc"), 
+          y=grid::unit(0.5, "npc"), 
+          width = grid::unit(1.0, "npc"), 
+          height = grid::unit(1.0, "npc"),
+          gp = grid::gpar(col = "lightgray")
         )
       }
       # draw the edges as articulated lines between node centres
-      sapply(private$E, FUN=function(e) {
+      for (ie in self$edge_along()) {
+        e <- self$edge_at(ie)
         # find source and target nodes
         n.source <- self$vertex_index(e$source())
         n.target <- self$vertex_index(e$target())
@@ -435,19 +431,20 @@ DecisionTree <- R6::R6Class(
           just = c("left", "bottom"),
           gp = grid::gpar(fontsize=fontsize)
         )
-      })
+      }
       # draw the nodes
-      sapply(private$V, function(v) {
+      for (iv in self$vertex_along()) {
+        v <- self$vertex_at(iv)
         # find the node from its index
         i <- which(XY$n==self$vertex_index(v))
         # switch type
         if (inherits(v, what="DecisionNode")) {
-          a <- sqrt(pi/4)*node.size
+          a <- sqrt(pi / 4.0)*node.size
           grid::grid.rect(
             x = gx(XY[i,"x"]),
             y = gy(XY[i,"y"]),
-            width = gd(a*2),
-            height = gd(a*2),
+            width = gd(a * 2.0),
+            height = gd(a * 2.0),
             default.units = "cm",
             gp = grid::gpar(col="black", fill="lightgray")
           )
@@ -477,17 +474,17 @@ DecisionTree <- R6::R6Class(
             gp = grid::gpar(fontsize=fontsize)
           )
         } else if (inherits(v, what="LeafNode")) {
-          a <- 2*sqrt(pi/sqrt(3))*node.size
+          a <- 2.0 * sqrt(pi / sqrt(3.0))*node.size
           grid::grid.polygon(
             x = c(
-              gx(XY[i,"x"]-a/sqrt(3)),
-              gx(XY[i,"x"]+sqrt(3)*a/6),
-              gx(XY[i,"x"]+sqrt(3)*a/6)
+              gx(XY[i, "x"] - a / sqrt(3.0)),
+              gx(XY[i, "x"] + sqrt(3.0) * a / 6.0),
+              gx(XY[i, "x"] + sqrt(3.0) * a / 6.0)
             ),
             y = c(
-              gy(XY[i,"y"]+0),
-              gy(XY[i,"y"]+a/2),
-              gy(XY[i,"y"]-a/2)
+              gy(XY[i, "y"] + 0.0),
+              gy(XY[i, "y"] + a / 2.0),
+              gy(XY[i, "y"] - a / 2.0)
             ),
             default.units = "cm",
             gp = grid::gpar(fill="lightgray", col="black")
@@ -496,12 +493,13 @@ DecisionTree <- R6::R6Class(
           grid::grid.text(
             label = v$label(),
             x = grid::unit(gx(XY[i,"x"]),"cm"),
-            y = grid::unit(gy(XY[i,"y"]+a/3),"cm")+grid::unit(0.4,"char"),
+            y = grid::unit(gy(XY[i, "y"] + a / 3.0), "cm") +
+                grid::unit(0.4, "char"),
             just = c("right", "bottom"),
             gp = grid::gpar(fontsize=fontsize)
           )
         }
-      })
+      }
       # return updated DecisionTree (unchanged)
       return(invisible(self))
     },
@@ -527,8 +525,7 @@ DecisionTree <- R6::R6Class(
         return(FALSE)
       }
       # the set of source nodes must be the same as the set of decision nodes
-      iS <- vapply(X = strategy, FUN.VALUE = 1, FUN = function(e) {
-        i <- self$vertex_index(e$source())
+      iS <- vapply(X = strategy, FUN.VALUE = 1L, FUN = function(e) {
         return(self$vertex_index(e$source()))
       })
       if (!setequal(iS,iD)) {
@@ -553,24 +550,22 @@ DecisionTree <- R6::R6Class(
     #' and each column is a Decision Node. Values are either the index of each
     #' action edge, or their label. The row names are the edge labels of each
     #' strategy, concatenated with underscores.
-    strategy_table = function(what="index", select=NULL) {
+    strategy_table = function(what = "index", select = NULL) {
       # check arguments
-      if ((what != "index") & (what != "label")) {
-        rlang::abort("Argument 'what' must be one of 'index' or 'label'",
-                     class="unknown_what_value")
-      }
+      abortifnot(what %in% c("index", "label"),
+        message = "Argument 'what' must be one of 'index' or 'label'",
+        class = "unknown_what_value"
+      )
       if (!is.null(select)) {
-        if (!self$is_strategy(select)) {
-          rlang::abort(
-            "'s' must be a valid strategy for this decision tree",
-            class = "invalid_strategy"
-          )
-        }
+        abortifnot(self$is_strategy(select),
+          message = "'s' must be a valid strategy for this decision tree",
+          class = "invalid_strategy"
+        )
       }
       # build a table with indexes of the action edges
       f <- list()
       for (d in self$decision_nodes("node")) {
-        a <- vapply(X = self$actions(d), FUN.VALUE = 1, FUN = function(a) {
+        a <- vapply(X = self$actions(d), FUN.VALUE = 1L, FUN = function(a) {
           self$edge_index(a)
         })
         f[[d$label()]] <- a
@@ -578,11 +573,11 @@ DecisionTree <- R6::R6Class(
       TTI <- expand.grid(f, KEEP.OUT.ATTRS=FALSE, stringsAsFactors=FALSE)
       # select a single strategy, if required
       if (!is.null(select)) {
-        lv <- apply(X=TTI, MARGIN=1, FUN=function(row) {
+        lv <- apply(X = TTI, MARGIN = 1L, FUN = function(row) {
           # indexes of action edges from the table
           st <- row
           # indexes of action edges in 'select' argument
-          ss <- vapply(X = select, FUN.VALUE = 1, FUN = function(e) {
+          ss <- vapply(X = select, FUN.VALUE = 1L, FUN = function(e) {
             self$edge_index(e)
           })
           # test whether the table row is the same as 'select'
@@ -600,7 +595,7 @@ DecisionTree <- R6::R6Class(
         })
       }
       # build row names
-      rn <- apply(TTL, 1, paste, collapse="_")
+      rn <- apply(TTL, 1L, paste, collapse="_")
       rownames(TTI) <- rn
       rownames(TTL) <- rn
       # return object
@@ -635,16 +630,16 @@ DecisionTree <- R6::R6Class(
       dn <- self$decision_nodes("label")
       P <- do.call("rbind", lapply(self$root_to_leaf_paths(), function(p) {
         # find the set of action edges in this walk
-        eW <- vapply(X = self$walk(p), FUN.VALUE = 1, FUN = function(e) {
+        eW <- vapply(X = self$walk(p), FUN.VALUE = 1L, FUN = function(e) {
           return(self$edge_index(e))
         })
         eW <- intersect(eA,eW)
         # iterate the strategies and find those consistent with the path
-        lv <- apply(S, MARGIN=1, FUN=function(row) {
+        lv <- apply(S, MARGIN=1L, FUN=function(row) {
           # the set of action edges which define the strategy
           eS <- row
           eS <- setdiff(eW,eS)
-          return(length(eS) == 0)
+          return(length(eS) == 0L)
         })        
         # Append to the strategy data frame
         SL <- cbind(
@@ -667,10 +662,10 @@ DecisionTree <- R6::R6Class(
     #' \code{probability}, \code{cost}, \code{benefit} and the row names are 
     #' the labels of the edges.
     edge_properties = function() {
-      ep <- matrix(data = NA, nrow = self$size(), ncol = 4)
+      ep <- matrix(data = NA, nrow = self$size(), ncol = 4L)
       colnames(ep) <- c("index", "probability", "cost", "benefit")
       rn <- vector(mode = "character", length = self$size())
-      r <- 1
+      r <- 1L
       for (ie in self$edge_along()) {
         e <- self$edge_at(ie)
         ep[r, "index"] <- ie
@@ -678,7 +673,7 @@ DecisionTree <- R6::R6Class(
         ep[r, "cost"] <- e$cost()
         ep[r, "benefit"] <- e$benefit()
         rn[r] <- e$label()
-        r <- r + 1
+        r <- r + 1L
       }
       rownames(ep) <- rn
       return(ep)
@@ -735,7 +730,7 @@ DecisionTree <- R6::R6Class(
       payoff <- matrix(
         data = NA,
         nrow = length(Wi),
-        ncol = 10,
+        ncol = 10L,
         dimnames = list(
           NULL, 
           c("Leaf", "Probability", "Path.Cost", "Path.Benefit", "Path.Utility",
@@ -848,37 +843,33 @@ DecisionTree <- R6::R6Class(
     #' concatenated strategy names and one (cost, benefit, utility, QALY) column
     #' for each strategy. 
     #' @return A data frame whose columns depend on \code{by}; see "Details".
-    evaluate = function(setvars="expected", N=1, by="strategy") {
+    evaluate = function(setvars = "expected", N = 1L, by = "strategy") {
       # check arguments
-      if (!is.character(setvars)) {
-        rlang::abort(
-          "'setvars' must be a character", 
-          class="setvars_not_character"
-        )
-      }
+      abortifnot(is.character(setvars),
+        "'setvars' must be a character", 
+        class = "setvars_not_character"
+      )
       valids <- c("expected","random","q2.5","q50","q97.5","current")
-      if (!(setvars %in% valids)) {
-        rlang::abort(
-          paste(
-            "'setvars' must be one of", 
-            paste(valids, collapse=" "), 
-            collapse=" "
+      abortifnot(setvars %in% valids,
+        message = paste(
+          "'setvars' must be one of", 
+          paste(valids, collapse=" "), 
+            collapse = " "
           ), 
-          class="setvars_invalid"
-        )
-      }
-      if (!is.numeric(N)) {
-        rlang::abort("'N' must be numeric", class="N_not_numeric")
-      }
-      if (!is.character(by)) {
-        rlang::abort("'by' must be character", class="by_not_character")
-      }
-      if (!(by %in% c("path", "strategy", "run"))) {
-        rlang::abort(
-          "'by' must be one of {path|strategy|run}.",
-          class = "by_invalid"
-        )
-      }
+          class = "setvars_invalid"
+      )
+      abortifnot(is.numeric(N),
+        message = "'N' must be numeric", 
+        class = "N_not_numeric"
+      )
+      abortifnot(is.character(by),
+        message = "'by' must be character", 
+        class = "by_not_character"
+      )
+      abortifnot(by %in% c("path", "strategy", "run"),
+        message = "'by' must be one of {path|strategy|run}.",
+        class = "by_invalid"
+      )
       # find the root-to-leaf paths
       P <- self$root_to_leaf_paths()
       # find the walk for each root-to-leaf path
@@ -888,7 +879,7 @@ DecisionTree <- R6::R6Class(
       # create list of modvars
       MV <- self$modvars()
       # N tree evaluations, stacked as a 3d array
-      RES <- vapply(X = 1:N, FUN.VALUE = TM, FUN = function(n) {
+      RES <- vapply(X = seq_len(N), FUN.VALUE = TM, FUN = function(n) {
         # set the ModVar values (to chosen option)
         for (v in MV) {
           v$set(setvars)
@@ -900,7 +891,7 @@ DecisionTree <- R6::R6Class(
         return(M)
       })
       # reform 3d array into concatenated 2d form
-      RES <- do.call("rbind", lapply(1:N, function(n) RES[,,n]))
+      RES <- do.call("rbind", lapply(seq_len(N), function(n) RES[,,n]))
       # find all paths walked for each strategy
       SW <- self$strategy_paths()
       # merge with results to get one row per path walked per strategy
@@ -949,10 +940,10 @@ DecisionTree <- R6::R6Class(
         )
         STR <- aggregate(f, data=RES, FUN=sum)
         # reshape to wide format
-        if (length(dn)==1) {
-          STR$Strategy <- STR[,dn[[1]]]
+        if (length(dn) == 1L) {
+          STR$Strategy <- STR[,dn[[1L]]]
         } else {
-          STR$Strategy <- apply(STR[,dn], MARGIN=1, FUN=paste, collapse="_")
+          STR$Strategy <- apply(STR[,dn], MARGIN = 1L, FUN=paste, collapse="_")
         }
         STR[,dn] <- NULL
         PAYOFF <- reshape(
@@ -997,38 +988,30 @@ DecisionTree <- R6::R6Class(
         return(!v$is_expression())
       }) 
       mvlist <- mvlist[lv]
-      if (length(mvlist) == 0) {
+      if (length(mvlist) == 0L) {
         if (draw) {
           plot.new()
         }
         return(NULL)
       }
       # check the parameters
-      if (missing(index) || missing(ref)) {
-        rlang::abort(
-          "'index' and 'ref' must be defined",
-          class = "missing_strategy"
-        )
-      }
-      if (!self$is_strategy(index) || !self$is_strategy(ref)) {
-        rlang::abort(
-          "'index' and 'ref' must be valid strategies for the decision tree",
-          class = "invalid_strategy"
-        )
-      }
-      if (!(outcome %in% c("saving", "ICER"))) {
-        rlang::abort(
-          "'outcome' must be one of {saving|ICER}",
-          class = "invalid_outcome"
-        )
-      }
+      abortif(missing(index) || missing(ref),
+        message = "'index' and 'ref' must be defined",
+        class = "missing_strategy"
+      )
+      abortifnot(self$is_strategy(index) && self$is_strategy(ref),
+        message = "'index' and 'ref' must be valid strategies",
+        class = "invalid_strategy"
+      )
+      abortifnot(outcome %in% c("saving", "ICER"),
+        message = "'outcome' must be one of {saving|ICER}",
+        class = "invalid_outcome"
+      )
       if (!is.null(exclude)) {
-        if (!is.list(exclude)) {
-          rlang::abort(
-            "'exclude must be a list of model variable descriptions",
-            class = "exclude_not_list"
-          )
-        }
+        abortifnot(is.list(exclude),
+          message = "'exclude' must be a list of model variable descriptions",
+          class = "exclude_not_list"
+        )
         mvd <- vapply(
           mvlist, 
           FUN.VALUE = "x", 
@@ -1038,19 +1021,15 @@ DecisionTree <- R6::R6Class(
           rv <- (is.character(d) && (d %in% mvd))
           return(rv)
         })
-        if (!all(isc)) {
-          rlang::abort(
-            "'exclude' must be a character list of model variable descriptions",
-            class = "exclude_element_not_modvar"
-          )
-        }
-      }
-      if (!is.logical(draw)) {
-        rlang::abort(
-          "'draw' must be boolean",
-          class = "invalid_draw"
+        abortifnot(all(isc),
+          message = "'exclude' must be a list of model variable descriptions",
+          class = "exclude_element_not_modvar"
         )
       }
+      abortifnot(is.logical(draw),
+        message = "'draw' must be boolean",
+        class = "invalid_draw"
+      )
       if (!is.null(exclude)) {
         lv <- vapply(X=mvlist, FUN.VALUE=TRUE, FUN=function(v) {
           return(v$description() %in% exclude)
@@ -1072,12 +1051,12 @@ DecisionTree <- R6::R6Class(
         LL = vapply(
           X = mvlist,
           FUN.VALUE = 1.5,
-          FUN = function(v) v$quantile(c(0.025))
+          FUN = function(v) v$quantile(0.025)
         ),
         UL = vapply(
           X = mvlist,
           FUN.VALUE = 1.5,
-          FUN = function(v) v$quantile(c(0.975))
+          FUN = function(v) v$quantile(0.975)
         ),
         stringsAsFactors = FALSE
       )
@@ -1087,7 +1066,7 @@ DecisionTree <- R6::R6Class(
       st.index <- self$strategy_table("label", select=index)
       st.ref <- self$strategy_table("label", select=ref)
       # find univariate outcome limits
-      template <- vector(mode="numeric", length=3)
+      template <- vector(mode="numeric", length = 3L)
       names(template) <- c("outcome.min","outcome.mean","outcome.max")
       O <- vapply(X=mvlist, FUN.VALUE=template, FUN=function(this.mv) {
         # result template
@@ -1104,14 +1083,14 @@ DecisionTree <- R6::R6Class(
           RES <- self$evaluate(setvars="current")
           # get outcome for index strategy
           ORES <- merge(st.index, RES, all.x=TRUE)
-          index.cost <- ORES$Cost[1]
-          index.utility <- ORES$Utility[1]
-          index.QALY <- ORES$QALY[1]
+          index.cost <- ORES$Cost[[1L]]
+          index.utility <- ORES$Utility[[1L]]
+          index.QALY <- ORES$QALY[[1L]]
           # get outcome for reference strategy
-          ORES <- merge(st.ref, RES, all.x=TRUE)
-          ref.cost <- ORES$Cost[1]
-          ref.utility <- ORES$Utility[1]
-          ref.QALY <- ORES$QALY[1]
+          ORES <- merge(st.ref, RES, all.x = TRUE)
+          ref.cost <- ORES$Cost[[1L]]
+          ref.utility <- ORES$Utility[[1L]]
+          ref.QALY <- ORES$QALY[[1L]]
           # outcome
           if (outcome == "saving") {
             rv <- ref.cost - index.cost
@@ -1151,18 +1130,18 @@ DecisionTree <- R6::R6Class(
         dw <- vapply(X=TO$Label, FUN.VAL=0.5, FUN=function(s) {
           return(strwidth(paste0(s, "MM"), cex = cex, units = "inches"))
         })
-        par(omi=c(0,max(dw),0,0))
+        par(omi = c(0.0, max(dw), 0.0, 0.0))
         # create sufficient space in the inner margin to write the variable
         # limits to the left and right of each bar
         lw <- vapply(X = TO$LL, FUN.VAL = 0.5, FUN = function(v) {
-          return(strwidth(signif(v,3), cex = cex, units = "inches"))
+          return(strwidth(signif(v, 3L), cex = cex, units = "inches"))
         })
         uw <- vapply(X = TO$UL, FUN.VAL = 0.5, FUN = function(v) {
-          return(strwidth(signif(v,3), cex = cex, units = "inches"))
+          return(strwidth(signif(v, 3L), cex = cex, units = "inches"))
         })
-        par(mar = c(4.1,4.1,1.1,1.1))
+        par(mar = c(4.1, 4.1, 1.1, 1.1))
         mai <- par("mai")
-        par(mai = c(mai[1],max(max(lw),max(uw)),mai[3],max(max(lw),max(uw))))
+        par(mai = c(mai[1L],max(max(lw),max(uw)),mai[3L],max(max(lw),max(uw))))
         mgp <- par("mgp")
         mgp <- mgp*cex
         # create the plot frame
@@ -1187,12 +1166,12 @@ DecisionTree <- R6::R6Class(
         )
         # label the y axis
         axis(
-          side = 2,
+          side = 2L,
           at = seq_len(nrow(TO)),
           labels = TO$Label,
-          lty = 0,
-          lwd.ticks = 0,
-          las = 2,
+          lty = 0L,
+          lwd.ticks = 0L,
+          las = 2L,
           cex.axis = cex,
           mgp = mgp,
           outer = TRUE
@@ -1213,22 +1192,22 @@ DecisionTree <- R6::R6Class(
           LL <- TO[i,"LL"]
           UL <- TO[i,"UL"]
           if (TO[i,"outcome.max"] > TO[i,"outcome.min"]) {
-            labels <- c(signif(LL,3), signif(UL,3))
+            labels <- c(signif(LL, 3L), signif(UL, 3L))
           } else {
-            labels <- c(signif(UL,3), signif(LL,3))
+            labels <- c(signif(UL, 3L), signif(LL, 3L))
           }
           text(
             x = c(xleft, xright),
             y = c(i, i),
             labels = labels,
-            pos = c(2, 4),
+            pos = c(2.0, 4.0),
             offset = 0.25,
             cex = cex, 
             xpd = TRUE
           )
         }
         # add mean (base case)
-        abline(v = TO[1,"outcome.mean"], lty = "dashed")
+        abline(v = TO[[1L, "outcome.mean"]], lty = "dashed")
         # remove label column
         TO$Label <- NULL
         # restore graphics state
@@ -1279,76 +1258,66 @@ DecisionTree <- R6::R6Class(
     #' @param lambda The ICER threshold (threshold ratio) for outcome="ICER".
     #' @param nmax Maximum number if iterations allowed to reach convergence.
     #' @return Value of the model variable of interest at the threshold.
-    threshold = function(index, ref, outcome="saving", mvd, a, b, tol, 
-                         lambda=NULL, nmax=1000) {
+    threshold = function(index, ref, outcome, mvd, a, b, tol, 
+                         lambda = NULL, nmax = 1000L) {
       # find all input modvars, excluding expressions
       mvlist <- self$modvars()
-      lv <- vapply(X=mvlist, FUN.VALUE=TRUE, FUN=function(v) {
+      lv <- vapply(X = mvlist, FUN.VALUE = TRUE, FUN = function(v) {
         return(!v$is_expression())
       })
       mvlist <- mvlist[lv]
       # check the parameters
-      if (missing(index) || missing(ref)) {
-        rlang::abort(
-          "'index' and 'ref' must be defined",
-          class = "missing_strategy"
+      abortif(missing(index) || missing(ref),
+        message = "'index' and 'ref' must be defined",
+        class = "missing_strategy"
+      )
+      abortifnot(self$is_strategy(index) && self$is_strategy(ref),
+        message = "'index' and 'ref' must be valid strategies",
+        class = "invalid_strategy"
+      )
+      abortif(missing(outcome),
+        message = "'outcome' must not be missing",
+        class = "invalid_outcome"
+      )
+      abortifnot(outcome %in% c("saving", "ICER"),
+        message  = "'outcome' must be one of {saving|ICER}", 
+        class = "invalid_outcome"
+      )
+      if (outcome == "ICER") {
+        abortif(missing(lambda) || !is.numeric(lambda) || lambda <= 0.0,
+          message = "'lambda' must be numeric and > 0",
+          class = "invalid_lambda"
         )
       }
-      if (!self$is_strategy(index) || !self$is_strategy(ref)) {
-        rlang::abort(
-          "'index' and 'ref' must be valid strategies for the decision tree",
-         class = "invalid_strategy"
-        )
-      }
-      if (outcome == "saving") {
-      } else if (outcome=="ICER") {
-        if (missing(lambda) || !is.numeric(lambda) || lambda <= 0) {
-          rlang::abort(
-            "'lambda' must be numeric and > 0",
-            class = "invalid_lambda"
-          )
-        }
-      } else {
-        rlang::abort(
-          "'outcome' must be one of {saving|ICER}", class = "invalid_outcome"
-        )
-      }
-      dsav <- NULL
-      if (is.character(mvd)) {
-        lv <- vapply(X=mvlist, FUN.VALUE=TRUE, FUN=function(v) {
-          return(identical(v$description(),mvd))
-        })
-        if (sum(lv) != 1) {
-          rlang::abort(
-            "'mvd' must identify exactly one variable in the model",
-            class = "invalid_mvd"
-          )
-        }
-        dsav <- mvlist[[which(lv)]]
-      } else {
-        rlang::abort(
-          "'mvd' must be a character string",
-          class = "invalid_mvd"
-        )
-      }
-      if (!is.numeric(a) || !is.numeric(b) || (b < a)) {
-        rlang::abort(
-          "'a' and 'b' must be numeric and 'b' > 'a'",
-          class = "invalid_brackets"
-        )
-      }
-      if (missing(tol) || !is.numeric(tol) || tol <= 0) {
-        rlang::abort("'tol' must be numeric and >0", class = "invalid_tol")
-      }
+      abortifnot(is.character(mvd),
+        message = "'mvd' must be a character string",
+        class = "invalid_mvd"
+      )           
+      lv <- vapply(X = mvlist, FUN.VALUE = TRUE, FUN = function(v) {
+        return(identical(v$description(), mvd))
+      })
+      abortifnot(sum(lv) == 1L,
+        message = "'mvd' must identify exactly one variable in the model",
+        class = "invalid_mvd"
+      )
+      dsav <- mvlist[[which(lv)]]
+      abortifnot(is.numeric(a) && is.numeric(b) && (b > a),
+        message = "'a' and 'b' must be numeric and 'b' > 'a'",
+        class = "invalid_brackets"
+      )
+      abortif(missing(tol) || !is.numeric(tol) || tol <= 0.0,
+        message = "'tol' must be numeric and > 0", 
+        class = "invalid_tol"
+      )
       # set all modvars to their mean
       for (v in mvlist) {
         v$set("expected")
       }
       # get names of index and ref strategies
       ST <- self$strategy_table(select=index)
-      index.name <- rownames(ST)[1]
+      index.name <- rownames(ST)[[1L]]
       ST <- self$strategy_table(select=ref)
-      ref.name <- rownames(ST)[1]
+      ref.name <- rownames(ST)[[1L]]
       # construct a function to calculate the outcome at value x of the 
       # variable for which the threshold is needed
       f <- function(x) {
@@ -1357,14 +1326,14 @@ DecisionTree <- R6::R6Class(
         # evaluate the tree
         RES <- self$evaluate(setvars="current", by="run")
         # get costs and QALYs of index and ref strategies
-        ref.cost <- RES[1,paste("Cost", ref.name, sep=".")]
-        index.cost <- RES[1,paste("Cost", index.name, sep=".")]
-        ref.qaly <- RES[1,paste("QALY", ref.name, sep=".")]
-        index.qaly <- RES[1,paste("QALY", index.name, sep=".")]
+        ref.cost <- RES[1L, paste("Cost", ref.name, sep=".")]
+        index.cost <- RES[1L, paste("Cost", index.name, sep=".")]
+        ref.qaly <- RES[1L, paste("QALY", ref.name, sep=".")]
+        index.qaly <- RES[1L, paste("QALY", index.name, sep=".")]
         # outcome
         if (outcome == "saving") {
           saving <- ref.cost - index.cost
-          rv <- (saving - 0)
+          rv <- (saving - 0.0)
         } else {
           icer <- (index.cost - ref.cost) / (index.qaly - ref.qaly)
           rv <- icer - lambda
@@ -1374,32 +1343,29 @@ DecisionTree <- R6::R6Class(
       # return variable
       threshold <- NA
       # check that sign of cost saving is different at the brackets
-      if ((f(a)*f(b)) < 0) {
-        n <- 0
-        while (n < nmax) {
-          # new midpoint
-          c <- (a + b)/2
-          if (((b-a)/2) < tol) {
-            break
-          }
-          n <- n + 1
-          if (sign(f(c))==sign(f(a))) {
-            a <- c
-          } else {
-            b <- c
-          }
+      abortifnot(f(a) * f(b) < 0.0,
+        "[a, b] does not bracket the root", 
+         class = "invalid_brackets"
+      )
+      n <- 0L
+      while (n < nmax) {
+        # new midpoint
+        c <- (a + b) / 2.0
+        if (((b - a) / 2.0) < tol) {
+          break
         }
-        if (n >= nmax) {
-          rlang::abort("Failed to converge", class="convergence_failure")
+        n <- n + 1L
+        if (sign(f(c)) == sign(f(a))) {
+          a <- c
         } else {
-          threshold <- c  
+          b <- c
         }
-      } else {
-        rlang::abort(
-          "[a,b] does not bracket the root", 
-          class = "invalid_brackets"
-        )
-      }     
+      }
+      abortif(n >= nmax,
+        message = "Failed to converge", 
+        class = "convergence_failure"
+      )
+      threshold <- c  
       # return the threshold
       return(threshold)
     }

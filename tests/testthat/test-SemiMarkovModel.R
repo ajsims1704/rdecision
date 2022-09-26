@@ -183,45 +183,45 @@ test_that("invalid transition probabilities are rejected", {
   M <- SemiMarkovModel$new(V = list(s.well, s.disabled, s.dead), E) 
   # check that initial state has equal probabilities
   EPt <- matrix(
-    data = c(1/3,1/3,1/3,0,0.5,0.5,0,0,1),
-    nrow=3, byrow=TRUE,
-    dimnames=list(source=snames,target=snames)
+    data = c(1L / 3L, 1L / 3L, 1L / 3L, 0L, 0.5, 0.5, 0L, 0L, 1L),
+    nrow = 3L, byrow = TRUE,
+    dimnames=list(source = snames, target = snames)
   )
-  expect_equal(M$transition_probabilities(), EPt)
+  expect_identical(M$transition_probabilities(), EPt)
   # no probabilities
   expect_error(
     M$set_probabilities(), class = "invalid_Pt"
   )
   # probabilities are not a matrix
   expect_error(
-    M$set_probabilities(Pt=42), class = "invalid_Pt"
+    M$set_probabilities(Pt = 42L), class = "invalid_Pt"
   )
   #  probability matrix is incorrect size
-  ePt <- matrix(c(1,0,0,1), nrow=2, byrow=TRUE)  
+  ePt <- matrix(c(1L, 0L, 0L, 1L), nrow = 2L, byrow=TRUE)  
   expect_error(
     M$set_probabilities(Pt=ePt), class = "invalid_Pt"
   )
   # probability matrix has incorrect state names
   ePt <- matrix(
-    data = c(0.6, 0.2, 0.2, 0, 0.6, 0.4, 0, 0, 1),
-    nrow = 3, byrow = TRUE,
+    data = c(0.6, 0.2, 0.2, 0.0, 0.6, 0.4, 0.0, 0.0, 1.0),
+    nrow = 3L, byrow = TRUE,
     dimnames = list(source=c("a","b","c"), target=c("a","b","c"))
   )
   expect_error(
     M$set_probabilities(Pt=ePt), class = "invalid_Pt"
   )
   ePt <- matrix(
-    data = c(0.6, 0.2, 0.2, 0, 0.6, 0.4, 0, 0, 1),
-    nrow = 3, byrow = TRUE,
-    dimnames = list(source=snames, target=c("a","b","c"))
+    data = c(0.6, 0.2, 0.2, 0.0, 0.6, 0.4, 0.0, 0.0, 1.0),
+    nrow = 3L, byrow = TRUE,
+    dimnames = list(source=snames, target=c("a", "b", "c"))
   )
   expect_error(
-    M$set_probabilities(Pt=ePt), class = "invalid_Pt"
+    M$set_probabilities(Pt = ePt), class = "invalid_Pt"
   )
   # probability matrix contains multiple NA per row
   ePt <- matrix(
-    data = c(0.6, NA, NA, 0, 0.6, 0.4, 0, 0, 1),
-    nrow = 3, byrow = TRUE,
+    data = c(0.6, NA, NA, 0.0, 0.6, 0.4, 0.0, 0.0, 1.0),
+    nrow = 3L, byrow = TRUE,
     dimnames = list(source=snames, target=snames)
   )
   expect_error(
@@ -229,47 +229,47 @@ test_that("invalid transition probabilities are rejected", {
   )
   # probability matrix contains values not in range [0,1]
   ePt <- matrix(
-    data = c(0.6, 1.3, -0.9, 0, 0.6, 0.4, 0, 0, 1),
-    nrow = 3, byrow = TRUE,
-    dimnames = list(source=snames, target=snames)
+    data = c(0.6, 1.3, -0.9, 0.0, 0.6, 0.4, 0.0, 0.0, 1.0),
+    nrow = 3L, byrow = TRUE,
+    dimnames = list(source = snames, target = snames)
   )
   expect_error(
     M$set_probabilities(Pt=ePt), class = "invalid_Pt"
   )
   # probability matrix has non-zero values for undefined transitions
   ePt <- matrix(
-    data = c(0.6, 0.2, 0.2, 0.1, 0.5, 0.4, 0, 0, 1),
-    nrow = 3, byrow = TRUE,
-    dimnames = list(source=snames, target=snames)
+    data = c(0.6, 0.2, 0.2, 0.1, 0.5, 0.4, 0.0, 0.0, 1.0),
+    nrow = 3L, byrow = TRUE,
+    dimnames = list(source = snames, target = snames)
   )
   expect_error(
-    M$set_probabilities(Pt=ePt), class = "invalid_Pt"
+    M$set_probabilities(Pt = ePt), class = "invalid_Pt"
   )
   # probability matrix has row sums > 1
   ePt <- matrix(
-    data = c(0.6, 0.2, 0.2, 0.0, 0.7, 0.4, 0, 0, 1),
-    nrow = 3, byrow = TRUE,
-    dimnames = list(source=snames, target=snames)
+    data = c(0.6, 0.2, 0.2, 0.0, 0.7, 0.4, 0.0, 0.0, 1.0),
+    nrow = 3L, byrow = TRUE,
+    dimnames = list(source = snames, target = snames)
   )
   expect_error(
     M$set_probabilities(Pt=ePt), class = "invalid_Pt"
   )
   # Sonnenberg and Beck probability matrix
   pt_sb <- matrix(
-    data = c(0.6, 0.2, 0.2, 0, 0.6, 0.4, 0, 0, 1),
-    nrow = 3, byrow = TRUE,
+    data = c(0.6, 0.2, 0.2, 0.0, 0.6, 0.4, 0.0, 0.0, 1.0),
+    nrow = 3L, byrow = TRUE,
     dimnames = list(source=snames, target=snames)
   )
   expect_silent(M$set_probabilities(Pt = pt_sb))
   # Sonnenberg and Beck probability matrix with NAs - check if NAs replaced
   pt_sb_na <- matrix(
-    data = c(NA, 0.2, 0.2, NA, 0.6, 0.4, 0, 0, NA),
-    nrow = 3, byrow = TRUE,
-    dimnames = list(source=snames, target=snames)
+    data = c(NA, 0.2, 0.2, NA, 0.6, 0.4, 0.0, 0.0, NA),
+    nrow = 3L, byrow = TRUE,
+    dimnames = list(source = snames, target = snames)
   )
   expect_silent(M$set_probabilities(Pt = pt_sb_na))
   ept_sb <- M$transition_probabilities()
-  expect_equal(ept_sb, pt_sb)
+  expect_identical(ept_sb, pt_sb)
 })
 
 test_that("NAs are replaced in transition probability matrix", {
@@ -291,17 +291,17 @@ test_that("NAs are replaced in transition probability matrix", {
   # use S&B per-cycle transition probabilities
   snames <- c("Well","Disabled","Dead")
   EPt <- matrix(
-    data = c(0.6, 0.2, 0.2, 0, 0.6, 0.4, 0, 0, 1),
-    nrow = 3, byrow = TRUE,
+    data = c(0.6, 0.2, 0.2, 0.0, 0.6, 0.4, 0.0, 0.0, 1.0),
+    nrow = 3L, byrow = TRUE,
     dimnames = list(source=snames, target=snames)
   )
   Pt <- matrix(
-    data = c(0.6, NA, 0.2, 0, 0.6, 0.4, 0, 0, NA),
-    nrow = 3, byrow = TRUE,
+    data = c(0.6, NA, 0.2, 0.0, 0.6, 0.4, 0.0, 0.0, NA),
+    nrow = 3L, byrow = TRUE,
     dimnames = list(source=snames, target=snames)
   )
   M$set_probabilities(Pt)
-  expect_equal(M$transition_probabilities(), EPt)
+  expect_identical(round(M$transition_probabilities(),2L), round(EPt, 2L))
 })
 
 # -----------------------------------------------------------------------------
@@ -310,45 +310,54 @@ test_that("NAs are replaced in transition probability matrix", {
 test_that("transition cost matrix is correct", {
   # create states
   s.well <- MarkovState$new(name="Well")
-  s.disabled <- MarkovState$new(name="Disabled", cost=750)
+  s.disabled <- MarkovState$new(name="Disabled", cost = 750.0)
   s.dead <- MarkovState$new(name="Dead")
   # create transitions
   E <- list(
     Transition$new(s.well, s.well),
     Transition$new(s.dead, s.dead),
     Transition$new(s.disabled, s.disabled),
-    Transition$new(s.well, s.disabled, cost=1000),
-    Transition$new(s.well, s.dead, cost=250),
-    Transition$new(s.disabled, s.dead, cost=500)
+    Transition$new(s.well, s.disabled, cost = 1000.0),
+    Transition$new(s.well, s.dead, cost = 250.0),
+    Transition$new(s.disabled, s.dead, cost = 500.0)
   )
   # create model
   M <- SemiMarkovModel$new(V = list(s.well, s.disabled, s.dead), E) 
   # use S&B per-cycle transition probabilities
   snames <- c("Well","Disabled","Dead")
   Pt <- matrix(
-    data = c(0.6, NA, 0.2, 0, 0.6, 0.4, 0, 0, NA),
-    nrow = 3, byrow = TRUE,
+    data = c(0.6, NA, 0.2, 0.0, 0.6, 0.4, 0.0, 0.0, NA),
+    nrow = 3L, byrow = TRUE,
     dimnames = list(source=snames, target=snames)
   )
   M$set_probabilities(Pt)
   # check the transition cost matrix
   ECt <- matrix(
-    data = c(0, 1000, 250, 0, 0, 500, 0, 0, 0),
-    nrow = 3, byrow = TRUE,
+    data = c(0.0, 1000.0, 250.0, 0.0, 0.0, 500.0, 0.0, 0.0, 0.0),
+    nrow = 3L, byrow = TRUE,
     dimnames = list(source=snames, target=snames)
   )
   Ct <- M$transition_cost()
-  expect_equal(Ct, ECt)
+  expect_identical(Ct, ECt)
   # check that transition costs are accumulated
-  C1 <- M$cycle(hcc.pop=FALSE, hcc.cost=FALSE)
-  ec.disabled <- 0.2*1000
-  expect_equal(C1$EntryCost[C1$State=="Disabled"], ec.disabled)
-  ec.dead <- 0.2*250
-  expect_equal(C1$EntryCost[C1$State=="Dead"], ec.dead)
+  C1 <- M$cycle(hcc.pop = FALSE, hcc.cost = FALSE)
+  ec.disabled <- 0.2*1000.0
+  expect_identical(
+    round(C1$EntryCost[C1$State=="Disabled"], 2L), round(ec.disabled, 2L)
+  )
+  ec.dead <- 0.2*250.0
+  expect_identical(
+    round(C1$EntryCost[C1$State=="Dead"], 2L), round(ec.dead, 2L)
+  )
   # check that entry costs and occupancy costs are added
-  oc.disabled <- 0.2*750
-  expect_equal(C1$Cost[C1$State=="Disabled"], oc.disabled+ec.disabled)
-  expect_equal(C1$Cost[C1$State=="Dead"], ec.dead)
+  oc.disabled <- 0.2*750.0
+  expect_identical(
+    round(C1$Cost[C1$State=="Disabled"], 2L), 
+    round(oc.disabled + ec.disabled, 2L)
+  )
+  expect_identical(
+    round(C1$Cost[C1$State=="Dead"], 2L), round(ec.dead, 2L)
+  )
 })
 
 # -----------------------------------------------------------------------------
@@ -373,27 +382,27 @@ test_that("invalid population vectors are rejected", {
   expect_setequal(M$get_statenames(), list("Well", "Disabled", "Dead"))
   # check default population
   rp <- M$get_populations()
-  expect_equal(unname(rp[1]),1000)
-  expect_equal(unname(rp[2]),0)
-  expect_equal(unname(rp[3]),0)
+  expect_identical(unname(rp[1L]), 1000.0)
+  expect_identical(unname(rp[2L]), 0.0)
+  expect_identical(unname(rp[3L]), 0.0)
   # number of elements
-  pop <- c(Well=10000, Disabled=0)
-  expect_error(M$reset(pop), class="incorrect_state_count")
+  pop <- c(Well = 10000L, Disabled = 0L)
+  expect_error(M$reset(pop), class = "incorrect_state_count")
   # state names
-  pop <- c(Well=10000, Poorly=0, Disabled=0)
-  expect_error(M$reset(pop), class="unmatched_states")
-  pop <- c(10000, 0, 0)
-  expect_error(M$reset(pop), class="unmatched_states")
+  pop <- c(Well = 10000.0, Poorly = 0.0, Disabled = 0.0)
+  expect_error(M$reset(pop), class = "unmatched_states")
+  pop <- c(10000L, 0L, 0L)
+  expect_error(M$reset(pop), class = "unmatched_states")
   # type
-  pop <- c(Well=10000, Disabled="0", Dead=0)
-  expect_error(M$reset(pop), class="non-numeric_state_population")
+  pop <- c(Well = 10000L, Disabled = "0", Dead = 0L)
+  expect_error(M$reset(pop), class = "non-numeric_state_population")
   # correct
-  pop <- c(Well=10000, Disabled=0, Dead=0)
+  pop <- c(Well = 10000L, Disabled = 0L, Dead = 0L)
   expect_silent(M$reset(pop))
   rp <- M$get_populations()
-  expect_equal(unname(rp["Well"]), 10000)
-  expect_equal(unname(rp["Disabled"]), 0)
-  expect_equal(unname(rp["Dead"]), 0)
+  expect_identical(unname(rp[["Well"]]), 10000.0)
+  expect_identical(unname(rp[["Disabled"]]), 0.0)
+  expect_identical(unname(rp[["Dead"]]), 0.0)
 })
 
 test_that("invalid cycle numbers are rejected", {
@@ -412,9 +421,9 @@ test_that("invalid cycle numbers are rejected", {
     E = list(e.ww, e.ss, e.dd, e.ws, e.wd, e.sd)
   )
   # attempt to reset with illegal cycle numbers
-  expect_error(M$reset(icycle=2), class="invalid_icycle")
-  expect_error(M$reset(icycle="2"), class="invalid_icycle")
-  expect_error(M$reset(icycle=as.integer(-1)), class="invalid_icycle")
+  expect_error(M$reset(icycle = 2.0), class = "invalid_icycle")
+  expect_error(M$reset(icycle = "2"), class="invalid_icycle")
+  expect_error(M$reset(icycle = -1L), class="invalid_icycle")
 })
 
 test_that("invalid elapsed times are rejected", {
@@ -433,10 +442,10 @@ test_that("invalid elapsed times are rejected", {
     E = list(e.ww, e.ss, e.dd, e.ws, e.wd, e.sd)
   )
   # attempt to reset with illegal elapsed times
-  expect_error(M$reset(elapsed=2), class="invalid_elapsed")
-  expect_error(M$reset(elapsed="2"), class="invalid_elapsed")
+  expect_error(M$reset(elapsed = 2.0), class="invalid_elapsed")
+  expect_error(M$reset(elapsed = "2"), class="invalid_elapsed")
   expect_error(
-    M$reset(icycle=as.difftime(-1, units="days")), 
+    M$reset(icycle = as.difftime(-1.0, units = "days")), 
     class="invalid_icycle"
   )
 })
@@ -447,15 +456,15 @@ test_that("invalid elapsed times are rejected", {
 test_that("model variables are detected", {
   # example of monotherapy from Chancellor, 1997
   # drug costs
-  cAZT <- 2278 # zidovudine drug cost
-  cLam <- 2087 # lamivudine drug cost
+  cAZT <- 2278.0 # zidovudine drug cost
+  cLam <- 2087.0 # lamivudine drug cost
   # direct medical and community costs (modelled as gamma distributions)
-  dmca <- GammaModVar$new("dmca", "GBP", shape=1, scale=1701)
-  dmcb <- GammaModVar$new("dmcb", "GBP", shape=1, scale=1774)
-  dmcc <- GammaModVar$new("dmcc", "GBP", shape=1, scale=6948)
-  ccca <- GammaModVar$new("ccca", "GBP", shape=1, scale=1055)
-  cccb <- GammaModVar$new("cccb", "GBP", shape=1, scale=1278)
-  cccc <- GammaModVar$new("cccc", "GBP", shape=1, scale=2059)
+  dmca <- GammaModVar$new("dmca", "GBP", shape = 1.0, scale = 1701.0)
+  dmcb <- GammaModVar$new("dmcb", "GBP", shape = 1.0, scale = 1774.0)
+  dmcc <- GammaModVar$new("dmcc", "GBP", shape = 1.0, scale = 6948.0)
+  ccca <- GammaModVar$new("ccca", "GBP", shape = 1.0, scale = 1055.0)
+  cccb <- GammaModVar$new("cccb", "GBP", shape = 1.0, scale = 1278.0)
+  cccc <- GammaModVar$new("cccc", "GBP", shape = 1.0, scale = 2059.0)
   # occupancy costs with monotherapy
   cAm <- ExprModVar$new("cA", "GBP", rlang::quo(dmca+ccca+cAZT))
   cBm <- ExprModVar$new("cB", "GBP", rlang::quo(dmcb+cccb+cAZT))
@@ -466,7 +475,7 @@ test_that("model variables are detected", {
   sA <- MarkovState$new("A", cost=cAm)
   sB <- MarkovState$new("B", cost=cBm)
   sC <- MarkovState$new("C", cost=cCm)
-  sD <- MarkovState$new("D", cost=0, utility=0)
+  sD <- MarkovState$new("D", cost = 0.0, utility = 0.0)
   # transitions 
   tAA <- Transition$new(sA, sA)
   tAB <- Transition$new(sA, sB)
@@ -485,11 +494,11 @@ test_that("model variables are detected", {
   )
   # check modvars
   mv <- m$modvars()
-  expect_length(mv, 9)
+  expect_length(mv, 9L)
   mvt <- m$modvar_table()
-  expect_equal(nrow(mvt), 9)
-  mvt <- m$modvar_table(expressions=FALSE)
-  expect_equal(nrow(mvt), 6)
+  expect_identical(nrow(mvt), 9L)
+  mvt <- m$modvar_table(expressions = FALSE)
+  expect_identical(nrow(mvt), 6L)
 })
 
 # -----------------------------------------------------------------------------
@@ -503,8 +512,8 @@ test_that("model is cyclable", {
   # use S&B per-cycle transition probabilities and calculate rates
   snames <- c("Well","Disabled","Dead")
   Pt <- matrix(
-    data = c(0.6, 0.2, 0.2, 0, 0.6, 0.4, 0, 0, 1),
-    nrow = 3, byrow = TRUE,
+    data = c(0.6, 0.2, 0.2, 0.0, 0.6, 0.4, 0.0, 0.0, 1.0),
+    nrow = 3L, byrow = TRUE,
     dimnames = list(source=snames, target=snames)
   )
   # create transitions
@@ -518,7 +527,7 @@ test_that("model is cyclable", {
   )
   # detect illegal parameters to cycle()
   expect_error(
-    SemiMarkovModel$new(V = list(s.well, s.disabled, s.dead), E, tcycle=42), 
+    SemiMarkovModel$new(V = list(s.well, s.disabled, s.dead), E, tcycle = 42L), 
     class="invalid_tcycle"
   )
   # create the model
@@ -526,44 +535,44 @@ test_that("model is cyclable", {
   # set rates
   M$set_probabilities(Pt)
   # test illegal arguments to cycle
-  expect_error(M$cycle(hcc.pop=3), class="invalid_hcc")
-  expect_error(M$cycle(hcc.cost=3), class="invalid_hcc")
+  expect_error(M$cycle(hcc.pop = 3.0), class = "invalid_hcc")
+  expect_error(M$cycle(hcc.cost = 3.0), class = "invalid_hcc")
   expect_error(M$cycle(hcc.pop=FALSE,hcc.cost=TRUE), class="invalid_hcc")
   # test cycles
   DF <- M$cycle()
-  expect_equal(M$get_elapsed(),as.difftime(365.25, units="days"))
-  expect_true(is.data.frame(DF))
+  expect_identical(M$get_elapsed(), as.difftime(365.25, units = "days"))
+  expect_s3_class(DF, "data.frame")
   expect_setequal(
     names(DF), 
     c("State", "Cycle", "Time", "Population", "EntryCost", "OccCost", "Cost", 
       "QALY")
   )
-  expect_equal(nrow(DF),3)
+  expect_identical(nrow(DF), 3L)
 })
 
 # cyclng with utilities > 1
 test_that("utilities > 1 are supported via model variables", {
-  cv <- ConstModVar$new(description = "", units = "", const = 2)
-  a <- MarkovState$new(name = "A", cost = 0, utility = 0.9)
-  b <- MarkovState$new(name = "B", cost = 0, utility = 0.8)
-  c <- MarkovState$new(name = "C", cost = 0, utility = cv)
-  aa <- Transition$new(source = a, target = a, cost = 0)
-  ab <- Transition$new(source = a, target = b, cost = 0)
-  ac <- Transition$new(source = a, target = c, cost = 0)
-  bb <- Transition$new(source = b, target = b, cost = 0)
-  cc <- Transition$new(source = c, target = c, cost = 0)
+  cv <- ConstModVar$new(description = "", units = "", const = 2.0)
+  a <- MarkovState$new(name = "A", cost = 0.0, utility = 0.9)
+  b <- MarkovState$new(name = "B", cost = 0.0, utility = 0.8)
+  c <- MarkovState$new(name = "C", cost = 0.0, utility = cv)
+  aa <- Transition$new(source = a, target = a, cost = 0.0)
+  ab <- Transition$new(source = a, target = b, cost = 0.0)
+  ac <- Transition$new(source = a, target = c, cost = 0.0)
+  bb <- Transition$new(source = b, target = b, cost = 0.0)
+  cc <- Transition$new(source = c, target = c, cost = 0.0)
   m <- SemiMarkovModel$new(V = list(a, b, c), E = list(aa, ab, ac, bb, cc))
   pt <- matrix(
-    data = c(NA, 0.2, 0.1, 0, NA, 0, 0, 0, NA),
-    nrow = 3,
+    data = c(NA, 0.2, 0.1, 0.0, NA, 0.0, 0.0, 0.0, NA),
+    nrow = 3L,
     byrow = TRUE,
     dimnames = list(source = c("A", "B", "C"), target = c("A", "B", "C"))
   )
   m$set_probabilities(pt)
-  trace <- m$cycle(hcc.pop = FALSE, hcc.cost = FALSE)
+  tr <- m$cycle(hcc.pop = FALSE, hcc.cost = FALSE)
   expect_intol(
-    trace$QALY[trace$State == "C" & trace$Cycle == 1], 
-    (1000 * 0.1 * 2) / 1000,
+    tr$QALY[tr$State == "C" & tr$Cycle == 1L], 
+    (1000.0 * 0.1 * 2.0) / 1000.0,
     0.01
   )
 })
@@ -574,9 +583,9 @@ test_that("utilities > 1 are supported via model variables", {
 # -----------------------------------------------------------------------------
 test_that("rdecision replicates Sonnenberg & Beck, Fig 3", {
   # create states
-  s.well <- MarkovState$new(name="Well", utility=1)
-  s.disabled <- MarkovState$new(name="Disabled",utility=0.7)
-  s.dead <- MarkovState$new(name="Dead",utility=0)
+  s.well <- MarkovState$new(name = "Well", utility = 1.0)
+  s.disabled <- MarkovState$new(name = "Disabled", utility = 0.7)
+  s.dead <- MarkovState$new(name = "Dead", utility = 0.0)
   # create transitions leaving rates undefined
   E <- list(
     Transition$new(s.well, s.well),
@@ -591,12 +600,12 @@ test_that("rdecision replicates Sonnenberg & Beck, Fig 3", {
   # check the state tabulation
   ST <- M$tabulate_states()
   expect_setequal(names(ST), c("Name", "Cost", "Utility"))
-  expect_equal(nrow(ST),3)
+  expect_identical(nrow(ST), 3L)
   # create transition probability matrix
   snames <- c("Well","Disabled","Dead")
   EPt <- matrix(
-    data = c(0.6, 0.2, 0.2, 0, 0.6, 0.4, 0, 0, 1),
-    nrow = 3, byrow = TRUE,
+    data = c(0.6, 0.2, 0.2, 0.0, 0.6, 0.4, 0.0, 0.0, 1.0),
+    nrow = 3L, byrow = TRUE,
     dimnames = list(source=snames, target=snames)
   )
   # set and check the transition probabilities
@@ -604,14 +613,14 @@ test_that("rdecision replicates Sonnenberg & Beck, Fig 3", {
   Pt <- M$transition_probabilities()
   expect_true(all(EPt-Pt < sqrt(.Machine$double.eps)))
   # set the starting populations
-  M$reset(c(Well=10000, Disabled=0, Dead=0)) 
+  M$reset(c(Well = 10000.0, Disabled = 0.0, Dead = 0.0)) 
   # cycle
-  RC <- M$cycles(25, hcc.pop=FALSE, hcc.cost=FALSE)
-  expect_equal(M$get_elapsed(), as.difftime(25*365.25, units="days"))
-  expect_true(is.data.frame(RC))
-  expect_equal(round(RC$Well[RC$Cycle==2]), 3600)
-  expect_equal(round(RC$Disabled[RC$Cycle==2]), 2400)
-  expect_equal(round(RC$Dead[RC$Cycle==2]), 4000)
+  RC <- M$cycles(25L, hcc.pop = FALSE, hcc.cost = FALSE)
+  expect_identical(M$get_elapsed(), as.difftime(25.0*365.25, units="days"))
+  expect_s3_class(RC, "data.frame")
+  expect_identical(round(RC$Well[RC$Cycle == 2L]), 3600.0)
+  expect_identical(round(RC$Disabled[RC$Cycle == 2L]), 2400.0)
+  expect_identical(round(RC$Dead[RC$Cycle == 2L]), 4000.0)
 })
 
 # ---------------------------------------------------------------------------
@@ -621,21 +630,21 @@ test_that("redecision replicates Briggs' example 4.7", {
   #
   # Discount rates
   # ==============
-  cDR <- 6 # annual discount rate, costs (%)
-  oDR <- 0 # annual discount rate, benefits (%)
+  cDR <- 6.0 # annual discount rate, costs (%)
+  oDR <- 0.0 # annual discount rate, benefits (%)
   #
   # Costs
   # =====
   # drug costs
-  cAZT <- 2278 # zidovudine drug cost
-  cLam <- 2087 # lamivudine drug cost
+  cAZT <- 2278.0 # zidovudine drug cost
+  cLam <- 2087.0 # lamivudine drug cost
   # direct medical and community costs (modelled as gamma distributions)
-  dmca <- GammaModVar$new("dmca", "GBP", shape=1, scale=1701)
-  dmcb <- GammaModVar$new("dmcb", "GBP", shape=1, scale=1774)
-  dmcc <- GammaModVar$new("dmcc", "GBP", shape=1, scale=6948)
-  ccca <- GammaModVar$new("ccca", "GBP", shape=1, scale=1055)
-  cccb <- GammaModVar$new("cccb", "GBP", shape=1, scale=1278)
-  cccc <- GammaModVar$new("cccc", "GBP", shape=1, scale=2059)
+  dmca <- GammaModVar$new("dmca", "GBP", shape = 1.0, scale = 1701.0)
+  dmcb <- GammaModVar$new("dmcb", "GBP", shape = 1.0, scale = 1774.0)
+  dmcc <- GammaModVar$new("dmcc", "GBP", shape = 1.0, scale = 6948.0)
+  ccca <- GammaModVar$new("ccca", "GBP", shape = 1.0, scale = 1055.0)
+  cccb <- GammaModVar$new("cccb", "GBP", shape = 1.0, scale = 1278.0)
+  cccc <- GammaModVar$new("cccc", "GBP", shape = 1.0, scale = 2059.0)
   # occupancy costs with monotherapy
   cAm <- ExprModVar$new("cA", "GBP", rlang::quo(dmca+ccca+cAZT))
   cBm <- ExprModVar$new("cB", "GBP", rlang::quo(dmcb+cccb+cAZT))
@@ -651,7 +660,7 @@ test_that("redecision replicates Briggs' example 4.7", {
   sA <- MarkovState$new("A")
   sB <- MarkovState$new("B")
   sC <- MarkovState$new("C")
-  sD <- MarkovState$new("D", cost=0, utility=0)
+  sD <- MarkovState$new("D", cost = 0.0, utility = 0.0)
   # transitions 
   tAA <- Transition$new(sA, sA)
   tAB <- Transition$new(sA, sB)
@@ -667,25 +676,25 @@ test_that("redecision replicates Briggs' example 4.7", {
   m <- SemiMarkovModel$new(
     V = list(sA, sB, sC, sD),
     E = list(tAA, tAB, tAC, tAD, tBB, tBC, tBD, tCC, tCD, tDD),
-    discount.cost = cDR/100,
-    discount.utility = oDR/100
+    discount.cost = cDR/100.0,
+    discount.utility = oDR/100.0
   )
   #
   # Treatment effect (modelled as a log normal distribution)
   # ========================================================
   RR <- LogNormModVar$new(
-    "Tx effect", "RR", p1 = 0.509, p2 = (0.710-0.365) / (2*1.96), "LN7"
+    "Tx effect", "RR", p1 = 0.509, p2 = (0.710-0.365) / (2.0*1.96), "LN7"
   )
   #
   # Dirichlet distributions for conditional probabilities
   # =====================================================
-  DA <- DirichletDistribution$new(c(1251, 350, 116, 17)) # from A
-  DB <- DirichletDistribution$new(c(731,512,15))  # from B
-  DC <- DirichletDistribution$new(c(1312,437)) # from C
+  DA <- DirichletDistribution$new(c(1251.0, 350.0, 116.0, 17.0)) # from A
+  DB <- DirichletDistribution$new(c(731.0, 512.0, 15.0))  # from B
+  DC <- DirichletDistribution$new(c(1312.0, 437.0)) # from C
   #
   # Function to estimate life years gained and costs
   # ================================================
-  runmodel <- function(expected=TRUE, hcc.pop=FALSE, hcc.cost=FALSE) {
+  runmodel <- function(expected = TRUE, hcc.pop = FALSE, hcc.cost = FALSE) {
     # set variables
     # =============
     cAm$set(ifelse(expected, "expected", "random"))
@@ -699,9 +708,9 @@ test_that("redecision replicates Briggs' example 4.7", {
     DB$sample(expected)
     DC$sample(expected)
     Pt <- matrix(
-        c(DA$r(), c(0, DB$r()), c(0, 0, DC$r()), c(0, 0, 0, 1)), 
+        c(DA$r(), c(0.0, DB$r()), c(0.0, 0.0, DC$r()), c(0.0, 0.0, 0.0, 1.0)), 
         byrow = TRUE,
-        nrow = 4,
+        nrow = 4L,
         dimnames = list(source=c("A","B","C","D"), target=c("A","B","C","D"))
     )
     # 
@@ -711,7 +720,7 @@ test_that("redecision replicates Briggs' example 4.7", {
     sA$set_cost(cAm)
     sB$set_cost(cBm)
     sC$set_cost(cCm)
-    sD$set_cost(0)
+    sD$set_cost(0.0)
     # set transition probabilities
     m$set_probabilities(Pt)
     # check them
@@ -723,17 +732,17 @@ test_that("redecision replicates Briggs' example 4.7", {
           0.000, 0.000, 0.750, 0.250,
           0.000, 0.000, 0.000, 1.000),   # typo in book (D,D) = 1!
         byrow = TRUE,
-        nrow = 4
+        nrow = 4L
       )
-      expect_true(all(TM-E < 0.01))
+      expect_true(all(TM - E < 0.01))
     }
     # create starting populations
-    N <- 1000
-    populations <- c(A = N, B = 0, C = 0, D = 0)
+    N <- 1000.0
+    populations <- c(A = N, B = 0.0, C = 0.0, D = 0.0)
     m$reset(populations)
     # run 20 cycles
     MT.mono <- m$cycles(
-      ncycles=20, 
+      ncycles = 20L, 
       hcc.pop = hcc.pop,
       hcc.cost = hcc.cost
     )
@@ -747,15 +756,15 @@ test_that("redecision replicates Briggs' example 4.7", {
     sA$set_cost(cAc)
     sB$set_cost(cBc)
     sC$set_cost(cCc)
-    sD$set_cost(0)
+    sD$set_cost(0.0)
     # create Pt for combination therapy (Briggs applied the RR to the transition
     # probabilities - not recommended, but done here for reproducibility).
     Ptc <- Pt
-    for (i in 1:4) {
-      for (j in 1:4) {
+    for (i in 1L:4L) {
+      for (j in 1L:4L) {
         Ptc[i,j] <- ifelse(i==j, NA, RR$get()*Ptc[i,j])
       }
-      Ptc[i,which(is.na(Ptc[i,]))] <- 1-sum(Ptc[i,],na.rm=TRUE) 
+      Ptc[i,which(is.na(Ptc[i,]))] <- 1.0 - sum(Ptc[i, ],na.rm=TRUE) 
     }
     # set transition rates from probabilities
     m$set_probabilities(Ptc)
@@ -768,15 +777,15 @@ test_that("redecision replicates Briggs' example 4.7", {
           0.000, 0.000, 0.873, 0.127,
           0.000, 0.000, 0.000, 1.000),   
         byrow = TRUE,
-        nrow = 4)
+        nrow = 4L)
       expect_true(all(TC-E < 0.01))
     }
     # run combination therapy model for 2 years
-    populations <- c("A" = N, "B" = 0, "C" = 0, "D" = 0)
+    populations <- c("A" = N, "B" = 0.0, "C" = 0.0, "D" = 0.0)
     m$reset(populations)
     # run 2 cycles
     MT.comb <- m$cycles(
-      2, 
+      2L, 
       hcc.pop = hcc.pop,
       hcc.cost = hcc.cost
     )
@@ -784,21 +793,21 @@ test_that("redecision replicates Briggs' example 4.7", {
     sA$set_cost(cAm)
     sB$set_cost(cBm)
     sC$set_cost(cCm)
-    sD$set_cost(0)
+    sD$set_cost(0.0)
     # set probabilities
     m$set_probabilities(Pt)
     # set populations in mono model & reset cycle counter and time
     populations <- m$get_populations()
     m$reset(
       populations, 
-      icycle=as.integer(2), 
-      elapsed=as.difftime(365.25*2, units="days")
+      icycle = 2L, 
+      elapsed = as.difftime(365.25*2.0, units = "days")
     )
     # run mono model for next 18 years
     MT.comb <- rbind(
       MT.comb, 
       m$cycles(
-        ncycles=18, 
+        ncycles = 18L, 
         hcc.pop = hcc.pop,
         hcc.cost = hcc.cost
       )
@@ -815,32 +824,32 @@ test_that("redecision replicates Briggs' example 4.7", {
   # Point estimate (without half-cycle correction)
   # ==============================================
   # run the model
-  M <- runmodel(expected=TRUE, hcc.pop=FALSE, hcc.cost=FALSE)
+  M <- runmodel(expected = TRUE, hcc.pop = FALSE, hcc.cost = FALSE)
   # check results
   expect_intol(M["el.mono"], 7.991, tolerance=0.03) # 7.991 from spreadsheet
-  expect_intol(M["cost.mono"], 44663, 100) # rounding errors in book
-  expect_intol(M["el.comb"], 8.937, tolerance=0.02) # 8.937 from spreadsheet
-  expect_intol(M["cost.comb"], 50602, 100) # rounding errors in book
+  expect_intol(M["cost.mono"], 44663.0, 100.0) # rounding errors in book
+  expect_intol(M["el.comb"], 8.937, tolerance = 0.02) # 8.937 from spreadsheet
+  expect_intol(M["cost.comb"], 50602.0, 100.0) # rounding errors in book
   icer <- (M["cost.comb"]-M["cost.mono"]) / (M["el.comb"]-M["el.mono"])
-  expect_intol(icer, 6276, 10) # rounding errors in book
+  expect_intol(icer, 6276.0, 10.0) # rounding errors in book
   #
   # Point estimate (with population half-cycle correction)
   # ======================================================
   # run the model
-  M <- runmodel(expected=TRUE, hcc.pop=TRUE, hcc.cost=FALSE)
+  M <- runmodel(expected = TRUE, hcc.pop = TRUE, hcc.cost = FALSE)
   # check results
   expect_intol(M["el.mono"], 8.48, tolerance=0.03) 
-  expect_intol(M["cost.mono"], 44663, 100) # rounding errors in book
-  expect_intol(M["el.comb"], 9.42, tolerance=0.02) 
-  expect_intol(M["cost.comb"], 50602, 100) # rounding errors in book
+  expect_intol(M["cost.mono"], 44663.0, 100.0) # rounding errors in book
+  expect_intol(M["el.comb"], 9.42, tolerance = 0.02) 
+  expect_intol(M["cost.comb"], 50602.0, 100.0) # rounding errors in book
   icer <- (M["cost.comb"]-M["cost.mono"]) / (M["el.comb"]-M["el.mono"])
-  expect_intol(icer, 6306, 10) # rounding errors in book
+  expect_intol(icer, 6306.0, 10.0) # rounding errors in book
   #
   # PSA
   # ===
   skip_on_cran()
-  n <- 1000
-  ODF <- sapply(1:n, FUN=function(i) {
+  n <- 1000L
+  ODF <- vapply(seq_len(n), FUN.VALUE = M, FUN=function(i) {
     # run the model
     M <- runmodel(expected=FALSE, hcc.pop=TRUE, hcc.cost=FALSE)
     return(M)
@@ -853,13 +862,13 @@ test_that("redecision replicates Briggs' example 4.7", {
   data(BriggsEx47, package="rdecision")
   # compare observed with expected
   suppressWarnings(ht <- ks.test(ODF$el.mono, BriggsEx47$Mono.LYs))
-  expect_true(ht$p.value > 0.001)
+  expect_gt(ht$p.value, 0.001)
   suppressWarnings(ht <- ks.test(ODF$cost.mono, BriggsEx47$Mono.Cost))
-  expect_true(ht$p.value > 0.001)
+  expect_gt(ht$p.value, 0.001)
   suppressWarnings(ht <- ks.test(ODF$el.comb, BriggsEx47$Comb.LYs))
-  expect_true(ht$p.value > 0.001)
+  expect_gt(ht$p.value, 0.001)
   suppressWarnings(ht <- ks.test(ODF$cost.comb, BriggsEx47$Comb.Cost))
-  expect_true(ht$p.value > 0.001)
+  expect_gt(ht$p.value, 0.001)
   suppressWarnings(ht <- ks.test(ODF$icer, BriggsEx47$ICER))
-  expect_true(ht$p.value > 0.001)
+  expect_gt(ht$p.value, 0.001)
 })

@@ -97,7 +97,7 @@ Andrew J. Sims \email{andrew.sims@newcastle.ac.uk}
 Create a \code{ModVar} formed from an expression involving 
 other model variables.
 \subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{ExprModVar$new(description, units, quo, nemp = 1000)}\if{html}{\out{</div>}}
+\if{html}{\out{<div class="r">}}\preformatted{ExprModVar$new(description, units, quo, nemp = 1000L)}\if{html}{\out{</div>}}
 }
 
 \subsection{Arguments}{
@@ -189,7 +189,7 @@ Return a list of operands.
 }
 \subsection{Details}{
 Finds operands that are themselves \code{ModVar}s in the
-expression. if \code{recursive=TRUE}, the list includes all 
+expression. if \code{recursive=TRUE}, the list includes all
 \code{ModVar}s that are operands of expression operands, recursively.
 }
 

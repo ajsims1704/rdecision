@@ -10,7 +10,7 @@ csl: "inst/nature-no-et-al.csl"
 knitr::opts_chunk$set(
   collapse = TRUE,
   comment = "#>",
-  fig.path = "man/figures/README-",
+  fig.path = file.path("man", "figures", "README-"),
   out.width = "75%"
 )
 ```
@@ -69,18 +69,18 @@ that the total probability associated with each chance node is one.
 ```{r pvars, echo=TRUE}
 library("rdecision")
 # probabilities of programme success & failure
-p.diet <- BetaModVar$new("P(diet)", "", alpha=12, beta=68-12)
-p.exercise <- BetaModVar$new("P(exercise)", "", alpha=18, beta=58-18)
-q.diet <- ExprModVar$new("1-P(diet)", "", rlang::quo(1-p.diet))
-q.exercise <- ExprModVar$new("1-P(exercise)", "", rlang::quo(1-p.exercise))
-# costs
-c.diet <- 50
-c.exercise <- ConstModVar$new("Cost of exercise programme", "GBP", 500)
-c.stent <- 5000
+p.diet <- BetaModVar$new("P(diet)", "", alpha = 12L, beta = 68L - 12L)
+p.exercise <- BetaModVar$new("P(exercise)", "", alpha = 18L, beta = 58L - 18L)
+q.diet <- ExprModVar$new("1-P(diet)", "", rlang::quo(1.0 - p.diet))
+q.exercise <- ExprModVar$new("1-P(exercise)", "", rlang::quo(1.0 - p.exercise))
+# costs 
+c.diet <- 50.0
+c.exercise <- ConstModVar$new("Cost of exercise programme", "GBP", 500.0)
+c.stent <- 5000.0
 ```
 
 The decision tree is constructed from nodes and edges as follows:
-```{r tree, echo=TRUE}
+```{r tree, echo = TRUE}
 t.ds <- LeafNode$new("no stent")
 t.df <- LeafNode$new("stent")
 t.es <- LeafNode$new("no stent")
@@ -91,10 +91,12 @@ d <- DecisionNode$new("Programme")
 
 e.d <- Action$new(d, c.d, cost=c.diet, label = "Diet")
 e.e <- Action$new(d, c.e, cost=c.exercise, label = "Exercise")
-e.ds <- Reaction$new(c.d, t.ds, p=p.diet, cost = 0, label = "success")
-e.df <- Reaction$new(c.d, t.df, p=q.diet, cost=c.stent, label="failure")
-e.es <- Reaction$new(c.e, t.es, p=p.exercise, cost=0, label="success")
-e.ef <- Reaction$new(c.e, t.ef, p=q.exercise, cost=c.stent, label="failure")
+e.ds <- Reaction$new(c.d, t.ds, p = p.diet, cost = 0.0, label = "success")
+e.df <- Reaction$new(c.d, t.df, p = q.diet, cost = c.stent, label="failure")
+e.es <- Reaction$new(c.e, t.es, p = p.exercise, cost = 0.0, label="success")
+e.ef <- Reaction$new(
+  c.e, t.ef, p = q.exercise, cost = c.stent, label = "failure"
+)
 
 DT <- DecisionTree$new(
   V = list(d, c.d, c.e, t.ds, t.df, t.es, t.ef),
@@ -109,12 +111,14 @@ DT$draw(border = TRUE)
 ```{r pointestimate, echo=FALSE}
 RES <- DT$evaluate()
 c.exercise.t <- DT$threshold(
-  index=list(e.e), ref=list(e.d), mvd=c.exercise$description(),
-  a=c.exercise$mean(), b=1000, tol=1
+  index = list(e.e), ref = list(e.d), outcome = "saving", 
+  mvd = c.exercise$description(),
+  a = c.exercise$mean(), b = 1000.0, tol = 1.0
 )
 p.ex.t <- DT$threshold(
-  index=list(e.e), ref=list(e.d), mvd=p.exercise$description(),
-  a=0, b=p.exercise$mean(), tol=0.001
+  index = list(e.e), ref = list(e.d), outcome = "saving",
+  mvd = p.exercise$description(),
+  a = 0.0, b = p.exercise$mean(), tol = 0.001
 )
 ```
 The expected per-patient net cost of each option is obtained by evaluating the
@@ -132,8 +136,8 @@ delivery is less than `r round(c.exercise.t,2)` GBP
 or when its success rate is greater than `r round(100*p.ex.t,1)`%.
 
 ```{r psa, echo=FALSE}
-N <- 1000
-RES <- DT$evaluate(setvars="random", by="run", N=N)
+N <- 1000L
+RES <- DT$evaluate(setvars = "random", by = "run", N = N)
 RES$Difference <- RES$Cost.Diet - RES$Cost.Exercise
 ```
 
@@ -158,9 +162,9 @@ be a temporary state.
 
 ```{r markoveg-model, echo=TRUE}
 # create states
-s.well <- MarkovState$new(name="Well", utility=1)
-s.disabled <- MarkovState$new(name="Disabled",utility=0.7)
-s.dead <- MarkovState$new(name="Dead",utility=0)
+s.well <- MarkovState$new(name = "Well", utility = 1.0)
+s.disabled <- MarkovState$new(name = "Disabled", utility = 0.7)
+s.dead <- MarkovState$new(name = "Dead", utility = 0.0)
 # create transitions, leaving rates undefined
 E <- list(
   Transition$new(s.well, s.well),
@@ -175,45 +179,51 @@ M <- SemiMarkovModel$new(V = list(s.well, s.disabled, s.dead), E)
 # create transition probability matrix
 snames <- c("Well","Disabled","Dead")
 Pt <- matrix(
-  data = c(0.6, 0.2, 0.2, 0, 0.6, 0.4, 0, 0, 1),
-  nrow = 3, byrow = TRUE,
+  data = c(0.6, 0.2, 0.2, 0.0, 0.6, 0.4, 0.0, 0.0, 1.0),
+  nrow = 3L, byrow = TRUE,
   dimnames = list(source=snames, target=snames)
 )
 # set the transition rates from per-cycle probabilities
-M$set_probabilities(Pt)
+M$set_probabilities(Pt) 
 ```
 
-```{r sb,echo=FALSE,fig.align="center"}
-#DOT <- M$as_DOT()
-#writeLines(DOT, con="man/figures/README-sb-1.gv")
-#system2(
-#  command="dot", 
-#  args=c("-Tpng","-o",
-#         "man/figures/README-sb-1.png",
-#         "man/figures/README-sb-1.gv"
-#         )
-#)
-#knitr::include_graphics("man/figures/README-sb-1.png")
+```{r sb, echo = FALSE, fig.align = "center"}
+# This .Rmd file is processed by knitr at build time (on the package developer's
+# system) and so the dot tool only needs to be available there, not on any
+# system used for processing the .md, including CRAN. 
+figdir <- system.file("man", "figures", package = "rdecision")
+pngfile <- file.path("man", "figures", "README-sb.png") 
+dotfile <- file.path("man", "figures", "README-sb.gv")
+# update the .gv file
+DOT <- M$as_DOT()
+writeLines(DOT, con = dotfile)
+# if graphviz is installed, create the .png file from the .gv file with the dot
+# command line tool, otherwise fail gracefully
+pdot <- Sys.which("dot")
+if (nchar(pdot["dot"]) > 0L) {
+  system2(command = pdot["dot"], args = c("-Tpng", "-o", pngfile, dotfile))
+  knitr::include_graphics(path = pngfile)
+}
 ```
-<img src="man/figures/README-sb-1.png" width="75%" style="display: block; margin: auto;" />
 
 With a starting population of 10,000, the model can be run for 25 years as
 follows. The output of the `cycles` function is the Markov trace, shown
 below, which replicates Table 2 [@sonnenberg1993].
 ```{r markoveg-cycle, echo=TRUE}
 # set the starting populations
-M$reset(c(Well=10000, Disabled=0, Dead=0)) 
+M$reset(c(Well = 10000L, Disabled = 0L, Dead = 0L)) 
 # cycle
-MT <- M$cycles(25, hcc.pop=FALSE, hcc.cost=FALSE)
+MT <- M$cycles(25L, hcc.pop = FALSE, hcc.cost = FALSE)
 ```
 
 ```{r markoveg-trace, echo=FALSE}
 MT$CU <- cumsum(MT$QALY)
 keep <- c("Years", "Well", "Disabled", "Dead", "CU")
-rows <- c(1,2,3,4,24,25,26)
+rows <- c(1L, 2L, 3L, 4L, 24L, 25L, 26L)
 pander::pander(
-  MT[rows,keep], row.names=FALSE, justify="rrrrr", round=c(2,0,0,0,3),
-  col.names=c("Years", "Well", "Disabled", "Dead", "Cumulative Utility")
+  MT[rows, keep], row.names = FALSE, justify = "rrrrr", 
+  round = c(2L, 0L, 0L, 0L, 3L),
+  col.names = c("Years", "Well", "Disabled", "Dead", "Cumulative Utility")
 )
 ```
 

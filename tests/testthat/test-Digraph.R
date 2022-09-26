@@ -6,8 +6,11 @@ test_that("incorrect node and edge types are rejected", {
   a1 <- Arrow$new(n1, n2)
   expect_error(Digraph$new(n1, list(a1)), class="non-list_vertices")
   expect_error(Digraph$new(list(n1,n2), a1), class="non-list_arrows")
-  expect_error(Digraph$new(list(n1,42), list(a1)), class="non-Node_vertex")
-  expect_error(Digraph$new(list(n1,n2), list(a1,42)), class="non-Arrow_edge")
+  expect_error(Digraph$new(list(n1, 42L), list(a1)), class = "non-Node_vertex")
+  expect_error(
+    Digraph$new(list(n1, n2), list(a1, 42L)), 
+    class = "non-Arrow_edge"
+  )
 })
 
 # tests of simple digraph properties
@@ -20,14 +23,14 @@ test_that("order and size are correct", {
   V <- list(n1,n2)
   A <- list(a1)
   G <- Digraph$new(V, A)
-  expect_equal(G$order(), length(V))
-  expect_equal(G$size(), length(A))
+  expect_identical(G$order(), length(V))
+  expect_identical(G$size(), length(A))
   #
   V <- list(n1)
   A <- list()
   G <- Digraph$new(V, A)
-  expect_equal(G$order(), 1)
-  expect_equal(G$size(), 0)
+  expect_identical(G$order(), 1L)
+  expect_identical(G$size(), 0L)
 })
 
 test_that("connectedness of underlying graph is correct", {
@@ -50,19 +53,19 @@ test_that("connectedness of underlying graph is correct", {
 test_that("adjacency matrix has correct properties", {
   # empty graph
   G <- Digraph$new(V=list(),A=list())
-  expect_error(G$digraph_adjacency_matrix(42), class="non-logical_boolean")
+  expect_error(G$digraph_adjacency_matrix(42L), class = "non-logical_boolean")
   A <- G$digraph_adjacency_matrix()
   expect_true(is.matrix(A))
-  expect_equal(nrow(A),0)
-  expect_equal(ncol(A),0)
+  expect_identical(nrow(A), 0L)
+  expect_identical(ncol(A), 0L)
   # trivial graph
   n1 <- Node$new()
   G <- Digraph$new(V=list(n1),A=list())
   A <- G$digraph_adjacency_matrix()
   expect_true(is.matrix(A))
-  expect_equal(nrow(A),1)
-  expect_equal(ncol(A),1)
-  expect_equal(A[1,1],0)
+  expect_identical(nrow(A), 1L)
+  expect_identical(ncol(A), 1L)
+  expect_identical(A[[1L, 1L]], 0L)
   # named nodes
   n1 <- Node$new("n1")
   n2 <- Node$new()
@@ -79,7 +82,9 @@ test_that("adjacency matrix has correct properties", {
   expect_setequal(names(dn), c("out.node", "in.node"))
   expect_setequal(dn$out.node, c("n1", "n2"))
   expect_setequal(dn$in.node, c("n1", "n2"))
-  expect_equal(sum(A-matrix(c(0,1,0,0),nrow=2,byrow=TRUE)),0)
+  expect_identical(
+    sum(A - matrix(c(0L, 1L, 0L, 0L), nrow = 2L, byrow = TRUE)), 0L
+  )
   # self loops and double self loops
   n1 <- Node$new("n1")
   n2 <- Node$new("n2")
@@ -89,7 +94,9 @@ test_that("adjacency matrix has correct properties", {
   ed <- Arrow$new(n2,n2,"d")
   G <- Digraph$new(V=list(n1,n2),A=list(ea,eb,ec,ed))
   A <- G$digraph_adjacency_matrix(boolean=FALSE)
-  expect_equal(sum(A-matrix(c(1,1,0,2),nrow=2,byrow=TRUE)),0)
+  expect_identical(
+    sum(A - matrix(c(1L, 1L, 0L, 2L), nrow = 2L, byrow = TRUE)), 0L
+  )
   # boolean
   n1 <- Node$new("n1")
   n2 <- Node$new("n2")
@@ -98,11 +105,11 @@ test_that("adjacency matrix has correct properties", {
   e3 <- Arrow$new(n1,n1)
   G <- Digraph$new(V=list(n1,n2),A=list(e1,e2,e3))
   A <- G$digraph_adjacency_matrix(boolean=FALSE)
-  expect_equal(A["n1","n1"],1)
-  expect_equal(A["n1","n2"],2)
+  expect_identical(A[["n1","n1"]], 1L)
+  expect_identical(A[["n1","n2"]], 2L)
   A <- G$digraph_adjacency_matrix(boolean=TRUE)
-  expect_true(A["n1","n1"])
-  expect_true(A["n1","n2"])
+  expect_true(A[["n1", "n1"]])
+  expect_true(A[["n1", "n2"]])
 })
 
 test_that("incidence matrix has correct properties", {
@@ -124,7 +131,9 @@ test_that("incidence matrix has correct properties", {
   expect_setequal(names(dn), c("vertex", "edge"))
   expect_setequal(dn$vertex, c("n1", "n2"))
   expect_setequal(dn$edge, c("a", "b"))
-  expect_equal(sum(B-matrix(c(-1,1,1,-1),nrow=2,byrow=TRUE)),0)
+  expect_identical(
+    sum(B - matrix(c(-1L, 1L, 1L, -1L), nrow = 2L, byrow = TRUE)), 0L
+  )
   # two nodes and two edges with self loops
   n1 <- Node$new("n1")
   n2 <- Node$new("n2")
@@ -137,7 +146,9 @@ test_that("incidence matrix has correct properties", {
   expect_setequal(names(dn), c("vertex", "edge"))
   expect_setequal(dn$vertex, c("n1", "n2"))
   expect_setequal(dn$edge, c("a", "b", "c"))
-  expect_equal(sum(B-matrix(c(0,1,0,0,-1,0),nrow=2,byrow=TRUE)),0)
+  expect_identical(
+    sum(B - matrix(c(0L, 1L, 0L, 0L, -1L, 0L), nrow = 2L, byrow = TRUE)), 0L
+  )
 })
 
 test_that("arborescences are detected", {
@@ -176,7 +187,7 @@ test_that("topological sorting is correct", {
   # attempt to sort an empty graph
   g <- Digraph$new(V = list(), A <- list())
   l <- g$topological_sort()
-  expect_equal(length(l), 0)
+  expect_length(l, 0L)
   # non-trivial DAG with one sort order
   n1 <- Node$new("1")
   n2 <- Node$new("2")
@@ -229,22 +240,22 @@ test_that("all paths in a 4-node graph with cycle are discovered", {
   expect_silent(G$walk(list()))
   # test that all paths are found
   P <- G$paths(n2,n3)
-  expect_length(P,3)
+  expect_length(P, 3L)
   PE <- list(c(n2,n1,n3), c(n2,n0,n3), c(n2,n0,n1,n3))
-  nmatch <- 0
+  nmatch <- 0L
   for (p in P) {
     for (pe in PE) {
-      if (R6setequal(p,pe)) {nmatch <- nmatch+1}
+      if (R6setequal(p,pe)) nmatch <- nmatch + 1L
     }
   }
-  expect_equal(nmatch,3)
+  expect_identical(nmatch, 3L)
   # check that walks for one path in edge and index form are as expected
   p <- list(n2, n1, n3)
   w <- G$walk(p)
-  expect_length(w, 2)
+  expect_length(w, 2L)
   expect_R6setequal(w, list(ee, ef))
   w <- G$walk(p, what = "index")
-  expect_length(w, 2)
+  expect_length(w, 2L)
   expect_setequal(w, list(G$edge_index(ee), G$edge_index(ef)))
   expect_error(G$walk(p, "42"), class = "invalid_argument")
 })
@@ -253,10 +264,10 @@ test_that("all paths in a 4-node graph with cycle are discovered", {
 # https://en.wikipedia.org/wiki/Directed_graph
 test_that("example of 4 node digraph with cycle has correct properties", {
   # construct graph
-  a <- Node$new('a')
-  b <- Node$new('b')
-  c <- Node$new('c')
-  d <- Node$new('d')
+  a <- Node$new("a")
+  b <- Node$new("b")
+  c <- Node$new("c")
+  d <- Node$new("d")
   a1 <- Arrow$new(a,b)
   a2 <- Arrow$new(b,c)
   a3 <- Arrow$new(c,a)
@@ -265,17 +276,17 @@ test_that("example of 4 node digraph with cycle has correct properties", {
   A <- list(a1, a2, a3, a4)
   G <- Digraph$new(V, A)
   #
-  expect_equal(G$order(), 4)
-  expect_equal(G$size(), 4)
+  expect_identical(G$order(), 4L)
+  expect_identical(G$size(), 4L)
   #
-  expect_error(G$direct_successors(42), class="not_in_graph")
-  e <- Node$new('e')
+  expect_error(G$direct_successors(42L), class="not_in_graph")
+  e <- Node$new("e")
   expect_error(G$direct_successors(e), class="not_in_graph")
   expect_R6setequal(G$direct_successors(a), list(b,d))
   expect_R6setequal(G$direct_successors(c), list(a))
-  expect_true(length(G$direct_successors(d))==0)
+  expect_length(G$direct_successors(d), 0L)
   #
-  expect_error(G$direct_predecessors(42), class="not_in_graph")
+  expect_error(G$direct_predecessors(42L), class = "not_in_graph")
   expect_error(G$direct_predecessors(e), class="not_in_graph")
   expect_R6setequal(G$direct_predecessors(a), list(c))
   expect_R6setequal(G$direct_predecessors(c), list(b))
@@ -288,25 +299,35 @@ test_that("example of 4 node digraph with cycle has correct properties", {
 test_that("rdecision solves New Scientist Puzzle 62", {
   # create vertices
   V <- list()
-  for (i in 1:5) {
-    for (j in 1:5) {
-      V <- c(V, Node$new(paste("N",i,j,sep="")))
+  for (i in 1L : 5L) {
+    for (j in 1L : 5L) {
+      V <- c(V, Node$new(paste0("N", i, j)))
     }
   }
   # create edges
   E <- list()
-  for (i in 1:5) {
-    for (j in 1:4) {
-      E <- c(E, Arrow$new(V[[5*(i-1)+j]],
-                          V[[5*(i-1)+j+1]],
-                          paste("H",i,j,sep="")
-                          )
-             )
+  for (i in 1L : 5L) {
+    for (j in 1L : 4L) {
+      E <- c(
+        E, 
+        Arrow$new(
+          V[[5L * (i - 1L) + j]],
+          V[[5L * (i - 1L) + j + 1L]],
+          paste0("H", i, j)
+        )
+      )
     }
   }
-  for (i in 1:4) {
-    for (j in 1:5) {
-      E <- c(E, Arrow$new(V[[5*(i-1)+j]], V[[5*i+j]], paste("V",i,j,sep="")))
+  for (i in 1L : 4L) {
+    for (j in 1L : 5L) {
+      E <- c(
+        E, 
+        Arrow$new(
+          V[[5L * (i - 1L) + j]], 
+          V[[5L * i + j]], 
+          paste0("V", i, j)
+        )
+      )
     }
   }
   # create graph
@@ -319,20 +340,20 @@ test_that("rdecision solves New Scientist Puzzle 62", {
   expect_false(G$is_polytree())
   expect_true(G$is_acyclic())
   # get all paths from A to B
-  A <- V[[1]]
-  B <- V[[25]]
+  A <- V[[1L]]
+  B <- V[[25L]]
   P <- G$paths(A,B)
   # convert paths to walks
-  W <- lapply(P,function(p){G$walk(p)})
+  W <- lapply(P, function(p) G$walk(p))
   # count and tabulate how many special edges each walk traverses
   BB <- c("V11", "H22", "V25", "H33", "V32", "H44", "V43")
-  nw <- sapply(W, function(w) {
-    lv <- sapply(w, function(e) {e$label() %in% BB})
+  nw <- vapply(W, FUN.VALUE = 1L, FUN = function(w) {
+    lv <- vapply(w, FUN.VALUE = TRUE, FUN = function(e) e$label() %in% BB)
     return(sum(lv))
   })
   ct <- as.data.frame(table(nw))
   # check that 23 paths traverse one special edge
-  expect_intol(ct$Freq[ct$nw==1],23,0.1)
+  expect_identical(ct$Freq[ct$nw == 1L], 23L)
 })
 
 # create DOT representation of a graph (Sonnenberg & Beck, 1993, Fig 3)

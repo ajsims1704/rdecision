@@ -119,7 +119,7 @@ unless \code{boolean} is \code{TRUE} when cells are either \code{FALSE}
 }
 
 \subsection{Returns}{
-A square numeric matrix with the number of rows and columns
+A square integer matrix with the number of rows and columns
 equal to the order of the graph. The rows and columns are in the
 same order as \code{V}. If the nodes have defined and unique labels the
 dimnames of the matrix are the labels of the nodes.
@@ -143,7 +143,7 @@ matrix are the labels of the vertexes and edges.
 }
 
 \subsection{Returns}{
-The incidence matrix.
+The incidence matrix of integers.
 }
 }
 \if{html}{\out{<hr>}}

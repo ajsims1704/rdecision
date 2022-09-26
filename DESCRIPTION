@@ -1,6 +1,6 @@
 Package: rdecision
 Title: Decision Analytic Modelling in Health Economics
-Version: 1.1.2.9002
+Version: 1.1.3
 Authors@R: c(
   person(given="Andrew", family="Sims", 
          email = "andrew.sims@newcastle.ac.uk", 
@@ -25,15 +25,15 @@ Imports:
   grid,
   R6,
   rlang (>= 0.4.2),
-  stats,
-  utils
+  stats
 Suggests:
-    covr,
-    knitr,
-    pander,
-    rmarkdown,
-    testthat (>= 3.0.0),
-    utf8
+  covr,
+  grDevices,
+  knitr,
+  pander,
+  rmarkdown,
+  testthat (>= 3.0.0),
+  utf8
 License: GPL-3
 Language: en-GB
 Encoding: UTF-8

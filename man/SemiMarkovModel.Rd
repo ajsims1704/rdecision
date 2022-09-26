@@ -46,7 +46,6 @@ between cycles.
 
 \section{Transition rates and probabilities}{
 
-
 \subsection{Why semi-Markov?}{
 Beck and Pauker (1983) and later Sonnenberg and Beck (1993) proposed the
 use of Markov processes to model the health economics of medical 
@@ -58,7 +57,6 @@ developed by Kolmogorov, is not applicable. For example, ensuring that all
 patients leave a temporary state requires its transition rate to be infinite.
 Hence, such models are usually labelled as semi-Markov processes.
 }
-
 \subsection{Rates and probabilities}{
 Miller and Homan (1994) and Fleurence & Hollenbeak (2007) provide advice
 on estimating probabilities from rates. Jones (2017) and Welton (2005) 
@@ -68,7 +66,6 @@ semi-Markov models with temporary states. In particular note that the
 "simple" equation, \eqn{p = 1-e^{-rt}} (Briggs 2006) applies only in a 
 two-state, one transition model.
 }
-
 \subsection{Uncertainty in rates}{
 In semi-Markov models, the conditional probabilities of the transitions 
 from each state are usually modelled by a Dirichlet distribution. In 
@@ -300,7 +297,7 @@ Resets the model counters.
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{SemiMarkovModel$reset(
   populations = NULL,
-  icycle = as.integer(0),
+  icycle = 0L,
   elapsed = as.difftime(0, units = "days")
 )}\if{html}{\out{</div>}}
 }
@@ -453,7 +450,7 @@ applied, if these options are set. Normalized by the model population.}
 \subsection{Method \code{cycles()}}{
 Applies multiple cycles of the model.
 \subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{SemiMarkovModel$cycles(ncycles = 2, hcc.pop = TRUE, hcc.cost = TRUE)}\if{html}{\out{</div>}}
+\if{html}{\out{<div class="r">}}\preformatted{SemiMarkovModel$cycles(ncycles = 2L, hcc.pop = TRUE, hcc.cost = TRUE)}\if{html}{\out{</div>}}
 }
 
 \subsection{Arguments}{

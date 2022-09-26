@@ -165,9 +165,9 @@ of "node", "label" or "index".}
 \if{html}{\out{</div>}}
 }
 \subsection{Returns}{
-A list of \code{DecisionNode} objects (for what="node"); a list
-of character strings (for what="label"); or a list of integer indexes of 
-the decision nodes (for what="index").
+A list of \code{DecisionNode} objects (for what = "node"); a list
+of character strings (for what = "label"), or an integer vector with
+indexes of the decision nodes (for what = "index").
 }
 }
 \if{html}{\out{<hr>}}
@@ -176,11 +176,21 @@ the decision nodes (for what="index").
 \subsection{Method \code{chance_nodes()}}{
 Find the chance nodes in the tree.
 \subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{DecisionTree$chance_nodes()}\if{html}{\out{</div>}}
+\if{html}{\out{<div class="r">}}\preformatted{DecisionTree$chance_nodes(what = "node")}\if{html}{\out{</div>}}
 }
 
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{what}}{A character string defining what to return. Must be one
+of "node", "label" or "index".}
+}
+\if{html}{\out{</div>}}
+}
 \subsection{Returns}{
-A list of \code{ChanceNode} objects.
+A list of \code{ChanceNode} objects (for what = "node"); a list
+of character strings (for what = "label"), or an integer vector with
+indexes of the decision nodes (for what = "index").
 }
 }
 \if{html}{\out{<hr>}}
@@ -202,9 +212,9 @@ nodes).}
 \if{html}{\out{</div>}}
 }
 \subsection{Returns}{
-A list of \code{LeafNode} objects (for what="node"); a list
-of character strings (for what="label"); or a list of integer indexes of 
-the decision nodes (for what="index").
+A list of \code{LeafNode} objects (for what = "node"); a list
+of character strings (for what = "label"); or an integer vector of 
+leaf node indexes (for what = "index").
 }
 }
 \if{html}{\out{<hr>}}
@@ -483,7 +493,7 @@ pathway.}
 \subsection{Method \code{evaluate()}}{
 Evaluate each strategy.
 \subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{DecisionTree$evaluate(setvars = "expected", N = 1, by = "strategy")}\if{html}{\out{</div>}}
+\if{html}{\out{<div class="r">}}\preformatted{DecisionTree$evaluate(setvars = "expected", N = 1L, by = "strategy")}\if{html}{\out{</div>}}
 }
 
 \subsection{Arguments}{
@@ -633,13 +643,13 @@ index strategy compared with a reference strategy.
 \if{html}{\out{<div class="r">}}\preformatted{DecisionTree$threshold(
   index,
   ref,
-  outcome = "saving",
+  outcome,
   mvd,
   a,
   b,
   tol,
   lambda = NULL,
-  nmax = 1000
+  nmax = 1000L
 )}\if{html}{\out{</div>}}
 }
 

@@ -1,11 +1,17 @@
+# rdecision 1.1.3
 
-
-
-
-# rdecision 1.1.2.9002
-
+* Method `threshold` in `DecisionTree` now has no default value for parameter
+  `outcome`.
+* Method `chance_nodes` in `DecisionTree` now has the option to return nodes,
+  indices or labels, consistent with similar functions for decision nodes and
+  leaf nodes. 
+* The incidence matrix of `Digraph` now contains integers.
+* The adjacency matrices of `Graph` and `Digraph` now contain integers.
 * The sample size of the empirical distribution associated with an expression
   model variable must be specified as an integer.
+* Added utility function `abortif`, which is identical to `abortifnot` but
+  with a negated condition. Intended to make argument checks more readable by
+  avoiding double negatives.
 * Function `is_probabilistic` for `ExprModVar` now returns correct result if
   the expression involves integers (previously and erroneously it returned NA).
 * Function `is_probabilistic` for base class `ModVar` now returns `FALSE`

@@ -1,8 +1,6 @@
 #' @title A semi-Markov model for cohort simulation
-#' 
 #' @description An R6 class representing a semi-Markov model for 
 #' cohort simulation.
-#' 
 #' @details A class to represent a continuous time semi-Markov chain, modelled
 #' using cohort simulation. As interpreted in \pkg{rdecision}, semi-Markov 
 #' models
@@ -24,7 +22,6 @@
 #' event rates.}
 #' \item{The cycle time cannot be changed during the simulation.}
 #' }
-#'  
 #' @section Graph theory:
 #' A Markov model is a directed multidigraph permitting loops (a loop 
 #' multidigraph), optionally labelled, or a \dfn{quiver}. It is a
@@ -35,9 +32,7 @@
 #' optionally labelled. It permits self-loops (edges whose source and target 
 #' are the same node) to represent patients that remain in the same state 
 #' between cycles.
-#'
 #' @section Transition rates and probabilities:
-#' 
 #' \subsection{Why semi-Markov?}{
 #' Beck and Pauker (1983) and later Sonnenberg and Beck (1993) proposed the
 #' use of Markov processes to model the health economics of medical 
@@ -49,7 +44,6 @@
 #' patients leave a temporary state requires its transition rate to be infinite.
 #' Hence, such models are usually labelled as semi-Markov processes.
 #' }
-#' 
 #' \subsection{Rates and probabilities}{
 #' Miller and Homan (1994) and Fleurence & Hollenbeak (2007) provide advice
 #' on estimating probabilities from rates. Jones (2017) and Welton (2005) 
@@ -59,7 +53,6 @@
 #' "simple" equation, \eqn{p = 1-e^{-rt}} (Briggs 2006) applies only in a 
 #' two-state, one transition model.
 #' }
-#' 
 #' \subsection{Uncertainty in rates}{
 #' In semi-Markov models, the conditional probabilities of the transitions 
 #' from each state are usually modelled by a Dirichlet distribution. In 
@@ -67,7 +60,6 @@
 #' optionally create model variables for each conditional probability 
 #' (\eqn{\rho_{ij}}) linked to an applicable Dirichlet distribution.
 #' }
-#' 
 #' @references{
 #'   Beck JR and Pauker SG. The Markov Process in Medical Prognosis. 
 #'   \emph{Med Decision Making}, 1983;\strong{3}:419–458.
@@ -93,11 +85,9 @@
 #'   propagation, evidence synthesis, and model calibration. 
 #'   \emph{Medical Decision Making}, 2005;\strong{25}:633-645.
 #' }
-#' 
 #' @docType class
 #' @author Andrew J. Sims \email{andrew.sims@@newcastle.ac.uk}
 #' @export 
-#' 
 SemiMarkovModel <- R6::R6Class(
   classname = "SemiMarkovModel",
   lock_class = TRUE,
@@ -146,98 +136,84 @@ SemiMarkovModel <- R6::R6Class(
     #' @return A \code{SemiMarkovModel} object. The population of the first
     #' state is set to 1000 and from each state there is an equal 
     #' conditional probability of each allowed transition.
-    initialize = function(V, E, tcycle=as.difftime(365.25, units="days"), 
-                          discount.cost=0, discount.utility=0) {
+    initialize = function(V, E, tcycle = as.difftime(365.25, units = "days"), 
+                          discount.cost = 0.0, discount.utility = 0.0) {
       # initialize the base class(es)
-      super$initialize(V,E)
+      super$initialize(V, E)
       # check minimum number of nodes and edges
-      if (self$order() < 1 || self$size() < 1) {
-        rlang::abort(
-          "The model must have at least 1 node and 1 edge", 
-          class = "invalid_graph"
-        )
-      }
+      abortifnot(self$order() >= 1L && self$size() >= 1L,
+        message = "The model must have at least 1 node and 1 edge", 
+        class = "invalid_graph"
+      )
       # check that all nodes inherit from MarkovState
-      S <- which(
-        sapply(V, function(v){inherits(v,what="MarkovState")}),arr.ind=TRUE
+      S <- which(vapply(V, FUN.VALUE = TRUE, FUN = function(v) {
+        inherits(v, what = "MarkovState")
+      }))
+      abortifnot(setequal(seq_along(V),S),
+        message = "Each node must be a 'MarkovState'.", 
+        class = "invalid_state"
       )
-      if (!setequal(seq_along(V),S)) {
-        rlang::abort(
-          "Each node must be a 'MarkovState'.", class="invalid_state"
-        )
-      }
       # check that all edges inherit from Transition
-      tedges <- which(
-        sapply(E, function(e) inherits(e,what = "Transition")), arr.ind = TRUE
+      tedges <- which(vapply(E, FUN.VALUE = TRUE, FUN = function(e) {
+        inherits(e, what = "Transition")
+      }))
+      abortifnot(setequal(seq_along(E), tedges),
+        message = "Each edge must be a 'Transition'.", 
+        class = "invalid_transition"
       )
-      if (!setequal(seq_along(E), tedges)) {
-        rlang::abort(
-          "Each edge must be a 'Transition'.", class="invalid_transition"
-        )
-      }
       # check that the underlying graph is connected
-      if (!self$is_weakly_connected()) {
-        rlang::abort("The underlying graph of {V,E} must be connected",
-                     class = "invalid_graph")
-      }
+      abortifnot(self$is_weakly_connected(),
+        message = "The underlying graph of {V,E} must be connected",
+        class = "invalid_graph"
+      )
       # check that there are no multiple edges
       A <- self$digraph_adjacency_matrix()
-      if (any(A > 1)) {
-        rlang::abort(
-          "The digraph must not have multiple edges",
-          class = "multiple_edges"
-        )
-      }
+      abortif(any(A > 1L),
+        message = "The digraph must not have multiple edges",
+        class = "multiple_edges"
+      )
       # check that there is at least one outgoing transition from each state
-      if (any(rowSums(A)<1)) {
-        rlang::abort(
-          "Every state must have at least one outgoing transition",
-          class = "missing_transition"
-        )
-      }
+      abortif(any(rowSums(A) < 1L),
+        message = "Every state must have at least one outgoing transition",
+        class = "missing_transition"
+      )
       # check that the node names are unique
-      if (length(unique(self$get_statenames()))!=self$order()) {
-        rlang::abort(
-          "State labels must be unique",
-          class = "invalid_state_names"
-        )
-      }
+      abortifnot(length(unique(self$get_statenames())) == self$order(),
+        message = "State labels must be unique",
+        class = "invalid_state_names"
+      )
       # check that the cycle time is an interval
-      if (!inherits(tcycle, what="difftime")) {
-        rlang::abort(
-          "Argument 'tcycle' must be of class 'difftime'.",
-          class = "invalid_tcycle"
-        )
-      }
+      abortifnot(inherits(tcycle, what = "difftime"),
+        message = "Argument 'tcycle' must be of class 'difftime'.",
+        class = "invalid_tcycle"
+      )
       private$smm.tcycle <- tcycle
       # check and set discounts
-      if (!is.numeric(discount.cost)) {
-        rlang::abort(
-          "Discount rate must be numeric", class="invalid_discount"
-        )
-      }
+      abortifnot(is.numeric(discount.cost),
+        message = "Discount rate must be numeric", 
+        class = "invalid_discount"
+      )
       private$smm.discost <- discount.cost
-      if (!is.numeric(discount.utility)) {
-        rlang::abort(
-          "Discount rate must be numeric", class="invalid_discount"
-        )
-      }
+      abortifnot(is.numeric(discount.utility),
+        message = "Discount rate must be numeric", 
+        class = "invalid_discount"
+      )
       private$smm.disutil <- discount.utility
       # set the initial probability matrix (equal chance from each state)
       Pt <- matrix(
-        data = 0, 
+        data = 0.0, 
         nrow = self$order(), ncol = self$order(),
         dimnames = list(
-          source=self$get_statenames(), target=self$get_statenames()
+          source=self$get_statenames(), target = self$get_statenames()
         )
       )
-      for (ie in 1:self$size()) {
+      for (ie in seq_len(self$size())) {
         e <- private$E[[ie]]
         is <- self$vertex_index(e$source())
         it <- self$vertex_index(e$target())
-        Pt[is,it] <- 1
+        Pt[is, it] <- 1.0
       }
-      Pt <- Pt/rowSums(Pt)
+      Pt <- Pt / rowSums(Pt)
       self$set_probabilities(Pt)
       # reset the model to its ground state
       self$reset()
@@ -254,75 +230,69 @@ SemiMarkovModel <- R6::R6Class(
     #' @return Updated \code{SemiMarkovModel} object
     set_probabilities = function(Pt) {
       # check Pt
-      if (missing(Pt)) {
-        rlang::abort("Pt is missing, without default", class="invalid_Pt")
-      }
-      if (!is.matrix(Pt)) {
-        rlang::abort("'Pt' must be a matrix", class="invalid_Pt")
-      }
-      if ((nrow(Pt)!=self$order() || ncol(Pt)!=self$order())) {
-        rlang::abort(
-          paste("'Pt' must have size", self$order(), "by", self$order()),
-          class = "invalid_Pt")
-      }
-      if (!setequal(self$get_statenames(), dimnames(Pt)[[1]])) {
-        rlang::abort(
-          "Each row of 'Pt' must have a state name",
-          class = "invalid_Pt")
-      }  
-      if (!setequal(self$get_statenames(), dimnames(Pt)[[2]])) {
-        rlang::abort(
-          "Each column of 'Pt' must have a state name",
-          class = "invalid_Pt")
-      }
+      abortif(missing(Pt),
+        message = "Pt is missing, without default", 
+        class = "invalid_Pt"
+      )
+      abortifnot(is.matrix(Pt),
+        message = "'Pt' must be a matrix", 
+        class = "invalid_Pt"
+      )
+      abortifnot(nrow(Pt) == self$order() && ncol(Pt) == self$order(),
+        message = paste("'Pt' must have size", self$order(), "x", self$order()),
+        class = "invalid_Pt"
+      )
+      abortifnot(setequal(self$get_statenames(), dimnames(Pt)[[1L]]),
+        message = "Each row of 'Pt' must have a state name",
+        class = "invalid_Pt"
+      )
+      abortifnot(setequal(self$get_statenames(), dimnames(Pt)[[2L]]),
+        message = "Each column of 'Pt' must have a state name",
+        class = "invalid_Pt"
+      )
       # check NAs and replace them 
       nNA <- rowSums(is.na(Pt))
-      if (any(nNA>1)) {
-        rlang::abort(
-          "No more than one NA per row is allowed",
-          class = "invalid_Pt"
-        )
-      }
-      sumP <- rowSums(Pt, na.rm=TRUE)
-      for (r in 1:self$order()) {
-        if (nNA[r]>0) {
-          Pt[r,which(is.na(Pt[r,]))] <- 1-sumP[r]
+      abortif(any(nNA > 1L),
+        message = "No more than one NA per row is allowed",
+        class = "invalid_Pt"
+      )
+      sumP <- rowSums(Pt, na.rm = TRUE)
+      for (r in seq_len(self$order())) {
+        if (nNA[[r]] > 0L) {
+          Pt[r, which(is.na(Pt[r, ]))] <- 1.0 - sumP[r]
         }
       }
       # check that all cells are a probability
-      if (any(Pt<0) | any(Pt>1)) {
-        rlang::abort(
-          "All elements of 'Pt' must be probabilities",
-          class = "invalid_Pt"
-        )
-      }
+      abortif(any(Pt < 0.0) || any(Pt > 1.0),
+        message = "All elements of 'Pt' must be probabilities",
+        class = "invalid_Pt"
+      )
       # check that Pt[i,j]==0 if edge i->j is not in graph
       M <- matrix(
         data = FALSE, 
         nrow = self$order(), ncol = self$order(),
-        dimnames = list(source=dimnames(Pt)[[1]], target=dimnames(Pt)[[2]])
+        dimnames = list(
+          source = dimnames(Pt)[[1L]], 
+          target = dimnames(Pt)[[2L]]
+        )
       )
-      for (ie in 1:self$size()) {
+      for (ie in seq_len(self$size())) {
         e <- private$E[[ie]]
         is <- e$source()$name()
         it <- e$target()$name()
         M[is,it] <- TRUE
       }
-      AA <- (Pt != 0)    
-      if (sum(M | AA) > sum(M)) {
-        rlang::abort(
-          "All non-zero elements of Pt must correspond to allowed transitions",
+      AA <- (Pt != 0.0)    
+      abortif(sum(M | AA) > sum(M),
+        message = "All non-zero Pt cells must correspond to transitions",
           class = "invalid_Pt"
-        )
-      }
+      )
       # check that all rows of Pt sum to 1
       sumP <- rowSums(Pt)
-      if (any(abs(sumP-1)>sqrt(.Machine$double.eps))) {
-        rlang::abort(
-          "All rows of Pt must sum to 1",
-          class = "invalid_Pt"
-        )
-      }
+      abortif(any(abs(sumP - 1.0) > sqrt(.Machine$double.eps)),
+        message = "All rows of Pt must sum to 1",
+        class = "invalid_Pt"
+      )
       # set the class variable
       private$smm.Pt <- Pt
       # return updated model
@@ -341,19 +311,21 @@ SemiMarkovModel <- R6::R6Class(
     #' states are labelled, the dimnames take the names of the states.
     transition_cost = function() {
       # get the state names
-      state.names <- sapply(private$V, function(v) {v$label()})
+      state.names <- vapply(private$V, FUN.VALUE = "x", FUN = function(v) {
+        v$label()
+      })
       # construct the matrix
       Ic <- matrix(
-        data = 0, 
+        data = 0.0, 
         nrow = self$order(), ncol = self$order(),
         dimnames = list(source=state.names, target=state.names)
       )
       # populate the cells with costs
-      for (ie in 1:self$size()) {
+      for (ie in seq_len(self$size())) {
         e <- private$E[[ie]]
         is <- self$vertex_index(e$source())
         it <- self$vertex_index(e$target())
-        Ic[is,it] <- e$cost()
+        Ic[is, it] <- e$cost()
       }
       return(Ic)
     },
@@ -361,7 +333,9 @@ SemiMarkovModel <- R6::R6Class(
     #' @description Returns a character list of state names.
     #' @return List of the names of each state.
     get_statenames = function() {
-      statenames <- sapply(private$V, function(x) {return(x$label())})
+      statenames <- vapply(private$V, FUN.VALUE = "x", FUN = function(x) {
+        x$label()
+      })
       return(statenames)
     },
     
@@ -383,33 +357,30 @@ SemiMarkovModel <- R6::R6Class(
     #' @param elapsed Elapsed time since the index (reference) time used for
     #' discounting as an R \code{difftime} object.
     #' @return Updated \code{SemiMarkovModel} object.
-    reset = function(populations=NULL, icycle=as.integer(0), 
-                     elapsed=as.difftime(0, units="days")) {
+    reset = function(populations = NULL, icycle = 0L, 
+                     elapsed = as.difftime(0.0, units = "days")) {
       # check that population is valid
       if (is.null(populations)) {
         private$smm.pop <- vector(mode="numeric", length=self$order())
         names(private$smm.pop) <- self$get_statenames()
-        private$smm.pop[1] <- 1000
+        private$smm.pop[[1L]] <- 1000.0
       } else {
-        if (length(populations) != self$order()) {
-          rlang::abort(
-            "Argument 'populations' must have one element per state", 
-            class="incorrect_state_count"
-          )
-        }
+        abortifnot(length(populations) == self$order(),
+          message = "Argument 'populations' must have one element per state", 
+          class = "incorrect_state_count"
+        )
         # check the state names are correct
-        if (!setequal(self$get_statenames(), names(populations))) {
-          rlang::abort(
-            "Each element of 'populations' must have a state name",
-            class="unmatched_states")
-        }  
+        abortifnot(setequal(self$get_statenames(), names(populations)),
+          message = "Each element of 'populations' must have a state name",
+          class = "unmatched_states"
+        )
         # check that all populations are of type numeric
-        sapply(populations, function(x) {
-          if (is.numeric(x) == FALSE) {
-            rlang::abort(
-              "Each element of 'populations' must be of type numeric",
-              class="non-numeric_state_population")
-          }
+        vapply(populations, FUN.VALUE = TRUE, FUN = function(x) {
+          abortifnot(is.numeric(x),
+            message = "Each element of 'populations' must be of type numeric",
+            class = "non-numeric_state_population"
+          )
+          return(TRUE)
         })
         # set the populations
         for (s in self$get_statenames()) {
@@ -417,27 +388,20 @@ SemiMarkovModel <- R6::R6Class(
         }
       }
       # check and set the cycle number
-      if (!is.integer(icycle)) {
-        rlang::abort(
-          "'icycle' must be an integer",
-          class = "invalid_icycle"
-        )
-      }
-      if (icycle < 0) {
-        rlang::abort(
-          "'icycle' must be >= 0",
-          class = "invalid_icycle"
-        )
-        
-      }
+      abortifnot(is.integer(icycle),
+        message = "'icycle' must be an integer",
+        class = "invalid_icycle"
+      )
+      abortifnot(icycle >= 0L,
+        message = "'icycle' must be >= 0",
+        class = "invalid_icycle"
+      )
       private$smm.icycle <- icycle
       # check and update the elapsed time
-      if (!inherits(elapsed, what="difftime")) {
-        rlang::abort(
-          "Argument 'elapsed' must be of class 'difftime'.",
-          class = "invalid_elapsed"
-        )
-      }
+      abortifnot(inherits(elapsed, what="difftime"),
+        message = "Argument 'elapsed' must be of class 'difftime'.",
+        class = "invalid_elapsed"
+      )
       private$smm.elapsed <- elapsed
       # return updated object
       return(invisible(self))
@@ -473,9 +437,11 @@ SemiMarkovModel <- R6::R6Class(
     #' }
     tabulate_states = function() {
       DF <- data.frame(
-        Name = sapply(private$V, function(x) {return(x$name())}),
-        Cost = sapply(private$V, function(x) {return(x$cost())}),
-        Utility = sapply(private$V, function(x) {return(x$utility())})
+        Name = vapply(private$V, FUN.VALUE = "x", FUN = function(x) x$name()),
+        Cost = vapply(private$V, FUN.VALUE = 1.0, FUN = function(x) x$cost()),
+        Utility = vapply(private$V, FUN.VALUE = 1.0, FUN = function(x) {
+          x$utility()
+        })
       )
       return(DF)
     },
@@ -516,30 +482,24 @@ SemiMarkovModel <- R6::R6Class(
     #' }
     cycle = function(hcc.pop=TRUE, hcc.cost=TRUE) {
       # check and set half cycle correction
-      if (!is.logical(hcc.pop)) {
-        rlang::abort(
-          "Argument 'hcc.pop' must be logical.",
-          class = "invalid_hcc"
-        )
-      }
-      if (!is.logical(hcc.cost)) {
-        rlang::abort(
-          "Argument 'hcc.cost' must be logical.",
-          class = "invalid_hcc"
-        )
-      }
-      if (hcc.cost & !hcc.pop) {
-        rlang::abort(
-          "hcc.cost applies only if hcc.pop is TRUE",
-          class = "invalid_hcc"
-        )
-      }
+      abortifnot(is.logical(hcc.pop),
+        message = "Argument 'hcc.pop' must be logical.",
+        class = "invalid_hcc"
+      )
+      abortifnot(is.logical(hcc.cost),
+        message = "Argument 'hcc.cost' must be logical.",
+        class = "invalid_hcc"
+      )
+      abortif(hcc.cost && !hcc.pop,
+        message = "hcc.cost applies only if hcc.pop is TRUE",
+        class = "invalid_hcc"
+      )
       # calculate cycle duration in years (dty), elapsed time at end cycle and 
       # discount factors (dfc, dfu)
       dty <- as.numeric(private$smm.tcycle, units="days")/365.25
       elapsed <- as.numeric(private$smm.elapsed, units="days")/365.25 + dty
-      dfc <- 1/(1+private$smm.discost)^elapsed
-      dfu <- 1/(1+private$smm.disutil)^elapsed
+      dfc <- 1.0 / (1.0 + private$smm.discost)^elapsed
+      dfu <- 1.0 / (1.0 + private$smm.disutil)^elapsed
       # transition costs, calculated as number of transitions between each
       # pair of states, multiplied by transition cost, summed by the state
       # being entered (entry costs)
@@ -554,18 +514,21 @@ SemiMarkovModel <- R6::R6Class(
       pop.end <- private$smm.pop %*% self$transition_probabilities()
       pop.end <- drop(pop.end)
       # calculate annual costs of state occupancy
-      state.costs <- sapply(private$V, function(x){x$cost()})
+      state.costs <- vapply(private$V, FUN.VALUE = 1.0, function(x) x$cost())
       state.costs <- state.costs * dty
       # calculate QALYs gained from state occupancy
-      state.utilities <- sapply(private$V, FUN=function(v){v$utility()})
+      state.utilities <- vapply(private$V, FUN.VALUE = 1.0, FUN = function(v) {
+        v$utility()
+      })
       state.utilities <- state.utilities*dfu
       # half cycle correction (affects reporting only)
+      elapsed_days <- as.numeric(private$smm.elapsed, units = "days")
       if (hcc.pop) {
-        pop <- (private$smm.pop + pop.end)/2
-        elapsed <- as.numeric(private$smm.elapsed, units="days")/365.25 + dty/2
+        pop <- (private$smm.pop + pop.end)/2.0
+        elapsed <- elapsed_days / 365.25 + dty / 2.0
       } else {
         pop <- pop.end
-        elapsed <- as.numeric(private$smm.elapsed, units="days")/365.25 + dty
+        elapsed <- elapsed_days / 365.25 + dty
       }
       qaly <- pop*state.utilities*dty
       if (hcc.cost) {
@@ -576,13 +539,13 @@ SemiMarkovModel <- R6::R6Class(
       # update the populations
       private$smm.pop <- pop.end
       # update cycle number
-      private$smm.icycle <- private$smm.icycle + 1
+      private$smm.icycle <- private$smm.icycle + 1L
       # update elapsed time
       private$smm.elapsed <- private$smm.elapsed + private$smm.tcycle
       # create matrix with numerical results
       nstates <- self$order()
       rcm <- matrix(
-        nrow = nstates, ncol = 7, 
+        nrow = nstates, ncol = 7L, 
         dimnames=list(
           self$get_statenames(), 
           c("Cycle","Time","Population","OccCost","EntryCost","Cost","QALY")
@@ -635,31 +598,33 @@ SemiMarkovModel <- R6::R6Class(
     #' \item{\code{<name>}}{Population of state \code{<name>} at the end of
     #' the cycle.}
     #' } 
-    cycles = function(ncycles=2, hcc.pop=TRUE, hcc.cost=TRUE) {
+    cycles = function(ncycles = 2L, hcc.pop = TRUE, hcc.cost = TRUE) {
       # show zero?
-      nzero <- ifelse(private$smm.icycle==0, 1, 0)
+      nzero <- as.integer(private$smm.icycle == 0L)
       # list of state names
       statenames <- self$get_statenames()
       # construct output matrix
       RM <- matrix(
-        nrow=ncycles+nzero, ncol=4+length(statenames),
+        nrow = ncycles + nzero, ncol = 4L + length(statenames),
         dimnames = list(NULL, c("Cycle", "Years", "Cost", "QALY", statenames))
       )
       # add zero
-      if (nzero > 0) {
-        RM[1,] <- c(0,0,0,0,private$smm.pop)
+      if (nzero > 0L) {
+        RM[1L, ] <- c(0L, 0.0, 0.0, 0.0, private$smm.pop)
       }
       # run the model
-      for (i in (1+nzero):(ncycles+nzero)) {
+      for (i in (1L + nzero) : (ncycles + nzero)) {
         # single cycle
         CYC <- self$cycle(hcc.pop, hcc.cost)
         # write the cycle summary
         RM[i,] <- c(
-          CYC$Cycle[1],CYC$Time[1],sum(CYC$Cost),sum(CYC$QALY), CYC$Population
+          CYC$Cycle[[1L]], CYC$Time[[1L]], sum(CYC$Cost), sum(CYC$QALY), 
+          CYC$Population
         )
       }
       # convert to data frame (note: it is more efficient to return as a matrix)
       DF <- as.data.frame(RM)
+      DF$Cycle <- as.integer(DF$Cycle)
       # return summary data frame
       return(DF)
     },
@@ -674,13 +639,13 @@ SemiMarkovModel <- R6::R6Class(
       mv <- list()
       # find the ModVars in the transitions
       for (e in private$E) {
-        if (inherits(e, what=c("Transition"))) {
+        if (inherits(e, what = "Transition")) {
           mv <- c(mv, e$modvars())
         }
       }
       # find the ModVars in the states
       for (v in private$V){
-        if (inherits(v, what=c("MarkovState"))) {
+        if (inherits(v, what = "MarkovState")) {
           mv <- c(mv, v$modvars())
         }
       }
@@ -716,58 +681,54 @@ SemiMarkovModel <- R6::R6Class(
       # expressions if not wanted
       mvlist <- self$modvars()
       if (!expressions) {
-        mvlist <- mvlist[sapply(mvlist,FUN=function(v){!v$is_expression()})]
+        mvlist <- mvlist[vapply(mvlist, FUN.VALUE = TRUE, FUN = function(v) {
+          !v$is_expression()
+        })]
       }
       # create a data frame of model variables
       DF <- data.frame(
-        Description = sapply(mvlist, FUN=function(x){
-          rv <- x$description()
-          return(rv)
+        Description = vapply(mvlist, FUN.VALUE = "x", FUN = function(x) {
+          x$description()
         }),
-        Units = sapply(mvlist, FUN=function(x){
-          rv <- x$units()
-          return(rv)
+        Units = vapply(mvlist, FUN.VALUE = "x", FUN = function(x) {
+          x$units()
         }),
-        Distribution = sapply(mvlist, FUN=function(x){
-          rv <- x$distribution()
-          return(rv)
+        Distribution = vapply(mvlist, FUN.VALUE = "x", FUN = function(x) {
+          x$distribution()
         }),
-        Mean = sapply(mvlist, FUN=function(x){
-          rv <- x$mean()
-          return(rv)
+        Mean = vapply(mvlist, FUN.VALUE = 1.0, FUN = function(x) {
+          x$mean()
         }),
-        E = sapply(mvlist, FUN=function(x){
+        E = vapply(mvlist, FUN.VALUE = 1.0, FUN = function(x) {
           rv <- ifelse(x$is_expression(), x$mu_hat(), x$mean())
           return(rv)
         }),
-        SD = sapply(mvlist, FUN=function(x){
+        SD = vapply(mvlist, FUN.VALUE = 1.0, FUN = function(x) {
           rv <- ifelse(x$is_expression(), x$sigma_hat(), x$SD())
           return(rv)
         }),
-        Q2.5 = sapply(mvlist, FUN=function(x){
+        Q2.5 = vapply(mvlist, FUN.VALUE = 1.0, FUN = function(x) {
           rv <- ifelse(
             x$is_expression(), 
-            x$q_hat(probs=c(0.025)), 
-            x$quantile(probs=c(0.025))
+            x$q_hat(probs = 0.025), 
+            x$quantile(probs = 0.025)
           )
           return(rv)
         }),
-        Q97.5 = sapply(mvlist, FUN=function(x){
+        Q97.5 = vapply(mvlist, FUN.VALUE = 1.0, FUN = function(x) {
           rv <- ifelse(
             x$is_expression(), 
-            x$q_hat(probs=c(0.975)), 
-            x$quantile(probs=c(0.975))
+            x$q_hat(probs = 0.975), 
+            x$quantile(probs = 0.975)
           )
           return(rv)
         }),
-        Est = sapply(mvlist, FUN=function(exp){
-          rv <- ifelse(exp$is_expression(),TRUE,FALSE)
-          return(rv)
+        Est = vapply(mvlist, FUN.VALUE = TRUE, FUN = function(exp) {
+          exp$is_expression()
         })
       )
       # Return the table
       return(DF)
     }
-
   )
 )
