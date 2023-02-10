@@ -20,7 +20,7 @@ MarkovState <- R6::R6Class(
     #' @description Create an object of type \code{MarkovState}.
     #' @param name The name of the state (character string).
     #' @param cost The annual cost of state occupancy (numeric or 
-    #' \code{ModVar}). Default 0.
+    #' \code{ModVar}). Default 0.0.
     #' @param utility The utility associated with being in the state (numeric
     #' or \code{ModVar}).
     #' @details Utility must be in the range \code{[-Inf,1]}. If it is of type 
