@@ -404,10 +404,15 @@ Digraph <- R6::R6Class(
     #' @details Writes a representation of the digraph in the 
     #' \code{graphviz} DOT language 
     #' (\url{http://graphviz.org/doc/info/lang.html}) for drawing with one
-    #' of the \code{graphviz} tools, including \code{dot} (Gansner, 1993). 
+    #' of the \code{graphviz} tools, including \code{dot} (Gansner, 1993). If
+    #' all nodes have labels, these are used in the graph, otherwise the labels
+    #' are the node indices.
+    #' @param rankdir One of "LR" (default), "TB", "RL" or "BT".
+    #' @param width of the drawing, in inches
+    #' @param height of thre drawing, in inches
     #' @return A character vector. Intended for passing to \code{writeLines}
     #' for saving as a text file.
-    as_DOT = function() {
+    as_DOT = function(rankdir = "LR", width = 7.0, height = 7.0) {
       # check whether all nodes have labels
       nodelab <- all(
         vapply(
@@ -416,13 +421,25 @@ Digraph <- R6::R6Class(
           FUN = function(v) nchar(v$label()) > 0L
         )
       )
+      # check rankdir argument
+      abortifnot(
+        rankdir %in% c("LR", "TB", "RL", "BT"),
+        message = "'rankdir' must be one of 'LR', 'TB', 'RL', 'BT'",
+        class = "invalid_rankdir"
+      )
+      # check width and height
+      abortifnot(
+        is.numeric(width),
+        message = "'width' must be numeric",
+        class = "invalid_width"
+      )
       # create stream vector (header+edges+footer)
       indent <- "  "
       o <- vector(mode = "character", length = 0L)
       # write header
       o[[length(o) + 1L]] <- "digraph rdecision {"
       o[[length(o) + 1L]] <- paste0(indent, 'size="7,7" ;')
-      o[[length(o) + 1L]] <- paste0(indent, "rankdir=LR ;")
+      o[[length(o) + 1L]] <- paste0(indent, "rankdir=", rankdir, " ;")
       # write edges
       for (e in private$E) {
         s <- e$source()

@@ -56,7 +56,7 @@ Create an object of type \code{MarkovState}.
 \item{\code{name}}{The name of the state (character string).}
 
 \item{\code{cost}}{The annual cost of state occupancy (numeric or 
-\code{ModVar}). Default 0.}
+\code{ModVar}). Default 0.0.}
 
 \item{\code{utility}}{The utility associated with being in the state (numeric
 or \code{ModVar}).}

@@ -1,3 +1,12 @@
+# rdecision 1.1.3.9000
+
+* Code chunks in vignettes which are entirely presentational are marked as
+  "purl = FALSE" to remove them from the R scripts that are generated at
+  vignette build. 
+* Changed the first argument in utility functions `abortif` and `abortifnot` to
+  be `...`, to increase their similarity with `stopifnot`, and allow testing
+  of multiple conditions with a single call.
+
 # rdecision 1.1.3
 
 * Method `threshold` in `DecisionTree` now has no default value for parameter

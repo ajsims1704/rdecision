@@ -1,14 +1,55 @@
-test_that("abortif raises an error condition as expected", {
+test_that("abortif raises an error condition with no expressions", {
+  expect_error(abortif(class = "no"), class = "no")
+  expect_error(abortif(class = "no", message = "none"), class = "no")
+  expect_error(abortif())
+})
+
+test_that("abortif raises an error condition with a single expression", {
   x <- 1L
   expect_silent(abortif(x > 1L, class = "no"))
   expect_error(abortif(x == 1L, class = "no"), class = "no")
   expect_error(abortif(x == 1L))
 })
 
+test_that("abortif raises an error condition with > 1 expression", {
+  x <- 1L
+  y <- "apple"
+  expect_silent(
+    abortif(
+      x > 1L,
+      y %in% c("orange", "pear"),
+      class = "no"
+    )
+  )
+  expect_error(
+    abortif(
+      x == 1L,
+      y %in% c("orange", "pear"),
+      class = "no"
+    )
+  )
+  expect_error(
+    abortif(
+      x > 1L,
+      y %in% c("orange", "pear", "apple")
+    )
+  )
+  expect_error(
+    abortif(
+      x == 1L,
+      y %in% c("orange", "pear"),
+      class = "no"
+    ),
+    class = "no"
+  )
+})
+
+
 test_that("abortif behaves correctly with non-boolean conditions", {
   expect_error(abortif("42"))
   expect_error(abortif(42L))
   expect_error(abortif("x"))
+  expect_error(abortif("x", FALSE))
 })
 
 test_that("abortifnot raises an error condition as expected", {

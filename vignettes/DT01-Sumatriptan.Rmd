@@ -10,19 +10,23 @@ output:
     fig_width: 7
     fig_height: 5
     fig_caption: true
+    df_print: kable
 vignette: >
   %\VignetteIndexEntry{Elementary decision tree (Evans 1997)}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---
-```{r, include = FALSE}
+```{r}
+#| include = FALSE,
+#| purl = FALSE
 knitr::opts_chunk$set(
+  echo = FALSE,
   collapse = TRUE,
   comment = "#>"
 )
 ```
 
-```{r setup, echo=FALSE}
+```{r}
 library(rdecision)
 ```
 
@@ -43,7 +47,9 @@ comprise three types of node: decision, chance and leaf nodes and two
 types of edge: actions (whose sources are decision nodes) and reactions
 (whose sources are chance nodes), [see figure](#tree-diagram).
 
-```{r echo=TRUE}
+```{r}
+#| echo = TRUE
+
 # Time horizon
 th <- as.difftime(48L, units="hours")
 
@@ -118,10 +124,11 @@ DT <- DecisionTree$new(V,E)
 ```
 
 ## Tree diagram
-```{r caption, echo=FALSE}
-f1c  <- "Decision tree for the Sumatriptan model"
-```
-```{r draw,echo=FALSE,results="hide",fig.keep="all",fig.align="center",fig.cap=f1c}
+```{r}
+#| results = "hide",
+#| fig.keep = "all",
+#| fig.align = "center",
+#| fig.cap = "Decision tree for the Sumatriptan model"
 DT$draw(border=TRUE)
 ```
 
@@ -142,12 +149,16 @@ aggregate the evaluation by strategy.
 
 # Model results
 The evaluation of each pathway, for each strategy, yields the following table:
-```{r echo=FALSE}
+```{r}
 local({
   RES <- DT$evaluate(by="path")
   RES$Benefit <- NULL
   RES$Run <- NULL
-  knitr::kable(RES, row.names = FALSE, digits = c(NA, NA, 2L, 2L, 2L, 4L))
+  RES$Probability <- round(RES$Probability, digits = 2L)
+  RES$Cost <- round(RES$Cost, digits = 2L)
+  RES$Utility <- round(RES$Utility, digits = 2L)
+  RES$QALY <- round(RES$QALY, digits = 4L)
+  knitr::knit_print(RES)
 })
 ```
 
@@ -158,15 +169,17 @@ above, or by invoking the `evaluate` method of a decision tree object with the
 default parameter `by="strategy"`. This gives the following result, consistent
 with that reported by Evans *et al* [-@evans1997].
 
-```{r echo=FALSE}
+```{r}
 local({
-  SUM <- DT$evaluate()
-  SUM$Run <- NULL
-  SUM$Probability <- NULL
-  SUM$Benefit <- NULL
-  knitr::kable(SUM, row.names = FALSE, digits = c(NA, 2L, 5L, 5L))
+  summary <- DT$evaluate()
+  summary$Run <- NULL
+  summary$Probability <- NULL
+  summary$Benefit <- NULL
+  summary$Cost <- round(summary$Cost, 2L)
+  summary$Utility <- round(summary$Utility, 4L)
+  summaryQALY <- round(summary$QALY, 4L)
+  knitr::knit_print(summary)
 })
 ```
-
 
 # References
