@@ -8,8 +8,9 @@
 # from the expected results of the model are identified.
 #
 # Code to construct and run the model is contained within labelled knitr code
-# chunks, intended for used by a vignette. Unlabelled code chunks
-# contain testthat expectations and can be ignored by a vignette.
+# chunks and do not contain test expectations, so can be used by a vignette.
+# Unlabelled code chunks may contain testthat expectations and should be
+# ignored by a vignette.
 
 
 ## @knitr state-names ---------------------------------------------------------
@@ -201,29 +202,35 @@ Pt <- matrix(c(
 ), nrow = 9L, byrow = TRUE, dimnames = list(
   source = states[LETTERS[1L:9L]], target = states[LETTERS[1L:9L]]
 ))
-
 SMM_base$set_probabilities(Pt)
+
+
+## @knitr tx-effect -----------------------------------------------------------
+
+txeffect <- function(Pt, rr) {
+  # copy transition matrix
+  pr <- Pt
+  # calculate reduced probability of transition to state B
+  derisk <- states[["B"]]
+  dpb <- pr[, derisk] * rr
+  # reduce the probability of making a transition to state B and increase the
+  # probability of making a transition elsewhere by the same amount
+  uprisks <- c("D", "G", "D", "D", "H", "H", "D", "H", "I")
+  for (i in 1L:9L) {
+    s <- states[[i]]
+    pr[[s, derisk]] <- pr[[s, derisk]] - dpb[[i]]
+    uprisk <- states[[uprisks[[i]]]]
+    pr[[s, uprisk]] <- pr[[s, uprisk]] + dpb[[i]]  
+  }
+  return(pr)
+}
 
 
 ## @knitr CAS-transitions-point ------------------------------------------------
 
-CAS_effect <- 1.0 - 0.34
-
-# Set transition probabilities
-Pt_CAS <- matrix(c(
- 0L, p_AtoB * CAS_effect, p_AtoC, p_AtoD,    0L,     0L,     0L,     0L,     0L,
- 0L,                  0L, p_BtoC,     0L, p_BtoE, p_BtoF, p_BtoG,    0L, p_BtoI,
- 0L, p_CtoB * CAS_effect, p_CtoC, p_CtoD,    0L, p_CtoF, p_CtoG,     0L, p_CtoI,
- 0L, p_DtoB * CAS_effect, p_DtoC, p_DtoD,    0L,     0L,     0L,     0L, p_DtoI,
- 0L, p_EtoB * CAS_effect,    0L,     0L,     0L,     0L,     0L, p_EtoH, p_EtoI,
- 0L, p_FtoB * CAS_effect, p_FtoC,    0L,     0L,     0L, p_FtoG, p_FtoH, p_FtoI,
- 0L, p_GtoB * CAS_effect, p_GtoC, p_GtoD,    0L, p_GtoF,     0L,     0L, p_GtoI,
- 0L,                  0L,    0L,     0L, p_HtoE, p_HtoF,    0L, p_HtoH, p_HtoI,
- 0L,                  0L,    0L,     0L,     0L,     0L,     0L,     0L, p_ItoI
-), nrow = 9L, byrow = TRUE, dimnames = list(
-  source = states[LETTERS[1L:9L]], target = states[LETTERS[1L:9L]]
-))
-
+# apply CAS_effect to the transition matrix
+CAS_effect <- 0.34
+Pt_CAS <- txeffect(Pt, CAS_effect)
 SMM_CAS$set_probabilities(Pt_CAS)
 
 
@@ -273,28 +280,8 @@ as_table4 <- function(m_trace) {
         "Discounted QALYs"
       )
     ),
-    nrow = 121L, ncol = 8
+    nrow = 121L, ncol = 8L
   )
-  # create annual summary table
-  #df_t4 <- data.frame(
-  #  "Year" = df_trace[, "Years"],
-  #  # Table 4 shows % while df_trace is per N = 1000 patients, so divide by 10
-  #  "Cumulative serious complication (%)" = 
-  #    m_cum[, "TKR with serious complications"] / 10L,
-  #  "Cumulative minor complication (%)" =
-  #    m_cum[, "TKR with minor complications"] / 10L,
-  #  "Cumulative complex revision (%)" =
-  #    m_cum[, "Complex revision"] / 10L,
-  #  "Cumulative simple revision (%)" =
-  #    m_cum[, "Simple revision"] / 10L,
-  #  # no need to use cumulative sum of deaths as each patient only enters
-  #  # this state once
-  #  "Cumulative death (%)" = df_trace[, "Death"] / 10L,
-  #  # multiply by N = 1000 to reverse the normalisation by population
-  #  "Discounted costs (£)" = m_cum[, "Cost"] * 1000L,
-  #  "Discounted QALYs" = m_cum[, "QALY"] * 1000L,
-  #  check.names = FALSE
-  #)
   # return in table 4 format
   yearly <- (1L:10L)* 12L + 1L
   return(m_t4[yearly, ])
@@ -302,69 +289,87 @@ as_table4 <- function(m_trace) {
 
 
 ## @knitr cs-table-4 ----------------------------------------------------------
+
 t4_CS <- as_table4(SMM_base_10years)
+
 
 ## @knitr ---------------------------------------------------------------------
 
 test_that("Table 4 for conventional surgery is replicated", {
   expect_identical(nrow(t4_CS), 10L)
   expect_intol(
-    t4_CS[10, "Cumulative serious complication (%)"], 87.32, tolerance = 0.2
+    t4_CS[[10L, "Cumulative serious complication (%)"]], 87.32, tolerance = 0.2
   )
   expect_intol(
-    t4_CS[10, "Cumulative minor complication (%)"], 135.87, tolerance = 0.2
+    t4_CS[[10L, "Cumulative minor complication (%)"]], 135.87, tolerance = 0.2
   )
   expect_intol(
-    t4_CS[10, "Cumulative complex revision (%)"], 5.13, tolerance = 0.2
+    t4_CS[[10L, "Cumulative complex revision (%)"]], 5.13, tolerance = 0.2
   )
   expect_intol(
-    t4_CS[10, "Cumulative simple revision (%)"], 2.55, tolerance = 0.2
+    t4_CS[[10L, "Cumulative simple revision (%)"]], 2.55, tolerance = 0.2
   )
   expect_intol(
-    t4_CS[10, "Cumulative death (%)"], 37.10, tolerance = 0.2
+    t4_CS[[10L, "Cumulative death (%)"]], 37.10, tolerance = 0.2
   )
   expect_intol(
-    t4_CS[10, "Discounted costs (£)"], 7791288.9, tolerance = 100000.0
+    t4_CS[[10L, "Discounted costs (£)"]], 7791288.9, tolerance = 100000.0
   )
   expect_intol(
-    t4_CS[10, "Discounted QALYs"], 5526.4, tolerance = 250.0
+    t4_CS[[10L, "Discounted QALYs"]], 5526.4, tolerance = 250.0
   )
 })
 
 
 ## @knitr cas-table-4 ----------------------------------------------------------
-CAS_t4 <- as_table4(SMM_CAS_10years)
+t4_CAS <- as_table4(SMM_CAS_10years)
 
 
 ## @knitr ---------------------------------------------------------------------
 
 test_that("Table 4 for computer-assisted surgery is replicated", {
-  expect_identical(nrow(CAS_t4), 10L)
+  expect_identical(nrow(t4_CAS), 10L)
   expect_intol(
-    CAS_t4[10, "Cumulative serious complication (%)"], 58.14, tolerance = 0.2
+    t4_CAS[[10L, "Cumulative serious complication (%)"]], 58.14, tolerance = 0.2
   )
   expect_intol(
-    CAS_t4[10, "Cumulative minor complication (%)"], 136.52, tolerance = 0.2
+    t4_CAS[[10L, "Cumulative minor complication (%)"]], 136.52, tolerance = 0.2
   )
   expect_intol(
-    CAS_t4[10, "Cumulative complex revision (%)"], 3.56, tolerance = 0.2
+    t4_CAS[[10L, "Cumulative complex revision (%)"]], 3.56, tolerance = 0.2
   )
   expect_intol(
-    CAS_t4[10, "Cumulative simple revision (%)"], 1.89, tolerance = 0.2
+    t4_CAS[[10L, "Cumulative simple revision (%)"]], 1.89, tolerance = 0.2
   )
   expect_intol(
-    CAS_t4[10, "Cumulative death (%)"], 37.06, tolerance = 0.2
+    t4_CAS[[10L, "Cumulative death (%)"]], 37.06, tolerance = 0.2
   )
   expect_intol(
-    CAS_t4[10, "Discounted costs (£)"], 7208671.4, tolerance = 100000.0
+    t4_CAS[[10L, "Discounted costs (£)"]], 7208671.4, tolerance = 100000.0
   )
   expect_intol(
-    CAS_t4[10, "Discounted QALYs"], 5541.2, tolerance = 250.0
+    t4_CAS[10L, "Discounted QALYs"], 5541.2, tolerance = 250.0
   )
 })
 
 
-### @knitr utilities-var ------------------------------------------------------
+## @knitr cea -----------------------------------------------------------------
+
+dcost <- t4_CAS[[10L, "Discounted costs (£)"]] / 1000L -
+         t4_CS[[10L, "Discounted costs (£)"]] / 1000L
+dutil <- t4_CAS[[10L, "Discounted QALYs"]] / 1000L - 
+         t4_CS[[10L, "Discounted QALYs"]] / 1000L
+
+
+## @knitr ---------------------------------------------------------------------
+
+test_that("Deterministic CEA matches published value", {
+  expect_intol(dcost, -583.0, tolerance = 50.0)
+  expect_intol(dutil, 0.0164, tolerance = 0.005)
+})
+
+
+## @knitr utilities-var ------------------------------------------------------
 
 utility_A_nu <- 0.42
 utility_B_nu <- 0.80
@@ -376,7 +381,7 @@ utility_G_nu <- 0.34
 utility_H_nu <- 0.38
 
 
-### @knitr utilities-beta -----------------------------------------------------
+## @knitr utilities-beta -----------------------------------------------------
 
 utility_A_beta <- BetaModVar$new(
   "Utility of state A", "", 
@@ -412,7 +417,7 @@ utility_H_beta <- BetaModVar$new(
 )
 
 
-### @knitr costs-gamma --------------------------------------------------------
+## @knitr costs-gamma --------------------------------------------------------
 
 cost_A_stdev <- (6217L- 4218L) / (2L * 1.96)
 cost_E_stdev <- (11307L - 5086L) / (2L * 1.96)
@@ -633,66 +638,150 @@ t4_CS_PSA <- array(
   dim = c(10L, ncol(t4_CS), nruns),
   dimnames = list(NULL, colnames(t4_CS), NULL)
 )
-str(t4_CS_PSA)
-for (run in seq_len(nruns)) {
-  # reset and randomise every run
-  SMM_base_PSA$reset(populations)
-  # randomise all other ModVars
-  for (mv in SMM_base_PSA$modvars()) mv$set("random")
-  # set the transition matrix 
-  Pt_cycle <- dirichletify(Pt, population=1000L)
-  SMM_base_PSA$set_probabilities(Pt_cycle)
-  mtrace <- SMM_base_PSA$cycles(
-    ncycles=120L, hcc.pop=FALSE, hcc.cost=FALSE
-  )
-  t4 <- as_table4(as.matrix(mtrace))
-  t4_CS_PSA[, , run] <- t4
-}
-
-
-## @knitr cycle-PSA-CAS -------------------------------------------------------
-
-ncycles = 120L
-SMM_CAS_PSA_sim <- array(
-  dim = c(ncycles + 1L, ncol(SMM_base_10years), nruns),
-  dimnames = list(NULL, colnames(SMM_base_10years), NULL)
+t4_CAS_PSA <- array(
+  dim = c(10L, ncol(t4_CS), nruns),
+  dimnames = list(NULL, colnames(t4_CAS), NULL)
 )
-
 for (run in seq_len(nruns)) {
-  # reset and randomise every run
+  # reset populations
+  SMM_base_PSA$reset(populations)
   SMM_CAS_PSA$reset(populations)
-  # randomise all SMM ModVars
-  for (mv in SMM_base_PSA$modvars()) mv$set("random")
-  # randomise and draw the CAS_effect_lognorm ModVar
-  CAS_effect_lognorm$set("random")
-  CAS_effect <- CAS_effect_lognorm$get()
-  # apply CAS_effect to column 2 of the transition matrix
-  Pt_CAS <- Pt
-  Pt_CAS[,2L] <- Pt_CAS[,2L] * (1.0 - CAS_effect)
-  # set the transition matrix 
-  Pt_cycle <- dirichletify(Pt_CAS, population=1000L)
-  SMM_CAS_PSA$set_probabilities(Pt_cycle)
-  mtrace <- SMM_CAS_PSA$cycles(ncycles=120L, hcc.pop=FALSE, hcc.cost=FALSE)
-  SMM_CAS_PSA_sim[, , run] <- as.matrix(mtrace)
+  # find unique modvars and randomise them
+   mv <- unique(c(
+     SMM_base_PSA$modvars(),
+     SMM_CAS_PSA$modvars(),
+     CAS_effect_lognorm
+   ))
+   for (m in mv) {
+     m$set("random")
+   }
+   # set the transition matrix, applying the CAS effect for CAS model
+   pt_cs <- dirichletify(Pt, population = 1000L)
+   SMM_base_PSA$set_probabilities(pt_cs)
+   pt_cas <- txeffect(pt_cs, CAS_effect_lognorm$get())
+   SMM_CAS_PSA$set_probabilities(pt_cas)
+   # cycle the CS model
+   mtrace <- SMM_base_PSA$cycles(
+     ncycles = 120L, hcc.pop = FALSE, hcc.cost = FALSE
+   )
+   t4 <- as_table4(as.matrix(mtrace))
+   t4_CS_PSA[, , run] <- t4
+   # cycle the CAS model
+   mtrace <- SMM_CAS_PSA$cycles(
+     ncycles = 120L, hcc.pop = FALSE, hcc.cost = FALSE
+    )
+   t4 <- as_table4(as.matrix(mtrace))
+   t4_CAS_PSA[, , run] <- t4
 }
 
 
-## @knitr t4-CS-PSA -----------------------------------------------------------
+## @knitr ---------------------------------------------------------------------
 
-t4_CS_PSA_mean <- apply(t4_CS_PSA, MARGIN = c(1L, 2L), FUN = mean)
-#t4_CS_PSA_mean <- as_table4(trace_CS_PSA_mean)
+test_that("Table 4 for conventional surgery is replicated by mean of PSA", {
+  # skip on CRAN
+  skip_on_cran()
+  # Test that the range of the PSA estimates includes the expected value for
+  # seven outcomes. This is a crude test of functionality. Statistical tests,
+  # such as a one sample t-test, are not much help here because the shape of
+  # the distribution of model results may be non-normal, and the type 1 error
+  # rate is likely to be higher than suggested by the p-value.
+  fields <- c(
+    "Cumulative serious complication (%)",
+    "Cumulative minor complication (%)",
+    "Cumulative complex revision (%)",
+    "Cumulative simple revision (%)",    
+    "Cumulative death (%)",
+    "Discounted costs (£)",
+    "Discounted QALYs"
+  )
+  for (f in fields) {
+    r <- range(t4_CS_PSA[10L, f, ])
+    e <- t4_CS[[10L, f]]
+    expect_between(e, r[[1L]], r[[2L]])
+  }
+})
 
-#trace_CS_PSA_sd <- apply(SMM_base_PSA_sim, MARGIN = c(1L, 2L), FUN = sd)
-#t4_CS_PSA_sd <- as_table4(trace_CS_PSA_sd)
 
-#trace_CS_PSA_lcl <- apply(
-#  SMM_base_PSA_sim, MARGIN = c(1L, 2L), FUN = quantile, probs = 0.025
-#)
-#t4_CS_PSA_lcl <- as_table4(trace_CS_PSA_lcl)
+## @knitr ---------------------------------------------------------------------
 
-#trace_CS_PSA_ucl <- apply(
-#  SMM_base_PSA_sim, MARGIN = c(1L, 2L), FUN = quantile, probs = 0.025
-#)
-#t4_CS_PSA_ucl <- as_table4(trace_CS_PSA_ucl)
+test_that("Table 4 for computer-assisted surgery is replicated by mean PSA", {
+  # skip on CRAN and set wide tolerance
+  skip_on_cran()
+  # Test that the range of the PSA estimates includes the expected value for
+  # seven outcomes. This is a crude test of functionality. Statistical tests,
+  # such as a one sample t-test, are not much help here because the shape of
+  # the distribution of model results may be non-normal, and the type 1 error
+  # rate is likely to be higher than suggested by the p-value.
+  fields <- c(
+    "Cumulative serious complication (%)",
+    "Cumulative minor complication (%)",
+    "Cumulative complex revision (%)",
+    "Cumulative simple revision (%)",    
+    "Cumulative death (%)",
+    "Discounted costs (£)",
+    "Discounted QALYs"
+  )
+  for (f in fields) {
+    r <- range(t4_CAS_PSA[10L, f, ])
+    e <- t4_CAS[[10L, f]]
+    expect_between(e, r[[1L]], r[[2L]])
+  }
+})
 
 
+## @knitr t5-CS-PSA ----------------------------------------------------------
+
+fields <- c(
+  "Cumulative serious complication (%)",
+  "Cumulative complex revision (%)",
+  "Cumulative simple revision (%)"
+)
+t5_CS <- matrix(
+  data = NA_real_, nrow = length(fields), ncol = 4L,
+  dimnames = list(fields, c("Mean", "SD", "Q2.5", "Q97.5"))
+)
+for (f in fields) {
+  t5_CS[[f, "Mean"]] <- mean(t4_CS_PSA[10L, f, ])
+  t5_CS[[f, "SD"]] <- sd(t4_CS_PSA[10L, f, ])
+  t5_CS[[f, "Q2.5"]] <- quantile(t4_CS_PSA[10L, f, ], probs = 0.025)
+  t5_CS[[f, "Q97.5"]] <- quantile(t4_CS_PSA[10L, f, ], probs = 0.975)
+}
+
+
+## @knitr t5-CAS-PSA ----------------------------------------------------------
+
+fields <- c(
+  "Cumulative serious complication (%)",
+  "Cumulative complex revision (%)",
+  "Cumulative simple revision (%)"
+)
+t5_CAS <- matrix(
+  data = NA_real_, nrow = length(fields), ncol = 4L,
+  dimnames = list(fields, c("Mean", "SD", "Q2.5", "Q97.5"))
+)
+for (f in fields) {
+  t5_CAS[[f, "Mean"]] <- mean(t4_CAS_PSA[10L, f, ])
+  t5_CAS[[f, "SD"]] <- sd(t4_CAS_PSA[10L, f, ])
+  t5_CAS[[f, "Q2.5"]] <- quantile(t4_CAS_PSA[10L, f, ], probs = 0.025)
+  t5_CAS[[f, "Q97.5"]] <- quantile(t4_CAS_PSA[10L, f, ], probs = 0.975)
+}
+
+
+## @knitr cea-psa --------------------------------------------------------------
+
+dcost_psa <- t4_CAS_PSA[10L, "Discounted costs (£)",] / 1000L -
+  t4_CS_PSA[10L, "Discounted costs (£)",] / 1000L
+dutil_psa <- t4_CAS_PSA[10L, "Discounted QALYs",] / 1000L -
+  t4_CS_PSA[10L, "Discounted QALYs",] / 1000L
+icer_psa <- dcost_psa / dutil_psa
+
+
+## @knitr ---------------------------------------------------------------------
+
+test_that("PSA CEA matches deterministic calculation", {
+  
+  r <- range(dcost_psa)
+  expect_between(dcost, r[[1L]], r[[2L]])
+  r <- range(dutil_psa)
+  expect_between(dutil, r[[1L]], r[[2L]])
+})

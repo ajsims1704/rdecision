@@ -1,6 +1,10 @@
 # rdecision 1.1.3.9001
 
 * DISCOUNTING!
+* Added vignette for total knee replacement, a semi Markov model with PSA,
+  replicating Dong and Buxton, 2006. R code is taken from chunks in a 
+  test_that context, thus avoiding repetition of code between the vignette
+  and the test case.
 * Code chunks in vignettes which are entirely presentational are marked as
   "purl = FALSE" to remove them from the R scripts that are generated at
   vignette build. 

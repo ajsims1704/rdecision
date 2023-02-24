@@ -28,12 +28,14 @@ Imports:
   stats
 Suggests:
   covr,
+  DiagrammeR,
   grDevices,
   knitr,
   pander,
   rmarkdown,
   testthat (>= 3.0.0),
-  utf8
+  utf8,
+  withr
 License: GPL-3
 Language: en-GB
 Encoding: UTF-8

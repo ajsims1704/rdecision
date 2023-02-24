@@ -21,7 +21,7 @@ vignette: >
 #| purl = FALSE,
 #| include = FALSE
 # read vignette source chunks from corresponding testthat script
-knitr::read_chunk("../tests/testthat/test-Model-TKR.R")
+knitr::read_chunk(file.path("..", "tests", "testthat", "test-Model-TKR.R"))
 ```
 
 ```{r}
@@ -44,20 +44,19 @@ Knee Replacement (TKR). This vignette follows their model to calculate the
 cost-effectiveness of conventional and computer-assisted TKR surgery using
 `rdecision`. 
 
-# Modelling
 The authors present both a point estimate and a probabilistic interpretation.
 Both approaches are shown to highlight the similarities and differences when
 using `rdecision`.
 
-## Model description
+# Model description
 
-### States
+## States
 The patient journey is represented by 9 possible states, with each patient
 assigned to exactly one state at any time:
 ```{r, state-names}
 ```
 
-### Parameters
+## Variables
 To assess cost effectiveness, the model must incorporate utilities and costs
 for each state.
 
@@ -88,13 +87,13 @@ by transitions that return to the same state).
 ```{r, costs-point}
 ```
 
-## Point estimate
+# Point estimate
 The initial deterministic analysis uses numerical best estimates for each
 parameter (cost, utility, transition probability etc.). This results in a
 model with an exact solution, but no estimate of the uncertainty, or of the
 impact of individual parameters on the undertainty of the outcome.
 
-### Markov model
+## Markov model
 The Markov state transition model specifies which transitions are permitted
 between states. Each of the 9 states is represented in `rdecision` by a
 `MarkovState` object, with a description, a state cost and a state utility.
@@ -126,7 +125,8 @@ The `SemiMarkovModel` object can be represented graphically in the DOT format
 using the `asDOT()` method. The `DiagrammeR` package can then be used to plot
 DOT files with the `grViz` function.
 
-```{r} 
+```{r}
+#| fig.cap = "Markov state transition model for total knee replacement (TKR)"
 # wrapped in `try` to avoid error for users who don't have DiagrammeR installed
 try(
   DiagrammeR::grViz(SMM_base$as_DOT(rankdir = "TB", width = 7.0, height = 5.0)),
@@ -134,7 +134,7 @@ try(
 )
 ```
 
-### Transition probabilities
+## Transition probabilities
 For each allowed transition between a pair of states, probabilities are
 reported in Table 2. These are added to the model using the
 `set_probabilities` method, which takes for input a numerical matrix of size
@@ -155,21 +155,27 @@ error if the probability matrix does not have row-wise sums of 1. Alternatively,
 exactly one cell in each row can be left undefined as `NA` and it will
 automatically be populated to ensure a row-wise total of 1.
 
-```{r transitions-point}
+```{r, transitions-point}
 ```
 
 The CAS technology affects patient outcomes by reducing the probability of
 serious complications by about 34%. This applies to all transition
 probabilities into state **B**, which correspond to column 2 in the transition
-matrix. Note that this also requires adjusting the row-wise sum to 1, which
-however is performed automatically by `set_probabilities` if one transition
-per row is defined as `NA`.
+matrix. Note that this also requires adjusting the row-wise sum to 1, by 
+increasing the probability of making a transition to another state. It is 
+assumed the states with increased transition probabilities are those defined as 
+`NA` in matrix `Pt`. Function `txeffect` adjusts the transition probability 
+matrix, given a relative risk.
+```{r, tx-effect}
+```
 
+The effect is applied to the transition matrix for conventional surgery to 
+get the transition matrix for computer-assisted surgery, as follows.
 ```{r CAS-transitions-point}
 ```
 
 
-### Running the model
+## Running the model
 The simulation described in the paper starts with 1000 patients and progresses
 for 10 years, or 120 one-month cycles. At the start of the model, all patients
 are in state **A**. The initial state of the simulation can be entered into
@@ -206,20 +212,26 @@ This progression can also be visualised using the base graphics function
 `barplot`:
 
 ```{r}
+#| fig.cap = "State occupancy progression for conventional surgery."
 plot_occupancy <- function(SMM) {
-  states <- colnames(SMM)[
-    !colnames(SMM) %in% c("Cost", "QALY", "Cycle", "Years")
-  ]
-  layout(matrix(c(1L, 2L), nrow = 1L), widths = c(0.6, 0.4))
-  pal <- sample(hcl.colors(length(states), palette="Spectral"))
-  barplot(t(as.matrix(SMM[,states])), 
-          xlab="Cycle", ylab="States", names.arg=SMM[,"Cycle"],
-          col=pal, border=NA, space=0L, main = "State occupancy progression")
-  legend(
-    "topleft", legend = states, fill = pal, bty = "n", 
-    inset = c(1.05, 0.0), xpd = NA
+  withr::with_par(
+    new = list(mar = c(5L, 4L, 1L, 14L) + 0.1),
+    code = {
+      states <- colnames(SMM)[
+        !colnames(SMM) %in% c("Cost", "QALY", "Cycle", "Years")
+      ]
+      pal <- sample(hcl.colors(length(states), palette="Spectral"))
+      barplot(
+        t(as.matrix(SMM[,states])), 
+        xlab = "Cycle", ylab = "States", names.arg = SMM[,"Cycle"],
+        col = pal, border = NA, space = 0L
+      )
+      legend(
+        "topright", legend = states, fill = pal, bty = "n", 
+        inset = c(-0.75, 0.0), xpd = TRUE
+      )
+    }
   )
-  layout(matrix(1L))
 }
 plot_occupancy(SMM_base_10years)
 ```
@@ -239,26 +251,30 @@ associated with the representation of currency in Excel. Small differences
 in the CAS calculations can also probably be traced to rounding of the 34%
 CAS effect figure.
 
-#### Conventional surgery
+### Conventional surgery
+```{r, cs-table-4}
+```
+
 ```{r}
-<<cs-table-4>>
 pander::pander(
   t4_CS, round = 2L, row.names = FALSE, big.mark = ",", 
   justify = "lrrrrrrr", keep.trailing.zeros = TRUE
 )
 ```
 
-#### Computer-assisted surgery
+### Computer-assisted surgery
+```{r, cas-table-4}
+```
+
 ```{r}
-<<cas-table-4>>
 pander::pander(
-  CAS_t4, round=2L, row.names=FALSE, big.mark=",",
+  t4_CAS, round=2L, row.names=FALSE, big.mark=",",
   justify="lrrrrrrr", keep.trailing.zeros=TRUE
 )
 ```
 
 
-## Probabilistic Sensitivity Analysis
+# Probabilistic Sensitivity Analysis
 PSA adds a randomisation-based process to estimate not only the central value
 of the estimate, but also its uncertainty. This is done by representing
 individual parameters not as single numerical values but as distributions,
@@ -266,9 +282,9 @@ from which a range of possible values can be extracted at random. The choice
 of distribution type and parametrisation depend on the type of variable and the
 values reported in the literature or observed in a relevant patient cohort.
 
-### Parameter distributions
+## Parameter distributions
 
-#### Utilities
+### Utilities
 These are constrained to a value between 0 and 1, and have been described with
 a Beta distribution:
 
@@ -311,7 +327,7 @@ associated with any uncertainty.
 ```{r utilities-beta}
 ```
 
-#### Costs
+### Costs
 These can take any non-negative value, and have been described with a Gamma
 distribution:
 
@@ -370,7 +386,7 @@ CAS_effect_lognorm <- LogNormModVar$new(
 )
 ```
 
-### Markov model
+## Markov model
 The same structure as the model used for the deterministic solution can be
 used again, but in this case the costs and utilities will be represented by
 distributions.
@@ -399,7 +415,7 @@ pander::pander(
 )
 ```
 
-### Transition probabilities
+## Transition probabilities
 > To generate a logical multi-Markov state probabilistic transition matrix from
   the initial point estimates, the Dirichlet distribution was used (11). We
   estimated a count for each Markov state by the transition probabilities (we
@@ -420,7 +436,7 @@ in-built functions:
 * For each state, construct a `DirichletDistribution` from the known counts or
   proportions for each exiting transition. If using proportions, a population
   should also specified to correctly assign variance to the probabilistic
-  distribution. In this example, the authors specified a population of 1000.
+  distribution. In this example, the authors assumed a population of 1000.
 * For each state-specific distribution, draw a random realisation of the
   multivariate distribution (`sample()` method) and populate the allowed
   transitions with numerical values (`r()` method). This is performed by
@@ -431,335 +447,128 @@ in-built functions:
 ```{r fun-dirichlet}
 ```
 
-### PSA runs
-The following code executes 250 versions of the model for conventional surgery,
-each of 120 cycles, and for each version the set of model variables are sampled
-from their uncertainty distributions. The Markov trace for each run, in matrix
-form, is added to an 3D array which stores the traces from all the runs. Note
-that each trace has one more row than the number of cycles to store the state
-populations at cycle zero. 
+## PSA runs
+The following code executes 250 runs of the model for conventional surgery and
+for computer-assisted surgery, each of 120 cycles. For each run the set of
+model variables are sampled from their uncertainty distributions. The Markov
+traces for each run, in matrix form, are converted to the format used by Dong
+et al in their Table 4, and added to 3D arrays which store the traces from all
+the runs, separately for conventional and computer-assisted surgery.  
 
-```{r cycle-PSA}
-```  
-
-Plotting some simulation examples shows how introducing a probabilistic
-representation for the transition probabilities has led to some differences
-in the progression through cycles:
-
-```{r some-plots}
-plot_occupancy(SMM_base_PSA_sim[,,1L])
-plot_occupancy(SMM_base_PSA_sim[,,2L])
-plot_occupancy(SMM_base_PSA_sim[,,3L])
-```
+The transition probability matrix is sampled from an assumed matrix of counts
+using the `dirichletify` function.
 
 In the case of CAS, there is an additional step in the simulation process due
 to the fact that the transition probabilities into state **B** (column 2 in the
 transition matrix) are modified by a multiplier, *Effect of CAS*, which is
 itself drawn from a distribution. In this case, the relevant ModVar needs to be
-randomised at every cycle, applied to the base transition matrix, and the
-matrix then processed by `dirichletify`. Because this function can correctly
-complete the proportions to a total of 1 as long as one element of each row
-is set to `NA`, the other transitions do not need to be modified manually.
+randomised at every cycle, and applied to the transition matrix.
 
-```{r cycle-PSA-CAS}
+This a "paired" simulation; that is, we are interested in the 
+difference between computer-assisted surgery and conventional surgery, 
+taking account of the variation in inputs. In this model, many variables are
+common to both models, and we make sure to randomise all variables once, before
+running each model, every cycle. This is analogous, in statistics, to a paired
+t-test rather than a two-sample t-test. When there are many common variables, 
+the results of the two models will be correlated.
+
+```{r, cycle-PSA}
 ```  
 
-### Results
+## Results
 The means of the cohort simulation results should be very similar, but not
 necessarily identical, to those in Table 4 (and replicated analytically above).
 Each run of this script is expected to yield a slightly different result.
+The addition of probabilistic elements can be used to describe not only the
+means (which should approximate the deterministic cohort model results), but
+also the distributions of the estimates, giving the uncertainties associated
+with the two models. 
 
-#### Conventional surgery
-```{r, t4-PSA-CAS}
-```
+In the following two sections, the mean of all runs are presented as per Table 4
+of Dong & Buxton [-@dong2006] and the uncertainties are presented as per their
+Table 5, with the addition of the upper and lower confidence limits of the mean.
 
-
-```{r cohort-simulation-results}
-#cum_SMM_base_PSA <- apply(SMM_base_PSA_sim, c(2L,3L), cumsum)
-#yearly <- (0L:10L)* 12L + 1L 
-#
-#data_summary <- function(data) {
-#  return(
-#    c(
-#      "Mean" = mean(data),
-#      "SD" = sd(data),
-#      "Q2.5" = quantile(data, 0.025, names = FALSE),
-#      "Q97.5" = quantile(data, 0.975, names = FALSE)
-#    )
-#  )
-#}
-#summ_base_PSA <- aperm(
-#  apply(SMM_base_PSA_sim[yearly,,], c(1L,2L), data_summary), c(2L,3L,1L)
-#)
-#cumsumms_base_PSA <- aperm(
-#  apply(cum_SMM_base_PSA[yearly,,], c(1L,2L), data_summary), c(2L,3L,1L)
-#)
-#
-#i <- "Mean"
-#dong_output_simulation <- data.frame(
-#  "Year" = summ_base_PSA[,,i][,"Cycle"] / 12L,
-#  # Table 4 shows % while here numbers are calculated per N = 1000 patients,
-#  # so divide by 10
-#  "Cumulative serious complication (%)" =
-#    cumsumms_base_PSA[,states["B"],i] / 10L,
-#  "Cumulative minor complication (%)" =
-#    cumsumms_base_PSA[,states["C"],i] / 10L,
-#  "Cumulative complex revision (%)" =
-#    cumsumms_base_PSA[,states["E"],i] / 10L,
-#  "Cumulative simple revision (%)" =
-#    cumsumms_base_PSA[,states["F"],i] / 10L,
-#  # no need to use cumulative sum of deaths as each patient only enters
-#  # this state once
-#  "Cumulative death (%)" = summ_base_PSA[,states["I"],i] / 10L,
-#  # multiply by N = 1000 to reverse the normalisation by population
-#  "Discounted costs (£)" = cumsumms_base_PSA[,"Cost",i] * 1000L,
-#  "Discounted QALYs" = cumsumms_base_PSA[,"QALY",i] * 1000L,
-#  check.names = FALSE
-#)
-#pander::pander(
-#  dong_output_simulation, round=2L, row.names=FALSE, big.mark=",",
-#  justify="lrrrrrrr", keep.trailing.zeros=TRUE
-#)
+### Conventional surgery
+```{r}
+t4_CS_PSA_mean <- apply(t4_CS_PSA, MARGIN = c(1L, 2L), FUN = mean)
 pander::pander(
   t4_CS_PSA_mean, round=2L, row.names=FALSE, big.mark=",",
   justify="lrrrrrrr", keep.trailing.zeros=TRUE
 )
 ```
 
-**Computer-assisted surgery**
-
-```{r cohort-simulation-CAS-results}
-#cum_SMM_CAS_PSA <- apply(SMM_CAS_PSA_sim, c(2L,3L), cumsum)
-#summ_CAS_PSA <- aperm(
-#  apply(SMM_CAS_PSA_sim[yearly,,], c(1L,2L), data_summary), c(2L,3L,1L)
-#)
-#cumsumms_CAS_PSA <- aperm(
-#  apply(cum_SMM_CAS_PSA[yearly,,], c(1L,2L), data_summary), c(2L,3L,1L)
-#)
-
-#i <- "Mean"
-#dong_output_simulation <- data.frame(
-#  "Year" = summ_CAS_PSA[,,i][,"Cycle"] / 12L,
-#  # Table 4 shows % while here numbers are calculated per N = 1000 patients,
-#  # so divide by 10
-#  "Cumulative serious complication (%)" =
-#    cumsumms_CAS_PSA[,states["B"],i] / 10L,
-#  "Cumulative minor complication (%)" =
-#    cumsumms_CAS_PSA[,states["C"],i] / 10L,
-#  "Cumulative complex revision (%)" =
-#    cumsumms_CAS_PSA[,states["E"],i] / 10L,
-#  "Cumulative simple revision (%)" =
-#    cumsumms_CAS_PSA[,states["F"],i] / 10L,
-#  # no need to use cumulative sum of deaths as each patient only
-#  # enters this state once
-#  "Cumulative death (%)" = summ_CAS_PSA[,states["I"],i] / 10L,
-#  # multiply by N = 1000 to reverse the normalisation by population
-#  "Discounted costs (£)" = cumsumms_CAS_PSA[,"Cost",i] * 1000L,
-#  "Discounted QALYs" = cumsumms_CAS_PSA[,"QALY",i] * 1000L,
-#  check.names = FALSE
-#)
-
-#pander::pander(
-#  dong_output_simulation, round=2L, row.names=FALSE, big.mark=",",
-#  justify="lrrrrrrr", keep.trailing.zeros=TRUE
-#)
+```{r, t5-CS-PSA}
 ```
 
-The addition of probabilistic elements can be used to compare not only the means, but also the uncertainties associated with the two models.
-
-```{r cohort-simulation-vars}
-#cols <- grepl("serious|[xe] revision", colnames(cumsumms_base_PSA))
-#pander::pander(
-#  cumsumms_base_PSA[11L, cols,]/10L, "Conventional TKR", justify="lrrrr"
-#)
-#pander::pander(
-#  cumsumms_CAS_PSA[11L, cols,]/10L, "Computer-assisted TKR", justify="lrrrr"
-#)
+```{r}
+pander::pander(t5_CS, round = 2L, keep.trailing.zeros = TRUE, justify = "lrrrr")
 ```
 
-Note that the means correlate well with those reported in Table 5, but the assertion that "[CAS] had lower variances for each indicator" is not reliably replicated for every variable. This is likely to be due to the fact that the parameters for the distribution of the *Effect of CAS* could not be extracted, and the values chosen here may assign excessive uncertainty to this variable.
-
-
-```{r exit, echo=FALSE}
-knitr::knit_exit()
-```
-
-
-versions with modvar extractions (for analysis of covariance)
-
-```{r cycle-PSA-with-modvar-table}
-nruns <- 50L
-ncycles <- 120L
-SMM_base_PSA_sim <- list()
-SMM_base_PSA_mvs <- list()
-
-for (run in seq_len(nruns)) {
-  # reset and randomise every run
-  SMM_base_PSA$reset(populations)
-  # randomise all other ModVars
-  for (mv in SMM_base_PSA$modvars()) mv$set("random")
-  # set the transition matrix 
-  Pt_cycle <- dirichletify(Pt, population=1000L)
-  SMM_base_PSA$set_probabilities(Pt_cycle)
-  run_results <- SMM_base_PSA$cycles(
-    ncycles=120L, hcc.pop=FALSE, hcc.cost=FALSE
-  )
-  run_modvars <- SMM_base_PSA$modvar_table()
-  SMM_base_PSA_sim[[run]] <- as.matrix(run_results)
-  SMM_base_PSA_mvs[[run]] <- as.matrix(run_modvars[,4L:8L])
-}
-
-SMM_base_PSA_sim <- simplify2array(SMM_base_PSA_sim)
-SMM_base_PSA_mvs <- simplify2array(SMM_base_PSA_mvs)
-dimnames(SMM_base_PSA_mvs)[[1L]] <- run_modvars$Description
-```  
-
-
-```{r cycle-PSA-CAS-with-modvar-table}
-SMM_CAS_PSA_sim <- list()
-SMM_CAS_PSA_mvs <- list()
-
-for (run in seq_len(nruns)) {
-  # reset and randomise every run
-  SMM_CAS_PSA$reset(populations)
-  # randomise all SMM ModVars
-  for (mv in SMM_base_PSA$modvars()) mv$set("random")
-  # randomise and draw the CAS_effect_lognorm ModVar
-  CAS_effect_lognorm$set("random")
-  CAS_effect <- CAS_effect_lognorm$get()
-  # apply CAS_effect to column 2 of the transition matrix
-  Pt_CAS <- Pt
-  Pt_CAS[,2L] <- Pt_CAS[,2L] * (1.0 - CAS_effect)
-  # set the transition matrix 
-  Pt_cycle <- dirichletify(Pt_CAS, population=1000L)
-  SMM_CAS_PSA$set_probabilities(Pt_cycle)
-  run_results <- SMM_CAS_PSA$cycles(
-    ncycles=120L, hcc.pop=FALSE, hcc.cost=FALSE
-  )
-  run_modvars <- SMM_CAS_PSA$modvar_table()
-  # manually add the CAS_effect modvar to the tabulation
-  run_modvars <- rbind(run_modvars, data.frame(
-    Description = CAS_effect_lognorm$description(),
-    Units = CAS_effect_lognorm$units(),
-    Distribution = CAS_effect_lognorm$distribution(),
-    Mean = CAS_effect_lognorm$mean(),
-    E = CAS_effect_lognorm$mean(),
-    SD = CAS_effect_lognorm$SD(),
-    Q2.5 = CAS_effect_lognorm$quantile(probs=0.025),
-    Q97.5 = CAS_effect_lognorm$quantile(probs=0.975),
-    Est = CAS_effect_lognorm$is_expression()
-  ))
-  # TODO the modvar_table method does not belong in SMM - either a 
-  # ModVarCollection
-  # class or a summary method for ModVar that returns a named array and the
-  # modvar_table method just rbinds it
-  SMM_CAS_PSA_sim[[run]] <- as.matrix(run_results)
-  SMM_CAS_PSA_mvs[[run]] <- as.matrix(run_modvars[,4L:8L])
-}
-
-SMM_CAS_PSA_sim <- simplify2array(SMM_CAS_PSA_sim)
-SMM_CAS_PSA_mvs <- simplify2array(SMM_CAS_PSA_mvs)
-dimnames(SMM_CAS_PSA_mvs)[[1L]] <- run_modvars$Description
-
-```  
-
-```{r plots}
-dcost <- cum_SMM_CAS_PSA[121L,"Cost",] - cum_SMM_base_PSA[121L,"Cost",]
-dqaly <- cum_SMM_CAS_PSA[121L,"QALY",] - cum_SMM_base_PSA[121L,"QALY",]
-plot(dcost ~ dqaly)
-```
-
-
-
-
-
-
-There is something else I don't understand with the costs:  
-All costs here are modelled as transition costs (which I expect to be independent of cycle length); all Occupancy costs are 0. We ignore cycle 1 because the only allowed transitions are from A to B, C or D, all with no cost. This is cycle 2 which shows some transitions to costed states (E, F, G):
-
-```{r cycle-1}
-SMM$reset(populations)
-# run first cycle but ignore
-SMM$cycle(FALSE, FALSE)
-# print cycle 2
-pander::pander(SMM$cycle(FALSE, FALSE)[,c(-2L, -3L)])
-```
-
-For ex.: row G (other treatments) has a stated cost of £2844. EntryCost should presumably be population * cost = 14.97 * £2844 = £42,574.68 but it's instead *exactly* 1/9th. Where does this come from? Is it due to there being 9 possible states?  
-Costs (total) looks correct after population correction (/1000).
-
-
-### Issues:
-
-- All distributions are reported as point estimate (range) but there is no explanation of what this range represents (ranges are assumed to be 95% CI? how has the asymmetry been incorporated to estimate shape?) and the actual parameters are not reported anywhere 
-- Costs are parametrised as Gamma with "variance ... estimated from the ranges" but the way in which this was done is not described 
-- Utilities have been modelled as Beta with "a high variance to reflect the uncertainty" (no more info given)
-- The utilities of normal health, minor complications and serious complications have been modelled "so that the hierarchical relationship was retained but the differences between the utilities were randomly drawn from the distribution" (not clear to me how this would remain within the 0-1 range, or did they just swap the utilities if in the wrong order?)
-- The cost of the intervention is never stated (could conceivably be reverse-engineered from the results if problems above are solved)
-- The parameters for the effect of the intervention are not described (the point estimate is given, but the variance is "estimated from the clinical trials" although not even a range is reported)
-
-```{r SMM-point-old, eval=FALSE}
-
-# Markov states
-sA <- MarkovState$new(states["A"], cost=cost_A, utility=utility_A)
-sB <- MarkovState$new(states["B"], cost=cost_B, utility=utility_B)
-sC <- MarkovState$new(states["C"], cost=cost_C, utility=utility_C)
-sD <- MarkovState$new(states["D"], cost=cost_D, utility=utility_D)
-sE <- MarkovState$new(states["E"], cost=cost_E, utility=utility_E)
-sF <- MarkovState$new(states["F"], cost=cost_F, utility=utility_F)
-sG <- MarkovState$new(states["G"], cost=cost_G, utility=utility_G)
-sH <- MarkovState$new(states["H"], cost=cost_H, utility=utility_H)
-sI <- MarkovState$new(states["I"], cost=cost_I, utility=utility_I)
-
-States <- do.call(list, mget(grep("^s[A-I]$", ls(), value = TRUE)))
-
-# Transitions
-tAD <- Transition$new(sA, sD)
-tAC <- Transition$new(sA, sC)
-tAB <- Transition$new(sA, sB)
-tBC <- Transition$new(sB, sC)
-tBE <- Transition$new(sB, sE)
-tBF <- Transition$new(sB, sF)
-tBG <- Transition$new(sB, sG)
-tCB <- Transition$new(sC, sB)
-tCD <- Transition$new(sC, sD)
-tCF <- Transition$new(sC, sF)
-tCG <- Transition$new(sC, sG)
-tCC <- Transition$new(sC, sC)
-tDC <- Transition$new(sD, sC)
-tDB <- Transition$new(sD, sB)
-tDD <- Transition$new(sD, sD)
-tEB <- Transition$new(sE, sB)
-tEH <- Transition$new(sE, sH)
-tFB <- Transition$new(sF, sB)
-tFC <- Transition$new(sF, sC)
-tFG <- Transition$new(sF, sG)
-tFH <- Transition$new(sF, sH)
-tGB <- Transition$new(sG, sB)
-tGC <- Transition$new(sG, sC)
-tGF <- Transition$new(sG, sF)
-tGD <- Transition$new(sG, sD)
-tHE <- Transition$new(sH, sE)
-tHF <- Transition$new(sH, sF)
-tHH <- Transition$new(sH, sH)
-tBI <- Transition$new(sB, sI)
-tCI <- Transition$new(sC, sI)
-tDI <- Transition$new(sD, sI)
-tEI <- Transition$new(sE, sI)
-tFI <- Transition$new(sF, sI)
-tGI <- Transition$new(sG, sI)
-tHI <- Transition$new(sH, sI)
-tII <- Transition$new(sI, sI)
-
-Transitions <- do.call(list, mget(grep("^t[A-I]{2}$", ls(), value = TRUE)))
-
-SMM <- SemiMarkovModel$new(
-  V = States, E = Transitions,
-  tcycle = as.difftime(365.25/12L, units = "days"), # cycles in months
-  discount.cost = 0.035/12L,
-  discount.utility = 0.035/12L
+### Computer-assisted surgery
+```{r}
+t4_CAS_PSA_mean <- apply(t4_CAS_PSA, MARGIN = c(1L, 2L), FUN = mean)
+pander::pander(
+  t4_CAS_PSA_mean, round=2L, row.names=FALSE, big.mark=",",
+  justify="lrrrrrrr", keep.trailing.zeros=TRUE
 )
+```
 
-pander::pander(SMM$tabulate_states()[,c("Name", "Cost")], justify="llr")
-DiagrammeR::grViz(SMM$as_DOT())
+```{r, t5-CAS-PSA}
+```
+
+```{r}
+pander::pander(
+  t5_CAS, round = 2L, justify = "lrrrr", keep.trailing.zeros = TRUE
+)
+```
+
+Note that the means correlate well with those reported in Table 5, but the
+assertion that "[CAS] had lower variances for each indicator" is not reliably
+replicated for every variable. This is likely to be due to the fact that the
+parameters for the distribution of the *Effect of CAS* could not be extracted,
+and the values chosen here may assign excessive uncertainty to this variable.
+
+### Cost effectiveness analysis
+```{r, cea-psa}
+```
+From PSA, after 10 years the mean (95% CI) cost change per patient was
+`r round(mean(dcost_psa), digits = 2L)` 
+(`r round(quantile(dcost_psa, probs = 0.025), digits = 2L)` to 
+`r round(quantile(dcost_psa, probs = 0.975), digits = 2L)`) £,
+and the mean change in utility was 
+`r round(mean(dutil_psa), digits = 2L)` 
+(`r round(quantile(dutil_psa, probs = 0.025), digits = 2L)` to 
+`r round(quantile(dutil_psa, probs = 0.975), digits = 2L)`) QALY, compared
+with the deterministic values of -£583 and +0.0148 respectively, as reported in
+the paper. The incremental cost effectiveness ratio was less than
+£30,000 per QALY for 
+`r round(100 * sum(icer_psa < 30000) / length(icer_psa), 2L)`% of runs. The
+distribution of results on the cost effectiveness plane is shown in the
+figure below (for comparison with figure 2 of the paper).
+
+
+```{r}
+#| fig.cap = "Cost-effectiveness plane. QALY = Quality-adjusted life year"
+withr::with_par(
+  new = list(mar = c(1L, 2L, 2L, 1L)), 
+  code = {
+    plot(
+      dcost_psa ~ dutil_psa,
+      pch = 20L,
+      xlim = c(-0.1, 0.15), ylim = c(-5000.0, 1000.0), 
+      axes = FALSE,
+      xlab = "", ylab = ""
+    )
+    axis(side = 1L, pos = 0.0, las = 1L)
+    axis(side = 2L, pos = 0.0, las = 1L)
+    mtext(
+      text = expression(paste(Delta, "QALYs")), 
+      side = 2L, adj = 5L/6L
+    )
+    mtext(
+      text = expression(paste(Delta, "Cost (£)")),
+      side = 3L, adj = 2L/5L
+    )
+  }
+)
 ```
