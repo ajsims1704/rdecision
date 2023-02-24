@@ -1,10 +1,13 @@
-# rdecision 1.1.3.9000
+# rdecision 1.1.3.9001
 
+* DISCOUNTING!
 * Code chunks in vignettes which are entirely presentational are marked as
   "purl = FALSE" to remove them from the R scripts that are generated at
   vignette build. 
+* Added arguments `rankdir`, `width` and `height` in `Digraph::as_DOT` to permit
+  the drawing direction and size of canvas to be adjusted in the dot syntax.
 * Changed the first argument in utility functions `abortif` and `abortifnot` to
-  be `...`, to increase their similarity with `stopifnot`, and allow testing
+  be `...`, to increase their similarity with `stopifnot`, allowing testing
   of multiple conditions with a single call.
 
 # rdecision 1.1.3

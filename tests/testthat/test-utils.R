@@ -1,7 +1,15 @@
+# tests of abortif
 test_that("abortif raises an error condition with no expressions", {
   expect_error(abortif(class = "no"), class = "no")
   expect_error(abortif(class = "no", message = "none"), class = "no")
   expect_error(abortif())
+})
+
+test_that("abortif behaves correctly with non-boolean conditions", {
+  expect_error(abortif("42"))
+  expect_error(abortif(42L))
+  expect_error(abortif("x"))
+  expect_error(abortif("x", FALSE))
 })
 
 test_that("abortif raises an error condition with a single expression", {
@@ -44,27 +52,98 @@ test_that("abortif raises an error condition with > 1 expression", {
   )
 })
 
-
-test_that("abortif behaves correctly with non-boolean conditions", {
-  expect_error(abortif("42"))
-  expect_error(abortif(42L))
-  expect_error(abortif("x"))
-  expect_error(abortif("x", FALSE))
+test_that("abortif error message with >1 expression is correct", {
+  f <- function(x) {
+    abortif(FALSE, x > 2L, FALSE, message = "failed inequality condition")
+  }
+  tmpenv <- env(errmsg = "")
+  tryCatch(
+    f(3L),
+    error = function(e) {
+      assign("errmsg", rlang::cnd_message(e), env = tmpenv)
+    }
+  )
+  expect_identical(
+    tmpenv$errmsg,
+    "failed inequality condition\n* x > 2L is not FALSE"
+  )
+  expect_true(TRUE)
 })
 
-test_that("abortifnot raises an error condition as expected", {
-  x <- 1L
-  expect_silent(abortifnot(x == 1L, class = "no"))
-  expect_error(abortifnot(x == 2L, class = "no"), class = "no")
-  expect_error(abortifnot(x == 2L))
+# tests of abortifnot
+test_that("abortifnot raises an error condition with no expressions", {
+  expect_error(abortifnot(class = "no"), class = "no")
+  expect_error(abortifnot(class = "no", message = "none"), class = "no")
+  expect_error(abortifnot())
 })
 
 test_that("abortifnot behaves correctly with non-boolean conditions", {
   expect_error(abortifnot("42"))
   expect_error(abortifnot(42L))
-  expect_error(abortif("x"))
+  expect_error(abortifnot("x"))
+  expect_error(abortifnot("x", TRUE))
 })
 
+test_that("abortifnot raises an error condition with a single expression", {
+  x <- 2L
+  expect_silent(abortifnot(x > 1L, class = "no"))
+  expect_error(abortifnot(x == 1L, class = "no"), class = "no")
+  expect_error(abortifnot(x == 1L))
+  expect_silent(abortifnot(is.character("random")))
+})
+
+test_that("abortifnot raises an error condition with > 1 expression", {
+  x <- 2L
+  y <- "orange"
+  expect_silent(
+    abortifnot(
+      x > 1L,
+      y %in% c("orange", "pear"),
+      class = "no"
+    )
+  )
+  expect_error(
+    abortifnot(
+      x == 1L,
+      y %in% c("orange", "pear"),
+      class = "no"
+    )
+  )
+  expect_error(
+    abortifnot(
+      x > 1L,
+      y %in% c("pear", "apple")
+    )
+  )
+  expect_error(
+    abortifnot(
+      x == 1L,
+      y %in% c("orange", "pear"),
+      class = "no"
+    ),
+    class = "no"
+  )
+})
+
+test_that("abortifnot error message with >1 expression is correct", {
+  f <- function(x) {
+    abortifnot(TRUE, x > 2L, TRUE, message = "failed inequality condition")
+  }
+  tmpenv <- env(errmsg = "")
+  tryCatch(
+    f(1L),
+    error = function(e) {
+      assign("errmsg", rlang::cnd_message(e), env = tmpenv)
+    }
+  )
+  expect_identical(
+    tmpenv$errmsg,
+    "failed inequality condition\n* x > 2L is not TRUE"
+  )
+  expect_true(TRUE)
+})
+
+# tests of as_numeric
 test_that("as_numeric missing argument is detected correctly", {
   expect_error(as_numeric())
 })

@@ -846,7 +846,7 @@ DecisionTree <- R6::R6Class(
     evaluate = function(setvars = "expected", N = 1L, by = "strategy") {
       # check arguments
       abortifnot(is.character(setvars),
-        "'setvars' must be a character", 
+        message = "'setvars' must be a character", 
         class = "setvars_not_character"
       )
       valids <- c("expected","random","q2.5","q50","q97.5","current")
@@ -1344,8 +1344,8 @@ DecisionTree <- R6::R6Class(
       threshold <- NA
       # check that sign of cost saving is different at the brackets
       abortifnot(f(a) * f(b) < 0.0,
-        "[a, b] does not bracket the root", 
-         class = "invalid_brackets"
+        message = "[a, b] does not bracket the root", 
+        class = "invalid_brackets"
       )
       n <- 0L
       while (n < nmax) {

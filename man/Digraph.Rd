@@ -372,14 +372,27 @@ indices for \code{what = "index"}.
 \subsection{Method \code{as_DOT()}}{
 Exports the digraph in DOT notation.
 \subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{Digraph$as_DOT()}\if{html}{\out{</div>}}
+\if{html}{\out{<div class="r">}}\preformatted{Digraph$as_DOT(rankdir = "LR", width = 7, height = 7)}\if{html}{\out{</div>}}
 }
 
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{rankdir}}{One of "LR" (default), "TB", "RL" or "BT".}
+
+\item{\code{width}}{of the drawing, in inches}
+
+\item{\code{height}}{of the drawing, in inches}
+}
+\if{html}{\out{</div>}}
+}
 \subsection{Details}{
 Writes a representation of the digraph in the 
 \code{graphviz} DOT language 
 (\url{http://graphviz.org/doc/info/lang.html}) for drawing with one
-of the \code{graphviz} tools, including \code{dot} (Gansner, 1993).
+of the \code{graphviz} tools, including \code{dot} (Gansner, 1993). If
+all nodes have labels, these are used in the graph, otherwise the labels
+are the node indices.
 }
 
 \subsection{Returns}{

@@ -409,7 +409,7 @@ Digraph <- R6::R6Class(
     #' are the node indices.
     #' @param rankdir One of "LR" (default), "TB", "RL" or "BT".
     #' @param width of the drawing, in inches
-    #' @param height of thre drawing, in inches
+    #' @param height of the drawing, in inches
     #' @return A character vector. Intended for passing to \code{writeLines}
     #' for saving as a text file.
     as_DOT = function(rankdir = "LR", width = 7.0, height = 7.0) {
@@ -429,17 +429,23 @@ Digraph <- R6::R6Class(
       )
       # check width and height
       abortifnot(
-        is.numeric(width),
-        message = "'width' must be numeric",
-        class = "invalid_width"
+        is.numeric(width), width > 0.0, is.numeric(height), height > 0.0,
+        message = "'width' and 'height' must be numeric and > 0",
+        class = "invalid_size"
       )
       # create stream vector (header+edges+footer)
       indent <- "  "
       o <- vector(mode = "character", length = 0L)
       # write header
       o[[length(o) + 1L]] <- "digraph rdecision {"
-      o[[length(o) + 1L]] <- paste0(indent, 'size="7,7" ;')
-      o[[length(o) + 1L]] <- paste0(indent, "rankdir=", rankdir, " ;")
+      # write graph attributes
+      o[[length(o) + 1L]] <- paste0(
+        indent,
+        "graph [ ",
+        'rankdir = "', rankdir, '"', ", ",
+        'size = "', width, ",", height, '"',
+        " ] ;"
+      )
       # write edges
       for (e in private$E) {
         s <- e$source()

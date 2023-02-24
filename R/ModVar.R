@@ -215,7 +215,7 @@ ModVar <- R6::R6Class(
     set = function(what="random", val=NULL) {
       # check argument
       abortifnot(is.character(what),
-        "'what' must be a a character string", 
+        message = "'what' must be a character string", 
         class = "what_not_character"
       )
       abortifnot(what %in% c(private$.whats, "current"),

@@ -1,41 +1,90 @@
 #' @title rlang analogue of base::stopifnot with negated condition
 #' @description If the value of any of the conditions is TRUE, execution is
-#' halted via the \code{rlang::abort} system. There is minimal checking of the 
-#' arguments because this function is intended to be used internally to the 
-#' package.
+#' halted via the \code{rlang::abort} system.
+#' @details Raises the condition \code{rlang::rlang_error}, optionally with
+#' subclass as defined by parameter \code{class}. The header of
+#' the message is the \code{message} argument and the body is the first
+#' expression that evaluated to \code{TRUE}.
 #' @param ... A number of R expressions which should all evaluate to FALSE. If
 #' any expression does not evaluate to a boolean value, it will be treated as
-#' TRUE. 
-#' @param message The message to display.
+#' TRUE.
+#' @param message The message to display (used as the condition header)
 #' @param class Subclass of the condition
 #' @noRd
-abortif <- function(..., message = NULL, class = NULL) {
+abortif <- function(..., message = NULL, class = NULL, 
+                    call = rlang::caller_env()) {
+  # construct header from argument
+  header <- ifelse(!is.null(message), message, "")
+  # get the dots argument as a quosure
+  qargs <- rlang::quos(...)
   # check that ... has at least one expression
   if (...length() == 0L) {
-    rlang::abort(message = message, class = class)
+    rlang::abort(
+      message = c(header, "there must be at least one expression"),
+      class = class
+    )
   } else {
     for (i in seq_len(...length())) {
       arg <- ...elt(i)
       if (!rlang::is_logical(arg) || arg) {
-        rlang::abort(message = message, class = class)
+        rlang::abort(
+          message = c(
+            header, 
+            paste(
+              rlang::expr_deparse(rlang::quo_get_expr(qargs[[i]])), 
+              "is not FALSE"
+            )
+          ), 
+          class = class,
+          call = call
+        )
       }
     }
   }
 }
 
 #' @title rlang analogue of base::stopifnot
-#' @description If the value of a condition is not TRUE, execution is halted
-#' via the \code{rlang::abort} system. There is minimal checking of the 
-#' arguments because this function is intended to be used internally to the 
-#' package.
-#' @param cond A boolean value or expression which should be TRUE. If cond
-#' does not evaluate to a boolean value, it will be treated as FALSE. 
-#' @param message The message to display.
+#' @description If the value of any of the conditions is FALSE, execution is
+#' halted via the \code{rlang::abort} system.
+#' @details Raises the condition \code{rlang::rlang_error}, optionally with
+#' subclass as defined by parameter \code{class}. The header of
+#' the message is the \code{message} argument and the body is the first
+#' expression that evaluated to \code{FALSE}.
+#' @param ... A number of R expressions which should all evaluate to TRUE. If
+#' any expression does not evaluate to a boolean value, it will be treated as
+#' FALSE.
+#' @param message The message to display (used as the condition header)
 #' @param class Subclass of the condition
 #' @noRd
-abortifnot <- function(cond, message = NULL, class = NULL) {
-  if (!rlang::is_logical(cond) || !cond) {
-    rlang::abort(message = message, class = class)
+abortifnot <- function(..., message = NULL, class = NULL, 
+                       call = rlang::caller_env()) {
+  # construct header from argument
+  header <- ifelse(!is.null(message), message, "")
+  # get the dots argument as a quosure
+  qargs <- rlang::quos(...)
+  # check that ... has at least one expression
+  if (...length() == 0L) {
+    rlang::abort(
+      message = c(header, "there must be at least one expression"),
+      class = class
+    )
+  } else {
+    for (i in seq_len(...length())) {
+      arg <- ...elt(i)
+      if (!rlang::is_logical(arg) || !arg) {
+        rlang::abort(
+          message = c(
+            header, 
+            paste(
+              rlang::expr_deparse(rlang::quo_get_expr(qargs[[i]])), 
+              "is not TRUE"
+            )
+          ), 
+          class = class,
+          call = call
+        )
+      }
+    }
   }
 }
 

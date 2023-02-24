@@ -364,7 +364,9 @@ ExprModVar <- R6::R6Class(
         class = "what_not_character"
       )
       abortifnot(what %in% c(private$.whats, "current"),
-        paste("'what' must be one of", paste(private$.whats, collapse="|")),
+        message = paste(
+          "'what' must be one of", paste(private$.whats, collapse="|")
+        ),
         class = "what_not_supported"
       )
       # if random, make a new draw from the distribution
