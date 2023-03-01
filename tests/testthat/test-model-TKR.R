@@ -674,7 +674,6 @@ for (run in seq_len(nruns)) {
    t4_CAS_PSA[, , run] <- t4
 }
 
-
 ## @knitr ---------------------------------------------------------------------
 
 test_that("Table 4 for conventional surgery is replicated by mean of PSA", {
@@ -779,7 +778,6 @@ icer_psa <- dcost_psa / dutil_psa
 ## @knitr ---------------------------------------------------------------------
 
 test_that("PSA CEA matches deterministic calculation", {
-  
   r <- range(dcost_psa)
   expect_between(dcost, r[[1L]], r[[2L]])
   r <- range(dutil_psa)

@@ -1,6 +1,11 @@
-# rdecision 1.1.3.9001
+# rdecision 1.1.3.9002
 
 * DISCOUNTING!
+* Combined code for Chancellor model of combination therapy for HIV into a
+  single script with tests (`test-modek-AZT.R`), taking code from the SM01-HIV
+  vignette and the SemiMarkovModel test script. Non-test chunks are referenced
+  by the vignette to avoid repetition. Edited and clarified the vignette
+  and added PSA (as oer Briggs example 4.7).
 * Added vignette for total knee replacement, a semi Markov model with PSA,
   replicating Dong and Buxton, 2006. R code is taken from chunks in a 
   test_that context, thus avoiding repetition of code between the vignette

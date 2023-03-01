@@ -21,7 +21,7 @@ vignette: >
 #| purl = FALSE,
 #| include = FALSE
 # read vignette source chunks from corresponding testthat script
-knitr::read_chunk(file.path("..", "tests", "testthat", "test-Model-TKR.R"))
+knitr::read_chunk(file.path("..", "tests", "testthat", "test-model-TKR.R"))
 ```
 
 ```{r}
@@ -118,6 +118,7 @@ and `discount.utility`.
 ```
 
 ```{r}
+#| purl = FALSE
 pander::pander(SMM_base$tabulate_states()[,c("Name", "Utility")], justify="ll")
 ```
 
@@ -126,7 +127,8 @@ using the `asDOT()` method. The `DiagrammeR` package can then be used to plot
 DOT files with the `grViz` function.
 
 ```{r}
-#| fig.cap = "Markov state transition model for total knee replacement (TKR)"
+#| fig.cap = "Markov state transition model for total knee replacement (TKR)",
+#| purl = FALSE
 # wrapped in `try` to avoid error for users who don't have DiagrammeR installed
 try(
   DiagrammeR::grViz(SMM_base$as_DOT(rankdir = "TB", width = 7.0, height = 5.0)),
@@ -206,13 +208,15 @@ assigned to the transitions out of **A**) and this, with the utilities
 associated with each state, can be used to calculate the QALY.
 
 ```{r}
+#| purl = FALSE
 pander::pander(SMM_base_10years[0L:5L,])
 ```
 This progression can also be visualised using the base graphics function
 `barplot`:
 
 ```{r}
-#| fig.cap = "State occupancy progression for conventional surgery."
+#| fig.cap = "State occupancy progression for conventional surgery.",
+#| purl = FALSE
 plot_occupancy <- function(SMM) {
   withr::with_par(
     new = list(mar = c(5L, 4L, 1L, 14L) + 0.1),
@@ -256,6 +260,7 @@ CAS effect figure.
 ```
 
 ```{r}
+#| purl = FALSE
 pander::pander(
   t4_CS, round = 2L, row.names = FALSE, big.mark = ",", 
   justify = "lrrrrrrr", keep.trailing.zeros = TRUE
@@ -267,6 +272,7 @@ pander::pander(
 ```
 
 ```{r}
+#| purl = FALSE
 pander::pander(
   t4_CAS, round=2L, row.names=FALSE, big.mark=",",
   justify="lrrrrrrr", keep.trailing.zeros=TRUE
@@ -379,11 +385,6 @@ this variable. Because exact replication is therefore impossible, an arbitrary
 parametrisation is used here that is unlikely to yield an illegal value.
 
 ```{r cas-lognorm}
-CAS_effect_mean <- 0.34
-CAS_effect_sd <- 1.25
-CAS_effect_lognorm <- LogNormModVar$new(
-  "Effect of CAS", "", log(CAS_effect_mean), log(CAS_effect_sd)
-)
 ```
 
 ## Markov model
@@ -399,6 +400,7 @@ using the `modvar_table` method. This tabulation can also be used to compare
 the 95% CI with the values reported in Table 3. 
 
 ```{r}
+#| purl = FALSE
 pander::pander(
   SMM_base_PSA$modvar_table()[,c(-2L, -5L, -9L)], justify="llrrrr", round=5L
 )
@@ -410,6 +412,7 @@ the variables that were explicitly assigned to States and Transitions, such as
 such as *Cost of CAS*, which is used to calculate *Cost of state A with CAS*.
 
 ```{r}
+#| purl = FALSE
 pander::pander(
   SMM_CAS_PSA$modvar_table()[,c(-2L, -5L, -9L)], justify="llrrrr", round=5L
 )
@@ -490,6 +493,7 @@ Table 5, with the addition of the upper and lower confidence limits of the mean.
 
 ### Conventional surgery
 ```{r}
+#| purl = FALSE
 t4_CS_PSA_mean <- apply(t4_CS_PSA, MARGIN = c(1L, 2L), FUN = mean)
 pander::pander(
   t4_CS_PSA_mean, round=2L, row.names=FALSE, big.mark=",",
@@ -501,11 +505,13 @@ pander::pander(
 ```
 
 ```{r}
+#| purl = FALSE
 pander::pander(t5_CS, round = 2L, keep.trailing.zeros = TRUE, justify = "lrrrr")
 ```
 
 ### Computer-assisted surgery
 ```{r}
+#| purl = FALSE
 t4_CAS_PSA_mean <- apply(t4_CAS_PSA, MARGIN = c(1L, 2L), FUN = mean)
 pander::pander(
   t4_CAS_PSA_mean, round=2L, row.names=FALSE, big.mark=",",
@@ -517,6 +523,7 @@ pander::pander(
 ```
 
 ```{r}
+#| purl = FALSE
 pander::pander(
   t5_CAS, round = 2L, justify = "lrrrr", keep.trailing.zeros = TRUE
 )
@@ -548,7 +555,8 @@ figure below (for comparison with figure 2 of the paper).
 
 
 ```{r}
-#| fig.cap = "Cost-effectiveness plane. QALY = Quality-adjusted life year"
+#| fig.cap = "Cost-effectiveness plane. QALY = Quality-adjusted life year",
+#| purl = FALSE
 withr::with_par(
   new = list(mar = c(1L, 2L, 2L, 1L)), 
   code = {
