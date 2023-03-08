@@ -7,38 +7,29 @@
 #' expression that evaluated to \code{TRUE}.
 #' @param ... A number of R expressions which should all evaluate to FALSE. If
 #' any expression does not evaluate to a boolean value, it will be treated as
-#' TRUE.
+#' TRUE. If there are no expressions, no condition will be raised.
 #' @param message The message to display (used as the condition header)
 #' @param class Subclass of the condition
 #' @noRd
 abortif <- function(..., message = NULL, class = NULL, 
                     call = rlang::caller_env()) {
-  # construct header from argument
-  header <- ifelse(!is.null(message), message, "")
-  # get the dots argument as a quosure
+  # get the arguments as a list of quosures before they are evaluated
   qargs <- rlang::quos(...)
-  # check that ... has at least one expression
-  if (...length() == 0L) {
-    rlang::abort(
-      message = c(header, "there must be at least one expression"),
-      class = class
-    )
-  } else {
-    for (i in seq_len(...length())) {
-      arg <- ...elt(i)
-      if (!rlang::is_logical(arg) || arg) {
-        rlang::abort(
-          message = c(
-            header, 
-            paste(
-              rlang::expr_deparse(rlang::quo_get_expr(qargs[[i]])), 
-              "is not FALSE"
-            )
-          ), 
-          class = class,
-          call = call
-        )
-      }
+  # test each argument
+  for (i in seq_len(...length())) {
+    arg <- ...elt(i)
+    if (!rlang::is_logical(arg) || arg) {
+      rlang::abort(
+        message = c(
+          ifelse(!is.null(message), message, ""), 
+          paste(
+            rlang::expr_deparse(rlang::quo_get_expr(qargs[[i]])), 
+            "is not FALSE"
+          )
+        ), 
+        class = class,
+        call = call
+      )
     }
   }
 }
@@ -52,38 +43,29 @@ abortif <- function(..., message = NULL, class = NULL,
 #' expression that evaluated to \code{FALSE}.
 #' @param ... A number of R expressions which should all evaluate to TRUE. If
 #' any expression does not evaluate to a boolean value, it will be treated as
-#' FALSE.
+#' FALSE. If there are no expressions no condition will be raised.
 #' @param message The message to display (used as the condition header)
 #' @param class Subclass of the condition
 #' @noRd
 abortifnot <- function(..., message = NULL, class = NULL, 
                        call = rlang::caller_env()) {
-  # construct header from argument
-  header <- ifelse(!is.null(message), message, "")
-  # get the dots argument as a quosure
+  # get the arguments as a list of quosures before they are evaluated
   qargs <- rlang::quos(...)
-  # check that ... has at least one expression
-  if (...length() == 0L) {
-    rlang::abort(
-      message = c(header, "there must be at least one expression"),
-      class = class
-    )
-  } else {
-    for (i in seq_len(...length())) {
-      arg <- ...elt(i)
-      if (!rlang::is_logical(arg) || !arg) {
-        rlang::abort(
-          message = c(
-            header, 
-            paste(
-              rlang::expr_deparse(rlang::quo_get_expr(qargs[[i]])), 
-              "is not TRUE"
-            )
-          ), 
-          class = class,
-          call = call
-        )
-      }
+  # test each argument
+  for (i in seq_len(...length())) {
+    arg <- ...elt(i)
+    if (!rlang::is_logical(arg) || !arg) {
+      rlang::abort(
+        message = c(
+          ifelse(!is.null(message), message, ""), 
+          paste(
+            rlang::expr_deparse(rlang::quo_get_expr(qargs[[i]])), 
+            "is not TRUE"
+          )
+        ), 
+        class = class,
+        call = call
+      )
     }
   }
 }

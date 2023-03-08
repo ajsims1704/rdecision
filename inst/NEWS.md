@@ -1,6 +1,12 @@
-# rdecision 1.1.3.9002
+# rdecision 1.1.3.9003
 
-* DISCOUNTING!
+* Optimised cycling speed in `SemiMarkovModel` by creating private methods
+  to manage the kernel operations of cycling the population and tallying the
+  costs and benefits. Approx factor of 10 improvement in speed, which is
+  helpful with PSA.
+* Clarified the role of `hcc.pop` and `hcc.cost` in function `cycle` of
+  `SemiMarkovModel`. Removed the requirement for `hcc.pop` to be TRUE if
+  `hcc.cost` is TRUE (i.e., the corrections are applied independently).
 * Combined code for Chancellor model of combination therapy for HIV into a
   single script with tests (`test-modek-AZT.R`), taking code from the SM01-HIV
   vignette and the SemiMarkovModel test script. Non-test chunks are referenced

@@ -243,6 +243,7 @@ test_that("combo therapy QALY, cost and ICER agree with Briggs ex 2.5", {
 
 
 ## @knitr hcc-det -------------------------------------------------------------
+
 MT.mono.hcc <- run_mono(Ptm, cAm, cBm, cCm, hcc = TRUE)
 el.mono.hcc <- sum(MT.mono.hcc$QALY)
 cost.mono.hcc <- sum(MT.mono.hcc$Cost)

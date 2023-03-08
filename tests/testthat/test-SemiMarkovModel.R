@@ -504,6 +504,77 @@ test_that("model variables are detected", {
 # -----------------------------------------------------------------------------
 # tests of cycling
 # -----------------------------------------------------------------------------
+
+test_that("low-level population cycling operates as expected", {
+  # create states
+  s.well <- MarkovState$new(name = "Well")
+  s.disabled <- MarkovState$new(name = "Disabled")
+  s.dead <- MarkovState$new(name = "Dead")
+  # use S&B per-cycle transition probabilities and calculate rates
+  snames <- c("Well", "Disabled", "Dead")
+  Pt <- matrix(
+    data = c(0.6, 0.2, 0.2, 0.0, 0.6, 0.4, 0.0, 0.0, 1.0),
+    nrow = 3L, byrow = TRUE,
+    dimnames = list(source = snames, target = snames)
+  )
+  # create transitions
+  E <- list(
+    Transition$new(s.well, s.well),
+    Transition$new(s.dead, s.dead),
+    Transition$new(s.disabled, s.disabled),
+    Transition$new(s.well, s.disabled),
+    Transition$new(s.well, s.dead),
+    Transition$new(s.disabled, s.dead)
+  )
+  # use a subclass to add a test wrapper for method cycle_pop
+  TestSemiMarkovModel <- R6Class(
+    classname = "TestSemiMarkovModel",
+    inherit = SemiMarkovModel,
+    public = list(
+      test_cycle_pop = function() {
+        # get the populations and cycle details prior to cycling
+        pop_pre <- private$smm.pop
+        icycle_pre <- private$smm.icycle
+        elapsed_pre <- private$smm.elapsed
+        # run one low-level cycle
+        n_t <- private$cycle_pop()
+        # check that the populations and cycle details have updated
+        epop <- drop(pop_pre %*% Pt)
+        expect_identical(private$smm.pop, epop)
+        expect_identical(private$smm.icycle, icycle_pre + 1L)
+        expect_identical(private$smm.elapsed, elapsed_pre + private$smm.tcycle)
+        # return the transition count
+        return(n_t)
+      }
+    )
+  )
+  # create the model
+  m <- TestSemiMarkovModel$new(V = list(s.well, s.disabled, s.dead), E)
+  m$set_probabilities(Pt)
+  m$reset(c(Well = 10000.0, Disabled = 0.0, Dead = 0.0)) 
+  # run one low-level population cycle and check against expected populations
+  n_t <- m$test_cycle_pop()
+  expect_true(is.matrix(n_t))
+  expect_identical(nrow(n_t), 3L)
+  expect_identical(ncol(n_t), 3L)
+  expect_setequal(rownames(n_t), snames)
+  expect_setequal(colnames(n_t), snames)
+  expect_intol(n_t[["Well", "Disabled"]], 2000.0, tolerance = 1.0)
+  # run one more cycle (to 2 years)
+  n_t <- m$test_cycle_pop()
+  expect_intol(n_t[["Well", "Disabled"]], 1200.0, tolerance = 1.0)
+  expect_intol(n_t[["Disabled", "Dead"]], 800.0, tolerance = 1.0)
+  pop <- m$get_populations()
+  expect_identical(round(pop[["Well"]]), 3600.0)
+  expect_identical(round(pop[["Disabled"]]), 2400.0)
+  expect_identical(round(pop[["Dead"]]), 4000.0)
+  # run 23 more cycles
+  for (i in 1:23) {
+    m$test_cycle_pop() 
+  }
+  expect_identical(m$get_elapsed(), as.difftime(25.0*365.25, units = "days"))
+})
+
 test_that("model is cyclable", {
   # create states
   s.well <- MarkovState$new(name="Well")
@@ -537,8 +608,7 @@ test_that("model is cyclable", {
   # test illegal arguments to cycle
   expect_error(M$cycle(hcc.pop = 3.0), class = "invalid_hcc")
   expect_error(M$cycle(hcc.cost = 3.0), class = "invalid_hcc")
-  expect_error(M$cycle(hcc.pop=FALSE,hcc.cost=TRUE), class="invalid_hcc")
-  # test cycles
+  # check return object from cycle()
   DF <- M$cycle()
   expect_identical(M$get_elapsed(), as.difftime(365.25, units = "days"))
   expect_s3_class(DF, "data.frame")
@@ -548,6 +618,9 @@ test_that("model is cyclable", {
       "QALY")
   )
   expect_identical(nrow(DF), 3L)
+  expect_setequal(
+    DF[, "State"], c("Well", "Disabled", "Dead")
+  )
 })
 
 # cyclng with utilities > 1

@@ -199,14 +199,14 @@ Graph <- R6::R6Class(
     #' class function such as \code{edge_index} and \code{edge_along}.
     #' @return the edge with the specified index.
     edge_at = function(index) {
-      if (length(index) == 1L && index %in% self$edge_along()) {
-        return(private$E[[index]])
-      } 
+      # check argument
       abortifnot(
-        FALSE,
+        length(index) == 1,
+        index %in% self$edge_along(),
         message = "There is no edge with the supplied index.",
         class = "invalid_index"
       )
+      return(private$E[[index]])
     },
     
     #' @description Test whether an edge is element of the graph.

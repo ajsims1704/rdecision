@@ -1,8 +1,8 @@
 # tests of abortif
-test_that("abortif raises an error condition with no expressions", {
-  expect_error(abortif(class = "no"), class = "no")
-  expect_error(abortif(class = "no", message = "none"), class = "no")
-  expect_error(abortif())
+test_that("abortif accepts no expressions", {
+  expect_silent(abortif(class = "no"))
+  expect_silent(abortif(class = "no", message = "none"))
+  expect_silent(abortif())
 })
 
 test_that("abortif behaves correctly with non-boolean conditions", {
@@ -71,10 +71,10 @@ test_that("abortif error message with >1 expression is correct", {
 })
 
 # tests of abortifnot
-test_that("abortifnot raises an error condition with no expressions", {
-  expect_error(abortifnot(class = "no"), class = "no")
-  expect_error(abortifnot(class = "no", message = "none"), class = "no")
-  expect_error(abortifnot())
+test_that("abortifnot accepts no expressions", {
+  expect_silent(abortifnot(class = "no"))
+  expect_silent(abortifnot(class = "no", message = "none"))
+  expect_silent(abortifnot())
 })
 
 test_that("abortifnot behaves correctly with non-boolean conditions", {

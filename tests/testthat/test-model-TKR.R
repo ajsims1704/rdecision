@@ -3,8 +3,8 @@
 # replacement, and to check that its results agree with those presented in the
 # paper.
 #
-# The checks are done as part of the testthat framework, which ensures that 
-# any changes in the package code which unintentionally result in deviations
+# The checks are done as part of the testthat framework, ensuring that 
+# changes in the package code which unintentionally result in deviations
 # from the expected results of the model are identified.
 #
 # Code to construct and run the model is contained within labelled knitr code
@@ -14,6 +14,7 @@
 
 
 ## @knitr state-names ---------------------------------------------------------
+
 states <- c(
   "A" = "TKR operation for knee problems",
   "B" = "TKR with serious complications",
@@ -28,6 +29,7 @@ states <- c(
 
 
 ## @knitr utils-point ----------------------------------------------------------
+
 utility_A <- 0.72
 utility_B <- 0.35
 utility_C <- 0.66
@@ -40,6 +42,7 @@ utility_I <- 0.00
 
 
 ## @knitr costs-point ----------------------------------------------------------
+
 cost_A <- 5197.0
 cost_B <- 0.0
 cost_C <- 0.0
@@ -64,7 +67,6 @@ sF <- MarkovState$new(states["F"], utility = utility_F)
 sG <- MarkovState$new(states["G"], utility = utility_G)
 sH <- MarkovState$new(states["H"], utility = utility_H)
 sI <- MarkovState$new(states["I"], utility = utility_I)
-
 States <- list(sA, sB, sC, sD, sE, sF, sG, sH, sI)
 
 # Transitions

@@ -404,17 +404,24 @@ Applies one cycle of the model.
 \subsection{Arguments}{
 \if{html}{\out{<div class="arguments">}}
 \describe{
-\item{\code{hcc.pop}}{Boolean; whether to apply half cycle correction to the
-population and QALY. If TRUE, the correction is only applied to the 
-outputs of 
-functions \code{cycle} and \code{cycles}; the state population passed to
-the next cycle is the end cycle population, obtainable 
-with \code{get_populations}.}
+\item{\code{hcc.pop}}{Determines the state populations returned by this
+function and for calculating incremental utility, and the time at which
+the utility discount is applied. If FALSE, the end of cycle populations
+and time apply; if TRUE the mid-cycle populations and time apply. The
+mid-cycle populations are taken as the mean of the start and end
+populations and the discount time as the mid-point. The value of this
+parameter does not affect the state populations or elapsed time passed
+to the next cycle or available via
+\code{get_populations}; those are always the end cycle values.}
 
-\item{\code{hcc.cost}}{Boolean; whether to apply half cycle correction to the
-costs. If true, the occupancy costs are computed using the population
-at half cycle; if false they are applied at the end of the cycle. 
-Applicable only if \code{hcc.pop} is TRUE.}
+\item{\code{hcc.cost}}{Determines the state occupancy costs returned by this
+function and the time at which the cost discount is applied to the
+occupancy costs and the entry costs. If FALSE, the end of cycle
+populations and time apply; if TRUE the mid-cycle populations and time
+apply, as per \code{hcc.pop}. The value of this parameter does not affect
+the state populations or elapsed time passed to the next cycle or
+available via \code{get_populations}; those are always the end cycle
+values.}
 }
 \if{html}{\out{</div>}}
 }
@@ -424,15 +431,13 @@ following columns:
 \describe{
 \item{\code{State}}{Name of the state.}
 \item{\code{Cycle}}{The cycle number.}
-\item{\code{Time}}{Clock time, years.}
-\item{\code{Population}}{Population of the state at the end of 
-the cycle, or at mid-cycle if half-cycle correction is applied.}
+\item{\code{Time}}{Clock time in years of the end of the cycle.}
+\item{\code{Population}}{Populations of the states; see \code{hcc.pop}.}
 \item{\code{OccCost}}{Cost of the population occupying the state for 
-the cycle. Discount is applied, if the options are set. The costs are
-normalized by the model population. The cycle costs are derived from the
-annual occupancy costs of the \code{MarkovState}s. Applied to the end
-population, i.e. unaffected by half cycle correction, as per 
-Briggs \emph{et al}.}
+the cycle. Discounting and half cycle correction is applied, if those
+options are set. The costs are normalized by the model population. The
+cycle costs are derived from the annual occupancy costs of the
+\code{MarkovState}s.}
 \item{\code{EntryCost}}{Cost of the transitions \emph{into} the state
 during the cycle. Discounting is applied, if the option is set. 
 The result is normalized by the model population. The cycle costs
@@ -458,17 +463,24 @@ Applies multiple cycles of the model.
 \describe{
 \item{\code{ncycles}}{Number of cycles to run; default is 2.}
 
-\item{\code{hcc.pop}}{Boolean; whether to apply half cycle correction to the
-population and QALY. If TRUE, the correction is only applied to the 
-outputs of functions \code{cycle} and \code{cycles}; the state 
-population passed to
-the next cycle is the end cycle population, obtainable 
-with \code{get_populations}.}
+\item{\code{hcc.pop}}{Determines the state populations returned by this
+function and for calculating incremental utility, and the time at which
+the utility discount is applied. If FALSE, the end of cycle populations
+and time apply; if TRUE the mid-cycle populations and time apply. The
+mid-cycle populations are taken as the mean of the start and end
+populations and the discount time as the mid-point. The value of this
+parameter does not affect the state populations or elapsed time passed
+to the next cycle or available via
+\code{get_populations}; those are always the end cycle values.}
 
-\item{\code{hcc.cost}}{Boolean; whether to apply half cycle correction to the
-costs. If true, the occupancy costs are computed using the population
-at half cycle; if false they are applied at the end of the cycle.
-Applicable only if \code{hcc.pop} is TRUE.}
+\item{\code{hcc.cost}}{Determines the state occupancy costs returned by this
+function and the time at which the cost discount is applied to the
+occupancy costs and the entry costs. If FALSE, the end of cycle
+populations and time apply; if TRUE the mid-cycle populations and time
+apply, as per \code{hcc.pop}. The value of this parameter does not affect
+the state populations or elapsed time passed to the next cycle or
+available via \code{get_populations}; those are always the end cycle
+values.}
 }
 \if{html}{\out{</div>}}
 }
