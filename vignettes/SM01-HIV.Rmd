@@ -21,6 +21,8 @@ csl: "../inst/nature-no-et-al.csl"
 #| include = FALSE
 # read vignette source chunks from corresponding testthat script
 knitr::read_chunk(file.path("..", "tests", "testthat", "test-model-AZT.R"))
+# read vignette build utility functions
+knitr::read_chunk(file.path("vutils.R"))
 ```
 
 ```{r}
@@ -35,13 +37,9 @@ knitr::opts_chunk$set(
 )
 ```
 
-```{r}
-#| purl = FALSE
-gbp <- function(x) {
-  s <- format(round(x, digits = 0L), digits = NULL, nsmall = 0L,
-              scientific = FALSE, big.mark = ",")
-  return(s)
-}
+```{r, gv2png}
+```
+```{r, gbp}
 ```
 
 ```{r setup, echo=FALSE}
@@ -117,21 +115,15 @@ visualization with the `dot` tool of Graphviz, or plotted directly in R via
 the `DiagrammeR` package. The Markov model is shown in the figure below.
 
 ```{r}
-#| fig.asp = 0.21,
 #| fig.cap = "Markov model for comparison of HIV therapy. 
 #|            A: 200 < cd4 < 500, B: cd4 < 200, C: AIDS, D: Death.",
 #| purl = FALSE
-# This vignette is processed by knitr at build time (on the package developer's
-# system) and so DiagrammeR only needs to be available there, not on any
-# system used for checking or installing the vignettes, which operate on the
-# versions moved to the doc directory at build time. 
-try(
-  DiagrammeR::grViz(m$as_DOT()), silent = TRUE
-)
+pngfile <- gv2png(m$as_DOT())
+knitr::include_graphics(path = pngfile)
 ```
 
 ## Per-cycle transition probabilities
-The per-cycle transition probabilities, which are the cells of the Markov
+The per-cycle transition probabilities are the cells of the Markov
 transition matrix. For the monotherapy model, the transition matrix is
 shown below. This is consistent with the Table 1 of 
 Chancellor *et al* [-@chancellor1997].

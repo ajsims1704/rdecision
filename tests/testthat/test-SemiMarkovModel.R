@@ -190,7 +190,7 @@ test_that("invalid transition probabilities are rejected", {
   expect_identical(M$transition_probabilities(), EPt)
   # no probabilities
   expect_error(
-    M$set_probabilities(), class = "invalid_Pt"
+    M$set_probabilities()
   )
   # probabilities are not a matrix
   expect_error(
@@ -387,15 +387,15 @@ test_that("invalid population vectors are rejected", {
   expect_identical(unname(rp[3L]), 0.0)
   # number of elements
   pop <- c(Well = 10000L, Disabled = 0L)
-  expect_error(M$reset(pop), class = "incorrect_state_count")
+  expect_error(M$reset(pop), class = "invalid_populations")
   # state names
   pop <- c(Well = 10000.0, Poorly = 0.0, Disabled = 0.0)
-  expect_error(M$reset(pop), class = "unmatched_states")
+  expect_error(M$reset(pop), class = "invalid_populations")
   pop <- c(10000L, 0L, 0L)
-  expect_error(M$reset(pop), class = "unmatched_states")
+  expect_error(M$reset(pop), class = "invalid_populations")
   # type
   pop <- c(Well = 10000L, Disabled = "0", Dead = 0L)
-  expect_error(M$reset(pop), class = "non-numeric_state_population")
+  expect_error(M$reset(pop), class = "invalid_populations")
   # correct
   pop <- c(Well = 10000L, Disabled = 0L, Dead = 0L)
   expect_silent(M$reset(pop))
@@ -569,7 +569,7 @@ test_that("low-level population cycling operates as expected", {
   expect_identical(round(pop[["Disabled"]]), 2400.0)
   expect_identical(round(pop[["Dead"]]), 4000.0)
   # run 23 more cycles
-  for (i in 1:23) {
+  for (i in 1L:23L) {
     m$test_cycle_pop() 
   }
   expect_identical(m$get_elapsed(), as.difftime(25.0*365.25, units = "days"))

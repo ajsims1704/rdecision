@@ -22,6 +22,8 @@ vignette: >
 #| include = FALSE
 # read vignette source chunks from corresponding testthat script
 knitr::read_chunk(file.path("..", "tests", "testthat", "test-model-TKR.R"))
+# read vignette build utility functions
+knitr::read_chunk(file.path("vutils.R"))
 ```
 
 ```{r}
@@ -33,6 +35,12 @@ knitr::opts_chunk$set(
 )
 pander::panderOptions("table.split.table", 200L)
 ```
+
+```{r, gv2png, echo = FALSE}
+```
+```{r, gbp, echo = FALSE}
+```
+
 
 ```{r}
 #| echo = FALSE
@@ -123,17 +131,27 @@ pander::pander(SMM_base$tabulate_states()[,c("Name", "Utility")], justify="ll")
 ```
 
 The `SemiMarkovModel` object can be represented graphically in the DOT format
-using the `asDOT()` method. The `DiagrammeR` package can then be used to plot
+using the `as_DOT()` method. The `DiagrammeR` package can then be used to plot
 DOT files with the `grViz` function.
 
 ```{r}
 #| fig.cap = "Markov state transition model for total knee replacement (TKR)",
-#| purl = FALSE
-# wrapped in `try` to avoid error for users who don't have DiagrammeR installed
-try(
-  DiagrammeR::grViz(SMM_base$as_DOT(rankdir = "TB", width = 7.0, height = 5.0)),
-  silent = TRUE
-)
+#| purl = FALSE,
+#| eval = FALSE
+DiagrammeR::grViz(SMM_base$as_DOT(rankdir = "TB", width = 7.0, height = 5.0))
+```
+
+```{r}
+#| fig.cap = "Markov state transition model for total knee replacement (TKR)",
+#| purl = FALSE,
+#| echo = FALSE
+# This vignette is processed by knitr at build time (on the package developer's
+# system) and so dot only needs to be available there, not on any system used
+# for checking or installing the vignettes, which operate on the
+# versions moved to the doc directory at build time. It is preferable to use
+# dot with png output for vignette builds because it creates more compact html.
+pngfile <- gv2png(SMM_base$as_DOT(rankdir = "TB"))
+knitr::include_graphics(path = pngfile)
 ```
 
 ## Transition probabilities

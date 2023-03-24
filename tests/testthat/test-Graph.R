@@ -261,13 +261,18 @@ test_that("Fig 1.1.1 from Gross & Yellen (2013)", {
   expect_identical(G$degree(v), 4L)
   expect_identical(G$degree(w), 2L)
   expect_identical(G$degree(x), 4L)
-  # adjacency
+  # adjacency, noting that nodes may not be in the same order as supplied
+  nodenames <- c("u", "v", "w", "x")
+  EA <- matrix(
+    data = c(
+      0L, 2L, 0L, 0L,  2L, 0L, 1L, 1L,  
+      0L, 1L, 0L, 1L,  0L, 1L, 1L, 2L
+    ), 
+    nrow = 4L, byrow = TRUE,
+    dimnames = list(out.node = nodenames, in.node = nodenames)
+  )
   A <- G$graph_adjacency_matrix()
-  EA <- matrix(c(0L, 2L, 0L, 0L,  2L, 0L, 1L, 1L,  
-                 0L, 1L, 0L, 1L,  0L, 1L, 1L, 2L), 
-               nrow = 4L, byrow = TRUE,
-               dimnames = list(out.node = c("u", "v", "w", "x"),
-                               in.node = c("u", "v", "w", "x")))
+  A <- A[nodenames, nodenames]
   expect_identical(A, EA)
   # neighbours
   XX <- Node$new("XX")

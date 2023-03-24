@@ -325,25 +325,19 @@ SemiMarkovModel <- R6::R6Class(
     #' it is replaced by 1 minus the sum of the defined probabilities.
     #' @return Updated \code{SemiMarkovModel} object
     set_probabilities = function(Pt) {
-      # check Pt
-      abortif(missing(Pt),
-        message = "Pt is missing, without default", 
-        class = "invalid_Pt"
-      )
-      abortifnot(is.matrix(Pt),
-        message = "'Pt' must be a matrix", 
-        class = "invalid_Pt"
-      )
-      abortifnot(nrow(Pt) == self$order() && ncol(Pt) == self$order(),
-        message = paste("'Pt' must have size", self$order(), "x", self$order()),
-        class = "invalid_Pt"
-      )
-      abortifnot(setequal(self$get_statenames(), dimnames(Pt)[[1L]]),
-        message = "Each row of 'Pt' must have a state name",
-        class = "invalid_Pt"
-      )
-      abortifnot(setequal(self$get_statenames(), dimnames(Pt)[[2L]]),
-        message = "Each column of 'Pt' must have a state name",
+      # check form of Pt
+      nstates <- self$order()
+      sn <- self$get_statenames()
+      abortifnot(
+        is.matrix(Pt),
+        nrow(Pt) == nstates && ncol(Pt) == nstates,
+        setequal(sn, dimnames(Pt)[[1L]]),
+        setequal(sn, dimnames(Pt)[[2L]]),
+        message = paste(
+          "'Pt' must be a matrix",
+          "of size", nstates, "x", nstates, ".",
+          "Each row and column must have a unique state name."
+        ),
         class = "invalid_Pt"
       )
       # check NAs and replace them 
@@ -353,31 +347,20 @@ SemiMarkovModel <- R6::R6Class(
         class = "invalid_Pt"
       )
       sumP <- rowSums(Pt, na.rm = TRUE)
-      for (r in seq_len(self$order())) {
+      for (r in seq_len(nstates)) {
         if (nNA[[r]] > 0L) {
-          Pt[r, which(is.na(Pt[r, ]))] <- 1.0 - sumP[r]
+          Pt[[r, which(is.na(Pt[r, ]))]] <- 1.0 - sumP[[r]]
         }
       }
       # check that all cells are a probability
-      abortif(any(Pt < 0.0) || any(Pt > 1.0),
+      abortif(
+        any(Pt < 0.0),
+        any(Pt > 1.0),
         message = "All elements of 'Pt' must be probabilities",
         class = "invalid_Pt"
       )
       # check that Pt[i,j]==0 if edge i->j is not in graph
-      M <- matrix(
-        data = FALSE, 
-        nrow = self$order(), ncol = self$order(),
-        dimnames = list(
-          source = dimnames(Pt)[[1L]], 
-          target = dimnames(Pt)[[2L]]
-        )
-      )
-      for (ie in seq_len(self$size())) {
-        e <- private$E[[ie]]
-        is <- e$source()$name()
-        it <- e$target()$name()
-        M[is,it] <- TRUE
-      }
+      M <- self$digraph_adjacency_matrix(boolean = TRUE)
       AA <- (Pt != 0.0)    
       abortif(sum(M | AA) > sum(M),
         message = "All non-zero Pt cells must correspond to transitions",
@@ -456,41 +439,34 @@ SemiMarkovModel <- R6::R6Class(
     #' @return Updated \code{SemiMarkovModel} object.
     reset = function(populations = NULL, icycle = 0L, 
                      elapsed = as.difftime(0.0, units = "days")) {
-      # check that population is valid
+      # get the state names
+      sn <- self$get_statenames()
+      # check and set the populations
       if (is.null(populations)) {
         private$smm.pop <- vector(mode="numeric", length=self$order())
-        names(private$smm.pop) <- self$get_statenames()
+        names(private$smm.pop) <- sn
         private$smm.pop[[1L]] <- 1000.0
       } else {
-        abortifnot(length(populations) == self$order(),
-          message = "Argument 'populations' must have one element per state", 
-          class = "incorrect_state_count"
+        abortifnot(
+          length(populations) == self$order(),
+          setequal(sn, names(populations)),
+          is.numeric(populations),
+          message = paste(
+            "'populations' must be a numeric vector with one named element",
+            "per state"
+            ), 
+          class = "invalid_populations"
         )
-        # check the state names are correct
-        abortifnot(setequal(self$get_statenames(), names(populations)),
-          message = "Each element of 'populations' must have a state name",
-          class = "unmatched_states"
-        )
-        # check that all populations are of type numeric
-        vapply(populations, FUN.VALUE = TRUE, FUN = function(x) {
-          abortifnot(is.numeric(x),
-            message = "Each element of 'populations' must be of type numeric",
-            class = "non-numeric_state_population"
-          )
-          return(TRUE)
-        })
         # set the populations
-        for (s in self$get_statenames()) {
+        for (s in sn) {
           private$smm.pop[s] <- populations[s]
         }
-      }
+      } 
       # check and set the cycle number
-      abortifnot(is.integer(icycle),
-        message = "'icycle' must be an integer",
-        class = "invalid_icycle"
-      )
-      abortifnot(icycle >= 0L,
-        message = "'icycle' must be >= 0",
+      abortifnot(
+        is.integer(icycle),
+        icycle >= 0L,
+        message = "'icycle' must be an integer >= 0",
         class = "invalid_icycle"
       )
       private$smm.icycle <- icycle

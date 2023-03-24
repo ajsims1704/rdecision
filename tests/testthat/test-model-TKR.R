@@ -573,44 +573,25 @@ SMM_CAS_PSA <- SemiMarkovModel$new(
 ## @knitr fun-dirichlet -------------------------------------------------------
 
 dirichletify <- function(Pt, population = 1L) {
-  if (!is.matrix(Pt)) {
-    rlang::abort("'Pt' must be a matrix", class="invalid_Pt")
-  }
-  if (!is.numeric(Pt)) {
-    rlang::abort("'Pt' must be a numeric matrix", class="invalid_Pt")
-  }
-  if ((nrow(Pt) != ncol(Pt))) {
-    rlang::abort(
-      "'Pt' must be a square matrix",
-      class = "invalid_Pt")
-  }
-  if (any(dimnames(Pt)[[2L]] != dimnames(Pt)[[1L]])) {
-    rlang::abort(
-      "Rows and columns of 'Pt' must have the same state names",
-      class = "invalid_Pt")
-  }  
+  # check argument
+  stopifnot(
+    is.matrix(Pt),
+    is.numeric(Pt),
+    nrow(Pt) == ncol(Pt),
+    all(dimnames(Pt)[[2L]] == dimnames(Pt)[[1L]])
+  )
   nNA <- rowSums(is.na(Pt))
   sumP <- rowSums(Pt, na.rm=TRUE)
   # check if a count or proportion representation
   is_count <- any(Pt>1.0, na.rm=TRUE)
   if (is_count) {
     # counts cannot have NAs
-    if (any(nNA>0L)) {
-      rlang::abort(
-        "Transition counts cannot include NAs",
-        class = "invalid_Pt"
-      )
-    }
+    stopifnot(all(nNA == 0L))
     # normalise into proportions
     Pt <- Pt/rowSums(Pt)
   } else {
     # proportions can have NA values, but only 1/row
-    if (any(nNA>1L)) {
-      rlang::abort(
-        "No more than one NA per row is allowed",
-        class = "invalid_Pt"
-      )
-    }
+    stopifnot(all(nNA <= 1L))
     # store information about which variable was set as NA
     whichNA <- apply(Pt, 1L, function(row) which(is.na(row)))
     # populate missing values to a total of 1

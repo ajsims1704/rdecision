@@ -1,5 +1,8 @@
-# rdecision 1.1.3.9003
+# rdecision 1.1.3.9004
 
+* **CHECK REORDERING OF NODES**
+* Created `vutils.R` in folder vignettes as a home for helper functions used in
+  vignette building.
 * Optimised cycling speed in `SemiMarkovModel` by creating private methods
   to manage the kernel operations of cycling the population and tallying the
   costs and benefits. Approx factor of 10 improvement in speed, which is

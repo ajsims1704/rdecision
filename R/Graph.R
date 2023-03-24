@@ -26,8 +26,8 @@ Graph <- R6::R6Class(
     
     #' @description Create a new \code{Graph} object from sets of nodes 
     #' and edges. 
-    #' @param V A list of Nodes.
-    #' @param E A list of Edges.
+    #' @param V An un-ordered set of Nodes, as a list.
+    #' @param E An un-ordered set of Edges, as a list.
     #' @return A \code{Graph} object.
     initialize = function(V, E) {
       # check and set nodes
@@ -78,6 +78,10 @@ Graph <- R6::R6Class(
         class = "repeated_edges"
       )
       private$E <- E
+      #### randomly permute the vertices and edges
+      #private$V <- sample(private$V, size = length(V), replace = FALSE)
+      #private$E <- sample(private$E, size = length(E), replace = FALSE)
+      ####
       # calculate the adjacency matrix 
       private$AG <- self$graph_adjacency_matrix(FALSE)
       # return new graph object
@@ -99,19 +103,22 @@ Graph <- R6::R6Class(
     #' @description Sequence of vertex indices.
     #' @details Similar to \code{base::seq_along}, this function provides
     #' the indices of the vertices in the graph. It is intended for use by 
-    #' graph algorithms which iterate vertices.
-    #' @return A numeric vector.
+    #' graph algorithms which iterate vertices. 
+    #' @return A numeric vector of indices from 1 to the order of the graph.
+    #' The vertex at index \eqn{i} is not guaranteed to be the same vertex at 
+    #' \code{V[[i]]} of the argument \code{V} to \code{new} (i.e., the order in
+    #' which the vertices are stored internally within the class may differ
+    #' from the order in which they were supplied).
     vertex_along = function() {
       return(seq_along(private$V))
     },
     
     #' @description Find the index of a vertex in the graph.
     #' @param v A vertex.
-    #' @return Index of \var{v}. The vertices are normally stored in the same
-    #' order they are specified in \code{new}, but this cannot be guaranteed. 
-    #' This function returns the same index as used in the adjacency matrix and 
-    #' \code{NA} if \var{v} is not a vertex, or is a vertex that is not in 
-    #' the graph.
+    #' @return Index of \var{v}. The index of vertex \code{v} is the one
+    #' used internally to the class object, which is not necessarily the same as
+    #' the order of vertices in the \code{V} argument of \code{new}. \code{NA}
+    #' if \var{v} is not a vertex, or is a vertex that is not in the graph.
     vertex_index = function(v) {
       # find v in V
       index <- NA_integer_
@@ -129,24 +136,20 @@ Graph <- R6::R6Class(
     #' @description Find the vertex at a given index.
     #' @details The inverse of function \code{vertex_index}. The function will
     #' raise an abort signal if the supplied index is not a vertex.
-    #' @param index Index of a vertex in the graph, as an integer. The indices
-    #' of the vertices normally run from 1 to the order of the graph, and are
-    #' normally in the same sequence as the list of vertices, \var{V}, supplied
-    #' when the graph was created. However, these assumptions are not
-    #' guaranteed to hold for future versions of the package, and it is
-    #' recommended to supply an index value that has been provided by another
-    #' class function such as \code{vertex_index}, \code{vertex_along} and
-    #' \code{graph_adjacency_matrix}.
+    #' @param index Index of a vertex in the graph, as an integer.
     #' @return the node (vertex) with the specified index.
     vertex_at = function(index) {
-      if (length(index) == 1L && index %in% self$vertex_along()) {
-        return(private$V[[index]])
-      } 
+      # check the argument
       abortifnot(
-        FALSE,
+        length(index) == 1L,
+        !is.na(index),
+        is.integer(index),
+        index >= 1L,
+        index <= length(private$V),
         message = "There is no vertex with the supplied index.",
         class = "invalid_index"
       )
+      return(private$V[[index]])
     },
     
     #' @description Test whether a vertex is an element of the graph.
@@ -160,19 +163,23 @@ Graph <- R6::R6Class(
 
     #' @description Sequence of edge indices.
     #' @details Similar to \code{base::seq_along}, this function provides
-    #' the indices of the  edges in the graph. It is intended for use by 
+    #' the indices of the edges in the graph. It is intended for use by 
     #' graph algorithms which iterate edges.
-    #' @return A numeric vector.
+    #' @return A numeric vector of indices from 1 to the size of the graph.
+    #' The edge at index \eqn{i} is not guaranteed to be the same edge at 
+    #' \code{E[[i]]} of the argument \code{E} to \code{new} (i.e., the order in
+    #' which the edges are stored internally within the class may differ
+    #' from the order in which they were supplied).
     edge_along = function() {
       return(seq_along(private$E))
     },
 
     #' @description Find the index of an edge in a graph.
     #' @param e Subject edge.
-    #' @return Index of \code{e}. The edges are normally stored in the same
-    #' order they are specified in \code{new}, but this cannot be guaranteed. 
-    #' This function returns the same index returned in other functions and 
-    #' \code{NA} if the edge is not in the graph.
+    #' @return Index of \code{e}. The index of edge \code{e} is the one used
+    #' internally to the class object, which is not necessarily the same as the
+    #' order of edges in the \code{E} argument of \code{new}. \code{NA} if
+    #' \var{e} is not an edge, or is an edge that is not in the graph.
     edge_index = function(e) {
       # find e in E
       index <- NA_integer_
@@ -188,21 +195,18 @@ Graph <- R6::R6Class(
     },
 
     #' @description Find the edge at a given index.
-    #' @details The inverse of function \code{dge_index}. The function will
+    #' @details The inverse of function \code{edge_index}. The function will
     #' raise an abort signal if the supplied index is not an edge.
-    #' @param index Index of a edge in the graph, as an integer. The indices
-    #' of the edges normally run from 1 to the size of the graph, and are
-    #' normally in the same sequence as the list of edges, \var{E}, supplied
-    #' when the graph was created. However, these assumptions are not
-    #' guaranteed to hold for future versions of the package, and it is
-    #' recommended to supply an index value that has been provided by another
-    #' class function such as \code{edge_index} and \code{edge_along}.
+    #' @param index Index of a edge in the graph, as an integer.
     #' @return the edge with the specified index.
     edge_at = function(index) {
       # check argument
       abortifnot(
-        length(index) == 1,
-        index %in% self$edge_along(),
+        length(index) == 1L,
+        !is.na(index),
+        is.integer(index),
+        index >= 1L,
+        index <= length(private$E),
         message = "There is no edge with the supplied index.",
         class = "invalid_index"
       )
@@ -227,8 +231,8 @@ Graph <- R6::R6Class(
     #' cell is {\code{FALSE}, \code{TRUE}}.
     #' @return A square integer matrix with the number of rows and columns
     #' equal to the order of the graph. The rows and columns are labelled
-    #' with the node labels, if all the nodes in the graph have labels, or the
-    #' node indices if not. 
+    #' with the node labels, if all the nodes in the graph have unique labels,
+    #' or the node indices if not. 
     graph_adjacency_matrix = function(boolean = FALSE) {
       # check argument
       abortifnot(
@@ -240,9 +244,17 @@ Graph <- R6::R6Class(
       # immutable (no edges or vertexes added or removed since its creation)
       if (is.null(private$AG)) {
         # create matrix
-        L <- vapply(private$V, FUN.VALUE = "x", FUN = function(v) v$label())
+        iv <- self$vertex_along()
+        L <- vapply(
+          iv, 
+          FUN.VALUE = "x",
+          FUN = function(i) {
+            v <- self$vertex_at(i)
+            v$label()
+          }
+        )
         if (anyDuplicated(L) != 0L || any(nchar(L) == 0L)) {
-          L <- as.character(self$vertex_along())
+          L <- as.character(iv)
         }
         n <- self$order()
         A <- matrix(

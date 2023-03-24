@@ -326,6 +326,7 @@ psa <- matrix(
 )
 
 # run the model repeatedly
+#Rprof()
 for (irun in seq_len(nrow(psa))) {
   
   # sample variables from their uncertainty distributions
@@ -367,6 +368,7 @@ for (irun in seq_len(nrow(psa))) {
   # calculate the icer
   psa[[irun, "icer"]] <- (cost.comb - cost.mono) / (el.comb - el.mono)
 }
+#Rprof(NULL)
 
 ## @knitr ---------------------------------------------------------------------
 

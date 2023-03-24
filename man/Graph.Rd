@@ -63,9 +63,9 @@ and edges.
 \subsection{Arguments}{
 \if{html}{\out{<div class="arguments">}}
 \describe{
-\item{\code{V}}{A list of Nodes.}
+\item{\code{V}}{An un-ordered set of Nodes, as a list.}
 
-\item{\code{E}}{A list of Edges.}
+\item{\code{E}}{An un-ordered set of Edges, as a list.}
 }
 \if{html}{\out{</div>}}
 }
@@ -115,7 +115,11 @@ graph algorithms which iterate vertices.
 }
 
 \subsection{Returns}{
-A numeric vector.
+A numeric vector of indices from 1 to the order of the graph.
+The vertex at index \eqn{i} is not guaranteed to be the same vertex at 
+\code{V[[i]]} of the argument \code{V} to \code{new} (i.e., the order in
+which the vertices are stored internally within the class may differ
+from the order in which they were supplied).
 }
 }
 \if{html}{\out{<hr>}}
@@ -135,11 +139,10 @@ Find the index of a vertex in the graph.
 \if{html}{\out{</div>}}
 }
 \subsection{Returns}{
-Index of \var{v}. The vertices are normally stored in the same
-order they are specified in \code{new}, but this cannot be guaranteed. 
-This function returns the same index as used in the adjacency matrix and 
-\code{NA} if \var{v} is not a vertex, or is a vertex that is not in 
-the graph.
+Index of \var{v}. The index of vertex \code{v} is the one
+used internally to the class object, which is not necessarily the same as
+the order of vertices in the \code{V} argument of \code{new}. \code{NA}
+if \var{v} is not a vertex, or is a vertex that is not in the graph.
 }
 }
 \if{html}{\out{<hr>}}
@@ -154,14 +157,7 @@ Find the vertex at a given index.
 \subsection{Arguments}{
 \if{html}{\out{<div class="arguments">}}
 \describe{
-\item{\code{index}}{Index of a vertex in the graph, as an integer. The indices
-of the vertices normally run from 1 to the order of the graph, and are
-normally in the same sequence as the list of vertices, \var{V}, supplied
-when the graph was created. However, these assumptions are not
-guaranteed to hold for future versions of the package, and it is
-recommended to supply an index value that has been provided by another
-class function such as \code{vertex_index}, \code{vertex_along} and
-\code{graph_adjacency_matrix}.}
+\item{\code{index}}{Index of a vertex in the graph, as an integer.}
 }
 \if{html}{\out{</div>}}
 }
@@ -205,12 +201,16 @@ Sequence of edge indices.
 
 \subsection{Details}{
 Similar to \code{base::seq_along}, this function provides
-the indices of the  edges in the graph. It is intended for use by 
+the indices of the edges in the graph. It is intended for use by 
 graph algorithms which iterate edges.
 }
 
 \subsection{Returns}{
-A numeric vector.
+A numeric vector of indices from 1 to the size of the graph.
+The edge at index \eqn{i} is not guaranteed to be the same edge at 
+\code{E[[i]]} of the argument \code{E} to \code{new} (i.e., the order in
+which the edges are stored internally within the class may differ
+from the order in which they were supplied).
 }
 }
 \if{html}{\out{<hr>}}
@@ -230,10 +230,10 @@ Find the index of an edge in a graph.
 \if{html}{\out{</div>}}
 }
 \subsection{Returns}{
-Index of \code{e}. The edges are normally stored in the same
-order they are specified in \code{new}, but this cannot be guaranteed. 
-This function returns the same index returned in other functions and 
-\code{NA} if the edge is not in the graph.
+Index of \code{e}. The index of edge \code{e} is the one used
+internally to the class object, which is not necessarily the same as the
+order of edges in the \code{E} argument of \code{new}. \code{NA} if
+\var{e} is not an edge, or is an edge that is not in the graph.
 }
 }
 \if{html}{\out{<hr>}}
@@ -248,18 +248,12 @@ Find the edge at a given index.
 \subsection{Arguments}{
 \if{html}{\out{<div class="arguments">}}
 \describe{
-\item{\code{index}}{Index of a edge in the graph, as an integer. The indices
-of the edges normally run from 1 to the size of the graph, and are
-normally in the same sequence as the list of edges, \var{E}, supplied
-when the graph was created. However, these assumptions are not
-guaranteed to hold for future versions of the package, and it is
-recommended to supply an index value that has been provided by another
-class function such as \code{edge_index} and \code{edge_along}.}
+\item{\code{index}}{Index of a edge in the graph, as an integer.}
 }
 \if{html}{\out{</div>}}
 }
 \subsection{Details}{
-The inverse of function \code{dge_index}. The function will
+The inverse of function \code{edge_index}. The function will
 raise an abort signal if the supplied index is not an edge.
 }
 
@@ -314,8 +308,8 @@ cells are either 0 (not adjacent) or 1 (adjacent).
 \subsection{Returns}{
 A square integer matrix with the number of rows and columns
 equal to the order of the graph. The rows and columns are labelled
-with the node labels, if all the nodes in the graph have labels, or the
-node indices if not.
+with the node labels, if all the nodes in the graph have unique labels,
+or the node indices if not.
 }
 }
 \if{html}{\out{<hr>}}
