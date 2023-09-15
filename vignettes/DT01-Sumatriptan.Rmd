@@ -16,6 +16,21 @@ vignette: >
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---
+
+```{r}
+#| purl = FALSE,
+#| include = FALSE
+# read vignette source chunks from corresponding testthat script
+knitr::read_chunk(
+  file.path("..", "tests", "testthat", "test-model-Sumatriptan.R")
+)
+# read vignette build utility functions
+knitr::read_chunk(file.path("vutils.R"))
+```
+
+```{r, gbp, echo = FALSE}
+```
+
 ```{r}
 #| include = FALSE,
 #| purl = FALSE
@@ -34,9 +49,17 @@ library(rdecision)
 This vignette is an example of modelling a decision tree using the `rdecision`
 package. It is based on the example given by Briggs [-@briggs2006] (Box 2.3) 
 which itself is based on a decision tree which compared oral Sumatriptan versus
-oral caffeine/Ergotamine for migraine [@evans1997].
+oral caffeine/Ergotamine for migraine [@evans1997]. In this vignette, we 
+consider the problem from the perspective of a provincial health department.
 
 # Creating the model
+
+## Model variables
+The following code defines the variables for cost, utility and effect that will
+be used in the model. There are 14 variables in total; 4 costs, 4 utilities and
+6 probabilities.
+```{r, modvars, echo = TRUE}
+```
 
 ## Constructing the tree
 The following code constructs the decision tree. In the
@@ -45,90 +68,16 @@ formulation used by `rdecision`, a decision tree is a form of
 root and a unique path from the root to each leaf node. Decision trees
 comprise three types of node: decision, chance and leaf nodes and two
 types of edge: actions (whose sources are decision nodes) and reactions
-(whose sources are chance nodes), [see figure](#tree-diagram).
+(whose sources are chance nodes), [see Figure 1](#tree-diagram).
 
-```{r}
-#| echo = TRUE
-
-# Time horizon
-th <- as.difftime(48L, units="hours")
-
-# model variables for cost
-c.sumatriptan <- 16.10
-c.caffeine <- 1.32
-c.ED <- 63.16
-c.admission <- 1093.0
-
-# Sumatriptan branch
-ta <- LeafNode$new("A", utility=1.0, interval=th)
-tb <- LeafNode$new("B", utility=0.9, interval=th)
-c3 <- ChanceNode$new()
-e1 <- Reaction$new(c3, ta, p=0.594, label="No recurrence")
-e2 <- Reaction$new(c3, tb, p=0.406, cost=c.sumatriptan, 
-                   label="Relieved 2nd dose")
-
-td <- LeafNode$new("D", utility=0.1, interval=th)
-te <- LeafNode$new("E", utility=-0.3, interval=th)
-c7 <- ChanceNode$new()
-e3 <- Reaction$new(c7, td, p=0.998, label="Relief")
-e4 <- Reaction$new(c7, te, p=0.002, cost=c.admission, label="Hospitalization")
-
-tc <- LeafNode$new("C", utility=-0.3, interval=th)
-c4 <- ChanceNode$new()
-e5 <- Reaction$new(c4, tc, p=0.920, label="Endures attack")
-e6 <- Reaction$new(c4, c7, p=0.080, cost=c.ED, label="ED")
-
-c1 <- ChanceNode$new()
-e7 <- Reaction$new(c1, c3, p=0.558, label="Relief")
-e8 <- Reaction$new(c1, c4, p=0.442, label="No relief")
-
-# Caffeine/Ergotamine branch
-tf <- LeafNode$new("F", utility=1.0, interval=th)
-tg <- LeafNode$new("G", utility=0.9, interval=th)
-c5 <- ChanceNode$new()
-e9 <- Reaction$new(c5, tf, p=0.703, label="No recurrence")
-e10 <- Reaction$new(c5, tg, p=0.297, cost=c.caffeine, 
-                    label="Relieved 2nd dose")
-
-ti <- LeafNode$new("I", utility=0.1, interval=th)
-tj <- LeafNode$new("J", utility=-0.3, interval=th)
-c8 <- ChanceNode$new()
-e11 <- Reaction$new(c8, ti, p=0.998, label="Relief")
-e12 <- Reaction$new(c8, tj, p=0.002, cost=c.admission, label="Hospitalization")
- 
-th <- LeafNode$new("H", utility=-0.3, interval=th)
-c6 <- ChanceNode$new()
-e13 <- Reaction$new(c6, th, p=0.920, label="Endures attack")
-e14 <- Reaction$new(c6, c8, p=0.080, cost=c.ED, label="ED")
-
-c2 <- ChanceNode$new()
-e15 <- Reaction$new(c2, c5, p=0.379, label="Relief")
-e16 <- Reaction$new(c2, c6, p=0.621, label="No relief")
-
-# decision node
-d1 <- DecisionNode$new("d1")
-e17 <- Action$new(d1, c1, cost=c.sumatriptan, label="Sumatriptan")
-e18 <- Action$new(d1, c2, cost=c.caffeine, label="Caffeine-Ergotamine")
- 
-# create lists of nodes and edges
-V <- list(
-  d1, c1, c2, c3, c4, c5, c6, c7, c8,
-  ta, tb, tc, td, te, tf, tg, th, ti, tj
-)
-E <- list(
-  e1, e2, e3, e4, e5, e6, e7, e8, e9, e10, e11, e12, e13, e14, e15, e16, 
-  e17, e18
-)
-# tree
-DT <- DecisionTree$new(V,E)
+```{r, model, echo = TRUE}
 ```
 
-## Tree diagram
 ```{r}
 #| results = "hide",
 #| fig.keep = "all",
 #| fig.align = "center",
-#| fig.cap = "Decision tree for the Sumatriptan model"
+#| fig.cap = "Figure 1. Decision tree for the Sumatriptan model"
 DT$draw(border=TRUE)
 ```
 
@@ -140,46 +89,116 @@ example there is a single decision node with two actions, and the strategies
 are simply the two forms of treatment to be compared. More complex decision
 trees are also possible.
 
-The paths traversable in each strategy can be evaluated individually
-using the method `evaluate(by="path")`. In `rdecision` a strategy is defined as
-a set of action edges with one action edge per decision node. It is necessary to 
-use the option `by="path"` only if information about each pathway is
+The paths traversed in each strategy can be evaluated individually
+using the method `evaluate(by = "path")`. In `rdecision` a strategy is defined
+as a set of action edges with one action edge per decision node. It is necessary
+to use the option `by = "path"` only if information about each pathway is
 required; normally it is sufficient to call `evaluate` which will automatically
 aggregate the evaluation by strategy.
 
 # Model results
-The evaluation of each pathway, for each strategy, yields the following table:
-```{r}
-local({
-  RES <- DT$evaluate(by="path")
-  RES$Benefit <- NULL
-  RES$Run <- NULL
-  RES$Probability <- round(RES$Probability, digits = 2L)
-  RES$Cost <- round(RES$Cost, digits = 2L)
-  RES$Utility <- round(RES$Utility, digits = 2L)
-  RES$QALY <- round(RES$QALY, digits = 4L)
-  knitr::knit_print(RES)
-})
+
+## Base case
+The evaluation of each pathway, for each strategy, is done as follows:
+```{r, eval_by_path, echo = TRUE}
+```
+
+and yields the following table:
+```{r, echo = FALSE}
+knitr::kable(
+  ep[, c("Leaf", "Probability", "Cost", "Utility")],
+  align = "lrrr",
+  digits = c(2L, 4L, 2L, 5L),
+  format.args = list(scientific = FALSE)
+)
 ```
 
 There are, as expected, ten pathways (5 per strategy). The expected
 cost, utility and QALY (utility multiplied by the time horizon of the model) for
 each choice can be calculated from the table 
 above, or by invoking the `evaluate` method of a decision tree object with the
-default parameter `by="strategy"`. This gives the following result, consistent
-with that reported by Evans *et al* [-@evans1997].
+default parameter `by = "strategy"`. 
 
-```{r}
-local({
-  summary <- DT$evaluate()
-  summary$Run <- NULL
-  summary$Probability <- NULL
-  summary$Benefit <- NULL
-  summary$Cost <- round(summary$Cost, 2L)
-  summary$Utility <- round(summary$Utility, 4L)
-  summaryQALY <- round(summary$QALY, 4L)
-  knitr::knit_print(summary)
-})
+```{r, eval_by_strategy, echo = TRUE}
 ```
+
+This gives the following result, consistent with that reported by
+Evans *et al* [-@evans1997].
+
+```{r, echo = FALSE}
+knitr::kable(
+  es[, c("d1", "Cost", "Utility", "QALY")],
+  align = "lrrr",
+  digits = c(2L, 2L, 4L, 4L),
+  format.args = list(scientific = FALSE)
+)
+```
+
+```{r, icer, echo = FALSE}
+```
+The incremental cost was $Can `r gbp(x = delta_c, p = TRUE)` and the
+incremental utility was `r round(delta_u, 2L)`. Because the time
+horizon of the model was 1 day, the incremental QALYs was the incremental
+utility divided by 365, and the ICER was therefore equal to `r gbp(icer)`
+$Can/QALY, within 5% of the published estimate. 
+
+## Univariate sensitivity analysis
+Evans *et al* [-@evans1997] reported the ICER for various alternative values
+of input variables. For example (their Table VIII), they reported that the 
+ICER was 60,839 $Can/QALY for a relative increase in effectiveness of 9.1%
+(i.e., when the relief from Sumatriptan was 9.1 percentage points greater than
+that of Caffeine-Ergotamine) and 18,950 $Can/QALY for a relative increase in
+effectiveness of 26.8% (these being the lower and upper confidence intervals
+of the estimate of effectiveness from meta-analysis).
+
+To calculate these ICERs, we set the value of the model variable
+`p_sumatriptan_relief`, and re-evaluate the model. The upper range of ICER
+(with the smaller relative increase in effectiveness) is calculated as follows:
+
+```{r, relief_threshold_upper, echo = TRUE}
+```
+
+
+## Blah
+
+
+Clearly, it would be possible to simply change the value of the variable
+`p.sumatriptan.relief` in the code above, and re-run the script. However, it 
+is common to want to estimate the threshold value of an input parameter that
+leads to a particular outcome (cost saving or ICER). `rdecision` includes
+a method to do this, and we will use the ICER values given in the previous
+paragraph to estimate the corresponding effectiveness thresholds, as an
+illustrative example.
+
+Method `threshold` works by changing the value of one variable over a defined
+range. The variable must be a type of object called a `ModVar` within 
+`rdecision`, and is identified by its unique name. In the model created
+earlier, all variables were scalar constants. So, to make the `threshold`
+method work correctly, the variable of interest must be re-defined as a 
+`ModVar`. Further, because the variable of interest is a probability, its
+complement must be defined as an expression model variable (a model variable
+whose value depends on other model variables), so that the sum of the
+probabilities remains as one. The code below creates the necessary model
+variables, and re-builds the model with revised edges that refer to them.
+Note that the type of `ModVar` is unimportant for calculating thresholds, and
+so in this case, we have used the simplest form, a `ConstModVar`.
+
+```{r, threshold_model, echo = TRUE}
+```
+
+Next, we apply the threshold method to estimate the values of 
+`p_sumatriptan_relief` at two known values of the ICER. In each case, we can
+specify the range over which to seek the threshold.
+
+```{r, relief_thresholds, echo = TRUE}
+```
+
+The value of `p_relief_upper` is `r round(100.0 * p_relief_upper, 1L)`% and the
+value of `p_relief_lower` is `r round(100.0 * p_relief_lower, 1L)`%, which are
+`r round(100.0 * (p_relief_upper - p_caffeine_relief), 1L)` and 
+`r round(100.0 * (p_relief_lower - p_caffeine_relief), 1L)` percentage
+points greater than the relief from Caffeine-Ergotamine 
+(`r round(100.0 * p_caffeine_relief, 1L)`), and close to the
+values reported by Evans *et al* (26.8% and 9.1% respectively).
 
 # References

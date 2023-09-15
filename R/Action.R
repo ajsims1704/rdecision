@@ -11,8 +11,8 @@ Action <- R6::R6Class(
   lock_class = TRUE,
   inherit = Arrow,
   private = list(
-    edge.cost = NULL,
-    edge.benefit = NULL
+    edge_cost = NULL,
+    edge_benefit = NULL
   ),
   public = list(
     
@@ -26,41 +26,33 @@ Action <- R6::R6Class(
     #' must be defined for an action because the label is used in
     #' tabulation of strategies. It is recommended to choose labels that are
     #' brief and not punctuated with spaces, dots or underscores.
-    #' @param cost Cost associated with traversal of this edge.
+    #' @param cost Cost associated with traversal of this edge (numeric or
+    #' \code{ModVar}).
     #' @param benefit Benefit associated with traversal of the edge.
     #' @return A new \code{Action} object.
     initialize = function(source_node, target_node, label, 
                           cost = 0.0, benefit = 0.0) {
       # check label
-      abortifnot(is.character(label),
+      abortifnot(
+        is.character(label),
+        nchar(label) > 0L,
         message = "Argument 'label' must be a string", 
         class = "invalid_label"
       )
-      abortifnot(nchar(label) > 0L,
-        message = "Argument 'label' must be defined", 
-        class = "empty_label"
-      )
-      # initialize base class
+      # initialize base class (checks that source and target are both Nodes)
       super$initialize(
         source = source_node, target = target_node, label = label
       )
       # check that source inherits from DecisionNode
-      abortifnot(inherits(source_node, what = "DecisionNode"),
+      abortifnot(
+        inherits(source_node, what = "DecisionNode"),
         message = "Node 'source_node' must be a DecisionNode", 
         class = "invalid_source"
       )
       # check and set cost, ensuring initialization
-      abortifnot(inherits(cost, what = c("numeric", "ModVar")),
-        message = "Argument 'cost' must be of type 'numeric' or 'ModVar'.",
-        class = "invalid_cost"
-      )
-      private$edge.cost <- cost
+      self$set_cost(cost)
       # check and set benefit, ensuring initialization
-      abortifnot(inherits(benefit, what = c("numeric", "ModVar")),
-        message = "Argument 'benefit' must be of type 'numeric' or 'ModVar'.",
-        class = "invalid_benefit"
-      )
-      private$edge.benefit <- benefit
+      self$set_benefit(benefit)
       # Return Action node
       return(invisible(self))
     },
@@ -71,7 +63,7 @@ Action <- R6::R6Class(
     #' @return A list of \code{ModVar}s.
     modvars = function() {
       # create lists of input variables and output ModVars
-      iv <- c(private$edge.cost, private$edge.benefit)
+      iv <- c(private$edge_cost, private$edge_benefit)
       ov <- list()
       for (v in iv) {
         if (is_ModVar(v)) {
@@ -94,17 +86,45 @@ Action <- R6::R6Class(
       return(1.0)
     },
     
+    #' @description Set the cost associated with the action edge.
+    #' @param c Cost associated with traversing the action edge. Of type numeric
+    #' or \code{ModVar}.
+    #' @return Updated \code{Action} object.
+    set_cost = function(c = 0.0) {
+      abortifnot(
+        inherits(c, what = c("numeric", "ModVar")),
+        message = "Argument 'c' must be of type 'numeric' or 'ModVar'.",
+        class = "invalid_cost"
+      )
+      private$edge_cost <- c
+      return(invisible(self))
+    },
+    
     #' @description Return the cost associated with traversing the edge.
     #' @return Cost.
     cost = function() {
-      rv <- as_numeric(private$edge.cost)
+      rv <- as_numeric(private$edge_cost)
       return(rv)
     },
     
+    #' @description Set the benefit associated with the action edge.
+    #' @param b Benefit associated with traversing the action edge. Of type
+    #' numeric or \code{ModVar}.
+    #' @return Updated \code{Action} object.
+    set_benefit = function(b = 0.0) {
+      abortifnot(
+        inherits(b, what = c("numeric", "ModVar")),
+        message = "Argument 'b' must be of type 'numeric' or 'ModVar'.",
+        class = "invalid_benefit"
+      )
+      private$edge_benefit <- b
+      return(invisible(self))
+    },
+
     #' @description Return the benefit associated with traversing the edge.
     #' @return Benefit.
     benefit = function() {
-      rv <- as_numeric(private$edge.benefit)
+      rv <- as_numeric(private$edge_benefit)
       return(rv)
     }  
   )

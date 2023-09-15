@@ -268,10 +268,10 @@ test_that("example of 4 node digraph with cycle has correct properties", {
   b <- Node$new("b")
   c <- Node$new("c")
   d <- Node$new("d")
-  a1 <- Arrow$new(a,b)
-  a2 <- Arrow$new(b,c)
-  a3 <- Arrow$new(c,a)
-  a4 <- Arrow$new(a,d)
+  a1 <- Arrow$new(a, b)
+  a2 <- Arrow$new(b, c)
+  a3 <- Arrow$new(c, a)
+  a4 <- Arrow$new(a, d)
   V <- list(a, b, c, d)
   A <- list(a1, a2, a3, a4)
   G <- Digraph$new(V, A)
@@ -279,18 +279,40 @@ test_that("example of 4 node digraph with cycle has correct properties", {
   expect_identical(G$order(), 4L)
   expect_identical(G$size(), 4L)
   #
-  expect_error(G$direct_successors(42L), class="not_in_graph")
+  expect_error(G$direct_successors(42L), class = "not_in_graph")
   e <- Node$new("e")
-  expect_error(G$direct_successors(e), class="not_in_graph")
-  expect_R6setequal(G$direct_successors(a), list(b,d))
+  expect_error(G$direct_successors(e), class = "not_in_graph")
+  expect_R6setequal(G$direct_successors(a), list(b, d))
   expect_R6setequal(G$direct_successors(c), list(a))
   expect_length(G$direct_successors(d), 0L)
   #
+  # test of target() function
+  expect_error(G$target(42L), class = "not_in_graph")
+  expect_error(G$target(a), class = "not_in_graph") 
+  a5 <- Arrow$new(b, d)
+  expect_true(is_Arrow(a5))
+  expect_error(G$target(a5), class = "not_in_graph")
+  expect_true(G$has_edge(a1))
+  expect_identical(G$target(a1), G$vertex_index(b))
+  expect_identical(G$target(a2), G$vertex_index(c))
+  expect_identical(G$target(a4), G$vertex_index(d))
+  #
   expect_error(G$direct_predecessors(42L), class = "not_in_graph")
-  expect_error(G$direct_predecessors(e), class="not_in_graph")
+  expect_error(G$direct_predecessors(e), class = "not_in_graph")
   expect_R6setequal(G$direct_predecessors(a), list(c))
   expect_R6setequal(G$direct_predecessors(c), list(b))
   expect_R6setequal(G$direct_predecessors(d), list(a))
+  #
+  # test of source() function
+  expect_error(G$source(42L), class = "not_in_graph")
+  expect_error(G$source(a), class = "not_in_graph")
+  a5 <- Arrow$new(b, d)
+  expect_true(is_Arrow(a5))
+  expect_error(G$source(a5), class = "not_in_graph")
+  expect_true(G$has_edge(a1))
+  expect_identical(G$source(a1), G$vertex_index(a))
+  expect_identical(G$source(a2), G$vertex_index(b))
+  expect_identical(G$source(a4), G$vertex_index(a))
   #
   expect_false(G$is_acyclic())
 })
@@ -344,7 +366,7 @@ test_that("rdecision solves New Scientist Puzzle 62", {
   B <- V[[25L]]
   P <- G$paths(A,B)
   # convert paths to walks
-  W <- lapply(P, function(p) G$walk(p))
+  W <- lapply(X = P, FUN = G$walk)
   # count and tabulate how many special edges each walk traverses
   BB <- c("V11", "H22", "V25", "H33", "V32", "H44", "V43")
   nw <- vapply(W, FUN.VALUE = 1L, FUN = function(w) {

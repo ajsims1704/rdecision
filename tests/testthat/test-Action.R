@@ -1,15 +1,46 @@
-test_that("unlabelled actions are rejected", {
+test_that("new object arguments are checked", {
   d1 <- DecisionNode$new("d1")
   t1 <- LeafNode$new("t1")
-  expect_error(Action$new(t1,d1,cost="200",label="e"), class="invalid_source")
-  expect_error(Action$new(d1, t1, 42L), class = "invalid_label")
-  expect_error(Action$new(d1,t1,""), class="empty_label")
-  expect_error(Action$new(d1,t1,cost="200",label="e"), class="invalid_cost")
   expect_error(
-    Action$new(d1,t1,benefit="200",label="e"), 
-    class="invalid_benefit"
+    Action$new(t1, d1, cost = "200", label = "e"),
+    class = "invalid_source"
   )
-  expect_silent(Action$new(d1,t1,"mychoice"))
+  expect_error(Action$new(d1, t1, 42L), class = "invalid_label")
+  expect_error(Action$new(d1, t1, ""), class = "invalid_label")
+  expect_error(
+    Action$new(d1, t1, cost="200", label = "e"),
+    class = "invalid_cost"
+  )
+  expect_error(
+    Action$new(d1, t1, benefit = "200", label = "e"), 
+    class = "invalid_benefit"
+  )
+  expect_silent(Action$new(d1, t1, "mychoice"))
+})
+
+test_that("class parameters are updated dynamically", {
+  # create edge and check it
+  d1 <- DecisionNode$new("d1")
+  t1 <- LeafNode$new("t1")
+  e1 <- Action$new(source = d1, target = t1, label = "e")
+  expect_identical(e1$cost(), 0.0)
+  expect_identical(e1$benefit(), 0.0)
+  # attempt to set an invalid cost
+  expect_error(e1$set_cost("42"), class = "invalid_cost")
+  # set cost to default, and check it
+  e1$set_cost()
+  expect_identical(e1$cost(), 0.0)
+  # set cost and check it
+  e1$set_cost(42.0)
+  expect_identical(e1$cost(), 42.0)
+  # attempt to set an invalid benefit
+  expect_error(e1$set_benefit("42"), class = "invalid_benefit")
+  # set benefit to default, and check it
+  e1$set_benefit()
+  expect_identical(e1$benefit(), 0.0)
+  # set cost and check it
+  e1$set_benefit(42.0)
+  expect_identical(e1$benefit(), 42.0)
 })
 
 test_that("argument name matching supports old and new parameter names", {
@@ -46,4 +77,13 @@ test_that("modvars are identified", {
   })
   expect_setequal(d, c("fortytwo", "free"))
   expect_intol(e$benefit(), 42.0, 0.01)
+  # add a modvar dynamically
+  e <- Action$new(
+    n1, n2, cost = 42.0, benefit = fortytwo, label = "label"
+  )
+  mv <- e$modvars()
+  expect_length(mv, 1L)
+  e$set_cost(c = free)
+  mv <- e$modvars()
+  expect_length(mv, 2L)
 })

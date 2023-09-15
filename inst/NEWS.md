@@ -1,6 +1,17 @@
-# rdecision 1.1.3.9004
+# rdecision 1.1.3.9005
+
+* Added functions `source` and `target` to `Digraph` to support checked
+  iteration of lists of arrows to retrieve their source or target nodes.
+* Placed code for the Sumatriptan vignette into a single script with tests,
+  (`test-model-Sumatriptan.R`), to avoid replicating code in test scripts.
 
 * **CHECK REORDERING OF NODES**
+* **CHECK SUM OF PROBABILITIES AT CHANCE NODES IN DECISION TREE EVALUATION ** 
+* Added `set_cost`, `set_benefit` and `set_probability` to class `Reaction` to
+  allow dynamic setting of costs, benefits and probabilities in decision trees
+  without the need to rebuild the model.
+* Added `set_cost` and `set_benefit` to class `Action` to allow dynamic setting
+  of costs and benefits in decision trees without the need to rebuild the model.
 * Created `vutils.R` in folder vignettes as a home for helper functions used in
   vignette building.
 * Optimised cycling speed in `SemiMarkovModel` by creating private methods
@@ -11,13 +22,13 @@
   `SemiMarkovModel`. Removed the requirement for `hcc.pop` to be TRUE if
   `hcc.cost` is TRUE (i.e., the corrections are applied independently).
 * Combined code for Chancellor model of combination therapy for HIV into a
-  single script with tests (`test-modek-AZT.R`), taking code from the SM01-HIV
+  single script with tests (`test-model-AZT.R`), taking code from the SM01-HIV
   vignette and the SemiMarkovModel test script. Non-test chunks are referenced
   by the vignette to avoid repetition. Edited and clarified the vignette
   and added PSA (as oer Briggs example 4.7).
 * Added vignette for total knee replacement, a semi Markov model with PSA,
   replicating Dong and Buxton, 2006. R code is taken from chunks in a 
-  test_that context, thus avoiding repetition of code between the vignette
+  `test_that` context, thus avoiding repetition of code between the vignette
   and the test case.
 * Code chunks in vignettes which are entirely presentational are marked as
   "purl = FALSE" to remove them from the R scripts that are generated at

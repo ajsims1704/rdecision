@@ -303,5 +303,5 @@ test_that("Fig 1.1.1 from Gross & Yellen (2013) is drawn correctly", {
   f <- Edge$new(w,v,"f")
   G <- Graph$new(V=list(u,v,w,x), E=list(a,b,c,d,e,f))
   # draw it
-  expect_silent(DOT <- G$as_DOT())
+  expect_silent(G$as_DOT())
 })

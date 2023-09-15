@@ -12,9 +12,9 @@ Reaction <- R6::R6Class(
   lock_class = TRUE,
   inherit = Arrow,
   private = list(
-    edge.cost = NULL,
-    edge.benefit = NULL,
-    edge.p = NULL
+    edge_cost = NULL,
+    edge_benefit = NULL,
+    edge_p = NULL
   ),
   public = list(
     
@@ -26,9 +26,11 @@ Reaction <- R6::R6Class(
     #' general.
     #' @param source_node Chance node from which the reaction leaves.
     #' @param target_node Node which the reaction enters.
-    #' @param p Probability
-    #' @param cost Cost associated with traversal of this edge.
-    #' @param benefit Benefit associated with traversal of the edge.
+    #' @param p Conditional probability of traversing the reaction edge.
+    #' @param cost Cost associated with traversal of this edge (numeric or
+    #' \code{ModVar}).
+    #' @param benefit Benefit associated with traversal of the edge (numeric or
+    #' \code{ModVar}).
     #' @param label Character string containing the reaction label.
     #' @return A new \code{Reaction} object.
     initialize = function(source_node, target_node, p, cost = 0.0, 
@@ -38,28 +40,17 @@ Reaction <- R6::R6Class(
         source_node = source_node, target_node = target_node, label = label
       )
       # check that source inherits from ChanceNode
-      abortifnot(inherits(source_node, what = "ChanceNode"),
+      abortifnot(
+        inherits(source_node, what = "ChanceNode"),
         message = "Node 'source' must be a ChanceNode", 
         class = "invalid_source"
       )
-      # check and set p, ensuring initialization
-      abortifnot(inherits(p, what = c("numeric", "ModVar")),
-        message = "Argument 'p' must be of type 'numeric' or 'ModVar'.",
-        class = "invalid_p"
-      )
-      private$edge.p <- p
+      # check and set probability, ensuring initialization
+      self$set_probability(p)
       # check and set cost, ensuring initialization
-      abortifnot(inherits(cost, what = c("numeric", "ModVar")),
-        message = "Argument 'cost' must be of type 'numeric' or 'ModVar'.",
-        class = "invalid_cost"
-      )
-      private$edge.cost <- cost
+      self$set_cost(cost)
       # check and set benefit, ensuring initialization
-      abortifnot(inherits(benefit, what = c("numeric", "ModVar")),
-        message = "Argument 'benefit' must be of type 'numeric' or 'ModVar'.",
-        class = "invalid_benefit"
-      )
-      private$edge.benefit <- benefit
+      self$set_benefit(benefit)
       # Return reaction node
       return(invisible(self))
     },
@@ -70,7 +61,7 @@ Reaction <- R6::R6Class(
     #' @return A list of \code{ModVar}s.
     modvars = function() {
       # create lists of input variables and output Modvars
-      iv <- c(private$edge.cost, private$edge.benefit, private$edge.p)
+      iv <- c(private$edge_cost, private$edge_benefit, private$edge_p)
       ov <- list()
       for (v in iv) {
         if (inherits(v, what="ModVar")) {
@@ -86,27 +77,73 @@ Reaction <- R6::R6Class(
       return(unique(ov))
     },
 
+    #' @description Set the probability associated with the reaction edge.
+    #' @param p Conditional probability of traversing the reaction edge. Of type
+    #' numeric or \code{ModVar}. If numeric, \code{p} must be in the range
+    #' [0,1].
+    #' @return Updated \code{Reaction} object.
+    set_probability = function(p) {
+      abortifnot(
+        !is_missing(p),
+        inherits(p, what = c("numeric", "ModVar")),
+        ifelse(inherits(p, "numeric"), p >= 0.0 && p <= 1.0, TRUE),
+        message = paste(
+          "Argument 'p' must not be missing, of type 'numeric' or 'ModVar',",
+          "and in range [0,1] if numeric."
+        ),
+        class = "invalid_probability"
+      )
+      private$edge_p <- p
+      return(invisible(self))
+    },
+    
     #' @description Return the current value of the edge probability, i.e. the
     #' conditional' probability of traversing the edge.
     #' @return Numeric value in range [0,1].
     p = function() {
-      prob <- as_numeric(private$edge.p)
+      prob <- as_numeric(private$edge_p)
       return(prob)
     },
     
-    #' @description 
-    #' Return the cost associated with traversing the edge.
+    #' @description Set the cost associated with the reaction edge.
+    #' @param c Cost associated with traversing the reaction edge. Of type
+    #' numeric or \code{ModVar}.
+    #' @return Updated \code{Reaction} object.
+    set_cost = function(c = 0.0) {
+      abortifnot(
+        inherits(c, what = c("numeric", "ModVar")),
+        message = "Argument 'c' must be of type 'numeric' or 'ModVar'.",
+        class = "invalid_cost"
+      )
+      private$edge_cost <- c
+      return(invisible(self))
+    },
+
+    #' @description Return the cost associated with traversing the edge.
     #' @return Cost.
     cost = function() {
-      rv <- as_numeric(private$edge.cost)
+      rv <- as_numeric(private$edge_cost)
       return(rv)
     },
     
-    #' @description 
-    #' Return the benefit associated with traversing the edge.
+    #' @description Set the benefit associated with the reaction edge.
+    #' @param b Benefit associated with traversing the reaction edge. Of type
+    #' numeric or \code{ModVar}.
+    #' @return Updated \code{Action} object.
+    set_benefit = function(b = 0.0) {
+      abortifnot(
+        inherits(b, what = c("numeric", "ModVar")),
+        message = "Argument 'b' must be of type 'numeric' or 'ModVar'.",
+        class = "invalid_benefit"
+      )
+      private$edge_benefit <- b
+      return(invisible(self))
+    },
+    
+    #' @description Return the benefit associated with traversing the edge.
     #' @return Benefit.
     benefit = function() {
-      rv <- as_numeric(private$edge.benefit)
+      rv <- as_numeric(private$edge_benefit)
       return(rv)
     }  
   )

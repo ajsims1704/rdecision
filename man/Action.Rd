@@ -23,7 +23,9 @@ Andrew J. Sims \email{andrew.sims@newcastle.ac.uk}
 \item \href{#method-Action-new}{\code{Action$new()}}
 \item \href{#method-Action-modvars}{\code{Action$modvars()}}
 \item \href{#method-Action-p}{\code{Action$p()}}
+\item \href{#method-Action-set_cost}{\code{Action$set_cost()}}
 \item \href{#method-Action-cost}{\code{Action$cost()}}
+\item \href{#method-Action-set_benefit}{\code{Action$set_benefit()}}
 \item \href{#method-Action-benefit}{\code{Action$benefit()}}
 \item \href{#method-Action-clone}{\code{Action$clone()}}
 }
@@ -63,7 +65,8 @@ must be defined for an action because the label is used in
 tabulation of strategies. It is recommended to choose labels that are
 brief and not punctuated with spaces, dots or underscores.}
 
-\item{\code{cost}}{Cost associated with traversal of this edge.}
+\item{\code{cost}}{Cost associated with traversal of this edge (numeric or
+\code{ModVar}).}
 
 \item{\code{benefit}}{Benefit associated with traversal of the edge.}
 }
@@ -103,6 +106,27 @@ Numeric value equal to 1.
 }
 }
 \if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-Action-set_cost"></a>}}
+\if{latex}{\out{\hypertarget{method-Action-set_cost}{}}}
+\subsection{Method \code{set_cost()}}{
+Set the cost associated with the action edge.
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{Action$set_cost(c = 0)}\if{html}{\out{</div>}}
+}
+
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{c}}{Cost associated with traversing the action edge. Of type numeric
+or \code{ModVar}.}
+}
+\if{html}{\out{</div>}}
+}
+\subsection{Returns}{
+Updated \code{Action} object.
+}
+}
+\if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-Action-cost"></a>}}
 \if{latex}{\out{\hypertarget{method-Action-cost}{}}}
 \subsection{Method \code{cost()}}{
@@ -113,6 +137,27 @@ Return the cost associated with traversing the edge.
 
 \subsection{Returns}{
 Cost.
+}
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-Action-set_benefit"></a>}}
+\if{latex}{\out{\hypertarget{method-Action-set_benefit}{}}}
+\subsection{Method \code{set_benefit()}}{
+Set the benefit associated with the action edge.
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{Action$set_benefit(b = 0)}\if{html}{\out{</div>}}
+}
+
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{b}}{Benefit associated with traversing the action edge. Of type
+numeric or \code{ModVar}.}
+}
+\if{html}{\out{</div>}}
+}
+\subsection{Returns}{
+Updated \code{Action} object.
 }
 }
 \if{html}{\out{<hr>}}

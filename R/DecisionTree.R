@@ -49,50 +49,7 @@ DecisionTree <- R6::R6Class(
   classname = "DecisionTree",
   lock_class = TRUE,
   inherit = Arborescence,
-  private = list(
 
-    # @description Find the nodes of a particular type in the tree.
-    # @param type A character string with the name of the type of node of
-    # interest (\code{DecisionNode}, \code{ChanceNode} or \code{LeafNode}).
-    # @param what A character string defining what to return. Must be one
-    # of "node", "label" or "index".
-    # @return A list of \code{ChanceNode} objects (for what = "node"); a list
-    # of character strings (for what = "label"), or an integer vector with
-    # indexes of the decision nodes (for what = "index").
-    nodes_of_type = function(type = "DecisionNode", what = "node") {
-      # check arguments
-      abortifnot(
-        what %in% c("node", "index", "label"),
-        message = "Argument 'what' must be one of 'node', 'label' or 'index'.",
-        class = "unknown_what_value"
-      )
-      abortifnot(
-        type %in% c("DecisionNode", "ChanceNode", "LeafNode"),
-        message = paste0(
-          "Argument 'what' must be one of 'DecisionNode'", 
-          "'ChanceNode' or 'LeafNode'."
-        ),
-        class = "unknown_type_value"
-      )
-      # find which of the vertex indices are decision node indices
-      vi <- self$vertex_along()
-      ci <- vi[vapply(vi, FUN.VALUE = TRUE, FUN = function(i) {
-        inherits(self$vertex_at(i), what = type)
-      })]
-      rv <- ci
-      # find node objects or labels if required 
-      if (what == "node") {
-        rv <- lapply(ci, function(i) self$vertex_at(i))
-      } else if (what == "label") {
-        rv <- vapply(ci, FUN.VALUE = "x", FUN = function(i) {
-          v <- self$vertex_at(i)
-          v$label()
-        })
-      }
-      return(rv)      
-    }
-  ),
-  
   public = list(
     
     #' @description Create a new decision tree. 
@@ -162,7 +119,29 @@ DecisionTree <- R6::R6Class(
     #' of character strings (for what = "label"), or an integer vector with
     #' indexes of the decision nodes (for what = "index").
     decision_nodes = function(what = "node") {
-      return(private$nodes_of_type(type = "DecisionNode", what = what))
+      # check arguments
+      abortifnot(
+        what %in% c("node", "index", "label"),
+        message = "Argument 'what' must be one of 'node', 'label' or 'index'.",
+        class = "unknown_what_value"
+      )
+      # helper functions
+      isd <- function(i) {
+        n <- self$vertex_at(i)
+        return(inherits(n, what = "DecisionNode"))
+      }
+      lbl <- function(i) {
+        n <- self$vertex_at(i)
+        return(n$label())
+      }
+      # iterate
+      n <- which(vapply(self$vertex_along(), FUN.VALUE = TRUE, FUN = isd))
+      if (what == "node") {
+        n <- lapply(n, self$vertex_at)
+      } else if (what == "label") {
+        n <- vapply(n, FUN.VALUE = NA_character_, FUN = lbl)
+      }
+      return(n)
     },
 
     #' @description Find the chance nodes in the tree.
@@ -172,7 +151,29 @@ DecisionTree <- R6::R6Class(
     #' of character strings (for what = "label"), or an integer vector with
     #' indexes of the decision nodes (for what = "index").
     chance_nodes = function(what = "node") {
-      return(private$nodes_of_type(type = "ChanceNode", what = what))
+      # check arguments
+      abortifnot(
+        what %in% c("node", "index", "label"),
+        message = "Argument 'what' must be one of 'node', 'label' or 'index'.",
+        class = "unknown_what_value"
+      )
+      # helper functions
+      isd <- function(i) {
+        n <- self$vertex_at(i)
+        return(inherits(n, what = "ChanceNode"))
+      }
+      lbl <- function(i) {
+        n <- self$vertex_at(i)
+        return(n$label())
+      }
+      # iterate
+      n <- which(vapply(self$vertex_along(), FUN.VALUE = TRUE, FUN = isd))
+      if (what == "node") {
+        n <- lapply(n, self$vertex_at)
+      } else if (what == "label") {
+        n <- vapply(n, FUN.VALUE = NA_character_, FUN = lbl)
+      }
+      return(n)
     },
 
     #' @description Find the leaf nodes in the tree.
@@ -183,7 +184,29 @@ DecisionTree <- R6::R6Class(
     #' of character strings (for what = "label"); or an integer vector of 
     #' leaf node indexes (for what = "index").
     leaf_nodes = function(what = "node") {
-      return(private$nodes_of_type(type = "LeafNode", what = what))
+      # check arguments
+      abortifnot(
+        what %in% c("node", "index", "label"),
+        message = "Argument 'what' must be one of 'node', 'label' or 'index'.",
+        class = "unknown_what_value"
+      )
+      # helper functions
+      isd <- function(i) {
+        n <- self$vertex_at(i)
+        return(inherits(n, what = "LeafNode"))
+      }
+      lbl <- function(i) {
+        n <- self$vertex_at(i)
+        return(n$label())
+      }
+      # iterate
+      n <- which(vapply(self$vertex_along(), FUN.VALUE = TRUE, FUN = isd))
+      if (what == "node") {
+        n <- lapply(n, self$vertex_at)
+      } else if (what == "label") {
+        n <- vapply(n, FUN.VALUE = NA_character_, FUN = lbl)
+      }
+      return(n)
     },
 
     #' @description Find the edges that have the specified decision node as 
@@ -494,7 +517,7 @@ DecisionTree <- R6::R6Class(
             label = v$label(),
             x = grid::unit(gx(XY[i,"x"]),"cm"),
             y = grid::unit(gy(XY[i, "y"] + a / 3.0), "cm") +
-                grid::unit(0.4, "char"),
+              grid::unit(0.4, "char"),
             just = c("right", "bottom"),
             gp = grid::gpar(fontsize=fontsize)
           )
@@ -504,35 +527,45 @@ DecisionTree <- R6::R6Class(
       return(invisible(self))
     },
     
-    #' @description Tests whether a strategy is valid.
-    #' @details A strategy is a unanimous prescription of an action in each 
-    #' decision node, specified as a list of actions.  This checks whether the
-    #' strategy is valid for this decision tree.
+    #' @description Tests whether an object is a valid strategy. 
+    #' @details A strategy is a unanimous prescription of an action taken at
+    #' each decision node, coded as a list of action edges. This checks
+    #' whether the strategy is valid for this decision tree.
     #' @param strategy A list of Action edges.
     #' @return TRUE if the strategy is valid for this tree. Returns
     #' FALSE if the list of Action edges are not a valid strategy.
     is_strategy = function(strategy) {
+      # find the set of source nodes for the action edges in the strategy
+      iS <- vapply(X = strategy, FUN.VALUE = 1L, FUN = self$source)
       # check that the argument is a list of Action edges
-      isA <- vapply(X=strategy, FUN.VALUE=TRUE, FUN=function(e) {
-        inherits(e,what="Action")
-      })
-      if (!all(isA)) {
+      if (anyNA(iS)) {
         return(FALSE)
       }
-      # there must be as many Actions as Decision nodes
+      # find the list of Decision nodes
       iD <- self$decision_nodes("index")
-      if (length(strategy) != length(iD)) {
-        return(FALSE)
-      }
-      # the set of source nodes must be the same as the set of decision nodes
-      iS <- vapply(X = strategy, FUN.VALUE = 1L, FUN = function(e) {
-        return(self$vertex_index(e$source()))
-      })
-      if (!setequal(iS,iD)) {
-        return(FALSE)
-      }
-      # return validity
-      return(TRUE)
+      # the set of source nodes of the action edges must be the same as the set
+      # of decision nodes
+      return((length(iS) == length(iD)) && setequal(iS, iD))
+    },
+  
+    #' @description List all evaluation strategies for the decision tree.
+    #' @details A strategy is a unanimous prescription of the actions at each
+    #' decision node, coded as a list of action edges, with one element per
+    #' source decision node.
+    #' @return A list of strategies, i.e., a list of lists of action edges.
+    strategies = function() {
+      # build a list of action edges emerging from each decision node
+      ae <- lapply(self$decision_nodes(), FUN = self$actions)
+      # convert action edge objects to indexes
+      aei <- lapply(ae, lapply, self$edge_index)
+      # add the decision node label to each list element
+      names(aei) <- self$decision_nodes(what = "label")
+      # find all possible strategies, by taking each combination of one action
+      # edge from each decision node
+      s <- expand.grid(aei, KEEP.OUT.ATTRS = FALSE)
+      # construct a list of lists of edges
+      se <- split(x = s, f = seq(nrow(s)))
+      return(s)
     },
 
     #' @description Find all potential strategies for the decision tree. 
@@ -558,16 +591,14 @@ DecisionTree <- R6::R6Class(
       )
       if (!is.null(select)) {
         abortifnot(self$is_strategy(select),
-          message = "'s' must be a valid strategy for this decision tree",
+          message = "'select' must be a valid strategy for this decision tree",
           class = "invalid_strategy"
         )
       }
       # build a table with indexes of the action edges
       f <- list()
       for (d in self$decision_nodes("node")) {
-        a <- vapply(X = self$actions(d), FUN.VALUE = 1L, FUN = function(a) {
-          self$edge_index(a)
-        })
+        a <- vapply(X = self$actions(d), FUN.VALUE = 1L, FUN = self$edge_index)
         f[[d$label()]] <- a
       }
       TTI <- expand.grid(f, KEEP.OUT.ATTRS=FALSE, stringsAsFactors=FALSE)
@@ -577,9 +608,7 @@ DecisionTree <- R6::R6Class(
           # indexes of action edges from the table
           st <- row
           # indexes of action edges in 'select' argument
-          ss <- vapply(X = select, FUN.VALUE = 1L, FUN = function(e) {
-            self$edge_index(e)
-          })
+          ss <- vapply(X = select, FUN.VALUE = 1L, FUN = self$edge_index)
           # test whether the table row is the same as 'select'
           return(setequal(st,ss))
         })
@@ -606,7 +635,7 @@ DecisionTree <- R6::R6Class(
       # return the table
       return(TT)
     },
-
+    
     #' @description Find all paths walked in each possible strategy. 
     #' @details A strategy is a unanimous prescription of an action in each 
     #' decision node. Some paths can be walked in more than one strategy, if
@@ -643,9 +672,10 @@ DecisionTree <- R6::R6Class(
         })        
         # Append to the strategy data frame
         SL <- cbind(
-          S[lv,,drop=FALSE], 
-          Leaf=self$vertex_index(p[[length(p)]])
+          S[lv,, drop = FALSE], 
+          Leaf = self$vertex_index(p[[length(p)]])
         )
+        print(SL)
         return(SL)
       }))
       # return the paths
@@ -719,12 +749,7 @@ DecisionTree <- R6::R6Class(
     evaluate_walks = function(W = NULL, Wi = NULL) {
       # convert edge nodes into edge indices
       if (is.null(Wi)) {
-        Wi <- lapply(
-          W,
-          FUN = function(walk) {
-            lapply(walk, FUN = function(e) self$edge_index(e))
-          }
-        )
+        Wi <- lapply(W, lapply, self$edge_index)
       }
       # create a return matrix
       payoff <- matrix(
@@ -838,7 +863,7 @@ DecisionTree <- R6::R6Class(
     #' @param by One of {"path", "strategy", "run"}. If "path", the table has
     #' one row per path walked per strategy, per run, and includes the label of
     #' the terminating leaf node to identify each path. If "strategy" (the 
-    #' default), the table is aggregated by strategy, i.e. there is one row per
+    #' default), the table is aggregated by strategy, i.e., there is one row per
     #' strategy per run. If "run", the table has one row per run and uses
     #' concatenated strategy names and one (cost, benefit, utility, QALY) column
     #' for each strategy. 
@@ -854,9 +879,9 @@ DecisionTree <- R6::R6Class(
         message = paste(
           "'setvars' must be one of", 
           paste(valids, collapse=" "), 
-            collapse = " "
-          ), 
-          class = "setvars_invalid"
+          collapse = " "
+        ), 
+        class = "setvars_invalid"
       )
       abortifnot(is.numeric(N),
         message = "'N' must be numeric", 
@@ -873,7 +898,7 @@ DecisionTree <- R6::R6Class(
       # find the root-to-leaf paths
       P <- self$root_to_leaf_paths()
       # find the walk for each root-to-leaf path
-      Wi <- lapply(P, FUN = function(p) self$walk(p, what = "index"))
+      Wi <- lapply(P, FUN = self$walk, what = "index")
       # create template matrix for vapply
       TM <- cbind(self$evaluate_walks(Wi = Wi), Run = rep(NA, length(Wi)))
       # create list of modvars
@@ -917,18 +942,7 @@ DecisionTree <- R6::R6Class(
           return(l)
         })
         PAYOFF <- RES
-      } else if (by == "strategy") {
-        # aggregate by strategy
-        dn <- self$decision_nodes("label")
-        f <- as.formula(
-          paste(
-            "cbind(Probability, Cost, Benefit, Utility, QALY)",
-            paste(paste(dn, collapse="+"), "Run", sep = "+"),
-            sep = "~"
-          ) 
-        )
-        PAYOFF <- aggregate(f, data=RES, FUN=sum)
-      } else if (by == "run") {
+      } else {
         # aggregate by strategy
         dn <- self$decision_nodes("label")
         f <- as.formula(
@@ -939,16 +953,22 @@ DecisionTree <- R6::R6Class(
           ) 
         )
         STR <- aggregate(f, data=RES, FUN=sum)
-        # reshape to wide format
-        if (length(dn) == 1L) {
-          STR$Strategy <- STR[,dn[[1L]]]
-        } else {
-          STR$Strategy <- apply(STR[,dn], MARGIN = 1L, FUN=paste, collapse="_")
+        PAYOFF <- STR
+        # further aggregate strategies by run if required
+        if (by == "run") {
+          # reshape to wide format
+          if (length(dn) == 1L) {
+            STR$Strategy <- STR[, dn[[1L]]]
+          } else {
+            STR$Strategy <- apply(
+              STR[, dn], MARGIN = 1L, FUN=paste, collapse = "_"
+            )
+          }
+          STR[,dn] <- NULL
+          PAYOFF <- reshape(
+            STR, idvar="Run", timevar="Strategy", direction="wide"
+          )
         }
-        STR[,dn] <- NULL
-        PAYOFF <- reshape(
-          STR, idvar="Run", timevar="Strategy", direction="wide"
-        )
       }
       # return the data frame     
       return(PAYOFF)

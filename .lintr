@@ -1,5 +1,4 @@
-linters: linters_with_tags(
-  tags = NULL,
+linters: all_linters(
   commas_linter = NULL,
   extraction_operator_linter = NULL,
   infix_spaces_linter = NULL,
@@ -9,4 +8,3 @@ linters: linters_with_tags(
 exclusions: list(
     "tests/testthat.R"
   )
-

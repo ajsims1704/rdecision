@@ -356,11 +356,11 @@ Graph <- R6::R6Class(
         return(FALSE)
       }
       # get the adjacency matrix
-      A <- self$graph_adjacency_matrix(boolean=TRUE)
+      A <- self$graph_adjacency_matrix(boolean = TRUE)
       # DFS from each vertex
       for (v in seq_len(self$order())) {
         # D marks nodes as discovered
-        D <- vector(mode="logical", length=self$order())
+        D <- vector(mode = "logical", length = self$order())
         # S is a stack of nodes being processed
         S <- Stack$new()
         S$push(v)
@@ -374,14 +374,12 @@ Graph <- R6::R6Class(
           # and get its parent
           p <- P$pop()
           # if not discovered, mark and process it
-          if (!D[s]) {
-            D[s] <- TRUE
+          if (!D[[s]]) {
+            D[[s]] <- TRUE
             # process neighbours
-            for (n in which(A[s,],arr.ind=TRUE)) {
-              if (!is.na(p) && n!=p) {
-                if (D[n]) {
-                  return(FALSE)
-                }
+            for (n in which(A[s, ], arr.ind = TRUE)) {
+              if (!is.na(p) && n != p && D[[n]]) {
+                return(FALSE)
               }
               S$push(n)
               P$push(s)
@@ -432,7 +430,7 @@ Graph <- R6::R6Class(
       n <- private$V[ni]
       return(n)
     },
-
+    
     #' @description Export a representation of the graph in DOT format.
     #' @details Writes the representation in the \code{graphviz} DOT language
     #' (\url{http://graphviz.org/doc/info/lang.html}) for drawing with one

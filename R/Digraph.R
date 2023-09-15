@@ -305,7 +305,53 @@ Digraph <- R6::R6Class(
       pred <- private$V[iw]
       return(pred)
     },
-
+    
+    #' @description Find the node that is the source of the given arrow.
+    #' @details The source node is a property of the arrow, not the digraph of
+    #' which it is part, hence the canonical method for establishing the source
+    #' node of an arrow is via method \code{$source} of an \code{Arrow} object.
+    #' This function is provided for convenience when iterating the arrows of a
+    #' digraph. It raises an error if the arrow is not in the graph. It
+    #' returns the index of the source node, which is a property of the graph;
+    #' the node object itself may be retrieved using the \code{$vertex_at}
+    #' method of the graph.
+    #' @param a An arrow (directed edge), which must be in the digraph.
+    #' @return Index of the source node of the specified edge.
+    source = function(a) {
+      # check if a is an arrow and is in the graph
+      abortifnot(
+        self$has_edge(a),
+        message = "Argument 'a' is not an Arrow in the graph",
+        class = "not_in_graph"
+      )
+      # find the index of the source node
+      sn <- self$vertex_index(a$source())
+      return(sn)
+    },
+    
+    #' @description Find the node that is the target of the given arrow.
+    #' @details The target node is a property of the arrow, not the digraph of
+    #' which it is part, hence the canonical method for establishing the target
+    #' node of an arrow is via method \code{$target} of an \code{$Arrow} object.
+    #' This function is provided for convenience when iterating the arrows of a
+    #' digraph. It raises an error if the arrow is not in the graph. It
+    #' returns the index of the target node, which is a property of the graph;
+    #' the node itself may be retrieved using the \code{$vertex_at} method
+    #' of the graph.
+    #' @param a An arrow (directed edge), which must be in the digraph.
+    #' @return Index of the target node of the specified edge.
+    target = function(a) {
+      # check arguments
+      abortifnot(
+        self$has_edge(a),
+        message = "Argument 'a' is not an Arrow in the graph",
+        class = "not_in_graph"
+      )
+      # find the target node or its index (checks if a$target is in the graph)
+      tn <- self$vertex_index(a$target())
+      return(tn)
+    },
+    
     #' @description Find all directed simple paths from source to target.
     #' @details In simple paths all vertexes are unique. Uses a recursive 
     #' depth-first search algorithm.
@@ -366,7 +412,7 @@ Digraph <- R6::R6Class(
         class = "invalid_argument"
       )
       # check vertexes and get index of each
-      p <- vapply(X = P, FUN.VALUE = 1L, FUN = function(n) self$vertex_index(n))
+      p <- vapply(X = P, FUN.VALUE = 1L, FUN = self$vertex_index)
       # check all the vertices are in the graph
       abortif(
         anyNA(p),
@@ -394,7 +440,7 @@ Digraph <- R6::R6Class(
       }
       # convert edge indices into edges, if required
       if (what == "edge") {
-        W <- lapply(W, function(ie) self$edge_at(ie))
+        W <- lapply(X = W, FUN = self$edge_at)
       }
       # return the walk 
       return(W)
