@@ -1,5 +1,8 @@
 # rdecision 1.1.3.9005
 
+* Added functions `node_label` and `edge_label` to `Graph` to support checked
+  iteration of lists of nodes and edges when retrieving labels.
+* Vectorized functions `edge_index`, `edge_at` and `has_edge` in `Graph`.
 * Added functions `source` and `target` to `Digraph` to support checked
   iteration of lists of arrows to retrieve their source or target nodes.
 * Placed code for the Sumatriptan vignette into a single script with tests,

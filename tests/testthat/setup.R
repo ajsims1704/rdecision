@@ -1,17 +1,23 @@
 
+# is.element function for R6 objects
+r6_is_element <- function(e, x) {
+  return(any(vapply(x, FUN.VALUE = TRUE, FUN = identical, y = e)))
+}
+
 # setequal function for R6 objects
-R6setequal <- function(A,B) {
-  AinB <- all(vapply(A, FUN.VALUE = TRUE, FUN = function(a) {
-    return(any(vapply(B, FUN.VALUE = TRUE, FUN = function(b) identical(a, b))))
-  }))
-  BinA <- all(vapply(B, FUN.VALUE = TRUE, FUN = function(b) {
-    return(any(vapply(A, FUN.VALUE = TRUE, function(a) identical(a,b))))
-  }))
+r6_setequal <- function(A, B) {
+  # is e an element of x
+  AinB <- all(
+    vapply(A, FUN.VALUE = TRUE, FUN = r6_is_element, x = B)
+  )
+  BinA <- all(
+    vapply(B, FUN.VALUE = TRUE, FUN = r6_is_element, x = A)
+  )
   return(AinB & BinA)
 }
 
 # custom expectation to compare two sets of R6 objects
-expect_R6setequal <- function(object, eset) {
+expect_r6_setequal <- function(object, eset) {
   # capture object and label
   act <- testthat::quasi_label(rlang::enquo(object), arg = "object")
   # object must be a list of R6 objects
@@ -21,10 +27,8 @@ expect_R6setequal <- function(object, eset) {
       sprintf("%s must be a list", act$lab)
     )
   }
-  is_s6 <- vapply(act$val, FUN.VALUE = TRUE, FUN = function(r) {
-    inherits(r, what = "R6")
-  })
-  if (!all(is_s6)) {
+  is_r6 <- vapply(act$val, FUN.VALUE = TRUE, FUN = inherits, what = "R6")
+  if (!all(is_r6)) {
     testthat::expect(
       ok = FALSE,
       sprintf("%s must be a list of R6 objects", act$lab)
@@ -32,7 +36,7 @@ expect_R6setequal <- function(object, eset) {
   }
   # compare sets 
   testthat::expect(
-    ok = R6setequal(act$val, eset),
+    ok = r6_setequal(act$val, eset),
     sprintf("%s is not equal to to the expected set", act$lab)
   )
   # Invisibly return the value

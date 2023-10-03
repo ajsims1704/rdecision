@@ -22,8 +22,8 @@ knitr::opts_chunk$set(
 )
 ```
 
-```{r setup, echo=FALSE}
-library("rdecision")
+```{r setup, echo = FALSE}
+library("rdecision") # nolint
 ```
 
 # Introduction
@@ -172,7 +172,7 @@ A <- V[[1L]]
 B <- V[[25L]]
 P <- G$paths(A, B)
 # convert paths to walks
-W <- lapply(P, function(p) G$walk(p))
+W <- lapply(P, FUN = G$walk)
 # count and tabulate how many special edges each walk traverses
 BB <- c("V11", "H22", "V25", "H33", "V32", "H44", "V43")
 nw <- vapply(W, FUN.VALUE = 1L, FUN = function(w) {

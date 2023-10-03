@@ -63,19 +63,19 @@ test_that("arborescences that are not decision trees are rejected", {
   DT <- DecisionTree$new(V=list(d1,c1,t1,t2,t3), E=list(e1,e2,e3,e4))
   # decision nodes
   expect_error(DT$decision_nodes(42L), class = "unknown_what_value")
-  expect_R6setequal(DT$decision_nodes(), list(d1))
+  expect_r6_setequal(DT$decision_nodes(), list(d1))
   expect_setequal(DT$decision_nodes(what = "label"), list("d1"))
   ev <- as.vector(x = DT$vertex_index(d1), mode = "integer")
   expect_identical(DT$decision_nodes(what = "index"), ev)
   # chance nodes
   expect_error(DT$chance_nodes(42L), class = "unknown_what_value")
-  expect_R6setequal(DT$chance_nodes(), list(c1))
+  expect_r6_setequal(DT$chance_nodes(), list(c1))
   expect_setequal(DT$chance_nodes(what = "label"), list(""))
   ev <- as.vector(x = DT$vertex_index(c1), mode = "integer")
   expect_identical(DT$chance_nodes(what = "index"), ev)
   # leaf nodes
   expect_error(DT$leaf_nodes(42L), class = "unknown_what_value")
-  expect_R6setequal(DT$leaf_nodes(), list(t1, t2, t3))
+  expect_r6_setequal(DT$leaf_nodes(), list(t1, t2, t3))
   expect_setequal(DT$leaf_nodes("label"), list("t1", "t2", "t3"))
   ev <- as.vector(
     x = c(DT$vertex_index(t1), DT$vertex_index(t2), DT$vertex_index(t3)),
@@ -87,7 +87,7 @@ test_that("arborescences that are not decision trees are rejected", {
   expect_error(DT$actions(d2), class="not_in_tree")
   expect_error(DT$actions(c1), class="not_decision_node")
   expect_error(DT$actions(),  class="decision_node_not_defined")
-  expect_R6setequal(DT$actions(d1), list(e1,e4))
+  expect_r6_setequal(DT$actions(d1), list(e1,e4))
   # evaluate
   expect_error(DT$evaluate(N="forty two"), class = "N_not_numeric")
   expect_error(DT$evaluate(by = 42L), class = "by_not_character")
@@ -151,11 +151,6 @@ test_that("simple decision trees are modelled correctly", {
   expect_false(DT$is_strategy(list(e1, e4)))
   PS <- DT$strategy_paths()
   expect_identical(nrow(PS), 3L)
-  # strategies
-  print("Strategy test")
-  s <- DT$strategies()
-  str(s)
-  print(s)
   # strategy table
   expect_error(DT$strategy_table(42L), class = "unknown_what_value")
   expect_error(
@@ -165,7 +160,7 @@ test_that("simple decision trees are modelled correctly", {
   expect_identical(nrow(S), 2L)
   expect_setequal(rownames(S), c("e1", "e4"))
   S <- DT$strategy_table("label", select = list(e1))
-  expect_identical(S$d1[[1L]], "e1")
+  expect_identical(S[[1L, "d1"]], "e1")
   expect_setequal(rownames(S), "e1")
   # evaluate valid walks
   paths <- DT$root_to_leaf_paths()
@@ -251,198 +246,6 @@ test_that("decision trees with utility > 1 are supported", {
   expect_intol(oicer, eicer, 100.0)
   expect_true(TRUE)
 })
-
-# Evans et al, Pharmacoeconomics, 1997;12:565-577, Sumatriptan for migraine
-# (base case)
-# test_that("rdecision replicates Evans et al, Sumatriptan base case", {
-#   # Time horizon
-#   th <- as.difftime(24L, units="hours")
-#   # model variables (include a couple of uncertainties for later tests)
-#   c.sumatriptan <- GammaModVar$new(
-#     "Sumatriptan","CAD", shape = 16.10, scale = 1.0
-#   )
-#   c.caffeine <- GammaModVar$new("Caffeine", "CAD", shape = 1.32, scale = 1.0)
-#   c.ED <- 63.16
-#   c.admission <- 1093.0
-#   p.caffeine.relief <- 0.379
-#   p.sumatriptan.relief <- ConstModVar$new("P(relief|sumatriptan)", "P", 0.558)
-#   q.sumatriptan.relief <- ExprModVar$new(
-#     "Q(relief|sumatriptan)", "P", rlang::quo(1.0 - p.sumatriptan.relief)
-#   )
-#   
-#   # Sumatriptan branch
-#   ta <- LeafNode$new("A", utility=1.0, interval=th)
-#   tb <- LeafNode$new("B", utility=0.9, interval=th)
-#   c3 <- ChanceNode$new("c3")
-#   e1 <- Reaction$new(c3, ta, p=0.594, label="No recurrence")
-#   e2 <- Reaction$new(c3, tb, p=0.406, cost=c.sumatriptan, 
-#                      label="Recurrence relieved with 2nd dose")
-#   #
-#   td <- LeafNode$new("D", utility=0.1, interval=th)
-#   te <- LeafNode$new("E", utility=-0.3, interval=th)
-#   c7 <- ChanceNode$new("c7")
-#   e3 <- Reaction$new(c7, td, p=0.998, label="Relief")
-#   e4 <- Reaction$new(c7, te, p=0.002, cost=c.admission, label="Hospitalization")
-#   #
-#   tc <- LeafNode$new("C", utility=-0.3, interval=th)
-#   c4 <- ChanceNode$new("c4")
-#   e5 <- Reaction$new(c4, tc, p=0.920, label="Endures attack")
-#   e6 <- Reaction$new(c4, c7, p=0.080, cost=c.ED, label="Emergency Department")
-#   #
-#   c1 <- ChanceNode$new("c1")
-#   e7 <- Reaction$new(c1, c3, p=p.sumatriptan.relief, label="Relief")
-#   e8 <- Reaction$new(c1, c4, p=q.sumatriptan.relief, label="No relief")
-#   
-#   # Caffeine/Ergotamine branch
-#   tf <- LeafNode$new("F", utility=1.0, interval=th)
-#   tg <- LeafNode$new("G", utility=0.9, interval=th)
-#   c5 <- ChanceNode$new("c5")
-#   e9 <- Reaction$new(c5, tf, p=0.703, label="No recurrence")
-#   e10 <- Reaction$new(c5, tg, p=0.297, cost=c.caffeine, 
-#                       label="Recurrence relieved with 2nd dose")
-#   #
-#   ti <- LeafNode$new("I", utility=0.1, interval=th)
-#   tj <- LeafNode$new("J", utility=-0.3, interval=th)
-#   c8 <- ChanceNode$new("c8")
-#   e11 <- Reaction$new(c8, ti, p=0.998, label="Relief")
-#   e12 <- Reaction$new(c8, tj, p=0.002, cost=c.admission, 
-#                       label="Hospitalization")
-#   # 
-#   th <- LeafNode$new("H", utility=-0.3, interval=th)
-#   c6 <- ChanceNode$new("c6")
-#   e13 <- Reaction$new(c6, th, p=0.920, label="Endures attack")
-#   e14 <- Reaction$new(c6, c8, p=0.080, cost=c.ED, label="Emergency Department")
-#   #
-#   c2 <- ChanceNode$new("c2")
-#   expect_identical(c2$label(), "c2")
-#   e15 <- Reaction$new(c2, c5, p=p.caffeine.relief, label="Relief")
-#   e16 <- Reaction$new(c2, c6, p=1.0 - p.caffeine.relief, label="No relief")
-#   #
-#   # decision node
-#   d1 <- DecisionNode$new("d1")
-#   expect_identical(d1$label(), "d1")
-#   e17 <- Action$new(d1, c1, cost=c.sumatriptan, label="Sumatriptan")
-#   e18 <- Action$new(d1, c2, cost=c.caffeine, label="Caffeine")
-#   # 
-#   # create lists of nodes and edges
-#   V <- list(
-#     d1, c1, c2, c3, c4, c5, c6, c7, c8,
-#     ta, tb, tc, td, te, tf, tg, th, ti, tj
-#   )
-#   E <- list(
-#     e1, e2, e3, e4, e5, e6, e7, e8, e9, e10, e11, e12, e13, e14, e15, e16, 
-#     e17, e18
-#   )
-#   # tree
-#   expect_silent(dt <- DecisionTree$new(V,E))
-#   # evaluate
-#   RES <- dt$evaluate(by="run")
-#   # check costs and utilities
-#   expect_s3_class(RES, "data.frame")
-#   c.Sumatriptan <- RES$Cost.Sumatriptan[[1L]]
-#   expect_intol(c.Sumatriptan, 22.06, 0.1)
-#   c.Caffeine <- RES$Cost.Caffeine[[1L]]
-#   expect_intol(c.Caffeine, 4.71, 0.1)
-#   u.Sumatriptan <- RES$Utility.Sumatriptan[[1L]]
-#   expect_intol(u.Sumatriptan, 0.42, 0.1)
-#   u.Caffeine <- RES$Utility.Caffeine[[1L]]
-#   expect_intol(u.Caffeine, 0.20, 0.05)
-#   # check ICER
-#   q.Sumatriptan <- RES$QALY.Sumatriptan[[1L]]
-#   q.Caffeine <- RES$QALY.Caffeine[[1L]]
-#   ICER <- (c.Sumatriptan-c.Caffeine) / (q.Sumatriptan-q.Caffeine)
-#   expect_intol(ICER, 29366.0, tol=100.0)
-#   # check parameters of threshold function
-#   expect_error(
-#     dt$threshold(
-#       index=list(e17), ref=list(e18), outcome="ICER", 
-#       mvd=p.sumatriptan.relief$description(), 
-#       a=0.5, b=0.6,
-#       lambda=-1.0, tol=0.0001
-#     ),
-#     class = "invalid_lambda"
-#   )
-#   expect_error(
-#     dt$threshold(
-#       index=list(e17), ref=list(e18), outcome="ICER", 
-#       mvd=p.sumatriptan.relief$description(), 
-#       a=0.1, b=0.2,
-#       lambda=29366.0, tol=0.0001
-#     ),
-#     class = "invalid_brackets"
-#   )
-#   expect_error(
-#     dt$threshold(
-#       index=list(e17), ref=list(e18), outcome="ICER", 
-#       mvd=p.sumatriptan.relief$description(), 
-#       a=0.5, b=0.6,
-#       lambda=29366.0, tol=0.0001, nmax=5L
-#     ),
-#     class = "convergence_failure"
-#   )
-#   # mean relief rate threshold for ICER
-#   pt <- dt$threshold(
-#     index=list(e17), ref=list(e18), outcome="ICER", 
-#     mvd=p.sumatriptan.relief$description(), 
-#     a=0.5, b=0.6,
-#     lambda=29366.0, tol=0.0001
-#   )
-#   expect_intol(pt, p.caffeine.relief+0.179, tol=0.02)
-#   # upper 95% relief rate threshold for ICER (Table VIII)
-#   pt <- dt$threshold(
-#     index=list(e17), ref=list(e18), outcome="ICER", 
-#     mvd=p.sumatriptan.relief$description(), 
-#     a=0.6, b=0.7,
-#     lambda=18950.0, tol=0.0001
-#   )
-#   expect_intol(pt, p.caffeine.relief+0.268, tol=0.02)
-#   # lower 95% relief rate threshold for ICER (Table VIII)
-#   pt <- dt$threshold(
-#     index=list(e17), ref=list(e18), outcome="ICER", 
-#     mvd=p.sumatriptan.relief$description(), 
-#     a=0.4, b=0.5,
-#     lambda=60839.0, tol=0.0001
-#   )
-#   expect_intol(pt, p.caffeine.relief+0.091, tol=0.02)
-#   # check ICER ranges in tornado diagram (branches B and G get 2nd dose)
-#   TO <- dt$tornado(index=list(e17),ref=list(e18),outcome="ICER",draw=FALSE)
-#   dq <- (q.Sumatriptan-q.Caffeine)
-#   c.sumatriptan$set("expected")
-#   c.caffeine$set("expected")
-#   p.sumatriptan.relief$set("expected")
-#   x <- qgamma(p=0.025,shape=16.10,rate=1.0)
-#   expect_intol(TO$LL[TO$Description=="Sumatriptan"], x,tol=0.01)
-#   deltac <- (x-c.sumatriptan$get())*1.227
-#   expect_intol(
-#     TO$outcome.min[TO$Description=="Sumatriptan"],
-#     (c.Sumatriptan-c.Caffeine+deltac)/dq,
-#     tol=100.0
-#   )
-#   x <- qgamma(p=0.975,shape=16.10,rate=1.0)
-#   expect_intol(TO$UL[TO$Description=="Sumatriptan"],x,tol=0.01)
-#   deltac <- (x-c.sumatriptan$get())*1.227
-#   expect_intol(
-#     TO$outcome.max[TO$Description=="Sumatriptan"],
-#     (c.Sumatriptan-c.Caffeine+deltac)/dq,
-#     tol=100.0
-#   )
-#   x <- qgamma(p=0.025,shape=1.32,rate=1.0)
-#   expect_intol(TO$LL[TO$Description=="Caffeine"], x,tol=0.01)
-#   deltac <- (c.caffeine$get()-x)*1.113
-#   expect_intol(
-#     TO$outcome.min[TO$Description=="Caffeine"],
-#     (c.Sumatriptan-c.Caffeine+deltac)/dq,
-#     tol=100.0
-#   )
-#   x <- qgamma(p=0.975,shape=1.32, rate=1.0)
-#   expect_intol(TO$UL[TO$Description=="Caffeine"],x,tol=0.01)
-#   deltac <- (c.caffeine$get()-x)*1.113
-#   expect_intol(
-#     TO$outcome.max[TO$Description=="Caffeine"],
-#     (c.Sumatriptan-c.Caffeine+deltac)/dq,
-#     tol=100.0
-#   )
-# })
 
 # -----------------------------------------------------------------------------
 # Kaminski et al CEJOR 2018;26:135-139, fig 7 (gas problem)
@@ -589,15 +392,9 @@ test_that("paths common to >1 strategy are analyzed", {
   # t2 and t3 and four on t4) out of 16 possible (4 paths and 4 strategies); 
   # each strategy walks 2 paths
   st <- DT$strategy_table()
-  print(st)
-  SP <- DT$strategy_paths()
-  print(SP)
-  expect_s3_class(SP, "data.frame")
-  expect_identical(nrow(SP), 8L)
-  
-  # check that there are 4 strategies and that the table has expected properties
-  st <- DT$strategy_table(what = "label")
   expect_s3_class(st, "data.frame")
+  expect_type(st[, "d1"], "integer")
+  expect_type(st[, "d2"], "integer")
   expect_identical(nrow(st), 4L)
   expect_setequal(colnames(st), c("d1", "d2"))
   expect_setequal(
@@ -606,7 +403,34 @@ test_that("paths common to >1 strategy are analyzed", {
       "manage_conservatively", "manage_watch"
     )
   )
-  
+  st <- DT$strategy_table(what = "label")
+  expect_s3_class(st, "data.frame")
+  expect_type(st[, "d1"], "character")
+  expect_type(st[, "d2"], "character")
+  expect_identical(nrow(st), 4L)
+  expect_setequal(colnames(st), c("d1", "d2"))
+  expect_setequal(
+    rownames(st),
+    c("treat_conservatively", "treat_watch",
+      "manage_conservatively", "manage_watch"
+    )
+  )
+  # check the strategy paths (2 paths per strategy)
+  sp <- DT$strategy_paths()
+  expect_s3_class(sp, "data.frame")
+  expect_identical(nrow(sp), 8L)
+  it1 <- DT$vertex_index(t1)
+  it2 <- DT$vertex_index(t2)
+  it3 <- DT$vertex_index(t3)
+  it4 <- DT$vertex_index(t4)
+  expect_identical(sum(sp[, "Leaf"] == it1), 2L)
+  expect_identical(sum(sp[, "Leaf"] == it2), 1L)
+  expect_identical(sum(sp[, "Leaf"] == it3), 1L)
+  expect_identical(sum(sp[, "Leaf"] == it4), 4L)
+  ag <- aggregate(x = Leaf ~ d1 + d2, data = sp, FUN = length)
+  expect_identical(nrow(ag), 4L)
+  expect_true(all(ag[, "Leaf"] == 2L))
+
   # evaluate by path
   RES <- DT$evaluate(by="path")
   # evaluate by strategy (4 strategies x 2 runs)

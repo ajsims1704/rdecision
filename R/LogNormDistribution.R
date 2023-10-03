@@ -156,7 +156,7 @@ LogNormDistribution <- R6::R6Class(
     #' @return Standard deviation as a numeric value
     SD = function() {
       S <- exp(private$meanlog + 0.5 * private$sdlog ^ 2L) *
-           sqrt(exp(private$sdlog ^ 2L) - 1L)
+        sqrt(exp(private$sdlog ^ 2L) - 1L)
       return(S)
     },
     

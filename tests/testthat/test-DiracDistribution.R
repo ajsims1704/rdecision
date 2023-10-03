@@ -18,8 +18,8 @@ test_that("const values are returned", {
   expect_error(
     x$quantile(probs = c(0.25, "A", 0.75)), class = "probs_not_numeric"
   )
-  expect_error(x$quantile(
-    probs = c(-0.25, 0.75)), class = "probs_out_of_range"
+  expect_error(
+    x$quantile(probs = c(-0.25, 0.75)), class = "probs_out_of_range"
   )
   expect_identical(x$quantile(probs = 0.22), 42.0)
 })

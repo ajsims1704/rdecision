@@ -22,7 +22,7 @@ knitr::opts_chunk$set(
 ```
 
 ```{r setup, echo=FALSE}
-library("rdecision")
+library("rdecision") # nolint
 ```
 
 # Decision Tree representations
@@ -124,19 +124,23 @@ p.exercise <- 18L/58L
 
 reaction_diet_success <- Reaction$new(
   chance_node_diet, leaf_node_diet_no_stent, 
-  p = p.diet, cost = 0.0, label = "Success")
+  p = p.diet, cost = 0.0, label = "Success"
+)
 
 reaction_diet_failure <- Reaction$new(
   chance_node_diet, leaf_node_diet_stent, 
-  p = 1.0 - p.diet, cost = 5000.0, label = "Failure")
+  p = 1.0 - p.diet, cost = 5000.0, label = "Failure"
+)
 
 reaction_exercise_success <- Reaction$new(
   chance_node_exercise, leaf_node_exercise_no_stent, 
-  p = p.exercise, cost = 0.0, label = "Success")
+  p = p.exercise, cost = 0.0, label = "Success"
+)
 
 reaction_exercise_failure <- Reaction$new(
   chance_node_exercise, leaf_node_exercise_stent, 
-  p = 1.0 - p.exercise, cost = 5000.0, label = "Failure")
+  p = 1.0 - p.exercise, cost = 5000.0, label = "Failure"
+)
 ```
 
 When all the elements are defined and satisfy the restrictions of a Decision
@@ -203,11 +207,13 @@ leaf_node_exercise_stent_u <- LeafNode$new("Intervention", utility = 0.75)
 
 reaction_diet_failure_u <- Reaction$new(
   chance_node_diet, leaf_node_diet_stent_u, 
-  p = 1.0 - p.diet, cost = 5000.0, label = "Failure")
+  p = 1.0 - p.diet, cost = 5000.0, label = "Failure"
+)
 
 reaction_exercise_failure_u <- Reaction$new(
   chance_node_exercise, leaf_node_exercise_stent_u, 
-  p = 1.0 - p.exercise, cost = 5000.0, label = "Failure")
+  p = 1.0 - p.exercise, cost = 5000.0, label = "Failure"
+)
 
 DT_u <- DecisionTree$new(
   V = list(decision_node, 
@@ -216,13 +222,15 @@ DT_u <- DecisionTree$new(
            leaf_node_diet_no_stent, 
            leaf_node_diet_stent_u, 
            leaf_node_exercise_no_stent, 
-           leaf_node_exercise_stent_u),
+           leaf_node_exercise_stent_u
+  ),
   E = list(action_diet,
            action_exercise,
            reaction_diet_success,
            reaction_diet_failure_u,
            reaction_exercise_success,
-           reaction_exercise_failure_u)
+           reaction_exercise_failure_u
+  )
 )
 
 DT_u_evaluation <- DT_u$evaluate()

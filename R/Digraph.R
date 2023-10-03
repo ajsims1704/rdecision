@@ -92,7 +92,7 @@ Digraph <- R6::R6Class(
           A <- matrix(rep(0L, times=n * n), nrow=n)
         }
         # populate it
-        for (e in private$E) {
+        for (e in self$edges()) {
           s <- self$vertex_index(e$source())
           t <- self$vertex_index(e$target())
           A[[s, t]] <- A[[s, t]] + 1L
@@ -122,7 +122,7 @@ Digraph <- R6::R6Class(
       if (is.null(private$BD)) {
         # create matrix
         LV <- vapply(private$V, FUN.VALUE = "x", FUN = function(v) v$label())
-        LE <- vapply(private$E, FUN.VALUE = "x", FUN = function(e) e$label())
+        LE <- vapply(self$edge_along(), FUN.VALUE = "x", FUN = self$edge_label)
         nv <- self$order()
         ne <- self$size()
         if (anyDuplicated(LV) == 0L && anyDuplicated(LE) == 0L &&
@@ -137,7 +137,7 @@ Digraph <- R6::R6Class(
           B <- matrix(rep(0L, times = nv * ne), nrow = nv)
         }
         # populate it
-        for (e in private$E) {
+        for (e in self$edges()) {
           s <- self$vertex_index(e$source())
           t <- self$vertex_index(e$target())
           ei <- self$edge_index(e)
@@ -493,7 +493,7 @@ Digraph <- R6::R6Class(
         " ] ;"
       )
       # write edges
-      for (e in private$E) {
+      for (e in self$edges()) {
         s <- e$source()
         t <- e$target()
         o[[length(o) + 1L]] <- paste(

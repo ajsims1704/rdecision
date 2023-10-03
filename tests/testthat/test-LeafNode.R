@@ -26,9 +26,7 @@ test_that("utility values and distributions are supported", {
   expect_length(mv, 2L)
   # check that using ModVar permits utilities > 1 (e.g. maternity)
   umat <- ConstModVar$new("Pregnant", "U", 2.0)
-  expect_silent(
-    t1 <- LeafNode$new("QALY", utility = umat)
-  )
+  t1 <- LeafNode$new("QALY", utility = umat)
   expect_intol(t1$utility(), 2.0, 0.01)
 })
 

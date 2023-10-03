@@ -73,7 +73,7 @@ test_that("vertex and edge properties are set and got", {
   n1 <- Node$new()
   n2 <- Node$new()
   n3 <- Node$new()
-  e1 <- Edge$new(n1, n2)
+  e1 <- Edge$new(n1, n2, label = "e1")
   e2 <- Edge$new(n1, n3)
   G <- Graph$new(V = list(n1, n2), E = list(e1))
   # check that valid vertices in the graph are identified
@@ -102,14 +102,71 @@ test_that("vertex and edge properties are set and got", {
   expect_true(is.na(ie2))
   ie3 <- G$edge_index(42L)
   expect_true(is.na(ie3))
+  expect_length(G$edge_index(list()), 0L)
+  # test of finding edges, given index
   expect_error(G$edge_at(42L), class = "invalid_index")
   expect_error(G$edge_at("42"), class = "invalid_index")
   expect_error(G$edge_at(ie2), class = "invalid_index")
+  expect_error(G$edge_at(-1L, class = "invalid_index"))
   # tests of degree function
   expect_error(G$degree(42L), class="invalid_vertex")
   expect_error(G$degree(n3), class="invalid_vertex")
   expect_error(G$degree(e1), class="invalid_vertex")
   expect_identical(G$degree(n1), 1L)
+})
+
+# tests of node and edge indexes in vector mode
+test_that("vectorized node and edge indexes are as expected", {
+  # create graph
+  n1 <- Node$new()
+  n2 <- Node$new()
+  n3 <- Node$new()
+  e1 <- Edge$new(n1, n2, label = "e1")
+  e2 <- Edge$new(n1, n3)
+  G <- Graph$new(V = list(n1, n2, n3), E = list(e1, e2))
+  # edges
+  e <- G$edges()
+  expect_r6_setequal(e, list(e1, e2))
+  # edge indexes
+  ie1 <- G$edge_index(e1)
+  ie2 <- G$edge_index(e2)
+  expect_identical(G$edge_index(list(e1, e2)), c(ie1, ie2))
+  expect_identical(G$edge_index(list(e1, 42L)), c(ie1, NA_integer_))
+  expect_identical(G$edge_index(G$edges()), G$edge_along())
+  # edges at given indexes
+  expect_identical(G$edge_at(c(ie1, ie2)), c(e1, e2))
+  expect_identical(G$edge_at(c(ie2, ie1)), c(e2, e1))
+  expect_identical(G$edge_at(list(ie1, ie2)), c(e1, e2))
+  expect_identical(G$edge_at(list(ie1, ie1)), c(e1, e1))
+  expect_error(G$edge_at(c(ie1, NA_integer_)), class = "invalid_index")
+  expect_error(G$edge_at(c(ie1, G$size()+1L)), class = "invalid_index")
+  # edge existence
+  expect_identical(G$has_edge(list(e1, e2)), c(TRUE, TRUE))
+  expect_identical(G$has_edge(list(e1, e1, e2)), c(TRUE, TRUE, TRUE))
+  expect_identical(G$has_edge(list(e1, e2, 42L)), c(TRUE, TRUE, FALSE))
+})
+
+# tests of node and edge labels
+test_that("node and edge label indexes are as expected", {
+  # create graph
+  n1 <- Node$new()
+  n2 <- Node$new()
+  n3 <- Node$new()
+  e1 <- Edge$new(n1, n2, label = "e1")
+  e2 <- Edge$new(n1, n3)
+  G <- Graph$new(V = list(n1, n2, n3), E = list(e1, e2))
+  # indexes
+  ie1 <- G$edge_index(e1)
+  ie2 <- G$edge_index(e2)
+  # tests of edge labels
+  expect_identical(e1$label(), "e1")
+  expect_identical(e2$label(), "")
+  expect_identical(G$edge_label(ie1), "e1")
+  expect_identical(G$edge_label(ie2), "")
+  expect_error(G$edge_label(42L), class = "invalid_index")
+  expect_identical(G$edge_label(c(ie1, ie2)), c("e1", ""))
+  expect_error(G$edge_label(c(ie1, as.numeric(ie2))), class = "invalid_index")
+  expect_identical(G$edge_label(list(ie1, ie2)), c("e1", ""))
 })
 
 # tests of adjacency matrix
@@ -277,10 +334,10 @@ test_that("Fig 1.1.1 from Gross & Yellen (2013)", {
   # neighbours
   XX <- Node$new("XX")
   expect_error(G$neighbours(XX), class = "not_in_graph")
-  expect_R6setequal(G$neighbours(u), list(v))
-  expect_R6setequal(G$neighbours(v), list(u,w,x))
-  expect_R6setequal(G$neighbours(w), list(v,x))
-  expect_R6setequal(G$neighbours(x), list(v,w))
+  expect_r6_setequal(G$neighbours(u), list(v))
+  expect_r6_setequal(G$neighbours(v), list(u,w,x))
+  expect_r6_setequal(G$neighbours(w), list(v,x))
+  expect_r6_setequal(G$neighbours(x), list(v,w))
   # connected
   expect_true(G$is_connected())
   # cycle

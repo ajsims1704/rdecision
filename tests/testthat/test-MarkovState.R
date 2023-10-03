@@ -22,7 +22,8 @@ test_that("invalid utilities are rejected", {
   )
   expect_error(
     MarkovState$new(name = "Futile", utility = 2.0),
-    class = "invalid_utility")
+    class = "invalid_utility"
+  )
 })
 
 # tests of label, cost and utility
@@ -59,12 +60,8 @@ test_that("ModVar state utilities whose values exceed 1 cause warnings", {
   u.beta <- BetaModVar$new("Utility", "U", alpha = 10L, beta = 10L) 
   u.vw <- ExprModVar$new("vwell", "U", rlang::quo(2L + u.beta))
   u.beta$set("random")
-  expect_silent(
-    s.vw <- MarkovState$new(name="Very Well", utility = u.vw)
-  )
-  expect_silent(
-    u <- s.vw$utility()
-  )
+  s.vw <- MarkovState$new(name="Very Well", utility = u.vw)
+  expect_silent(s.vw$utility())
 })
 
 test_that("ModVars are identified and returned", {

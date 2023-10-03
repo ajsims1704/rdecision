@@ -181,7 +181,8 @@ test_that("combo therapy transition matrix agrees with Briggs Table 2.2", {
       0.000, 0.000, 0.873, 0.127,
       0.000, 0.000, 0.000, 1.000),   
     byrow = TRUE,
-    nrow = 4L)
+    nrow = 4L
+  )
   expect_true(all(Ptc - E < 0.01))
 })
 
@@ -297,9 +298,9 @@ RR <- LogNormModVar$new(
 # function to generate a probabilistic transition matrix
 pt_prob <- function() {
   # create Dirichlet distributions for conditional probabilities
-  DA <- DirichletDistribution$new(c(1251L, 350L, 116L, 17L)) # from A
-  DB <- DirichletDistribution$new(c(731L, 512L, 15L))  # from B
-  DC <- DirichletDistribution$new(c(1312L, 437L)) # from C
+  DA <- DirichletDistribution$new(c(1251L, 350L, 116L, 17L)) # from A # nolint
+  DB <- DirichletDistribution$new(c(731L, 512L, 15L))  # from B # nolint
+  DC <- DirichletDistribution$new(c(1312L, 437L)) # from C # nolint
   # sample from the Dirichlet distributions  
   DA$sample()
   DB$sample()
@@ -326,7 +327,6 @@ psa <- matrix(
 )
 
 # run the model repeatedly
-#Rprof()
 for (irun in seq_len(nrow(psa))) {
   
   # sample variables from their uncertainty distributions
@@ -368,24 +368,33 @@ for (irun in seq_len(nrow(psa))) {
   # calculate the icer
   psa[[irun, "icer"]] <- (cost.comb - cost.mono) / (el.comb - el.mono)
 }
-#Rprof(NULL)
 
 ## @knitr ---------------------------------------------------------------------
-
-test_that("distributions from PSA match Briggs ex 4.7", {
+test_that("PSA matches Briggs ex4.7", {
+  
   # skip PSA tests on CRAN
   skip_on_cran()
   # retrieve data set with individual run results from Briggs
   data(BriggsEx47, package = "rdecision")
   # compare observed with expected
-  suppressWarnings(ht <- ks.test(psa[, "el.mono"], BriggsEx47$Mono.LYs))
-  expect_gt(ht$p.value, 0.001)
-  suppressWarnings(ht <- ks.test(psa[, "cost.mono"], BriggsEx47$Mono.Cost))
-  expect_gt(ht$p.value, 0.001)
-  suppressWarnings(ht <- ks.test(psa[, "el.comb"], BriggsEx47$Comb.LYs))
-  expect_gt(ht$p.value, 0.001)
-  suppressWarnings(ht <- ks.test(psa[, "cost.comb"], BriggsEx47$Comb.Cost))
-  expect_gt(ht$p.value, 0.001)
-  suppressWarnings(ht <- ks.test(psa[, "icer"], BriggsEx47$ICER))
-  expect_gt(ht$p.value, 0.001)
+  suppressWarnings({
+    ht <- ks.test(psa[, "el.mono"], BriggsEx47$Mono.LYs)
+    expect_gt(ht$p.value, 0.001)
+  })
+  suppressWarnings({
+    ht <- ks.test(psa[, "cost.mono"], BriggsEx47$Mono.Cost)
+    expect_gt(ht$p.value, 0.001)
+  })
+  suppressWarnings({
+    ht <- ks.test(psa[, "el.comb"], BriggsEx47$Comb.LYs)
+    expect_gt(ht$p.value, 0.001)
+  })
+  suppressWarnings({
+    ht <- ks.test(psa[, "cost.comb"], BriggsEx47$Comb.Cost)
+    expect_gt(ht$p.value, 0.001)
+  })
+  suppressWarnings({
+    ht <- ks.test(psa[, "icer"], BriggsEx47$ICER)
+    expect_gt(ht$p.value, 0.001)
+  })
 })

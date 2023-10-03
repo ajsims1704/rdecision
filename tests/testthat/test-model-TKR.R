@@ -121,13 +121,14 @@ tHF_CAS <- Transition$new(sH, sF, cost = cost_F + cost_CAS)
 Transitions_base <- list(
   tAD, tAC, tAB, tBC, tBE, tBF, tBG, tCB, tCD, tCF, tCG, tCC, 
   tDC, tDB, tDD, tEB, tEH, tFB, tFC, tFG, tFH, tGB, tGC, tGF, 
-  tGD, tHE, tHF, tHH, tBI, tCI, tDI, tEI, tFI, tGI, tHI, tII)
+  tGD, tHE, tHF, tHH, tBI, tCI, tDI, tEI, tFI, tGI, tHI, tII
+)
 
 Transitions_CAS <- list(
   tAD_CAS, tAC_CAS, tAB_CAS, tBC, tBE_CAS, tBF_CAS, tBG, tCB, tCD, tCF_CAS, 
   tCG, tCC, tDC, tDB, tDD, tEB, tEH, tFB, tFC, tFG, tFH, tGB, tGC, tGF_CAS, 
-  tGD, tHE_CAS, tHF_CAS, tHH, tBI, tCI, tDI, tEI, tFI, tGI, tHI, tII)
-
+  tGD, tHE_CAS, tHF_CAS, tHH, tBI, tCI, tDI, tEI, tFI, tGI, tHI, tII
+)
 
 ## @knitr SMM-def-point --------------------------------------------------------
 SMM_base <- SemiMarkovModel$new(
@@ -358,9 +359,9 @@ test_that("Table 4 for computer-assisted surgery is replicated", {
 ## @knitr cea -----------------------------------------------------------------
 
 dcost <- t4_CAS[[10L, "Discounted costs (£)"]] / 1000L -
-         t4_CS[[10L, "Discounted costs (£)"]] / 1000L
+  t4_CS[[10L, "Discounted costs (£)"]] / 1000L
 dutil <- t4_CAS[[10L, "Discounted QALYs"]] / 1000L - 
-         t4_CS[[10L, "Discounted QALYs"]] / 1000L
+  t4_CS[[10L, "Discounted QALYs"]] / 1000L
 
 
 ## @knitr ---------------------------------------------------------------------
@@ -604,7 +605,7 @@ dirichletify <- function(Pt, population = 1L) {
     non0 <- which(Pt[r,] != 0.0)
     # if multiple outgoing transitions are possible, model as Dirichlet
     if (length(non0)>1L) {
-      dist <- DirichletDistribution$new(Pt[r,non0]*population)
+      dist <- DirichletDistribution$new(Pt[r,non0]*population) # nolint
       dist$sample() # randomise
       Pt[r,non0] <- dist$r()
     }
@@ -630,31 +631,31 @@ for (run in seq_len(nruns)) {
   SMM_base_PSA$reset(populations)
   SMM_CAS_PSA$reset(populations)
   # find unique modvars and randomise them
-   mv <- unique(c(
-     SMM_base_PSA$modvars(),
-     SMM_CAS_PSA$modvars(),
-     CAS_effect_lognorm
-   ))
-   for (m in mv) {
-     m$set("random")
-   }
-   # set the transition matrix, applying the CAS effect for CAS model
-   pt_cs <- dirichletify(Pt, population = 1000L)
-   SMM_base_PSA$set_probabilities(pt_cs)
-   pt_cas <- txeffect(pt_cs, CAS_effect_lognorm$get())
-   SMM_CAS_PSA$set_probabilities(pt_cas)
-   # cycle the CS model
-   mtrace <- SMM_base_PSA$cycles(
-     ncycles = 120L, hcc.pop = FALSE, hcc.cost = FALSE
-   )
-   t4 <- as_table4(as.matrix(mtrace))
-   t4_CS_PSA[, , run] <- t4
-   # cycle the CAS model
-   mtrace <- SMM_CAS_PSA$cycles(
-     ncycles = 120L, hcc.pop = FALSE, hcc.cost = FALSE
-    )
-   t4 <- as_table4(as.matrix(mtrace))
-   t4_CAS_PSA[, , run] <- t4
+  mv <- unique(c(
+    SMM_base_PSA$modvars(),
+    SMM_CAS_PSA$modvars(),
+    CAS_effect_lognorm
+  ))
+  for (m in mv) {
+    m$set("random")
+  }
+  # set the transition matrix, applying the CAS effect for CAS model
+  pt_cs <- dirichletify(Pt, population = 1000L)
+  SMM_base_PSA$set_probabilities(pt_cs)
+  pt_cas <- txeffect(pt_cs, CAS_effect_lognorm$get())
+  SMM_CAS_PSA$set_probabilities(pt_cas)
+  # cycle the CS model
+  mtrace <- SMM_base_PSA$cycles(
+    ncycles = 120L, hcc.pop = FALSE, hcc.cost = FALSE
+  )
+  t4 <- as_table4(as.matrix(mtrace))
+  t4_CS_PSA[, , run] <- t4
+  # cycle the CAS model
+  mtrace <- SMM_CAS_PSA$cycles(
+    ncycles = 120L, hcc.pop = FALSE, hcc.cost = FALSE
+  )
+  t4 <- as_table4(as.matrix(mtrace))
+  t4_CAS_PSA[, , run] <- t4
 }
 
 ## @knitr ---------------------------------------------------------------------

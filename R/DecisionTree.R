@@ -49,7 +49,7 @@ DecisionTree <- R6::R6Class(
   classname = "DecisionTree",
   lock_class = TRUE,
   inherit = Arborescence,
-
+  
   public = list(
     
     #' @description Create a new decision tree. 
@@ -231,7 +231,7 @@ DecisionTree <- R6::R6Class(
       # find the edges with d as their source 
       B <- self$digraph_incidence_matrix()
       ie <- which(B[id,] == -1L, arr.ind=TRUE)
-      return(private$E[ie])
+      return(self$edge_at(ie))
     },
     
     #' @description Find all the model variables of type \code{ModVar}.
@@ -242,7 +242,7 @@ DecisionTree <- R6::R6Class(
       # create list
       mv <- list()
       # find the ModVars in Actions and Reactions
-      for (e in private$E) {
+      for (e in self$edges()) {
         if (inherits(e, what=c("Action", "Reaction"))) {
           mv <- c(mv, e$modvars())
         }
@@ -548,26 +548,6 @@ DecisionTree <- R6::R6Class(
       return((length(iS) == length(iD)) && setequal(iS, iD))
     },
   
-    #' @description List all evaluation strategies for the decision tree.
-    #' @details A strategy is a unanimous prescription of the actions at each
-    #' decision node, coded as a list of action edges, with one element per
-    #' source decision node.
-    #' @return A list of strategies, i.e., a list of lists of action edges.
-    strategies = function() {
-      # build a list of action edges emerging from each decision node
-      ae <- lapply(self$decision_nodes(), FUN = self$actions)
-      # convert action edge objects to indexes
-      aei <- lapply(ae, lapply, self$edge_index)
-      # add the decision node label to each list element
-      names(aei) <- self$decision_nodes(what = "label")
-      # find all possible strategies, by taking each combination of one action
-      # edge from each decision node
-      s <- expand.grid(aei, KEEP.OUT.ATTRS = FALSE)
-      # construct a list of lists of edges
-      se <- split(x = s, f = seq(nrow(s)))
-      return(s)
-    },
-
     #' @description Find all potential strategies for the decision tree. 
     #' @details A strategy is a unanimous prescription of the actions at each
     #' decision node. If there are decision nodes that are descendants of other
@@ -595,45 +575,35 @@ DecisionTree <- R6::R6Class(
           class = "invalid_strategy"
         )
       }
-      # build a table with indexes of the action edges
-      f <- list()
-      for (d in self$decision_nodes("node")) {
-        a <- vapply(X = self$actions(d), FUN.VALUE = 1L, FUN = self$edge_index)
-        f[[d$label()]] <- a
-      }
-      TTI <- expand.grid(f, KEEP.OUT.ATTRS=FALSE, stringsAsFactors=FALSE)
+      # build a list of action edges emerging from each decision node
+      ae <- lapply(self$decision_nodes(), FUN = self$actions)
+      # convert action edge objects to indexes
+      aei <- lapply(ae, vapply, self$edge_index, FUN.VALUE = 1L)
+      # add the decision node label to each list element
+      names(aei) <- self$decision_nodes(what = "label")
+      # find all possible strategies, by taking each combination of one action
+      # edge from each decision node
+      tti <- expand.grid(aei, KEEP.OUT.ATTRS = FALSE)
       # select a single strategy, if required
       if (!is.null(select)) {
-        lv <- apply(X = TTI, MARGIN = 1L, FUN = function(row) {
-          # indexes of action edges from the table
-          st <- row
-          # indexes of action edges in 'select' argument
-          ss <- vapply(X = select, FUN.VALUE = 1L, FUN = self$edge_index)
-          # test whether the table row is the same as 'select'
-          return(setequal(st,ss))
-        })
-        TTI <- TTI[lv,,drop=FALSE]
+        # indexes of action edges in 'select' argument
+        ss <- vapply(X = select, FUN.VALUE = 1L, FUN = self$edge_index)
+        # test whether each table row has the same action edges as 'select'
+        lv <- apply(X = tti, MARGIN = 1L, FUN = setequal, y = ss)
+        tti <- tti[lv, , drop = FALSE]
       }
-      # build a table with edge labels in place of edge indexes
-      TTL <- TTI
-      dn <- self$decision_nodes("label")
-      for (d in dn) {
-        TTL[,d] <- vapply(X = TTI[,d], FUN.VALUE = "x", FUN = function(ie) {
-          e <- private$E[[ie]]$label()
-          return(e)
-        })
+      # build a table with labels in place of indexes
+      ttl <- tti
+      for (d in colnames(tti)) {
+        ttl[, d] <- vapply(X = tti[, d], FUN.VALUE = "x", FUN = self$edge_label)
       }
       # build row names
-      rn <- apply(TTL, 1L, paste, collapse="_")
-      rownames(TTI) <- rn
-      rownames(TTL) <- rn
+      rn <- apply(ttl, 1L, paste, collapse = "_")
+      rownames(tti) <- rn
+      rownames(ttl) <- rn
       # return object
-      TT <- TTI
-      if (what == "label") {
-        TT <- TTL
-      }
-      # return the table
-      return(TT)
+      tt <- if (what == "label") ttl else tti
+      return(tt)
     },
     
     #' @description Find all paths walked in each possible strategy. 
@@ -646,40 +616,36 @@ DecisionTree <- R6::R6Class(
     #' each path, and there is one row for each path in each strategy.
     strategy_paths = function() {
       # find possible strategies 
-      S <- self$strategy_table()
+      st <- self$strategy_table()
+      rownames(st) <- NULL
       # find the set of action edges in the tree
-      eA <- which(
-        vapply(X = private$E, FUN.VALUE = TRUE, FUN = function(e) {
-          return(inherits(e, what = "Action"))
-        }),
-        arr.ind = TRUE
+      ea <- which(
+        vapply(
+          X = self$edges(), FUN.VALUE = TRUE, FUN = inherits, what = "Action"
+        )
       )
       # iterate all paths and create data frame with action nodes visited and
       # terminating leaf node
       dn <- self$decision_nodes("label")
-      P <- do.call("rbind", lapply(self$root_to_leaf_paths(), function(p) {
+      p <- do.call("rbind", lapply(self$root_to_leaf_paths(), function(p) {
         # find the set of action edges in this walk
-        eW <- vapply(X = self$walk(p), FUN.VALUE = 1L, FUN = function(e) {
-          return(self$edge_index(e))
-        })
-        eW <- intersect(eA,eW)
+        ew <- vapply(X = self$walk(p), FUN.VALUE = 1L, FUN = self$edge_index)
+        ew <- intersect(ea, ew)
         # iterate the strategies and find those consistent with the path
-        lv <- apply(S, MARGIN=1L, FUN=function(row) {
+        lv <- apply(st, MARGIN = 1L, FUN = function(es) {
           # the set of action edges which define the strategy
-          eS <- row
-          eS <- setdiff(eW,eS)
-          return(length(eS) == 0L)
+          ae <- setdiff(ew, es)
+          return(length(ae) == 0L)
         })        
         # Append to the strategy data frame
-        SL <- cbind(
-          S[lv,, drop = FALSE], 
+        sl <- cbind(
+          st[lv, , drop = FALSE], 
           Leaf = self$vertex_index(p[[length(p)]])
         )
-        print(SL)
-        return(SL)
+        return(sl)
       }))
       # return the paths
-      return(P)
+      return(p)
     },
 
     #' @description Properties of all actions and reactions as a matrix.
@@ -924,10 +890,7 @@ DecisionTree <- R6::R6Class(
       # Replace the edge indexes of the strategy with their edge labels
       dn <- self$decision_nodes("label")
       for (d in dn) {
-        RES[,d] <- vapply(X = RES[,d], FUN.VALUE = "x", FUN = function(ie) {
-          e <- private$E[[ie]]$label()
-          return(e)
-        })
+        RES[, d] <- vapply(X = RES[, d], FUN.VALUE = "X", FUN = self$edge_label)
       }
       # exclude unnecessary columns
       RES$Path.Cost <- NULL

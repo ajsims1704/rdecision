@@ -228,8 +228,8 @@ ModVar <- R6::R6Class(
       # if random, make a new draw from the distribution
       if (what == "random") {
         private$.D$sample()
-      # if value, check and save the supplied number
       } else if (what == "value") {
+        # if value, check and save the supplied number
         abortif(is.null(val) | !is.numeric(val),
           message = "'v' must be numeric", 
           class = "invalid_val"

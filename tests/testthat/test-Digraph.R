@@ -245,7 +245,7 @@ test_that("all paths in a 4-node graph with cycle are discovered", {
   nmatch <- 0L
   for (p in P) {
     for (pe in PE) {
-      if (R6setequal(p,pe)) nmatch <- nmatch + 1L
+      if (r6_setequal(p,pe)) nmatch <- nmatch + 1L
     }
   }
   expect_identical(nmatch, 3L)
@@ -253,7 +253,7 @@ test_that("all paths in a 4-node graph with cycle are discovered", {
   p <- list(n2, n1, n3)
   w <- G$walk(p)
   expect_length(w, 2L)
-  expect_R6setequal(w, list(ee, ef))
+  expect_r6_setequal(w, list(ee, ef))
   w <- G$walk(p, what = "index")
   expect_length(w, 2L)
   expect_setequal(w, list(G$edge_index(ee), G$edge_index(ef)))
@@ -282,8 +282,8 @@ test_that("example of 4 node digraph with cycle has correct properties", {
   expect_error(G$direct_successors(42L), class = "not_in_graph")
   e <- Node$new("e")
   expect_error(G$direct_successors(e), class = "not_in_graph")
-  expect_R6setequal(G$direct_successors(a), list(b, d))
-  expect_R6setequal(G$direct_successors(c), list(a))
+  expect_r6_setequal(G$direct_successors(a), list(b, d))
+  expect_r6_setequal(G$direct_successors(c), list(a))
   expect_length(G$direct_successors(d), 0L)
   #
   # test of target() function
@@ -299,9 +299,9 @@ test_that("example of 4 node digraph with cycle has correct properties", {
   #
   expect_error(G$direct_predecessors(42L), class = "not_in_graph")
   expect_error(G$direct_predecessors(e), class = "not_in_graph")
-  expect_R6setequal(G$direct_predecessors(a), list(c))
-  expect_R6setequal(G$direct_predecessors(c), list(b))
-  expect_R6setequal(G$direct_predecessors(d), list(a))
+  expect_r6_setequal(G$direct_predecessors(a), list(c))
+  expect_r6_setequal(G$direct_predecessors(c), list(b))
+  expect_r6_setequal(G$direct_predecessors(d), list(a))
   #
   # test of source() function
   expect_error(G$source(42L), class = "not_in_graph")

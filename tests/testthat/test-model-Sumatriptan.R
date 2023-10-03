@@ -156,7 +156,7 @@ test_that("evaluation by path is as per Box 2.3 of Briggs", {
 es <- DT$evaluate()
 
 
-## @knitr icer ---------------------------------------------------------------
+## @knitr icer_basecase --------------------------------------------------------
 
 is <- which(es[, "d1"] == "Sumatriptan")
 cost_s <- es[[is, "Cost"]]
@@ -204,26 +204,28 @@ e8$set_probability(1.0 - p_sumatriptan_relief)
 es <- DT$evaluate()
 
 
+## @knitr icer_upper ----------------------------------------------------------
+
+is <- which(es[, "d1"] == "Sumatriptan")
+cost_s_upper <- es[[is, "Cost"]]
+utility_s_upper <- es[[is, "Utility"]]
+qaly_s_upper <- es[[is, "QALY"]]
+
+ic <- which(es[, "d1"] == "Caffeine-Ergotamine")
+cost_c_upper <- es[[ic, "Cost"]]
+utility_c_upper <- es[[ic, "Utility"]]
+qaly_c_upper <- es[[ic, "QALY"]]
+
+delta_c_upper <- cost_s_upper - cost_c_upper
+delta_u_upper <- utility_s_upper - utility_c_upper
+delta_q_upper <- qaly_s_upper - qaly_c_upper
+icer_upper <- delta_c_upper / delta_q_upper
+
+
 ## @knitr ---------------------------------------------------------------------
 
 test_that("upper relief threshold ICER agrees with Evans et al", {
-  
-  is <- which(es[, "d1"] == "Sumatriptan")
-  cost_s <- es[[is, "Cost"]]
-  utility_s <- es[[is, "Utility"]]
-  qaly_s <- es[[is, "QALY"]]
-  
-  ic <- which(es[, "d1"] == "Caffeine-Ergotamine")
-  cost_c <- es[[ic, "Cost"]]
-  utility_c <- es[[ic, "Utility"]]
-  qaly_c <- es[[ic, "QALY"]]
-  
-  delta_c <- cost_s - cost_c
-  delta_u <- utility_s - utility_c
-  delta_q <- qaly_s - qaly_c
-  icer <- delta_c / delta_q
-  
-  expect_between(icer / 18950.0, lower = 0.95, upper = 1.05)
+  expect_between(icer_upper / 18950.0, lower = 0.95, upper = 1.05)
 })
 
 
@@ -235,31 +237,32 @@ e8$set_probability(1.0 - p_sumatriptan_relief)
 es <- DT$evaluate()
 
 
+## @knitr icer_lower ----------------------------------------------------------
+
+is <- which(es[, "d1"] == "Sumatriptan")
+cost_s_lower <- es[[is, "Cost"]]
+utility_s_lower <- es[[is, "Utility"]]
+qaly_s_lower <- es[[is, "QALY"]]
+
+ic <- which(es[, "d1"] == "Caffeine-Ergotamine")
+cost_c_lower <- es[[ic, "Cost"]]
+utility_c_lower <- es[[ic, "Utility"]]
+qaly_c_lower <- es[[ic, "QALY"]]
+
+delta_c_lower <- cost_s_lower - cost_c_lower
+delta_u_lower <- utility_s_lower - utility_c_lower
+delta_q_lower <- qaly_s_lower - qaly_c_lower
+icer_lower <- delta_c_lower / delta_q_lower
+
+
 ## @knitr ---------------------------------------------------------------------
 
 test_that("lower relief threshold ICER agrees with Evans et al", {
-  
-  is <- which(es[, "d1"] == "Sumatriptan")
-  cost_s <- es[[is, "Cost"]]
-  utility_s <- es[[is, "Utility"]]
-  qaly_s <- es[[is, "QALY"]]
-  
-  ic <- which(es[, "d1"] == "Caffeine-Ergotamine")
-  cost_c <- es[[ic, "Cost"]]
-  utility_c <- es[[ic, "Utility"]]
-  qaly_c <- es[[ic, "QALY"]]
-  
-  delta_c <- cost_s - cost_c
-  delta_u <- utility_s - utility_c
-  delta_q <- qaly_s - qaly_c
-  icer <- delta_c / delta_q
-  
-  expect_between(icer / 60839.0, lower = 0.95, upper = 1.05)
+  expect_between(icer_lower / 60839.0, lower = 0.95, upper = 1.05)
 })
 
 
-
-## @knitr threshold_model -----------------------------------------------------------
+## @knitr threshold_model -----------------------------------------------------
 
 # model variables with uncertainty
 p_sumatriptan_relief <- ConstModVar$new(
@@ -378,7 +381,6 @@ dt <- DecisionTree$new(V,E)
 test_that("tornado diagram ICER ranges agree with Evans et al", {
   # check ICER ranges in tornado diagram (branches B and G get 2nd dose)
   TO <- dt$tornado(index=list(e17),ref=list(e18),outcome="ICER",draw=FALSE)
-  #dq <- (q.Sumatriptan-q.Caffeine)
   c_sumatriptan$set("expected")
   c_caffeine$set("expected")
   p_sumatriptan_relief$set("expected")

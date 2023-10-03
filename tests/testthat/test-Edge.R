@@ -1,14 +1,14 @@
 
 test_that("incorrect endpoints are rejected", {
   n1 <- Node$new()
-  expect_error(e <- Edge$new(42L, n1), class = "non-Node_endpoint")
-  expect_error(e <- Edge$new(n1, 42L), class = "non-Node_endpoint")
+  expect_error(Edge$new(42L, n1), class = "non-Node_endpoint")
+  expect_error(Edge$new(n1, 42L), class = "non-Node_endpoint")
 })
 
 test_that("incorrect labels are rejected", {
   n1 <- Node$new()
   n2 <- Node$new()
-  expect_error(e <- Edge$new(n1, n2, TRUE), class = "non-string_label")
+  expect_error(Edge$new(n1, n2, TRUE), class = "non-string_label")
 })
 
 test_that("edge is defined correctly", {

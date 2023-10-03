@@ -9,7 +9,6 @@
 #' @docType class
 #' @author Andrew J. Sims \email{andrew.sims@@newcastle.ac.uk}
 #' @export
-#' 
 DirichletDistribution <- R6::R6Class(
   classname = "DirichletDistribution",
   lock_class = TRUE,
@@ -136,7 +135,7 @@ DirichletDistribution <- R6::R6Class(
       for (i in seq_len(private$K)) {
         for (j in seq_len(private$K)) {
           VC[[i,j]] <- ifelse(i == j, alphabar[[i]], 0L) -
-                       (alphabar[[i]] * alphabar[[j]])
+            (alphabar[[i]] * alphabar[[j]])
           VC[[i,j]] <- VC[[i,j]] / (alpha0 + 1L)
         }
       }

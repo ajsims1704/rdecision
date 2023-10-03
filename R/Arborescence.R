@@ -223,7 +223,7 @@ Arborescence <- R6::R6Class(
       HASLEFTSIBLING <- function(iNode) {
         v <- private$V[[iNode]]
         S <- self$siblings(v)
-        iS <- vapply(S, FUN.VALUE = 1L, FUN=function(s) self$vertex_index(s))
+        iS <- vapply(S, FUN.VALUE = 1L, FUN = self$vertex_index)
         rb <- any(iS < iNode)
         return(rb)
       }
@@ -232,7 +232,7 @@ Arborescence <- R6::R6Class(
         rn <- 0L
         v <- private$V[[iNode]]
         S <- self$siblings(v)
-        iS <- vapply(S, FUN.VALUE = 1L, FUN=function(s) self$vertex_index(s))
+        iS <- vapply(S, FUN.VALUE = 1L, FUN = self$vertex_index)
         lS <- iS[which(iS < iNode)]
         if (any(iS < iNode)) {
           rn <- max(lS)
@@ -243,7 +243,7 @@ Arborescence <- R6::R6Class(
       HASRIGHTSIBLING <- function(iNode) {
         v <- private$V[[iNode]]
         S <- self$siblings(v)
-        iS <- vapply(S, FUN.VALUE = 1L, FUN=function(s) self$vertex_index(s))
+        iS <- vapply(S, FUN.VALUE = 1L, FUN = self$vertex_index)
         rb <- any(iS > iNode)
         return(rb)
       }
@@ -252,7 +252,7 @@ Arborescence <- R6::R6Class(
         rn <- 0L
         v <- private$V[[iNode]]
         S <- self$siblings(v)
-        iS <- vapply(S, FUN.VALUE = 1L, FUN = function(s) self$vertex_index(s))
+        iS <- vapply(S, FUN.VALUE = 1L, FUN = self$vertex_index)
         rS <- iS[which(iS>iNode)]
         if (any(iS>iNode)) {
           rn <- min(rS)
@@ -280,7 +280,7 @@ Arborescence <- R6::R6Class(
         rn <- 0L
         v <- private$V[[iNode]]
         C <- self$direct_successors(v)
-        iC <- vapply(C, FUN.VALUE = 1L, FUN = function(c) self$vertex_index(c))
+        iC <- vapply(C, FUN.VALUE = 1L, FUN = self$vertex_index)
         if (length(iC) > 0L) {
           rn <- min(iC)
         }
@@ -311,7 +311,7 @@ Arborescence <- R6::R6Class(
         DepthToStop <- MaxDepth - Level
         #
         while (Leftmost != 0L && Neighbor != 0L && 
-               CompareDepth <= DepthToStop) {
+                 CompareDepth <= DepthToStop) {
           # Compute the location of Leftmost and where it should 
           # be with respect to Neighbor.
           LeftModsum <- 0.0
@@ -327,10 +327,10 @@ Arborescence <- R6::R6Class(
           # Find the MoveDistance, and apply it to Node's subtree.
           # Add appropriate portions to smaller interior subtrees.
           MoveDistance <- (private$PRELIM[Neighbor] +
-                           LeftModsum +
-                           SubtreeSeparation + 
-                           MEANNODESIZE(Leftmost, Neighbor)) -
-                           (private$PRELIM[Leftmost] + RightModsum)  
+                             LeftModsum +
+                             SubtreeSeparation + 
+                             MEANNODESIZE(Leftmost, Neighbor)) -
+            (private$PRELIM[Leftmost] + RightModsum)  
           if (MoveDistance > 0.0) {
             # Count interior sibling subtrees in LeftSiblings
             TempPtr <- iNode
@@ -345,9 +345,9 @@ Arborescence <- R6::R6Class(
               TempPtr <- iNode
               while (TempPtr != AncestorNeighbor) { ##DEBUG - != not =##
                 private$PRELIM[TempPtr] <- private$PRELIM[TempPtr] + 
-                                           MoveDistance
+                  MoveDistance
                 private$MODIFIER[TempPtr] <- private$MODIFIER[TempPtr] + 
-                                             MoveDistance
+                  MoveDistance
                 MoveDistance <- MoveDistance - Portion
                 TempPtr <- LEFTSIBLING(TempPtr)
               }
@@ -366,10 +366,10 @@ Arborescence <- R6::R6Class(
           if (ISLEAF(Leftmost)) {
             Leftmost <- GETLEFTMOST(iNode, 0L, CompareDepth)
           } else {
-# nocov start
-# in an arborescence the leftmost node in a subtree is always a leaf
+            # nocov start
+            # in an arborescence the leftmost node in a subtree is always a leaf
             Leftmost <- FIRSTCHILD(Leftmost)
-# nocov end
+            # nocov end
           }
           Neighbor <- private$LEFTNEIGHBOR[Leftmost] ##DEBUG - line missing##
         }
@@ -388,11 +388,11 @@ Arborescence <- R6::R6Class(
             #   the separation between sibling nodes, and 
             #   the mean size of left sibling and current node.
             private$PRELIM[iNode] <- private$PRELIM[LEFTSIBLING(iNode)] + 
-                                     SiblingSeparation +
-                                     MEANNODESIZE(LEFTSIBLING(iNode), iNode)
+              SiblingSeparation +
+              MEANNODESIZE(LEFTSIBLING(iNode), iNode)
           } else {
-           # No sibling on the left to worry about.
-           private$PRELIM[iNode] <- 0.0
+            # No sibling on the left to worry about.
+            private$PRELIM[iNode] <- 0.0
           }
         } else {
           # This Node is not a leaf, so call this procedure 
@@ -408,8 +408,8 @@ Arborescence <- R6::R6Class(
             (private$PRELIM[Leftmost] + private$PRELIM[Rightmost]) / 2.0
           if (HASLEFTSIBLING(iNode)) {
             private$PRELIM[iNode] <- private$PRELIM[LEFTSIBLING(iNode)] + 
-                                     SiblingSeparation + 
-                                     MEANNODESIZE(LEFTSIBLING(iNode), iNode)
+              SiblingSeparation + 
+              MEANNODESIZE(LEFTSIBLING(iNode), iNode)
             private$MODIFIER[iNode] <- private$PRELIM[iNode] - Midpoint
             APPORTION(iNode, Level) 
           } else {
@@ -453,18 +453,19 @@ Arborescence <- R6::R6Class(
                                    Level + 1L,
                                    Modsum + private$MODIFIER[iNode])
             }
-            if (Result==TRUE && HASRIGHTSIBLING(iNode)) {
-                Result <- SECONDWALK(RIGHTSIBLING(iNode),
-                                     Level,   ##DEBUG - not Level+1##
-                                     Modsum)
+            if (Result && HASRIGHTSIBLING(iNode)) {
+              Result <- SECONDWALK(
+                ##DEBUG - not Level+1##
+                RIGHTSIBLING(iNode), Level, Modsum
+              )
             }
           } else {
             # Continuing would put the tree outside of the 
             # drawable extent's range.
-# nocov start
-# there are no limits on the drawable extent, so will never reach here
+            # nocov start
+            # there are no limits on the drawable extent, so never reaches here
             Result <- FALSE
-# nocov end
+            # nocov end
           }
         } else {
           # We are at a level deeper than that we want to draw. 
@@ -492,10 +493,10 @@ Arborescence <- R6::R6Class(
           return(SECONDWALK(iNode, 0L, 0L))      
         } else {
           # Trivial: return TRUE if a null pointer was passed.
-# nocov start
-# an arborescence must have a root node, so never reach here
+          # nocov start
+          # an arborescence must have a root node, so never reach here
           return(TRUE)         
-# nocov end
+          # nocov end
         }
       }
       # call Walker's main function

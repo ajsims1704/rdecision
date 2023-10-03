@@ -242,17 +242,17 @@ SemiMarkovModel <- R6::R6Class(
         class = "invalid_graph"
       )
       # check that all nodes inherit from MarkovState
-      S <- which(vapply(V, FUN.VALUE = TRUE, FUN = function(v) {
-        inherits(v, what = "MarkovState")
-      }))
+      S <- which(
+        vapply(V, FUN.VALUE = TRUE, FUN = inherits, what = "MarkovState")
+      )
       abortifnot(setequal(seq_along(V),S),
         message = "Each node must be a 'MarkovState'.", 
         class = "invalid_state"
       )
       # check that all edges inherit from Transition
-      tedges <- which(vapply(E, FUN.VALUE = TRUE, FUN = function(e) {
-        inherits(e, what = "Transition")
-      }))
+      tedges <- which(
+        vapply(E, FUN.VALUE = TRUE, inherits, what = "Transition")
+      )
       abortifnot(setequal(seq_along(E), tedges),
         message = "Each edge must be a 'Transition'.", 
         class = "invalid_transition"
@@ -303,8 +303,7 @@ SemiMarkovModel <- R6::R6Class(
           source=self$get_statenames(), target = self$get_statenames()
         )
       )
-      for (ie in seq_len(self$size())) {
-        e <- private$E[[ie]]
+      for (e in self$edges()) {
         is <- self$vertex_index(e$source())
         it <- self$vertex_index(e$target())
         Pt[is, it] <- 1.0
@@ -364,7 +363,7 @@ SemiMarkovModel <- R6::R6Class(
       AA <- (Pt != 0.0)    
       abortif(sum(M | AA) > sum(M),
         message = "All non-zero Pt cells must correspond to transitions",
-          class = "invalid_Pt"
+        class = "invalid_Pt"
       )
       # check that all rows of Pt sum to 1
       sumP <- rowSums(Pt)
@@ -454,7 +453,7 @@ SemiMarkovModel <- R6::R6Class(
           message = paste(
             "'populations' must be a numeric vector with one named element",
             "per state"
-            ), 
+          ), 
           class = "invalid_populations"
         )
         # set the populations
@@ -695,7 +694,7 @@ SemiMarkovModel <- R6::R6Class(
       # create list
       mv <- list()
       # find the ModVars in the transitions
-      for (e in private$E) {
+      for (e in self$edges()) {
         if (inherits(e, what = "Transition")) {
           mv <- c(mv, e$modvars())
         }

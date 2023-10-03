@@ -161,65 +161,98 @@ Graph <- R6::R6Class(
       return(!is.na(index))
     },
 
+    #' @description A list of all the Edge objects in the graph.
+    #' @details The list of Edge objects is returned in the same order as their
+    #' indexes understood by \code{edge_index}, \code{edge_at} and
+    #' \code{edge_along}, which is not necessarily the same order in which they
+    #' were supplied in the \code{E} argument to \code{new}.
+    edges = function() {
+      return(private$E)
+    },
+    
     #' @description Sequence of edge indices.
     #' @details Similar to \code{base::seq_along}, this function provides
     #' the indices of the edges in the graph. It is intended for use by 
-    #' graph algorithms which iterate edges.
+    #' graph algorithms which iterate edges. It is equivalent to
+    #' \code{seq_along(g$edges())}, where \code{g} is a graph.
     #' @return A numeric vector of indices from 1 to the size of the graph.
     #' The edge at index \eqn{i} is not guaranteed to be the same edge at 
     #' \code{E[[i]]} of the argument \code{E} to \code{new} (i.e., the order in
     #' which the edges are stored internally within the class may differ
     #' from the order in which they were supplied).
     edge_along = function() {
-      return(seq_along(private$E))
+      return(seq_along(self$edges()))
     },
 
-    #' @description Find the index of an edge in a graph.
-    #' @param e Subject edge.
-    #' @return Index of \code{e}. The index of edge \code{e} is the one used
-    #' internally to the class object, which is not necessarily the same as the
-    #' order of edges in the \code{E} argument of \code{new}. \code{NA} if
-    #' \var{e} is not an edge, or is an edge that is not in the graph.
+    #' @description Find the index(es) of edge(s) in a graph.
+    #' @details The index of edge \code{e} is the one used internally to the
+    #' class object, which is not necessarily the same as the
+    #' order of edges in the \code{E} argument of \code{new}.
+    #' @param e An edge object, or list of edge objects.
+    #' @return Index of \code{e}. \code{NA} if \var{e} is not an edge, or is an
+    #' edge that is not in the graph.
     edge_index = function(e) {
-      # find e in E
-      index <- NA_integer_
-      i <- 1L
-      for (ee in private$E) {
-        if (identical(ee, e)) {
-          index <- i
-          break
+      # coerce e to a list, if it is not
+      e <- if (is.list(e)) e else list(e)
+      # match
+      ie <- vapply(e, FUN.VALUE = 1L, FUN = function(em) {
+        index <- NA_integer_
+        for (i in seq_along(private$E)) {
+          if (identical(private$E[[i]], em)) {
+            index <- i
+            break
+          }
         }
-        i <- i + 1L
-      }
-      return(index)
+        return(index)
+      })
+      return(ie)
     },
 
-    #' @description Find the edge at a given index.
+    #' @description Find the edge(s) at given index(es).
     #' @details The inverse of function \code{edge_index}. The function will
     #' raise an abort signal if the supplied index is not an edge.
-    #' @param index Index of a edge in the graph, as an integer.
-    #' @return the edge with the specified index.
+    #' @param index Index(es) of edge in the graph, as an integer, vector of
+    #' integers, or list of integers.
+    #' @return The edge, or list of edges, with the specified index(es).
     edge_at = function(index) {
       # check argument
       abortifnot(
-        length(index) == 1L,
-        !is.na(index),
-        is.integer(index),
-        index >= 1L,
-        index <= length(private$E),
+        !anyNA(index),
+        all(vapply(X = index, FUN.VALUE = TRUE, FUN = is.integer)),
+        all(index >= 1L),
+        all(index <= self$size()),
         message = "There is no edge with the supplied index.",
         class = "invalid_index"
       )
-      return(private$E[[index]])
+      # coerce index to a numeric vector
+      ie <- as.integer(index)
+      # fetch the edge node(s)
+      e <- if (length(ie) > 1L) private$E[ie] else private$E[[ie]]
+      return(e)
     },
     
-    #' @description Test whether an edge is element of the graph.
-    #' @param e Subject edge.
-    #' @return \code{TRUE} if \code{e} is an element of \eqn{E(G)}.
+    #' @description Test whether an edge (or list of edges), is (are) element(s)
+    #' of the graph.
+    #' @param e Edge or list of edges.
+    #' @return Logical vector with each element \code{TRUE} if the corresponding
+    #' element of \code{e} is an element of \eqn{E(G)}.
     has_edge = function(e) {
       # edge_index checks argument
       index <- self$edge_index(e)
       return(!is.na(index))
+    },
+    
+    #' @description Find label(s) of edge(s) at index(es) i
+    #' @param ie Index of edge, or vector of indexes.
+    #' @return Label(s) of edge(s) at index(es) i
+    edge_label = function(ie) {
+      # fetch each edge object (argument ie is checked in edge_at)
+      e <- lapply(X = ie, FUN = self$edge_at)
+      # fetch the labels
+      el <- vapply(X = e, FUN.VALUE = "x", FUN = function(e) {
+        return(e$label())
+      })
+      return(el)
     },
 
     #' @description Compute the adjacency matrix for the graph. 
@@ -263,7 +296,7 @@ Graph <- R6::R6Class(
           dimnames = list(out.node = L, in.node = L)
         )
         # populate it
-        for (e in private$E) {
+        for (e in self$edges()) {
           W <- e$endpoints()
           iv1 <- self$vertex_index(W[[1L]])
           iv2 <- self$vertex_index(W[[2L]])
@@ -453,7 +486,7 @@ Graph <- R6::R6Class(
       o[[length(o) + 1L]] <- paste0(indent, 'size="7,7" ;')
       o[[length(o) + 1L]] <- paste0(indent, "rankdir=LR ;")
       # write edges
-      for (e in private$E) {
+      for (e in self$edges()) {
         ep <- e$endpoints()
         s <- ep[[1L]]
         t <- ep[[2L]]

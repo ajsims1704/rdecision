@@ -197,11 +197,9 @@ ExprModVar <- R6::R6Class(
           # add the variable to the list
           mvlist <- c(mvlist, vv)
           # recurse, if required
-          if (recursive) {
-            if (inherits(vv, what = "ExprModVar")) {
-              for (o in vv$operands(recursive)) {
-                mvlist <- c(mvlist, o)
-              }
+          if (recursive && inherits(vv, what = "ExprModVar")) {
+            for (o in vv$operands(recursive)) {
+              mvlist <- c(mvlist, o)
             }
           }
         }

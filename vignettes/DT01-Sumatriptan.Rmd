@@ -134,13 +134,15 @@ knitr::kable(
 )
 ```
 
-```{r, icer, echo = FALSE}
+```{r, icer_basecase, echo = FALSE}
 ```
-The incremental cost was $Can `r gbp(x = delta_c, p = TRUE)` and the
-incremental utility was `r round(delta_u, 2L)`. Because the time
+The incremental cost was $Can `r gbp(x = delta_c, p = TRUE)`
+(`r gbp(x = cost_s, p = TRUE)` - `r gbp(x = cost_c, p = TRUE)`)
+and the incremental utility was `r round(delta_u, 2L)`
+(`r round(utility_s, 2L)` - `r round(utility_c, 2L)`). Because the time
 horizon of the model was 1 day, the incremental QALYs was the incremental
-utility divided by 365, and the ICER was therefore equal to `r gbp(icer)`
-$Can/QALY, within 5% of the published estimate. 
+annual utility divided by 365, and the ICER was therefore equal to `r gbp(icer)`
+\$Can/QALY, within 5% of the published estimate (29,366 \$Can/QALY). 
 
 ## Univariate sensitivity analysis
 Evans *et al* [-@evans1997] reported the ICER for various alternative values
@@ -152,53 +154,44 @@ effectiveness of 26.8% (these being the lower and upper confidence intervals
 of the estimate of effectiveness from meta-analysis).
 
 To calculate these ICERs, we set the value of the model variable
-`p_sumatriptan_relief`, and re-evaluate the model. The upper range of ICER
-(with the smaller relative increase in effectiveness) is calculated as follows:
+`p_sumatriptan_relief`, and re-evaluate the model. The lower range of ICER
+(with the greater relative increase in effectiveness) is calculated as follows:
 
 ```{r, relief_threshold_upper, echo = TRUE}
 ```
+```{r, icer_upper, echo = FALSE}
+```
+This yields the following table, from which the ICER is calculated as 
+`r gbp(icer_upper)` \$Can/QALY, close to the published estimate of
+18,950 \$Can/QALY.
 
-
-## Blah
-
-
-Clearly, it would be possible to simply change the value of the variable
-`p.sumatriptan.relief` in the code above, and re-run the script. However, it 
-is common to want to estimate the threshold value of an input parameter that
-leads to a particular outcome (cost saving or ICER). `rdecision` includes
-a method to do this, and we will use the ICER values given in the previous
-paragraph to estimate the corresponding effectiveness thresholds, as an
-illustrative example.
-
-Method `threshold` works by changing the value of one variable over a defined
-range. The variable must be a type of object called a `ModVar` within 
-`rdecision`, and is identified by its unique name. In the model created
-earlier, all variables were scalar constants. So, to make the `threshold`
-method work correctly, the variable of interest must be re-defined as a 
-`ModVar`. Further, because the variable of interest is a probability, its
-complement must be defined as an expression model variable (a model variable
-whose value depends on other model variables), so that the sum of the
-probabilities remains as one. The code below creates the necessary model
-variables, and re-builds the model with revised edges that refer to them.
-Note that the type of `ModVar` is unimportant for calculating thresholds, and
-so in this case, we have used the simplest form, a `ConstModVar`.
-
-```{r, threshold_model, echo = TRUE}
+```{r, echo = FALSE}
+knitr::kable(
+  es[, c("d1", "Cost", "Utility", "QALY")],
+  align = "lrrr",
+  digits = c(2L, 2L, 4L, 4L),
+  format.args = list(scientific = FALSE)
+)
 ```
 
-Next, we apply the threshold method to estimate the values of 
-`p_sumatriptan_relief` at two known values of the ICER. In each case, we can
-specify the range over which to seek the threshold.
+The upper range of ICER (with the smaller relative increase in effectiveness) is
+calculated as follows:
 
-```{r, relief_thresholds, echo = TRUE}
+```{r, relief_threshold_lower, echo = TRUE}
 ```
+```{r, icer_lower, echo = FALSE}
+```
+This yields the following table, from which the ICER is calculated as 
+`r gbp(icer_lower)` \$Can/QALY, close to the published estimate of
+60,839 \$Can/QALY.
 
-The value of `p_relief_upper` is `r round(100.0 * p_relief_upper, 1L)`% and the
-value of `p_relief_lower` is `r round(100.0 * p_relief_lower, 1L)`%, which are
-`r round(100.0 * (p_relief_upper - p_caffeine_relief), 1L)` and 
-`r round(100.0 * (p_relief_lower - p_caffeine_relief), 1L)` percentage
-points greater than the relief from Caffeine-Ergotamine 
-(`r round(100.0 * p_caffeine_relief, 1L)`), and close to the
-values reported by Evans *et al* (26.8% and 9.1% respectively).
+```{r, echo = FALSE}
+knitr::kable(
+  es[, c("d1", "Cost", "Utility", "QALY")],
+  align = "lrrr",
+  digits = c(2L, 2L, 4L, 4L),
+  format.args = list(scientific = FALSE)
+)
+```
 
 # References

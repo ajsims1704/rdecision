@@ -11,7 +11,8 @@ test_that("incorrect node and edge types are rejected", {
   )
   expect_error(
     Arborescence$new(list(n1, n2), list(a1, 42L)), 
-    class = "non-Arrow_edge")
+    class = "non-Arrow_edge"
+  )
 })
 
 test_that("graphs that are not trees are rejected", {
@@ -36,7 +37,7 @@ test_that("graphs that are not arborescences are rejected", {
   n3 <- Node$new()
   e1 <- Arrow$new(n1,n2)
   e2 <- Arrow$new(n1,n3)
-  expect_silent(G <- Arborescence$new(V=list(n1,n2,n3),A=list(e1,e2)))
+  expect_silent(Arborescence$new(V=list(n1,n2,n3),A=list(e1,e2)))
   # out tree (single root) with nodes and edges in different order
   n1 <- Node$new()
   n2 <- Node$new()
@@ -46,11 +47,11 @@ test_that("graphs that are not arborescences are rejected", {
   G <- Digraph$new(V=list(n2,n3,n1),A=list(e1,e2))
   expect_true(G$is_weakly_connected())
   expect_true(G$is_tree())
-  expect_silent(G <- Arborescence$new(V=list(n2,n3,n1),A=list(e1,e2)))
+  expect_silent(Arborescence$new(V=list(n2,n3,n1),A=list(e1,e2)))
   # in tree (2 roots)
   e1 <- Arrow$new(n2,n1)
   e2 <- Arrow$new(n3,n1)
-  expect_error(G <- Arborescence$new(V=list(n1,n2,n3), A=list(e1,e2)), 
+  expect_error(Arborescence$new(V=list(n1,n2,n3), A=list(e1,e2)), 
                class="not_arborescence")
 })
 
@@ -92,9 +93,9 @@ test_that("parent, sibling and drawing functions are correct", {
   expect_identical(A$order(), 15L)
   # check siblings
   expect_length(A$siblings(nO), 0L)
-  expect_R6setequal(A$siblings(nE), list(nF, nN))
-  expect_R6setequal(A$siblings(nA), list(nD))
-  expect_R6setequal(A$siblings(nJ), list(nH, nI, nK, nL))
+  expect_r6_setequal(A$siblings(nE), list(nF, nN))
+  expect_r6_setequal(A$siblings(nA), list(nD))
+  expect_r6_setequal(A$siblings(nJ), list(nH, nI, nK, nL))
   # check postree arguments
   expect_error(
     A$postree(SiblingSeparation = "x"), 
