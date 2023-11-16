@@ -87,6 +87,8 @@ Andrew J. Sims \email{andrew.sims@newcastle.ac.uk}
 <li><span class="pkg-link" data-pkg="rdecision" data-topic="Graph" data-id="edge_along"><a href='../../rdecision/html/Graph.html#method-Graph-edge_along'><code>rdecision::Graph$edge_along()</code></a></span></li>
 <li><span class="pkg-link" data-pkg="rdecision" data-topic="Graph" data-id="edge_at"><a href='../../rdecision/html/Graph.html#method-Graph-edge_at'><code>rdecision::Graph$edge_at()</code></a></span></li>
 <li><span class="pkg-link" data-pkg="rdecision" data-topic="Graph" data-id="edge_index"><a href='../../rdecision/html/Graph.html#method-Graph-edge_index'><code>rdecision::Graph$edge_index()</code></a></span></li>
+<li><span class="pkg-link" data-pkg="rdecision" data-topic="Graph" data-id="edge_label"><a href='../../rdecision/html/Graph.html#method-Graph-edge_label'><code>rdecision::Graph$edge_label()</code></a></span></li>
+<li><span class="pkg-link" data-pkg="rdecision" data-topic="Graph" data-id="edges"><a href='../../rdecision/html/Graph.html#method-Graph-edges'><code>rdecision::Graph$edges()</code></a></span></li>
 <li><span class="pkg-link" data-pkg="rdecision" data-topic="Graph" data-id="graph_adjacency_matrix"><a href='../../rdecision/html/Graph.html#method-Graph-graph_adjacency_matrix'><code>rdecision::Graph$graph_adjacency_matrix()</code></a></span></li>
 <li><span class="pkg-link" data-pkg="rdecision" data-topic="Graph" data-id="has_edge"><a href='../../rdecision/html/Graph.html#method-Graph-has_edge'><code>rdecision::Graph$has_edge()</code></a></span></li>
 <li><span class="pkg-link" data-pkg="rdecision" data-topic="Graph" data-id="has_vertex"><a href='../../rdecision/html/Graph.html#method-Graph-has_vertex'><code>rdecision::Graph$has_vertex()</code></a></span></li>
@@ -109,6 +111,8 @@ Andrew J. Sims \email{andrew.sims@newcastle.ac.uk}
 <li><span class="pkg-link" data-pkg="rdecision" data-topic="Digraph" data-id="is_tree"><a href='../../rdecision/html/Digraph.html#method-Digraph-is_tree'><code>rdecision::Digraph$is_tree()</code></a></span></li>
 <li><span class="pkg-link" data-pkg="rdecision" data-topic="Digraph" data-id="is_weakly_connected"><a href='../../rdecision/html/Digraph.html#method-Digraph-is_weakly_connected'><code>rdecision::Digraph$is_weakly_connected()</code></a></span></li>
 <li><span class="pkg-link" data-pkg="rdecision" data-topic="Digraph" data-id="paths"><a href='../../rdecision/html/Digraph.html#method-Digraph-paths'><code>rdecision::Digraph$paths()</code></a></span></li>
+<li><span class="pkg-link" data-pkg="rdecision" data-topic="Digraph" data-id="source"><a href='../../rdecision/html/Digraph.html#method-Digraph-source'><code>rdecision::Digraph$source()</code></a></span></li>
+<li><span class="pkg-link" data-pkg="rdecision" data-topic="Digraph" data-id="target"><a href='../../rdecision/html/Digraph.html#method-Digraph-target'><code>rdecision::Digraph$target()</code></a></span></li>
 <li><span class="pkg-link" data-pkg="rdecision" data-topic="Digraph" data-id="topological_sort"><a href='../../rdecision/html/Digraph.html#method-Digraph-topological_sort'><code>rdecision::Digraph$topological_sort()</code></a></span></li>
 <li><span class="pkg-link" data-pkg="rdecision" data-topic="Digraph" data-id="walk"><a href='../../rdecision/html/Digraph.html#method-Digraph-walk'><code>rdecision::Digraph$walk()</code></a></span></li>
 <li><span class="pkg-link" data-pkg="rdecision" data-topic="Arborescence" data-id="is_leaf"><a href='../../rdecision/html/Arborescence.html#method-Arborescence-is_leaf'><code>rdecision::Arborescence$is_leaf()</code></a></span></li>
@@ -325,7 +329,7 @@ No return value.
 \if{html}{\out{<a id="method-DecisionTree-is_strategy"></a>}}
 \if{latex}{\out{\hypertarget{method-DecisionTree-is_strategy}{}}}
 \subsection{Method \code{is_strategy()}}{
-Tests whether a strategy is valid.
+Tests whether an object is a valid strategy.
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{DecisionTree$is_strategy(strategy)}\if{html}{\out{</div>}}
 }
@@ -338,9 +342,9 @@ Tests whether a strategy is valid.
 \if{html}{\out{</div>}}
 }
 \subsection{Details}{
-A strategy is a unanimous prescription of an action in each 
-decision node, specified as a list of actions.  This checks whether the
-strategy is valid for this decision tree.
+A strategy is a unanimous prescription of an action taken at
+each decision node, coded as a list of action edges. This checks
+whether the strategy is valid for this decision tree.
 }
 
 \subsection{Returns}{
@@ -513,7 +517,7 @@ will be repetitive and uninformative.}
 \item{\code{by}}{One of {"path", "strategy", "run"}. If "path", the table has
 one row per path walked per strategy, per run, and includes the label of
 the terminating leaf node to identify each path. If "strategy" (the 
-default), the table is aggregated by strategy, i.e. there is one row per
+default), the table is aggregated by strategy, i.e., there is one row per
 strategy per run. If "run", the table has one row per run and uses
 concatenated strategy names and one (cost, benefit, utility, QALY) column
 for each strategy.}
@@ -662,7 +666,7 @@ index strategy compared with a reference strategy.
 will be compared.}
 
 \item{\code{outcome}}{One of \code{"saving"} or \code{"ICER"}. For 
-\code{"saving"} (e.g. in cost consequence analysis), the value of 
+\code{"saving"} (e.g., in cost consequence analysis), the value of 
 \code{mvd}
 is found at which cost saved is zero (cost saved is cost of reference 
 minus cost of index, on the presumption that the new technology will be

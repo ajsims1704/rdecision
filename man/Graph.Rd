@@ -35,10 +35,12 @@ Andrew Sims \email{andrew.sims@newcastle.ac.uk}
 \item \href{#method-Graph-vertex_index}{\code{Graph$vertex_index()}}
 \item \href{#method-Graph-vertex_at}{\code{Graph$vertex_at()}}
 \item \href{#method-Graph-has_vertex}{\code{Graph$has_vertex()}}
+\item \href{#method-Graph-edges}{\code{Graph$edges()}}
 \item \href{#method-Graph-edge_along}{\code{Graph$edge_along()}}
 \item \href{#method-Graph-edge_index}{\code{Graph$edge_index()}}
 \item \href{#method-Graph-edge_at}{\code{Graph$edge_at()}}
 \item \href{#method-Graph-has_edge}{\code{Graph$has_edge()}}
+\item \href{#method-Graph-edge_label}{\code{Graph$edge_label()}}
 \item \href{#method-Graph-graph_adjacency_matrix}{\code{Graph$graph_adjacency_matrix()}}
 \item \href{#method-Graph-is_simple}{\code{Graph$is_simple()}}
 \item \href{#method-Graph-is_connected}{\code{Graph$is_connected()}}
@@ -191,6 +193,23 @@ TRUE if v is an element of V(G).
 }
 }
 \if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-Graph-edges"></a>}}
+\if{latex}{\out{\hypertarget{method-Graph-edges}{}}}
+\subsection{Method \code{edges()}}{
+A list of all the Edge objects in the graph.
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{Graph$edges()}\if{html}{\out{</div>}}
+}
+
+\subsection{Details}{
+The list of Edge objects is returned in the same order as their
+indexes understood by \code{edge_index}, \code{edge_at} and
+\code{edge_along}, which is not necessarily the same order in which they
+were supplied in the \code{E} argument to \code{new}.
+}
+
+}
+\if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-Graph-edge_along"></a>}}
 \if{latex}{\out{\hypertarget{method-Graph-edge_along}{}}}
 \subsection{Method \code{edge_along()}}{
@@ -202,7 +221,8 @@ Sequence of edge indices.
 \subsection{Details}{
 Similar to \code{base::seq_along}, this function provides
 the indices of the edges in the graph. It is intended for use by 
-graph algorithms which iterate edges.
+graph algorithms which iterate edges. It is equivalent to
+\code{seq_along(g$edges())}, where \code{g} is a graph.
 }
 
 \subsection{Returns}{
@@ -217,7 +237,7 @@ from the order in which they were supplied).
 \if{html}{\out{<a id="method-Graph-edge_index"></a>}}
 \if{latex}{\out{\hypertarget{method-Graph-edge_index}{}}}
 \subsection{Method \code{edge_index()}}{
-Find the index of an edge in a graph.
+Find the index(es) of edge(s) in a graph.
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{Graph$edge_index(e)}\if{html}{\out{</div>}}
 }
@@ -225,22 +245,26 @@ Find the index of an edge in a graph.
 \subsection{Arguments}{
 \if{html}{\out{<div class="arguments">}}
 \describe{
-\item{\code{e}}{Subject edge.}
+\item{\code{e}}{An edge object, or list of edge objects.}
 }
 \if{html}{\out{</div>}}
 }
+\subsection{Details}{
+The index of edge \code{e} is the one used internally to the
+class object, which is not necessarily the same as the
+order of edges in the \code{E} argument of \code{new}.
+}
+
 \subsection{Returns}{
-Index of \code{e}. The index of edge \code{e} is the one used
-internally to the class object, which is not necessarily the same as the
-order of edges in the \code{E} argument of \code{new}. \code{NA} if
-\var{e} is not an edge, or is an edge that is not in the graph.
+Index of \code{e}. \code{NA} if \var{e} is not an edge, or is an
+edge that is not in the graph.
 }
 }
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-Graph-edge_at"></a>}}
 \if{latex}{\out{\hypertarget{method-Graph-edge_at}{}}}
 \subsection{Method \code{edge_at()}}{
-Find the edge at a given index.
+Find the edge(s) at given index(es).
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{Graph$edge_at(index)}\if{html}{\out{</div>}}
 }
@@ -248,7 +272,8 @@ Find the edge at a given index.
 \subsection{Arguments}{
 \if{html}{\out{<div class="arguments">}}
 \describe{
-\item{\code{index}}{Index of a edge in the graph, as an integer.}
+\item{\code{index}}{Index(es) of edge in the graph, as an integer, vector of
+integers, or list of integers.}
 }
 \if{html}{\out{</div>}}
 }
@@ -258,14 +283,15 @@ raise an abort signal if the supplied index is not an edge.
 }
 
 \subsection{Returns}{
-the edge with the specified index.
+The edge, or list of edges, with the specified index(es).
 }
 }
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-Graph-has_edge"></a>}}
 \if{latex}{\out{\hypertarget{method-Graph-has_edge}{}}}
 \subsection{Method \code{has_edge()}}{
-Test whether an edge is element of the graph.
+Test whether an edge (or list of edges), is (are) element(s)
+of the graph.
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{Graph$has_edge(e)}\if{html}{\out{</div>}}
 }
@@ -273,12 +299,33 @@ Test whether an edge is element of the graph.
 \subsection{Arguments}{
 \if{html}{\out{<div class="arguments">}}
 \describe{
-\item{\code{e}}{Subject edge.}
+\item{\code{e}}{Edge or list of edges.}
 }
 \if{html}{\out{</div>}}
 }
 \subsection{Returns}{
-\code{TRUE} if \code{e} is an element of \eqn{E(G)}.
+Logical vector with each element \code{TRUE} if the corresponding
+element of \code{e} is an element of \eqn{E(G)}.
+}
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-Graph-edge_label"></a>}}
+\if{latex}{\out{\hypertarget{method-Graph-edge_label}{}}}
+\subsection{Method \code{edge_label()}}{
+Find label(s) of edge(s) at index(es) i
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{Graph$edge_label(ie)}\if{html}{\out{</div>}}
+}
+
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{ie}}{Index of edge, or vector of indexes.}
+}
+\if{html}{\out{</div>}}
+}
+\subsection{Returns}{
+Label(s) of edge(s) at index(es) i
 }
 }
 \if{html}{\out{<hr>}}

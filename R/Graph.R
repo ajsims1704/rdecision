@@ -20,7 +20,8 @@ Graph <- R6::R6Class(
   private = list(
     V = NULL,
     E = NULL,
-    AG = NULL
+    AG = NULL,
+    reorder = TRUE
   ),
   public = list(
     
@@ -78,10 +79,12 @@ Graph <- R6::R6Class(
         class = "repeated_edges"
       )
       private$E <- E
-      #### randomly permute the vertices and edges
-      #private$V <- sample(private$V, size = length(V), replace = FALSE)
-      #private$E <- sample(private$E, size = length(E), replace = FALSE)
-      ####
+      # reorder the vertices and edges for optimisation of graph algorithms, or
+      # during package testing.
+      if (private$reorder) {
+        private$V <- sample(private$V, size = length(V), replace = FALSE)
+        private$E <- sample(private$E, size = length(E), replace = FALSE)
+      }
       # calculate the adjacency matrix 
       private$AG <- self$graph_adjacency_matrix(FALSE)
       # return new graph object
@@ -100,6 +103,15 @@ Graph <- R6::R6Class(
       return(length(private$E))  
     },
     
+    #' @description A list of all the Node objects in the graph.
+    #' @details The list of Node objects is returned in the same order as their
+    #' indexes understood by \code{vertex_index}, \code{vertex_at} and
+    #' \code{vertex_along}, which is not necessarily the same order in which
+    #' they were supplied in the \code{V} argument to \code{new}.
+    vertexes = function() {
+      return(private$V)
+    },
+    
     #' @description Sequence of vertex indices.
     #' @details Similar to \code{base::seq_along}, this function provides
     #' the indices of the vertices in the graph. It is intended for use by 
@@ -113,45 +125,52 @@ Graph <- R6::R6Class(
       return(seq_along(private$V))
     },
     
-    #' @description Find the index of a vertex in the graph.
-    #' @param v A vertex.
+    #' @description Find the index(es) of vertex(es) in the graph.
+    #' @param v A vertex, or list of vertexes.
     #' @return Index of \var{v}. The index of vertex \code{v} is the one
     #' used internally to the class object, which is not necessarily the same as
     #' the order of vertices in the \code{V} argument of \code{new}. \code{NA}
     #' if \var{v} is not a vertex, or is a vertex that is not in the graph.
     vertex_index = function(v) {
-      # find v in V
-      index <- NA_integer_
-      i <- 1L
-      for (vv in private$V) {
-        if (identical(vv, v)) {
-          index <- i
-          break
+      # coerce v to a list, if it is not
+      v <- if (is.list(v)) v else list(v)
+      # match
+      iv <- vapply(v, FUN.VALUE = 1L, FUN = function(vm) {
+        index <- NA_integer_
+        for (i in seq_along(private$V)) {
+          if (identical(private$V[[i]], vm)) {
+            index <- i
+            break
+          }
         }
-        i <- i + 1L
-      }
-      return(index)
-    }, 
-    
-    #' @description Find the vertex at a given index.
+        return(index)
+      })
+      return(iv)
+    },
+
+    #' @description Find the vertex(es) at given index(es).
     #' @details The inverse of function \code{vertex_index}. The function will
-    #' raise an abort signal if the supplied index is not a vertex.
-    #' @param index Index of a vertex in the graph, as an integer.
-    #' @return the node (vertex) with the specified index.
+    #' raise an abort signal if the supplied arguments are not vertexes.
+    #' @param index Index(es) of vertex(es) in the graph, as integers.
+    #' @return Index of \code{v}. \code{NA} if \var{v} is not a vertex, or is a
+    #' vertex that is not in the graph.
     vertex_at = function(index) {
-      # check the argument
+      # check argument
       abortifnot(
-        length(index) == 1L,
-        !is.na(index),
-        is.integer(index),
-        index >= 1L,
-        index <= length(private$V),
+        !anyNA(index),
+        all(vapply(X = index, FUN.VALUE = TRUE, FUN = is.integer)),
+        all(index >= 1L),
+        all(index <= self$order()),
         message = "There is no vertex with the supplied index.",
         class = "invalid_index"
       )
-      return(private$V[[index]])
+      # coerce index to a numeric vector
+      iv <- as.integer(index)
+      # fetch the vertex object(s)
+      v <- if (length(iv) > 1L) private$V[iv] else private$V[[iv]]
+      return(v)
     },
-    
+      
     #' @description Test whether a vertex is an element of the graph.
     #' @param v Subject vertex.
     #' @return TRUE if v is an element of V(G).
@@ -159,6 +178,19 @@ Graph <- R6::R6Class(
       # vertex_index checks if v is a node
       index <- self$vertex_index(v)
       return(!is.na(index))
+    },
+
+    #' @description Find label(s) of vertexes(s) at index(es) i.
+    #' @param iv Index of vertex, or vector of indexes.
+    #' @return Label(s) of vertex(es) at index(es) i
+    vertex_label = function(iv) {
+      # fetch each vertex object (argument iv is checked in vertex_at)
+      vv <- lapply(X = iv, FUN = self$vertex_at)
+      # fetch the labels
+      vl <- vapply(X = vv, FUN.VALUE = "x", FUN = function(v) {
+        return(v$label())
+      })
+      return(vl)
     },
 
     #' @description A list of all the Edge objects in the graph.
@@ -226,7 +258,7 @@ Graph <- R6::R6Class(
       )
       # coerce index to a numeric vector
       ie <- as.integer(index)
-      # fetch the edge node(s)
+      # fetch the edge(s)
       e <- if (length(ie) > 1L) private$E[ie] else private$E[[ie]]
       return(e)
     },
@@ -247,9 +279,9 @@ Graph <- R6::R6Class(
     #' @return Label(s) of edge(s) at index(es) i
     edge_label = function(ie) {
       # fetch each edge object (argument ie is checked in edge_at)
-      e <- lapply(X = ie, FUN = self$edge_at)
+      ee <- lapply(X = ie, FUN = self$edge_at)
       # fetch the labels
-      el <- vapply(X = e, FUN.VALUE = "x", FUN = function(e) {
+      el <- vapply(X = ee, FUN.VALUE = "x", FUN = function(e) {
         return(e$label())
       })
       return(el)

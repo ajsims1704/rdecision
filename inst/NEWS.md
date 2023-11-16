@@ -1,13 +1,19 @@
-# rdecision 1.1.3.9005
+# rdecision 1.1.3.9007
 
-* Added functions `node_label` and `edge_label` to `Graph` to support checked
+* Replaced calls to `par` n the tornado plot section of `DecisionTree` with
+  calls to `withr::with_par`. This avoids the need to change the global plot
+  defaults. Package `withr` added to dependency list.
+* Placed Tegaderm model vignette code in a separate script with `test_that`
+  expectations, and referenced code from the vignette's markdown. This
+  reduced replication of code between vignette and test harness.
+* Added functions `vertex_label` and `edge_label` to `Graph` to support checked
   iteration of lists of nodes and edges when retrieving labels.
 * Vectorized functions `edge_index`, `edge_at` and `has_edge` in `Graph`.
+* Vectorized functions `vertex_index`, `vertex_at` and `has_vertex` in `Graph`.
 * Added functions `source` and `target` to `Digraph` to support checked
   iteration of lists of arrows to retrieve their source or target nodes.
 * Placed code for the Sumatriptan vignette into a single script with tests,
   (`test-model-Sumatriptan.R`), to avoid replicating code in test scripts.
-
 * **CHECK REORDERING OF NODES**
 * **CHECK SUM OF PROBABILITIES AT CHANCE NODES IN DECISION TREE EVALUATION ** 
 * Added `set_cost`, `set_benefit` and `set_probability` to class `Reaction` to
@@ -28,7 +34,7 @@
   single script with tests (`test-model-AZT.R`), taking code from the SM01-HIV
   vignette and the SemiMarkovModel test script. Non-test chunks are referenced
   by the vignette to avoid repetition. Edited and clarified the vignette
-  and added PSA (as oer Briggs example 4.7).
+  and added PSA (as per Briggs example 4.7).
 * Added vignette for total knee replacement, a semi Markov model with PSA,
   replicating Dong and Buxton, 2006. R code is taken from chunks in a 
   `test_that` context, thus avoiding repetition of code between the vignette

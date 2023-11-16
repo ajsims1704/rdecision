@@ -104,7 +104,7 @@ LogNormDistribution <- R6::R6Class(
         private$sdlog <- sqrt(log(1L + (p2 ^ 2L) / (p1 ^ 2L)))
       } else {
         abortif(TRUE,
-          message = "'parametrize' must be one of 'LN1' through 'LN7'",
+          message = "'parametrization' must be one of 'LN1' through 'LN7'",
           class = "parametrization_not_supported"
         )
       }

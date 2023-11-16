@@ -66,11 +66,13 @@ Arborescence <- R6::R6Class(
     root = function() {
       # vertex with no incoming edges (only one, checked in initialize)
       B <- self$digraph_incidence_matrix()
-      u <- which(
+      iu <- which(
         apply(B, MARGIN = 1L, function(r) !any(r > 0L)), 
         arr.ind = TRUE
       )
-      return(private$V[[u]])
+      u <- self$vertex_at(iu)
+      return(u)
+      #return(private$V[[u]])
     },
 
     #' @description Find the siblings of a vertex in the arborescence.
@@ -103,9 +105,11 @@ Arborescence <- R6::R6Class(
       # Find the root
       r <- self$root()
       P <- list()
-      for (v in private$V) {
+      #for (v in private$V) {
+      for (iv in self$vertex_along()) {
+        v <- vertex_at(iv)        
         if (self$is_leaf(v)) {
-          pp <- self$paths(r,v)
+          pp <- self$paths(r, v)
           P[[length(P) + 1L]] <- pp[[1L]]    
         }
       }
@@ -166,13 +170,13 @@ Arborescence <- R6::R6Class(
       xTopAdjustment <- 0.0
       yTopAdjustment <- 0.0
       # prevnode list (max 'height' is order of graph)
-      private$PREVNODE <- vector(mode="integer", length=self$order())
+      private$PREVNODE <- vector(mode="integer", length = self$order())
       # per-node arrays
-      private$LEFTNEIGHBOR <- vector(mode="integer", length=self$order())
-      private$MODIFIER <- vector(mode="numeric", length=self$order())
-      private$PRELIM <- vector(mode="numeric", length=self$order())
-      private$XCOORD <- vector(mode="numeric", length=self$order())
-      private$YCOORD <- vector(mode="numeric", length=self$order())
+      private$LEFTNEIGHBOR <- vector(mode="integer", length = self$order())
+      private$MODIFIER <- vector(mode="numeric", length = self$order())
+      private$PRELIM <- vector(mode="numeric", length = self$order())
+      private$XCOORD <- vector(mode="numeric", length = self$order())
+      private$YCOORD <- vector(mode="numeric", length = self$order())
       # initialize list of previous nodes at each level
       INITPREVNODELIST <- function() {
       }
@@ -188,7 +192,8 @@ Arborescence <- R6::R6Class(
       }
       # test if node is a leaf
       ISLEAF <- function(iNode) {
-        v <- private$V[[iNode]]
+        #v <- private$V[[iNode]]
+        v <- self$vertex_at(iNode)
         return(self$is_leaf(v))
       }
       # left size of each node
@@ -221,7 +226,8 @@ Arborescence <- R6::R6Class(
       }
       # test if a node has a left sibling
       HASLEFTSIBLING <- function(iNode) {
-        v <- private$V[[iNode]]
+        #v <- private$V[[iNode]]
+        v <- self$vertex_at(iNode)
         S <- self$siblings(v)
         iS <- vapply(S, FUN.VALUE = 1L, FUN = self$vertex_index)
         rb <- any(iS < iNode)
@@ -230,7 +236,8 @@ Arborescence <- R6::R6Class(
       # find the node's closest sibling on the left (0 if none)
       LEFTSIBLING <- function(iNode) {
         rn <- 0L
-        v <- private$V[[iNode]]
+        #v <- private$V[[iNode]]
+        v <- self$vertex_at(iNode)
         S <- self$siblings(v)
         iS <- vapply(S, FUN.VALUE = 1L, FUN = self$vertex_index)
         lS <- iS[which(iS < iNode)]
@@ -241,7 +248,8 @@ Arborescence <- R6::R6Class(
       }
       # test if a node has a right sibling 
       HASRIGHTSIBLING <- function(iNode) {
-        v <- private$V[[iNode]]
+        #v <- private$V[[iNode]]
+        v <- self$vertex_at(iNode)
         S <- self$siblings(v)
         iS <- vapply(S, FUN.VALUE = 1L, FUN = self$vertex_index)
         rb <- any(iS > iNode)
@@ -250,7 +258,8 @@ Arborescence <- R6::R6Class(
       # find the node's closest sibling on the right (0 if none)
       RIGHTSIBLING <- function(iNode) {
         rn <- 0L
-        v <- private$V[[iNode]]
+        #v <- private$V[[iNode]]
+        v <- self$vertex_at(iNode)
         S <- self$siblings(v)
         iS <- vapply(S, FUN.VALUE = 1L, FUN = self$vertex_index)
         rS <- iS[which(iS>iNode)]
@@ -262,7 +271,8 @@ Arborescence <- R6::R6Class(
       # parent of the node (0 if none)
       PARENT <- function(iNode) {
         rn <- 0L
-        v <- private$V[[iNode]]
+        #v <- private$V[[iNode]]
+        v <- self$vertex_at(iNode)
         P <- self$direct_predecessors(v)
         if (length(P) == 1L) {
           rn <- self$vertex_index(P[[1L]])
@@ -271,14 +281,16 @@ Arborescence <- R6::R6Class(
       }
       # does the specified node have a child?
       HASCHILD <- function(iNode) {
-        v <- private$V[[iNode]]
+        #v <- private$V[[iNode]]
+        v <- self$vertex_at(iNode)
         C <- self$direct_successors(v)
         return(length(C) > 0L)
       }
       # find the first child of iNode (0 if none)
       FIRSTCHILD <- function(iNode) {
         rn <- 0L
-        v <- private$V[[iNode]]
+        #v <- private$V[[iNode]]
+        v <- self$vertex_at(iNode)
         C <- self$direct_successors(v)
         iC <- vapply(C, FUN.VALUE = 1L, FUN = self$vertex_index)
         if (length(iC) > 0L) {

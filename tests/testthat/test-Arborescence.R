@@ -88,7 +88,7 @@ test_that("parent, sibling and drawing functions are correct", {
   eML <- Arrow$new(nM, nL)  
   A <- Arborescence$new(
     V=list(nA, nB, nC, nD, nE, nF, nG, nH, nI, nJ, nK, nL, nM, nN, nO), 
-    A=list(eOE,eOF,eON,eEA,eED,eDB,eDC,eNG,eNM,eMH,eMI,eMJ,eMK,eML)
+    A=list(eOE, eOF, eON, eEA, eED, eDB, eDC, eNG, eNM, eMH, eMI, eMJ, eMK, eML)
   )  
   expect_identical(A$order(), 15L)
   # check siblings
@@ -129,7 +129,9 @@ test_that("parent, sibling and drawing functions are correct", {
   # check the node coordinates
   XY <- A$postree()
   expect_identical(nrow(XY), A$order())
-  rownames(XY) <- LETTERS[seq_len(A$order())]
+  rownames(XY) <- A$vertex_label(A$vertex_along())
+  print(XY)
+  #rownames(XY) <- LETTERS[seq_len(A$order())]
   expect_identical(XY["O","x"], 13.5)
   expect_identical(XY["E","x"], 3.0)
   expect_identical(XY["A","x"], 0.0)

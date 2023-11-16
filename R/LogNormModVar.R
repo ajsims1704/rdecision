@@ -28,7 +28,8 @@ LogNormModVar <- R6::R6Class(
   ),
   public = list(
     
-    #' @description Create a model variable with log normal uncertainty. 
+    #' @description Create a model variable with log normal uncertainty.
+    #' @seealso \code{\link{LogNormDistribution}}.
     #' @param description A character string describing the variable.
     #' @param units Units of the quantity; character string.
     #' @param p1 First hyperparameter, a measure of location. 

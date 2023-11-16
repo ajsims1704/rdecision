@@ -46,6 +46,8 @@ Andrew Sims \email{andrew.sims@newcastle.ac.uk}
 \item \href{#method-Digraph-is_arborescence}{\code{Digraph$is_arborescence()}}
 \item \href{#method-Digraph-direct_successors}{\code{Digraph$direct_successors()}}
 \item \href{#method-Digraph-direct_predecessors}{\code{Digraph$direct_predecessors()}}
+\item \href{#method-Digraph-source}{\code{Digraph$source()}}
+\item \href{#method-Digraph-target}{\code{Digraph$target()}}
 \item \href{#method-Digraph-paths}{\code{Digraph$paths()}}
 \item \href{#method-Digraph-walk}{\code{Digraph$walk()}}
 \item \href{#method-Digraph-as_DOT}{\code{Digraph$as_DOT()}}
@@ -59,6 +61,8 @@ Andrew Sims \email{andrew.sims@newcastle.ac.uk}
 <li><span class="pkg-link" data-pkg="rdecision" data-topic="Graph" data-id="edge_along"><a href='../../rdecision/html/Graph.html#method-Graph-edge_along'><code>rdecision::Graph$edge_along()</code></a></span></li>
 <li><span class="pkg-link" data-pkg="rdecision" data-topic="Graph" data-id="edge_at"><a href='../../rdecision/html/Graph.html#method-Graph-edge_at'><code>rdecision::Graph$edge_at()</code></a></span></li>
 <li><span class="pkg-link" data-pkg="rdecision" data-topic="Graph" data-id="edge_index"><a href='../../rdecision/html/Graph.html#method-Graph-edge_index'><code>rdecision::Graph$edge_index()</code></a></span></li>
+<li><span class="pkg-link" data-pkg="rdecision" data-topic="Graph" data-id="edge_label"><a href='../../rdecision/html/Graph.html#method-Graph-edge_label'><code>rdecision::Graph$edge_label()</code></a></span></li>
+<li><span class="pkg-link" data-pkg="rdecision" data-topic="Graph" data-id="edges"><a href='../../rdecision/html/Graph.html#method-Graph-edges'><code>rdecision::Graph$edges()</code></a></span></li>
 <li><span class="pkg-link" data-pkg="rdecision" data-topic="Graph" data-id="graph_adjacency_matrix"><a href='../../rdecision/html/Graph.html#method-Graph-graph_adjacency_matrix'><code>rdecision::Graph$graph_adjacency_matrix()</code></a></span></li>
 <li><span class="pkg-link" data-pkg="rdecision" data-topic="Graph" data-id="has_edge"><a href='../../rdecision/html/Graph.html#method-Graph-has_edge'><code>rdecision::Graph$has_edge()</code></a></span></li>
 <li><span class="pkg-link" data-pkg="rdecision" data-topic="Graph" data-id="has_vertex"><a href='../../rdecision/html/Graph.html#method-Graph-has_vertex'><code>rdecision::Graph$has_vertex()</code></a></span></li>
@@ -314,6 +318,68 @@ Find the direct predecessors of a node.
 \subsection{Returns}{
 A list of nodes or an empty list if the specified
 node has no predecessors.
+}
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-Digraph-source"></a>}}
+\if{latex}{\out{\hypertarget{method-Digraph-source}{}}}
+\subsection{Method \code{source()}}{
+Find the node that is the source of the given arrow.
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{Digraph$source(a)}\if{html}{\out{</div>}}
+}
+
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{a}}{An arrow (directed edge), which must be in the digraph.}
+}
+\if{html}{\out{</div>}}
+}
+\subsection{Details}{
+The source node is a property of the arrow, not the digraph of
+which it is part, hence the canonical method for establishing the source
+node of an arrow is via method \code{$source} of an \code{Arrow} object.
+This function is provided for convenience when iterating the arrows of a
+digraph. It raises an error if the arrow is not in the graph. It
+returns the index of the source node, which is a property of the graph;
+the node object itself may be retrieved using the \code{$vertex_at}
+method of the graph.
+}
+
+\subsection{Returns}{
+Index of the source node of the specified edge.
+}
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-Digraph-target"></a>}}
+\if{latex}{\out{\hypertarget{method-Digraph-target}{}}}
+\subsection{Method \code{target()}}{
+Find the node that is the target of the given arrow.
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{Digraph$target(a)}\if{html}{\out{</div>}}
+}
+
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{a}}{An arrow (directed edge), which must be in the digraph.}
+}
+\if{html}{\out{</div>}}
+}
+\subsection{Details}{
+The target node is a property of the arrow, not the digraph of
+which it is part, hence the canonical method for establishing the target
+node of an arrow is via method \code{$target} of an \code{$Arrow} object.
+This function is provided for convenience when iterating the arrows of a
+digraph. It raises an error if the arrow is not in the graph. It
+returns the index of the target node, which is a property of the graph;
+the node itself may be retrieved using the \code{$vertex_at} method
+of the graph.
+}
+
+\subsection{Returns}{
+Index of the target node of the specified edge.
 }
 }
 \if{html}{\out{<hr>}}

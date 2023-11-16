@@ -10,20 +10,36 @@ output:
     fig_width: 7
     fig_height: 5
     fig_caption: true
+    df_print: kable
 vignette: >
   %\VignetteIndexEntry{Decision tree with PSA (Jenks 2016)}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---
-```{r, include = FALSE}
+
+```{r}
+#| purl = FALSE,
+#| include = FALSE
+# read vignette source chunks from corresponding testthat script
+knitr::read_chunk(
+  file.path("..", "tests", "testthat", "test-model-Tegaderm.R")
+)
+# read vignette build utility functions
+knitr::read_chunk(file.path("vutils.R"))
+```
+
+```{r}
+#| include = FALSE,
+#| purl = FALSE
 knitr::opts_chunk$set(
   collapse = TRUE,
   comment = "#>"
 )
 ```
 
-```{r setup, include=FALSE, echo=FALSE}
-library("rdecision")
+```{r}
+#| echo = FALSE
+library("rdecision") # nolint
 ```
 
 # Introduction
@@ -36,69 +52,35 @@ standard dressing.
 # Model variables
 
 ## Source variables
-Thirteen source variables were used in the model. The choice of
-variables, their distributions and their parameters are taken from Table 3 
+Eleven source variables were used in the model. The choice of
+variables, their distributions and their parameters are taken from Table 4 
 of Jenks *et al* [-@jenks2016], with the following additional information:
 
-* For variables with lognormal uncertainty, the company synthesized a log
-  normal distribution as $\exp(\mu + \sigma r())$ where $r()$ is a random
-  draw from a standard normal distribution. This is equivalent to the
-  `LN1` parametrization of the `LogNormModVar` provided in `rdecision`.
-* The values for $\mu$ and $\sigma$ for the hazard ratio for CRBSI and LSI were
-  -0.911 and -0.393 respectively, and 1.482 and 0.490 for the relative
-  risk of dermatitis. The point estimates in the company's model were taken at
-  $\exp(-0.911)$ (0.402) and $\exp(1.482)$ (4.40), the expected value
-  of the uncertainty distributions on the log scale, rather than at the 
-  expected values on the linear scale (0.434 and 4.963). In this vignette
-  the latter are used for consistency between base case and PSA.
+* The baseline catheter-related blood stream infection (CRBSI) rate was modelled
+  as a Gamma distribution fitted by the method of moments to a mean of 1.48
+  (per 1000 catheter days) and a standard deviation of 0.12 (per 1000 catheter
+  days).
+* The baseline local site infection (LSI) rate was modelled as a Gamma
+  distribution fitted by the method of moments to a mean of 0.14 (per 1000
+  catheter days) and an assumed standard deviation of 0.5 (/1000 catheter days).
+* The baseline rate of dermatitis was modelled as a Beta distribution, based on
+  one observed case in a trial of 476 catheter uses.
+* The effect size of Tegaderm, expressed as the hazard ratio of Tegaderm
+  compared with standard dressings for CRBSI and LSI, and the relative risk of
+  Tegaderm compared with standard dressings for dermatitis, was modelled in
+  each case using a log normal distribution. This was fitted to a sample mean
+  and sample standard deviation on the natural scale, by using the "LN7"
+  parametrization of `LogNormModVar`.
 * The probabilities of CRBSI and LSI for standard dressings ($p$) were 
-  modified by the hazard ratio for Tegaderm using the form $(1-(1-p)^r)$
-  where $r$ is the hazard ratio. Relative risks were applied as
-  multipliers.
-* The point estimate cost of CRBSI was £9900, not £9990, although the parameters
-  (198,50) are quoted correctly.
+  modified by the hazard ratio $r$ for Tegaderm using the form $p * r$. This
+  is an approximation which holds only for very small rates.
+* Relative risks were also applied as multipliers. This is an approximation
+  which holds only for very small rates.
 
 The model variables were constructed as follows:
 
-```{r variables, echo=T}
-# clinical variables
-r.CRBSI <- NormModVar$new(
-  "Baseline CRBSI rate", "/1000 catheter days", mu = 1.48, sigma = 0.074
-)
-hr.CRBSI <- LogNormModVar$new(
-  "Tegaderm CRBSI HR", "HR", p1 = -0.911, p2 = 0.393
-)
-hr.LSI <- LogNormModVar$new(
-  "Tegaderm LSI HR", "HR", p1 = -0.911, p2 = 0.393
-)
-r.Dermatitis <- NormModVar$new(
-  "Baseline dermatitis risk", "/catheter", mu = 0.0026, sigma = 0.00026
-)
-rr.Dermatitis <- LogNormModVar$new(
-  "Tegaderm Dermatitis RR", "RR", p1 = 1.482, p2 = 0.490
-)
-# cost variables
-c.CRBSI <- GammaModVar$new(
-  "CRBSI cost", "GBP", shape = 198.0, scale = 50.0
-)
-c.Dermatitis <- GammaModVar$new(
-  "Dermatitis cost", "GBP", shape = 30.0, scale = 5.0
-)
-c.LSI <- GammaModVar$new(
-  "LSI cost", "GBP", shape = 50.0, scale = 5.0
-)
-n.catheters <- NormModVar$new(
-  "No. catheters", "catheters", mu = 3.0, sigma = 0.3 
-)
-c.Tegaderm <- ExprModVar$new(
-  "Tegaderm CHG cost", "GBP", rlang::quo(6.21 * n.catheters)
-)
-c.Standard <- ExprModVar$new(
-  "Standard dressing cost", "GBP", rlang::quo(1.34*n.catheters)
-)
-n.cathdays <- NormModVar$new(
-  "No. days with catheter", "days", mu = 10.0, sigma = 2.0
-)  
+```{r variables}
+#| echo = TRUE
 ```
 
 ## Model variable expressions
@@ -107,57 +89,12 @@ expressions, which involve model variables and are themselves
 model variables. Forms of expression involving R functions and
 multiple model variables are supported, provided they conform to R syntax.
 The following code creates the model variable expressions to be used as values
-in the decision tree edges. For probabilities, the convention $q = 1-p$ is 
+in the decision tree edges. For probabilities, the convention $q = 1 - p$ is 
 used to ensure that the sum of probabilities leaving each chance node is one.
 
-```{r expressions, echo=TRUE}
-# probabilities
-p.Dermatitis.S <- ExprModVar$new(
-  "P(dermatitis | standard dressing)", "P", 
-  rlang::quo(r.Dermatitis * n.catheters)
-)
-q.Dermatitis.S <- ExprModVar$new(
-  "Q(dermatitis | standard dressing)", "1 - P", 
-  rlang::quo(1.0 - p.Dermatitis.S)
-)
-p.Dermatitis.T <- ExprModVar$new(
-  "P(dermatitis | Tegaderm)", "P", 
-  rlang::quo(r.Dermatitis * rr.Dermatitis * n.catheters)
-)
-q.Dermatitis.T <- ExprModVar$new(
-  "Q(dermatitis | Tegaderm)", "1 - P", 
-  rlang::quo(1.0 - p.Dermatitis.T)
-)
-
-p.LSI.S <- NormModVar$new(
-  "P(LSI | Standard)", "/patient", mu = 0.1, sigma = 0.01 
-)
-q.LSI.S <- ExprModVar$new(
-  "Q(LSI | Standard)", "1 - P", rlang::quo(1.0 - p.LSI.S) 
-)
-p.LSI.T <- ExprModVar$new(
-  "P(LSI | Tegaderm)", "P", rlang::quo(1.0 - (1.0 - p.LSI.S) ^ hr.LSI)
-)
-q.LSI.T <- ExprModVar$new(
-  "Q(LSI | Tegaderm)", "1 - P", rlang::quo(1.0 - p.LSI.T)
-)
-
-p.CRBSI.S <- ExprModVar$new(
-  "P(CRBSI | standard dressing)", "P",  
-  rlang::quo(r.CRBSI * n.cathdays / 1000.0)
-)
-q.CRBSI.S <- ExprModVar$new(
-  "Q(CRBSI | standard dressing)", "1 - P",  rlang::quo(1.0 - p.CRBSI.S)
-)
-p.CRBSI.T <- ExprModVar$new(
-  "P(CRBSI|Tegaderm)", "P", 
-  rlang::quo(1.0 - (1.0 - r.CRBSI * n.cathdays / 1000.0) ^ hr.CRBSI)
-)
-q.CRBSI.T <- ExprModVar$new(
-  "Q(CRBSI | Tegaderm)", "1 - P", rlang::quo(1.0 - p.CRBSI.T)
-)
+```{r expressions}
+#| echo = TRUE
 ```
-
 
 # The decision tree
 
@@ -177,122 +114,21 @@ The tree is somewhat more complex than Figure 2 of Jenks *et al* because it
 allows for patients to have more than one adverse event (AE) during their stay
 (whereas their Figure 2 implies that only one event per patient is possible). 
 The rates of AE were estimated independently, and allow for multiple events,
-[see figure](#tree-diagram).
+(figure 1).
 
-```{r tree, echo=T}
-# create decision tree
-th <- as.difftime(7L, units = "days")
-# standard dressing
-t01 <- LeafNode$new("t01", interval = th)
-t02 <- LeafNode$new("t02", interval = th)
-c01 <- ChanceNode$new()
-e01 <- Reaction$new(c01, t01, p = p.Dermatitis.S, cost = c.Dermatitis,
-                    label = "Dermatitis")
-e02 <- Reaction$new(c01, t02, p = q.Dermatitis.S, cost = 0.0,
-                    label = "No dermatitis")
-#
-t03 <- LeafNode$new("t03", interval = th)
-t04 <- LeafNode$new("t04", interval = th)
-c02 <- ChanceNode$new()
-e03 <- Reaction$new(c02, t03, p = p.Dermatitis.S, cost = c.Dermatitis,
-                    label = "Dermatitis")
-e04 <- Reaction$new(c02, t04, p = q.Dermatitis.S, cost = 0.0,
-                    label = "No dermatitis")
-#
-c03 <- ChanceNode$new()
-e05 <- Reaction$new(c03, c01, p = p.LSI.S, cost = c.LSI, label = "LSI")
-e06 <- Reaction$new(c03, c02, p = q.LSI.S, cost = 0.0, label = "No LSI")
-#
-t11 <- LeafNode$new("t11", interval = th)
-t12 <- LeafNode$new("t12", interval = th)
-c11 <- ChanceNode$new()
-e11 <- Reaction$new(c11, t11, p = p.Dermatitis.S, cost = c.Dermatitis,
-                    label = "Dermatitis")
-e12 <- Reaction$new(c11, t12, p = q.Dermatitis.S, cost = 0.0, 
-                    label = "No Dermatitis")
-#
-t13 <- LeafNode$new("t13", interval = th)
-t14 <- LeafNode$new("t14", interval = th)
-c12 <- ChanceNode$new()
-e13 <- Reaction$new(c12, t13, p = p.Dermatitis.S, cost = c.Dermatitis, 
-                    label = "Dermatitis")
-e14 <- Reaction$new(c12, t14, p = q.Dermatitis.S, cost = 0.0, 
-                    label = "No dermatitis")
-#
-c13 <- ChanceNode$new()
-e15 <- Reaction$new(c13, c11, p = p.LSI.S, cost = c.LSI, label = "LSI")
-e16 <- Reaction$new(c13, c12, p = q.LSI.S, cost = 0.0, label = "No LSI")
-#
-c23 <- ChanceNode$new()
-e21 <- Reaction$new(c23, c03, p = p.CRBSI.S, cost = c.CRBSI, label = "CRBSI")
-e22 <- Reaction$new(c23, c13, p = q.CRBSI.S, cost = 0.0, label = "No CRBSI")
-#
-# Tegaderm branch  
-t31 <- LeafNode$new("t31", interval = th)
-t32 <- LeafNode$new("t32", interval = th)
-c31 <- ChanceNode$new()
-e31 <- Reaction$new(c31, t31, p = p.Dermatitis.T, cost = c.Dermatitis,
-                    label = "Dermatitis")
-e32 <- Reaction$new(c31, t32, p = q.Dermatitis.T, cost = 0.0, 
-                    label = "no dermatitis")
-#
-t33 <- LeafNode$new("t33", interval = th)
-t34 <- LeafNode$new("t34", interval = th)
-c32 <- ChanceNode$new()
-e33 <- Reaction$new(c32, t33, p = p.Dermatitis.T, cost = c.Dermatitis,
-                    label = "Dermatitis")
-e34 <- Reaction$new(c32, t34, p = q.Dermatitis.T, cost = 0.0, 
-                    label = "No dermatitis")
-#
-c33 <- ChanceNode$new()
-e35 <- Reaction$new(c33, c31, p = p.LSI.T, cost = c.LSI, label = "LSI")
-e36 <- Reaction$new(c33, c32, p = q.LSI.T, cost = 0.0, label = "No LSI")
-#
-t41 <- LeafNode$new("t41", interval=th)
-t42 <- LeafNode$new("t42", interval=th)
-c41 <- ChanceNode$new()
-e41 <- Reaction$new(c41, t41, p = p.Dermatitis.T, cost = c.Dermatitis,
-                    label = "Dermatitis")
-e42 <- Reaction$new(c41, t42, p = q.Dermatitis.T, cost = 0.0, 
-                    label = "No dermatitis")
-#
-t43 <- LeafNode$new("t43", interval = th)
-t44 <- LeafNode$new("t44", interval = th)
-c42 <- ChanceNode$new()
-e43 <- Reaction$new(c42, t43, p = p.Dermatitis.T, cost = c.Dermatitis,
-                    label = "Dermatitis")
-e44 <- Reaction$new(c42, t44, p = q.Dermatitis.T, cost = 0.0, 
-                    label = "No dermatitis")
-#
-c43 <- ChanceNode$new()
-e45 <- Reaction$new(c43, c41, p = p.LSI.T, cost = c.LSI, label = "LSI")
-e46 <- Reaction$new(c43, c42, p = q.LSI.T, cost = 0.0, label = "No LSI")
-#
-c53 <- ChanceNode$new()
-e51 <- Reaction$new(c53, c43, p = p.CRBSI.T, cost = c.CRBSI, label = "CRBSI")
-e52 <- Reaction$new(c53, c33, p = q.CRBSI.T, cost = 0.0, label = "no CRBSI")
-#  
-# decision node
-d1 <- DecisionNode$new("d1")
-e9 <- Action$new(d1, c23, label = "Standard", cost = c.Standard)
-e10 <- Action$new(d1, c53, label = "Tegaderm", cost = c.Tegaderm)
-#
-# create decision tree
-V <- list(d1, 
-          c01, c02, c03, c11, c12, c13, c23, c31, c32, c33, c41, c42, c43, c53,
-          t01, t02, t03, t04, t11, t12, t13, t14, t31, t32, t33, t34, 
-          t41, t42, t43, t44)
-E <- list(e01, e02, e03, e04, e05, e06, e11, e12, e13, e14, e15, e16, e21, e22,
-          e31, e32, e33, e34, e35, e36, e41, e42, e43, e44, e45, e46, e51, e52,
-          e9,e10)
-DT <- DecisionTree$new(V, E)
+```{r tree}
+#| echo = TRUE
 ```
 
 ## Tree diagram
-```{r fig1.caption, echo=FALSE}
-f1c <- "Decision tree for the Tegaderm model"
-```
-```{r draw, echo=FALSE, results="hide", fig.keep="all", fig.align="center", fig.cap=f1c}
+The `draw` method of a `DecisionTree` object creates a graphical representation
+of the tree, as follows.
+```{r}
+#| results = "hide",
+#| purl = FALSE,
+#| fig.keep = "all",
+#| fig.align = "center",
+#| fig.cap = "Figure 1. Decision tree for the Tegaderm model"
 DT$draw(border = TRUE)
 ```
 
@@ -311,7 +147,9 @@ tabulation unless explicitly excluded, regular numeric values will not be
 listed. In the Tegaderm model, the input model variables are in the following
 table, with expression model variables excluded. 
 
-```{r modelinputs-structure, echo=FALSE}
+```{r}
+#| echo = FALSE,
+#| purl = FALSE
 local({
   DF <- DT$modvar_table(expressions = FALSE)
   keep <- c("Description", "Distribution")
@@ -323,7 +161,9 @@ local({
 The point estimates, units and distributional properties are obtained from the
 same call, in the remaining columns. 
 
-```{r modelinputs-pe, echo=FALSE}
+```{r}
+#| echo = FALSE,
+#| purl = FALSE
 local({
   DF <- DT$modvar_table(expressions = FALSE)
   DF$Variable <- paste(DF$Description, DF$Units, sep =", ")
@@ -331,7 +171,6 @@ local({
   pander::pander(DF[, keep], row.names = FALSE, digits = 3L, justify = "lrrr")
 })
 ```
-
 
 # Running the model
 
@@ -341,11 +180,13 @@ method of a decision node to evaluate each pathway from the decision node,
 shown in the table. This model did not consider utility, and the columns 
 associated with utility are removed. 
 
-```{r basecase, echo=FALSE}
-RES <- DT$evaluate()
+```{r basecase}
+#| echo = FALSE
 ```
 
-```{r basecase_table, echo=FALSE}
+```{r}
+#| echo = FALSE,
+#| purl = FALSE
 local({
   keep <- c("Run", "d1", "Cost")
   pander::pander(RES[, keep], round = 2L, justify = "llr")
@@ -357,55 +198,130 @@ The sensitivity of the decision tree results to each source model variable,
 varied independently of the others, is demonstrated by a tornado diagram. The
 method `tornado` can be used to generate such a plot (and also provides a
 tabulated version of the values used in the plot). Source variables are
-varied over their 95% confidence limits, 
-[see figure](#univariate-sensitivity-analysis).
+varied over their 95% confidence limits (figure 2).
 
-```{r fig2.caption, echo=FALSE}
-f2c <- "Tornado diagram for the Tegaderm model"
-```
-```{r tornado, echo=FALSE, results="hide", fig.keep="all", fig.align="center", fig.cap=f2c}
-DT$tornado(
+```{r}
+#| results = "hide",
+#| purl = FALSE,
+#| fig.keep = "all",
+#| fig.align = "center",
+#| fig.cap = "Figure 2. Tornado diagram for the Tegaderm model"
+to <- DT$tornado(
   index = list(e10), ref = list(e9), draw = TRUE
 )
+```
+
+The object returned from method `tornado` (`to`) is a data frame which includes
+the values of the cost difference when each model variable is univariately at
+the limits of its 95% confidence interval, as follows:
+
+```{r}
+#| echo = FALSE,
+#| purl = FALSE
+local({
+  to$Variable <- paste(to$Description, to$Units, sep =", ")
+  keep <- c("Variable", "LL", "UL", "outcome.min", "outcome.max")
+  pander::pander(to[, keep], round = 2L, justify = "lrrrr", row.names = FALSE)
+})
 ```
 
 ## Probabilistic sensitivity analysis
 Multivariate probabilistic sensitivity analysis is supported through the use of
 sampling model variables. The same call, with extra parameters, is used to run 
-the PSA:
+the PSA and save the results in a data frame. Additionally, the cost difference
+is computed for each run of the model, as follows:
 
-```{r PSA, echo=TRUE}
-N <- 1000L
-PSA <- DT$evaluate(setvars = "random", by = "run", N = N)
+```{r PSA}
+#| echo = TRUE
 ```
 
-The first few runs of PSA are as follows; the `by="run"` option reshapes the
+The first few runs of PSA are as follows; the `by = "run"` option reshapes the
 table to give one row per simulation, rather than one row per run, per strategy.
 
-```{r PSA_table, echo=FALSE}
-PSA$Difference <- PSA$Cost.Tegaderm - PSA$Cost.Standard
+```{r}
+#| echo = FALSE,
+#| purl = FALSE
 keep<- c("Run", "Cost.Tegaderm", "Cost.Standard", "Difference")
-pander::pander(head(PSA[, keep], n = 10L), round = 2L, row.names = FALSE, 
-               justify = "lrrr")
+pander::pander(
+  head(psa[, keep], n = 10L),
+  round = 2L,
+  row.names = FALSE, 
+  justify = "lrrr"
+)
 ```
 
 From PSA (`r N` runs), the mean cost of treatment with Tegaderm 
-was `r round(mean(PSA$Cost.Tegaderm),2)`,
+was `r gbp(mean(psa$Cost.Tegaderm), p = TRUE)` GBP,
 the mean cost of treatment with standard dressings was 
-`r round(mean(PSA$Cost.Standard),2)`
-and the mean cost saving was `r round(mean(PSA$Difference),2)`. The 95% 
-confidence interval for cost saving was 
-`r round(quantile(PSA$Difference, probs=c(0.025)),2)` to 
-`r round(quantile(PSA$Difference, probs=c(0.975)),2)`; the standard deviation
-of the cost saving was `r round(sd(PSA$Difference),2)`.
-Overall, `r round(100*sum(PSA$Difference<0)/nrow(PSA),2)`% of runs found that
-Tegaderm was cost saving. These results replicate those reported by the
-manufacturer (saving of 77.76, 98.5% cases cost saving; mean cost of standard 
-dressing 176.89, mean cost of Tegaderm 99.63).
+`r gbp(mean(psa$Cost.Standard), p = TRUE)` GBP
+and the mean cost saving was `r gbp(mean(psa$Difference), p = TRUE)` GBP. The
+95% confidence interval for cost saving was 
+`r gbp(quantile(psa$Difference, probs=c(0.025)), p = TRUE)` GBP to 
+`r gbp(quantile(psa$Difference, probs=c(0.975)), p = TRUE)` GBP; the standard
+deviation of the cost saving was `r gbp(sd(psa$Difference), p = TRUE)` GBP.
+Overall, `r round(100 * sum(psa$Difference > 0.0) / nrow(psa), 2L)`% of runs
+found that Tegaderm was cost saving. These results replicate those reported by
+Jenks *et al* (saving of 72.90 GBP, 97.8% cases cost saving; mean cost of
+standard dressing 151.29 GBP, mean cost of Tegaderm 77.75 GBP).
 
-```{r echo=F}
-rm(PSA)
+```{r}
+#| echo = FALSE
+rm(psa)
 ```
+
+## Scenario - low baseline rate of CRBSI
+Jenks *et al* modelled an additional scenario, in which the baseline rate
+of CRBSI was 0.3 per 1000 catheter days (modelled as a Gamma distribution fitted
+to a sample mean of 0.3 and a sample 95% confidence interval of 0.2 to 0.6). A
+way to achieve this in `rdecision` is to replace the model variable for the
+baseline rate of CRBSI, and any other model variables that depend on it via
+expressions, and then reconstruct the model, as follows.
+
+```{r scenario}
+#| echo = TRUE
+```
+
+The model for this scenario was run under PSA, as for the base case:
+
+```{r scenario-PSA}
+#| echo = TRUE
+```
+
+From PSA (`r N` runs), the mean cost of treatment with Tegaderm 
+was `r gbp(mean(psa$Cost.Tegaderm), p = TRUE)` GBP,
+the mean cost of treatment with standard dressings was 
+`r gbp(mean(psa$Cost.Standard), p = TRUE)` GBP
+and the mean cost saving was `r gbp(mean(psa$Difference), p = TRUE)` GBP. The
+95% confidence interval for cost saving was 
+`r gbp(quantile(psa$Difference, probs=c(0.025)), p = TRUE)` GBP to 
+`r gbp(quantile(psa$Difference, probs=c(0.975)), p = TRUE)` GBP; the standard
+deviation
+of the cost saving was `r gbp(sd(psa$Difference), p = TRUE)` GBP.
+Overall, `r round(100 * sum(psa$Difference > 0.0) / nrow(psa), 2L)`% of runs
+found that Tegaderm was cost saving. These results replicate those reported by
+Jenks *et al* (saving of 3.56 GBP, 57.9% cases cost saving; mean cost of
+standard dressing 34.47 GBP, mean cost of Tegaderm 30.79 GBP).
+
+Two threshold analyses were reported for this scenario. This can be achieved
+in `rdecision` by using the `threshold` method of the decision tree. Firstly,
+the threshold hazard ratio of a CRBSI with Tegaderm versus a CRBSI with a
+standard dressing was varied in the range 0.1 to 0.9, as follows:
+
+```{r threshold-hr}
+#| echo = TRUE
+```
+
+This gave a threshold value of `r round(hr_threshold, 2L)`, above which
+Tegaderm became cost incurring (the reported threshold was 0.53).
+Secondly, the cost of each CRBSI was varied between 0 GBP and 9900 GBP to find
+the threshold of cost saving, as follows:
+
+```{r threshold_ccrbsi}
+#| echo = TRUE
+```
+
+This gave a threshold value of `r gbp(c_crbsi_threshold, p = TRUE)` GBP, below
+which Tegaderm became cost incurring (the reported threshold was 8000 GBP).
 
 
 # References

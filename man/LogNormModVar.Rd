@@ -28,6 +28,9 @@ defined by Swat \emph{et al} can be used. Inherits from \code{ModVar}.
  \url{https://sites.google.com/site/probonto/download}.
 }
 }
+\seealso{
+\code{\link{LogNormDistribution}}.
+}
 \author{
 Andrew J. Sims \email{andrew.sims@newcastle.ac.uk}
 }

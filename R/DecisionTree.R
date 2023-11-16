@@ -537,10 +537,6 @@ DecisionTree <- R6::R6Class(
     is_strategy = function(strategy) {
       # find the set of source nodes for the action edges in the strategy
       iS <- vapply(X = strategy, FUN.VALUE = 1L, FUN = self$source)
-      # check that the argument is a list of Action edges
-      if (anyNA(iS)) {
-        return(FALSE)
-      }
       # find the list of Decision nodes
       iD <- self$decision_nodes("index")
       # the set of source nodes of the action edges must be the same as the set
@@ -1100,105 +1096,116 @@ DecisionTree <- R6::R6Class(
       
       # plot the graph, if required
       if (draw) {
-        # save current graphical parameters and ensure they are restored on exit
-        oldpar <- par(no.readonly = TRUE)
-        on.exit(par(oldpar))
-        # controllable parameters
-        cex <- 0.75
         # x axis label
-        xlab <- ifelse(outcome=="saving", "Mean cost saving", "Mean ICER")
+        xlab <- ifelse(outcome == "saving", "Mean cost saving", "Mean ICER")
         # make labels (description + units)
         TO$Label <- paste(TO$Description, TO$Units, sep=", ")
-        # set up the outer margins; bar labels are in the outer margin,
-        dw <- vapply(X=TO$Label, FUN.VAL=0.5, FUN=function(s) {
-          return(strwidth(paste0(s, "MM"), cex = cex, units = "inches"))
-        })
-        par(omi = c(0.0, max(dw), 0.0, 0.0))
-        # create sufficient space in the inner margin to write the variable
-        # limits to the left and right of each bar
-        lw <- vapply(X = TO$LL, FUN.VAL = 0.5, FUN = function(v) {
-          return(strwidth(signif(v, 3L), cex = cex, units = "inches"))
-        })
-        uw <- vapply(X = TO$UL, FUN.VAL = 0.5, FUN = function(v) {
-          return(strwidth(signif(v, 3L), cex = cex, units = "inches"))
-        })
-        par(mar = c(4.1, 4.1, 1.1, 1.1))
-        mai <- par("mai")
-        par(mai = c(mai[1L],max(max(lw),max(uw)),mai[3L],max(max(lw),max(uw))))
-        mgp <- par("mgp")
-        mgp <- mgp*cex
+        # width and height of the plot in inches
+        dsize <- dev.size(unit = "in")
+        figw <- dsize[[1L]]
+        figh <- dsize[[2L]] 
+        # width of the left outer margin as a proportion of figw
+        louter <- 0.4
+        # size of the inner margins as lines of text (0.2 inches per line)
+        binner <- 4.1
+        linner <- 2.1
+        tinner <- 1.1
+        rinner <- linner
         # create the plot frame
-        plot(
-          x = NULL,
-          y = NULL,
-          xlim = c(
-            min(min(TO$outcome.min),min(TO$outcome.max)),
-            max(max(TO$outcome.min),max(TO$outcome.max))
+        withr::with_par(
+          new = list(
+            omi = c(0.0, figw * louter, 0.0, 0.0),
+            mar = c(binner, linner, tinner, rinner),  # lines of text
+            cex = 0.75
           ),
-          ylim = c(0.5,nrow(TO)+0.5),
-          xlab = xlab,
-          ylab = "",
-          yaxt = "n",
-          cex.axis = cex,
-          cex.lab = cex,
-          cex.main = cex,
-          cex.sub = cex,
-          mgp = mgp,
-          xpd = TRUE,
-          frame.plot = FALSE
-        )
-        # label the y axis
-        axis(
-          side = 2L,
-          at = seq_len(nrow(TO)),
-          labels = TO$Label,
-          lty = 0L,
-          lwd.ticks = 0L,
-          las = 2L,
-          cex.axis = cex,
-          mgp = mgp,
-          outer = TRUE
-        )
-        # add bars and limits
-        for (i in seq_len(nrow(TO))) {
-          xleft <- min(TO[i,"outcome.min"], TO[i,"outcome.max"])
-          xright <- max(TO[i,"outcome.min"], TO[i,"outcome.max"])
-          rect(
-            xleft,
-            xright,
-            ybottom = i - 0.25,
-            ytop = i + 0.25,
-            border = "black",
-            col = "lightgray",
-            xpd = TRUE
-          )
-          LL <- TO[i,"LL"]
-          UL <- TO[i,"UL"]
-          if (TO[i,"outcome.max"] > TO[i,"outcome.min"]) {
-            labels <- c(signif(LL, 3L), signif(UL, 3L))
-          } else {
-            labels <- c(signif(UL, 3L), signif(LL, 3L))
+          code = {
+            # set up the plot axes
+            plot(
+              x = NULL,
+              y = NULL,
+              xlim = c(
+                min(min(TO$outcome.min), min(TO$outcome.max)),
+                max(max(TO$outcome.min), max(TO$outcome.max))
+              ),
+              ylim = c(0.5, nrow(TO) + 0.5),
+              xlab = xlab,
+              ylab = "",
+              yaxt = "n",
+              frame.plot = FALSE
+            )
+            # find the longest label and scale text size accordingly
+            lw <- max(strwidth(s = TO[, "Label"], unit = "in"))
+            lw <- lw + strwidth("MM", unit = "in")
+            cex_axis <- if (lw > (louter * figw)) {
+              (louter * figw) / lw
+            } else {
+              1.0
+            }
+            # label the y axis
+            axis(
+              side = 2L,
+              at = seq_len(nrow(TO)),
+              labels = TO$Label,
+              lty = 0L,
+              tick = FALSE,
+              las = 2L,
+              hadj = 1.0,
+              cex.axis = cex_axis,
+              outer = TRUE
+            )
+            # function to return a limit value (vectorized)
+            limtxt <- function(x) {
+              txt <- signif(x, 3L)
+            }
+            # find longest limit labels and adjust label text size
+            lmin <- max(strwidth(s = limtxt(TO[, "outcome.min"]), unit = "in"))
+            lmax <- max(strwidth(s = limtxt(TO[, "outcome.max"]), unit = "in"))
+            lw <- max(lmin, lmax)
+            cex_limit <- if (lw > (linner * 0.2)) {
+              (linner * 0.2) / lw
+            } else {
+              1.0
+            }
+            # add bars and limits
+            for (i in seq_len(nrow(TO))) {
+              xleft <- min(TO[i, "outcome.min"], TO[i, "outcome.max"])
+              xright <- max(TO[i, "outcome.min"], TO[i, "outcome.max"])
+              rect(
+                xleft,
+                xright,
+                ybottom = i - 0.25,
+                ytop = i + 0.25,
+                border = "black",
+                col = "lightgray",
+                xpd = TRUE
+              )
+              LL <- TO[i, "LL"]
+              UL <- TO[i, "UL"]
+              if (TO[i, "outcome.max"] > TO[i, "outcome.min"]) {
+                labels <- limtxt(c(LL, UL))
+              } else {
+                labels <- limtxt(c(UL, LL))
+              }
+              text(
+                x = c(xleft, xright),
+                y = c(i, i),
+                labels = labels,
+                pos = c(2.0, 4.0),
+                offset = 0.25,
+                cex = cex_limit, 
+                xpd = TRUE
+              )
+            }
+            # add mean (base case)
+            abline(v = TO[[1L, "outcome.mean"]], lty = "dashed")
+            # remove label column
+            TO$Label <- NULL
           }
-          text(
-            x = c(xleft, xright),
-            y = c(i, i),
-            labels = labels,
-            pos = c(2.0, 4.0),
-            offset = 0.25,
-            cex = cex, 
-            xpd = TRUE
-          )
-        }
-        # add mean (base case)
-        abline(v = TO[[1L, "outcome.mean"]], lty = "dashed")
-        # remove label column
-        TO$Label <- NULL
-        # restore graphics state
-        par(oldpar)
+        )
       }
       # re-order it with greatest variation first
       TO$range <- abs(TO$outcome.max - TO$outcome.min)
-      TO <- TO[order(TO$range, decreasing=TRUE),]
+      TO <- TO[order(TO$range, decreasing = TRUE),]
       TO$range <- NULL
       # remove mean column
       TO$outcome.mean <- NULL
@@ -1217,7 +1224,7 @@ DecisionTree <- R6::R6Class(
     #' @param ref The reference strategy (option) with which the index strategy
     #' will be compared.
     #' @param outcome One of \code{"saving"} or \code{"ICER"}. For 
-    #' \code{"saving"} (e.g. in cost consequence analysis), the value of 
+    #' \code{"saving"} (e.g., in cost consequence analysis), the value of 
     #' \code{mvd}
     #' is found at which cost saved is zero (cost saved is cost of reference 
     #' minus cost of index, on the presumption that the new technology will be

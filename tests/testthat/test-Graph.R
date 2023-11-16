@@ -124,10 +124,31 @@ test_that("vectorized node and edge indexes are as expected", {
   e1 <- Edge$new(n1, n2, label = "e1")
   e2 <- Edge$new(n1, n3)
   G <- Graph$new(V = list(n1, n2, n3), E = list(e1, e2))
+  # vertexes
+  v <- G$vertexes()
+  expect_r6_setequal(v, list(n1, n2, n3))
+  # vertex indexes
+  in1 <- G$vertex_index(n1)
+  in2 <- G$vertex_index(n2)
+  in3 <- G$vertex_index(n3)
+  expect_identical(G$vertex_index(list(n1, n2, n3)), c(in1, in2, in3))
+  expect_identical(G$vertex_index(list(n1, 42L)), c(in1, NA_integer_))
+  expect_identical(G$vertex_index(G$vertexes()), G$vertex_along())
+  # vertexes at given indexes
+  expect_identical(G$vertex_at(c(in1, in2)), c(n1, n2))
+  expect_identical(G$vertex_at(c(in2, in1)), c(n2, n1))
+  expect_identical(G$vertex_at(list(in1, in2)), c(n1, n2))
+  expect_identical(G$vertex_at(list(in1, in1)), c(n1, n1))
+  expect_error(G$vertex_at(c(in1, NA_integer_)), class = "invalid_index")
+  expect_error(G$vertex_at(c(in1, G$order() + 1L)), class = "invalid_index")
+  # vertex existence
+  expect_identical(G$has_vertex(list(n1, n2)), c(TRUE, TRUE))
+  expect_identical(G$has_vertex(list(n1, n1, n2)), c(TRUE, TRUE, TRUE))
+  expect_identical(G$has_vertex(list(n1, n2, 42L)), c(TRUE, TRUE, FALSE))
   # edges
   e <- G$edges()
   expect_r6_setequal(e, list(e1, e2))
-  # edge indexes
+  # edge indexesn
   ie1 <- G$edge_index(e1)
   ie2 <- G$edge_index(e2)
   expect_identical(G$edge_index(list(e1, e2)), c(ie1, ie2))
@@ -150,12 +171,15 @@ test_that("vectorized node and edge indexes are as expected", {
 test_that("node and edge label indexes are as expected", {
   # create graph
   n1 <- Node$new()
-  n2 <- Node$new()
-  n3 <- Node$new()
+  n2 <- Node$new(label = "n2")
+  n3 <- Node$new(label = "n3")
   e1 <- Edge$new(n1, n2, label = "e1")
   e2 <- Edge$new(n1, n3)
   G <- Graph$new(V = list(n1, n2, n3), E = list(e1, e2))
   # indexes
+  in1 <- G$vertex_index(n1)
+  in2 <- G$vertex_index(n2)
+  in3 <- G$vertex_index(n3)
   ie1 <- G$edge_index(e1)
   ie2 <- G$edge_index(e2)
   # tests of edge labels
@@ -167,6 +191,17 @@ test_that("node and edge label indexes are as expected", {
   expect_identical(G$edge_label(c(ie1, ie2)), c("e1", ""))
   expect_error(G$edge_label(c(ie1, as.numeric(ie2))), class = "invalid_index")
   expect_identical(G$edge_label(list(ie1, ie2)), c("e1", ""))
+  # tests of vertex labels
+  expect_identical(n1$label(), "")
+  expect_identical(n2$label(), "n2")
+  expect_identical(n3$label(), "n3")
+  expect_identical(G$vertex_label(in1), "")
+  expect_identical(G$vertex_label(in2), "n2")
+  expect_identical(G$vertex_label(in3), "n3")
+  expect_error(G$vertex_label(42L), class = "invalid_index")
+  expect_identical(G$vertex_label(c(in1, in2)), c("", "n2"))
+  expect_error(G$vertex_label(c(in1, as.numeric(in2))), class = "invalid_index")
+  expect_identical(G$vertex_label(list(in1, in2, in3)), c("", "n2", "n3"))
 })
 
 # tests of adjacency matrix
