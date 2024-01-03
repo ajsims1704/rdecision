@@ -5,12 +5,12 @@
 \alias{Arborescence}
 \title{A rooted directed tree}
 \description{
-An R6 class representing an \dfn{arborescence} (a rooted 
+An R6 class representing an \dfn{arborescence} (a rooted
 directed tree).
 }
 \details{
-Class to encapsulate a directed rooted tree specialization of a 
-digraph. An arborescence is a directed tree with exactly one root and 
+Class to encapsulate a directed rooted tree specialization of a
+digraph. An arborescence is a directed tree with exactly one root and
 unique directed paths from the root. Inherits from class \code{Digraph}.
 }
 \references{
@@ -29,9 +29,11 @@ Andrew Sims \email{andrew.sims@newcastle.ac.uk}
 \subsection{Public methods}{
 \itemize{
 \item \href{#method-Arborescence-new}{\code{Arborescence$new()}}
+\item \href{#method-Arborescence-parent}{\code{Arborescence$parent()}}
 \item \href{#method-Arborescence-is_parent}{\code{Arborescence$is_parent()}}
 \item \href{#method-Arborescence-is_leaf}{\code{Arborescence$is_leaf()}}
 \item \href{#method-Arborescence-root}{\code{Arborescence$root()}}
+\item \href{#method-Arborescence-is_root}{\code{Arborescence$is_root()}}
 \item \href{#method-Arborescence-siblings}{\code{Arborescence$siblings()}}
 \item \href{#method-Arborescence-root_to_leaf_paths}{\code{Arborescence$root_to_leaf_paths()}}
 \item \href{#method-Arborescence-postree}{\code{Arborescence$postree()}}
@@ -57,6 +59,10 @@ Andrew Sims \email{andrew.sims@newcastle.ac.uk}
 <li><span class="pkg-link" data-pkg="rdecision" data-topic="Graph" data-id="vertex_along"><a href='../../rdecision/html/Graph.html#method-Graph-vertex_along'><code>rdecision::Graph$vertex_along()</code></a></span></li>
 <li><span class="pkg-link" data-pkg="rdecision" data-topic="Graph" data-id="vertex_at"><a href='../../rdecision/html/Graph.html#method-Graph-vertex_at'><code>rdecision::Graph$vertex_at()</code></a></span></li>
 <li><span class="pkg-link" data-pkg="rdecision" data-topic="Graph" data-id="vertex_index"><a href='../../rdecision/html/Graph.html#method-Graph-vertex_index'><code>rdecision::Graph$vertex_index()</code></a></span></li>
+<li><span class="pkg-link" data-pkg="rdecision" data-topic="Graph" data-id="vertex_label"><a href='../../rdecision/html/Graph.html#method-Graph-vertex_label'><code>rdecision::Graph$vertex_label()</code></a></span></li>
+<li><span class="pkg-link" data-pkg="rdecision" data-topic="Graph" data-id="vertexes"><a href='../../rdecision/html/Graph.html#method-Graph-vertexes'><code>rdecision::Graph$vertexes()</code></a></span></li>
+<li><span class="pkg-link" data-pkg="rdecision" data-topic="Digraph" data-id="arrow_source"><a href='../../rdecision/html/Digraph.html#method-Digraph-arrow_source'><code>rdecision::Digraph$arrow_source()</code></a></span></li>
+<li><span class="pkg-link" data-pkg="rdecision" data-topic="Digraph" data-id="arrow_target"><a href='../../rdecision/html/Digraph.html#method-Digraph-arrow_target'><code>rdecision::Digraph$arrow_target()</code></a></span></li>
 <li><span class="pkg-link" data-pkg="rdecision" data-topic="Digraph" data-id="as_DOT"><a href='../../rdecision/html/Digraph.html#method-Digraph-as_DOT'><code>rdecision::Digraph$as_DOT()</code></a></span></li>
 <li><span class="pkg-link" data-pkg="rdecision" data-topic="Digraph" data-id="digraph_adjacency_matrix"><a href='../../rdecision/html/Digraph.html#method-Digraph-digraph_adjacency_matrix'><code>rdecision::Digraph$digraph_adjacency_matrix()</code></a></span></li>
 <li><span class="pkg-link" data-pkg="rdecision" data-topic="Digraph" data-id="digraph_incidence_matrix"><a href='../../rdecision/html/Digraph.html#method-Digraph-digraph_incidence_matrix'><code>rdecision::Digraph$digraph_incidence_matrix()</code></a></span></li>
@@ -69,8 +75,6 @@ Andrew Sims \email{andrew.sims@newcastle.ac.uk}
 <li><span class="pkg-link" data-pkg="rdecision" data-topic="Digraph" data-id="is_tree"><a href='../../rdecision/html/Digraph.html#method-Digraph-is_tree'><code>rdecision::Digraph$is_tree()</code></a></span></li>
 <li><span class="pkg-link" data-pkg="rdecision" data-topic="Digraph" data-id="is_weakly_connected"><a href='../../rdecision/html/Digraph.html#method-Digraph-is_weakly_connected'><code>rdecision::Digraph$is_weakly_connected()</code></a></span></li>
 <li><span class="pkg-link" data-pkg="rdecision" data-topic="Digraph" data-id="paths"><a href='../../rdecision/html/Digraph.html#method-Digraph-paths'><code>rdecision::Digraph$paths()</code></a></span></li>
-<li><span class="pkg-link" data-pkg="rdecision" data-topic="Digraph" data-id="source"><a href='../../rdecision/html/Digraph.html#method-Digraph-source'><code>rdecision::Digraph$source()</code></a></span></li>
-<li><span class="pkg-link" data-pkg="rdecision" data-topic="Digraph" data-id="target"><a href='../../rdecision/html/Digraph.html#method-Digraph-target'><code>rdecision::Digraph$target()</code></a></span></li>
 <li><span class="pkg-link" data-pkg="rdecision" data-topic="Digraph" data-id="topological_sort"><a href='../../rdecision/html/Digraph.html#method-Digraph-topological_sort'><code>rdecision::Digraph$topological_sort()</code></a></span></li>
 <li><span class="pkg-link" data-pkg="rdecision" data-topic="Digraph" data-id="walk"><a href='../../rdecision/html/Digraph.html#method-Digraph-walk'><code>rdecision::Digraph$walk()</code></a></span></li>
 </ul>
@@ -100,10 +104,32 @@ An \code{Arborescence} object.
 }
 }
 \if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-Arborescence-parent"></a>}}
+\if{latex}{\out{\hypertarget{method-Arborescence-parent}{}}}
+\subsection{Method \code{parent()}}{
+Find the parent of a Node.
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{Arborescence$parent(v)}\if{html}{\out{</div>}}
+}
+
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{v}}{Index node, or a list of index Nodes.}
+}
+\if{html}{\out{</div>}}
+}
+\subsection{Returns}{
+A list of Nodes of the same length as v, if v is a list, or a
+scalar Node if v is a single node. NA if v (or an element of v) is the
+root node.
+}
+}
+\if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-Arborescence-is_parent"></a>}}
 \if{latex}{\out{\hypertarget{method-Arborescence-is_parent}{}}}
 \subsection{Method \code{is_parent()}}{
-Test whether the given node is a parent (has child nodes).
+Test whether the given node(s) is (are) parent(s).
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{Arborescence$is_parent(v)}\if{html}{\out{</div>}}
 }
@@ -111,20 +137,25 @@ Test whether the given node is a parent (has child nodes).
 \subsection{Arguments}{
 \if{html}{\out{<div class="arguments">}}
 \describe{
-\item{\code{v}}{Node to test}
+\item{\code{v}}{Node to test, or a list of Nodes.}
 }
 \if{html}{\out{</div>}}
 }
+\subsection{Details}{
+In an arborescence, \code{is_parent()} and \code{is_leaf()} are
+mutually exclusive.
+}
+
 \subsection{Returns}{
-TRUE if v has one or more child nodes, FALSE otherwise.
+A logical vector of the same length as v, if v is a list, or a
+logical scalar if v is a single node.
 }
 }
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-Arborescence-is_leaf"></a>}}
 \if{latex}{\out{\hypertarget{method-Arborescence-is_leaf}{}}}
 \subsection{Method \code{is_leaf()}}{
-Test whether the given node is a leaf. In an arborescence,
-\code{is_parent()} and \code{is_leaf()} are mutually exclusive.
+Test whether the given node is a leaf.
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{Arborescence$is_leaf(v)}\if{html}{\out{</div>}}
 }
@@ -132,12 +163,18 @@ Test whether the given node is a leaf. In an arborescence,
 \subsection{Arguments}{
 \if{html}{\out{<div class="arguments">}}
 \describe{
-\item{\code{v}}{Vertex to test.}
+\item{\code{v}}{Node to test, or a list of Nodes.}
 }
 \if{html}{\out{</div>}}
 }
+\subsection{Details}{
+In an arborescence, \code{is_parent()} and \code{is_leaf()} are
+mutually exclusive.
+}
+
 \subsection{Returns}{
-TRUE if v has no child nodes, FALSE otherwise.
+A logical vector of the same length as v, if v is a list, or a
+logical scalar is v is a single node.
 }
 }
 \if{html}{\out{<hr>}}
@@ -154,6 +191,27 @@ The root vertex.
 }
 }
 \if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-Arborescence-is_root"></a>}}
+\if{latex}{\out{\hypertarget{method-Arborescence-is_root}{}}}
+\subsection{Method \code{is_root()}}{
+Is the specified node the root?
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{Arborescence$is_root(v)}\if{html}{\out{</div>}}
+}
+
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{v}}{Vertex to test, or list of vertexes}
+}
+\if{html}{\out{</div>}}
+}
+\subsection{Returns}{
+A logical vector if v is a list, or a logical scalar if v is a
+single node.
+}
+}
+\if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-Arborescence-siblings"></a>}}
 \if{latex}{\out{\hypertarget{method-Arborescence-siblings}{}}}
 \subsection{Method \code{siblings()}}{
@@ -165,7 +223,7 @@ Find the siblings of a vertex in the arborescence.
 \subsection{Arguments}{
 \if{html}{\out{<div class="arguments">}}
 \describe{
-\item{\code{v}}{Vertex to test.}
+\item{\code{v}}{Vertex to test (only accepts a scalar Node).}
 }
 \if{html}{\out{</div>}}
 }
@@ -212,7 +270,7 @@ distance between siblings.}
 \item{\code{SubtreeSeparation}}{Distance in arbitrary units for the
 distance between neighbouring subtrees.}
 
-\item{\code{LevelSeparation}}{Distance in arbitrary units for the 
+\item{\code{LevelSeparation}}{Distance in arbitrary units for the
 separation between adjacent levels.}
 
 \item{\code{RootOrientation}}{Must be one of "NORTH", "SOUTH", "EAST", "WEST".
@@ -226,9 +284,15 @@ the tree exceeds this, an error will be raised.}
 }
 \if{html}{\out{</div>}}
 }
+\subsection{Details}{
+In the \code{rdecision} implementation, the
+sibling order is taken to be the lexicographic order of the node
+labels, if they are unique among siblings, or the node indexes otherwise.
+}
+
 \subsection{Returns}{
 A data frame with one row per node and three columns (n, x
-and y) where \code{n} gives the node index given by the 
+and y) where \code{n} gives the node index given by the
 \code{Graph::vertex_index()} function.
 }
 }

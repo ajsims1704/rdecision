@@ -8,8 +8,8 @@
 An R6 class representing a multivariate Dirichlet distribution.
 }
 \details{
-A multivariate Dirichlet distribution. See 
-\url{https://en.wikipedia.org/wiki/Dirichlet_distribution} for details. 
+A multivariate Dirichlet distribution. See
+\url{https://en.wikipedia.org/wiki/Dirichlet_distribution} for details.
 Inherits from class \code{Distribution}.
 }
 \author{
@@ -128,8 +128,8 @@ quantiles of the multivariate Dirichlet.
 }
 
 \subsection{Returns}{
-A matrix of numeric values with the number of rows equal to the 
-length of \code{probs}, the number of columns equal to the order; rows 
+A matrix of numeric values with the number of rows equal to the
+length of \code{probs}, the number of columns equal to the order; rows
 are labelled with quantiles and columns with the dimension (1, 2, etc).
 }
 }
@@ -143,7 +143,7 @@ Variance-covariance matrix.
 }
 
 \subsection{Returns}{
-A positive definite symmetric matrix of size \code{K} by 
+A positive definite symmetric matrix of size \code{K} by
 \code{K}.
 }
 }

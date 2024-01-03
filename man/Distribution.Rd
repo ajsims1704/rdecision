@@ -8,7 +8,7 @@
 An R6 class representing a (possibly multivariate) distribution.
 }
 \details{
-The base class for particular univariate or multivariate 
+The base class for particular univariate or multivariate
 distributions.
 }
 \author{
@@ -44,7 +44,7 @@ Create an object of class \code{Distribution}.
 \describe{
 \item{\code{name}}{Name of the distribution ("Beta" etc.)}
 
-\item{\code{K}}{Order of the distribution (1 = univariate, 2 = bivariate etc.). 
+\item{\code{K}}{Order of the distribution (1 = univariate, 2 = bivariate etc.).
 Must be an integer; use 1L, 3L etc. to avoid an error.}
 }
 \if{html}{\out{</div>}}
@@ -93,7 +93,7 @@ Mean value of the distribution.
 }
 
 \subsection{Returns}{
-Mean value as a numeric scalar (\code{K = 1L}) or vector of 
+Mean value as a numeric scalar (\code{K = 1L}) or vector of
 length \code{K}.
 }
 }
@@ -112,7 +112,7 @@ because an arbitrary distribution is not guaranteed to be unimodal.
 }
 
 \subsection{Returns}{
-Mode as a numeric scalar (\code{K = 1L}) or vector of 
+Mode as a numeric scalar (\code{K = 1L}) or vector of
 length \code{K}.
 }
 }
@@ -126,8 +126,8 @@ Return the standard deviation of a univariate distribution.
 }
 
 \subsection{Details}{
-Only defined for univariate (\code{K = 1L}) distributions; for 
-multivariate distributions, function \code{varcov} returns the 
+Only defined for univariate (\code{K = 1L}) distributions; for
+multivariate distributions, function \code{varcov} returns the
 variance-covariance matrix.
 }
 
@@ -145,7 +145,7 @@ Variance-covariance matrix.
 }
 
 \subsection{Returns}{
-A positive definite symmetric matrix of size \code{K} by 
+A positive definite symmetric matrix of size \code{K} by
 \code{K}, or a scalar for \code{K = 1L}, equal to the variance.
 }
 }
@@ -166,12 +166,12 @@ Marginal quantiles of the distribution.
 \if{html}{\out{</div>}}
 }
 \subsection{Details}{
-If they are defined, this function returns the marginal 
+If they are defined, this function returns the marginal
 quantiles of the multivariate distribution; i.e. the quantiles of each
 univariate marginal distribution of the multivariate distribution. For
 example, the univariate marginal distributions of a multivariate
 normal are univariate normals, and the univariate marginal distributions
-of a Dirichlet distribution are Beta distributions. Note that these are 
+of a Dirichlet distribution are Beta distributions. Note that these are
 not the true quantiles of a multivariate distribution, which are contours
 for \code{K = 2L}, surfaces for \code{K = 3L}, etc. For example, the
 2.5\% and 97.5\% marginal quantiles of a bivariate normal distribution
@@ -182,7 +182,7 @@ distribution is an ellipse.
 
 \subsection{Returns}{
 For \code{K = 1L} a numeric vector of length equal to the length
-of \code{probs}, with each entry labelled with the quantile. For 
+of \code{probs}, with each entry labelled with the quantile. For
 \code{K > 1L} a matrix of numeric values with the number of rows equal
 to the length of \code{probs}, the number of columns equal to the order;
 rows are labelled with probabilities and columns with the dimension

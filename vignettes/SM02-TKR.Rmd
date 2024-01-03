@@ -31,20 +31,28 @@ knitr::read_chunk(file.path("vutils.R"))
 #| include = FALSE
 knitr::opts_chunk$set(
   collapse = TRUE,
+  echo = FALSE,
   comment = "#>"
 )
 pander::panderOptions("table.split.table", 200L)
 ```
 
-```{r, gv2png, echo = FALSE}
+```{r}
+#| gbp
 ```
-```{r, gbp, echo = FALSE}
-```
-
 
 ```{r}
-#| echo = FALSE
+#| purl = FALSE
+#nolint start
+```
+
+```{r}
 library(rdecision)
+```
+
+```{r}
+#| purl = FALSE
+#nolint end
 ```
 The article by Dong and Buxton, 2006 [-@dong2006] describes a Markov model for
 the assessment of a new Computer-Assisted Surgery (CAS) technology for Total
@@ -61,7 +69,9 @@ using `rdecision`.
 ## States
 The patient journey is represented by 9 possible states, with each patient
 assigned to exactly one state at any time:
-```{r, state-names}
+```{r}
+#| state-names,
+#| echo = TRUE
 ```
 
 ## Variables
@@ -74,7 +84,9 @@ This is represented in `rdecision` by assigning the utility to a particular
 `MarkovState`. This ensures that they are correctly scaled to different cycle
 lengths, and that the annual discount rate is applied correctly.
 
-```{r, utils-point}
+```{r}
+#| utils-point,
+#| echo = TRUE
 ```
 
 **Costs**, in this case, represent one-time expenses associated with the
@@ -92,14 +104,16 @@ states. When applying costs to transitions, it's important to consider the
 possible transitions and ensure that no "double-counting" occurs (for example
 by transitions that return to the same state).
 
-```{r, costs-point}
+```{r}
+#| costs-point,
+#| echo = TRUE
 ```
 
 # Point estimate
 The initial deterministic analysis uses numerical best estimates for each
 parameter (cost, utility, transition probability etc.). This results in a
 model with an exact solution, but no estimate of the uncertainty, or of the
-impact of individual parameters on the undertainty of the outcome.
+impact of individual parameters on the uncertainty of the outcome.
 
 ## Markov model
 The Markov state transition model specifies which transitions are permitted
@@ -115,19 +129,26 @@ an additional cost attached to interventions - in this case, this would affect
 procedures). Utilities are unchanged and therefore the same Markov state
 definitions can be used by both models.
 
-```{r, SMM-point}
+```{r}
+#| SMM-point,
+#| echo = TRUE
 ```
 
-To fully define a SemiMarkov model, we assign the States, Transitions, duration
+To fully define a semi Markov model, we assign the States, Transitions, duration
 of a cycle (as a `difftime` object) and, optionally, annual `discount.cost`
 and `discount.utility`.
 
-```{r, SMM-def-point}
+```{r}
+#| SMM-def-point,
+#| echo = TRUE
 ```
 
 ```{r}
-#| purl = FALSE
-pander::pander(SMM_base$tabulate_states()[,c("Name", "Utility")], justify="ll")
+#| purl = FALSE,
+#| echo = TRUE
+pander::pander(
+  SMM_base$tabulate_states()[, c("Name", "Utility")], justify = "ll"
+)
 ```
 
 The `SemiMarkovModel` object can be represented graphically in the DOT format
@@ -136,22 +157,22 @@ DOT files with the `grViz` function.
 
 ```{r}
 #| fig.cap = "Markov state transition model for total knee replacement (TKR)",
+#| echo = TRUE,
 #| purl = FALSE,
 #| eval = FALSE
-DiagrammeR::grViz(SMM_base$as_DOT(rankdir = "TB", width = 7.0, height = 5.0))
+DiagrammeR::grViz(SMM_base$as_DOT(rankdir = "TB", width = 7.0, height = 7.0))
 ```
 
 ```{r}
-#| fig.cap = "Markov state transition model for total knee replacement (TKR)",
-#| purl = FALSE,
-#| echo = FALSE
-# This vignette is processed by knitr at build time (on the package developer's
-# system) and so dot only needs to be available there, not on any system used
-# for checking or installing the vignettes, which operate on the
-# versions moved to the doc directory at build time. It is preferable to use
-# dot with png output for vignette builds because it creates more compact html.
-pngfile <- gv2png(SMM_base$as_DOT(rankdir = "TB"))
-knitr::include_graphics(path = pngfile)
+#| gv2png
+```
+
+```{r}
+# images created with dot are more compact than DiagrammeR.
+pngfile <- gv2png(
+  dot = SMM_base$as_DOT(rankdir = "TB", width = 7.0, height = 7.0)
+)
+knitr::include_graphics(pngfile)
 ```
 
 ## Transition probabilities
@@ -175,7 +196,9 @@ error if the probability matrix does not have row-wise sums of 1. Alternatively,
 exactly one cell in each row can be left undefined as `NA` and it will
 automatically be populated to ensure a row-wise total of 1.
 
-```{r, transitions-point}
+```{r}
+#| transitions-point,
+#| echo = TRUE
 ```
 
 The CAS technology affects patient outcomes by reducing the probability of
@@ -186,12 +209,16 @@ increasing the probability of making a transition to another state. It is
 assumed the states with increased transition probabilities are those defined as 
 `NA` in matrix `Pt`. Function `txeffect` adjusts the transition probability 
 matrix, given a relative risk.
-```{r, tx-effect}
+```{r}
+#| tx-effect,
+#| echo = TRUE
 ```
 
 The effect is applied to the transition matrix for conventional surgery to 
 get the transition matrix for computer-assisted surgery, as follows.
-```{r CAS-transitions-point}
+```{r}
+#| CAS-transitions-point,
+#| echo = TRUE
 ```
 
 
@@ -208,7 +235,9 @@ the specified number of cycles, and, optionally, can apply half-cycle
 correction to population and cost (`hcc.pop` and `hcc.cost`). In this example,
 half-cycle correction is not used.
 
-```{r cycle-point}
+```{r}
+#| cycle-point,
+#| echo = TRUE
 ```
 
 Running the `cycles` function returns a data frame with the population in each
@@ -227,7 +256,7 @@ associated with each state, can be used to calculate the QALY.
 
 ```{r}
 #| purl = FALSE
-pander::pander(SMM_base_10years[0L:5L,])
+pander::pander(SMM_base_10years[0L:5L, ])
 ```
 This progression can also be visualised using the base graphics function
 `barplot`:
@@ -242,14 +271,14 @@ plot_occupancy <- function(SMM) {
       states <- colnames(SMM)[
         !colnames(SMM) %in% c("Cost", "QALY", "Cycle", "Years")
       ]
-      pal <- sample(hcl.colors(length(states), palette="Spectral"))
+      pal <- sample(hcl.colors(length(states), palette = "Spectral"))
       barplot(
-        t(as.matrix(SMM[,states])), 
-        xlab = "Cycle", ylab = "States", names.arg = SMM[,"Cycle"],
+        t(as.matrix(SMM[, states])),
+        xlab = "Cycle", ylab = "States", names.arg = SMM[, "Cycle"],
         col = pal, border = NA, space = 0L
       )
       legend(
-        "topright", legend = states, fill = pal, bty = "n", 
+        "topright", legend = states, fill = pal, bty = "n",
         inset = c(-0.75, 0.0), xpd = TRUE
       )
     }
@@ -263,7 +292,9 @@ Dong and Buxton [-@dong2006] report results yearly (corresponding to cycles 12,
 `SemiMarkovModel` returns a Markov trace (state occupancies at the end of each
 cycle, with per-cycle costs and QALYs) in the form of a data frame. The Markov
 trace can be converted to their Table 4 form via the function `as_table4`. 
-```{r, as-table4}
+```{r}
+#| as-table4,
+#| echo = TRUE
 ```
 
 Replication of their Table 4 is given in the next two sections. Note that these
@@ -274,26 +305,30 @@ in the CAS calculations can also probably be traced to rounding of the 34%
 CAS effect figure.
 
 ### Conventional surgery
-```{r, cs-table-4}
+```{r}
+#| cs-table-4,
+#| echo = TRUE
 ```
 
 ```{r}
 #| purl = FALSE
 pander::pander(
-  t4_CS, round = 2L, row.names = FALSE, big.mark = ",", 
+  t4_CS, round = 2L, row.names = FALSE, big.mark = ",",
   justify = "lrrrrrrr", keep.trailing.zeros = TRUE
 )
 ```
 
 ### Computer-assisted surgery
-```{r, cas-table-4}
+```{r}
+#| cas-table-4,
+#| echo = TRUE
 ```
 
 ```{r}
 #| purl = FALSE
 pander::pander(
-  t4_CAS, round=2L, row.names=FALSE, big.mark=",",
-  justify="lrrrrrrr", keep.trailing.zeros=TRUE
+  t4_CAS, round = 2L, row.names = FALSE, big.mark = ",",
+  justify = "lrrrrrrr", keep.trailing.zeros = TRUE
 )
 ```
 
@@ -337,18 +372,22 @@ Beta distributions. Note also that the authors report that
 but there is no description of the method used and/or how the resulting values
 are constrained to the [0, 1] interval.
 
-```{r utilities-var}
+```{r}
+#| utilities-var,
+#| echo = TRUE
 ```
 
 These parameters can now be used to describe the distributions that each
 utility value should be drawn from. This is represented in `rdecision` by a
 `ModVar` variable, in this case specifically the `BetaModVar` child class. This
-type of ModVar requires the `alpha` and `beta` parameters, which can be
+type of `ModVar` requires the `alpha` and `beta` parameters, which can be
 calculated according to the equations above. Note that for state **I** (Death),
-there is no need to define a ModVar, as the utility of this state is not
+there is no need to define a `ModVar`, as the utility of this state is not
 associated with any uncertainty.
 
-```{r utilities-beta}
+```{r}
+#| utilities-beta,
+#| echo = TRUE
 ```
 
 ### Costs
@@ -367,7 +406,9 @@ The `GammaModVar` class requires the parameters `shape` and `scale`, which
 relate to mean $\mu$ and variance $\sigma^2$ as $shape = \mu^2 / \sigma^2$
 and $scale = \sigma^2 / \mu$.
 
-```{r costs-gamma}
+```{r}
+#| costs-gamma,
+#| echo = TRUE
 ```
 
 The cost of CAS is also modelled with a Gamma distribution, but in this case
@@ -383,7 +424,9 @@ gamma distribution. This can be easily represented in `rdecision` using an
 The expression needs to be quoted using the `rlang::quo` command in order to
 be stored rather than executed straight away.
 
-```{r cas-cost-gamma}
+```{r}
+#| cas-cost-gamma,
+#| echo = TRUE
 ```
 
 The CAS effect in this model is a reduction in the transition probabilities
@@ -402,7 +445,9 @@ distribution given a mean and 95% CI, the article does not report a range for
 this variable. Because exact replication is therefore impossible, an arbitrary
 parametrisation is used here that is unlikely to yield an illegal value.
 
-```{r cas-lognorm}
+```{r}
+#| cas-lognorm,
+#| echo = TRUE
 ```
 
 ## Markov model
@@ -410,7 +455,9 @@ The same structure as the model used for the deterministic solution can be
 used again, but in this case the costs and utilities will be represented by
 distributions.
 
-```{r SMM-PSA}
+```{r}
+#| SMM-PSA,
+#| echo = TRUE
 ```
 
 The current model includes a number of model variables, that can be displayed
@@ -418,21 +465,24 @@ using the `modvar_table` method. This tabulation can also be used to compare
 the 95% CI with the values reported in Table 3. 
 
 ```{r}
-#| purl = FALSE
+#| purl = FALSE,
+#| echo = TRUE
 pander::pander(
-  SMM_base_PSA$modvar_table()[,c(-2L, -5L, -9L)], justify="llrrrr", round=5L
+  SMM_base_PSA$modvar_table()[, c(-2L, -5L, -9L)], justify = "llrrrr",
+  round = 5L
 )
 ```
 
-Note that the list of ModVars associated with the CAS model includes not only
+Note that the list of `ModVar`s associated with the CAS model includes not only
 the variables that were explicitly assigned to States and Transitions, such as
-*Utility of state A*, but also the implicit ModVars underlying ExprModVars,
+*Utility of state A*, but also the implicit `ModVar`s underlying `ExprModVar`s,
 such as *Cost of CAS*, which is used to calculate *Cost of state A with CAS*.
 
 ```{r}
-#| purl = FALSE
+#| purl = FALSE,
+#| echo = TRUE
 pander::pander(
-  SMM_CAS_PSA$modvar_table()[,c(-2L, -5L, -9L)], justify="llrrrr", round=5L
+  SMM_CAS_PSA$modvar_table()[, c(-2L, -5L, -9L)], justify = "llrrrr", round = 5L
 )
 ```
 
@@ -465,7 +515,9 @@ in-built functions:
 * Repeat the process at every cycle to sample different outgoing transition
   probabilities from the distribution.
 
-```{r fun-dirichlet}
+```{r}
+#| fun-dirichlet,
+#| echo = TRUE
 ```
 
 ## PSA runs
@@ -482,7 +534,7 @@ using the `dirichletify` function.
 In the case of CAS, there is an additional step in the simulation process due
 to the fact that the transition probabilities into state **B** (column 2 in the
 transition matrix) are modified by a multiplier, *Effect of CAS*, which is
-itself drawn from a distribution. In this case, the relevant ModVar needs to be
+itself drawn from a distribution. In this case, the relevant `ModVar` needs to be
 randomised at every cycle, and applied to the transition matrix.
 
 This a "paired" simulation; that is, we are interested in the 
@@ -493,7 +545,9 @@ running each model, every cycle. This is analogous, in statistics, to a paired
 t-test rather than a two-sample t-test. When there are many common variables, 
 the results of the two models will be correlated.
 
-```{r, cycle-PSA}
+```{r}
+#| cycle-PSA,
+#| echo = TRUE
 ```  
 
 ## Results
@@ -511,15 +565,18 @@ Table 5, with the addition of the upper and lower confidence limits of the mean.
 
 ### Conventional surgery
 ```{r}
-#| purl = FALSE
+#| purl = FALSE,
+#| echo = TRUE
 t4_CS_PSA_mean <- apply(t4_CS_PSA, MARGIN = c(1L, 2L), FUN = mean)
 pander::pander(
-  t4_CS_PSA_mean, round=2L, row.names=FALSE, big.mark=",",
-  justify="lrrrrrrr", keep.trailing.zeros=TRUE
+  t4_CS_PSA_mean, round = 2L, row.names = FALSE, big.mark = ",",
+  justify = "lrrrrrrr", keep.trailing.zeros = TRUE
 )
 ```
 
-```{r, t5-CS-PSA}
+```{r}
+#| t5-CS-PSA,
+#| echo = TRUE
 ```
 
 ```{r}
@@ -529,19 +586,23 @@ pander::pander(t5_CS, round = 2L, keep.trailing.zeros = TRUE, justify = "lrrrr")
 
 ### Computer-assisted surgery
 ```{r}
-#| purl = FALSE
+#| purl = FALSE,
+#| echo = TRUE
 t4_CAS_PSA_mean <- apply(t4_CAS_PSA, MARGIN = c(1L, 2L), FUN = mean)
 pander::pander(
-  t4_CAS_PSA_mean, round=2L, row.names=FALSE, big.mark=",",
-  justify="lrrrrrrr", keep.trailing.zeros=TRUE
+  t4_CAS_PSA_mean, round = 2L, row.names = FALSE, big.mark = ",",
+  justify = "lrrrrrrr", keep.trailing.zeros = TRUE
 )
 ```
 
-```{r, t5-CAS-PSA}
+```{r}
+#| t5-CAS-PSA,
+#| echo = TRUE
 ```
 
 ```{r}
-#| purl = FALSE
+#| purl = FALSE,
+#| echo = TRUE
 pander::pander(
   t5_CAS, round = 2L, justify = "lrrrr", keep.trailing.zeros = TRUE
 )
@@ -554,7 +615,9 @@ parameters for the distribution of the *Effect of CAS* could not be extracted,
 and the values chosen here may assign excessive uncertainty to this variable.
 
 ### Cost effectiveness analysis
-```{r, cea-psa}
+```{r}
+#| cea-psa,
+#| echo = TRUE
 ```
 From PSA, after 10 years the mean (95% CI) cost change per patient was
 `r round(mean(dcost_psa), digits = 2L)` 
@@ -576,24 +639,24 @@ figure below (for comparison with figure 2 of the paper).
 #| fig.cap = "Cost-effectiveness plane. QALY = Quality-adjusted life year",
 #| purl = FALSE
 withr::with_par(
-  new = list(mar = c(1L, 2L, 2L, 1L)), 
+  new = list(mar = c(1L, 2L, 2L, 1L)),
   code = {
     plot(
       dcost_psa ~ dutil_psa,
       pch = 20L,
-      xlim = c(-0.1, 0.15), ylim = c(-5000.0, 1000.0), 
+      xlim = c(-0.1, 0.15), ylim = c(-5000.0, 1000.0),
       axes = FALSE,
       xlab = "", ylab = ""
     )
     axis(side = 1L, pos = 0.0, las = 1L)
     axis(side = 2L, pos = 0.0, las = 1L)
     mtext(
-      text = expression(paste(Delta, "QALYs")), 
-      side = 2L, adj = 5L/6L
+      text = expression(paste(Delta, "QALYs")),
+      side = 2L, adj = 5L / 6L
     )
     mtext(
       text = expression(paste(Delta, "Cost (£)")),
-      side = 3L, adj = 2L/5L
+      side = 3L, adj = 2L / 5L
     )
   }
 )

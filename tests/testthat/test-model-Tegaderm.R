@@ -2,7 +2,7 @@
 # (App Health Econ 2016;14:135-149) for a securement dressing for central
 # venous and arterial catheters.
 #
-# The checks are done as part of the testthat framework, which ensures that 
+# The checks are done as part of the testthat framework, which ensures that
 # any changes in the package code which unintentionally result in deviations
 # from the reported results of the model are identified.
 #
@@ -32,7 +32,7 @@ hr.CRBSI <- LogNormModVar$new(
   p1 = 0.402, p2 = (0.868 - 0.186) / (2L * 1.96), param = "LN7"
 )
 hr.LSI <- LogNormModVar$new(
-  "Tegaderm LSI HR", "HR", 
+  "Tegaderm LSI HR", "HR",
   p1 = 0.402, p2 = (0.868 - 0.186) / (2L * 1.96), param = "LN7"
 )
 rr.Dermatitis <- LogNormModVar$new(
@@ -58,13 +58,13 @@ c.Dermatitis <- GammaModVar$new(
 n.dressings <- GammaModVar$new(
   "No. dressings", "dressings",
   shape = (3.0 ^ 2L) / (2.0 ^ 2L),
-  scale = (2.0 ^ 2L) / 3.0 
+  scale = (2.0 ^ 2L) / 3.0
 )
 n.cathdays <- GammaModVar$new(
   "No. days with catheter", "days",
   shape = (10.0 ^ 2L) / (5.0 ^ 2L),
   scale = (5.0 ^ 2L) / 10.0
-)  
+)
 
 ## @knitr ---------------------------------------------------------------------
 test_that("variables have expected values", {
@@ -126,14 +126,14 @@ test_that("variables have expected values", {
 
 ## @knitr expressions ---------------------------------------------------------
 p.CRBSI.S <- ExprModVar$new(
-  "P(CRBSI | standard dressing)", "P",  
+  "P(CRBSI | standard dressing)", "P",
   rlang::quo(r.CRBSI * n.cathdays / 1000.0)
 )
 q.CRBSI.S <- ExprModVar$new(
   "Q(CRBSI | standard dressing)", "1 - P",  rlang::quo(1.0 - p.CRBSI.S)
 )
 p.CRBSI.T <- ExprModVar$new(
-  "P(CRBSI|Tegaderm)", "P", 
+  "P(CRBSI|Tegaderm)", "P",
   rlang::quo(p.CRBSI.S * hr.CRBSI)
 )
 q.CRBSI.T <- ExprModVar$new(
@@ -141,10 +141,10 @@ q.CRBSI.T <- ExprModVar$new(
 )
 p.LSI.S <- ExprModVar$new(
   "P(LSI | Standard)", "/patient",
-  rlang::quo(r.LSI * n.cathdays / 1000.0) 
+  rlang::quo(r.LSI * n.cathdays / 1000.0)
 )
 q.LSI.S <- ExprModVar$new(
-  "Q(LSI | Standard)", "1 - P", rlang::quo(1.0 - p.LSI.S) 
+  "Q(LSI | Standard)", "1 - P", rlang::quo(1.0 - p.LSI.S)
 )
 p.LSI.T <- ExprModVar$new(
   "P(LSI | Tegaderm)", "P", rlang::quo(p.LSI.S * hr.LSI)
@@ -153,19 +153,19 @@ q.LSI.T <- ExprModVar$new(
   "Q(LSI | Tegaderm)", "1 - P", rlang::quo(1.0 - p.LSI.T)
 )
 p.Dermatitis.S <- ExprModVar$new(
-  "P(dermatitis | standard dressing)", "P", 
+  "P(dermatitis | standard dressing)", "P",
   rlang::quo(r.Dermatitis)
 )
 q.Dermatitis.S <- ExprModVar$new(
-  "Q(dermatitis | standard dressing)", "1 - P", 
+  "Q(dermatitis | standard dressing)", "1 - P",
   rlang::quo(1.0 - p.Dermatitis.S)
 )
 p.Dermatitis.T <- ExprModVar$new(
-  "P(dermatitis | Tegaderm)", "P", 
+  "P(dermatitis | Tegaderm)", "P",
   rlang::quo(p.Dermatitis.S * rr.Dermatitis)
 )
 q.Dermatitis.T <- ExprModVar$new(
-  "Q(dermatitis | Tegaderm)", "1 - P", 
+  "Q(dermatitis | Tegaderm)", "1 - P",
   rlang::quo(1.0 - p.Dermatitis.T)
 )
 c.Tegaderm <- ExprModVar$new(
@@ -225,7 +225,7 @@ c23 <- ChanceNode$new()
 e21 <- Reaction$new(c23, c03, p = p.CRBSI.S, cost = c.CRBSI, label = "CRBSI")
 e22 <- Reaction$new(c23, c13, p = q.CRBSI.S, cost = 0.0, label = "No CRBSI")
 
-# Tegaderm branch  
+# Tegaderm branch
 t31 <- LeafNode$new("t31", interval = th)
 t32 <- LeafNode$new("t32", interval = th)
 c31 <- ChanceNode$new()
@@ -247,8 +247,8 @@ e34 <- Reaction$new(
 c33 <- ChanceNode$new()
 e35 <- Reaction$new(c33, c31, p = p.LSI.T, cost = c.LSI, label = "LSI")
 e36 <- Reaction$new(c33, c32, p = q.LSI.T, cost = 0.0, label = "No LSI")
-t41 <- LeafNode$new("t41", interval=th)
-t42 <- LeafNode$new("t42", interval=th)
+t41 <- LeafNode$new("t41", interval = th)
+t42 <- LeafNode$new("t42", interval = th)
 c41 <- ChanceNode$new()
 e41 <- Reaction$new(
   c41, t41, p = p.Dermatitis.T, cost = c.Dermatitis, label = "Dermatitis"
@@ -271,7 +271,7 @@ e46 <- Reaction$new(c43, c42, p = q.LSI.T, cost = 0.0, label = "No LSI")
 c53 <- ChanceNode$new()
 e51 <- Reaction$new(c53, c43, p = p.CRBSI.T, cost = c.CRBSI, label = "CRBSI")
 e52 <- Reaction$new(c53, c33, p = q.CRBSI.T, cost = 0.0, label = "no CRBSI")
-  
+
 # decision node
 d1 <- DecisionNode$new("d1")
 e9 <- Action$new(d1, c23, label = "Standard", cost = c.Standard)
@@ -279,9 +279,9 @@ e10 <- Action$new(d1, c53, label = "Tegaderm", cost = c.Tegaderm)
 
 # create decision tree
 V <- list(
-  d1, 
+  d1,
   c01, c02, c03, c11, c12, c13, c23, c31, c32, c33, c41, c42, c43, c53,
-  t01, t02, t03, t04, t11, t12, t13, t14, t31, t32, t33, t34, 
+  t01, t02, t03, t04, t11, t12, t13, t14, t31, t32, t33, t34,
   t41, t42, t43, t44
 )
 E <- list(
@@ -319,7 +319,7 @@ test_that("EAC base case agrees with direct calculation", {
   c_lsi <- 100.0
   n_cdays <- 10.0
   n_dress <- 3L
-  c_teg <- 6.26 
+  c_teg <- 6.26
   c_std <- 1.54
   # probabilities
   p_crbsi_std <- r_crbsi * (n_cdays / 1000.0)
@@ -364,7 +364,7 @@ test_that("tornado method rejects illegal arguments", {
   # tornado
   expect_error(DT$tornado(), class = "missing_strategy")
   expect_error(
-    DT$tornado(index = list(e10),ref = list(e52)),
+    DT$tornado(index = list(e10), ref = list(e52)),
     class = "invalid_strategy"
   )
   expect_error(
@@ -384,19 +384,19 @@ test_that("tornado method rejects illegal arguments", {
   )
   expect_error(
     DT$tornado(
-      index=list(e10), ref=list(e9), exclude = list("SN1", "SN2", "SNX"),
+      index = list(e10), ref = list(e9), exclude = list("SN1", "SN2", "SNX"),
       draw = TRUE
     ),
     class = "exclude_element_not_modvar"
   )
   expect_silent(
     DT$tornado(
-      index=list(e10), ref = list(e9), exclude = list(hr.CRBSI$description()),
+      index = list(e10), ref = list(e9), exclude = list(hr.CRBSI$description()),
       draw = TRUE
     )
   )
   to <- DT$tornado(
-    index=list(e10), ref = list(e9),
+    index = list(e10), ref = list(e9),
     draw = TRUE
   )
   expect_identical(nrow(to), 11L)
@@ -414,7 +414,7 @@ test_that("PSA replicates values from Excel model", {
   expect_intol(mean(psa$Cost.Standard), 151.29, 10.00)
   expect_intol(mean(psa$Cost.Tegaderm), 77.75, 10.00)
   expect_intol(mean(psa$Difference), 72.90, 10.00)
-  expect_intol(sum(psa$Difference > 0.0) / 1000L, 0.978, tol = 0.05)
+  expect_intol(sum(psa$Difference > 0.0) / N, 0.978, tol = 0.05)
 })
 
 ## @knitr scenario -----------------------------------------------------------
@@ -424,14 +424,14 @@ r.CRBSI <- GammaModVar$new(
   scale = (0.102 ^ 2L) / 0.30
 )
 p.CRBSI.S <- ExprModVar$new(
-  "P(CRBSI | standard dressing)", "P",  
+  "P(CRBSI | standard dressing)", "P",
   rlang::quo(r.CRBSI * n.cathdays / 1000.0)
 )
 q.CRBSI.S <- ExprModVar$new(
   "Q(CRBSI | standard dressing)", "1 - P",  rlang::quo(1.0 - p.CRBSI.S)
 )
 p.CRBSI.T <- ExprModVar$new(
-  "P(CRBSI|Tegaderm)", "P", 
+  "P(CRBSI|Tegaderm)", "P",
   rlang::quo(p.CRBSI.S * hr.CRBSI)
 )
 q.CRBSI.T <- ExprModVar$new(
@@ -464,7 +464,7 @@ test_that("scenario case agrees with direct calculation", {
   c_lsi <- 100.0
   n_cdays <- 10.0
   n_dress <- 3L
-  c_teg <- 6.26 
+  c_teg <- 6.26
   c_std <- 1.54
   # probabilities
   p_crbsi_std <- r_crbsi * (n_cdays / 1000.0)
@@ -494,6 +494,7 @@ test_that("scenario case agrees with direct calculation", {
 })
 
 ## @knitr scenario-PSA --------------------------------------------------------
+N <- 1000L
 psa <- DT$evaluate(setvars = "random", by = "run", N = N)
 psa$Difference <- psa$Cost.Standard - psa$Cost.Tegaderm
 
@@ -503,7 +504,7 @@ test_that("scenario PSA agrees with reported results", {
   expect_intol(mean(psa$Cost.Standard), 34.47, 5.00)
   expect_intol(mean(psa$Cost.Tegaderm), 30.79, 5.00)
   expect_intol(mean(psa$Difference), 3.56, 3.00)
-  expect_intol(sum(psa$Difference > 0.0) / 1000L, 0.579, tol = 0.2)
+  expect_intol(sum(psa$Difference > 0.0) / N, 0.579, tol = 0.2)
 })
 
 ## @knitr threshold-hr -------------------------------------------------------
@@ -519,10 +520,10 @@ hr_threshold <- DT$threshold(
 
 ## @knitr --------------------------------------------------------------------
 test_that("scenario hazard rate threshold agrees with that reported", {
-  expect_intol(hr_threshold, 0.53, tol = 0.05)  
+  expect_intol(hr_threshold, 0.53, tol = 0.05)
 })
 
-## @knitr threshold_ccrbsi ----------------------------------------------------
+## @knitr threshold-ccrbsi ----------------------------------------------------
 c_crbsi_threshold <- DT$threshold(
   index = list(e10),
   ref = list(e9),

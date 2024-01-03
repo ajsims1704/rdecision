@@ -15,15 +15,40 @@ vignette: >
 bibliography: "../inst/REFERENCES.bib"
 csl: "../inst/nature-no-et-al.csl"
 ---
-```{r, include = FALSE}
+
+```{r}
+#| purl = FALSE,
+#| include = FALSE
+# read vignette source chunks from corresponding testthat script
+knitr::read_chunk(
+  file.path("..", "tests", "testthat", "test-model-BurgerRun.R")
+)
+# read vignette build utility functions
+knitr::read_chunk(file.path("vutils.R"))
+```
+
+```{r}
+#| purl = FALSE,
+#| include = FALSE
 knitr::opts_chunk$set(
   collapse = TRUE,
+  echo = FALSE,
   comment = "#>"
 )
 ```
 
-```{r setup, echo = FALSE}
-library("rdecision") # nolint
+```{r}
+#| purl = FALSE
+#nolint start
+```
+
+```{r}
+library(rdecision)
+```
+
+```{r}
+#| purl = FALSE
+#nolint end
 ```
 
 # Introduction
@@ -39,19 +64,22 @@ shortest routes will pass through exactly one Big Burger. Xenia: "I reckon there
 are 10." Yolanda: "I'd say more like 20." Zara: "No you're both wrong, I bet 
 there are more than 50." Who is right, or closest to right?
 
-```{r diagram, echo=FALSE, results='hide', fig.keep='last', fig.align='center'}
+```{r}
+#| results = "hide",
+#| fig.keep = "last",
+#| fig.align = "center"
 # new page
 grid::grid.newpage()
-# functions to transform coordinates and distances in graph space (0:300) 
+# functions to transform coordinates and distances in graph space (0:300)
 # to grid space (cm)
 fig.size <- dev.size("cm")
-scale <- max(300.0 / fig.size[1L], 300.0 / fig.size[2L])
+scale <- max(300.0 / fig.size[[1L]], 300.0 / fig.size[[2L]])
 gx <- function(x) {
-  xcm <- fig.size[1L] / 2.0 + (x - 150.0) / scale
+  xcm <- fig.size[[1L]] / 2.0 + (x - 150.0) / scale
   return(xcm)
 }
 gy <- function(y) {
-  ycm <- fig.size[2L] / 2.0 + (y - 150.0) / scale
+  ycm <- fig.size[[2L]] / 2.0 + (y - 150.0) / scale
   return(ycm)
 }
 gd <- function(d) {
@@ -64,7 +92,7 @@ for (x in seq(50L, 250L, 50L)) {
     x = grid::unit(gx(x), "cm"), y = grid::unit(gy(50.0), "cm")
   )
   grid::grid.line.to(
-    x = grid::unit(gx(x), "cm"), y = grid::unit(gy(250.0), "cm"), 
+    x = grid::unit(gx(x), "cm"), y = grid::unit(gy(250.0), "cm"),
     gp = grid::gpar(lwd = 2.0)
   )
 }
@@ -73,12 +101,12 @@ for (y in seq(50L, 250L, 50L)) {
     x = grid::unit(gx(50.0), "cm"), y = grid::unit(gy(y), "cm")
   )
   grid::grid.line.to(
-    x = grid::unit(gx(250.0), "cm"), y = grid::unit(gy(y), "cm"), 
+    x = grid::unit(gx(250.0), "cm"), y = grid::unit(gy(y), "cm"),
     gp = grid::gpar(lwd = 2.0)
   )
 }
 grid::grid.text(
-  label = "A", x = grid::unit(gx(45.0), "cm"), y = grid::unit(gy(255.0), "cm"), 
+  label = "A", x = grid::unit(gx(45.0), "cm"), y = grid::unit(gy(255.0), "cm"),
   gp = grid::gpar(fontsize = 14.0)
 )
 grid::grid.text(
@@ -94,11 +122,11 @@ BB <- data.frame(
 )
 apply(BB, MARGIN = 1L, function(r) {
   grid::grid.move.to(
-    x = grid::unit(gx(r["x0"]), "cm"), y = grid::unit(gy(r["y0"]), "cm")
+    x = grid::unit(gx(r[["x0"]]), "cm"), y = grid::unit(gy(r[["y0"]]), "cm")
   )
   grid::grid.line.to(
-    x = grid::unit(gx(r["x1"]), "cm"), 
-    y = grid::unit(gy(r["y1"]), "cm"), 
+    x = grid::unit(gx(r[["x1"]]), "cm"),
+    y = grid::unit(gy(r[["y1"]]), "cm"),
     gp = grid::gpar(col = "red", lwd = 6.0, lend = "square")
   )
 })
@@ -116,40 +144,14 @@ objects explicitly, it is more compact to create a list of vertices
 in a loop construct. Indices $i = [1 .. 5]$ and $j = [1 .. 5]$ are
 used to identify grid intersections in the vertical and horizontal directions
 respectively. Each node is labelled as $N_{i,j}$ and the index of node
-$N_{i,j}$ in the list is $5(i-1)+j$.
+$N_{i,j}$ in the list is $5(i-1)+j$. Similarly, the 40 edges (arrows) are
+constructed more compactly in a list, with horizontal edges being labelled
+$H_{i,j}$ (the horizontal edge joining node $N_{i,j}$ to node $N_{i,j+1}$) and
+the vertical edges similarly as $V_{i,j}$.
 
-Similarly, the 40 edges (arrows) are constructed more compactly in a list, with
-horizontal edges being labelled $H_{i,j}$ (the horizontal edge joining node
-$N_{i,j}$ to node $N_{i,j+1}$) and the vertical edges similarly as $V_{i,j}$.
-
-```{r construct-graph, echo=TRUE}
-# create vertices
-V <- list()
-for (i in 1L : 5L) {
-  for (j in 1L : 5L) {
-    V <- c(V, Node$new(paste0("N", i, j)))
-  }
-}
-# create edges
-E <- list()
-for (i in 1L : 5L) {
-  for (j in 1L : 4L) {
-    a <- Arrow$new(
-      V[[5L * (i - 1L) + j]], V[[5L * (i - 1L) + j + 1L]], paste0("H", i, j)
-    )
-    E <- c(E, a)
-  }
-} 
-for (i in 1L : 4L) {
-  for (j in 1L : 5L) {
-    a <- Arrow$new(
-      V[[5L * (i - 1L) + j]], V[[5L * i + j]], paste0("V", i, j)
-    )
-    E <- c(E, a)
-  }
-} 
-# create graph
-G <- Digraph$new(V, E)
+```{r}
+#| construct-graph,
+#| echo = TRUE
 ```
 
 # Finding the paths
@@ -166,29 +168,19 @@ Note that although we cannot guarantee that node A is saved *within* the graph
 at index 1 and node B is saved at index 25, we do know that A and B are saved
 at indices 1 and 25 in the local list `V`.
 
-```{r findpaths, echo=TRUE, results = "markdown"}
-# get all paths from A to B
-A <- V[[1L]]
-B <- V[[25L]]
-P <- G$paths(A, B)
-# convert paths to walks
-W <- lapply(P, FUN = G$walk)
-# count and tabulate how many special edges each walk traverses
-BB <- c("V11", "H22", "V25", "H33", "V32", "H44", "V43")
-nw <- vapply(W, FUN.VALUE = 1L, FUN = function(w) {
-  lv <- vapply(w, FUN.VALUE = TRUE, FUN = function(e) e$label() %in% BB) 
-  return(sum(lv))
-})
-# tabulate 
-ct <- as.data.frame(table(nw))
+```{r}
+#| findpaths,
+#| echo = TRUE,
+#| results = "markdown"
 ```
 
 # Solution found by `rdecision`
 The number of paths which pass through exactly one Big Burger 
-is `r ct$Freq[ct$nw==1]`. In total there are `r sum(ct$Freq)` paths from A to B,
-with the number of restaurants $n$, traversed by each path as follows:
+is `r ct$Freq[ct$nw == 1L]`. In total there are `r sum(ct$Freq)` paths from A
+to B, with the number of restaurants $n$, traversed by each path as follows:
 
-```{r echo=FALSE, results='markdown'}
+```{r}
+#| results = "markdown"
 names(ct) <- c("n", "frequency")
 knitr::kable(ct)
 ```

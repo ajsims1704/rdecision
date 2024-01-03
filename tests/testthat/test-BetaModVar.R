@@ -2,13 +2,25 @@
 test_that("illegal initializations are rejected", {
   a <- 2L
   b <- 5L
-  expect_silent(BetaModVar$new("beta","GBP",a,b))
+  expect_silent(BetaModVar$new("beta", "GBP", a, b))
   expect_error(BetaModVar$new(42L, 42L, a, b), class = "description_not_string")
   expect_error(BetaModVar$new("beta", 42L, a, b), class = "units_not_string")
-  expect_error(BetaModVar$new("beta","GBP","9",b), class="alpha_not_numeric")
-  expect_error(BetaModVar$new("beta","GBP",a,"0.5"), class="beta_not_numeric")
-  expect_error(BetaModVar$new("beta","GBP",-1L,b), class="alpha_not_supported")
-  expect_error(BetaModVar$new("beta","GBP",a,0L), class="beta_not_supported")
+  expect_error(
+    BetaModVar$new("beta", "GBP", "9", b),
+    class = "alpha_not_numeric"
+  )
+  expect_error(
+    BetaModVar$new("beta", "GBP", a, "0.5"),
+    class = "beta_not_numeric"
+  )
+  expect_error(
+    BetaModVar$new("beta", "GBP", -1L, b),
+    class = "alpha_not_supported"
+  )
+  expect_error(
+    BetaModVar$new("beta", "GBP", a, 0L),
+    class = "beta_not_supported"
+  )
 })
 
 test_that("properties are correct", {
@@ -30,7 +42,7 @@ test_that("get() is initialized correctly", {
   a <- 2L
   b <- 5L
   B <- BetaModVar$new("beta", "GBP", a, b)
-  expect_intol(B$get(), a / (a+b), 0.02)
+  expect_intol(B$get(), a / (a + b), 0.02)
 })
 
 test_that("set(current) works as intended", {
@@ -60,7 +72,7 @@ test_that("mean, mode, sd and quantiles are returned correctly", {
   beta <- 5L
   b <- BetaModVar$new("beta", "GBP", alpha, beta)
   m <- alpha / (alpha + beta)
-  v <- (alpha*beta) / ((alpha + beta + 1L) * (alpha + beta) ^ 2L)
+  v <- (alpha * beta) / ((alpha + beta + 1L) * (alpha + beta) ^ 2L)
   o <- (alpha - 1L) / (alpha + beta - 2L)
   expect_intol(b$mean(), m, 0.01)
   expect_intol(b$SD(), sqrt(v), 0.01)
@@ -78,11 +90,11 @@ test_that("quantile function checks inputs and has correct output", {
   probs <- c(0.1, 0.2, 0.5)
   expect_silent(b$quantile(probs))
   probs <- c(0.1, NA, 0.5)
-  expect_error(b$quantile(probs), class="probs_not_defined")
+  expect_error(b$quantile(probs), class = "probs_not_defined")
   probs <- c(0.1, "boo", 0.5)
-  expect_error(b$quantile(probs), class="probs_not_numeric")
+  expect_error(b$quantile(probs), class = "probs_not_numeric")
   probs <- c(0.1, 0.4, 1.5)
-  expect_error(b$quantile(probs), class="probs_out_of_range")
+  expect_error(b$quantile(probs), class = "probs_out_of_range")
   probs <- c(0.1, 0.2, 0.5)
   expect_length(b$quantile(probs), 3L)
 })
@@ -111,13 +123,13 @@ test_that("random sampling is from a Beta distribution", {
   beta <- 5L
   n <- 1000L
   b <- BetaModVar$new("beta", "GBP", alpha, beta)
-  osamp <- vapply(seq_len(n), FUN.VALUE = 1.0, FUN=function(i) {
+  osamp <- vapply(seq_len(n), FUN.VALUE = 1.0, FUN = function(i) {
     b$set("random")
     rv <- b$get()
     return(rv)
   })
   expect_length(osamp, n)
-  # 99.9% confidence limits; expected test failure rate is 0.1%, 
+  # 99.9% confidence limits; expected test failure rate is 0.1%,
   # skip for CRAN
   skip_on_cran()
   esamp <- rbeta(n, shape1 = alpha, shape2 = beta)

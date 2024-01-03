@@ -3,7 +3,7 @@
 # replacement, and to check that its results agree with those presented in the
 # paper.
 #
-# The checks are done as part of the testthat framework, ensuring that 
+# The checks are done as part of the testthat framework, ensuring that
 # changes in the package code which unintentionally result in deviations
 # from the expected results of the model are identified.
 #
@@ -12,9 +12,7 @@
 # Unlabelled code chunks may contain testthat expectations and should be
 # ignored by a vignette.
 
-
 ## @knitr state-names ---------------------------------------------------------
-
 states <- c(
   "A" = "TKR operation for knee problems",
   "B" = "TKR with serious complications",
@@ -27,9 +25,7 @@ states <- c(
   "I" = "Death"
 )
 
-
 ## @knitr utils-point ----------------------------------------------------------
-
 utility_A <- 0.72
 utility_B <- 0.35
 utility_C <- 0.66
@@ -40,9 +36,7 @@ utility_G <- 0.72
 utility_H <- 0.68
 utility_I <- 0.00
 
-
 ## @knitr costs-point ----------------------------------------------------------
-
 cost_A <- 5197.0
 cost_B <- 0.0
 cost_C <- 0.0
@@ -56,8 +50,7 @@ cost_CAS <- 235.0
 
 
 ## @knitr SMM-point ------------------------------------------------------------
-
-# Markov states 
+# Markov states
 sA <- MarkovState$new(states["A"], utility = utility_A)
 sB <- MarkovState$new(states["B"], utility = utility_B)
 sC <- MarkovState$new(states["C"], utility = utility_C)
@@ -119,35 +112,33 @@ tHE_CAS <- Transition$new(sH, sE, cost = cost_E + cost_CAS)
 tHF_CAS <- Transition$new(sH, sF, cost = cost_F + cost_CAS)
 
 Transitions_base <- list(
-  tAD, tAC, tAB, tBC, tBE, tBF, tBG, tCB, tCD, tCF, tCG, tCC, 
-  tDC, tDB, tDD, tEB, tEH, tFB, tFC, tFG, tFH, tGB, tGC, tGF, 
+  tAD, tAC, tAB, tBC, tBE, tBF, tBG, tCB, tCD, tCF, tCG, tCC,
+  tDC, tDB, tDD, tEB, tEH, tFB, tFC, tFG, tFH, tGB, tGC, tGF,
   tGD, tHE, tHF, tHH, tBI, tCI, tDI, tEI, tFI, tGI, tHI, tII
 )
 
 Transitions_CAS <- list(
-  tAD_CAS, tAC_CAS, tAB_CAS, tBC, tBE_CAS, tBF_CAS, tBG, tCB, tCD, tCF_CAS, 
-  tCG, tCC, tDC, tDB, tDD, tEB, tEH, tFB, tFC, tFG, tFH, tGB, tGC, tGF_CAS, 
+  tAD_CAS, tAC_CAS, tAB_CAS, tBC, tBE_CAS, tBF_CAS, tBG, tCB, tCD, tCF_CAS,
+  tCG, tCC, tDC, tDB, tDD, tEB, tEH, tFB, tFC, tFG, tFH, tGB, tGC, tGF_CAS,
   tGD, tHE_CAS, tHF_CAS, tHH, tBI, tCI, tDI, tEI, tFI, tGI, tHI, tII
 )
 
 ## @knitr SMM-def-point --------------------------------------------------------
 SMM_base <- SemiMarkovModel$new(
   V = States, E = Transitions_base,
-  tcycle = as.difftime(365.25/12L, units = "days"), # cycles expressed in months
+  tcycle = as.difftime(365.25 / 12L, units = "days"), # cycles in months
   discount.cost = 0.035,
   discount.utility = 0.035
 )
 
 SMM_CAS <- SemiMarkovModel$new(
   V = States, E = Transitions_CAS,
-  tcycle = as.difftime(365.25/12L, units = "days"), # cycles expressed in months
+  tcycle = as.difftime(365.25 / 12L, units = "days"), # cycles in months
   discount.cost = 0.035,
   discount.utility = 0.035
 )
 
-
 ## @knitr transitions-point ---------------------------------------------------
-
 # Death
 p_death_all <- 0.00341
 p_death_primary <- 0.00046
@@ -209,7 +200,6 @@ SMM_base$set_probabilities(Pt)
 
 
 ## @knitr tx-effect -----------------------------------------------------------
-
 txeffect <- function(Pt, rr) {
   # copy transition matrix
   pr <- Pt
@@ -223,22 +213,18 @@ txeffect <- function(Pt, rr) {
     s <- states[[i]]
     pr[[s, derisk]] <- pr[[s, derisk]] - dpb[[i]]
     uprisk <- states[[uprisks[[i]]]]
-    pr[[s, uprisk]] <- pr[[s, uprisk]] + dpb[[i]]  
+    pr[[s, uprisk]] <- pr[[s, uprisk]] + dpb[[i]]
   }
   return(pr)
 }
 
-
 ## @knitr CAS-transitions-point ------------------------------------------------
-
 # apply CAS_effect to the transition matrix
 CAS_effect <- 0.34
 Pt_CAS <- txeffect(Pt, CAS_effect)
 SMM_CAS$set_probabilities(Pt_CAS)
 
-
 ## @knitr cycle-point ----------------------------------------------------------
-
 # create starting populations
 N <- 1000L
 populations <- c(N, 0L, 0L, 0L, 0L, 0L, 0L, 0L, 0L)
@@ -246,13 +232,15 @@ names(populations) <- states
 
 # run 120 one-month cycles for both models
 SMM_base$reset(populations)
-SMM_base_10years <- SMM_base$cycles(ncycles=120L, hcc.pop=FALSE, hcc.cost=FALSE)
+SMM_base_10years <- SMM_base$cycles(
+  ncycles = 120L, hcc.pop = FALSE, hcc.cost = FALSE
+)
 SMM_CAS$reset(populations)
-SMM_CAS_10years <- SMM_CAS$cycles(ncycles=120L, hcc.pop=FALSE, hcc.cost=FALSE)
-
+SMM_CAS_10years <- SMM_CAS$cycles(
+  ncycles = 120L, hcc.pop = FALSE, hcc.cost = FALSE
+)
 
 ## @knitr as-table4 ----------------------------------------------------------
-
 # convert a Markov trace (matrix) with monthly cycles to an annual summary
 # matrix with cumulative values, as per Dong and Buxton, Table 4
 as_table4 <- function(m_trace) {
@@ -271,7 +259,7 @@ as_table4 <- function(m_trace) {
       m_cum[, "QALY"] * 1000L
     ),
     dimnames = list(
-      NULL, 
+      NULL,
       c(
         "Year",
         "Cumulative serious complication (%)",
@@ -286,18 +274,14 @@ as_table4 <- function(m_trace) {
     nrow = 121L, ncol = 8L
   )
   # return in table 4 format
-  yearly <- (1L:10L)* 12L + 1L
+  yearly <- (1L:10L) * 12L + 1L
   return(m_t4[yearly, ])
 }
 
-
 ## @knitr cs-table-4 ----------------------------------------------------------
-
 t4_CS <- as_table4(SMM_base_10years)
 
-
 ## @knitr ---------------------------------------------------------------------
-
 test_that("Table 4 for conventional surgery is replicated", {
   expect_identical(nrow(t4_CS), 10L)
   expect_intol(
@@ -323,13 +307,10 @@ test_that("Table 4 for conventional surgery is replicated", {
   )
 })
 
-
 ## @knitr cas-table-4 ----------------------------------------------------------
 t4_CAS <- as_table4(SMM_CAS_10years)
 
-
 ## @knitr ---------------------------------------------------------------------
-
 test_that("Table 4 for computer-assisted surgery is replicated", {
   expect_identical(nrow(t4_CAS), 10L)
   expect_intol(
@@ -355,25 +336,19 @@ test_that("Table 4 for computer-assisted surgery is replicated", {
   )
 })
 
-
 ## @knitr cea -----------------------------------------------------------------
-
 dcost <- t4_CAS[[10L, "Discounted costs (£)"]] / 1000L -
   t4_CS[[10L, "Discounted costs (£)"]] / 1000L
-dutil <- t4_CAS[[10L, "Discounted QALYs"]] / 1000L - 
+dutil <- t4_CAS[[10L, "Discounted QALYs"]] / 1000L -
   t4_CS[[10L, "Discounted QALYs"]] / 1000L
 
-
 ## @knitr ---------------------------------------------------------------------
-
 test_that("Deterministic CEA matches published value", {
   expect_intol(dcost, -583.0, tolerance = 50.0)
   expect_intol(dutil, 0.0164, tolerance = 0.005)
 })
 
-
 ## @knitr utilities-var ------------------------------------------------------
-
 utility_A_nu <- 0.42
 utility_B_nu <- 0.80
 utility_C_nu <- 0.32
@@ -383,68 +358,68 @@ utility_F_nu <- 0.57
 utility_G_nu <- 0.34
 utility_H_nu <- 0.38
 
-
 ## @knitr utilities-beta -----------------------------------------------------
-
 utility_A_beta <- BetaModVar$new(
-  "Utility of state A", "", 
+  "Utility of state A", "",
   utility_A * utility_A_nu, (1.0 - utility_A) * utility_A_nu
 )
 utility_B_beta <- BetaModVar$new(
-  "Utility of state B", "", 
+  "Utility of state B", "",
   utility_B * utility_B_nu, (1.0 - utility_B) * utility_B_nu
 )
 utility_C_beta <- BetaModVar$new(
-  "Utility of state C", "", 
+  "Utility of state C", "",
   utility_C * utility_C_nu, (1.0 - utility_C) * utility_C_nu
 )
 utility_D_beta <- BetaModVar$new(
-  "Utility of state D", "", 
+  "Utility of state D", "",
   utility_D * utility_D_nu, (1.0 - utility_D) * utility_D_nu
 )
 utility_E_beta <- BetaModVar$new(
-  "Utility of state E", "", 
+  "Utility of state E", "",
   utility_E * utility_E_nu, (1.0 - utility_E) * utility_E_nu
 )
 utility_F_beta <- BetaModVar$new(
-  "Utility of state F", "", 
+  "Utility of state F", "",
   utility_F * utility_F_nu, (1.0 - utility_F) * utility_F_nu
 )
 utility_G_beta <- BetaModVar$new(
-  "Utility of state G", "", 
+  "Utility of state G", "",
   utility_G * utility_G_nu, (1.0 - utility_G) * utility_G_nu
 )
 utility_H_beta <- BetaModVar$new(
-  "Utility of state H", "", 
+  "Utility of state H", "",
   utility_H * utility_H_nu, (1.0 - utility_H) * utility_H_nu
 )
 
-
 ## @knitr costs-gamma --------------------------------------------------------
-
-cost_A_stdev <- (6217L- 4218L) / (2L * 1.96)
+cost_A_stdev <- (6217L - 4218L) / (2L * 1.96)
 cost_E_stdev <- (11307L - 5086L) / (2L * 1.96)
 cost_F_stdev <- (7972L - 5043L) / (2L * 1.96)
 cost_G_stdev <- (5579L - 1428L) / (2L * 1.96)
 
 cost_A_gamma <- GammaModVar$new(
-  "Cost of state A", "", cost_A^2L/cost_A_stdev^2L, cost_A_stdev^2L/cost_A
+  "Cost of state A", "", cost_A ^ 2L / cost_A_stdev ^ 2L,
+  cost_A_stdev ^ 2L / cost_A
 )
 cost_E_gamma <- GammaModVar$new(
-  "Cost of state E", "", cost_E^2L/cost_E_stdev^2L, cost_E_stdev^2L/cost_E
+  "Cost of state E", "", cost_E ^ 2L / cost_E_stdev ^ 2L,
+  cost_E_stdev ^ 2L / cost_E
 )
 cost_F_gamma <- GammaModVar$new(
-  "Cost of state F", "", cost_F^2L/cost_F_stdev^2L, cost_F_stdev^2L/cost_F
+  "Cost of state F", "", cost_F ^ 2L / cost_F_stdev ^ 2L,
+  cost_F_stdev ^ 2L / cost_F
 )
 cost_G_gamma <- GammaModVar$new(
-  "Cost of state G", "", cost_G^2L/cost_G_stdev^2L, cost_G_stdev^2L/cost_G
+  "Cost of state G", "", cost_G ^ 2L / cost_G_stdev ^ 2L,
+  cost_G_stdev ^ 2L / cost_G
 )
 
 ## @knitr cas-cost-gamma ------------------------------------------------------
-
 cost_CAS_stdev <- 4L * cost_A_stdev / cost_A * cost_CAS
 cost_CAS_gamma <- GammaModVar$new(
-  "Cost of CAS", "", cost_CAS^2L/cost_CAS_stdev^2L, cost_CAS_stdev^2L/cost_CAS
+  "Cost of CAS", "", cost_CAS ^ 2L / cost_CAS_stdev ^ 2L,
+  cost_CAS_stdev ^ 2L / cost_CAS
 )
 cost_A_CAS <- ExprModVar$new(
   "Cost of state A with CAS", "", rlang::quo(cost_A_gamma + cost_CAS_gamma)
@@ -456,7 +431,6 @@ cost_F_CAS <- ExprModVar$new(
   "Cost of state F with CAS", "", rlang::quo(cost_F_gamma + cost_CAS_gamma)
 )
 
-
 ## @knitr cas-lognorm ---------------------------------------------------------
 CAS_effect_mean <- 0.34
 CAS_effect_sd <- 1.25
@@ -464,9 +438,7 @@ CAS_effect_lognorm <- LogNormModVar$new(
   "Effect of CAS", "", log(CAS_effect_mean), log(CAS_effect_sd)
 )
 
-
 ## @knitr SMM-PSA -------------------------------------------------------------
-
 # Markov states as Beta distributions
 sA_PSA <- MarkovState$new(states["A"], utility = utility_A_beta)
 sB_PSA <- MarkovState$new(states["B"], utility = utility_B_beta)
@@ -533,8 +505,8 @@ tHE_CAS_PSA <- Transition$new(sH_PSA, sE_PSA, cost = cost_E_CAS)
 tHF_CAS_PSA <- Transition$new(sH_PSA, sF_PSA, cost = cost_F_CAS)
 
 Transitions_base_PSA <- list(
-  tAD_PSA, tAC_PSA, tAB_PSA, 
-  tBC_PSA, tBE_PSA, tBF_PSA, tBG_PSA, tBI_PSA, 
+  tAD_PSA, tAC_PSA, tAB_PSA,
+  tBC_PSA, tBE_PSA, tBF_PSA, tBG_PSA, tBI_PSA,
   tCB_PSA, tCD_PSA, tCF_PSA, tCG_PSA, tCC_PSA, tCI_PSA,
   tDC_PSA, tDB_PSA, tDD_PSA, tDI_PSA,
   tEB_PSA, tEH_PSA, tEI_PSA,
@@ -558,21 +530,19 @@ Transitions_CAS_PSA <- list(
 
 SMM_base_PSA <- SemiMarkovModel$new(
   V = States_PSA, E = Transitions_base_PSA,
-  tcycle = as.difftime(365.25/12L, units = "days"), # cycles expressed in months
+  tcycle = as.difftime(365.25 / 12L, units = "days"), # cycles in months
   discount.cost = 0.035,
   discount.utility = 0.035
 )
 
 SMM_CAS_PSA <- SemiMarkovModel$new(
   V = States_PSA, E = Transitions_CAS_PSA,
-  tcycle = as.difftime(365.25/12L, units = "days"), # cycles expressed in months
+  tcycle = as.difftime(365.25 / 12L, units = "days"), # cycles in months
   discount.cost = 0.035,
   discount.utility = 0.035
 )
 
-
 ## @knitr fun-dirichlet -------------------------------------------------------
-
 dirichletify <- function(Pt, population = 1L) {
   # check argument
   stopifnot(
@@ -582,41 +552,39 @@ dirichletify <- function(Pt, population = 1L) {
     all(dimnames(Pt)[[2L]] == dimnames(Pt)[[1L]])
   )
   nNA <- rowSums(is.na(Pt))
-  sumP <- rowSums(Pt, na.rm=TRUE)
+  sumP <- rowSums(Pt, na.rm = TRUE)
   # check if a count or proportion representation
-  is_count <- any(Pt>1.0, na.rm=TRUE)
+  is_count <- any(Pt > 1.0, na.rm = TRUE)
   if (is_count) {
     # counts cannot have NAs
     stopifnot(all(nNA == 0L))
     # normalise into proportions
-    Pt <- Pt/rowSums(Pt)
+    Pt <- Pt / rowSums(Pt)
   } else {
     # proportions can have NA values, but only 1/row
     stopifnot(all(nNA <= 1L))
     # store information about which variable was set as NA
     whichNA <- apply(Pt, 1L, function(row) which(is.na(row)))
     # populate missing values to a total of 1
-    for (row in names(nNA)[nNA>0L]) {
+    for (row in names(nNA)[nNA > 0L]) {
       Pt[row, whichNA[[row]]] <- 1.0 - sumP[row]
     }
   }
   # build state-wise Dirichlet distributions
   for (r in seq_len(nrow(Pt))) {
-    non0 <- which(Pt[r,] != 0.0)
+    non0 <- which(Pt[r, ] != 0.0)
     # if multiple outgoing transitions are possible, model as Dirichlet
-    if (length(non0)>1L) {
-      dist <- DirichletDistribution$new(Pt[r,non0]*population) # nolint
+    if (length(non0) > 1L) {
+      dist <- DirichletDistribution$new(Pt[r, non0] * population)
       dist$sample() # randomise
-      Pt[r,non0] <- dist$r()
+      Pt[r, non0] <- dist$r()
     }
     # if only 1 transition is possible, leave as given originally
   }
   return(Pt)
 }
 
-
 ## @knitr cycle-PSA -----------------------------------------------------------
-
 nruns <- 250L
 t4_CS_PSA <- array(
   dim = c(10L, ncol(t4_CS), nruns),
@@ -659,7 +627,6 @@ for (run in seq_len(nruns)) {
 }
 
 ## @knitr ---------------------------------------------------------------------
-
 test_that("Table 4 for conventional surgery is replicated by mean of PSA", {
   # skip on CRAN
   skip_on_cran()
@@ -672,7 +639,7 @@ test_that("Table 4 for conventional surgery is replicated by mean of PSA", {
     "Cumulative serious complication (%)",
     "Cumulative minor complication (%)",
     "Cumulative complex revision (%)",
-    "Cumulative simple revision (%)",    
+    "Cumulative simple revision (%)",
     "Cumulative death (%)",
     "Discounted costs (£)",
     "Discounted QALYs"
@@ -684,9 +651,7 @@ test_that("Table 4 for conventional surgery is replicated by mean of PSA", {
   }
 })
 
-
 ## @knitr ---------------------------------------------------------------------
-
 test_that("Table 4 for computer-assisted surgery is replicated by mean PSA", {
   # skip on CRAN and set wide tolerance
   skip_on_cran()
@@ -699,7 +664,7 @@ test_that("Table 4 for computer-assisted surgery is replicated by mean PSA", {
     "Cumulative serious complication (%)",
     "Cumulative minor complication (%)",
     "Cumulative complex revision (%)",
-    "Cumulative simple revision (%)",    
+    "Cumulative simple revision (%)",
     "Cumulative death (%)",
     "Discounted costs (£)",
     "Discounted QALYs"
@@ -711,9 +676,7 @@ test_that("Table 4 for computer-assisted surgery is replicated by mean PSA", {
   }
 })
 
-
 ## @knitr t5-CS-PSA ----------------------------------------------------------
-
 fields <- c(
   "Cumulative serious complication (%)",
   "Cumulative complex revision (%)",
@@ -730,9 +693,7 @@ for (f in fields) {
   t5_CS[[f, "Q97.5"]] <- quantile(t4_CS_PSA[10L, f, ], probs = 0.975)
 }
 
-
 ## @knitr t5-CAS-PSA ----------------------------------------------------------
-
 fields <- c(
   "Cumulative serious complication (%)",
   "Cumulative complex revision (%)",
@@ -749,18 +710,14 @@ for (f in fields) {
   t5_CAS[[f, "Q97.5"]] <- quantile(t4_CAS_PSA[10L, f, ], probs = 0.975)
 }
 
-
 ## @knitr cea-psa --------------------------------------------------------------
-
-dcost_psa <- t4_CAS_PSA[10L, "Discounted costs (£)",] / 1000L -
-  t4_CS_PSA[10L, "Discounted costs (£)",] / 1000L
-dutil_psa <- t4_CAS_PSA[10L, "Discounted QALYs",] / 1000L -
-  t4_CS_PSA[10L, "Discounted QALYs",] / 1000L
+dcost_psa <- t4_CAS_PSA[10L, "Discounted costs (£)", ] / 1000L -
+  t4_CS_PSA[10L, "Discounted costs (£)", ] / 1000L
+dutil_psa <- t4_CAS_PSA[10L, "Discounted QALYs", ] / 1000L -
+  t4_CS_PSA[10L, "Discounted QALYs", ] / 1000L
 icer_psa <- dcost_psa / dutil_psa
 
-
 ## @knitr ---------------------------------------------------------------------
-
 test_that("PSA CEA matches deterministic calculation", {
   r <- range(dcost_psa)
   expect_between(dcost, r[[1L]], r[[2L]])

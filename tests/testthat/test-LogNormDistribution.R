@@ -1,10 +1,10 @@
 
 test_that("illegal initializations are rejected", {
   expect_silent(LogNormDistribution$new(1.0, 1.0))
-  expect_error(LogNormDistribution$new("1", 1.0), class="p1_not_numeric")
-  expect_error(LogNormDistribution$new(1.0, "1"), class="p2_not_numeric")
-  expect_error(LogNormDistribution$new(1.0, 1.0, "LN8"), 
-               class="parametrization_not_supported")
+  expect_error(LogNormDistribution$new("1", 1.0), class = "p1_not_numeric")
+  expect_error(LogNormDistribution$new(1.0, "1"), class = "p2_not_numeric")
+  expect_error(LogNormDistribution$new(1.0, 1.0, "LN8"),
+               class = "parametrization_not_supported")
 })
 
 test_that("distribution name is correct", {
@@ -17,7 +17,7 @@ test_that("distribution name is correct", {
 test_that("mean, mode, sd and quantiles are returned correctly", {
   mu <- 0.0
   sigma <- 0.25
-  ln <- LogNormDistribution$new(p1=mu, p2=sigma, "LN1")
+  ln <- LogNormDistribution$new(p1 = mu, p2 = sigma, "LN1")
   expect_intol(ln$mean(), exp(mu + (sigma ^ 2L) / 2L), 0.01)
   sd <- sqrt((exp(sigma ^ 2L) - 1L) * (exp(2L * mu + sigma ^ 2L)))
   expect_intol(ln$SD(), sd, 0.01)
@@ -35,15 +35,15 @@ test_that("mean, mode, sd and quantiles are returned correctly", {
 test_that("quantile function checks inputs and has correct output", {
   mu <- 0.0
   sigma <- 0.25
-  ln <- LogNormDistribution$new(p1=mu, p2=sigma, "LN1")
+  ln <- LogNormDistribution$new(p1 = mu, p2 = sigma, "LN1")
   probs <- c(0.1, 0.2, 0.5)
   expect_silent(ln$quantile(probs))
   probs <- c(0.1, NA, 0.5)
-  expect_error(ln$quantile(probs), class="probs_not_defined")
+  expect_error(ln$quantile(probs), class = "probs_not_defined")
   probs <- c(0.1, "boo", 0.5)
-  expect_error(ln$quantile(probs), class="probs_not_numeric")
+  expect_error(ln$quantile(probs), class = "probs_not_numeric")
   probs <- c(0.1, 0.4, 1.5)
-  expect_error(ln$quantile(probs), class="probs_out_of_range")
+  expect_error(ln$quantile(probs), class = "probs_out_of_range")
   probs <- c(0.1, 0.2, 0.5)
   expect_length(ln$quantile(probs), 3L)
 })
@@ -66,7 +66,7 @@ test_that("random sampling is from a log normal distribution", {
   # expect sample mean and sd to fall within 99.9% CI; test
   # expected to fail 0.1% of the time, exclude from CRAN
   skip_on_cran()
-  ht <- ks.test(samp, rlnorm(n,meanlog=mu,sdlog=sigma))
+  ht <- ks.test(samp, rlnorm(n, meanlog = mu, sdlog = sigma))
   expect_gt(ht$p.value, 0.001)
 })
 
@@ -88,7 +88,7 @@ test_that("parametrizations are linked", {
   expect_intol(ln1$mean(), ln4$mean(), 0.01)
   expect_intol(ln1$mode(), ln4$mode(), 0.01)
   # 5
-  ln5 <- LogNormDistribution$new(mu, 1L/sigma ^ 2L, "LN5")
+  ln5 <- LogNormDistribution$new(mu, 1L / sigma ^ 2L, "LN5")
   expect_intol(ln1$mean(), ln5$mean(), 0.01)
   expect_intol(ln1$mode(), ln5$mode(), 0.01)
   # 6
@@ -97,7 +97,7 @@ test_that("parametrizations are linked", {
   expect_intol(ln1$mode(), ln6$mode(), 0.01)
   # 7
   ln7 <- LogNormDistribution$new(
-    exp(mu + (sigma ^ 2L) / 2L), 
+    exp(mu + (sigma ^ 2L) / 2L),
     exp(mu + (sigma ^ 2L) / 2L) * sqrt(exp(sigma ^ 2L) - 1L), "LN7"
   )
   expect_intol(ln1$mean(), ln7$mean(), 0.01)

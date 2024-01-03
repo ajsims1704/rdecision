@@ -24,27 +24,27 @@ and leaf nodes.}
 \item{All and only leaf nodes must have no children.}
 \item{Each edge must inherit from either \code{Action} or
 \code{Reaction}.}
-\item{All and only edges that have source endpoints joined to 
+\item{All and only edges that have source endpoints joined to
 decision nodes must inherit from \code{Action}.}
-\item{All and only edges that have source endpoints joined to 
+\item{All and only edges that have source endpoints joined to
 chance nodes must inherit from \code{Reaction}.}
-\item{The sum of probabilities of each set of reaction edges 
+\item{The sum of probabilities of each set of reaction edges
 with a common source endpoint must be 1.}
 \item{Each \code{DecisionNode} must have a label, and the labels of all
 \code{DecisionNodes} must be unique within the model.}
-\item{Each \code{Action} must have a label, and the labels of  
+\item{Each \code{Action} must have a label, and the labels of
 \code{Action}s that share a common source endpoint must be unique.}
 }
 }
 \references{
 {
-  Briggs A, Claxton K, Sculpher M. Decision modelling for health economic 
+  Briggs A, Claxton K, Sculpher M. Decision modelling for health economic
   evaluation. Oxford, UK: Oxford University Press; 2006.
 
   Briggs AH, Weinstein MC, Fenwick EAL, Karnon J, Sculpher MJ, Paltiel AD.
-  Model Parameter Estimation and Uncertainty: A Report of the 
-  \acronym{ISPOR-SMDM} Modeling Good Research Practices Task Force-6. 
-  \emph{Value in Health} 2012;\bold{15}:835–42, 
+  Model Parameter Estimation and Uncertainty: A Report of the
+  \acronym{ISPOR-SMDM} Modeling Good Research Practices Task Force-6.
+  \emph{Value in Health} 2012;\bold{15}:835–42,
   \doi{10.1016/j.jval.2012.04.014}.
 
   Kaminski B, Jakubczyk M, Szufel P. A framework for sensitivity analysis of
@@ -99,6 +99,10 @@ Andrew J. Sims \email{andrew.sims@newcastle.ac.uk}
 <li><span class="pkg-link" data-pkg="rdecision" data-topic="Graph" data-id="vertex_along"><a href='../../rdecision/html/Graph.html#method-Graph-vertex_along'><code>rdecision::Graph$vertex_along()</code></a></span></li>
 <li><span class="pkg-link" data-pkg="rdecision" data-topic="Graph" data-id="vertex_at"><a href='../../rdecision/html/Graph.html#method-Graph-vertex_at'><code>rdecision::Graph$vertex_at()</code></a></span></li>
 <li><span class="pkg-link" data-pkg="rdecision" data-topic="Graph" data-id="vertex_index"><a href='../../rdecision/html/Graph.html#method-Graph-vertex_index'><code>rdecision::Graph$vertex_index()</code></a></span></li>
+<li><span class="pkg-link" data-pkg="rdecision" data-topic="Graph" data-id="vertex_label"><a href='../../rdecision/html/Graph.html#method-Graph-vertex_label'><code>rdecision::Graph$vertex_label()</code></a></span></li>
+<li><span class="pkg-link" data-pkg="rdecision" data-topic="Graph" data-id="vertexes"><a href='../../rdecision/html/Graph.html#method-Graph-vertexes'><code>rdecision::Graph$vertexes()</code></a></span></li>
+<li><span class="pkg-link" data-pkg="rdecision" data-topic="Digraph" data-id="arrow_source"><a href='../../rdecision/html/Digraph.html#method-Digraph-arrow_source'><code>rdecision::Digraph$arrow_source()</code></a></span></li>
+<li><span class="pkg-link" data-pkg="rdecision" data-topic="Digraph" data-id="arrow_target"><a href='../../rdecision/html/Digraph.html#method-Digraph-arrow_target'><code>rdecision::Digraph$arrow_target()</code></a></span></li>
 <li><span class="pkg-link" data-pkg="rdecision" data-topic="Digraph" data-id="as_DOT"><a href='../../rdecision/html/Digraph.html#method-Digraph-as_DOT'><code>rdecision::Digraph$as_DOT()</code></a></span></li>
 <li><span class="pkg-link" data-pkg="rdecision" data-topic="Digraph" data-id="digraph_adjacency_matrix"><a href='../../rdecision/html/Digraph.html#method-Digraph-digraph_adjacency_matrix'><code>rdecision::Digraph$digraph_adjacency_matrix()</code></a></span></li>
 <li><span class="pkg-link" data-pkg="rdecision" data-topic="Digraph" data-id="digraph_incidence_matrix"><a href='../../rdecision/html/Digraph.html#method-Digraph-digraph_incidence_matrix'><code>rdecision::Digraph$digraph_incidence_matrix()</code></a></span></li>
@@ -111,12 +115,12 @@ Andrew J. Sims \email{andrew.sims@newcastle.ac.uk}
 <li><span class="pkg-link" data-pkg="rdecision" data-topic="Digraph" data-id="is_tree"><a href='../../rdecision/html/Digraph.html#method-Digraph-is_tree'><code>rdecision::Digraph$is_tree()</code></a></span></li>
 <li><span class="pkg-link" data-pkg="rdecision" data-topic="Digraph" data-id="is_weakly_connected"><a href='../../rdecision/html/Digraph.html#method-Digraph-is_weakly_connected'><code>rdecision::Digraph$is_weakly_connected()</code></a></span></li>
 <li><span class="pkg-link" data-pkg="rdecision" data-topic="Digraph" data-id="paths"><a href='../../rdecision/html/Digraph.html#method-Digraph-paths'><code>rdecision::Digraph$paths()</code></a></span></li>
-<li><span class="pkg-link" data-pkg="rdecision" data-topic="Digraph" data-id="source"><a href='../../rdecision/html/Digraph.html#method-Digraph-source'><code>rdecision::Digraph$source()</code></a></span></li>
-<li><span class="pkg-link" data-pkg="rdecision" data-topic="Digraph" data-id="target"><a href='../../rdecision/html/Digraph.html#method-Digraph-target'><code>rdecision::Digraph$target()</code></a></span></li>
 <li><span class="pkg-link" data-pkg="rdecision" data-topic="Digraph" data-id="topological_sort"><a href='../../rdecision/html/Digraph.html#method-Digraph-topological_sort'><code>rdecision::Digraph$topological_sort()</code></a></span></li>
 <li><span class="pkg-link" data-pkg="rdecision" data-topic="Digraph" data-id="walk"><a href='../../rdecision/html/Digraph.html#method-Digraph-walk'><code>rdecision::Digraph$walk()</code></a></span></li>
 <li><span class="pkg-link" data-pkg="rdecision" data-topic="Arborescence" data-id="is_leaf"><a href='../../rdecision/html/Arborescence.html#method-Arborescence-is_leaf'><code>rdecision::Arborescence$is_leaf()</code></a></span></li>
 <li><span class="pkg-link" data-pkg="rdecision" data-topic="Arborescence" data-id="is_parent"><a href='../../rdecision/html/Arborescence.html#method-Arborescence-is_parent'><code>rdecision::Arborescence$is_parent()</code></a></span></li>
+<li><span class="pkg-link" data-pkg="rdecision" data-topic="Arborescence" data-id="is_root"><a href='../../rdecision/html/Arborescence.html#method-Arborescence-is_root'><code>rdecision::Arborescence$is_root()</code></a></span></li>
+<li><span class="pkg-link" data-pkg="rdecision" data-topic="Arborescence" data-id="parent"><a href='../../rdecision/html/Arborescence.html#method-Arborescence-parent'><code>rdecision::Arborescence$parent()</code></a></span></li>
 <li><span class="pkg-link" data-pkg="rdecision" data-topic="Arborescence" data-id="postree"><a href='../../rdecision/html/Arborescence.html#method-Arborescence-postree'><code>rdecision::Arborescence$postree()</code></a></span></li>
 <li><span class="pkg-link" data-pkg="rdecision" data-topic="Arborescence" data-id="root"><a href='../../rdecision/html/Arborescence.html#method-Arborescence-root'><code>rdecision::Arborescence$root()</code></a></span></li>
 <li><span class="pkg-link" data-pkg="rdecision" data-topic="Arborescence" data-id="root_to_leaf_paths"><a href='../../rdecision/html/Arborescence.html#method-Arborescence-root_to_leaf_paths'><code>rdecision::Arborescence$root_to_leaf_paths()</code></a></span></li>
@@ -143,7 +147,7 @@ Create a new decision tree.
 \if{html}{\out{</div>}}
 }
 \subsection{Details}{
-The tree must consist of a set of nodes and a set of edges 
+The tree must consist of a set of nodes and a set of edges
 which satisfy the conditions given in the details section of this class.
 }
 
@@ -217,7 +221,7 @@ nodes).}
 }
 \subsection{Returns}{
 A list of \code{LeafNode} objects (for what = "node"); a list
-of character strings (for what = "label"); or an integer vector of 
+of character strings (for what = "label"); or an integer vector of
 leaf node indexes (for what = "index").
 }
 }
@@ -225,7 +229,7 @@ leaf node indexes (for what = "index").
 \if{html}{\out{<a id="method-DecisionTree-actions"></a>}}
 \if{latex}{\out{\hypertarget{method-DecisionTree-actions}{}}}
 \subsection{Method \code{actions()}}{
-Find the edges that have the specified decision node as 
+Find the edges that have the specified decision node as
 their source.
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{DecisionTree$actions(d)}\if{html}{\out{</div>}}
@@ -252,7 +256,7 @@ Find all the model variables of type \code{ModVar}.
 }
 
 \subsection{Details}{
-Find \code{ModVar}s that have been specified as values 
+Find \code{ModVar}s that have been specified as values
 associated with the nodes and edges of the tree.
 }
 
@@ -287,7 +291,7 @@ it is a regular model variable, or the expression used to create it,
 if it is an \code{ExprModVar}.}
 \item{\code{Mean}}{Mean; calculated from means of operands if
 an expression.}
-\item{\code{E}}{Expectation; estimated from random sample if expression, 
+\item{\code{E}}{Expectation; estimated from random sample if expression,
 mean otherwise.}
 \item{\code{SD}}{Standard deviation; estimated from random sample if
 expression, exact value otherwise.}
@@ -295,7 +299,7 @@ expression, exact value otherwise.}
 expression, exact value otherwise.}
 \item{\code{Q97.5}}{p=0.975 quantile; estimated from random sample if
 expression, exact value otherwise.}
-\item{\code{Est}}{TRUE if the quantiles and SD have been estimated by 
+\item{\code{Est}}{TRUE if the quantiles and SD have been estimated by
 random sampling.}
 }
 }
@@ -317,7 +321,7 @@ Draw the decision tree to the current graphics output.
 \if{html}{\out{</div>}}
 }
 \subsection{Details}{
-Uses the algorithm of Walker (1989) to distribute the nodes 
+Uses the algorithm of Walker (1989) to distribute the nodes
 compactly (see the \link{Arborescence} class help for details).
 }
 
@@ -382,10 +386,10 @@ be unique.
 }
 
 \subsection{Returns}{
-A data frame where each row is a potential strategy 
-and each column is a Decision Node. Values are either the index of each
-action edge, or their label. The row names are the edge labels of each
-strategy, concatenated with underscores.
+A data frame where each row is a potential strategy
+and each column is a decision node, ordered lexicographically. Values
+are either the index of each action edge, or their label. The row names
+are the edge labels of each strategy, concatenated with underscores.
 }
 }
 \if{html}{\out{<hr>}}
@@ -398,15 +402,15 @@ Find all paths walked in each possible strategy.
 }
 
 \subsection{Details}{
-A strategy is a unanimous prescription of an action in each 
+A strategy is a unanimous prescription of an action in each
 decision node. Some paths can be walked in more than one strategy, if
 there exist paths that do not pass a decision node.
 }
 
 \subsection{Returns}{
 A data frame, where each row is a path walked in a strategy. The
-structure is similar to that returned by \code{strategy_table} but 
-includes an extra column, \code{Leaf} which gives the leaf node index of 
+structure is similar to that returned by \code{strategy_table} but
+includes an extra column, \code{Leaf} which gives the leaf node index of
 each path, and there is one row for each path in each strategy.
 }
 }
@@ -420,16 +424,16 @@ Properties of all actions and reactions as a matrix.
 }
 
 \subsection{Details}{
-Gets the properties (probability, cost, benefit) of each 
+Gets the properties (probability, cost, benefit) of each
 action and reaction in the decision tree in matrix form.
 }
 
 \subsection{Returns}{
 A numeric matrix with one row per edge, and with four columns:
-the index of the edge, the conditional probability of traversing the 
+the index of the edge, the conditional probability of traversing the
 edge, the cost of traversing the edge and the benefit associated with
 traversing the edge. The column names are \code{index},
-\code{probability}, \code{cost}, \code{benefit} and the row names are 
+\code{probability}, \code{cost}, \code{benefit} and the row names are
 the labels of the edges.
 }
 }
@@ -453,7 +457,7 @@ a leaf node. The list of walks is normally the walks associated with all
 the root to leaf paths in a tree.}
 
 \item{\code{Wi}}{As \var{W} but with edge indices instead of Edge objects. One
-of \var{W} and \var{Wi} must be NULL. It is more efficient to provide 
+of \var{W} and \var{Wi} must be NULL. It is more efficient to provide
 \var{Wi} during PSA, where the paths do not change between cycles, to
 avoid repeated conversion of edges to indices.}
 }
@@ -462,33 +466,34 @@ avoid repeated conversion of edges to indices.}
 \subsection{Details}{
 For each walk, probability, cost, benefit and utility are
 calculated. There is minimal checking of the argument because this
-function is intended to be called repeatedly during tree evaluation, 
+function is intended to be called repeatedly during tree evaluation,
 including PSA.
 }
 
 \subsection{Returns}{
-A matrix (pay-off table) with one row per path and columns
-organized as follows:
+A pay-off table, represented as a matrix of numeric values
+with response columns as follows:
 \describe{
-\item{\code{Leaf}}{The unique identifier of the path, taken to be the 
-index of the terminal (leaf) node.}
 \item{\code{Probability}}{The probability of traversing the pathway. }
 \item{\code{Path.Cost}}{The cost of traversing the pathway.}
-\item{\code{Path.Benefit}}{The benefit derived from traversing the 
+\item{\code{Path.Benefit}}{The benefit derived from traversing the
       pathway.}
 \item{\code{Path.Utility}}{The utility associated with the outcome (leaf
       node).}
-\item{\code{Path.QALY}}{The QALYs associated with the outcome (leaf 
+\item{\code{Path.QALY}}{The QALYs associated with the outcome (leaf
       node).}
 \item{\code{Cost}}{\code{Path.Cost} \eqn{*} probability of traversing the
       pathway.}
-\item{\code{Benefit}}{\code{Path.Benefit} \eqn{*} probability of 
+\item{\code{Benefit}}{\code{Path.Benefit} \eqn{*} probability of
 traversing the pathway.}
-\item{\code{Utility}}{\code{Path.Utility} \eqn{*} probability of 
+\item{\code{Utility}}{\code{Path.Utility} \eqn{*} probability of
 traversing the pathway.}
 \item{\code{QALY}}{\code{Path.QALY} \eqn{*} probability of traversing the
 pathway.}
 }
+The matrix has one row per path, with the row label equal to the
+character representation of the index of the leaf node at the end of
+the path.
 }
 }
 \if{html}{\out{<hr>}}
@@ -504,62 +509,63 @@ Evaluate each strategy.
 \if{html}{\out{<div class="arguments">}}
 \describe{
 \item{\code{setvars}}{One of "expected" (evaluate with each model variable at
-its mean value), "random" (sample each variable from its uncertainty 
+its mean value), "random" (sample each variable from its uncertainty
 distribution and evaluate the model), "q2.5", "q50", "q97.5" (set each
 model variable to its 2.5\%, 50\% or 97.5\% quantile, respectively, and
-evaluate the model) or "current" (leave each model variable at its 
+evaluate the model) or "current" (leave each model variable at its
 current value prior to calling the function and evaluate the model).}
 
-\item{\code{N}}{Number of replicates. Intended for use with PSA 
-(\code{modvars="random"}); use with \code{modvars} = "expected"
+\item{\code{N}}{Number of replicates. Intended for use with PSA
+(\code{modvars = "random"}); use with \code{modvars} = "expected"
 will be repetitive and uninformative.}
 
 \item{\code{by}}{One of {"path", "strategy", "run"}. If "path", the table has
 one row per path walked per strategy, per run, and includes the label of
-the terminating leaf node to identify each path. If "strategy" (the 
+the terminating leaf node to identify each path. If "strategy" (the
 default), the table is aggregated by strategy, i.e., there is one row per
 strategy per run. If "run", the table has one row per run and uses
-concatenated strategy names and one (cost, benefit, utility, QALY) column
-for each strategy.}
+concatenated strategy names (as above) and one (cost, benefit, utility,
+QALY) as row names.}
 }
 \if{html}{\out{</div>}}
 }
 \subsection{Details}{
 Starting with the root, the function works though all possible
-paths to leaf nodes and computes the probability, cost, benefit and 
-utility of each, then optionally aggregates by strategy or run.   
+paths to leaf nodes and computes the probability, cost, benefit and
+utility of each, optionally aggregated by strategy or run.
 The columns of the returned data frame are:
 \describe{
-\item{\code{by="path"}}{
+\item{\code{by = "path"}}{
   \describe{
-    \item{\code{Leaf}}{The label of terminating leaf node}
-    \item{\code{<label of first decision node>}}{label of action leaving 
+    \item{\code{Run}}{Run number}
+    \item{\code{<label of first decision node>}}{label of action leaving
           the node}
-    \item{\code{<label of second decision node (etc.)>}}{label of action}
+    \item{\code{<label of second decision node (etc.)>}}{label of action
+      leaving the node}
+    \item{\code{Leaf}}{The label of terminating leaf node}
     \item{\code{Probability}}{Probability of traversing the path}
     \item{\code{Cost}}{Cost of traversing the path}
     \item{\code{Benefit}}{Benefit of traversing the path}
     \item{\code{Utility}}{Utility of traversing the path}
     \item{\code{QALY}}{QALY of traversing the path}
-    \item{\code{Run}}{Run number}
   }
 }
 
-\item{\code{by="strategy"}}{
+\item{\code{by = "strategy"}}{
   \describe{
-    \item{\code{<label of first decision node>}}{label of action leaving 
+    \item{\code{Run}}{Run number}
+    \item{\code{<label of first decision node>}}{label of action leaving
           the node}
     \item{\code{<label of second decision node (etc)}}{label of action}
-    \item{\code{Run}}{Run number}
     \item{\code{Probability}}{\eqn{\Sigma p_i} for the run (1)}
     \item{\code{Cost}}{Aggregate cost of the strategy}
     \item{\code{Benefit}}{Aggregate benefit of the strategy}
     \item{\code{Utility}}{Aggregate utility of the strategy}
     \item{\code{QALY}}{Aggregate QALY of the strategy}
   }
-} 
+}
 
-\item{\code{by="run"}}{
+\item{\code{by = "run"}}{
   \describe{
     \item{\code{Run}}{Run number}
     \item{\code{Probability.<S>}}{Probability for strategy S}
@@ -568,9 +574,16 @@ The columns of the returned data frame are:
     \item{\code{Utility.<S>}}{Benefit for strategy S}
     \item{\code{QALY.<S>}}{QALY for strategy S}
   }
-  where <S> is string composed of the action labels in strategy \code{S}
-  concatenated with an underscore and there will be one probability etc.,
-  column for each strategy.
+  where <S> is a label associated with strategy \code{S}. Each strategy
+  label is
+  a list of the labels of the action edges that are traversed in the
+  strategy, concatenated with underscores. The ordering of each label
+  part follows the lexicographical order of the decision node labels
+  concatenated with underscores. For example, if there are three
+  decision nodes labelled d1, d2 and d3, each strategy label will be of
+  the form a1i_a2i_a3i where a1i is the label of one action edge
+  emanating from decision node d1, etc. There will be one probability,
+  cost, benefit, utility and QALY column for each strategy.
   }
 }
 }
@@ -602,14 +615,14 @@ Create a "tornado" diagram.
 \item{\code{ref}}{The reference strategy (option) with which the index strategy
 will be compared.}
 
-\item{\code{outcome}}{One of \code{"saving"} or \code{"ICER"}. For 
+\item{\code{outcome}}{One of \code{"saving"} or \code{"ICER"}. For
 \code{"saving"} (e.g. in cost consequence analysis), the x axis is cost
 saved (cost of reference minus
 cost of index), on the presumption that the new technology will be cost
 saving at the point estimate. For \code{"ICER"} the x axis is
-\eqn{\Delta C/\Delta E} and is expected to be positive at the point 
-estimate (i.e. in the NE or SW quadrants of the cost-effectiveness 
-plane), where \eqn{\Delta C} is cost of index minus cost of reference, 
+\eqn{\Delta C/\Delta E} and is expected to be positive at the point
+estimate (i.e. in the NE or SW quadrants of the cost-effectiveness
+plane), where \eqn{\Delta C} is cost of index minus cost of reference,
 and \eqn{\Delta E} is utility of index minus utility of reference.}
 
 \item{\code{exclude}}{A list of descriptions of model variables to be excluded
@@ -622,10 +635,10 @@ data frame silently.}
 }
 \subsection{Details}{
 Used to compare two strategies for traversing the decision tree.
-A strategy is a unanimous prescription of the actions at each 
-decision node. The extreme values of each input variable are the upper 
+A strategy is a unanimous prescription of the actions at each
+decision node. The extreme values of each input variable are the upper
 and lower 95\% confidence limits of the uncertainty distributions of each
-variable. This ensures that the range of each input is defensible 
+variable. This ensures that the range of each input is defensible
 (Briggs 2012).
 }
 
@@ -665,31 +678,31 @@ index strategy compared with a reference strategy.
 \item{\code{ref}}{The reference strategy (option) with which the index strategy
 will be compared.}
 
-\item{\code{outcome}}{One of \code{"saving"} or \code{"ICER"}. For 
-\code{"saving"} (e.g., in cost consequence analysis), the value of 
+\item{\code{outcome}}{One of \code{"saving"} or \code{"ICER"}. For
+\code{"saving"} (e.g., in cost consequence analysis), the value of
 \code{mvd}
-is found at which cost saved is zero (cost saved is cost of reference 
+is found at which cost saved is zero (cost saved is cost of reference
 minus cost of index, on the presumption that the new technology will be
-cost saving at the point estimate). For \code{"ICER"} the value of 
-\code{mvd} 
-is found for which the incremental cost effectiveness ratio (ICER) is 
-equal to the threshold \code{lambda}. ICER is calculated as 
+cost saving at the point estimate). For \code{"ICER"} the value of
+\code{mvd}
+is found for which the incremental cost effectiveness ratio (ICER) is
+equal to the threshold \code{lambda}. ICER is calculated as
 \eqn{\Delta C/\Delta E}, which will normally be positive
-at the point estimate (i.e. in the NE or SW quadrants of the 
+at the point estimate (i.e. in the NE or SW quadrants of the
 cost-effectiveness plane), where \eqn{\Delta C} is cost of index minus
-cost of reference and \eqn{\Delta E} is utility of index minus utility 
+cost of reference and \eqn{\Delta E} is utility of index minus utility
 of reference.}
 
 \item{\code{mvd}}{The description of the model variable for which the threshold
 is to be found.}
 
-\item{\code{a}}{The lower bound of the range of values of \code{mvd} to search 
+\item{\code{a}}{The lower bound of the range of values of \code{mvd} to search
 for the root (numeric).}
 
 \item{\code{b}}{The upper bound of the range of values of \code{mvd} to search
 for the root (numeric).}
 
-\item{\code{tol}}{The tolerance to which the threshold should be 
+\item{\code{tol}}{The tolerance to which the threshold should be
 calculated (numeric).}
 
 \item{\code{lambda}}{The ICER threshold (threshold ratio) for outcome="ICER".}

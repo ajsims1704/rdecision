@@ -4,14 +4,14 @@
 ## @knitr gbp -----------------------------------------------------------------
 
 #' @title Write a monetary value
-#' @param x Monetary value
+#' @param x Monetary value, or vector of values
 #' @param p Logical; if TRUE show value to nearest penny, cent etc. If FALSE
 #' show it to the nearest pound, dollar, euro etc.
 #' @noRd
 gbp <- function(x, p = FALSE) {
   digits <- if (p) 2L else 0L
   s <- format(
-    round(x, digits = digits),
+    x = vapply(X = x, FUN.VALUE = 1.0, FUN = round, digits = digits),
     digits = NULL,
     nsmall = digits,
     scientific = FALSE,

@@ -5,7 +5,7 @@
 \alias{LeafNode}
 \title{A leaf node in a decision tree}
 \description{
-An R6 class representing a leaf (terminal) node in a decision 
+An R6 class representing a leaf (terminal) node in a decision
 tree.
 }
 \details{
@@ -23,6 +23,7 @@ Andrew J. Sims \email{andrew.sims@newcastle.ac.uk}
 \itemize{
 \item \href{#method-LeafNode-new}{\code{LeafNode$new()}}
 \item \href{#method-LeafNode-modvars}{\code{LeafNode$modvars()}}
+\item \href{#method-LeafNode-set_utility}{\code{LeafNode$set_utility()}}
 \item \href{#method-LeafNode-utility}{\code{LeafNode$utility()}}
 \item \href{#method-LeafNode-interval}{\code{LeafNode$interval()}}
 \item \href{#method-LeafNode-QALY}{\code{LeafNode$QALY()}}
@@ -60,13 +61,13 @@ as a column name in a data frame.}
 
 \item{\code{utility}}{The incremental utility that a user associates with
 being in the health state for the interval.
-Intended for use with cost benefit analysis. Can be \code{numeric} or 
-a type of \code{ModVar}. If the type is \code{numeric}, the allowed 
-range is \code{-Inf} to 1; if it is of type \code{ModVar}, it is 
+Intended for use with cost benefit analysis. Can be \code{numeric} or
+a type of \code{ModVar}. If the type is \code{numeric}, the allowed
+range is \code{-Inf} to 1; if it is of type \code{ModVar}, it is
 unchecked.}
 
 \item{\code{interval}}{The time interval over which the \code{utility}
-parameter applies, expressed as an R \code{difftime} object; default 
+parameter applies, expressed as an R \code{difftime} object; default
 1 year.}
 }
 \if{html}{\out{</div>}}
@@ -79,8 +80,8 @@ A new \code{LeafNode} object
 \if{html}{\out{<a id="method-LeafNode-modvars"></a>}}
 \if{latex}{\out{\hypertarget{method-LeafNode-modvars}{}}}
 \subsection{Method \code{modvars()}}{
-Find all the model variables of type \code{ModVar} that have been 
-specified as values associated with this \code{LeafNode}. Includes 
+Find all the model variables of type \code{ModVar} that have
+been specified as values associated with this \code{LeafNode}. Includes
 operands of these \code{ModVar}s, if they are expressions.
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{LeafNode$modvars()}\if{html}{\out{</div>}}
@@ -88,6 +89,31 @@ operands of these \code{ModVar}s, if they are expressions.
 
 \subsection{Returns}{
 A list of \code{ModVar}s.
+}
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-LeafNode-set_utility"></a>}}
+\if{latex}{\out{\hypertarget{method-LeafNode-set_utility}{}}}
+\subsection{Method \code{set_utility()}}{
+Set the incremental utility associated with the node.
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{LeafNode$set_utility(utility)}\if{html}{\out{</div>}}
+}
+
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{utility}}{The incremental utility that a user associates with
+being in the health state for the interval.
+Intended for use with cost benefit analysis. Can be \code{numeric} or
+a type of \code{ModVar}. If the type is \code{numeric}, the allowed
+range is \code{-Inf} to 1; if it is of type \code{ModVar}, it is
+unchecked.}
+}
+\if{html}{\out{</div>}}
+}
+\subsection{Returns}{
+Updated \code{Leaf} object.
 }
 }
 \if{html}{\out{<hr>}}
@@ -121,7 +147,7 @@ Interval (as a \code{difftime}).
 \if{html}{\out{<a id="method-LeafNode-QALY"></a>}}
 \if{latex}{\out{\hypertarget{method-LeafNode-QALY}{}}}
 \subsection{Method \code{QALY()}}{
-Return the quality adjusted life years associated with 
+Return the quality adjusted life years associated with
 being in the state.
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{LeafNode$QALY()}\if{html}{\out{</div>}}

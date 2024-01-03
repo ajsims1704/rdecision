@@ -1,11 +1,8 @@
 #' @title A parametrized Dirichlet distribution
-#' 
 #' @description An R6 class representing a multivariate Dirichlet distribution.
-#' 
-#' @details A multivariate Dirichlet distribution. See 
-#' \url{https://en.wikipedia.org/wiki/Dirichlet_distribution} for details. 
+#' @details A multivariate Dirichlet distribution. See
+#' \url{https://en.wikipedia.org/wiki/Dirichlet_distribution} for details.
 #' Inherits from class \code{Distribution}.
-#'
 #' @docType class
 #' @author Andrew J. Sims \email{andrew.sims@@newcastle.ac.uk}
 #' @export
@@ -17,19 +14,19 @@ DirichletDistribution <- R6::R6Class(
     alpha = NULL
   ),
   public = list(
-    
-    #' @description 
+
+    #' @description
     #' Create an object of class \code{DirichletDistribution}.
     #' @param alpha Parameters of the distribution; a vector of \code{K} numeric
     #' values each > 0, with \eqn{K > 1}.
-    #' @return An object of class \code{DirichletDistribution}. 
+    #' @return An object of class \code{DirichletDistribution}.
     initialize = function(alpha) {
       # check alpha parameter
       abortifnot(length(alpha) >= 2L,
-        message = "'alpha' must have at least 2 elements", 
+        message = "'alpha' must have at least 2 elements",
         class = "alpha_unsupported"
       )
-      vapply(alpha, FUN.VALUE = TRUE, FUN=function(x) {
+      vapply(alpha, FUN.VALUE = TRUE, FUN = function(x) {
         abortifnot(!is.na(x),
           message = "All elements of 'alpha' must be defined",
           class = "alpha_not_defined"
@@ -52,22 +49,22 @@ DirichletDistribution <- R6::R6Class(
       # return Dirichlet distribution object
       return(invisible(self))
     },
-    
+
     #' @description Accessor function for the name of the distribution.
     #' @return Distribution name as character string.
     distribution = function() {
       rv <- paste0("Dir(", paste(private$alpha, collapse = ","), ")")
       return(rv)
     },
-    
+
     #' @description Mean value of each dimension of the distribution.
     #' @return A numerical vector of length K.
     mean = function() {
       alpha0 <- sum(private$alpha)
-      return(private$alpha/alpha0)
+      return(private$alpha / alpha0)
     },
 
-    #' @description Return the mode of the distribution. 
+    #' @description Return the mode of the distribution.
     #' @details Undefined if any alpha is \eqn{\le 1}.
     #' @return Mode as a vector of length \code{K}.
     mode = function() {
@@ -78,19 +75,19 @@ DirichletDistribution <- R6::R6Class(
       }
       return(rv)
     },
-    
+
     #' @description Quantiles of the univariate marginal distributions.
     #' @details The univariate marginal distributions of a Dirichlet
     #' distribution are Beta distributions. This function returns the
     #' quantiles of each marginal. Note that these are not the true
     #' quantiles of the multivariate Dirichlet.
     #' @param probs Numeric vector of probabilities, each in range [0,1].
-    #' @return A matrix of numeric values with the number of rows equal to the 
-    #' length of \code{probs}, the number of columns equal to the order; rows 
+    #' @return A matrix of numeric values with the number of rows equal to the
+    #' length of \code{probs}, the number of columns equal to the order; rows
     #' are labelled with quantiles and columns with the dimension (1, 2, etc).
     quantile = function(probs) {
       # test argument
-      vapply(probs, FUN.VALUE = TRUE, FUN=function(x) {
+      vapply(probs, FUN.VALUE = TRUE, FUN = function(x) {
         abortifnot(!is.na(x),
           message = "All elements of 'probs' must be defined",
           class = "probs_not_defined"
@@ -108,7 +105,7 @@ DirichletDistribution <- R6::R6Class(
       # create output object
       rv <- matrix(
         rep(NA_real_, times = length(probs) * private$K),
-        nrow = length(probs), 
+        nrow = length(probs),
         ncol = private$K,
         dimnames = list(probs, seq_len(private$K))
       )
@@ -116,17 +113,17 @@ DirichletDistribution <- R6::R6Class(
       alpha0 <- sum(private$alpha)
       for (k in seq_len(private$K)) {
         q <- stats::qbeta(
-          probs, 
-          shape1 = private$alpha[k], 
-          shape2 = alpha0-private$alpha[k]
+          probs,
+          shape1 = private$alpha[[k]],
+          shape2 = alpha0 - private$alpha[[k]]
         )
         rv[, k] <- q
       }
-      return(rv)      
+      return(rv)
     },
 
     #' @description Variance-covariance matrix.
-    #' @return A positive definite symmetric matrix of size \code{K} by 
+    #' @return A positive definite symmetric matrix of size \code{K} by
     #' \code{K}.
     varcov = function() {
       VC <- matrix(data = NA_real_, nrow = private$K, ncol = private$K)
@@ -134,14 +131,14 @@ DirichletDistribution <- R6::R6Class(
       alphabar <- private$alpha / alpha0
       for (i in seq_len(private$K)) {
         for (j in seq_len(private$K)) {
-          VC[[i,j]] <- ifelse(i == j, alphabar[[i]], 0L) -
+          VC[[i, j]] <- ifelse(i == j, alphabar[[i]], 0L) -
             (alphabar[[i]] * alphabar[[j]])
-          VC[[i,j]] <- VC[[i,j]] / (alpha0 + 1L)
+          VC[[i, j]] <- VC[[i, j]] / (alpha0 + 1L)
         }
       }
       return(VC)
     },
-    
+
     #' @description Draw and hold a random sample from the distribution.
     #' @param expected If TRUE, sets the next value retrieved by a call to
     #' \code{r()} to be the mean of the distribution.
@@ -149,15 +146,15 @@ DirichletDistribution <- R6::R6Class(
     sample = function(expected = FALSE) {
       if (!expected) {
         # sample from gamma distributions
-        y <- vapply(seq_len(private$K), FUN.VALUE = 0.5, FUN=function(i) {
-          stats::rgamma(n = 1L, shape=private$alpha[[i]], rate = 1.0)
+        y <- vapply(seq_len(private$K), FUN.VALUE = 0.5, FUN = function(i) {
+          stats::rgamma(n = 1L, shape = private$alpha[[i]], rate = 1.0)
         })
         # normalize and hold
         private$.r <- y / sum(y)
       } else {
         private$.r <- self$mean()
       }
-      return(invisible(self)) 
+      return(invisible(self))
     }
   )
 )

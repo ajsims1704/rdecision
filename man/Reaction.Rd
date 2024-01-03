@@ -5,7 +5,7 @@
 \alias{Reaction}
 \title{A reaction (chance) edge in a decision tree}
 \description{
-An R6 class representing a reaction (chance) edge in a decision 
+An R6 class representing a reaction (chance) edge in a decision
 tree.
 }
 \details{
@@ -47,7 +47,7 @@ Andrew J. Sims \email{andrew.sims@newcastle.ac.uk}
 \if{html}{\out{<a id="method-Reaction-new"></a>}}
 \if{latex}{\out{\hypertarget{method-Reaction-new}{}}}
 \subsection{Method \code{new()}}{
-Create an object of type \code{Reaction}. A probability 
+Create an object of type \code{Reaction}. A probability
 must be assigned
 to the edge. Optionally, a cost and a benefit may be associated
 with traversing the edge. A \dfn{pay-off} (benefit-cost) is sometimes
@@ -84,8 +84,8 @@ A new \code{Reaction} object.
 \if{html}{\out{<a id="method-Reaction-modvars"></a>}}
 \if{latex}{\out{\hypertarget{method-Reaction-modvars}{}}}
 \subsection{Method \code{modvars()}}{
-Find all the model variables of type \code{ModVar} that 
-have been specified as values associated with this Action. Includes 
+Find all the model variables of type \code{ModVar} that
+have been specified as values associated with this Action. Includes
 operands of these \code{ModVar}s, if they are expressions.
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{Reaction$modvars()}\if{html}{\out{</div>}}

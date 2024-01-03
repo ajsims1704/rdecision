@@ -8,19 +8,19 @@
 An R6 class representing a digraph (a directed graph).
 }
 \details{
-Encapsulates and provides methods for computation and checking of 
+Encapsulates and provides methods for computation and checking of
 directed graphs (digraphs). Inherits from class \code{Graph}.
 }
 \references{
-{ 
+{
   Gansner ER, Koutsofios E, North SC, Vo K-P. A technique for drawing
   directed graphs. \emph{IEEE Transactions on Software Engineering},
   1993;\bold{19}:214–30, \doi{10.1109/32.221135}.
 
-  Gross JL, Yellen J, Zhang P. Handbook of Graph Theory. Second edition, 
+  Gross JL, Yellen J, Zhang P. Handbook of Graph Theory. Second edition,
   Chapman and Hall/CRC.; 2013, \doi{10.1201/b16132}.
 
-  Kahn AB, Topological Sorting of Large Networks, 
+  Kahn AB, Topological Sorting of Large Networks,
   \emph{Communications of the \acronym{ACM}},
   1962;\strong{5}:558-562, \doi{10.1145/368996.369025}.
 }
@@ -46,8 +46,8 @@ Andrew Sims \email{andrew.sims@newcastle.ac.uk}
 \item \href{#method-Digraph-is_arborescence}{\code{Digraph$is_arborescence()}}
 \item \href{#method-Digraph-direct_successors}{\code{Digraph$direct_successors()}}
 \item \href{#method-Digraph-direct_predecessors}{\code{Digraph$direct_predecessors()}}
-\item \href{#method-Digraph-source}{\code{Digraph$source()}}
-\item \href{#method-Digraph-target}{\code{Digraph$target()}}
+\item \href{#method-Digraph-arrow_source}{\code{Digraph$arrow_source()}}
+\item \href{#method-Digraph-arrow_target}{\code{Digraph$arrow_target()}}
 \item \href{#method-Digraph-paths}{\code{Digraph$paths()}}
 \item \href{#method-Digraph-walk}{\code{Digraph$walk()}}
 \item \href{#method-Digraph-as_DOT}{\code{Digraph$as_DOT()}}
@@ -73,6 +73,8 @@ Andrew Sims \email{andrew.sims@newcastle.ac.uk}
 <li><span class="pkg-link" data-pkg="rdecision" data-topic="Graph" data-id="vertex_along"><a href='../../rdecision/html/Graph.html#method-Graph-vertex_along'><code>rdecision::Graph$vertex_along()</code></a></span></li>
 <li><span class="pkg-link" data-pkg="rdecision" data-topic="Graph" data-id="vertex_at"><a href='../../rdecision/html/Graph.html#method-Graph-vertex_at'><code>rdecision::Graph$vertex_at()</code></a></span></li>
 <li><span class="pkg-link" data-pkg="rdecision" data-topic="Graph" data-id="vertex_index"><a href='../../rdecision/html/Graph.html#method-Graph-vertex_index'><code>rdecision::Graph$vertex_index()</code></a></span></li>
+<li><span class="pkg-link" data-pkg="rdecision" data-topic="Graph" data-id="vertex_label"><a href='../../rdecision/html/Graph.html#method-Graph-vertex_label'><code>rdecision::Graph$vertex_label()</code></a></span></li>
+<li><span class="pkg-link" data-pkg="rdecision" data-topic="Graph" data-id="vertexes"><a href='../../rdecision/html/Graph.html#method-Graph-vertexes'><code>rdecision::Graph$vertexes()</code></a></span></li>
 </ul>
 </details>
 }}
@@ -80,7 +82,8 @@ Andrew Sims \email{andrew.sims@newcastle.ac.uk}
 \if{html}{\out{<a id="method-Digraph-new"></a>}}
 \if{latex}{\out{\hypertarget{method-Digraph-new}{}}}
 \subsection{Method \code{new()}}{
-Create a new \code{Digraph} object from sets of nodes and edges.
+Create a new \code{Digraph} object from sets of nodes and
+edges.
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{Digraph$new(V, A)}\if{html}{\out{</div>}}
 }
@@ -110,7 +113,7 @@ Compute the adjacency matrix for the digraph.
 \subsection{Arguments}{
 \if{html}{\out{<div class="arguments">}}
 \describe{
-\item{\code{boolean}}{If \code{TRUE}, the adjacency matrix is logical, each 
+\item{\code{boolean}}{If \code{TRUE}, the adjacency matrix is logical, each
 cell is \code{{FALSE,TRUE}}.}
 }
 \if{html}{\out{</div>}}
@@ -141,7 +144,7 @@ Compute the incidence matrix for the digraph.
 \subsection{Details}{
 Each row is a vertex and each column is an edge. Edges leaving
 a vertex have value -1 and edges entering have value +1. By convention
-self loops have value 0 (1-1). If all vertexes have defined and unique 
+self loops have value 0 (1-1). If all vertexes have defined and unique
 labels and all edges have defined and unique labels, the dimnames of the
 matrix are the labels of the vertexes and edges.
 }
@@ -180,7 +183,7 @@ Test whether the graph is connected.
 
 \subsection{Details}{
 For digraphs this will always return \code{FALSE} because
-\dfn{connected} is not defined. Function \code{weakly_connected} 
+\dfn{connected} is not defined. Function \code{weakly_connected}
 calculates whether the underlying graph is connected.
 }
 
@@ -213,7 +216,7 @@ Checks for the presence of a cycle in the graph.
 
 \subsection{Details}{
 Attempts to do a topological sort. If the sort does not contain
-all vertexes, the digraph contains at least one cycle. This method 
+all vertexes, the digraph contains at least one cycle. This method
 overrides \code{is_acyclic} in \code{Graph}.
 }
 
@@ -235,7 +238,7 @@ It is a tree if it is connected and acyclic.
 }
 
 \subsection{Returns}{
-\code{TRUE} if the underlying graph is a tree; \code{FALSE} 
+\code{TRUE} if the underlying graph is a tree; \code{FALSE}
 if not.
 }
 }
@@ -290,12 +293,12 @@ Find the direct successors of a node.
 \subsection{Arguments}{
 \if{html}{\out{<div class="arguments">}}
 \describe{
-\item{\code{v}}{The index vertex.}
+\item{\code{v}}{The index vertex (a scalar; does not accept a vector of nodes).}
 }
 \if{html}{\out{</div>}}
 }
 \subsection{Returns}{
-A list of nodes or an empty list if the specified
+A list of Nodes or an empty list if the specified
 node has no successors.
 }
 }
@@ -311,22 +314,22 @@ Find the direct predecessors of a node.
 \subsection{Arguments}{
 \if{html}{\out{<div class="arguments">}}
 \describe{
-\item{\code{v}}{The index vertex.}
+\item{\code{v}}{The index vertex (a scalar; does not accept an index of nodes).}
 }
 \if{html}{\out{</div>}}
 }
 \subsection{Returns}{
-A list of nodes or an empty list if the specified
+A list of Nodes or an empty list if the specified
 node has no predecessors.
 }
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-Digraph-source"></a>}}
-\if{latex}{\out{\hypertarget{method-Digraph-source}{}}}
-\subsection{Method \code{source()}}{
+\if{html}{\out{<a id="method-Digraph-arrow_source"></a>}}
+\if{latex}{\out{\hypertarget{method-Digraph-arrow_source}{}}}
+\subsection{Method \code{arrow_source()}}{
 Find the node that is the source of the given arrow.
 \subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{Digraph$source(a)}\if{html}{\out{</div>}}
+\if{html}{\out{<div class="r">}}\preformatted{Digraph$arrow_source(a)}\if{html}{\out{</div>}}
 }
 
 \subsection{Arguments}{
@@ -352,12 +355,12 @@ Index of the source node of the specified edge.
 }
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-Digraph-target"></a>}}
-\if{latex}{\out{\hypertarget{method-Digraph-target}{}}}
-\subsection{Method \code{target()}}{
+\if{html}{\out{<a id="method-Digraph-arrow_target"></a>}}
+\if{latex}{\out{\hypertarget{method-Digraph-arrow_target}{}}}
+\subsection{Method \code{arrow_target()}}{
 Find the node that is the target of the given arrow.
 \subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{Digraph$target(a)}\if{html}{\out{</div>}}
+\if{html}{\out{<div class="r">}}\preformatted{Digraph$arrow_target(a)}\if{html}{\out{</div>}}
 }
 
 \subsection{Arguments}{
@@ -401,7 +404,7 @@ Find all directed simple paths from source to target.
 \if{html}{\out{</div>}}
 }
 \subsection{Details}{
-In simple paths all vertexes are unique. Uses a recursive 
+In simple paths all vertexes are unique. Uses a recursive
 depth-first search algorithm.
 }
 
@@ -453,8 +456,8 @@ Exports the digraph in DOT notation.
 \if{html}{\out{</div>}}
 }
 \subsection{Details}{
-Writes a representation of the digraph in the 
-\code{graphviz} DOT language 
+Writes a representation of the digraph in the
+\code{graphviz} DOT language
 (\url{http://graphviz.org/doc/info/lang.html}) for drawing with one
 of the \code{graphviz} tools, including \code{dot} (Gansner, 1993). If
 all nodes have labels, these are used in the graph, otherwise the labels

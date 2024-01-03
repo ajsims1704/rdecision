@@ -5,12 +5,12 @@
 \alias{SemiMarkovModel}
 \title{A semi-Markov model for cohort simulation}
 \description{
-An R6 class representing a semi-Markov model for 
+An R6 class representing a semi-Markov model for
 cohort simulation.
 }
 \details{
 A class to represent a continuous time semi-Markov chain, modelled
-using cohort simulation. As interpreted in \pkg{rdecision}, semi-Markov 
+using cohort simulation. As interpreted in \pkg{rdecision}, semi-Markov
 models
 may include temporary states and transitions are defined by per-cycle
 probabilities. Although used widely in health economic modelling, the
@@ -20,27 +20,27 @@ some caveats for modellers:
 \item{If there are temporary states, the result will depend on cycle length.}
 \item{Transitions are specified by their conditional probability, which
 is a \emph{per-cycle} probability of starting a cycle in one state and
-ending it in another; if the cycle length changes, the probabilities should 
+ending it in another; if the cycle length changes, the probabilities should
 change, too.}
 \item{Probabilities and rates cannot be linked by the Kolmogorov forward
-equation, where the per-cycle probabilities are given by the matrix 
+equation, where the per-cycle probabilities are given by the matrix
 exponential of the transition rate matrix, because this equation does not
-apply if there are temporary states. In creating semi-Markov models, it is 
-the  modeller's task to estimate probabilities from published data on 
+apply if there are temporary states. In creating semi-Markov models, it is
+the  modeller's task to estimate probabilities from published data on
 event rates.}
 \item{The cycle time cannot be changed during the simulation.}
 }
 }
 \section{Graph theory}{
 
-A Markov model is a directed multidigraph permitting loops (a loop 
+A Markov model is a directed multidigraph permitting loops (a loop
 multidigraph), optionally labelled, or a \dfn{quiver}. It is a
 multidigraph because there are potentially two edges between each pair of
-nodes {A,B} representing the transition probabilities from A to B and 
+nodes {A,B} representing the transition probabilities from A to B and
 \emph{vice versa}. It is a directed graph because the transition
-probabilities refer to transitions in one direction. Each edge can be 
-optionally labelled. It permits self-loops (edges whose source and target 
-are the same node) to represent patients that remain in the same state 
+probabilities refer to transitions in one direction. Each edge can be
+optionally labelled. It permits self-loops (edges whose source and target
+are the same node) to represent patients that remain in the same state
 between cycles.
 }
 
@@ -48,8 +48,8 @@ between cycles.
 
 \subsection{Why semi-Markov?}{
 Beck and Pauker (1983) and later Sonnenberg and Beck (1993) proposed the
-use of Markov processes to model the health economics of medical 
-interventions. Further, they introduced the additional concept of temporary 
+use of Markov processes to model the health economics of medical
+interventions. Further, they introduced the additional concept of temporary
 states, to which patients who transition remain for exactly one cycle. This
 breaks the principle that Markov processes are memoryless
 and thus the underlying mathematical formalism, first
@@ -59,46 +59,46 @@ Hence, such models are usually labelled as semi-Markov processes.
 }
 \subsection{Rates and probabilities}{
 Miller and Homan (1994) and Fleurence & Hollenbeak (2007) provide advice
-on estimating probabilities from rates. Jones (2017) and Welton (2005) 
-describe methods for estimating probabilities in multi-state, 
-multi-transition models, although those methods may not apply to 
+on estimating probabilities from rates. Jones (2017) and Welton (2005)
+describe methods for estimating probabilities in multi-state,
+multi-transition models, although those methods may not apply to
 semi-Markov models with temporary states. In particular note that the
-"simple" equation, \eqn{p = 1-e^{-rt}} (Briggs 2006) applies only in a 
+"simple" equation, \eqn{p = 1-e^{-rt}} (Briggs 2006) applies only in a
 two-state, one transition model.
 }
 \subsection{Uncertainty in rates}{
-In semi-Markov models, the conditional probabilities of the transitions 
-from each state are usually modelled by a Dirichlet distribution. In 
-\pkg{rdecision}, create a Dirichlet distribution for each state and 
-optionally create model variables for each conditional probability 
+In semi-Markov models, the conditional probabilities of the transitions
+from each state are usually modelled by a Dirichlet distribution. In
+\pkg{rdecision}, create a Dirichlet distribution for each state and
+optionally create model variables for each conditional probability
 (\eqn{\rho_{ij}}) linked to an applicable Dirichlet distribution.
 }
 }
 
 \references{
 {
-  Beck JR and Pauker SG. The Markov Process in Medical Prognosis. 
+  Beck JR and Pauker SG. The Markov Process in Medical Prognosis.
   \emph{Med Decision Making}, 1983;\strong{3}:419–458.
 
-  Briggs A, Claxton K, Sculpher M. Decision modelling for health economic 
+  Briggs A, Claxton K, Sculpher M. Decision modelling for health economic
   evaluation. Oxford, UK: Oxford University Press; 2006.
-  
-  Fleurence RL and Hollenbeak CS. Rates and probabilities in economic 
-  modelling. \emph{PharmacoEconomics}, 2007;\strong{25}:3--6. 
-  
-  Jones E, Epstein D and García-Mochón L. A procedure for deriving 
+
+  Fleurence RL and Hollenbeak CS. Rates and probabilities in economic
+  modelling. \emph{PharmacoEconomics}, 2007;\strong{25}:3--6.
+
+  Jones E, Epstein D and García-Mochón L. A procedure for deriving
   formulas to convert transition rates to probabilities for multistate
   Markov models. \emph{Medical Decision Making} 2017;\strong{37}:779–789.
 
   Miller DK and Homan SM. Determining transition probabilities: confusion
-  and suggestions. \emph{Medical Decision Making} 1994;\strong{14}:52-58. 
-  
+  and suggestions. \emph{Medical Decision Making} 1994;\strong{14}:52-58.
+
   Sonnenberg FA, Beck JR. Markov models in medical decision making: a
   practical guide. \emph{Medical Decision Making}, 1993:\strong{13}:322.
-  
+
   Welton NJ and Ades A. Estimation of Markov chain transition probabilities
   and rates from fully and partially observed data: uncertainty
-  propagation, evidence synthesis, and model calibration. 
+  propagation, evidence synthesis, and model calibration.
   \emph{Medical Decision Making}, 2005;\strong{25}:633-645.
 }
 }
@@ -146,6 +146,10 @@ Andrew J. Sims \email{andrew.sims@newcastle.ac.uk}
 <li><span class="pkg-link" data-pkg="rdecision" data-topic="Graph" data-id="vertex_along"><a href='../../rdecision/html/Graph.html#method-Graph-vertex_along'><code>rdecision::Graph$vertex_along()</code></a></span></li>
 <li><span class="pkg-link" data-pkg="rdecision" data-topic="Graph" data-id="vertex_at"><a href='../../rdecision/html/Graph.html#method-Graph-vertex_at'><code>rdecision::Graph$vertex_at()</code></a></span></li>
 <li><span class="pkg-link" data-pkg="rdecision" data-topic="Graph" data-id="vertex_index"><a href='../../rdecision/html/Graph.html#method-Graph-vertex_index'><code>rdecision::Graph$vertex_index()</code></a></span></li>
+<li><span class="pkg-link" data-pkg="rdecision" data-topic="Graph" data-id="vertex_label"><a href='../../rdecision/html/Graph.html#method-Graph-vertex_label'><code>rdecision::Graph$vertex_label()</code></a></span></li>
+<li><span class="pkg-link" data-pkg="rdecision" data-topic="Graph" data-id="vertexes"><a href='../../rdecision/html/Graph.html#method-Graph-vertexes'><code>rdecision::Graph$vertexes()</code></a></span></li>
+<li><span class="pkg-link" data-pkg="rdecision" data-topic="Digraph" data-id="arrow_source"><a href='../../rdecision/html/Digraph.html#method-Digraph-arrow_source'><code>rdecision::Digraph$arrow_source()</code></a></span></li>
+<li><span class="pkg-link" data-pkg="rdecision" data-topic="Digraph" data-id="arrow_target"><a href='../../rdecision/html/Digraph.html#method-Digraph-arrow_target'><code>rdecision::Digraph$arrow_target()</code></a></span></li>
 <li><span class="pkg-link" data-pkg="rdecision" data-topic="Digraph" data-id="as_DOT"><a href='../../rdecision/html/Digraph.html#method-Digraph-as_DOT'><code>rdecision::Digraph$as_DOT()</code></a></span></li>
 <li><span class="pkg-link" data-pkg="rdecision" data-topic="Digraph" data-id="digraph_adjacency_matrix"><a href='../../rdecision/html/Digraph.html#method-Digraph-digraph_adjacency_matrix'><code>rdecision::Digraph$digraph_adjacency_matrix()</code></a></span></li>
 <li><span class="pkg-link" data-pkg="rdecision" data-topic="Digraph" data-id="digraph_incidence_matrix"><a href='../../rdecision/html/Digraph.html#method-Digraph-digraph_incidence_matrix'><code>rdecision::Digraph$digraph_incidence_matrix()</code></a></span></li>
@@ -158,8 +162,6 @@ Andrew J. Sims \email{andrew.sims@newcastle.ac.uk}
 <li><span class="pkg-link" data-pkg="rdecision" data-topic="Digraph" data-id="is_tree"><a href='../../rdecision/html/Digraph.html#method-Digraph-is_tree'><code>rdecision::Digraph$is_tree()</code></a></span></li>
 <li><span class="pkg-link" data-pkg="rdecision" data-topic="Digraph" data-id="is_weakly_connected"><a href='../../rdecision/html/Digraph.html#method-Digraph-is_weakly_connected'><code>rdecision::Digraph$is_weakly_connected()</code></a></span></li>
 <li><span class="pkg-link" data-pkg="rdecision" data-topic="Digraph" data-id="paths"><a href='../../rdecision/html/Digraph.html#method-Digraph-paths'><code>rdecision::Digraph$paths()</code></a></span></li>
-<li><span class="pkg-link" data-pkg="rdecision" data-topic="Digraph" data-id="source"><a href='../../rdecision/html/Digraph.html#method-Digraph-source'><code>rdecision::Digraph$source()</code></a></span></li>
-<li><span class="pkg-link" data-pkg="rdecision" data-topic="Digraph" data-id="target"><a href='../../rdecision/html/Digraph.html#method-Digraph-target'><code>rdecision::Digraph$target()</code></a></span></li>
 <li><span class="pkg-link" data-pkg="rdecision" data-topic="Digraph" data-id="topological_sort"><a href='../../rdecision/html/Digraph.html#method-Digraph-topological_sort'><code>rdecision::Digraph$topological_sort()</code></a></span></li>
 <li><span class="pkg-link" data-pkg="rdecision" data-topic="Digraph" data-id="walk"><a href='../../rdecision/html/Digraph.html#method-Digraph-walk'><code>rdecision::Digraph$walk()</code></a></span></li>
 </ul>
@@ -193,7 +195,7 @@ Creates a semi-Markov model for cohort simulation.
 is a rate, not a probability (i.e. use 0.035 for 3.5\%).}
 
 \item{\code{discount.utility}}{Annual discount rate for future incremental
-utility. Note this is a rate, not a probability (i.e. use 0.035 
+utility. Note this is a rate, not a probability (i.e. use 0.035
 for 3.5\%).}
 }
 \if{html}{\out{</div>}}
@@ -206,16 +208,16 @@ A semi-Markov model must meet the following conditions:
   \item All edges must be of class \code{Transition};
   \item The nodes and edges must form a digraph whose underlying
   graph is connected;
-  \item Each state must have at least one outgoing transition (for 
+  \item Each state must have at least one outgoing transition (for
   absorbing states this is a self-loop);
-  \item For each state the sum of outgoing conditional transition 
-  probabilities must be one. For convenience, one outgoing transition 
-  probability from each state may be set to NA when the 
-  probabilities are defined. Typically, probabilities for self 
-  loops would be set to NA. Transition probabilities in \eqn{Pt} 
-  associated with transitions that are not defined as edges in the 
+  \item For each state the sum of outgoing conditional transition
+  probabilities must be one. For convenience, one outgoing transition
+  probability from each state may be set to NA when the
+  probabilities are defined. Typically, probabilities for self
+  loops would be set to NA. Transition probabilities in \eqn{Pt}
+  associated with transitions that are not defined as edges in the
   graph are zero. Probabilities can be changed between cycles.
-  \item No two edges may share the same source and target nodes (i.e. 
+  \item No two edges may share the same source and target nodes (i.e.
   the digraph may not have multiple edges). This is to ensure that there
   are no more transitions than cells in the transition matrix.
   \item The node labels must be unique to the graph.
@@ -224,7 +226,7 @@ A semi-Markov model must meet the following conditions:
 
 \subsection{Returns}{
 A \code{SemiMarkovModel} object. The population of the first
-state is set to 1000 and from each state there is an equal 
+state is set to 1000 and from each state there is an equal
 conditional probability of each allowed transition.
 }
 }
@@ -240,7 +242,7 @@ Sets transition probabilities.
 \subsection{Arguments}{
 \if{html}{\out{<div class="arguments">}}
 \describe{
-\item{\code{Pt}}{Per-cycle transition probability matrix. The row and 
+\item{\code{Pt}}{Per-cycle transition probability matrix. The row and
 column labels must be the state names and each row must sum to one.
 Non-zero probabilities for undefined transitions are not allowed. At
 most one \code{NA} may appear in each row. If an NA is present in a row,
@@ -310,11 +312,10 @@ Resets the model counters.
 \if{html}{\out{<div class="arguments">}}
 \describe{
 \item{\code{populations}}{A named vector of populations for
-the start of the state. The names should be the state names. 
-Due to the R implementation of matrix algebra, \code{populations} 
-must be a numeric type and is not restricted to being an integer. If 
-NULL, the population of the first state is set to 1000 and the others
-to zero.}
+the start of the state. The names should be the state names.
+Due to the R implementation of matrix algebra, \code{populations}
+must be a numeric type and is not restricted to being an integer. If
+NULL, the population of all states is set to zero.}
 
 \item{\code{icycle}}{Cycle number at which to start/restart.}
 
@@ -325,10 +326,10 @@ discounting as an R \code{difftime} object.}
 }
 \subsection{Details}{
 Resets the state populations, next cycle number and elapsed time
-of the model. By default the model is returned to its ground state (1000
-people in the first state and zero in the others; next cycle is labelled
-zero; elapsed time (years) is zero). Any or all of these can be set via 
-this function. \code{icycle} is simply an integer counter label for each 
+of the model. By default the model is returned to its ground state (zero
+people in the all states; next cycle is labelled
+zero; elapsed time (years) is zero). Any or all of these can be set via
+this function. \code{icycle} is simply an integer counter label for each
 cycle, \code{elapsed} sets the elapsed time in years from the index time
 from which discounting is assumed to apply.
 }
@@ -360,13 +361,13 @@ Gets the current elapsed time.
 }
 
 \subsection{Details}{
-The elapsed time is defined as the difference between the 
+The elapsed time is defined as the difference between the
 current time in the model and an index time used as the reference
 time for applying discounting. By default the elapsed time starts at
 zero. It can be set directly by calling \code{reset}. It is incremented
 after each call to \code{cycle} by the cycle duration to the time at the
 end of the cycle (even if half cycle correction is used). Thus, via the
-\code{reset} and \code{cycle} methods, the time of each cycle relative 
+\code{reset} and \code{cycle} methods, the time of each cycle relative
 to the discounting index and its duration can be controlled arbitrarily.
 }
 
@@ -437,18 +438,18 @@ following columns:
 \item{\code{Cycle}}{The cycle number.}
 \item{\code{Time}}{Clock time in years of the end of the cycle.}
 \item{\code{Population}}{Populations of the states; see \code{hcc.pop}.}
-\item{\code{OccCost}}{Cost of the population occupying the state for 
+\item{\code{OccCost}}{Cost of the population occupying the state for
 the cycle. Discounting and half cycle correction is applied, if those
 options are set. The costs are normalized by the model population. The
 cycle costs are derived from the annual occupancy costs of the
 \code{MarkovState}s.}
 \item{\code{EntryCost}}{Cost of the transitions \emph{into} the state
-during the cycle. Discounting is applied, if the option is set. 
+during the cycle. Discounting is applied, if the option is set.
 The result is normalized by the model population. The cycle costs
 are derived from \code{Transition} costs.}
 \item{\code{Cost}}{Total cost, normalized by model population.}
-\item{\code{QALY}}{Quality adjusted life years gained by occupancy of 
-the states during the cycle. Half cycle correction and discounting are 
+\item{\code{QALY}}{Quality adjusted life years gained by occupancy of
+the states during the cycle. Half cycle correction and discounting are
 applied, if these options are set. Normalized by the model population.}
 }
 }
@@ -525,7 +526,7 @@ Find all the model variables in the Markov model.
 }
 
 \subsection{Details}{
-Returns variables of type \code{ModVar} that have been 
+Returns variables of type \code{ModVar} that have been
 specified as values associated with transition rates and costs and
 the state occupancy costs and utilities.
 }
@@ -561,7 +562,7 @@ it is a regular model variable, or the expression used to create it,
 if it is an \code{ExprModVar}.}
 \item{\code{Mean}}{Mean; calculated from means of operands if
 an expression.}
-\item{\code{E}}{Expectation; estimated from random sample if expression, 
+\item{\code{E}}{Expectation; estimated from random sample if expression,
 mean otherwise.}
 \item{\code{SD}}{Standard deviation; estimated from random sample if
 expression, exact value otherwise.}
@@ -569,7 +570,7 @@ expression, exact value otherwise.}
 expression, exact value otherwise.}
 \item{\code{Q97.5}}{p=0.975 quantile; estimated from random sample if
 expression, exact value otherwise.}
-\item{\code{Est}}{TRUE if the quantiles and SD have been estimated by 
+\item{\code{Est}}{TRUE if the quantiles and SD have been estimated by
 random sampling.}
 }
 }

@@ -2,8 +2,8 @@
 
 test_that("incorrect source and target are rejected", {
   n1 <- Node$new()
-  expect_error(Arrow$new(42L, n1), class="non-Node_endpoint")
-  expect_error(Arrow$new(n1, 42L), class="non-Node_endpoint")
+  expect_error(Arrow$new(42L, n1), class = "non-Node_endpoint")
+  expect_error(Arrow$new(n1, 42L), class = "non-Node_endpoint")
 })
 
 test_that("argument name matching supports old names", {
@@ -17,7 +17,7 @@ test_that("argument name matching supports old names", {
 test_that("incorrect labels are rejected", {
   n1 <- Node$new()
   n2 <- Node$new()
-  expect_error(Arrow$new(n1, n2, TRUE), class="non-string_label")
+  expect_error(Arrow$new(n1, n2, TRUE), class = "non-string_label")
 })
 
 test_that("arrow is defined correctly", {

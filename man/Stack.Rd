@@ -8,10 +8,10 @@
 An R6 class representing a stack of objects of any type.
 }
 \details{
-Conventional implementation of a stack. Used extensively in graph 
-algorithms and offered as a separate class for ease of programming and to 
-ensure that implementations of stacks are optimized. By intention, there is 
-only minimal checking of method arguments. This is to maximize performance 
+Conventional implementation of a stack. Used extensively in graph
+algorithms and offered as a separate class for ease of programming and to
+ensure that implementations of stacks are optimized. By intention, there is
+only minimal checking of method arguments. This is to maximize performance
 and because the class is mainly intended for use internally to
 \pkg{rdecision}.
 }
@@ -68,7 +68,7 @@ An updated \code{Stack} object
 \if{html}{\out{<a id="method-Stack-pop"></a>}}
 \if{latex}{\out{\hypertarget{method-Stack-pop}{}}}
 \subsection{Method \code{pop()}}{
-Pop an item from the stack. Stack underflow and 
+Pop an item from the stack. Stack underflow and
 raises an error.
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{Stack$pop()}\if{html}{\out{</div>}}

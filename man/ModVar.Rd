@@ -8,7 +8,7 @@
 An R6 class for a variable in a health economic model.
 }
 \details{
-Base class for a variable used in a health economic model. The base 
+Base class for a variable used in a health economic model. The base
 class wraps a numerical value which is used in calculations.
 It provides a framework for creating classes of model
 variables whose uncertainties are described by statistical distributions
@@ -52,7 +52,7 @@ Create an object of type \code{ModVar}.
 and its role in the model. This description will be used in a
 tabulation of the variables linked to a model.}
 
-\item{\code{units}}{A character string description of the units, e.g. 
+\item{\code{units}}{A character string description of the units, e.g.
 \code{"GBP"}, \code{"per year"}.}
 
 \item{\code{D}}{The distribution representing the uncertainty in the variable.
@@ -102,7 +102,7 @@ Is the model variable probabilistic?
 }
 
 \subsection{Details}{
-Tests whether the model variable is probabilistic, i.e. a 
+Tests whether the model variable is probabilistic, i.e. a
 random variable that follows a distribution, or an expression involving
 random variables, some of which follow distributions.
 }
@@ -147,9 +147,9 @@ Name and parameters of the uncertainty distribution.
 }
 
 \subsection{Details}{
-If \eqn{K > 1} the dimension of the distribution associated 
-with this model variable is appended, e.g. \code{Dir(2,3)[1]} 
-means that the model variable is associated with the first dimension 
+If \eqn{K > 1} the dimension of the distribution associated
+with this model variable is appended, e.g. \code{Dir(2,3)[1]}
+means that the model variable is associated with the first dimension
 of a 2D Dirichlet distribution with alpha parameters 2 and 3.
 }
 
@@ -180,8 +180,8 @@ The mode of the variable.
 }
 
 \subsection{Details}{
-By default returns \code{NA}, which will be the case for 
-most \code{ModVar} variables, because arbitrary distributions are 
+By default returns \code{NA}, which will be the case for
+most \code{ModVar} variables, because arbitrary distributions are
 not guaranteed to be unimodal.
 }
 
@@ -252,30 +252,30 @@ Sets the value of the \code{ModVar}.
 \subsection{Arguments}{
 \if{html}{\out{<div class="arguments">}}
 \describe{
-\item{\code{what}}{Until \code{set} is called again, subsequent calls to 
+\item{\code{what}}{Until \code{set} is called again, subsequent calls to
 \code{get} will return a value determined by the \code{what} parameter
 as follows:
 \describe{
-\item{\code{"random"}}{a random sample is drawn from the uncertainty 
+\item{\code{"random"}}{a random sample is drawn from the uncertainty
 distribution;}
 \item{\code{"expected"}}{the mean of the uncertainty distribution;}
-\item{\code{"q2.5"}}{the lower 95\% confidence limit of the uncertainty 
+\item{\code{"q2.5"}}{the lower 95\% confidence limit of the uncertainty
 distribution, i.e. the 2.5th percentile;}
 \item{\code{"q50"}}{the median of the uncertainty distribution;}
-\item{\code{"q97.5"}}{the upper 95\% confidence limit of the uncertainty 
+\item{\code{"q97.5"}}{the upper 95\% confidence limit of the uncertainty
 distribution, i.e. the 97.5th percentile;}
-\item{\code{"current"}}{leaves the \code{what} parameter of method 
+\item{\code{"current"}}{leaves the \code{what} parameter of method
 \code{set} unchanged, i.e. the call to \code{set} has no effect on the
 subsequent values returned by \code{get}. It is provided as an option to
 help use cases in which the \code{what} parameter is a variable;}
-\item{\code{"value"}}{sets the value explicitly to be equal to parameter 
+\item{\code{"value"}}{sets the value explicitly to be equal to parameter
 \code{val}. This is not recommended for normal usage because it allows
-the model variable to be set to an implausible value, based on its 
-defined uncertainty. An example of where this may be needed is in 
-threshold finding.} 
+the model variable to be set to an implausible value, based on its
+defined uncertainty. An example of where this may be needed is in
+threshold finding.}
 }}
 
-\item{\code{val}}{A numeric value, only used with \code{what}=\code{"value"}, 
+\item{\code{val}}{A numeric value, only used with \code{what}=\code{"value"},
 ignored otherwise.}
 }
 \if{html}{\out{</div>}}

@@ -1,6 +1,6 @@
 #' @title A parametrized Normal distribution
 #' @description An R6 class representing a parametrized Normal distribution.
-#' @details A Normal distribution with hyperparameters mean (\code{mu}) and 
+#' @details A Normal distribution with hyperparameters mean (\code{mu}) and
 #' standard deviation (\code{sd}). Inherits from class \code{Distribution}.
 #' @docType class
 #' @author Andrew J. Sims \email{andrew.sims@@newcastle.ac.uk}
@@ -12,10 +12,10 @@ NormalDistribution <- R6::R6Class(
   private = list(
     mu = NULL,
     sigma = NULL
-  ), 
+  ),
   public = list(
-    
-    #' @description Create a parametrized normal distribution. 
+
+    #' @description Create a parametrized normal distribution.
     #' @param mu Mean of the Normal distribution.
     #' @param sigma Standard deviation of the Normal distribution.
     #' @return A \code{NormalDistribution} object.
@@ -24,12 +24,12 @@ NormalDistribution <- R6::R6Class(
       super$initialize("Normal", K = 1L)
       # check the parameters
       abortifnot(is.numeric(mu),
-        message = "Argument 'mu' must be numeric", 
+        message = "Argument 'mu' must be numeric",
         class = "mu_not_numeric"
       )
       private$mu <- mu
       abortifnot(is.numeric(sigma),
-        message = "Argument 'sigma' must be numeric", 
+        message = "Argument 'sigma' must be numeric",
         class = "sigma_not_numeric"
       )
       private$sigma <- sigma
@@ -38,7 +38,7 @@ NormalDistribution <- R6::R6Class(
       # return
       return(invisible(self))
     },
-    
+
     #' @description Accessor function for the name of the distribution.
     #' @return Distribution name as character string.
     distribution = function() {
@@ -48,8 +48,8 @@ NormalDistribution <- R6::R6Class(
       )
       return(rv)
     },
-    
-    #' @description Draw a random sample from the model variable. 
+
+    #' @description Draw a random sample from the model variable.
     #' @param expected If TRUE, sets the next value retrieved by a call to
     #' \code{r()} to be the mean of the distribution.
     #' @return A sample drawn at random.
@@ -62,19 +62,19 @@ NormalDistribution <- R6::R6Class(
       # return the updated object
       return(invisible(self))
     },
-    
+
     #' @description Return the mean value of the distribution.
     #' @return Expected value as a numeric value.
     mean = function() {
       return(private$mu)
     },
-    
+
     #' @description Return the standard deviation of the distribution.
     #' @return Standard deviation as a numeric value
     SD = function() {
       return(private$sigma)
     },
-    
+
     #' @description Return the quantiles of the Normal uncertainty distribution.
     #' @param probs Vector of probabilities, in range [0,1].
     #' @return Vector of quantiles.
@@ -95,8 +95,8 @@ NormalDistribution <- R6::R6Class(
         )
         return(TRUE)
       })
-      # quantiles of the normal distribution      
-      q <- qnorm(probs, mean=private$mu, sd=private$sigma)
+      # quantiles of the normal distribution
+      q <- qnorm(probs, mean = private$mu, sd = private$sigma)
       return(q)
     }
   )

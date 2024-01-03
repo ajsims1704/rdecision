@@ -15,25 +15,25 @@ BetaModVar <- R6::R6Class(
   private = list(
   ),
   public = list(
-    
+
     #' @description Create an object of class \code{BetaModVar}.
     #' @param description A character string describing the variable.
     #' @param units Units of the variable, as character string.
     #' @param alpha parameter of the Beta distribution.
     #' @param beta parameter of the Beta distribution.
-    #' @return An object of class \code{BetaModVar}. 
+    #' @return An object of class \code{BetaModVar}.
     initialize = function(description, units, alpha, beta) {
       # create Beta distribution (also checks arguments)
-      D <- BetaDistribution$new(alpha=alpha, beta=beta)
+      D <- BetaDistribution$new(alpha = alpha, beta = beta)
       # create BetaModVar
       super$initialize(description, units, D = D, k = 1L)
       # return BetaModVar
       return(invisible(self))
     },
 
-    #' @description Tests whether the model variable is probabilistic, 
+    #' @description Tests whether the model variable is probabilistic,
     #' i.e. a random variable that follows a distribution, or an expression
-    #' involving random variables, some of which follow distributions. 
+    #' involving random variables, some of which follow distributions.
     #' @return TRUE if probabilistic
     is_probabilistic = function() {
       return(TRUE)

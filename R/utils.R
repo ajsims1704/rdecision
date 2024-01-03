@@ -11,7 +11,7 @@
 #' @param message The message to display (used as the condition header)
 #' @param class Subclass of the condition
 #' @noRd
-abortif <- function(..., message = NULL, class = NULL, 
+abortif <- function(..., message = NULL, class = NULL,
                     call = rlang::caller_env()) {
   # get the arguments as a list of quosures before they are evaluated
   qargs <- rlang::quos(...)
@@ -21,12 +21,12 @@ abortif <- function(..., message = NULL, class = NULL,
     if (!rlang::is_logical(arg) || arg) {
       rlang::abort(
         message = c(
-          ifelse(!is.null(message), message, ""), 
+          ifelse(!is.null(message), message, ""),
           paste(
-            rlang::expr_deparse(rlang::quo_get_expr(qargs[[i]])), 
+            rlang::expr_deparse(rlang::quo_get_expr(qargs[[i]])),
             "is not FALSE"
           )
-        ), 
+        ),
         class = class,
         call = call
       )
@@ -47,7 +47,7 @@ abortif <- function(..., message = NULL, class = NULL,
 #' @param message The message to display (used as the condition header)
 #' @param class Subclass of the condition
 #' @noRd
-abortifnot <- function(..., message = NULL, class = NULL, 
+abortifnot <- function(..., message = NULL, class = NULL,
                        call = rlang::caller_env()) {
   # get the arguments as a list of quosures before they are evaluated
   qargs <- rlang::quos(...)
@@ -57,12 +57,12 @@ abortifnot <- function(..., message = NULL, class = NULL,
     if (!rlang::is_logical(arg) || !arg) {
       rlang::abort(
         message = c(
-          ifelse(!is.null(message), message, ""), 
+          ifelse(!is.null(message), message, ""),
           paste(
-            rlang::expr_deparse(rlang::quo_get_expr(qargs[[i]])), 
+            rlang::expr_deparse(rlang::quo_get_expr(qargs[[i]])),
             "is not TRUE"
           )
-        ), 
+        ),
         class = class,
         call = call
       )
@@ -104,10 +104,10 @@ as_numeric <- function(x) {
 }
 
 #' @title Is an object of a given class?
-#' @description Tests whether an object inherits from a given class, as 
-#' detectable via \code{inherits}. Intended for internal use with 
+#' @description Tests whether an object inherits from a given class, as
+#' detectable via \code{inherits}. Intended for internal use with
 #' \pkg{rdecision} and is the template for specific \var{is_X} convenience
-#' functions. 
+#' functions.
 #' @param x An object to test, possibly a vector.
 #' @param class_name A character string giving the name of the class.
 #' @return A logical vector of the same length as \var{x} with TRUE values if

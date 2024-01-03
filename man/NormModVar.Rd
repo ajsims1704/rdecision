@@ -5,7 +5,7 @@
 \alias{NormModVar}
 \title{A model variable whose uncertainty follows a Normal distribution}
 \description{
-An R6 class representing a model variable with Normal 
+An R6 class representing a model variable with Normal
 uncertainty.
 }
 \details{
@@ -62,7 +62,7 @@ Create a model variable with normal uncertainty.
 
 \item{\code{units}}{Units of the quantity; character string.}
 
-\item{\code{mu}}{Hyperparameter with mean of the Normal distribution for 
+\item{\code{mu}}{Hyperparameter with mean of the Normal distribution for
 the uncertainty of the variable.}
 
 \item{\code{sigma}}{Hyperparameter equal to the standard deviation of the

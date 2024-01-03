@@ -20,16 +20,16 @@ The Gamma model variable class can be used to model the uncertainty of
 the mean of a count quantity which follows a Poisson distribution. The Gamma
 distribution is the conjugate prior of a Poisson distribution, and the shape
 and scale relate directly to the number of intervals from which the mean
-count has been estimated. Specifically, the shape (\eqn{k}) is equal to the 
+count has been estimated. Specifically, the shape (\eqn{k}) is equal to the
 total count of events in \eqn{1/\theta} intervals, where \eqn{\theta} is the
 scale. For example, if 200 counts were observed in a sample of 100 intervals,
-setting \code{shape=200} and \code{scale=1/100} gives a Gamma distribution 
+setting \code{shape=200} and \code{scale=1/100} gives a Gamma distribution
 with a mean of 2 and a 95\% confidence interval from 1.73 to 2.29.
 }
 \references{
 {
   Briggs A, Claxton K, Sculpher M. Decision modelling for health
-  economic evaluation. Oxford, UK: Oxford University Press; 2006. 
+  economic evaluation. Oxford, UK: Oxford University Press; 2006.
 }
 }
 \author{
@@ -93,9 +93,9 @@ An object of class \code{GammaModVar}.
 \if{html}{\out{<a id="method-GammaModVar-is_probabilistic"></a>}}
 \if{latex}{\out{\hypertarget{method-GammaModVar-is_probabilistic}{}}}
 \subsection{Method \code{is_probabilistic()}}{
-Tests whether the model variable is probabilistic, i.e. a random
-variable that follows a distribution, or an expression involving
-random variables, some of which follow distributions.
+Tests whether the model variable is probabilistic, i.e.,
+a random variable that follows a distribution, or an expression
+involving random variables, some of which follow distributions.
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{GammaModVar$is_probabilistic()}\if{html}{\out{</div>}}
 }

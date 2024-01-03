@@ -8,6 +8,9 @@ Bayoumi
 Bodycombe
 bigcirc
 bookdown
+BT
+CAS
+centered
 centile
 Claxton
 cloneable
@@ -21,6 +24,7 @@ Dervieux
 devtools
 Devtools
 Dirichlet
+disutility
 DK
 doi
 Dutang
@@ -47,6 +51,7 @@ Hollenbeak
 Homan
 Iannone
 ICER
+ICERs
 interventional
 ISPOR
 Jahn
@@ -65,11 +70,15 @@ Kuntz
 lamivudine
 Lamivudine
 lhd
+LN
+lognormally
+LR
 LSI
 Luraschi
 Maechler
 MJ
 Mochón
+modeling
 Modeling
 multidigraph
 multistate
@@ -86,6 +95,7 @@ PSA
 QALY
 QALYs
 quosure
+R's
 Riederer
 rlang
 Rlang
@@ -106,9 +116,11 @@ techreports
 Tegaderm
 Testthat
 th
-'tidyverse'
+tidyverse
+TKR
 TR
 unc
+univariately
 Ushey
 Vo
 wikipedia

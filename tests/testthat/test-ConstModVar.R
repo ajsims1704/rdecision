@@ -18,7 +18,7 @@ test_that("properties are correct", {
 
 test_that("it has correct distribution name", {
   lue <- ConstModVar$new("lue", "GBP", 42.0)
-  expect_identical(lue$distribution(), "Const(42)")  
+  expect_identical(lue$distribution(), "Const(42)")
 })
 
 test_that("const values are returned", {
@@ -26,12 +26,15 @@ test_that("const values are returned", {
   expect_identical(x$mean(), 42.0)
   expect_identical(x$SD(), 0.0)
   expect_identical(x$mode(), 42.0)
-  expect_error(x$quantile(probs=c(0.25, NA, 0.75)), class = "probs_not_defined")
   expect_error(
-    x$quantile(probs=c(0.25, "A", 0.75)), class = "probs_not_numeric"
+    x$quantile(probs = c(0.25, NA, 0.75)),
+    class = "probs_not_defined"
   )
   expect_error(
-    x$quantile(probs=c(-0.25, 0.75)), class = "probs_out_of_range"
+    x$quantile(probs = c(0.25, "A", 0.75)), class = "probs_not_numeric"
+  )
+  expect_error(
+    x$quantile(probs = c(-0.25, 0.75)), class = "probs_out_of_range"
   )
   expect_equal(x$quantile(probs = 0.22), 42.0)
 })
@@ -48,8 +51,8 @@ test_that("set and get function as expected", {
   S <- vector(mode = "numeric", length = n)
   for (i in seq_len(n)) {
     x$set()
-    S[i] <- x$get() 
-  }  
+    S[i] <- x$get()
+  }
   expect_intol(mean(S), 42.0, 0.1)
   expect_intol(sd(S), 0.0, 0.01)
 })

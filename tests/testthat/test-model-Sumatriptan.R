@@ -1,10 +1,10 @@
 # Script to construct, in rdecision, the model described by Evans et al
 # (Pharmacoeconomics 1997;12:565-77) for comparing two drugs used for treating
-# migraine to check that its results agree with those presented in the paper, 
-# and those reported by Briggs et al, Box 2.3, which replicated the model 
+# migraine to check that its results agree with those presented in the paper,
+# and those reported by Briggs et al, Box 2.3, which replicated the model
 # reported by Evans.
 #
-# The checks are done as part of the testthat framework, which ensures that 
+# The checks are done as part of the testthat framework, which ensures that
 # any changes in the package code which unintentionally result in deviations
 # from the reported results of the model are identified.
 #
@@ -13,9 +13,7 @@
 # Unlabelled code chunks may contain testthat expectations and should be
 # ignored by a vignette.
 
-
 ## @knitr modvars --------------------------------------------------------------
-
 # Time horizon
 th <- as.difftime(24L, units = "hours")
 
@@ -41,7 +39,6 @@ p_admitted <- 0.002
 
 
 ## @knitr model ---------------------------------------------------------------
-
 # Sumatriptan branch
 ta <- LeafNode$new("A", utility = u_relief_norecurrence, interval = th)
 tb <- LeafNode$new("B", utility = u_relief_recurrence, interval = th)
@@ -50,7 +47,7 @@ e1 <- Reaction$new(
   c3, ta, p = p_sumatriptan_recurrence, label = "No recurrence"
 )
 e2 <- Reaction$new(
-  c3, tb, p = 1.0 - p_sumatriptan_recurrence, cost=c_sumatriptan, 
+  c3, tb, p = 1.0 - p_sumatriptan_recurrence, cost = c_sumatriptan,
   label = "Relieved 2nd dose"
 )
 td <- LeafNode$new("D", utility = u_norelief_er, interval = th)
@@ -64,7 +61,7 @@ e4 <- Reaction$new(
 tc <- LeafNode$new("C", utility = u_norelief_endures, interval = th)
 c4 <- ChanceNode$new()
 e5 <- Reaction$new(c4, tc, p = 1.0 - p_er, label = "Endures attack")
-e6 <- Reaction$new(c4, c7, p = p_er, cost=c_ed, label = "ER")
+e6 <- Reaction$new(c4, c7, p = p_er, cost = c_ed, label = "ER")
 
 c1 <- ChanceNode$new()
 e7 <- Reaction$new(c1, c3, p = p_sumatriptan_relief, label = "Relief")
@@ -76,7 +73,7 @@ tg <- LeafNode$new("G", utility = u_relief_recurrence, interval = th)
 c5 <- ChanceNode$new()
 e9 <- Reaction$new(c5, tf, p = p_caffeine_recurrence, label = "No recurrence")
 e10 <- Reaction$new(
-  c5, tg, p = 1.0 - p_caffeine_recurrence, cost=c_caffeine, 
+  c5, tg, p = 1.0 - p_caffeine_recurrence, cost = c_caffeine,
   label = "Relieved 2nd dose"
 )
 ti <- LeafNode$new("I", utility = u_norelief_er, interval = th)
@@ -107,13 +104,12 @@ V <- list(
   ta, tb, tc, td, te, tf, tg, th, ti, tj
 )
 E <- list(
-  e1, e2, e3, e4, e5, e6, e7, e8, e9, e10, e11, e12, e13, e14, e15, e16, 
+  e1, e2, e3, e4, e5, e6, e7, e8, e9, e10, e11, e12, e13, e14, e15, e16,
   e17, e18
 )
 
 # tree
-DT <- DecisionTree$new(V,E)
-
+DT <- DecisionTree$new(V, E)
 
 ## @knitr ---------------------------------------------------------------------
 test_that("decision tree structure is as per Evans et al", {
@@ -121,13 +117,10 @@ test_that("decision tree structure is as per Evans et al", {
 })
 
 
-## @knitr eval_by_path --------------------------------------------------------
-
+## @knitr eval-by-path --------------------------------------------------------
 ep <- DT$evaluate(by = "path")
 
-
 ## @knitr ---------------------------------------------------------------------
-
 test_that("evaluation by path is as per Box 2.3 of Briggs", {
   expect_identical(nrow(ep), 10L)
   expect_setequal(
@@ -136,13 +129,13 @@ test_that("evaluation by path is as per Box 2.3 of Briggs", {
   )
   expect_setequal(ep[, "Leaf"], LETTERS[1L : 10L])
   expect_intol(sum(ep["Probability"]), 2.0, 0.01)
-  
+
   ia <- which(ep[, "Leaf"] == "A")
   expect_identical(ep[[ia, "d1"]], "Sumatriptan")
   expect_intol(ep[[ia, "Probability"]], 0.331, 0.001)
   expect_intol(ep[[ia, "Cost"]], 5.34, 0.01)
   expect_intol(ep[[ia, "Utility"]], 0.33, 0.01)
-  
+
   ih <- which(ep[, "Leaf"] == "H")
   expect_identical(ep[[ih, "d1"]], "Caffeine-Ergotamine")
   expect_intol(ep[[ih, "Probability"]], 0.571, 0.001)
@@ -150,14 +143,10 @@ test_that("evaluation by path is as per Box 2.3 of Briggs", {
   expect_intol(ep[[ih, "Utility"]], -0.17, 0.01)
 })
 
-
-## @knitr eval_by_strategy ---------------------------------------------------
-
+## @knitr eval-by-strategy ---------------------------------------------------
 es <- DT$evaluate()
 
-
-## @knitr icer_basecase --------------------------------------------------------
-
+## @knitr icer-basecase --------------------------------------------------------
 is <- which(es[, "d1"] == "Sumatriptan")
 cost_s <- es[[is, "Cost"]]
 utility_s <- es[[is, "Utility"]]
@@ -175,9 +164,8 @@ icer <- delta_c / delta_q
 
 
 ## @knitr -------------------------------------------------------------------
-
 test_that("evaluation by strategy is as per Evans et al", {
-  
+
   expect_identical(nrow(es), 2L)
   expect_setequal(
     colnames(es),
@@ -185,27 +173,24 @@ test_that("evaluation by strategy is as per Evans et al", {
   )
   expect_setequal(es[, "d1"], c("Sumatriptan", "Caffeine-Ergotamine"))
   expect_intol(sum(es["Probability"]), 2.0, 0.01)
-  
+
   expect_intol(cost_s, 22.06, 0.01)
   expect_intol(utility_s, 0.41, 0.01)
-  
+
   expect_intol(cost_c, 4.73, 0.02)
   expect_intol(utility_c, 0.20, 0.01)
-  
+
   expect_between(icer / 29366.0, lower = 0.95, upper = 1.05)
 })
 
 
-## @knitr relief_threshold_upper -----------------------------------------------
-
+## @knitr relief-threshold-upper -----------------------------------------------
 p_sumatriptan_relief <- p_caffeine_relief + 0.268
 e7$set_probability(p_sumatriptan_relief)
 e8$set_probability(1.0 - p_sumatriptan_relief)
 es <- DT$evaluate()
 
-
-## @knitr icer_upper ----------------------------------------------------------
-
+## @knitr icer-upper ----------------------------------------------------------
 is <- which(es[, "d1"] == "Sumatriptan")
 cost_s_upper <- es[[is, "Cost"]]
 utility_s_upper <- es[[is, "Utility"]]
@@ -221,24 +206,18 @@ delta_u_upper <- utility_s_upper - utility_c_upper
 delta_q_upper <- qaly_s_upper - qaly_c_upper
 icer_upper <- delta_c_upper / delta_q_upper
 
-
 ## @knitr ---------------------------------------------------------------------
-
 test_that("upper relief threshold ICER agrees with Evans et al", {
   expect_between(icer_upper / 18950.0, lower = 0.95, upper = 1.05)
 })
 
-
-## @knitr relief_threshold_lower -----------------------------------------------
-
+## @knitr relief-threshold-lower -----------------------------------------------
 p_sumatriptan_relief <- p_caffeine_relief + 0.091
 e7$set_probability(p_sumatriptan_relief)
 e8$set_probability(1.0 - p_sumatriptan_relief)
 es <- DT$evaluate()
 
-
-## @knitr icer_lower ----------------------------------------------------------
-
+## @knitr icer-lower ----------------------------------------------------------
 is <- which(es[, "d1"] == "Sumatriptan")
 cost_s_lower <- es[[is, "Cost"]]
 utility_s_lower <- es[[is, "Utility"]]
@@ -254,16 +233,12 @@ delta_u_lower <- utility_s_lower - utility_c_lower
 delta_q_lower <- qaly_s_lower - qaly_c_lower
 icer_lower <- delta_c_lower / delta_q_lower
 
-
 ## @knitr ---------------------------------------------------------------------
-
 test_that("lower relief threshold ICER agrees with Evans et al", {
   expect_between(icer_lower / 60839.0, lower = 0.95, upper = 1.05)
 })
 
-
-## @knitr threshold_model -----------------------------------------------------
-
+## @knitr threshold-model -----------------------------------------------------
 # model variables with uncertainty
 p_sumatriptan_relief <- ConstModVar$new(
   "P(relief|sumatriptan)", "P", 0.558
@@ -273,147 +248,157 @@ q_sumatriptan_relief <- ExprModVar$new(
 )
 
 # create edges associated with model variables
-e7 <- Reaction$new(c1, c3, p = p_sumatriptan_relief, label="Relief")
-e8 <- Reaction$new(c1, c4, p = q_sumatriptan_relief, label="No relief")
+e7 <- Reaction$new(c1, c3, p = p_sumatriptan_relief, label = "Relief")
+e8 <- Reaction$new(c1, c4, p = q_sumatriptan_relief, label = "No relief")
 
-e15 <- Reaction$new(c2, c5, p = p_caffeine_relief, label="Relief")
-e16 <- Reaction$new(c2, c6, p = 1.0 - p_caffeine_relief, label="No relief")
+e15 <- Reaction$new(c2, c5, p = p_caffeine_relief, label = "Relief")
+e16 <- Reaction$new(c2, c6, p = 1.0 - p_caffeine_relief, label = "No relief")
 
 # rebuild the model
 E <- list(
-  e1, e2, e3, e4, e5, e6, e7, e8, e9, e10, e11, e12, e13, e14, e15, e16, 
+  e1, e2, e3, e4, e5, e6, e7, e8, e9, e10, e11, e12, e13, e14, e15, e16,
   e17, e18
 )
-dt <- DecisionTree$new(V,E)
+dt <- DecisionTree$new(V, E)
 
-
-## @knitr relief_thresholds ---------------------------------------------------
-
+## @knitr relief-thresholds ---------------------------------------------------
 # upper 95% relief rate threshold for ICER (Table VIII)
 p_relief_upper <- dt$threshold(
-  index = list(e17), ref = list(e18), outcome = "ICER", 
-  mvd = p_sumatriptan_relief$description(), 
+  index = list(e17), ref = list(e18), outcome = "ICER",
+  mvd = p_sumatriptan_relief$description(),
   a = 0.6, b = 0.7,
   lambda = 18950.0, tol = 0.0001
 )
 # lower 95% relief rate threshold for ICER (Table VIII)
 p_relief_lower <- dt$threshold(
-  index = list(e17), ref = list(e18), outcome = "ICER", 
-  mvd = p_sumatriptan_relief$description(), 
+  index = list(e17), ref = list(e18), outcome = "ICER",
+  mvd = p_sumatriptan_relief$description(),
   a = 0.4, b = 0.5,
   lambda = 60839.0, tol = 0.0001
 )
 
-
 ## @knitr ---------------------------------------------------------------------
-
 test_that("ICER thresholds agree with Evans et al", {
   # check parameters of threshold function
   expect_error(
     dt$threshold(
-      index=list(e17), ref=list(e18), outcome="ICER", 
-      mvd = p_sumatriptan_relief$description(), 
-      a=0.5, b=0.6,
-      lambda=-1.0, tol=0.0001
+      index = list(e17), ref = list(e18), outcome = "ICER",
+      mvd = p_sumatriptan_relief$description(),
+      a = 0.5, b = 0.6,
+      lambda = -1.0, tol = 0.0001
     ),
     class = "invalid_lambda"
   )
   expect_error(
     dt$threshold(
-      index=list(e17), ref=list(e18), outcome="ICER", 
-      mvd = p_sumatriptan_relief$description(), 
-      a=0.1, b=0.2,
-      lambda=29366.0, tol=0.0001
+      index = list(e17), ref = list(e18), outcome = "ICER",
+      mvd = p_sumatriptan_relief$description(),
+      a = 0.1, b = 0.2,
+      lambda = 29366.0, tol = 0.0001
     ),
     class = "invalid_brackets"
   )
   expect_error(
     dt$threshold(
-      index=list(e17), ref=list(e18), outcome="ICER", 
-      mvd = p_sumatriptan_relief$description(), 
-      a=0.5, b=0.6,
-      lambda=29366.0, tol=0.0001, nmax=5L
+      index = list(e17), ref = list(e18), outcome = "ICER",
+      mvd = p_sumatriptan_relief$description(),
+      a = 0.5, b = 0.6,
+      lambda = 29366.0, tol = 0.0001, nmax = 5L
     ),
     class = "convergence_failure"
   )
   # mean relief rate threshold for ICER
   pt <- dt$threshold(
-    index=list(e17), ref=list(e18), outcome="ICER", 
-    mvd = p_sumatriptan_relief$description(), 
-    a=0.5, b=0.6,
-    lambda=29366.0, tol=0.0001
+    index = list(e17), ref = list(e18), outcome = "ICER",
+    mvd = p_sumatriptan_relief$description(),
+    a = 0.5, b = 0.6,
+    lambda = 29366.0, tol = 0.0001
   )
-  expect_intol(pt, p_caffeine_relief+0.179, tol=0.02)
+  expect_intol(pt, p_caffeine_relief + 0.179, tol = 0.02)
   # check values against Table VIII
   expect_intol(p_relief_upper, p_caffeine_relief + 0.268, tol = 0.02)
   expect_intol(p_relief_lower, p_caffeine_relief + 0.091, tol = 0.02)
 })
 
-
-## @knitr psa_model ----------------------------------------------------------
-
+## @knitr psa-model ----------------------------------------------------------
 # model variables with uncertainty
 c_sumatriptan <- GammaModVar$new(
-  "Sumatriptan","CAD", shape = 16.10, scale = 1.0
+  "Sumatriptan", "CAD", shape = 16.10, scale = 1.0
 )
 c_caffeine <- GammaModVar$new(
   "Caffeine", "CAD", shape = 1.32, scale = 1.0
 )
 
 # create edges with model variables
-e2 <- Reaction$new(c3, tb, p=0.406, cost=c_sumatriptan, 
-                   label="Relieved 2nd dose")
-e10 <- Reaction$new(c5, tg, p=0.297, cost=c_caffeine, 
-                    label="Relieved 2nd dose")
-e17 <- Action$new(d1, c1, cost=c_sumatriptan, label="Sumatriptan")
-e18 <- Action$new(d1, c2, cost=c_caffeine, label="Caffeine")
+e2 <- Reaction$new(c3, tb, p = 0.406, cost = c_sumatriptan,
+                   label = "Relieved 2nd dose")
+e10 <- Reaction$new(c5, tg, p = 0.297, cost = c_caffeine,
+                    label = "Relieved 2nd dose")
+e17 <- Action$new(d1, c1, cost = c_sumatriptan, label = "Sumatriptan")
+e18 <- Action$new(d1, c2, cost = c_caffeine, label = "Caffeine")
 
 # rebuild the model
 E <- list(
-  e1, e2, e3, e4, e5, e6, e7, e8, e9, e10, e11, e12, e13, e14, e15, e16, 
+  e1, e2, e3, e4, e5, e6, e7, e8, e9, e10, e11, e12, e13, e14, e15, e16,
   e17, e18
 )
-dt <- DecisionTree$new(V,E)
-
+dt <- DecisionTree$new(V, E)
 
 ## @knitr ---------------------------------------------------------------------
-
 test_that("tornado diagram ICER ranges agree with Evans et al", {
   # check ICER ranges in tornado diagram (branches B and G get 2nd dose)
-  TO <- dt$tornado(index=list(e17),ref=list(e18),outcome="ICER",draw=FALSE)
+  TO <- dt$tornado(
+    index = list(e17), ref = list(e18), outcome = "ICER", draw = FALSE
+  )
   c_sumatriptan$set("expected")
   c_caffeine$set("expected")
   p_sumatriptan_relief$set("expected")
-  x <- qgamma(p=0.025,shape=16.10,rate=1.0)
-  expect_intol(TO$LL[TO$Description=="Sumatriptan"], x,tol=0.01)
-  deltac <- (x-c_sumatriptan$get())*1.227
+  x <- qgamma(p = 0.025, shape = 16.10, rate = 1.0)
   expect_intol(
-    TO$outcome.min[TO$Description=="Sumatriptan"],
-    (cost_s - cost_c + deltac) / delta_q,
-    tol=100.0
+    TO[[which(TO$Description == "Sumatriptan"), "LL"]],
+    x,
+    tol = 0.01
   )
-  x <- qgamma(p=0.975,shape=16.10,rate=1.0)
-  expect_intol(TO$UL[TO$Description=="Sumatriptan"],x,tol=0.01)
-  deltac <- (x-c_sumatriptan$get())*1.227
+  deltac <- (x - c_sumatriptan$get()) * 1.227
   expect_intol(
-    TO$outcome.max[TO$Description=="Sumatriptan"],
+    TO[[which(TO$Description == "Sumatriptan"), "outcome.min"]],
     (cost_s - cost_c + deltac) / delta_q,
-    tol=100.0
+    tol = 100.0
   )
-  x <- qgamma(p=0.025,shape=1.32,rate=1.0)
-  expect_intol(TO$LL[TO$Description=="Caffeine"], x,tol=0.01)
-  deltac <- (c_caffeine$get()-x)*1.113
+  x <- qgamma(p = 0.975, shape = 16.10, rate = 1.0)
   expect_intol(
-    TO$outcome.min[TO$Description=="Caffeine"],
-    (cost_s - cost_c + deltac) / delta_q,
-    tol=100.0
+    TO[[which(TO$Description == "Sumatriptan"), "UL"]],
+    x,
+    tol = 0.01
   )
-  x <- qgamma(p=0.975,shape=1.32, rate=1.0)
-  expect_intol(TO$UL[TO$Description=="Caffeine"],x,tol=0.01)
-  deltac <- (c_caffeine$get()-x)*1.113
+  deltac <- (x - c_sumatriptan$get()) * 1.227
   expect_intol(
-    TO$outcome.max[TO$Description=="Caffeine"],
+    TO[[which(TO$Description == "Sumatriptan"), "outcome.max"]],
     (cost_s - cost_c + deltac) / delta_q,
-    tol=100.0
+    tol = 100.0
+  )
+  x <- qgamma(p = 0.025, shape = 1.32, rate = 1.0)
+  expect_intol(
+    TO[[which(TO$Description == "Caffeine"), "LL"]],
+    x,
+    tol = 0.01
+  )
+  deltac <- (c_caffeine$get() - x) * 1.113
+  expect_intol(
+    TO[[which(TO$Description == "Caffeine"), "outcome.min"]],
+    (cost_s - cost_c + deltac) / delta_q,
+    tol = 100.0
+  )
+  x <- qgamma(p = 0.975, shape = 1.32, rate = 1.0)
+  expect_intol(
+    TO[[which(TO$Description == "Caffeine"), "UL"]],
+    x,
+    tol = 0.01
+  )
+  deltac <- (c_caffeine$get() - x) * 1.113
+  expect_intol(
+    TO[[which(TO$Description == "Caffeine"), "outcome.max"]],
+    (cost_s - cost_c + deltac) / delta_q,
+    tol = 100.0
   )
 })

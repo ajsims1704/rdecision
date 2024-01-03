@@ -35,14 +35,14 @@ test_that("mean is calculated correctly", {
   alpha <- c(3L, 12L, 9L)
   D <- DirichletDistribution$new(alpha = alpha)
   m <- D$mean()
-  expect_identical(m, c(1L/8L, 1L/2L, 3L/8L))
+  expect_identical(m, c(1L / 8L, 1L / 2L, 3L / 8L))
 })
 
 test_that("mode is calculated correctly", {
   alpha <- c(3L, 12L, 9L)
   D <- DirichletDistribution$new(alpha = alpha)
   m <- D$mode()
-  expect_identical(m, c(2L/21L, 11L/21L, 8L/21L))
+  expect_identical(m, c(2L / 21L, 11L / 21L, 8L / 21L))
   #
   alpha <- c(3.0, 0.5, 9.0)
   D <- DirichletDistribution$new(alpha = alpha)
@@ -88,9 +88,9 @@ test_that("marginal quantiles are from Beta distributions", {
   Q <- D$quantile(p)
   expect_true(is.matrix(Q))
   q1 <- stats::qbeta(p, shape1 = 3L, shape2 = 21L)
-  expect_identical(q1, unname(Q[,"1"]))
+  expect_identical(q1, unname(Q[, "1"]))
   q2 <- stats::qbeta(p, shape1 = 12L, shape2 = 12L)
-  expect_identical(q2, unname(Q[,"2"]))
+  expect_identical(q2, unname(Q[, "2"]))
   q3 <- stats::qbeta(p, shape1 = 9L, shape2 = 15L)
   expect_identical(q3, unname(Q[, "3"]))
 })
@@ -103,15 +103,15 @@ test_that("variance-covariance matrix is calculated correctly", {
   expect_identical(nrow(VC), 3L)
   expect_identical(ncol(VC), 3L)
   VCE <- matrix(
-    c(7L/64L, -1L/16L, -3L/64L, 
-      -1L/16L, 1L/4L, -3L/16L, 
-      -3L/64L, -3L/16L, 15L/64L
-    ), 
+    c(7L / 64L, -1L / 16L, -3L / 64L,
+      -1L / 16L, 1L / 4L, -3L / 16L,
+      -3L / 64L, -3L / 16L, 15L / 64L
+    ),
     nrow = 3L,
     ncol = 3L,
     byrow = TRUE
   )
-  VCE <- VCE/25L
+  VCE <- VCE / 25L
   expect_intol(sum(VC - VCE), 0.0, tolerance = 0.0001)
 })
 
@@ -121,12 +121,12 @@ test_that("random sampling is from a Dirichlet distribution", {
   D <- DirichletDistribution$new(alpha = alpha)
   # test that means are provided at first call to r() without sampling
   samp <- D$r()
-  expect_identical(samp, c(1L/8L, 1L/2L, 3L/8L))
+  expect_identical(samp, c(1L / 8L, 1L / 2L, 3L / 8L))
   # test that sample argument works
   D$sample()
   D$sample(expected = TRUE)
   samp <- D$r()
-  expect_identical(samp, c(1L/8L, 1L/2L, 3L/8L))
+  expect_identical(samp, c(1L / 8L, 1L / 2L, 3L / 8L))
   # sample from it
   n <- 1000L
   osamp <- matrix(nrow = n, ncol = 3L)
@@ -138,7 +138,7 @@ test_that("random sampling is from a Dirichlet distribution", {
   expect_identical(ncol(osamp), 3L)
   expect_identical(sum(is.na(osamp)), 0L)
   # check that marginal distributions are Beta(). Use 99.9% confidence limits;
-  # expected test failure rate is 0.1%; 
+  # expected test failure rate is 0.1%;
   # skip for CRAN
   skip_on_cran()
   marg1 <- rbeta(n, shape1 = alpha[[1L]], shape2 = sum(alpha) - alpha[[1L]])

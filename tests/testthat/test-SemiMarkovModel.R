@@ -6,20 +6,20 @@ test_that("incorrect state types are rejected", {
   s.well <- MarkovState$new("WELL")
   expect_error(
     SemiMarkovModel$new(
-      V=list(s.well, "DISABLED", "STROKE", "DEAD"), 
-      E=list()
-    ), 
-    class="non-Node_vertex"
-  )  
+      V = list(s.well, "DISABLED", "STROKE", "DEAD"),
+      E = list()
+    ),
+    class = "non-Node_vertex"
+  )
   n1 <- Node$new()
   e.ww <- Transition$new(s.well, s.well)
   expect_error(
     SemiMarkovModel$new(
-      V=list(s.well, n1), 
-      E=list(e.ww)
-    ), 
-    class="invalid_state"
-  )  
+      V = list(s.well, n1),
+      E = list(e.ww)
+    ),
+    class = "invalid_state"
+  )
 })
 
 test_that("incorrect transition types are rejected", {
@@ -33,26 +33,26 @@ test_that("incorrect transition types are rejected", {
     SemiMarkovModel$new(
       V = list(s.well, s.disabled, s.dead),
       E = list(e.ww, e.wd, e.dd)
-    ), 
-    class="invalid_transition"
-  )  
+    ),
+    class = "invalid_transition"
+  )
 })
 
 test_that("edge case graphs are rejected", {
   # empty graph
   expect_error(
-    SemiMarkovModel$new(V=list(), E=list()),
+    SemiMarkovModel$new(V = list(), E = list()),
     class = "invalid_graph"
   )
   # single node, no edges
   s.dead <- MarkovState$new("Dead")
   expect_error(
-    SemiMarkovModel$new(V=list(s.dead), E=list()),
+    SemiMarkovModel$new(V = list(s.dead), E = list()),
     class = "invalid_graph"
   )
   # minimal model
   e.dd <- Transition$new(s.dead, s.dead)
-  expect_silent(SemiMarkovModel$new(V=list(s.dead),E=list(e.dd)))
+  expect_silent(SemiMarkovModel$new(V = list(s.dead), E = list(e.dd)))
 })
 
 test_that("multiple digraph edges are rejected", {
@@ -65,7 +65,7 @@ test_that("multiple digraph edges are rejected", {
   # no outgoing transition from dead
   expect_error(
     SemiMarkovModel$new(
-      V = list(s.well, s.dead), 
+      V = list(s.well, s.dead),
       E = list(e.ww, e.wd)
     ),
     class = "missing_transition"
@@ -73,7 +73,7 @@ test_that("multiple digraph edges are rejected", {
   # two self loops from well to well
   expect_error(
     SemiMarkovModel$new(
-      V = list(s.well, s.dead), 
+      V = list(s.well, s.dead),
       E = list(e.ww, e.ww.bleed, e.wd, e.dd)
     ),
     class = "multiple_edges"
@@ -82,7 +82,7 @@ test_that("multiple digraph edges are rejected", {
   e.wd.bleed <- Transition$new(s.well, s.dead)
   expect_error(
     SemiMarkovModel$new(
-      V = list(s.well, s.dead), 
+      V = list(s.well, s.dead),
       E = list(e.ww, e.wd.bleed, e.wd, e.dd)
     ),
     class = "multiple_edges"
@@ -91,7 +91,7 @@ test_that("multiple digraph edges are rejected", {
   e.dw <- Transition$new(s.dead, s.well)
   expect_silent(
     SemiMarkovModel$new(
-      V = list(s.well, s.dead), 
+      V = list(s.well, s.dead),
       E = list(e.ww, e.wd, e.dw, e.dd)
     )
   )
@@ -108,9 +108,9 @@ test_that("unconnected underlying graphs are detected", {
     SemiMarkovModel$new(
       V = list(s.well, s.disabled, s.dead),
       E = list(e.ww, e.wd, e.dd)
-    ), 
-    class="invalid_graph"
-  )  
+    ),
+    class = "invalid_graph"
+  )
 })
 
 test_that("non-unique state labels are detected", {
@@ -127,10 +127,10 @@ test_that("non-unique state labels are detected", {
     SemiMarkovModel$new(
       V = list(s.well, s.disabled, s.dead),
       E = list(e.ww, e.wd, e.ws, e.ss, e.sd, e.dd)
-    ), 
-    class="invalid_state_names"
-  )  
-})  
+    ),
+    class = "invalid_state_names"
+  )
+})
 
 test_that("invalid discount rates are detected", {
   s.well <- MarkovState$new("Well")
@@ -147,17 +147,17 @@ test_that("invalid discount rates are detected", {
       V = list(s.well, s.disabled, s.dead),
       E = list(e.ww, e.wd, e.ws, e.ss, e.sd, e.dd),
       discount.cost = "0"
-    ), 
-    class="invalid_discount"
-  )  
+    ),
+    class = "invalid_discount"
+  )
   expect_error(
     SemiMarkovModel$new(
       V = list(s.well, s.disabled, s.dead),
       E = list(e.ww, e.wd, e.ws, e.ss, e.sd, e.dd),
       discount.utility = "0"
-    ), 
-    class="invalid_discount"
-  )  
+    ),
+    class = "invalid_discount"
+  )
 })
 
 # -----------------------------------------------------------------------------
@@ -165,11 +165,11 @@ test_that("invalid discount rates are detected", {
 # -----------------------------------------------------------------------------
 test_that("invalid transition probabilities are rejected", {
   # create states
-  s.well <- MarkovState$new(name="Well")
-  s.disabled <- MarkovState$new(name="Disabled")
-  s.dead <- MarkovState$new(name="Dead")
-  # state names 
-  snames <- c("Well","Disabled","Dead")
+  s.well <- MarkovState$new(name = "Well")
+  s.disabled <- MarkovState$new(name = "Disabled")
+  s.dead <- MarkovState$new(name = "Dead")
+  # state names
+  snames <- c("Well", "Disabled", "Dead")
   # create transitions
   E <- list(
     Transition$new(s.well, s.well),
@@ -180,14 +180,16 @@ test_that("invalid transition probabilities are rejected", {
     Transition$new(s.disabled, s.dead)
   )
   # create model
-  M <- SemiMarkovModel$new(V = list(s.well, s.disabled, s.dead), E) 
+  M <- SemiMarkovModel$new(V = list(s.well, s.disabled, s.dead), E)
   # check that initial state has equal probabilities
   EPt <- matrix(
     data = c(1L / 3L, 1L / 3L, 1L / 3L, 0L, 0.5, 0.5, 0L, 0L, 1L),
     nrow = 3L, byrow = TRUE,
-    dimnames=list(source = snames, target = snames)
+    dimnames = list(source = snames, target = snames)
   )
-  expect_identical(M$transition_probabilities(), EPt)
+  OPt <- M$transition_probabilities()
+  OPt <- OPt[snames, snames]
+  expect_identical(OPt, EPt)
   # no probabilities
   expect_error(
     M$set_probabilities()
@@ -197,23 +199,23 @@ test_that("invalid transition probabilities are rejected", {
     M$set_probabilities(Pt = 42L), class = "invalid_Pt"
   )
   #  probability matrix is incorrect size
-  ePt <- matrix(c(1L, 0L, 0L, 1L), nrow = 2L, byrow=TRUE)  
+  ePt <- matrix(c(1L, 0L, 0L, 1L), nrow = 2L, byrow = TRUE)
   expect_error(
-    M$set_probabilities(Pt=ePt), class = "invalid_Pt"
+    M$set_probabilities(Pt = ePt), class = "invalid_Pt"
   )
   # probability matrix has incorrect state names
   ePt <- matrix(
     data = c(0.6, 0.2, 0.2, 0.0, 0.6, 0.4, 0.0, 0.0, 1.0),
     nrow = 3L, byrow = TRUE,
-    dimnames = list(source=c("a","b","c"), target=c("a","b","c"))
+    dimnames = list(source = c("a", "b", "c"), target = c("a", "b", "c"))
   )
   expect_error(
-    M$set_probabilities(Pt=ePt), class = "invalid_Pt"
+    M$set_probabilities(Pt = ePt), class = "invalid_Pt"
   )
   ePt <- matrix(
     data = c(0.6, 0.2, 0.2, 0.0, 0.6, 0.4, 0.0, 0.0, 1.0),
     nrow = 3L, byrow = TRUE,
-    dimnames = list(source=snames, target=c("a", "b", "c"))
+    dimnames = list(source = snames, target = c("a", "b", "c"))
   )
   expect_error(
     M$set_probabilities(Pt = ePt), class = "invalid_Pt"
@@ -222,10 +224,10 @@ test_that("invalid transition probabilities are rejected", {
   ePt <- matrix(
     data = c(0.6, NA, NA, 0.0, 0.6, 0.4, 0.0, 0.0, 1.0),
     nrow = 3L, byrow = TRUE,
-    dimnames = list(source=snames, target=snames)
+    dimnames = list(source = snames, target = snames)
   )
   expect_error(
-    M$set_probabilities(Pt=ePt), class = "invalid_Pt"
+    M$set_probabilities(Pt = ePt), class = "invalid_Pt"
   )
   # probability matrix contains values not in range [0,1]
   ePt <- matrix(
@@ -234,7 +236,7 @@ test_that("invalid transition probabilities are rejected", {
     dimnames = list(source = snames, target = snames)
   )
   expect_error(
-    M$set_probabilities(Pt=ePt), class = "invalid_Pt"
+    M$set_probabilities(Pt = ePt), class = "invalid_Pt"
   )
   # probability matrix has non-zero values for undefined transitions
   ePt <- matrix(
@@ -252,13 +254,13 @@ test_that("invalid transition probabilities are rejected", {
     dimnames = list(source = snames, target = snames)
   )
   expect_error(
-    M$set_probabilities(Pt=ePt), class = "invalid_Pt"
+    M$set_probabilities(Pt = ePt), class = "invalid_Pt"
   )
   # Sonnenberg and Beck probability matrix
   pt_sb <- matrix(
     data = c(0.6, 0.2, 0.2, 0.0, 0.6, 0.4, 0.0, 0.0, 1.0),
     nrow = 3L, byrow = TRUE,
-    dimnames = list(source=snames, target=snames)
+    dimnames = list(source = snames, target = snames)
   )
   expect_silent(M$set_probabilities(Pt = pt_sb))
   # Sonnenberg and Beck probability matrix with NAs - check if NAs replaced
@@ -269,14 +271,15 @@ test_that("invalid transition probabilities are rejected", {
   )
   expect_silent(M$set_probabilities(Pt = pt_sb_na))
   ept_sb <- M$transition_probabilities()
+  ept_sb <- ept_sb[snames, snames]
   expect_identical(ept_sb, pt_sb)
 })
 
 test_that("NAs are replaced in transition probability matrix", {
   # create states
-  s.well <- MarkovState$new(name="Well")
-  s.disabled <- MarkovState$new(name="Disabled")
-  s.dead <- MarkovState$new(name="Dead")
+  s.well <- MarkovState$new(name = "Well")
+  s.disabled <- MarkovState$new(name = "Disabled")
+  s.dead <- MarkovState$new(name = "Dead")
   # create transitions
   E <- list(
     Transition$new(s.well, s.well),
@@ -287,21 +290,23 @@ test_that("NAs are replaced in transition probability matrix", {
     Transition$new(s.disabled, s.dead)
   )
   # create model
-  M <- SemiMarkovModel$new(V = list(s.well, s.disabled, s.dead), E) 
+  M <- SemiMarkovModel$new(V = list(s.well, s.disabled, s.dead), E)
   # use S&B per-cycle transition probabilities
-  snames <- c("Well","Disabled","Dead")
+  snames <- c("Well", "Disabled", "Dead")
   EPt <- matrix(
     data = c(0.6, 0.2, 0.2, 0.0, 0.6, 0.4, 0.0, 0.0, 1.0),
     nrow = 3L, byrow = TRUE,
-    dimnames = list(source=snames, target=snames)
+    dimnames = list(source = snames, target = snames)
   )
   Pt <- matrix(
     data = c(0.6, NA, 0.2, 0.0, 0.6, 0.4, 0.0, 0.0, NA),
     nrow = 3L, byrow = TRUE,
-    dimnames = list(source=snames, target=snames)
+    dimnames = list(source = snames, target = snames)
   )
   M$set_probabilities(Pt)
-  expect_identical(round(M$transition_probabilities(),2L), round(EPt, 2L))
+  OPt <- M$transition_probabilities()
+  OPt <- OPt[snames, snames]
+  expect_identical(round(OPt, 2L), round(EPt, 2L))
 })
 
 # -----------------------------------------------------------------------------
@@ -309,9 +314,9 @@ test_that("NAs are replaced in transition probability matrix", {
 # -----------------------------------------------------------------------------
 test_that("transition cost matrix is correct", {
   # create states
-  s.well <- MarkovState$new(name="Well")
-  s.disabled <- MarkovState$new(name="Disabled", cost = 750.0)
-  s.dead <- MarkovState$new(name="Dead")
+  s.well <- MarkovState$new(name = "Well")
+  s.disabled <- MarkovState$new(name = "Disabled", cost = 750.0)
+  s.dead <- MarkovState$new(name = "Dead")
   # create transitions
   E <- list(
     Transition$new(s.well, s.well),
@@ -322,41 +327,47 @@ test_that("transition cost matrix is correct", {
     Transition$new(s.disabled, s.dead, cost = 500.0)
   )
   # create model
-  M <- SemiMarkovModel$new(V = list(s.well, s.disabled, s.dead), E) 
+  M <- SemiMarkovModel$new(V = list(s.well, s.disabled, s.dead), E)
   # use S&B per-cycle transition probabilities
-  snames <- c("Well","Disabled","Dead")
+  snames <- c("Well", "Disabled", "Dead")
   Pt <- matrix(
     data = c(0.6, NA, 0.2, 0.0, 0.6, 0.4, 0.0, 0.0, NA),
     nrow = 3L, byrow = TRUE,
-    dimnames = list(source=snames, target=snames)
+    dimnames = list(source = snames, target = snames)
   )
   M$set_probabilities(Pt)
   # check the transition cost matrix
   ECt <- matrix(
     data = c(0.0, 1000.0, 250.0, 0.0, 0.0, 500.0, 0.0, 0.0, 0.0),
     nrow = 3L, byrow = TRUE,
-    dimnames = list(source=snames, target=snames)
+    dimnames = list(source = snames, target = snames)
   )
   Ct <- M$transition_cost()
+  Ct <- Ct[snames, snames]
   expect_identical(Ct, ECt)
+  # set the starting populations
+  M$reset(populations = c("Well" = 1000L, "Disabled" = 0L, "Dead" = 0L))
   # check that transition costs are accumulated
   C1 <- M$cycle(hcc.pop = FALSE, hcc.cost = FALSE)
-  ec.disabled <- 0.2*1000.0
+  ec.disabled <- 0.2 * 1000.0
   expect_identical(
-    round(C1$EntryCost[C1$State=="Disabled"], 2L), round(ec.disabled, 2L)
+    round(C1[[which(C1[, "State"] == "Disabled"), "EntryCost"]], 2L),
+    round(ec.disabled, 2L)
   )
-  ec.dead <- 0.2*250.0
+  ec.dead <- 0.2 * 250.0
   expect_identical(
-    round(C1$EntryCost[C1$State=="Dead"], 2L), round(ec.dead, 2L)
+    round(C1[[which(C1[, "State"] == "Dead"), "EntryCost"]], 2L),
+    round(ec.dead, 2L)
   )
   # check that entry costs and occupancy costs are added
-  oc.disabled <- 0.2*750.0
+  oc.disabled <- 0.2 * 750.0
   expect_identical(
-    round(C1$Cost[C1$State=="Disabled"], 2L), 
+    round(C1[[which(C1[, "State"] == "Disabled"), "Cost"]], 2L),
     round(oc.disabled + ec.disabled, 2L)
   )
   expect_identical(
-    round(C1$Cost[C1$State=="Dead"], 2L), round(ec.dead, 2L)
+    round(C1[[which(C1[, "State"] == "Dead"), "Cost"]], 2L),
+    round(ec.dead, 2L)
   )
 })
 
@@ -365,7 +376,7 @@ test_that("transition cost matrix is correct", {
 # -----------------------------------------------------------------------------
 test_that("invalid population vectors are rejected", {
   # create the model
-  s.well <- MarkovState$new(name="Well")
+  s.well <- MarkovState$new(name = "Well")
   s.disabled <- MarkovState$new("Disabled")
   s.dead <- MarkovState$new("Dead")
   e.ww <- Transition$new(s.well, s.well)
@@ -382,9 +393,9 @@ test_that("invalid population vectors are rejected", {
   expect_setequal(M$get_statenames(), list("Well", "Disabled", "Dead"))
   # check default population
   rp <- M$get_populations()
-  expect_identical(unname(rp[1L]), 1000.0)
-  expect_identical(unname(rp[2L]), 0.0)
-  expect_identical(unname(rp[3L]), 0.0)
+  expect_identical(unname(rp[[1L]]), 0.0)
+  expect_identical(unname(rp[[2L]]), 0.0)
+  expect_identical(unname(rp[[3L]]), 0.0)
   # number of elements
   pop <- c(Well = 10000L, Disabled = 0L)
   expect_error(M$reset(pop), class = "invalid_populations")
@@ -407,7 +418,7 @@ test_that("invalid population vectors are rejected", {
 
 test_that("invalid cycle numbers are rejected", {
   # create the model
-  s.well <- MarkovState$new(name="Well")
+  s.well <- MarkovState$new(name = "Well")
   s.disabled <- MarkovState$new("Disabled")
   s.dead <- MarkovState$new("Dead")
   e.ww <- Transition$new(s.well, s.well)
@@ -422,13 +433,13 @@ test_that("invalid cycle numbers are rejected", {
   )
   # attempt to reset with illegal cycle numbers
   expect_error(M$reset(icycle = 2.0), class = "invalid_icycle")
-  expect_error(M$reset(icycle = "2"), class="invalid_icycle")
-  expect_error(M$reset(icycle = -1L), class="invalid_icycle")
+  expect_error(M$reset(icycle = "2"), class = "invalid_icycle")
+  expect_error(M$reset(icycle = -1L), class = "invalid_icycle")
 })
 
 test_that("invalid elapsed times are rejected", {
   # create the model
-  s.well <- MarkovState$new(name="Well")
+  s.well <- MarkovState$new(name = "Well")
   s.disabled <- MarkovState$new("Disabled")
   s.dead <- MarkovState$new("Dead")
   e.ww <- Transition$new(s.well, s.well)
@@ -442,11 +453,11 @@ test_that("invalid elapsed times are rejected", {
     E = list(e.ww, e.ss, e.dd, e.ws, e.wd, e.sd)
   )
   # attempt to reset with illegal elapsed times
-  expect_error(M$reset(elapsed = 2.0), class="invalid_elapsed")
-  expect_error(M$reset(elapsed = "2"), class="invalid_elapsed")
+  expect_error(M$reset(elapsed = 2.0), class = "invalid_elapsed")
+  expect_error(M$reset(elapsed = "2"), class = "invalid_elapsed")
   expect_error(
-    M$reset(icycle = as.difftime(-1.0, units = "days")), 
-    class="invalid_icycle"
+    M$reset(icycle = as.difftime(-1.0, units = "days")),
+    class = "invalid_icycle"
   )
 })
 
@@ -466,17 +477,17 @@ test_that("model variables are detected", {
   cccb <- GammaModVar$new("cccb", "GBP", shape = 1.0, scale = 1278.0)
   cccc <- GammaModVar$new("cccc", "GBP", shape = 1.0, scale = 2059.0)
   # occupancy costs with monotherapy
-  cAm <- ExprModVar$new("cA", "GBP", rlang::quo(dmca+ccca+cAZT))
-  cBm <- ExprModVar$new("cB", "GBP", rlang::quo(dmcb+cccb+cAZT))
-  cCm <- ExprModVar$new("cC", "GBP", rlang::quo(dmcc+cccc+cAZT))
+  cAm <- ExprModVar$new("cA", "GBP", rlang::quo(dmca + ccca + cAZT))
+  cBm <- ExprModVar$new("cB", "GBP", rlang::quo(dmcb + cccb + cAZT))
+  cCm <- ExprModVar$new("cC", "GBP", rlang::quo(dmcc + cccc + cAZT))
   # Markov model
   # ============
   # states (leave all costs as zero initially)
-  sA <- MarkovState$new("A", cost=cAm)
-  sB <- MarkovState$new("B", cost=cBm)
-  sC <- MarkovState$new("C", cost=cCm)
+  sA <- MarkovState$new("A", cost = cAm)
+  sB <- MarkovState$new("B", cost = cBm)
+  sC <- MarkovState$new("C", cost = cCm)
   sD <- MarkovState$new("D", cost = 0.0, utility = 0.0)
-  # transitions 
+  # transitions
   tAA <- Transition$new(sA, sA)
   tAB <- Transition$new(sA, sB)
   tAC <- Transition$new(sA, sC)
@@ -538,8 +549,11 @@ test_that("low-level population cycling operates as expected", {
         elapsed_pre <- private$smm.elapsed
         # run one low-level cycle
         n_t <- private$cycle_pop()
+        # reorder the probability matrix with revised state names
+        snames <- self$get_statenames()
+        lpt <- Pt[snames, snames, drop = FALSE]
         # check that the populations and cycle details have updated
-        epop <- drop(pop_pre %*% Pt)
+        epop <- drop(pop_pre %*% lpt)
         expect_identical(private$smm.pop, epop)
         expect_identical(private$smm.icycle, icycle_pre + 1L)
         expect_identical(private$smm.elapsed, elapsed_pre + private$smm.tcycle)
@@ -551,7 +565,7 @@ test_that("low-level population cycling operates as expected", {
   # create the model
   m <- TestSemiMarkovModel$new(V = list(s.well, s.disabled, s.dead), E)
   m$set_probabilities(Pt)
-  m$reset(c(Well = 10000.0, Disabled = 0.0, Dead = 0.0)) 
+  m$reset(c(Well = 10000.0, Disabled = 0.0, Dead = 0.0))
   # run one low-level population cycle and check against expected populations
   n_t <- m$test_cycle_pop()
   expect_true(is.matrix(n_t))
@@ -569,23 +583,23 @@ test_that("low-level population cycling operates as expected", {
   expect_identical(round(pop[["Disabled"]]), 2400.0)
   expect_identical(round(pop[["Dead"]]), 4000.0)
   # run 23 more cycles
-  for (i in 1L:23L) {
-    m$test_cycle_pop() 
+  for (i in 1L : 23L) {
+    m$test_cycle_pop()
   }
-  expect_identical(m$get_elapsed(), as.difftime(25.0*365.25, units = "days"))
+  expect_identical(m$get_elapsed(), as.difftime(25.0 * 365.25, units = "days"))
 })
 
 test_that("model is cyclable", {
   # create states
-  s.well <- MarkovState$new(name="Well")
-  s.disabled <- MarkovState$new(name="Disabled")
-  s.dead <- MarkovState$new(name="Dead")
+  s.well <- MarkovState$new(name = "Well")
+  s.disabled <- MarkovState$new(name = "Disabled")
+  s.dead <- MarkovState$new(name = "Dead")
   # use S&B per-cycle transition probabilities and calculate rates
-  snames <- c("Well","Disabled","Dead")
+  snames <- c("Well", "Disabled", "Dead")
   Pt <- matrix(
     data = c(0.6, 0.2, 0.2, 0.0, 0.6, 0.4, 0.0, 0.0, 1.0),
     nrow = 3L, byrow = TRUE,
-    dimnames = list(source=snames, target=snames)
+    dimnames = list(source = snames, target = snames)
   )
   # create transitions
   E <- list(
@@ -598,8 +612,8 @@ test_that("model is cyclable", {
   )
   # detect illegal parameters to cycle()
   expect_error(
-    SemiMarkovModel$new(V = list(s.well, s.disabled, s.dead), E, tcycle = 42L), 
-    class="invalid_tcycle"
+    SemiMarkovModel$new(V = list(s.well, s.disabled, s.dead), E, tcycle = 42L),
+    class = "invalid_tcycle"
   )
   # create the model
   M <- SemiMarkovModel$new(V = list(s.well, s.disabled, s.dead), E)
@@ -613,8 +627,8 @@ test_that("model is cyclable", {
   expect_identical(M$get_elapsed(), as.difftime(365.25, units = "days"))
   expect_s3_class(DF, "data.frame")
   expect_setequal(
-    names(DF), 
-    c("State", "Cycle", "Time", "Population", "EntryCost", "OccCost", "Cost", 
+    names(DF),
+    c("State", "Cycle", "Time", "Population", "EntryCost", "OccCost", "Cost",
       "QALY")
   )
   expect_identical(nrow(DF), 3L)
@@ -642,56 +656,11 @@ test_that("utilities > 1 are supported via model variables", {
     dimnames = list(source = c("A", "B", "C"), target = c("A", "B", "C"))
   )
   m$set_probabilities(pt)
+  m$reset(populations = c("A" = 1000L, "B" = 0L, "C" = 0L))
   tr <- m$cycle(hcc.pop = FALSE, hcc.cost = FALSE)
   expect_intol(
-    tr$QALY[tr$State == "C" & tr$Cycle == 1L], 
+    tr[[which(tr[, "State"] == "C" & tr[, "Cycle"] == 1L), "QALY"]],
     (1000.0 * 0.1 * 2.0) / 1000.0,
     0.01
   )
-})
-
-# -----------------------------------------------------------------------------
-# Sonnenberg & Beck, Med Decis Making, 1993;13:322, Fig 3
-# (prosthetic heart valve)
-# -----------------------------------------------------------------------------
-test_that("rdecision replicates Sonnenberg & Beck, Fig 3", {
-  # create states
-  s.well <- MarkovState$new(name = "Well", utility = 1.0)
-  s.disabled <- MarkovState$new(name = "Disabled", utility = 0.7)
-  s.dead <- MarkovState$new(name = "Dead", utility = 0.0)
-  # create transitions leaving rates undefined
-  E <- list(
-    Transition$new(s.well, s.well),
-    Transition$new(s.dead, s.dead),
-    Transition$new(s.disabled, s.disabled),
-    Transition$new(s.well, s.disabled),
-    Transition$new(s.well, s.dead),
-    Transition$new(s.disabled, s.dead)
-  )
-  # create the model
-  M <- SemiMarkovModel$new(V = list(s.well, s.disabled, s.dead), E)
-  # check the state tabulation
-  ST <- M$tabulate_states()
-  expect_setequal(names(ST), c("Name", "Cost", "Utility"))
-  expect_identical(nrow(ST), 3L)
-  # create transition probability matrix
-  snames <- c("Well","Disabled","Dead")
-  EPt <- matrix(
-    data = c(0.6, 0.2, 0.2, 0.0, 0.6, 0.4, 0.0, 0.0, 1.0),
-    nrow = 3L, byrow = TRUE,
-    dimnames = list(source=snames, target=snames)
-  )
-  # set and check the transition probabilities
-  M$set_probabilities(EPt)
-  Pt <- M$transition_probabilities()
-  expect_true(all(EPt-Pt < sqrt(.Machine$double.eps)))
-  # set the starting populations
-  M$reset(c(Well = 10000.0, Disabled = 0.0, Dead = 0.0)) 
-  # cycle
-  RC <- M$cycles(25L, hcc.pop = FALSE, hcc.cost = FALSE)
-  expect_identical(M$get_elapsed(), as.difftime(25.0*365.25, units="days"))
-  expect_s3_class(RC, "data.frame")
-  expect_identical(round(RC$Well[RC$Cycle == 2L]), 3600.0)
-  expect_identical(round(RC$Disabled[RC$Cycle == 2L]), 2400.0)
-  expect_identical(round(RC$Dead[RC$Cycle == 2L]), 4000.0)
 })

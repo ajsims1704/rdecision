@@ -171,7 +171,7 @@ test_that("as_numeric identifies non ModVar objects", {
   expect_length(xo, 3L)
   expect_true(all(is.numeric(xo)))
   expect_true(all(is.na(xo)))
-  # R6 class but not ModVar    
+  # R6 class but not ModVar
   xi <- R6::R6Class()
   xo <- as_numeric(xi)
   expect_true(is.na(xo))

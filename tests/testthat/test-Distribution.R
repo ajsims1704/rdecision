@@ -105,7 +105,7 @@ test_that("single sample has K dimensions", {
 
 test_that("invalid arguments to sample are detected", {
   D <- Distribution$new("Base", K = 3L)
-  expect_error(D$sample(42L), class = "invalid_expected")  
+  expect_error(D$sample(42L), class = "invalid_expected")
 })
 
 test_that("univariate samples are scalars", {

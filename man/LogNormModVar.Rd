@@ -5,7 +5,7 @@
 \alias{LogNormModVar}
 \title{A model variable whose uncertainty follows a log Normal distribution}
 \description{
-An R6 class representing a model variable with log Normal 
+An R6 class representing a model variable with log Normal
 uncertainty.
 }
 \details{
@@ -14,17 +14,17 @@ be modelled with a log Normal distribution. One of seven parametrizations
 defined by Swat \emph{et al} can be used. Inherits from \code{ModVar}.
 }
 \references{
-{ 
+{
  Briggs A, Claxton K and Sculpher M. Decision Modelling for Health
  Economic Evaluation. Oxford 2006, ISBN 978-0-19-852662-9.
 
  Leaper DJ, Edmiston CE and Holy CE. Meta-analysis of the potential
- economic impact following introduction of absorbable antimicrobial 
+ economic impact following introduction of absorbable antimicrobial
  sutures. \emph{British Journal of Surgery} 2017;\bold{104}:e134-e144.
 
  Swat MJ, Grenon P and Wimalaratne S. Ontology and Knowledge Base of
  Probability Distributions. \acronym{EMBL-EBI} Technical Report
- (ProbOnto 2.5), 13 January 2017, 
+ (ProbOnto 2.5), 13 January 2017,
  \url{https://sites.google.com/site/probonto/download}.
 }
 }
@@ -78,7 +78,7 @@ Create a model variable with log normal uncertainty.
 
 \item{\code{units}}{Units of the quantity; character string.}
 
-\item{\code{p1}}{First hyperparameter, a measure of location. 
+\item{\code{p1}}{First hyperparameter, a measure of location.
 See \emph{Details}.}
 
 \item{\code{p2}}{Second hyperparameter, a measure of spread.
@@ -97,8 +97,8 @@ A \code{LogNormModVar} object.
 \if{html}{\out{<a id="method-LogNormModVar-is_probabilistic"></a>}}
 \if{latex}{\out{\hypertarget{method-LogNormModVar-is_probabilistic}{}}}
 \subsection{Method \code{is_probabilistic()}}{
-Tests whether the model variable is probabilistic, i.e. a random
-variable that follows a distribution, or an expression involving
+Tests whether the model variable is probabilistic, i.e., a
+random variable that follows a distribution, or an expression involving
 random variables, some of which follow distributions.
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{LogNormModVar$is_probabilistic()}\if{html}{\out{</div>}}

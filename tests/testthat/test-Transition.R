@@ -5,12 +5,12 @@ test_that("initialize parameters are checked", {
   expect_silent(Transition$new(s1, s2))
   expect_error(Transition$new(s1, s2, label = 42L), class = "non-string_label")
   n1 <- Node$new()
-  expect_error(Transition$new(n1,s2), class="invalid_source")
-  expect_error(Transition$new(s1,n1), class="invalid_target")
-  expect_silent(Transition$new(s1,s2))
-  expect_error(Transition$new(s1,s2,cost="200"), class="invalid_cost")
-  expect_silent(Transition$new(s1,s2,label=""))
-  expect_silent(Transition$new(s1,s2,label="mychance"))
+  expect_error(Transition$new(n1, s2), class = "invalid_source")
+  expect_error(Transition$new(s1, n1), class = "invalid_target")
+  expect_silent(Transition$new(s1, s2))
+  expect_error(Transition$new(s1, s2, cost = "200"), class = "invalid_cost")
+  expect_silent(Transition$new(s1, s2, label = ""))
+  expect_silent(Transition$new(s1, s2, label = "mychance"))
   # check values are retrieved
   MT <- Transition$new(s1, s2, cost = 20.0)
   expect_identical(MT$cost(), 20.0)
@@ -56,7 +56,7 @@ test_that("ModVars are identified and their values are returned", {
   # expression modvar
   discount <- ConstModVar$new("discount", "rate", 0.1)
   dcost <- ExprModVar$new(
-    "true cost", "GPB", 
+    "true cost", "GPB",
     rlang::quo(fortytwo * (1.0 - discount))
   )
   e <- Transition$new(s1, s2, cost = dcost, label = "label")

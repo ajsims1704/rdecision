@@ -11,8 +11,8 @@ Updated \code{MarkovState} object
 An R6 class representing a state in a Markov model.
 }
 \details{
-Represents a single state in a Markov model. A Markov model is 
-a digraph in which states are nodes and transitions are arrows. Inherits 
+Represents a single state in a Markov model. A Markov model is
+a digraph in which states are nodes and transitions are arrows. Inherits
 from class \code{Node}.
 }
 \author{
@@ -55,7 +55,7 @@ Create an object of type \code{MarkovState}.
 \describe{
 \item{\code{name}}{The name of the state (character string).}
 
-\item{\code{cost}}{The annual cost of state occupancy (numeric or 
+\item{\code{cost}}{The annual cost of state occupancy (numeric or
 \code{ModVar}). Default 0.0.}
 
 \item{\code{utility}}{The utility associated with being in the state (numeric
@@ -64,7 +64,7 @@ or \code{ModVar}).}
 \if{html}{\out{</div>}}
 }
 \subsection{Details}{
-Utility must be in the range \code{[-Inf,1]}. If it is of type 
+Utility must be in the range \code{[-Inf,1]}. If it is of type
 numeric, the range is checked on object creation.
 }
 
@@ -138,8 +138,8 @@ Find all the model variables.
 }
 
 \subsection{Details}{
-Find variables of type \code{ModVar} that have been 
-specified as values associated with this \code{MarkovState}. 
+Find variables of type \code{ModVar} that have been
+specified as values associated with this \code{MarkovState}.
 Includes operands of these \code{ModVar}s, if they are expressions.
 }
 

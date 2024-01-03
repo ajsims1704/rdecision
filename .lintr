@@ -1,10 +1,7 @@
 linters: all_linters(
   cyclocomp_linter = cyclocomp_linter(complexity_limit = 85L),
-  commas_linter = NULL,
   extraction_operator_linter = NULL,
-  infix_spaces_linter = NULL,
   object_name_linter = NULL,
-  trailing_whitespace_linter = NULL
   )
 exclusions: list(
     "tests/testthat.R"

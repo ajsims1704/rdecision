@@ -75,7 +75,7 @@ An object of class \code{BetaModVar}.
 \if{html}{\out{<a id="method-BetaModVar-is_probabilistic"></a>}}
 \if{latex}{\out{\hypertarget{method-BetaModVar-is_probabilistic}{}}}
 \subsection{Method \code{is_probabilistic()}}{
-Tests whether the model variable is probabilistic, 
+Tests whether the model variable is probabilistic,
 i.e. a random variable that follows a distribution, or an expression
 involving random variables, some of which follow distributions.
 \subsection{Usage}{

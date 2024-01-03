@@ -8,13 +8,13 @@ test_that("illegal initializations are rejected", {
     LogNormModVar$new("lognorm", 42L, 1.0, 1.0), class = "units_not_string"
   )
   expect_error(
-    LogNormModVar$new("lognorm", "GBP"," 1", 1.0), class = "p1_not_numeric"
+    LogNormModVar$new("lognorm", "GBP", " 1", 1.0), class = "p1_not_numeric"
   )
   expect_error(
     LogNormModVar$new("lognorm", "GBP", 1.0, "1"), class = "p2_not_numeric"
   )
   expect_error(
-    LogNormModVar$new("lognorm", "GBP", 1.0, 1.0, "LN8"), 
+    LogNormModVar$new("lognorm", "GBP", 1.0, 1.0, "LN8"),
     class = "parametrization_not_supported"
   )
 })
@@ -35,15 +35,15 @@ test_that("modvar has correct distribution name", {
 test_that("mean, mode, sd and quantiles are returned correctly", {
   mu <- 0.0
   sigma <- 0.25
-  ln <- LogNormModVar$new("ln", "GBP", p1=mu, p2=sigma, "LN1")
+  ln <- LogNormModVar$new("ln", "GBP", p1 = mu, p2 = sigma, "LN1")
   expect_intol(ln$mean(), exp(mu + (sigma ^ 2L) / 2L), 0.01)
   sd <- sqrt((exp(sigma ^ 2L) - 1L) * (exp(2L * mu + sigma ^ 2L)))
   expect_intol(ln$SD(), sd, 0.01)
   expect_intol(ln$mode(), exp(mu - sigma ^ 2L), 0.01)
   # quantiles
   expect_intol(ln$quantile(0.5), exp(mu), 0.01)
-  erf.inv <- function(x) qnorm((x + 1L) / 2L)/sqrt(2L)
-  ln.quant <- function(mu,sigma,p) {
+  erf.inv <- function(x) qnorm((x + 1L) / 2L) / sqrt(2L)
+  ln.quant <- function(mu, sigma, p) {
     exp(mu + sqrt(2L * sigma ^ 2L) * erf.inv(2L * p - 1L))
   }
   expect_intol(ln$quantile(0.25), ln.quant(mu, sigma, 0.25), 0.01)
@@ -53,15 +53,15 @@ test_that("mean, mode, sd and quantiles are returned correctly", {
 test_that("quantile function checks inputs and has correct output", {
   mu <- 0.0
   sigma <- 0.25
-  ln <- LogNormModVar$new("ln", "GBP", p1=mu, p2=sigma, "LN1")
+  ln <- LogNormModVar$new("ln", "GBP", p1 = mu, p2 = sigma, "LN1")
   probs <- c(0.1, 0.2, 0.5)
   expect_silent(ln$quantile(probs))
   probs <- c(0.1, NA, 0.5)
-  expect_error(ln$quantile(probs), class="probs_not_defined")
+  expect_error(ln$quantile(probs), class = "probs_not_defined")
   probs <- c(0.1, "boo", 0.5)
-  expect_error(ln$quantile(probs), class="probs_not_numeric")
+  expect_error(ln$quantile(probs), class = "probs_not_numeric")
   probs <- c(0.1, 0.4, 1.5)
-  expect_error(ln$quantile(probs), class="probs_out_of_range")
+  expect_error(ln$quantile(probs), class = "probs_out_of_range")
   probs <- c(0.1, 0.2, 0.5)
   expect_length(ln$quantile(probs), 3L)
 })
@@ -78,7 +78,7 @@ test_that("random sampling is from a log normal distribution", {
   sigma <- 0.25
   n <- 1000L
   ln <- LogNormModVar$new("ln", "GBP", mu, sigma, "LN1")
-  samp <- vapply(seq_len(n), FUN.VALUE = 1.0, FUN=function(i) {
+  samp <- vapply(seq_len(n), FUN.VALUE = 1.0, FUN = function(i) {
     ln$set("random")
     rv <- ln$get()
     return(rv)
@@ -120,8 +120,8 @@ test_that("parametrizations are linked", {
   expect_intol(ln1$mode(), ln6$mode(), 0.01)
   # 7
   ln7 <- LogNormModVar$new(
-    "ln7", "GBP", exp(mu + (sigma ^ 2L) / 2L), 
-    exp(mu + (sigma ^ 2L) / 2L)*sqrt(exp(sigma ^ 2L) - 1L), "LN7"
+    "ln7", "GBP", exp(mu + (sigma ^ 2L) / 2L),
+    exp(mu + (sigma ^ 2L) / 2L) * sqrt(exp(sigma ^ 2L) - 1L), "LN7"
   )
   expect_intol(ln1$mean(), ln7$mean(), 0.01)
   expect_intol(ln1$mode(), ln7$mode(), 0.01)

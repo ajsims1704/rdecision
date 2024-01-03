@@ -8,10 +8,10 @@
 An R6 class representing a constant in a model.
 }
 \details{
-A \code{ModVar} with no uncertainty in its value. Its distribution 
-is treated as a Dirac delta function \eqn{\delta(x-c)} where \eqn{c} is the 
-hyperparameter (value of the constant). The benefit over 
-using a regular numeric variable in a model is that it will appear in 
+A \code{ModVar} with no uncertainty in its value. Its distribution
+is treated as a Dirac delta function \eqn{\delta(x-c)} where \eqn{c} is the
+hyperparameter (value of the constant). The benefit over
+using a regular numeric variable in a model is that it will appear in
 tabulations of the model variables associated with a model and therefore be
 explicitly documented as a model input. Inherits from class \code{ModVar}.
 }
@@ -83,8 +83,8 @@ Tests whether the model variable is probabilistic.
 }
 
 \subsection{Details}{
-Does the random variable follow a distribution, or is it an 
-expression involving' random variables, some of which follow 
+Does the random variable follow a distribution, or is it an
+expression involving' random variables, some of which follow
 distributions?
 }
 

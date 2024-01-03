@@ -8,8 +8,8 @@
 An R6 class representing a chance node in a decision tree.
 }
 \details{
-A chance node is associated with at least two branches to other 
-nodes, each of which has a conditional probability (the probability of 
+A chance node is associated with at least two branches to other
+nodes, each of which has a conditional probability (the probability of
 following that branch given that the node has been reached). Inherits from
 class \code{Node}.
 }

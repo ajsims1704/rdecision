@@ -4,14 +4,16 @@ test_that("new object arguments are checked", {
   t1 <- LeafNode$new("t1")
   p <- 0.5
   expect_error(Reaction$new(c1, t1))
-  expect_error(Reaction$new(c1,t1,p,label = 42L), class = "non-string_label")
-  expect_error(Reaction$new(t1,c1,p), class="invalid_source")
-  expect_silent(Reaction$new(c1,t1,p))
-  expect_error(Reaction$new(c1,t1,"0.5"), class="invalid_probability")
-  expect_error(Reaction$new(c1,t1,p,cost="200"), class="invalid_cost")
-  expect_error(Reaction$new(c1,t1,p,benefit="200"), class="invalid_benefit")
-  expect_silent(Reaction$new(c1,t1,p,label=""))
-  expect_silent(Reaction$new(c1,t1,p,label="mychance"))
+  expect_error(Reaction$new(c1, t1, p, label = 42L), class = "non-string_label")
+  expect_error(Reaction$new(t1, c1, p), class = "invalid_source")
+  expect_silent(Reaction$new(c1, t1, p))
+  expect_error(Reaction$new(c1, t1, "0.5"), class = "invalid_probability")
+  expect_error(Reaction$new(c1, t1, p, cost = "200"), class = "invalid_cost")
+  expect_error(
+    Reaction$new(c1, t1, p, benefit = "200"), class = "invalid_benefit"
+  )
+  expect_silent(Reaction$new(c1, t1, p, label = ""))
+  expect_silent(Reaction$new(c1, t1, p, label = "mychance"))
 })
 
 test_that("class parameters are updated dynamically", {

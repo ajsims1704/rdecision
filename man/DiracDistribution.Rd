@@ -9,11 +9,11 @@ An R6 class representing a Dirac Delta function.
 }
 \details{
 A distribution modelled by a Dirac delta function \eqn{\delta(x-c)}
-where \eqn{c} is the hyperparameter (value of the constant). It has 
-probability 1 that the value will be equal to \eqn{c} and zero otherwise. 
+where \eqn{c} is the hyperparameter (value of the constant). It has
+probability 1 that the value will be equal to \eqn{c} and zero otherwise.
 The mode, mean, quantiles and random samples are all equal to \eqn{c}. It is
-acknowledged that there is debate over whether Dirac delta functions are 
-true distributions, but the assumption makes little practical difference in 
+acknowledged that there is debate over whether Dirac delta functions are
+true distributions, but the assumption makes little practical difference in
 this case. Inherits from class \code{Distribution}.
 }
 \author{
@@ -87,7 +87,7 @@ Return the mode of the distribution.
 }
 
 \subsection{Returns}{
-Numeric Value where the distribution is centred.
+Numeric Value where the distribution is centered.
 }
 }
 \if{html}{\out{<hr>}}

@@ -37,13 +37,22 @@ knitr::opts_chunk$set(
 )
 ```
 
-```{r, gv2png}
-```
-```{r, gbp}
+```{r}
+#| gbp
 ```
 
-```{r setup, echo=FALSE}
-library("rdecision")
+```{r}
+#| purl = FALSE
+#nolint start
+```
+
+```{r}
+library(rdecision)
+```
+
+```{r}
+#| purl = FALSE
+#nolint end
 ```
 
 # Introduction
@@ -68,19 +77,25 @@ model is identical for monotherapy and combination therapy, we will use the
 same model throughout. For this reason, the costs of occupancy of each state
 and the costs of making transitions between states are set to zero when the
 model is created, and will be changed each time the model is run.
-```{r, model, echo=TRUE}
+```{r}
+#| model,
+#| echo = TRUE
 ```
 
 ## Costs and discounts
 The costs and discount rates used in the model (1995 rates) are numerical
 constants, and are defined as follows. 
-```{r, costs-det, echo = TRUE}
+```{r}
+#| costs-det,
+#| echo = TRUE
 ```
 
 ## Treatment effect
 The treatment effect was estimated by Chancellor *et al* [-@chancellor1997]
 via a meta-analysis, and is defined as follows:
-```{r, txeffect-det, echo = TRUE}
+```{r}
+#| txeffect-det,
+#| echo = TRUE
 ```
 
 ## Transition rates and probabilities
@@ -89,7 +104,9 @@ in 1 year as transition probabilities by dividing counts by the total
 transitions observed from each state. With this assumption, the annual 
 (per-cycle) transition probabilities are calculated as follows and applied
 to the model via the `set_probabilities` function.
-```{r, pt-mono-det, echo=TRUE}
+```{r}
+#| pt-mono-det,
+#| echo = TRUE
 ```
 
 More usually, fully observed transition counts are converted into 
@@ -115,11 +132,25 @@ visualization with the `dot` tool of Graphviz, or plotted directly in R via
 the `DiagrammeR` package. The Markov model is shown in the figure below.
 
 ```{r}
-#| fig.cap = "Markov model for comparison of HIV therapy. 
+#| fig.cap = "Markov model for comparison of HIV therapy.
 #|            A: 200 < cd4 < 500, B: cd4 < 200, C: AIDS, D: Death.",
-#| purl = FALSE
-pngfile <- gv2png(m$as_DOT())
-knitr::include_graphics(path = pngfile)
+#| purl = FALSE,
+#| eval = FALSE
+DiagrammeR::grViz(m$as_DOT())
+```
+
+```{r}
+#| gv2png
+```
+
+```{r}
+#| fig.cap = "Markov model for comparison of HIV therapy.
+#|            A: 200 < cd4 < 500, B: cd4 < 200, C: AIDS, D: Death.",
+# images created with dot are more compact than DiagrammeR.
+pngfile <- gv2png(
+  dot = m$as_DOT(rankdir = "TB", width = 7.0, height = 7.0)
+)
+knitr::include_graphics(pngfile)
 ```
 
 ## Per-cycle transition probabilities
@@ -150,7 +181,9 @@ the model for monotherapy. The arguments to the function are the transition
 probability matrix, the occupancy costs for states A, B, and C, and a logical
 variable which determines whether to apply half-cycle correction to the state
 populations.
-```{r, run-mono, echo = TRUE}
+```{r}
+#| run-mono,
+#| echo = TRUE
 ```
 
 > Coding note: In function `run_mono`, the occupancy costs for states A, B
@@ -169,7 +202,9 @@ populations.
 The model is run by calling the new function, with appropriate arguments. The
 cumulative cost and life years are calculated by summing the appropriate
 columns from the Markov trace, as follows:
-```{r, mono-det-results, echo = TRUE}
+```{r}
+#| mono-det-results,
+#| echo = TRUE
 ```
 
 The populations and discounted costs are consistent with Briggs *et al*,
@@ -178,8 +213,8 @@ Table 2.3 [-@briggs2006], and the QALY column is consistent with Table 2.4
 ```{r}
 #| purl = FALSE
 keep <- c("Years", "A", "B", "C", "D", "Cost", "QALY")
-pander::pander(MT.mono[, keep], row.names = FALSE, justify = "rrrrrrr", 
-               round=c(2L, 0L, 0L, 0L, 0L, 0L, 3L))
+pander::pander(MT.mono[, keep], row.names = FALSE, justify = "rrrrrrr",
+               round = c(2L, 0L, 0L, 0L, 0L, 0L, 3L))
 ```
 
 # Model results
@@ -197,7 +232,9 @@ For combination therapy, a similar model was created, with adjusted costs and
 transition rates. Following Briggs *et al* [@briggs2006] the treatment effect
 was applied to the probabilities, and these were used as inputs to the model.
 More usually, treatment effects are applied to rates, rather than probabilities.
-```{r pt-comb-det, echo = TRUE}
+```{r}
+#| pt-comb-det,
+#| echo = TRUE
 ```
 
 The resulting per-cycle transition matrix for the combination therapy is as
@@ -217,21 +254,25 @@ population is used to continue with the monotherapy model for the remaining
 time of the new run of the mono model. As before, function `run_comb` is created
 to wrap up these steps, so they can be used repeatedly for different values of
 the model variables.
-```{r run-combo, echo = TRUE}
+```{r}
+#| run-combo,
+#| echo = TRUE
 ```
 
 The model is run by calling the new function, with appropriate arguments,
 as follows. The incremental cost effectiveness ratio (ICER) is also calculated,
 as the ratio of the incremental cost to the incremental life years of the 
 combination therapy compared with monotherapy.
-```{r, comb-det-results, echo = TRUE}
+```{r}
+#| comb-det-results,
+#| echo = TRUE
 ```
 
 The Markov trace for combination therapy is as follows:
 ```{r}
 #| purl = FALSE
 keep <- c("Years", "A", "B", "C", "D", "Cost", "QALY")
-pander::pander(MT.comb[, keep], row.names = FALSE, justify = "rrrrrrr", 
+pander::pander(MT.comb[, keep], row.names = FALSE, justify = "rrrrrrr",
                round = c(2L, 0L, 0L, 0L, 0L, 0L, 3L))
 ```
 
@@ -250,7 +291,9 @@ This is consistent with the result obtained by Briggs *et al* [-@briggs2006]
 ## Results with half-cycle correction
 With half-cycle correction applied to the state populations, the model can
 be recalculated as follows.
-```{r hcc-det, echo = TRUE}
+```{r}
+#| hcc-det,
+#| echo = TRUE
 ```
 Over the 20 year time horizon, the expected life
 years gained for monotherapy was `r round(el.mono.hcc, 3L)` years at a total
@@ -260,7 +303,6 @@ total cost per patient of `r gbp(cost.comb.hcc)` GBP. The incremental change in
 life years was `r round(el.comb.hcc - el.mono.hcc, 3L)` years at an incremental
 cost of `r gbp(cost.comb.hcc - cost.mono.hcc)` GBP, giving an ICER of
 `r gbp(icer.hcc)` GBP/QALY.
-
 
 # Probabilistic sensitivity analysis
 In their Exercise 4.7, Briggs *et al* [-@briggs2006] extended the original model
@@ -283,13 +325,17 @@ as a mathematical expression (an `ExprModVar`) potentially involving `ModVar`s.
 The uncertainty distribution of `cAm`, for example, is complex, because it is a 
 sum of two Gamma-distributed variables and a scalar, but `rdecision` takes care
 of this when `cAm` is sampled.
-```{r, costs-psa, echo = TRUE}
+```{r}
+#| costs-psa,
+#| echo = TRUE
 ```
 
 ## Treatment effect
 The treatment effect is also represented by a `ModVar` whose uncertainty follows
 a log normal distribution.
-```{r, txeffect-psa, echo = TRUE}
+```{r}
+#| txeffect-psa,
+#| echo = TRUE
 ```
 
 ## Transition matrix
@@ -297,7 +343,9 @@ The following function generates a transition probability matrix from observed
 counts, using Dirichlet distributions, as described by Briggs *et al*. This
 could be achieved using the R `stats` function `rgamma`, but `rdecision` offers
 the `DirichletDistribition` class for convenience, which is used here.
-```{r, pt-psa, echo = TRUE}
+```{r}
+#| pt-psa,
+#| echo = TRUE
 ```
 
 ## Running the PSA
@@ -307,7 +355,9 @@ matrix is sampled from count data, and the treatment effect is applied.
 Functions `run_mono` and `run_comb` are used to generate Markov traces for
 each form of therapy, and the incremental costs, life years and ICER for
 each run are saved in a matrix.
-```{r, run-psa, echo = TRUE}
+```{r}
+#| run-psa,
+#| echo = TRUE
 ```
 
 > Coding note: The state occupancy costs `cAm`, `cBm` etc. are now 

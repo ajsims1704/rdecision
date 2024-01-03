@@ -9,7 +9,7 @@ An R6 class representing a transition in a semi-Markov model.
 }
 \details{
 A specialism of class \code{Arrow} which is used in a semi-Markov
-model to represent a transition between two \code{MarkovState}s. The 
+model to represent a transition between two \code{MarkovState}s. The
 transition is optionally associated with a cost. The transition probability
 is associated with the model (\code{SemiMarkovModel}) rather than the
 transition.
@@ -78,8 +78,8 @@ Find all the model variables.
 }
 
 \subsection{Details}{
-Find variables of type \code{ModVar} that have been 
-specified as values associated with this \code{MarkovTransition}. 
+Find variables of type \code{ModVar} that have been
+specified as values associated with this \code{MarkovTransition}.
 Includes operands of these \code{ModVar}s, if they are expressions.
 }
 

@@ -8,17 +8,17 @@
 #' class \code{ModVar}.
 #' @references{
 #'   Briggs A, Claxton K, Sculpher M. Decision modelling for health
-#'   economic evaluation. Oxford, UK: Oxford University Press; 2006. 
+#'   economic evaluation. Oxford, UK: Oxford University Press; 2006.
 #' }
 #' @note The Gamma model variable class can be used to model the uncertainty of
 #' the mean of a count quantity which follows a Poisson distribution. The Gamma
 #' distribution is the conjugate prior of a Poisson distribution, and the shape
 #' and scale relate directly to the number of intervals from which the mean
-#' count has been estimated. Specifically, the shape (\eqn{k}) is equal to the 
+#' count has been estimated. Specifically, the shape (\eqn{k}) is equal to the
 #' total count of events in \eqn{1/\theta} intervals, where \eqn{\theta} is the
 #' scale. For example, if 200 counts were observed in a sample of 100 intervals,
-#' setting \code{shape=200} and \code{scale=1/100} gives a Gamma distribution 
-#' with a mean of 2 and a 95\% confidence interval from 1.73 to 2.29. 
+#' setting \code{shape=200} and \code{scale=1/100} gives a Gamma distribution
+#' with a mean of 2 and a 95\% confidence interval from 1.73 to 2.29.
 #' @docType class
 #' @author Andrew J. Sims \email{andrew.sims@@newcastle.ac.uk}
 #' @export
@@ -29,14 +29,13 @@ GammaModVar <- R6::R6Class(
   private = list(
   ),
   public = list(
-    
-    #' @description 
-    #' Create an object of class \code{GammaModVar}.
+
+    #' @description Create an object of class \code{GammaModVar}.
     #' @param description A character string describing the variable.
     #' @param units Units of the variable, as character string.
     #' @param shape shape parameter of the Gamma distribution.
     #' @param scale scale parameter of the Gamma distribution.
-    #' @return An object of class \code{GammaModVar}. 
+    #' @return An object of class \code{GammaModVar}.
     initialize = function(description, units, shape, scale) {
       # create a Gamma distribution (and check arguments)
       D <- GammaDistribution$new(shape, scale)
@@ -46,10 +45,9 @@ GammaModVar <- R6::R6Class(
       return(invisible(self))
     },
 
-    #' @description 
-    #' Tests whether the model variable is probabilistic, i.e. a random
-    #' variable that follows a distribution, or an expression involving
-    #' random variables, some of which follow distributions. 
+    #' @description Tests whether the model variable is probabilistic, i.e.,
+    #' a random variable that follows a distribution, or an expression
+    #' involving random variables, some of which follow distributions.
     #' @return \code{TRUE} if probabilistic
     is_probabilistic = function() {
       return(TRUE)

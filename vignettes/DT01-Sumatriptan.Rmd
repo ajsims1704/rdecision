@@ -28,7 +28,9 @@ knitr::read_chunk(
 knitr::read_chunk(file.path("vutils.R"))
 ```
 
-```{r, gbp, echo = FALSE}
+```{r}
+#| gbp,
+#| echo = FALSE
 ```
 
 ```{r}
@@ -42,7 +44,17 @@ knitr::opts_chunk$set(
 ```
 
 ```{r}
+#| purl = FALSE
+#nolint start
+```
+
+```{r}
 library(rdecision)
+```
+
+```{r}
+#| purl = FALSE
+#nolint end
 ```
 
 # Introduction
@@ -58,7 +70,9 @@ consider the problem from the perspective of a provincial health department.
 The following code defines the variables for cost, utility and effect that will
 be used in the model. There are 14 variables in total; 4 costs, 4 utilities and
 6 probabilities.
-```{r, modvars, echo = TRUE}
+```{r}
+#| modvars,
+#| echo = TRUE
 ```
 
 ## Constructing the tree
@@ -70,7 +84,9 @@ comprise three types of node: decision, chance and leaf nodes and two
 types of edge: actions (whose sources are decision nodes) and reactions
 (whose sources are chance nodes), [see Figure 1](#tree-diagram).
 
-```{r, model, echo = TRUE}
+```{r}
+#| model,
+#| echo = TRUE
 ```
 
 ```{r}
@@ -78,7 +94,7 @@ types of edge: actions (whose sources are decision nodes) and reactions
 #| fig.keep = "all",
 #| fig.align = "center",
 #| fig.cap = "Figure 1. Decision tree for the Sumatriptan model"
-DT$draw(border=TRUE)
+DT$draw(border = TRUE)
 ```
 
 # Running the model
@@ -100,11 +116,14 @@ aggregate the evaluation by strategy.
 
 ## Base case
 The evaluation of each pathway, for each strategy, is done as follows:
-```{r, eval_by_path, echo = TRUE}
+```{r}
+#| eval-by-path,
+#| echo = TRUE
 ```
 
 and yields the following table:
-```{r, echo = FALSE}
+```{r}
+#| echo = FALSE
 knitr::kable(
   ep[, c("Leaf", "Probability", "Cost", "Utility")],
   align = "lrrr",
@@ -119,13 +138,16 @@ each choice can be calculated from the table
 above, or by invoking the `evaluate` method of a decision tree object with the
 default parameter `by = "strategy"`. 
 
-```{r, eval_by_strategy, echo = TRUE}
+```{r}
+#| eval-by-strategy,
+#| echo = TRUE
 ```
 
 This gives the following result, consistent with that reported by
 Evans *et al* [-@evans1997].
 
-```{r, echo = FALSE}
+```{r}
+#| echo = FALSE
 knitr::kable(
   es[, c("d1", "Cost", "Utility", "QALY")],
   align = "lrrr",
@@ -134,7 +156,9 @@ knitr::kable(
 )
 ```
 
-```{r, icer_basecase, echo = FALSE}
+```{r}
+#| icer-basecase,
+#| echo = FALSE
 ```
 The incremental cost was $Can `r gbp(x = delta_c, p = TRUE)`
 (`r gbp(x = cost_s, p = TRUE)` - `r gbp(x = cost_c, p = TRUE)`)
@@ -157,15 +181,20 @@ To calculate these ICERs, we set the value of the model variable
 `p_sumatriptan_relief`, and re-evaluate the model. The lower range of ICER
 (with the greater relative increase in effectiveness) is calculated as follows:
 
-```{r, relief_threshold_upper, echo = TRUE}
+```{r}
+#| relief-threshold-upper,
+#| echo = TRUE
 ```
-```{r, icer_upper, echo = FALSE}
+```{r}
+#| icer-upper,
+#| echo = FALSE
 ```
 This yields the following table, from which the ICER is calculated as 
 `r gbp(icer_upper)` \$Can/QALY, close to the published estimate of
 18,950 \$Can/QALY.
 
-```{r, echo = FALSE}
+```{r}
+#| echo = FALSE
 knitr::kable(
   es[, c("d1", "Cost", "Utility", "QALY")],
   align = "lrrr",
@@ -177,15 +206,20 @@ knitr::kable(
 The upper range of ICER (with the smaller relative increase in effectiveness) is
 calculated as follows:
 
-```{r, relief_threshold_lower, echo = TRUE}
+```{r}
+#| relief-threshold-lower,
+#| echo = TRUE
 ```
-```{r, icer_lower, echo = FALSE}
+```{r}
+#| icer-lower,
+#| echo = FALSE
 ```
 This yields the following table, from which the ICER is calculated as 
 `r gbp(icer_lower)` \$Can/QALY, close to the published estimate of
 60,839 \$Can/QALY.
 
-```{r, echo = FALSE}
+```{r}
+#| echo = FALSE
 knitr::kable(
   es[, c("d1", "Cost", "Utility", "QALY")],
   align = "lrrr",

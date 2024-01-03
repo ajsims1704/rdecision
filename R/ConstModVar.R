@@ -1,9 +1,9 @@
 #' @title A constant model variable
 #' @description An R6 class representing a constant in a model.
-#' @details A \code{ModVar} with no uncertainty in its value. Its distribution 
-#' is treated as a Dirac delta function \eqn{\delta(x-c)} where \eqn{c} is the 
-#' hyperparameter (value of the constant). The benefit over 
-#' using a regular numeric variable in a model is that it will appear in 
+#' @details A \code{ModVar} with no uncertainty in its value. Its distribution
+#' is treated as a Dirac delta function \eqn{\delta(x-c)} where \eqn{c} is the
+#' hyperparameter (value of the constant). The benefit over
+#' using a regular numeric variable in a model is that it will appear in
 #' tabulations of the model variables associated with a model and therefore be
 #' explicitly documented as a model input. Inherits from class \code{ModVar}.
 #' @docType class
@@ -16,7 +16,7 @@ ConstModVar <- R6::R6Class(
   private = list(
   ),
   public = list(
-    
+
     #' @description Create a new constant model variable.
     #' @param description A character string description of the variable
     #' and its role in the model. This description will be used in a tabulation
@@ -33,10 +33,10 @@ ConstModVar <- R6::R6Class(
       # return object
       return(invisible(self))
     },
-    
+
     #' @description Tests whether the model variable is probabilistic.
-    #' @details Does the random variable follow a distribution, or is it an 
-    #' expression involving' random variables, some of which follow 
+    #' @details Does the random variable follow a distribution, or is it an
+    #' expression involving' random variables, some of which follow
     #' distributions?
     #' @return TRUE if probabilistic
     is_probabilistic = function() {

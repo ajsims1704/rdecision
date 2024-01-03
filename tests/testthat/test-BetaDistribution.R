@@ -2,10 +2,10 @@ test_that("illegal initializations are rejected", {
   a <- 2L
   b <- 5L
   expect_silent(BetaDistribution$new(a, b))
-  expect_error(BetaDistribution$new("9", b), class="alpha_not_numeric")
-  expect_error(BetaDistribution$new(a, "0.5"), class="beta_not_numeric")
-  expect_error(BetaDistribution$new(-1L, b), class="alpha_not_supported")
-  expect_error(BetaDistribution$new(a, 0L), class="beta_not_supported")
+  expect_error(BetaDistribution$new("9", b), class = "alpha_not_numeric")
+  expect_error(BetaDistribution$new(a, "0.5"), class = "beta_not_numeric")
+  expect_error(BetaDistribution$new(-1L, b), class = "alpha_not_supported")
+  expect_error(BetaDistribution$new(a, 0L), class = "beta_not_supported")
 })
 
 test_that("the correct distribution name is created", {
@@ -38,11 +38,11 @@ test_that("quantile function checks inputs and has correct output", {
   probs <- c(0.1, 0.2, 0.5)
   expect_silent(b$quantile(probs))
   probs <- c(0.1, NA, 0.5)
-  expect_error(b$quantile(probs), class="probs_not_defined")
+  expect_error(b$quantile(probs), class = "probs_not_defined")
   probs <- c(0.1, "boo", 0.5)
-  expect_error(b$quantile(probs), class="probs_not_numeric")
+  expect_error(b$quantile(probs), class = "probs_not_numeric")
   probs <- c(0.1, 0.4, 1.5)
-  expect_error(b$quantile(probs), class="probs_out_of_range")
+  expect_error(b$quantile(probs), class = "probs_out_of_range")
   probs <- c(0.1, 0.2, 0.5)
   q <- b$quantile(probs)
   expect_length(q, 3L)
@@ -75,19 +75,19 @@ test_that("random sampling is from a Beta distribution", {
   b <- BetaDistribution$new(alpha, beta)
   # sample mean
   b$sample(TRUE)
-  expect_intol(b$r(), 2.0/7.0, 0.01)
+  expect_intol(b$r(), 2.0 / 7.0, 0.01)
   # random sampling
   n <- 1000L
-  osamp <- vapply(1L:n, FUN.VALUE = 1.0, FUN=function(i) {
+  osamp <- vapply(seq(n), FUN.VALUE = 1.0, FUN = function(i) {
     b$sample()
     rv <- b$r()
     return(rv)
   })
   expect_length(osamp, n)
-  # 99.9% confidence limits; expected test failure rate is 0.1%, 
+  # 99.9% confidence limits; expected test failure rate is 0.1%,
   # skip for CRAN
   skip_on_cran()
-  esamp <- rbeta(n, shape1=alpha, shape2=beta)
+  esamp <- rbeta(n, shape1 = alpha, shape2 = beta)
   ht <- ks.test(osamp, esamp)
   expect_gt(ht$p.value, 0.001)
 })

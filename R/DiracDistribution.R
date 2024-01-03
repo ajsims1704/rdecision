@@ -1,11 +1,11 @@
 #' @title A Dirac delta function
 #' @description An R6 class representing a Dirac Delta function.
 #' @details A distribution modelled by a Dirac delta function \eqn{\delta(x-c)}
-#' where \eqn{c} is the hyperparameter (value of the constant). It has 
-#' probability 1 that the value will be equal to \eqn{c} and zero otherwise. 
+#' where \eqn{c} is the hyperparameter (value of the constant). It has
+#' probability 1 that the value will be equal to \eqn{c} and zero otherwise.
 #' The mode, mean, quantiles and random samples are all equal to \eqn{c}. It is
-#' acknowledged that there is debate over whether Dirac delta functions are 
-#' true distributions, but the assumption makes little practical difference in 
+#' acknowledged that there is debate over whether Dirac delta functions are
+#' true distributions, but the assumption makes little practical difference in
 #' this case. Inherits from class \code{Distribution}.
 #' @docType class
 #' @author Andrew Sims \email{andrew.sims@@newcastle.ac.uk}
@@ -18,7 +18,7 @@ DiracDistribution <- R6::R6Class(
     c = NULL
   ),
   public = list(
-    
+
     #' @description Create a new Dirac Delta function distribution.
     #' @param const The value at which the distribution is centred.
     #' @return A new \code{DiracDistribution} object.
@@ -27,7 +27,7 @@ DiracDistribution <- R6::R6Class(
       super$initialize("Dirac", K = 1L)
       # check the argument
       abortifnot(is.numeric(const),
-        message = "Argument 'const' must be numeric", 
+        message = "Argument 'const' must be numeric",
         class = "const_not_numeric"
       )
       private$c <- const
@@ -36,7 +36,7 @@ DiracDistribution <- R6::R6Class(
       # return object
       return(invisible(self))
     },
-    
+
     #' @description Accessor function for the name of the distribution.
     #' @return Distribution name as character string.
     distribution = function() {
@@ -45,25 +45,25 @@ DiracDistribution <- R6::R6Class(
       )
       return(rv)
     },
-    
+
     #' @description Return the mode of the distribution.
-    #' @return Numeric Value where the distribution is centred.
+    #' @return Numeric Value where the distribution is centered.
     mode = function() {
       return(private$c)
     },
-    
-    #' @description Return the expected value of the distribution. 
+
+    #' @description Return the expected value of the distribution.
     #' @return Expected value as a numeric value.
     mean = function() {
       return(private$c)
     },
-    
-    #' @description  Return the standard deviation of the distribution. 
+
+    #' @description  Return the standard deviation of the distribution.
     #' @return Standard deviation as a numeric value
     SD = function() {
       return(0.0)
     },
-    
+
     #' @description Quantiles of the distribution.
     #' @details For a Dirac Delta Function all quantiles are returned as the
     #' value at which the distribution is centred.
@@ -71,7 +71,7 @@ DiracDistribution <- R6::R6Class(
     #' @return Vector of numeric values of the same length as \code{probs}.
     quantile = function(probs) {
       # test argument
-      vapply(probs, FUN.VALUE = TRUE, FUN=function(x) {
+      vapply(probs, FUN.VALUE = TRUE, FUN = function(x) {
         abortifnot(!is.na(x),
           message = "All elements of 'probs' must be defined",
           class = "probs_not_defined"
@@ -89,8 +89,8 @@ DiracDistribution <- R6::R6Class(
       q <- rep(private$c, times = length(probs))
       return(q)
     },
-    
-    #' @description Draw and hold a random sample from the model variable. 
+
+    #' @description Draw and hold a random sample from the model variable.
     #' @param expected If TRUE, sets the next value retrieved by a call to
     #' \code{r()} to be the mean of the distribution.
     #' @return Updated distribution.

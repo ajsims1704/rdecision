@@ -1,20 +1,20 @@
 #' @title A parametrized Gamma distribution
 #' @description An R6 class representing a Gamma distribution.
-#' @details An object representing a Gamma distribution with hyperparameters 
+#' @details An object representing a Gamma distribution with hyperparameters
 #' shape (\code{k}) and scale (\code{theta}). In econometrics this
-#' parametrization is more common but in Bayesian statistics the shape 
-#' (\code{alpha}) and rate (\code{beta}) parametrization is more usual. Note, 
+#' parametrization is more common but in Bayesian statistics the shape
+#' (\code{alpha}) and rate (\code{beta}) parametrization is more usual. Note,
 #' however, that although Briggs \emph{et al} (2006) use the shape, scale
 #' formulation, they use \code{alpha}, \code{beta} as parameter names. Inherits
 #' from class \code{Distribution}.
 #' @references{
 #'   Briggs A, Claxton K, Sculpher M. Decision modelling for health
-#'   economic evaluation. Oxford, UK: Oxford University Press; 2006. 
+#'   economic evaluation. Oxford, UK: Oxford University Press; 2006.
 #' }
 #' @docType class
 #' @author Andrew J. Sims \email{andrew.sims@@newcastle.ac.uk}
 #' @export
-#' 
+#'
 GammaDistribution <- R6::R6Class(
   classname = "GammaDistribution",
   lock_class = TRUE,
@@ -24,30 +24,30 @@ GammaDistribution <- R6::R6Class(
     scale = NULL
   ),
   public = list(
-    
+
     #' @description Create an object of class \code{GammaDistribution}.
     #' @param shape shape parameter of the Gamma distribution.
     #' @param scale scale parameter of the Gamma distribution.
-    #' @return An object of class \code{GammaDistribution}. 
+    #' @return An object of class \code{GammaDistribution}.
     initialize = function(shape, scale) {
       # initialize the base class
       super$initialize("Gamma", K = 1L)
       # check the parameters
       abortifnot(is.numeric(shape),
-        message = "Argument 'shape' must be numeric", 
+        message = "Argument 'shape' must be numeric",
         class = "shape_not_numeric"
       )
       abortifnot(shape > 0.0,
-        message = "Argument 'shape' must be > 0", 
+        message = "Argument 'shape' must be > 0",
         class = "shape_not_supported"
       )
       private$shape <- shape
       abortifnot(is.numeric(scale),
-        message = "Argument 'scale' must be numeric", 
+        message = "Argument 'scale' must be numeric",
         class = "scale_not_numeric"
       )
       abortifnot(scale > 0.0,
-        message = "Argument 'scale' must be > 0", 
+        message = "Argument 'scale' must be > 0",
         class = "scale_not_supported"
       )
       private$scale <- scale
@@ -61,62 +61,59 @@ GammaDistribution <- R6::R6Class(
     #' @return Distribution name as character string.
     distribution = function() {
       rv <- paste0(
-        "Ga(", 
-        round(private$shape, digits = 3L), ",", 
-        round(private$scale, digits = 3L), ")" 
+        "Ga(",
+        round(private$shape, digits = 3L), ",",
+        round(private$scale, digits = 3L), ")"
       )
       return(rv)
     },
-    
-    #' @description 
-    #' Return the expected value of the distribution. 
+
+    #' @description
+    #' Return the expected value of the distribution.
     #' @return Expected value as a numeric value.
     mean = function() {
-      return(private$shape*private$scale)
+      return(private$shape * private$scale)
     },
-    
-    #' @description 
-    #' Return the mode of the distribution (if \code{shape} >= 1) 
+
+    #' @description Return the mode of the distribution (if \code{shape} >= 1)
     #' @return mode as a numeric value.
     mode = function() {
       rv <- NA_real_
       if (private$shape >= 1.0) {
-        rv <- (private$shape - 1.0)*private$scale 
+        rv <- (private$shape - 1.0) * private$scale
       }
       return(rv)
     },
-    
-    #' @description 
-    #' Return the standard deviation of the distribution. 
+
+    #' @description Return the standard deviation of the distribution.
     #' @return Standard deviation as a numeric value
     SD = function() {
-      return(sqrt(private$shape)*private$scale)
+      return(sqrt(private$shape) * private$scale)
     },
-    
-    #' @description Draw and hold a random sample from the distribution. 
+
+    #' @description Draw and hold a random sample from the distribution.
     #' @param expected If TRUE, sets the next value retrieved by a call to
     #' \code{r()} to be the mean of the distribution.
     #' @return Updated distribution.
-    sample = function(expected=FALSE) {
+    sample = function(expected = FALSE) {
       if (!expected) {
         private$.r[[1L]] <- rgamma(
-          n = 1L, 
-          shape=private$shape, 
-          scale=private$scale
+          n = 1L,
+          shape = private$shape,
+          scale = private$scale
         )
       } else {
         private$.r[[1L]] <- self$mean()
       }
       return(invisible(self))
     },
-    
-    #' @description
-    #' Return the quantiles of the Gamma uncertainty distribution.
-    #' @param probs Vector of probabilities, in range [0,1].    
+
+    #' @description Return the quantiles of the Gamma uncertainty distribution.
+    #' @param probs Vector of probabilities, in range [0,1].
     #' @return Vector of quantiles.
     quantile = function(probs) {
       # test argument
-      vapply(probs, FUN.VALUE = TRUE, FUN=function(x) {
+      vapply(probs, FUN.VALUE = TRUE, FUN = function(x) {
         abortif(is.na(x),
           message = "All elements of 'probs' must be defined",
           class = "probs_not_defined"
@@ -131,7 +128,7 @@ GammaDistribution <- R6::R6Class(
         )
         return(TRUE)
       })
-      q <- qgamma(probs, shape=private$shape, scale=private$scale)
+      q <- qgamma(probs, shape = private$shape, scale = private$scale)
       return(q)
     }
   )

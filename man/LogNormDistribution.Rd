@@ -9,12 +9,12 @@ An R6 class representing a log Normal distribution.
 }
 \details{
 A parametrized Log Normal distribution inheriting from class
-\code{Distribution}. Swat (2017) defined seven parametrizations of the log 
-normal distribution. 
-These are linked, allowing the parameters of any one to be derived from any 
+\code{Distribution}. Swat (2017) defined seven parametrizations of the log
+normal distribution.
+These are linked, allowing the parameters of any one to be derived from any
 other. All 7 parametrizations require two parameters as follows:
 \describe{
-\item{LN1}{\eqn{p_1=\mu}, \eqn{p_2=\sigma}, where \eqn{\mu} and \eqn{\sigma} 
+\item{LN1}{\eqn{p_1=\mu}, \eqn{p_2=\sigma}, where \eqn{\mu} and \eqn{\sigma}
 are the mean and standard deviation, both on the log scale.}
 \item{LN2}{\eqn{p_1=\mu}, \eqn{p_2=v}, where \eqn{\mu} and \eqn{v} are the
 mean and variance, both on the log scale.}
@@ -26,7 +26,7 @@ scale.}
 \item{LN5}{\eqn{p_1=\mu}, \eqn{p_2=\tau}, where \eqn{\mu} is the mean on the
 log scale and \eqn{\tau} is the precision on the log scale.}
 \item{LN6}{\eqn{p_1=m}, \eqn{p_2=\sigma_g}, where \eqn{m} is the median on
-the natural scale and \eqn{\sigma_g} is the geometric standard deviation on 
+the natural scale and \eqn{\sigma_g} is the geometric standard deviation on
 the natural scale.}
 \item{LN7}{\eqn{p_1=\mu_N}, \eqn{p_2=\sigma_N}, where \eqn{\mu_N} is the mean
 on the natural scale and \eqn{\sigma_N} is the standard deviation on the
@@ -34,28 +34,28 @@ natural scale.}
 }
 }
 \note{
-The log normal distribution may be used to model the uncertainty in 
-an estimate of relative risk (Briggs 2006, p90). If a relative risk 
-estimate is available with a 95\% confidence interval, the \verb{"LN7"} 
+The log normal distribution may be used to model the uncertainty in
+an estimate of relative risk (Briggs 2006, p90). If a relative risk
+estimate is available with a 95\% confidence interval, the \verb{"LN7"}
 parametrization
-allows the uncertainty distribution to be specified directly. For example, 
-if RR = 0.67 with 95\% confidence interval 0.53 to 0.84 (Leaper, 2016), it 
+allows the uncertainty distribution to be specified directly. For example,
+if RR = 0.67 with 95\% confidence interval 0.53 to 0.84 (Leaper, 2016), it
 can be modelled with
-\code{LogNormModVar$new("rr", "RR", p1=0.67, 
+\code{LogNormModVar$new("rr", "RR", p1=0.67,
 p2=(0.84-0.53)/(2*1.96)), "LN7")}.
 }
 \references{
-{ 
+{
  Briggs A, Claxton K and Sculpher M. Decision Modelling for Health
  Economic Evaluation. Oxford 2006, ISBN 978-0-19-852662-9.
 
  Leaper DJ, Edmiston CE and Holy CE. Meta-analysis of the potential
- economic impact following introduction of absorbable antimicrobial 
+ economic impact following introduction of absorbable antimicrobial
  sutures. \emph{British Journal of Surgery} 2017;\bold{104}:e134-e144.
 
  Swat MJ, Grenon P and Wimalaratne S. Ontology and Knowledge Base of
  Probability Distributions. \acronym{EMBL-EBI} Technical Report
- (ProbOnto 2.5), 13 January 2017, 
+ (ProbOnto 2.5), 13 January 2017,
  \url{https://sites.google.com/site/probonto/download}.
 }
 }
@@ -99,7 +99,7 @@ Create a log normal distribution.
 \subsection{Arguments}{
 \if{html}{\out{<div class="arguments">}}
 \describe{
-\item{\code{p1}}{First hyperparameter, a measure of location. See 
+\item{\code{p1}}{First hyperparameter, a measure of location. See
 \emph{Details}.}
 
 \item{\code{p2}}{Second hyperparameter, a measure of spread. See \emph{Details}.}

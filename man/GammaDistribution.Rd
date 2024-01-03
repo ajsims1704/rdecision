@@ -8,10 +8,10 @@
 An R6 class representing a Gamma distribution.
 }
 \details{
-An object representing a Gamma distribution with hyperparameters 
+An object representing a Gamma distribution with hyperparameters
 shape (\code{k}) and scale (\code{theta}). In econometrics this
-parametrization is more common but in Bayesian statistics the shape 
-(\code{alpha}) and rate (\code{beta}) parametrization is more usual. Note, 
+parametrization is more common but in Bayesian statistics the shape
+(\code{alpha}) and rate (\code{beta}) parametrization is more usual. Note,
 however, that although Briggs \emph{et al} (2006) use the shape, scale
 formulation, they use \code{alpha}, \code{beta} as parameter names. Inherits
 from class \code{Distribution}.
@@ -19,7 +19,7 @@ from class \code{Distribution}.
 \references{
 {
   Briggs A, Claxton K, Sculpher M. Decision modelling for health
-  economic evaluation. Oxford, UK: Oxford University Press; 2006. 
+  economic evaluation. Oxford, UK: Oxford University Press; 2006.
 }
 }
 \author{

@@ -5,7 +5,7 @@
 #' @docType class
 #' @author Andrew J. Sims \email{andrew.sims@@newcastle.ac.uk}
 #' @export
-#'  
+#'
 Action <- R6::R6Class(
   classname = "Action",
   lock_class = TRUE,
@@ -15,7 +15,7 @@ Action <- R6::R6Class(
     edge_benefit = NULL
   ),
   public = list(
-    
+
     #' @description Create an object of type \code{Action}. Optionally, a cost
     #' and a benefit may be associated with traversing the edge. A \dfn{pay-off}
     #' (benefit minus cost)  is sometimes used in edges of decision trees; the
@@ -30,13 +30,13 @@ Action <- R6::R6Class(
     #' \code{ModVar}).
     #' @param benefit Benefit associated with traversal of the edge.
     #' @return A new \code{Action} object.
-    initialize = function(source_node, target_node, label, 
+    initialize = function(source_node, target_node, label,
                           cost = 0.0, benefit = 0.0) {
       # check label
       abortifnot(
         is.character(label),
         nchar(label) > 0L,
-        message = "Argument 'label' must be a string", 
+        message = "Argument 'label' must be a string",
         class = "invalid_label"
       )
       # initialize base class (checks that source and target are both Nodes)
@@ -46,7 +46,7 @@ Action <- R6::R6Class(
       # check that source inherits from DecisionNode
       abortifnot(
         inherits(source_node, what = "DecisionNode"),
-        message = "Node 'source_node' must be a DecisionNode", 
+        message = "Node 'source_node' must be a DecisionNode",
         class = "invalid_source"
       )
       # check and set cost, ensuring initialization
@@ -56,7 +56,7 @@ Action <- R6::R6Class(
       # Return Action node
       return(invisible(self))
     },
-    
+
     #' @description Find all the model variables of type \code{ModVar} that have
     #' been specified as values associated with this \code{Action}. Includes
     #' operands of these \code{ModVar}s, if they are expressions.
@@ -68,24 +68,24 @@ Action <- R6::R6Class(
       for (v in iv) {
         if (is_ModVar(v)) {
           ov <- c(ov, v)
-          if (inherits(v, what="ExprModVar")) {
+          if (inherits(v, what = "ExprModVar")) {
             for (o in v$operands()) {
               ov <- c(ov, o)
             }
-          } 
+          }
         }
       }
       # return the unique list
       return(unique(ov))
     },
-    
+
     #' @description Return the current value of the edge probability, i.e. the
     #' conditional probability of traversing the edge.
     #' @return Numeric value equal to 1.
     p = function() {
       return(1.0)
     },
-    
+
     #' @description Set the cost associated with the action edge.
     #' @param c Cost associated with traversing the action edge. Of type numeric
     #' or \code{ModVar}.
@@ -99,14 +99,14 @@ Action <- R6::R6Class(
       private$edge_cost <- c
       return(invisible(self))
     },
-    
+
     #' @description Return the cost associated with traversing the edge.
     #' @return Cost.
     cost = function() {
       rv <- as_numeric(private$edge_cost)
       return(rv)
     },
-    
+
     #' @description Set the benefit associated with the action edge.
     #' @param b Benefit associated with traversing the action edge. Of type
     #' numeric or \code{ModVar}.
@@ -126,6 +126,6 @@ Action <- R6::R6Class(
     benefit = function() {
       rv <- as_numeric(private$edge_benefit)
       return(rv)
-    }  
+    }
   )
 )

@@ -1,5 +1,5 @@
 #' @title A model variable whose uncertainty follows a Normal distribution
-#' @description An R6 class representing a model variable with Normal 
+#' @description An R6 class representing a model variable with Normal
 #' uncertainty.
 #' @details A model variable for which the uncertainty in its point estimate can
 #' be modelled with a Normal distribution. The hyperparameters of the
@@ -17,10 +17,10 @@ NormModVar <- R6::R6Class(
   ),
   public = list(
 
-    #' @description Create a model variable with normal uncertainty. 
+    #' @description Create a model variable with normal uncertainty.
     #' @param description A character string describing the variable.
     #' @param units Units of the quantity; character string.
-    #' @param mu Hyperparameter with mean of the Normal distribution for 
+    #' @param mu Hyperparameter with mean of the Normal distribution for
     #' the uncertainty of the variable.
     #' @param sigma Hyperparameter equal to the standard deviation of the
     #' normal distribution for the uncertainty of the variable.
@@ -34,7 +34,7 @@ NormModVar <- R6::R6Class(
       return(invisible(self))
     },
 
-    #' @description Tests whether the model variable is probabilistic. 
+    #' @description Tests whether the model variable is probabilistic.
     #' @return \code{TRUE} if probabilistic.
     is_probabilistic = function() {
       return(TRUE)

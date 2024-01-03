@@ -1,12 +1,12 @@
 #' @title A reaction (chance) edge in a decision tree
-#' @description An R6 class representing a reaction (chance) edge in a decision 
+#' @description An R6 class representing a reaction (chance) edge in a decision
 #' tree.
 #' @details A specialism of class \code{Arrow} which is used in a decision tree
 #' to represent edges whose source nodes are \code{ChanceNode}s.
 #' @docType class
 #' @author Andrew J. Sims \email{andrew.sims@@newcastle.ac.uk}
 #' @export
-#'  
+#'
 Reaction <- R6::R6Class(
   classname = "Reaction",
   lock_class = TRUE,
@@ -17,8 +17,8 @@ Reaction <- R6::R6Class(
     edge_p = NULL
   ),
   public = list(
-    
-    #' @description Create an object of type \code{Reaction}. A probability 
+
+    #' @description Create an object of type \code{Reaction}. A probability
     #' must be assigned
     #' to the edge. Optionally, a cost and a benefit may be associated
     #' with traversing the edge. A \dfn{pay-off} (benefit-cost) is sometimes
@@ -33,7 +33,7 @@ Reaction <- R6::R6Class(
     #' \code{ModVar}).
     #' @param label Character string containing the reaction label.
     #' @return A new \code{Reaction} object.
-    initialize = function(source_node, target_node, p, cost = 0.0, 
+    initialize = function(source_node, target_node, p, cost = 0.0,
                           benefit = 0.0, label = "") {
       # initialize base class
       super$initialize(
@@ -42,7 +42,7 @@ Reaction <- R6::R6Class(
       # check that source inherits from ChanceNode
       abortifnot(
         inherits(source_node, what = "ChanceNode"),
-        message = "Node 'source' must be a ChanceNode", 
+        message = "Node 'source' must be a ChanceNode",
         class = "invalid_source"
       )
       # check and set probability, ensuring initialization
@@ -54,9 +54,9 @@ Reaction <- R6::R6Class(
       # Return reaction node
       return(invisible(self))
     },
-    
-    #' @description Find all the model variables of type \code{ModVar} that 
-    #' have been specified as values associated with this Action. Includes 
+
+    #' @description Find all the model variables of type \code{ModVar} that
+    #' have been specified as values associated with this Action. Includes
     #' operands of these \code{ModVar}s, if they are expressions.
     #' @return A list of \code{ModVar}s.
     modvars = function() {
@@ -64,13 +64,13 @@ Reaction <- R6::R6Class(
       iv <- c(private$edge_cost, private$edge_benefit, private$edge_p)
       ov <- list()
       for (v in iv) {
-        if (inherits(v, what="ModVar")) {
+        if (inherits(v, what = "ModVar")) {
           ov <- c(ov, v)
-          if (inherits(v, what="ExprModVar")) {
+          if (inherits(v, what = "ExprModVar")) {
             for (o in v$operands()) {
               ov <- c(ov, o)
             }
-          } 
+          }
         }
       }
       # return the unique list
@@ -96,7 +96,7 @@ Reaction <- R6::R6Class(
       private$edge_p <- p
       return(invisible(self))
     },
-    
+
     #' @description Return the current value of the edge probability, i.e. the
     #' conditional' probability of traversing the edge.
     #' @return Numeric value in range [0,1].
@@ -104,7 +104,7 @@ Reaction <- R6::R6Class(
       prob <- as_numeric(private$edge_p)
       return(prob)
     },
-    
+
     #' @description Set the cost associated with the reaction edge.
     #' @param c Cost associated with traversing the reaction edge. Of type
     #' numeric or \code{ModVar}.
@@ -125,7 +125,7 @@ Reaction <- R6::R6Class(
       rv <- as_numeric(private$edge_cost)
       return(rv)
     },
-    
+
     #' @description Set the benefit associated with the reaction edge.
     #' @param b Benefit associated with traversing the reaction edge. Of type
     #' numeric or \code{ModVar}.
@@ -139,12 +139,12 @@ Reaction <- R6::R6Class(
       private$edge_benefit <- b
       return(invisible(self))
     },
-    
+
     #' @description Return the benefit associated with traversing the edge.
     #' @return Benefit.
     benefit = function() {
       rv <- as_numeric(private$edge_benefit)
       return(rv)
-    }  
+    }
   )
 )

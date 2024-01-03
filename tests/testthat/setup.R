@@ -20,27 +20,31 @@ r6_setequal <- function(A, B) {
 expect_r6_setequal <- function(object, eset) {
   # capture object and label
   act <- testthat::quasi_label(rlang::enquo(object), arg = "object")
+  # copy the object
+  oset <- act$val
+  # coerce it to a list
+  oset <- if (is.list(oset)) oset else list(oset)
   # object must be a list of R6 objects
-  if (!is.list(act$val)) {
+  if (!is.list(oset)) {
     testthat::expect(
       ok = FALSE,
       sprintf("%s must be a list", act$lab)
     )
   }
-  is_r6 <- vapply(act$val, FUN.VALUE = TRUE, FUN = inherits, what = "R6")
+  is_r6 <- vapply(oset, FUN.VALUE = TRUE, FUN = inherits, what = "R6")
   if (!all(is_r6)) {
     testthat::expect(
       ok = FALSE,
       sprintf("%s must be a list of R6 objects", act$lab)
     )
   }
-  # compare sets 
+  # compare sets
   testthat::expect(
-    ok = r6_setequal(act$val, eset),
+    ok = r6_setequal(oset, eset),
     sprintf("%s is not equal to to the expected set", act$lab)
   )
   # Invisibly return the value
-  invisible(act$val)    
+  invisible(oset)
 }
 
 # expectation that a numeric value is equal within tolerance. The expectation
@@ -63,7 +67,7 @@ expect_intol <- function(object, E, tolerance) {
     sprintf("%s (%f) is not within %f of %f", act$lab, act$val, tolerance, E)
   )
   # Invisibly return the value
-  invisible(act$val)    
+  invisible(act$val)
 }
 
 # expectation that object, lies in an interval (including its limits).
@@ -72,12 +76,12 @@ expect_between <- function(object, lower, upper) {
   act <- testthat::quasi_label(rlang::enquo(object), arg = "object")
   # test
   testthat::expect(
-    ok = ((act$val>=lower) && (act$val<=upper)),
+    ok = ((act$val >= lower) && (act$val <= upper)),
     sprintf(
       "%s (%f) does not lie in the interval [%f,%f]",
       act$lab, act$val, lower, upper
     )
-  ) 
+  )
   # Invisibly return the value
-  invisible(act$val)    
+  invisible(act$val)
 }

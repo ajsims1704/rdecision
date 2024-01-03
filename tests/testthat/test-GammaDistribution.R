@@ -1,11 +1,13 @@
 test_that("illegal initializations are rejected", {
   k <- 9.0
   theta <- 0.5
-  expect_silent(GammaDistribution$new(k,theta))
-  expect_error(GammaDistribution$new("9",theta), class="shape_not_numeric")
-  expect_error(GammaDistribution$new(k,"0.5"), class="scale_not_numeric")
-  expect_error(GammaDistribution$new(-1.0, theta), class="shape_not_supported")
-  expect_error(GammaDistribution$new(k, 0.0), class="scale_not_supported")
+  expect_silent(GammaDistribution$new(k, theta))
+  expect_error(GammaDistribution$new("9", theta), class = "shape_not_numeric")
+  expect_error(GammaDistribution$new(k, "0.5"), class = "scale_not_numeric")
+  expect_error(
+    GammaDistribution$new(-1.0, theta), class = "shape_not_supported"
+  )
+  expect_error(GammaDistribution$new(k, 0.0), class = "scale_not_supported")
 })
 
 test_that("distribution name is correct", {
@@ -19,8 +21,8 @@ test_that("mean, mode, sd and quantiles are returned correctly", {
   k <- 9.0
   theta <- 0.5
   g <- GammaDistribution$new(k, theta)
-  expect_intol(g$mean(), k*theta, 0.01)
-  expect_intol(g$SD(), sqrt(k)*theta, 0.01)
+  expect_intol(g$mean(), k * theta, 0.01)
+  expect_intol(g$SD(), sqrt(k) * theta, 0.01)
   expect_intol(g$mode(), (k - 1.0) * theta, 0.01)
   probs <- c(0.025, 0.975)
   q <- g$quantile(probs)
@@ -35,11 +37,11 @@ test_that("quantile function checks inputs and has correct output", {
   probs <- c(0.1, 0.2, 0.5)
   expect_silent(g$quantile(probs))
   probs <- c(0.1, NA, 0.5)
-  expect_error(g$quantile(probs), class="probs_not_defined")
+  expect_error(g$quantile(probs), class = "probs_not_defined")
   probs <- c(0.1, "boo", 0.5)
-  expect_error(g$quantile(probs), class="probs_not_numeric")
+  expect_error(g$quantile(probs), class = "probs_not_numeric")
   probs <- c(0.1, 0.4, 1.5)
-  expect_error(g$quantile(probs), class="probs_out_of_range")
+  expect_error(g$quantile(probs), class = "probs_out_of_range")
   probs <- c(0.1, 0.2, 0.5)
   expect_length(g$quantile(probs), 3L)
 })
@@ -53,7 +55,7 @@ test_that("random sampling is from a Gamma distribution", {
   g$sample(TRUE)
   expect_equal(g$r(), 4.5)
   # random sampling
-  samp <- vapply(seq_len(n), FUN.VALUE = 1.0, FUN=function(i) {
+  samp <- vapply(seq_len(n), FUN.VALUE = 1.0, FUN = function(i) {
     g$sample()
     rv <- g$r()
     return(rv)
@@ -62,6 +64,6 @@ test_that("random sampling is from a Gamma distribution", {
   # 99.9% confidence limits; expected test failure rate is 0.1%;
   # skip for CRAN
   skip_on_cran()
-  ht <- ks.test(samp, stats::rgamma(n,shape=k,scale=theta))
+  ht <- ks.test(samp, stats::rgamma(n, shape = k, scale = theta))
   expect_gt(ht$p.value, 0.001)
 })

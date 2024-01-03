@@ -16,44 +16,44 @@
 #' \item{All and only leaf nodes must have no children.}
 #' \item{Each edge must inherit from either \code{Action} or
 #' \code{Reaction}.}
-#' \item{All and only edges that have source endpoints joined to 
+#' \item{All and only edges that have source endpoints joined to
 #' decision nodes must inherit from \code{Action}.}
-#' \item{All and only edges that have source endpoints joined to 
+#' \item{All and only edges that have source endpoints joined to
 #' chance nodes must inherit from \code{Reaction}.}
-#' \item{The sum of probabilities of each set of reaction edges 
+#' \item{The sum of probabilities of each set of reaction edges
 #' with a common source endpoint must be 1.}
 #' \item{Each \code{DecisionNode} must have a label, and the labels of all
 #' \code{DecisionNodes} must be unique within the model.}
-#' \item{Each \code{Action} must have a label, and the labels of  
+#' \item{Each \code{Action} must have a label, and the labels of
 #' \code{Action}s that share a common source endpoint must be unique.}
 #' }
 #' @references{
-#'   Briggs A, Claxton K, Sculpher M. Decision modelling for health economic 
+#'   Briggs A, Claxton K, Sculpher M. Decision modelling for health economic
 #'   evaluation. Oxford, UK: Oxford University Press; 2006.
-#' 
+#'
 #'   Briggs AH, Weinstein MC, Fenwick EAL, Karnon J, Sculpher MJ, Paltiel AD.
-#'   Model Parameter Estimation and Uncertainty: A Report of the 
-#'   \acronym{ISPOR-SMDM} Modeling Good Research Practices Task Force-6. 
-#'   \emph{Value in Health} 2012;\bold{15}:835–42, 
+#'   Model Parameter Estimation and Uncertainty: A Report of the
+#'   \acronym{ISPOR-SMDM} Modeling Good Research Practices Task Force-6.
+#'   \emph{Value in Health} 2012;\bold{15}:835–42,
 #'   \doi{10.1016/j.jval.2012.04.014}.
 #'
 #'   Kaminski B, Jakubczyk M, Szufel P. A framework for sensitivity analysis of
 #'   decision trees. \emph{Central European Journal of Operational Research}
 #'   2018;\bold{26}:135–59, \doi{10.1007/s10100-017-0479-6}.
-#' } 
+#' }
 #' @docType class
 #' @author Andrew J. Sims \email{andrew.sims@@newcastle.ac.uk}
 #' @export
-#' 
+#'
 DecisionTree <- R6::R6Class(
   classname = "DecisionTree",
   lock_class = TRUE,
   inherit = Arborescence,
-  
+
   public = list(
-    
-    #' @description Create a new decision tree. 
-    #' @details The tree must consist of a set of nodes and a set of edges 
+
+    #' @description Create a new decision tree.
+    #' @details The tree must consist of a set of nodes and a set of edges
     #' which satisfy the conditions given in the details section of this class.
     #' @param V A list of nodes.
     #' @param E A list of edges.
@@ -85,9 +85,9 @@ DecisionTree <- R6::R6Class(
         inherits(e, what = c("Action", "Reaction"))
       })
       abortifnot(all(lv),
-        message = "Each edge must inherit from Action or Reaction", 
+        message = "Each edge must inherit from Action or Reaction",
         class = "incorrect_edge_type"
-      )     
+      )
       # DecisionNode labels must be unique and the labels of the Actions from
       # each decision node must be unique
       D.lab <- vapply(D, FUN.VALUE = "x", FUN = function(d) {
@@ -105,13 +105,13 @@ DecisionTree <- R6::R6Class(
         return(v$label())
       })
       abortifnot(anyDuplicated(D.lab) == 0L,
-        message = "Labels of DecisionNodes must be unique", 
+        message = "Labels of DecisionNodes must be unique",
         class = "non_unique_labels"
       )
       # return a new DecisionTree object
       return(invisible(self))
     },
-    
+
     #' @description Find the decision nodes in the tree.
     #' @param what A character string defining what to return. Must be one
     #' of "node", "label" or "index".
@@ -125,21 +125,17 @@ DecisionTree <- R6::R6Class(
         message = "Argument 'what' must be one of 'node', 'label' or 'index'.",
         class = "unknown_what_value"
       )
-      # helper functions
-      isd <- function(i) {
-        n <- self$vertex_at(i)
-        return(inherits(n, what = "DecisionNode"))
-      }
-      lbl <- function(i) {
-        n <- self$vertex_at(i)
-        return(n$label())
-      }
-      # iterate
-      n <- which(vapply(self$vertex_along(), FUN.VALUE = TRUE, FUN = isd))
+      # indexes of decision nodes
+      n <- which(
+        vapply(
+          X = self$vertexes(), FUN.VALUE = TRUE, FUN = inherits,
+          what = "DecisionNode"
+        )
+      )
       if (what == "node") {
-        n <- lapply(n, self$vertex_at)
+        n <- self$vertex_at(n, as_list = TRUE)
       } else if (what == "label") {
-        n <- vapply(n, FUN.VALUE = NA_character_, FUN = lbl)
+        n <- self$vertex_label(n)
       }
       return(n)
     },
@@ -157,21 +153,17 @@ DecisionTree <- R6::R6Class(
         message = "Argument 'what' must be one of 'node', 'label' or 'index'.",
         class = "unknown_what_value"
       )
-      # helper functions
-      isd <- function(i) {
-        n <- self$vertex_at(i)
-        return(inherits(n, what = "ChanceNode"))
-      }
-      lbl <- function(i) {
-        n <- self$vertex_at(i)
-        return(n$label())
-      }
-      # iterate
-      n <- which(vapply(self$vertex_along(), FUN.VALUE = TRUE, FUN = isd))
+      # indexes of chance nodes
+      n <- which(
+        vapply(
+          self$vertexes(), FUN.VALUE = TRUE, FUN = inherits,
+          what = "ChanceNode"
+        )
+      )
       if (what == "node") {
-        n <- lapply(n, self$vertex_at)
+        n <- self$vertex_at(n, as_list = TRUE)
       } else if (what == "label") {
-        n <- vapply(n, FUN.VALUE = NA_character_, FUN = lbl)
+        n <- self$vertex_label(n)
       }
       return(n)
     },
@@ -181,7 +173,7 @@ DecisionTree <- R6::R6Class(
     #' leaf node labels) or "index" (returns the vertex indexes of the leaf
     #' nodes).
     #' @return A list of \code{LeafNode} objects (for what = "node"); a list
-    #' of character strings (for what = "label"); or an integer vector of 
+    #' of character strings (for what = "label"); or an integer vector of
     #' leaf node indexes (for what = "index").
     leaf_nodes = function(what = "node") {
       # check arguments
@@ -190,52 +182,48 @@ DecisionTree <- R6::R6Class(
         message = "Argument 'what' must be one of 'node', 'label' or 'index'.",
         class = "unknown_what_value"
       )
-      # helper functions
-      isd <- function(i) {
-        n <- self$vertex_at(i)
-        return(inherits(n, what = "LeafNode"))
-      }
-      lbl <- function(i) {
-        n <- self$vertex_at(i)
-        return(n$label())
-      }
-      # iterate
-      n <- which(vapply(self$vertex_along(), FUN.VALUE = TRUE, FUN = isd))
+      # indexes of leaf nodes
+      n <- which(
+        vapply(
+          X = self$vertexes(), FUN.VALUE = TRUE, FUN = inherits,
+          what = "LeafNode"
+        )
+      )
       if (what == "node") {
-        n <- lapply(n, self$vertex_at)
+        n <- self$vertex_at(n, as_list = TRUE)
       } else if (what == "label") {
-        n <- vapply(n, FUN.VALUE = NA_character_, FUN = lbl)
+        n <- self$vertex_label(n)
       }
       return(n)
     },
 
-    #' @description Find the edges that have the specified decision node as 
+    #' @description Find the edges that have the specified decision node as
     #' their source.
     #' @param d A decision node.
     #' @return A list of \code{Action} edges.
     actions = function(d) {
       # check argument
       abortif(missing(d),
-        message = "Node 'd' must be defined", 
+        message = "Node 'd' must be defined",
         class = "decision_node_not_defined"
       )
       abortifnot(self$has_vertex(d),
-        message = "Node 'd' is not in the Decision Tree", 
+        message = "Node 'd' is not in the Decision Tree",
         class = "not_in_tree"
       )
       abortifnot(inherits(d, what = "DecisionNode"),
-        message = "Node 'd' is not a Decision Node", 
+        message = "Node 'd' is not a Decision Node",
         class = "not_decision_node"
       )
       id <- self$vertex_index(d)
-      # find the edges with d as their source 
+      # find the edges with d as their source
       B <- self$digraph_incidence_matrix()
-      ie <- which(B[id,] == -1L, arr.ind=TRUE)
-      return(self$edge_at(ie))
+      ie <- which(B[id, ] == -1L)
+      return(self$edge_at(ie, as_list = TRUE))
     },
-    
+
     #' @description Find all the model variables of type \code{ModVar}.
-    #' @details Find \code{ModVar}s that have been specified as values 
+    #' @details Find \code{ModVar}s that have been specified as values
     #' associated with the nodes and edges of the tree.
     #' @return A list of \code{ModVar}s.
     modvars = function() {
@@ -243,7 +231,7 @@ DecisionTree <- R6::R6Class(
       mv <- list()
       # find the ModVars in Actions and Reactions
       for (e in self$edges()) {
-        if (inherits(e, what=c("Action", "Reaction"))) {
+        if (inherits(e, what = c("Action", "Reaction"))) {
           mv <- c(mv, e$modvars())
         }
       }
@@ -256,10 +244,10 @@ DecisionTree <- R6::R6Class(
       # return a unique list
       return(unique(mv))
     },
-    
+
     #' @description Tabulate the model variables.
     #' @param expressions A logical that defines whether expression model
-    #' variables should be included in the tabulation. 
+    #' variables should be included in the tabulation.
     #' @return Data frame with one row per model variable, as follows:
     #' \describe{
     #' \item{\code{Description}}{As given at initialization.}
@@ -269,7 +257,7 @@ DecisionTree <- R6::R6Class(
     #' if it is an \code{ExprModVar}.}
     #' \item{\code{Mean}}{Mean; calculated from means of operands if
     #' an expression.}
-    #' \item{\code{E}}{Expectation; estimated from random sample if expression, 
+    #' \item{\code{E}}{Expectation; estimated from random sample if expression,
     #' mean otherwise.}
     #' \item{\code{SD}}{Standard deviation; estimated from random sample if
     #' expression, exact value otherwise.}
@@ -277,7 +265,7 @@ DecisionTree <- R6::R6Class(
     #' expression, exact value otherwise.}
     #' \item{\code{Q97.5}}{p=0.975 quantile; estimated from random sample if
     #' expression, exact value otherwise.}
-    #' \item{\code{Est}}{TRUE if the quantiles and SD have been estimated by 
+    #' \item{\code{Est}}{TRUE if the quantiles and SD have been estimated by
     #' random sampling.}
     #' }
     modvar_table = function(expressions = TRUE) {
@@ -317,16 +305,16 @@ DecisionTree <- R6::R6Class(
         }),
         Q2.5 = vapply(mvlist, FUN.VALUE = 1.0, FUN = function(x) {
           rv <- ifelse(
-            x$is_expression(), 
-            x$q_hat(probs = 0.025), 
+            x$is_expression(),
+            x$q_hat(probs = 0.025),
             x$quantile(probs = 0.025)
           )
           return(rv)
         }),
-        Q97.5 = vapply(mvlist, FUN.VALUE = 1.0, FUN=function(x) {
+        Q97.5 = vapply(mvlist, FUN.VALUE = 1.0, FUN = function(x) {
           rv <- ifelse(
-            x$is_expression(), 
-            x$q_hat(probs = 0.975), 
+            x$is_expression(),
+            x$q_hat(probs = 0.975),
             x$quantile(probs = 0.975)
           )
           return(rv)
@@ -339,9 +327,9 @@ DecisionTree <- R6::R6Class(
       # Return the table
       return(DF)
     },
-    
-    #' @description Draw the decision tree to the current graphics output. 
-    #' @details Uses the algorithm of Walker (1989) to distribute the nodes 
+
+    #' @description Draw the decision tree to the current graphics output.
+    #' @details Uses the algorithm of Walker (1989) to distribute the nodes
     #' compactly (see the \link{Arborescence} class help for details).
     #' @param border If TRUE draw a light grey border around the plot area.
     #' @return No return value.
@@ -364,30 +352,30 @@ DecisionTree <- R6::R6Class(
       # find the (x,y) coordinates of nodes using Walker's algorithm
       LevelSeparation <- 1.0
       XY <- self$postree(
-        RootOrientation="EAST", 
-        LevelSeparation=LevelSeparation
+        RootOrientation = "EAST",
+        LevelSeparation = LevelSeparation
       )
       # adjust level separation to create a tree with an aspect ratio
       # that approximates the figure aspect ratio
-      xmin <- min(XY[,"x"])
-      xmax <- max(XY[,"x"])
-      ymin <- min(XY[,"y"])
-      ymax <- max(XY[,"y"])
-      tree.asp <- (xmax-xmin) / (ymax-ymin)
-      LevelSeparation <- fig.asp/tree.asp
+      xmin <- min(XY[, "x"])
+      xmax <- max(XY[, "x"])
+      ymin <- min(XY[, "y"])
+      ymax <- max(XY[, "y"])
+      tree.asp <- (xmax - xmin) / (ymax - ymin)
+      LevelSeparation <- fig.asp / tree.asp
       # find the (x,y) coordinates of the nodes with adjusted level separation
       XY <- self$postree(
-        RootOrientation="EAST", 
-        LevelSeparation=LevelSeparation
+        RootOrientation = "EAST",
+        LevelSeparation = LevelSeparation
       )
       # find the extent of the new tree
-      xmin <- min(XY[,"x"])
-      xmax <- max(XY[,"x"])
-      ymin <- min(XY[,"y"])
-      ymax <- max(XY[,"y"])
+      xmin <- min(XY[, "x"])
+      xmax <- max(XY[, "x"])
+      ymin <- min(XY[, "y"])
+      ymax <- max(XY[, "y"])
       # width and height of the diagram in tree space
-      tw <- (xmax-xmin) + (lmargin+rmargin)
-      th <- (ymax-ymin) + (bmargin+tmargin)
+      tw <- (xmax - xmin) + (lmargin + rmargin)
+      th <- (ymax - ymin) + (bmargin + tmargin)
       # calculate scale factor
       scale <- max(tw / fig.size[[1L]], th / fig.size[[2L]])
       # find centre of drawing in tree space
@@ -396,18 +384,18 @@ DecisionTree <- R6::R6Class(
       # centre of the figure space
       cx.f <- fig.size[[1L]] / 2.0
       cy.f <- fig.size[[2L]] / 2.0
-      # functions to transform coordinates and distances in tree space 
+      # functions to transform coordinates and distances in tree space
       # to grid space (cm)
       gx <- function(xtree) {
-        xcm <- cx.f + (xtree-cx)/scale
+        xcm <- cx.f + (xtree - cx) / scale
         return(xcm)
       }
       gy <- function(ytree) {
-        ycm <- cy.f + (ytree-cy)/scale
+        ycm <- cy.f + (ytree - cy) / scale
         return(ycm)
       }
       gd <- function(dtree) {
-        dcm <- dtree/scale
+        dcm <- dtree / scale
         return(dcm)
       }
       # start new page for drawing
@@ -415,9 +403,9 @@ DecisionTree <- R6::R6Class(
       # viewport rectangle (border)
       if (border) {
         grid::grid.rect(
-          x=grid::unit(0.5, "npc"), 
-          y=grid::unit(0.5, "npc"), 
-          width = grid::unit(1.0, "npc"), 
+          x = grid::unit(0.5, "npc"),
+          y = grid::unit(0.5, "npc"),
+          width = grid::unit(1.0, "npc"),
           height = grid::unit(1.0, "npc"),
           gp = grid::gpar(col = "lightgray")
         )
@@ -428,106 +416,108 @@ DecisionTree <- R6::R6Class(
         # find source and target nodes
         n.source <- self$vertex_index(e$source())
         n.target <- self$vertex_index(e$target())
-        x.source <- XY$x[XY$n==n.source]
-        y.source <- XY$y[XY$n==n.source]
-        x.target <- XY$x[XY$n==n.target]
-        y.target <- XY$y[XY$n==n.target]
+        x.source <- XY[which(XY[, "n"] == n.source), "x"]
+        y.source <- XY[which(XY[, "n"] == n.source), "y"]
+        x.target <- XY[which(XY[, "n"] == n.target), "x"]
+        y.target <- XY[which(XY[, "n"] == n.target), "y"]
         grid::grid.move.to(
-          x = grid::unit(gx(x.source),"cm"),
-          y = grid::unit(gy(y.source),"cm")
+          x = grid::unit(gx(x.source), "cm"),
+          y = grid::unit(gy(y.source), "cm")
         )
-        x.joint <- (x.target-x.source)*fs + x.source
+        x.joint <- (x.target - x.source) * fs + x.source
         y.joint <- y.target
         grid::grid.line.to(
-          x = grid::unit(gx(x.joint),"cm"),
-          y = grid::unit(gy(y.joint),"cm")
+          x = grid::unit(gx(x.joint), "cm"),
+          y = grid::unit(gy(y.joint), "cm")
         )
         grid::grid.line.to(
-          x = grid::unit(gx(x.target),"cm"),
-          y = grid::unit(gy(y.target),"cm")
+          x = grid::unit(gx(x.target), "cm"),
+          y = grid::unit(gy(y.target), "cm")
         )
         # add label
         grid::grid.text(
           label = e$label(),
-          x = grid::unit(gx(x.joint),"cm")+grid::unit(0.2,"char"),
-          y = grid::unit(gy(y.joint),"cm")+grid::unit(0.4,"char"),
+          x = grid::unit(gx(x.joint), "cm") + grid::unit(0.2, "char"),
+          y = grid::unit(gy(y.joint), "cm") + grid::unit(0.4, "char"),
           just = c("left", "bottom"),
-          gp = grid::gpar(fontsize=fontsize)
+          gp = grid::gpar(fontsize = fontsize)
         )
       }
       # draw the nodes
       for (iv in self$vertex_along()) {
         v <- self$vertex_at(iv)
         # find the node from its index
-        i <- which(XY$n==self$vertex_index(v))
+        i <- which(XY[, "n"] == self$vertex_index(v))
         # switch type
-        if (inherits(v, what="DecisionNode")) {
-          a <- sqrt(pi / 4.0)*node.size
+        if (inherits(v, what = "DecisionNode")) {
+          a <- sqrt(pi / 4.0) * node.size
           grid::grid.rect(
-            x = gx(XY[i,"x"]),
-            y = gy(XY[i,"y"]),
+            x = gx(XY[[i, "x"]]),
+            y = gy(XY[[i, "y"]]),
             width = gd(a * 2.0),
             height = gd(a * 2.0),
             default.units = "cm",
-            gp = grid::gpar(col="black", fill="lightgray")
+            gp = grid::gpar(col = "black", fill = "lightgray")
           )
           # add label
           grid::grid.text(
             label = v$label(),
-            x = grid::unit(gx(XY[i,"x"]),"cm"),
-            y = grid::unit(gy(XY[i,"y"]+a),"cm")+grid::unit(0.4,"char"),
-            just = c("right", "bottom"),
-            gp = grid::gpar(fontsize=fontsize)
-          )
-        } else if (inherits(v, what="ChanceNode")) {
-          a <- node.size
-          grid::grid.circle(
-            x = gx(XY[i,"x"]),
-            y = gy(XY[i,"y"]),
-            r = gd(a),
-            default.units = "cm",
-            gp = grid::gpar(col="black", fill="lightgray")
-          )
-          # add label
-          grid::grid.text(
-            label = v$label(),
-            x = grid::unit(gx(XY[i,"x"]),"cm"),
-            y = grid::unit(gy(XY[i,"y"]+a),"cm")+grid::unit(0.4,"char"),
-            just = c("right", "bottom"),
-            gp = grid::gpar(fontsize=fontsize)
-          )
-        } else if (inherits(v, what="LeafNode")) {
-          a <- 2.0 * sqrt(pi / sqrt(3.0))*node.size
-          grid::grid.polygon(
-            x = c(
-              gx(XY[i, "x"] - a / sqrt(3.0)),
-              gx(XY[i, "x"] + sqrt(3.0) * a / 6.0),
-              gx(XY[i, "x"] + sqrt(3.0) * a / 6.0)
-            ),
-            y = c(
-              gy(XY[i, "y"] + 0.0),
-              gy(XY[i, "y"] + a / 2.0),
-              gy(XY[i, "y"] - a / 2.0)
-            ),
-            default.units = "cm",
-            gp = grid::gpar(fill="lightgray", col="black")
-          )
-          # add label
-          grid::grid.text(
-            label = v$label(),
-            x = grid::unit(gx(XY[i,"x"]),"cm"),
-            y = grid::unit(gy(XY[i, "y"] + a / 3.0), "cm") +
+            x = grid::unit(gx(XY[[i, "x"]]), "cm"),
+            y = grid::unit(gy(XY[[i, "y"]] + a), "cm") +
               grid::unit(0.4, "char"),
             just = c("right", "bottom"),
-            gp = grid::gpar(fontsize=fontsize)
+            gp = grid::gpar(fontsize = fontsize)
+          )
+        } else if (inherits(v, what = "ChanceNode")) {
+          a <- node.size
+          grid::grid.circle(
+            x = gx(XY[[i, "x"]]),
+            y = gy(XY[[i, "y"]]),
+            r = gd(a),
+            default.units = "cm",
+            gp = grid::gpar(col = "black", fill = "lightgray")
+          )
+          # add label
+          grid::grid.text(
+            label = v$label(),
+            x = grid::unit(gx(XY[[i, "x"]]), "cm"),
+            y = grid::unit(gy(XY[[i, "y"]] + a), "cm") +
+              grid::unit(0.4, "char"),
+            just = c("right", "bottom"),
+            gp = grid::gpar(fontsize = fontsize)
+          )
+        } else if (inherits(v, what = "LeafNode")) {
+          a <- 2.0 * sqrt(pi / sqrt(3.0)) * node.size
+          grid::grid.polygon(
+            x = c(
+              gx(XY[[i, "x"]] - a / sqrt(3.0)),
+              gx(XY[[i, "x"]] + sqrt(3.0) * a / 6.0),
+              gx(XY[[i, "x"]] + sqrt(3.0) * a / 6.0)
+            ),
+            y = c(
+              gy(XY[[i, "y"]] + 0.0),
+              gy(XY[[i, "y"]] + a / 2.0),
+              gy(XY[[i, "y"]] - a / 2.0)
+            ),
+            default.units = "cm",
+            gp = grid::gpar(fill = "lightgray", col = "black")
+          )
+          # add label
+          grid::grid.text(
+            label = v$label(),
+            x = grid::unit(gx(XY[[i, "x"]]), "cm"),
+            y = grid::unit(gy(XY[[i, "y"]] + a / 3.0), "cm") +
+              grid::unit(0.4, "char"),
+            just = c("right", "bottom"),
+            gp = grid::gpar(fontsize = fontsize)
           )
         }
       }
       # return updated DecisionTree (unchanged)
       return(invisible(self))
     },
-    
-    #' @description Tests whether an object is a valid strategy. 
+
+    #' @description Tests whether an object is a valid strategy.
     #' @details A strategy is a unanimous prescription of an action taken at
     #' each decision node, coded as a list of action edges. This checks
     #' whether the strategy is valid for this decision tree.
@@ -536,15 +526,15 @@ DecisionTree <- R6::R6Class(
     #' FALSE if the list of Action edges are not a valid strategy.
     is_strategy = function(strategy) {
       # find the set of source nodes for the action edges in the strategy
-      iS <- vapply(X = strategy, FUN.VALUE = 1L, FUN = self$source)
+      iS <- vapply(X = strategy, FUN.VALUE = 1L, FUN = self$arrow_source)
       # find the list of Decision nodes
       iD <- self$decision_nodes("index")
       # the set of source nodes of the action edges must be the same as the set
       # of decision nodes
       return((length(iS) == length(iD)) && setequal(iS, iD))
     },
-  
-    #' @description Find all potential strategies for the decision tree. 
+
+    #' @description Find all potential strategies for the decision tree.
     #' @details A strategy is a unanimous prescription of the actions at each
     #' decision node. If there are decision nodes that are descendants of other
     #' nodes in the tree, the strategies returned will not necessarily
@@ -555,10 +545,10 @@ DecisionTree <- R6::R6Class(
     #' one action edge per decision node). If provided, only that strategy
     #' is selected from the returned table. Intended for tabulating a
     #' single strategy into a readable form.
-    #' @return A data frame where each row is a potential strategy 
-    #' and each column is a Decision Node. Values are either the index of each
-    #' action edge, or their label. The row names are the edge labels of each
-    #' strategy, concatenated with underscores.
+    #' @return A data frame where each row is a potential strategy
+    #' and each column is a decision node, ordered lexicographically. Values
+    #' are either the index of each action edge, or their label. The row names
+    #' are the edge labels of each strategy, concatenated with underscores.
     strategy_table = function(what = "index", select = NULL) {
       # check arguments
       abortifnot(what %in% c("index", "label"),
@@ -577,6 +567,8 @@ DecisionTree <- R6::R6Class(
       aei <- lapply(ae, vapply, self$edge_index, FUN.VALUE = 1L)
       # add the decision node label to each list element
       names(aei) <- self$decision_nodes(what = "label")
+      # order the decision nodes lexicograpically
+      aei <- aei[order(names(aei))]
       # find all possible strategies, by taking each combination of one action
       # edge from each decision node
       tti <- expand.grid(aei, KEEP.OUT.ATTRS = FALSE)
@@ -601,17 +593,17 @@ DecisionTree <- R6::R6Class(
       tt <- if (what == "label") ttl else tti
       return(tt)
     },
-    
-    #' @description Find all paths walked in each possible strategy. 
-    #' @details A strategy is a unanimous prescription of an action in each 
+
+    #' @description Find all paths walked in each possible strategy.
+    #' @details A strategy is a unanimous prescription of an action in each
     #' decision node. Some paths can be walked in more than one strategy, if
     #' there exist paths that do not pass a decision node.
     #' @return A data frame, where each row is a path walked in a strategy. The
-    #' structure is similar to that returned by \code{strategy_table} but 
-    #' includes an extra column, \code{Leaf} which gives the leaf node index of 
+    #' structure is similar to that returned by \code{strategy_table} but
+    #' includes an extra column, \code{Leaf} which gives the leaf node index of
     #' each path, and there is one row for each path in each strategy.
     strategy_paths = function() {
-      # find possible strategies 
+      # find possible strategies
       st <- self$strategy_table()
       rownames(st) <- NULL
       # find the set of action edges in the tree
@@ -632,10 +624,10 @@ DecisionTree <- R6::R6Class(
           # the set of action edges which define the strategy
           ae <- setdiff(ew, es)
           return(length(ae) == 0L)
-        })        
+        })
         # Append to the strategy data frame
         sl <- cbind(
-          st[lv, , drop = FALSE], 
+          st[lv, , drop = FALSE],
           Leaf = self$vertex_index(p[[length(p)]])
         )
         return(sl)
@@ -645,13 +637,13 @@ DecisionTree <- R6::R6Class(
     },
 
     #' @description Properties of all actions and reactions as a matrix.
-    #' @details Gets the properties (probability, cost, benefit) of each 
+    #' @details Gets the properties (probability, cost, benefit) of each
     #' action and reaction in the decision tree in matrix form.
     #' @return A numeric matrix with one row per edge, and with four columns:
-    #' the index of the edge, the conditional probability of traversing the 
+    #' the index of the edge, the conditional probability of traversing the
     #' edge, the cost of traversing the edge and the benefit associated with
     #' traversing the edge. The column names are \code{index},
-    #' \code{probability}, \code{cost}, \code{benefit} and the row names are 
+    #' \code{probability}, \code{cost}, \code{benefit} and the row names are
     #' the labels of the edges.
     edge_properties = function() {
       ep <- matrix(data = NA, nrow = self$size(), ncol = 4L)
@@ -660,69 +652,72 @@ DecisionTree <- R6::R6Class(
       r <- 1L
       for (ie in self$edge_along()) {
         e <- self$edge_at(ie)
-        ep[r, "index"] <- ie
-        ep[r, "probability"] <- e$p()
-        ep[r, "cost"] <- e$cost()
-        ep[r, "benefit"] <- e$benefit()
-        rn[r] <- e$label()
+        ep[[r, "index"]] <- ie
+        ep[[r, "probability"]] <- e$p()
+        ep[[r, "cost"]] <- e$cost()
+        ep[[r, "benefit"]] <- e$benefit()
+        rn[[r]] <- e$label()
         r <- r + 1L
       }
       rownames(ep) <- rn
       return(ep)
     },
-    
+
     #' @description Evaluate the components of pay-off associated with a set of
-    #' walks in the decision tree. 
+    #' walks in the decision tree.
     #' @details For each walk, probability, cost, benefit and utility are
     #' calculated. There is minimal checking of the argument because this
-    #' function is intended to be called repeatedly during tree evaluation, 
-    #' including PSA. 
+    #' function is intended to be called repeatedly during tree evaluation,
+    #' including PSA.
     #' @param W A list of root-to-leaf walks. A walk is a sequence of edges
     #' (actions and reactions), stored as a list. Each walk must start with an
     #' edge whose source is the root node and end with an edge whose target is
     #' a leaf node. The list of walks is normally the walks associated with all
     #' the root to leaf paths in a tree.
     #' @param Wi As \var{W} but with edge indices instead of Edge objects. One
-    #' of \var{W} and \var{Wi} must be NULL. It is more efficient to provide 
+    #' of \var{W} and \var{Wi} must be NULL. It is more efficient to provide
     #' \var{Wi} during PSA, where the paths do not change between cycles, to
-    #' avoid repeated conversion of edges to indices. 
-    #' @return A matrix (pay-off table) with one row per path and columns
-    #' organized as follows:
+    #' avoid repeated conversion of edges to indices.
+    #' @return A pay-off table, represented as a matrix of numeric values
+    #' with response columns as follows:
     #' \describe{
-    #' \item{\code{Leaf}}{The unique identifier of the path, taken to be the 
-    #' index of the terminal (leaf) node.}
     #' \item{\code{Probability}}{The probability of traversing the pathway. }
     #' \item{\code{Path.Cost}}{The cost of traversing the pathway.}
-    #' \item{\code{Path.Benefit}}{The benefit derived from traversing the 
+    #' \item{\code{Path.Benefit}}{The benefit derived from traversing the
     #'       pathway.}
     #' \item{\code{Path.Utility}}{The utility associated with the outcome (leaf
     #'       node).}
-    #' \item{\code{Path.QALY}}{The QALYs associated with the outcome (leaf 
+    #' \item{\code{Path.QALY}}{The QALYs associated with the outcome (leaf
     #'       node).}
     #' \item{\code{Cost}}{\code{Path.Cost} \eqn{*} probability of traversing the
     #'       pathway.}
-    #' \item{\code{Benefit}}{\code{Path.Benefit} \eqn{*} probability of 
+    #' \item{\code{Benefit}}{\code{Path.Benefit} \eqn{*} probability of
     #' traversing the pathway.}
-    #' \item{\code{Utility}}{\code{Path.Utility} \eqn{*} probability of 
+    #' \item{\code{Utility}}{\code{Path.Utility} \eqn{*} probability of
     #' traversing the pathway.}
     #' \item{\code{QALY}}{\code{Path.QALY} \eqn{*} probability of traversing the
     #' pathway.}
     #' }
+    #' The matrix has one row per path, with the row label equal to the
+    #' character representation of the index of the leaf node at the end of
+    #' the path.
     evaluate_walks = function(W = NULL, Wi = NULL) {
-      # convert edge nodes into edge indices
+      # convert edge nodes into edge indices for each walk
       if (is.null(Wi)) {
-        Wi <- lapply(W, lapply, self$edge_index)
+        Wi <- lapply(W, self$edge_index)
       }
       # create a return matrix
+      cnames <- c(
+        "Probability",
+        "Path.Cost", "Path.Benefit", "Path.Utility", "Path.QALY",
+        "Cost", "Benefit", "Utility", "QALY"
+      )
+      rnames <- rep(NA_character_, times = length(Wi))
       payoff <- matrix(
-        data = NA,
+        data = NA_real_,
         nrow = length(Wi),
-        ncol = 10L,
-        dimnames = list(
-          NULL, 
-          c("Leaf", "Probability", "Path.Cost", "Path.Benefit", "Path.Utility",
-            "Path.QALY", "Cost", "Benefit", "Utility", "QALY")
-        )
+        ncol = length(cnames),
+        dimnames = list(Leaf = rnames, Response = cnames)
       )
       # get the edge properties for the tree
       ep <- self$edge_properties()
@@ -738,9 +733,9 @@ DecisionTree <- R6::R6Class(
           message = "Walk must end on a leaf",
           class = "not_to_leaf"
         )
-        # set the ID as the index of the leaf node
+        # set the row name as the index of the leaf node
         ileaf <- self$vertex_index(leaf)
-        payoff[i, "Leaf"] <- ileaf
+        rnames[[i]] <- as.character(ileaf)
         # find the rows of the edge properties that are in the walk
         wrows <- ep[, "index"] %in% walk
         # compute probability, cost and benefit
@@ -748,58 +743,61 @@ DecisionTree <- R6::R6Class(
         cost <- sum(ep[wrows, "cost"])
         benefit <- sum(ep[wrows, "benefit"])
         # # walk the path and accumulate p, cost and benefit
-        payoff[i,"Probability"] <- pr
-        payoff[i,"Path.Cost"] <- cost
-        payoff[i,"Path.Benefit"] <- benefit
+        payoff[[i, "Probability"]] <- pr
+        payoff[[i, "Path.Cost"]] <- cost
+        payoff[i, "Path.Benefit"] <- benefit
         # utility of the leaf node at end of the path
-        payoff[i, "Path.Utility"] <- leaf$utility()
-        payoff[i, "Path.QALY"] <- leaf$QALY()
+        payoff[[i, "Path.Utility"]] <- leaf$utility()
+        payoff[[i, "Path.QALY"]] <- leaf$QALY()
       }
-      # add expected cost and utility     
-      payoff[,"Cost"] <- payoff[,"Probability"]*payoff[,"Path.Cost"]
-      payoff[,"Benefit"] <- payoff[,"Probability"]*payoff[,"Path.Benefit"]
-      payoff[,"Utility"] <- payoff[,"Probability"]*payoff[,"Path.Utility"]
-      payoff[,"QALY"] <- payoff[,"Probability"]*payoff[,"Path.QALY"]
-      # return the payoff table      
+      # add expected cost and utility
+      payoff[, "Cost"] <- payoff[, "Probability"] * payoff[, "Path.Cost"]
+      payoff[, "Benefit"] <- payoff[, "Probability"] * payoff[, "Path.Benefit"]
+      payoff[, "Utility"] <- payoff[, "Probability"] * payoff[, "Path.Utility"]
+      payoff[, "QALY"] <- payoff[, "Probability"] * payoff[, "Path.QALY"]
+      # set the row names
+      rownames(payoff) <- rnames
+      # return the payoff table
       return(payoff)
     },
-    
-    #' @description Evaluate each strategy. 
+
+    #' @description Evaluate each strategy.
     #' @details Starting with the root, the function works though all possible
-    #' paths to leaf nodes and computes the probability, cost, benefit and 
-    #' utility of each, then optionally aggregates by strategy or run.   
+    #' paths to leaf nodes and computes the probability, cost, benefit and
+    #' utility of each, optionally aggregated by strategy or run.
     #' The columns of the returned data frame are:
     #' \describe{
-    #' \item{\code{by="path"}}{
+    #' \item{\code{by = "path"}}{
     #'   \describe{
-    #'     \item{\code{Leaf}}{The label of terminating leaf node}
-    #'     \item{\code{<label of first decision node>}}{label of action leaving 
+    #'     \item{\code{Run}}{Run number}
+    #'     \item{\code{<label of first decision node>}}{label of action leaving
     #'           the node}
-    #'     \item{\code{<label of second decision node (etc.)>}}{label of action}
+    #'     \item{\code{<label of second decision node (etc.)>}}{label of action
+    #'       leaving the node}
+    #'     \item{\code{Leaf}}{The label of terminating leaf node}
     #'     \item{\code{Probability}}{Probability of traversing the path}
     #'     \item{\code{Cost}}{Cost of traversing the path}
     #'     \item{\code{Benefit}}{Benefit of traversing the path}
     #'     \item{\code{Utility}}{Utility of traversing the path}
     #'     \item{\code{QALY}}{QALY of traversing the path}
-    #'     \item{\code{Run}}{Run number}
     #'   }
     #' }
-    #' 
-    #' \item{\code{by="strategy"}}{
+    #'
+    #' \item{\code{by = "strategy"}}{
     #'   \describe{
-    #'     \item{\code{<label of first decision node>}}{label of action leaving 
+    #'     \item{\code{Run}}{Run number}
+    #'     \item{\code{<label of first decision node>}}{label of action leaving
     #'           the node}
     #'     \item{\code{<label of second decision node (etc)}}{label of action}
-    #'     \item{\code{Run}}{Run number}
     #'     \item{\code{Probability}}{\eqn{\Sigma p_i} for the run (1)}
     #'     \item{\code{Cost}}{Aggregate cost of the strategy}
     #'     \item{\code{Benefit}}{Aggregate benefit of the strategy}
     #'     \item{\code{Utility}}{Aggregate utility of the strategy}
     #'     \item{\code{QALY}}{Aggregate QALY of the strategy}
     #'   }
-    #' } 
-    #' 
-    #' \item{\code{by="run"}}{
+    #' }
+    #'
+    #' \item{\code{by = "run"}}{
     #'   \describe{
     #'     \item{\code{Run}}{Run number}
     #'     \item{\code{Probability.<S>}}{Probability for strategy S}
@@ -808,49 +806,56 @@ DecisionTree <- R6::R6Class(
     #'     \item{\code{Utility.<S>}}{Benefit for strategy S}
     #'     \item{\code{QALY.<S>}}{QALY for strategy S}
     #'   }
-    #'   where <S> is string composed of the action labels in strategy \code{S}
-    #'   concatenated with an underscore and there will be one probability etc.,
-    #'   column for each strategy.
+    #'   where <S> is a label associated with strategy \code{S}. Each strategy
+    #'   label is
+    #'   a list of the labels of the action edges that are traversed in the
+    #'   strategy, concatenated with underscores. The ordering of each label
+    #'   part follows the lexicographical order of the decision node labels
+    #'   concatenated with underscores. For example, if there are three
+    #'   decision nodes labelled d1, d2 and d3, each strategy label will be of
+    #'   the form a1i_a2i_a3i where a1i is the label of one action edge
+    #'   emanating from decision node d1, etc. There will be one probability,
+    #'   cost, benefit, utility and QALY column for each strategy.
     #'   }
     #' }
     #' @param setvars One of "expected" (evaluate with each model variable at
-    #' its mean value), "random" (sample each variable from its uncertainty 
+    #' its mean value), "random" (sample each variable from its uncertainty
     #' distribution and evaluate the model), "q2.5", "q50", "q97.5" (set each
     #' model variable to its 2.5\%, 50\% or 97.5\% quantile, respectively, and
-    #' evaluate the model) or "current" (leave each model variable at its 
+    #' evaluate the model) or "current" (leave each model variable at its
     #' current value prior to calling the function and evaluate the model).
-    #' @param N Number of replicates. Intended for use with PSA 
-    #' (\code{modvars="random"}); use with \code{modvars} = "expected"
-    #' will be repetitive and uninformative. 
+    #' @param N Number of replicates. Intended for use with PSA
+    #' (\code{modvars = "random"}); use with \code{modvars} = "expected"
+    #' will be repetitive and uninformative.
     #' @param by One of {"path", "strategy", "run"}. If "path", the table has
     #' one row per path walked per strategy, per run, and includes the label of
-    #' the terminating leaf node to identify each path. If "strategy" (the 
+    #' the terminating leaf node to identify each path. If "strategy" (the
     #' default), the table is aggregated by strategy, i.e., there is one row per
     #' strategy per run. If "run", the table has one row per run and uses
-    #' concatenated strategy names and one (cost, benefit, utility, QALY) column
-    #' for each strategy. 
+    #' concatenated strategy names (as above) and one (cost, benefit, utility,
+    #' QALY) as row names.
     #' @return A data frame whose columns depend on \code{by}; see "Details".
     evaluate = function(setvars = "expected", N = 1L, by = "strategy") {
       # check arguments
       abortifnot(is.character(setvars),
-        message = "'setvars' must be a character", 
+        message = "'setvars' must be a character",
         class = "setvars_not_character"
       )
-      valids <- c("expected","random","q2.5","q50","q97.5","current")
+      valids <- c("expected", "random", "q2.5", "q50", "q97.5", "current")
       abortifnot(setvars %in% valids,
         message = paste(
-          "'setvars' must be one of", 
-          paste(valids, collapse=" "), 
+          "'setvars' must be one of",
+          paste(valids, collapse = " "),
           collapse = " "
-        ), 
+        ),
         class = "setvars_invalid"
       )
       abortifnot(is.numeric(N),
-        message = "'N' must be numeric", 
+        message = "'N' must be numeric",
         class = "N_not_numeric"
       )
       abortifnot(is.character(by),
-        message = "'by' must be character", 
+        message = "'by' must be character",
         class = "by_not_character"
       )
       abortifnot(by %in% c("path", "strategy", "run"),
@@ -861,96 +866,105 @@ DecisionTree <- R6::R6Class(
       P <- self$root_to_leaf_paths()
       # find the walk for each root-to-leaf path
       Wi <- lapply(P, FUN = self$walk, what = "index")
-      # create template matrix for vapply
-      TM <- cbind(self$evaluate_walks(Wi = Wi), Run = rep(NA, length(Wi)))
+      # create template matrix for the result
+      TM <- self$evaluate_walks(Wi = Wi)
       # create list of modvars
       MV <- self$modvars()
-      # N tree evaluations, stacked as a 3d array
-      RES <- vapply(X = seq_len(N), FUN.VALUE = TM, FUN = function(n) {
+      # N tree evaluations, stored as stacked 2d matrices, with one matrix per
+      # run, keeping only the necessary columns
+      keep <- c("Probability", "Cost", "Benefit", "Utility", "QALY")
+      nleaf <- nrow(TM)
+      RES <- matrix(
+        data = NA_real_,
+        ncol = length(keep),
+        nrow = nleaf * N,
+        dimnames = list(NULL, Response = keep)
+      )
+      for (i in seq_len(N)) {
         # set the ModVar values (to chosen option)
         for (v in MV) {
           v$set(setvars)
         }
         # evaluate the tree
         M <- self$evaluate_walks(Wi = Wi)
-        M <- cbind(M, "Run" = rep(n, length(Wi)))
-        # return matrix to be appended
-        return(M)
-      })
-      # reform 3d array into concatenated 2d form
-      RES <- do.call("rbind", lapply(seq_len(N), function(n) RES[,,n]))
+        # add it to the array
+        rstart <- (i - 1L) * nleaf + 1L
+        rend <- rstart + nleaf - 1L
+        RES[rstart : rend, ] <- M[, keep]
+      }
+      # form array into a data frame with correct column types
+      payoff <- as.data.frame(RES)
+      payoff[, "Run"] <- rep(seq_len(N), each = nrow(TM))
+      payoff[, "Leaf"] <- rep(as.integer(rownames(TM)), times = N)
       # find all paths walked for each strategy
       SW <- self$strategy_paths()
       # merge with results to get one row per path walked per strategy
-      RES <- merge(SW, RES, all.x=TRUE, by="Leaf")
+      payoff <- merge(SW, payoff, all.x = TRUE, by = "Leaf")
       # Replace the edge indexes of the strategy with their edge labels
       dn <- self$decision_nodes("label")
+      dn <- sort(dn, na.last = TRUE)
       for (d in dn) {
-        RES[, d] <- vapply(X = RES[, d], FUN.VALUE = "X", FUN = self$edge_label)
+        payoff[, d] <- self$edge_label(payoff[, d])
       }
-      # exclude unnecessary columns
-      RES$Path.Cost <- NULL
-      RES$Path.Utility <- NULL
-      RES$Path.QALY <- NULL
-      RES$Path.Benefit <- NULL
       # modify output as required
       if (by == "path") {
-        # replace Leaf node indexes by their label
-        RES$Leaf <- vapply(X = RES$Leaf, FUN.VALUE = "x", FUN = function(iv) {
-          l <- private$V[[iv]]$label()
-          return(l)
-        })
-        PAYOFF <- RES
+        # replace Leaf node indexes by their label and reorder
+        payoff[, "Leaf"] <- self$vertex_label(payoff[, "Leaf"])
+        ofact <- c("Run", dn, "Leaf")
+        oresp <- c("Probability", "Cost", "Benefit", "Utility", "QALY")
+        payoff <- payoff[do.call(order, payoff[, ofact]), c(ofact, oresp)]
       } else {
         # aggregate by strategy
-        dn <- self$decision_nodes("label")
         f <- as.formula(
           paste(
             "cbind(Probability, Cost, Benefit, Utility, QALY)",
-            paste(paste(dn, collapse="+"), "Run", sep = "+"),
+            paste(paste(dn, collapse = "+"), "Run", sep = "+"),
             sep = "~"
-          ) 
+          )
         )
-        STR <- aggregate(f, data=RES, FUN=sum)
-        PAYOFF <- STR
+        payoff <- aggregate(f, data = payoff, FUN = sum)
+        ofact <- c("Run", dn)
+        oresp <- c("Probability", "Cost", "Benefit", "Utility", "QALY")
+        payoff <- payoff[do.call(order, payoff[, ofact]), c(ofact, oresp)]
         # further aggregate strategies by run if required
         if (by == "run") {
           # reshape to wide format
           if (length(dn) == 1L) {
-            STR$Strategy <- STR[, dn[[1L]]]
+            payoff$Strategy <- payoff[, dn[[1L]]]
           } else {
-            STR$Strategy <- apply(
-              STR[, dn], MARGIN = 1L, FUN=paste, collapse = "_"
+            payoff$Strategy <- apply(
+              payoff[, dn], MARGIN = 1L, FUN = paste, collapse = "_"
             )
           }
-          STR[,dn] <- NULL
-          PAYOFF <- reshape(
-            STR, idvar="Run", timevar="Strategy", direction="wide"
+          payoff[, dn] <- NULL
+          payoff <- reshape(
+            payoff, idvar = "Run", timevar = "Strategy", direction = "wide"
           )
         }
       }
-      # return the data frame     
-      return(PAYOFF)
+      # return the data frame
+      row.names(payoff) <- NULL
+      return(payoff)
     },
 
     #' @description Create a "tornado" diagram.
     #' @details Used to compare two strategies for traversing the decision tree.
-    #' A strategy is a unanimous prescription of the actions at each 
-    #' decision node. The extreme values of each input variable are the upper 
+    #' A strategy is a unanimous prescription of the actions at each
+    #' decision node. The extreme values of each input variable are the upper
     #' and lower 95\% confidence limits of the uncertainty distributions of each
-    #' variable. This ensures that the range of each input is defensible 
+    #' variable. This ensures that the range of each input is defensible
     #' (Briggs 2012).
     #' @param index The index strategy (option) to be evaluated.
     #' @param ref The reference strategy (option) with which the index strategy
     #' will be compared.
-    #' @param outcome One of \code{"saving"} or \code{"ICER"}. For 
+    #' @param outcome One of \code{"saving"} or \code{"ICER"}. For
     #' \code{"saving"} (e.g. in cost consequence analysis), the x axis is cost
     #' saved (cost of reference minus
     #' cost of index), on the presumption that the new technology will be cost
     #' saving at the point estimate. For \code{"ICER"} the x axis is
-    #' \eqn{\Delta C/\Delta E} and is expected to be positive at the point 
-    #' estimate (i.e. in the NE or SW quadrants of the cost-effectiveness 
-    #' plane), where \eqn{\Delta C} is cost of index minus cost of reference, 
+    #' \eqn{\Delta C/\Delta E} and is expected to be positive at the point
+    #' estimate (i.e. in the NE or SW quadrants of the cost-effectiveness
+    #' plane), where \eqn{\Delta C} is cost of index minus cost of reference,
     #' and \eqn{\Delta E} is utility of index minus utility of reference.
     #' @param exclude A list of descriptions of model variables to be excluded
     #' from the tornado.
@@ -960,12 +974,14 @@ DecisionTree <- R6::R6Class(
     #' for: minimum value of the variable, maximum value of the variable,
     #' minimum value of the outcome and maximum value of the outcome. NULL
     #' if there are no \code{ModVar}s.
-    tornado = function(index, ref, outcome="saving", exclude=NULL, draw=TRUE) {
+    tornado = function(
+      index, ref, outcome = "saving", exclude = NULL, draw = TRUE
+    ) {
       # find all input modvars, excluding expressions and those stated
       mvlist <- self$modvars()
-      lv <- vapply(X=mvlist, FUN.VALUE=TRUE, FUN=function(v) {
+      lv <- vapply(X = mvlist, FUN.VALUE = TRUE, FUN = function(v) {
         return(!v$is_expression())
-      }) 
+      })
       mvlist <- mvlist[lv]
       if (length(mvlist) == 0L) {
         if (draw) {
@@ -992,11 +1008,11 @@ DecisionTree <- R6::R6Class(
           class = "exclude_not_list"
         )
         mvd <- vapply(
-          mvlist, 
-          FUN.VALUE = "x", 
+          mvlist,
+          FUN.VALUE = "x",
           FUN = function(v) v$description()
         )
-        isc <- vapply(X=exclude, FUN.VALUE=TRUE, FUN=function(d) {
+        isc <- vapply(X = exclude, FUN.VALUE = TRUE, FUN = function(d) {
           rv <- (is.character(d) && (d %in% mvd))
           return(rv)
         })
@@ -1010,7 +1026,7 @@ DecisionTree <- R6::R6Class(
         class = "invalid_draw"
       )
       if (!is.null(exclude)) {
-        lv <- vapply(X=mvlist, FUN.VALUE=TRUE, FUN=function(v) {
+        lv <- vapply(X = mvlist, FUN.VALUE = TRUE, FUN = function(v) {
           return(v$description() %in% exclude)
         })
         mvlist <- mvlist[!lv]
@@ -1042,12 +1058,12 @@ DecisionTree <- R6::R6Class(
       # find all modvars in the model, not only those in the tornado
       all.mv <- self$modvars()
       # build strategy tables for index and ref
-      st.index <- self$strategy_table("label", select=index)
-      st.ref <- self$strategy_table("label", select=ref)
+      st.index <- self$strategy_table("label", select = index)
+      st.ref <- self$strategy_table("label", select = ref)
       # find univariate outcome limits
-      template <- vector(mode="numeric", length = 3L)
-      names(template) <- c("outcome.min","outcome.mean","outcome.max")
-      O <- vapply(X=mvlist, FUN.VALUE=template, FUN=function(this.mv) {
+      template <- vector(mode = "numeric", length = 3L)
+      names(template) <- c("outcome.min", "outcome.mean", "outcome.max")
+      O <- vapply(X = mvlist, FUN.VALUE = template, FUN = function(this.mv) {
         # result template
         res <- template
         # set all modvars to their mean (including those excluded)
@@ -1059,9 +1075,9 @@ DecisionTree <- R6::R6Class(
           # set this modvar to its minimum
           this.mv$set(what)
           # evaluate the tree
-          RES <- self$evaluate(setvars="current")
+          RES <- self$evaluate(setvars = "current")
           # get outcome for index strategy
-          ORES <- merge(st.index, RES, all.x=TRUE)
+          ORES <- merge(st.index, RES, all.x = TRUE)
           index.cost <- ORES$Cost[[1L]]
           index.utility <- ORES$Utility[[1L]]
           index.QALY <- ORES$QALY[[1L]]
@@ -1075,35 +1091,35 @@ DecisionTree <- R6::R6Class(
             rv <- ref.cost - index.cost
           } else {
             rv <- (index.cost - ref.cost) / (index.QALY - ref.QALY)
-          } 
-          return(rv)          
+          }
+          return(rv)
         }
-        res["outcome.min"] <- ce("q2.5")
-        res["outcome.mean"] <- ce("expected")
-        res["outcome.max"] <- ce("q97.5")
+        res[["outcome.min"]] <- ce("q2.5")
+        res[["outcome.mean"]] <- ce("expected")
+        res[["outcome.max"]] <- ce("q97.5")
         # return row of results
         return(res)
       })
       # transpose the outcome
       O <- t(O)
       # append to the data frame
-      TO <- cbind(TO,O)
-      
+      TO <- cbind(TO, O)
+
       # re-order it with least variation first
-      TO$range <- abs(TO$outcome.max - TO$outcome.min)
-      TO <- TO[order(TO$range, decreasing=FALSE),]
-      TO$range <- NULL
-      
+      TO[, "range"] <- abs(TO[, "outcome.max"] - TO[, "outcome.min"])
+      TO <- TO[order(TO[, "range"], decreasing = FALSE), ]
+      TO[, "range"] <- NULL
+
       # plot the graph, if required
       if (draw) {
         # x axis label
         xlab <- ifelse(outcome == "saving", "Mean cost saving", "Mean ICER")
         # make labels (description + units)
-        TO$Label <- paste(TO$Description, TO$Units, sep=", ")
+        TO[, "Label"] <- paste(TO[, "Description"], TO[, "Units"], sep = ", ")
         # width and height of the plot in inches
         dsize <- dev.size(unit = "in")
         figw <- dsize[[1L]]
-        figh <- dsize[[2L]] 
+        figh <- dsize[[2L]]
         # width of the left outer margin as a proportion of figw
         louter <- 0.4
         # size of the inner margins as lines of text (0.2 inches per line)
@@ -1136,11 +1152,7 @@ DecisionTree <- R6::R6Class(
             # find the longest label and scale text size accordingly
             lw <- max(strwidth(s = TO[, "Label"], unit = "in"))
             lw <- lw + strwidth("MM", unit = "in")
-            cex_axis <- if (lw > (louter * figw)) {
-              (louter * figw) / lw
-            } else {
-              1.0
-            }
+            cex_axis <- min((louter * figw) / lw, 1.0)
             # label the y axis
             axis(
               side = 2L,
@@ -1161,11 +1173,7 @@ DecisionTree <- R6::R6Class(
             lmin <- max(strwidth(s = limtxt(TO[, "outcome.min"]), unit = "in"))
             lmax <- max(strwidth(s = limtxt(TO[, "outcome.max"]), unit = "in"))
             lw <- max(lmin, lmax)
-            cex_limit <- if (lw > (linner * 0.2)) {
-              (linner * 0.2) / lw
-            } else {
-              1.0
-            }
+            cex_limit <- min(linner * 0.2 / lw, 1.0)
             # add bars and limits
             for (i in seq_len(nrow(TO))) {
               xleft <- min(TO[i, "outcome.min"], TO[i, "outcome.max"])
@@ -1192,64 +1200,65 @@ DecisionTree <- R6::R6Class(
                 labels = labels,
                 pos = c(2.0, 4.0),
                 offset = 0.25,
-                cex = cex_limit, 
+                cex = cex_limit,
                 xpd = TRUE
               )
             }
             # add mean (base case)
             abline(v = TO[[1L, "outcome.mean"]], lty = "dashed")
             # remove label column
-            TO$Label <- NULL
+            TO[, "Label"] <- NULL
           }
         )
       }
       # re-order it with greatest variation first
-      TO$range <- abs(TO$outcome.max - TO$outcome.min)
-      TO <- TO[order(TO$range, decreasing = TRUE),]
-      TO$range <- NULL
+      TO$range <- abs(TO[, "outcome.max"] - TO[, "outcome.min"])
+      TO <- TO[order(TO[, "range"], decreasing = TRUE), ]
+      TO[, "range"] <- NULL
       # remove mean column
-      TO$outcome.mean <- NULL
+      TO[, "outcome.mean"] <- NULL
       # return tornado data frame
       return(TO)
     },
- 
+
     #' @description Find the threshold value of a model variable at which
     #' the cost difference is zero or the ICER is equal to a threshold, for an
-    #' index strategy compared with a reference strategy. 
+    #' index strategy compared with a reference strategy.
     #' @details Uses a rudimentary bisection method method to find the root.
     #' In PSA terms, the algorithm finds the value of the specified model
     #' variable for which 50\% of runs are cost saving (or above the ICER
-    #' threshold) and 50\% are cost incurring (below the ICER threshold). 
+    #' threshold) and 50\% are cost incurring (below the ICER threshold).
     #' @param index The index strategy (option) to be evaluated.
     #' @param ref The reference strategy (option) with which the index strategy
     #' will be compared.
-    #' @param outcome One of \code{"saving"} or \code{"ICER"}. For 
-    #' \code{"saving"} (e.g., in cost consequence analysis), the value of 
+    #' @param outcome One of \code{"saving"} or \code{"ICER"}. For
+    #' \code{"saving"} (e.g., in cost consequence analysis), the value of
     #' \code{mvd}
-    #' is found at which cost saved is zero (cost saved is cost of reference 
+    #' is found at which cost saved is zero (cost saved is cost of reference
     #' minus cost of index, on the presumption that the new technology will be
-    #' cost saving at the point estimate). For \code{"ICER"} the value of 
-    #' \code{mvd} 
-    #' is found for which the incremental cost effectiveness ratio (ICER) is 
-    #' equal to the threshold \code{lambda}. ICER is calculated as 
+    #' cost saving at the point estimate). For \code{"ICER"} the value of
+    #' \code{mvd}
+    #' is found for which the incremental cost effectiveness ratio (ICER) is
+    #' equal to the threshold \code{lambda}. ICER is calculated as
     #' \eqn{\Delta C/\Delta E}, which will normally be positive
-    #' at the point estimate (i.e. in the NE or SW quadrants of the 
+    #' at the point estimate (i.e. in the NE or SW quadrants of the
     #' cost-effectiveness plane), where \eqn{\Delta C} is cost of index minus
-    #' cost of reference and \eqn{\Delta E} is utility of index minus utility 
-    #' of reference. 
+    #' cost of reference and \eqn{\Delta E} is utility of index minus utility
+    #' of reference.
     #' @param mvd The description of the model variable for which the threshold
     #' is to be found.
-    #' @param a The lower bound of the range of values of \code{mvd} to search 
+    #' @param a The lower bound of the range of values of \code{mvd} to search
     #' for the root (numeric).
     #' @param b The upper bound of the range of values of \code{mvd} to search
     #' for the root (numeric).
-    #' @param tol The tolerance to which the threshold should be 
+    #' @param tol The tolerance to which the threshold should be
     #' calculated (numeric).
     #' @param lambda The ICER threshold (threshold ratio) for outcome="ICER".
     #' @param nmax Maximum number if iterations allowed to reach convergence.
     #' @return Value of the model variable of interest at the threshold.
-    threshold = function(index, ref, outcome, mvd, a, b, tol, 
-                         lambda = NULL, nmax = 1000L) {
+    threshold = function(
+      index, ref, outcome, mvd, a, b, tol, lambda = NULL, nmax = 1000L
+    ) {
       # find all input modvars, excluding expressions
       mvlist <- self$modvars()
       lv <- vapply(X = mvlist, FUN.VALUE = TRUE, FUN = function(v) {
@@ -1270,7 +1279,7 @@ DecisionTree <- R6::R6Class(
         class = "invalid_outcome"
       )
       abortifnot(outcome %in% c("saving", "ICER"),
-        message  = "'outcome' must be one of {saving|ICER}", 
+        message  = "'outcome' must be one of {saving|ICER}",
         class = "invalid_outcome"
       )
       if (outcome == "ICER") {
@@ -1282,7 +1291,7 @@ DecisionTree <- R6::R6Class(
       abortifnot(is.character(mvd),
         message = "'mvd' must be a character string",
         class = "invalid_mvd"
-      )           
+      )
       lv <- vapply(X = mvlist, FUN.VALUE = TRUE, FUN = function(v) {
         return(identical(v$description(), mvd))
       })
@@ -1296,7 +1305,7 @@ DecisionTree <- R6::R6Class(
         class = "invalid_brackets"
       )
       abortif(missing(tol) || !is.numeric(tol) || tol <= 0.0,
-        message = "'tol' must be numeric and > 0", 
+        message = "'tol' must be numeric and > 0",
         class = "invalid_tol"
       )
       # set all modvars to their mean
@@ -1304,22 +1313,22 @@ DecisionTree <- R6::R6Class(
         v$set("expected")
       }
       # get names of index and ref strategies
-      ST <- self$strategy_table(select=index)
+      ST <- self$strategy_table(select = index)
       index.name <- rownames(ST)[[1L]]
-      ST <- self$strategy_table(select=ref)
+      ST <- self$strategy_table(select = ref)
       ref.name <- rownames(ST)[[1L]]
-      # construct a function to calculate the outcome at value x of the 
+      # construct a function to calculate the outcome at value x of the
       # variable for which the threshold is needed
       f <- function(x) {
         # set the variable under investigation to be x
-        dsav$set("value",x)
+        dsav$set("value", x)
         # evaluate the tree
-        RES <- self$evaluate(setvars="current", by="run")
+        RES <- self$evaluate(setvars = "current", by = "run")
         # get costs and QALYs of index and ref strategies
-        ref.cost <- RES[1L, paste("Cost", ref.name, sep=".")]
-        index.cost <- RES[1L, paste("Cost", index.name, sep=".")]
-        ref.qaly <- RES[1L, paste("QALY", ref.name, sep=".")]
-        index.qaly <- RES[1L, paste("QALY", index.name, sep=".")]
+        ref.cost <- RES[[1L, paste("Cost", ref.name, sep = ".")]]
+        index.cost <- RES[[1L, paste("Cost", index.name, sep = ".")]]
+        ref.qaly <- RES[[1L, paste("QALY", ref.name, sep = ".")]]
+        index.qaly <- RES[[1L, paste("QALY", index.name, sep = ".")]]
         # outcome
         if (outcome == "saving") {
           saving <- ref.cost - index.cost
@@ -1334,7 +1343,7 @@ DecisionTree <- R6::R6Class(
       threshold <- NA
       # check that sign of cost saving is different at the brackets
       abortifnot(f(a) * f(b) < 0.0,
-        message = "[a, b] does not bracket the root", 
+        message = "[a, b] does not bracket the root",
         class = "invalid_brackets"
       )
       n <- 0L
@@ -1352,10 +1361,10 @@ DecisionTree <- R6::R6Class(
         }
       }
       abortif(n >= nmax,
-        message = "Failed to converge", 
+        message = "Failed to converge",
         class = "convergence_failure"
       )
-      threshold <- c  
+      threshold <- c
       # return the threshold
       return(threshold)
     }

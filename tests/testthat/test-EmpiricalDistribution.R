@@ -10,7 +10,7 @@ test_that("illegal initializations are rejected", {
   x <- 42L
   expect_silent(EmpiricalDistribution$new(x))
   expect_error(
-    EmpiricalDistribution$new(x, 42L), 
+    EmpiricalDistribution$new(x, 42L),
     class = "interpolate.sample_not_supported"
   )
   x <- seq(from = 1.0, to = 1000.0)
@@ -37,7 +37,7 @@ test_that("mean, mode, sd and quantiles are returned correctly", {
   expect_intol(q[[2L]], 0.5, 0.01)
   expect_intol(q[[3L]], 1.0, 0.01)
 })
- 
+
 test_that("quantile function checks inputs and has correct output", {
   x <- seq(from = 1.0, to = 1000.0)
   e <- EmpiricalDistribution$new(x)

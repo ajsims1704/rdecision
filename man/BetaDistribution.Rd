@@ -65,7 +65,7 @@ An object of class \code{BetaDistribution}.
 \if{html}{\out{<a id="method-BetaDistribution-distribution"></a>}}
 \if{latex}{\out{\hypertarget{method-BetaDistribution-distribution}{}}}
 \subsection{Method \code{distribution()}}{
-Accessor function for the name of the uncertainty 
+Accessor function for the name of the uncertainty
 distribution.
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{BetaDistribution$distribution()}\if{html}{\out{</div>}}
@@ -92,7 +92,7 @@ Expected value as a numeric value.
 \if{html}{\out{<a id="method-BetaDistribution-mode"></a>}}
 \if{latex}{\out{\hypertarget{method-BetaDistribution-mode}{}}}
 \subsection{Method \code{mode()}}{
-The mode of the distribution (if 
+The mode of the distribution (if
 \code{alpha}, \code{beta} > 1)
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{BetaDistribution$mode()}\if{html}{\out{</div>}}

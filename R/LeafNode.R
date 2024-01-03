@@ -1,5 +1,5 @@
 #' @title A leaf node in a decision tree
-#' @description An R6 class representing a leaf (terminal) node in a decision 
+#' @description An R6 class representing a leaf (terminal) node in a decision
 #' tree.
 #' @details Represents a terminal state in a tree, and is associated with an
 #' incremental utility. Inherits from class \code{Node}.
@@ -15,7 +15,7 @@ LeafNode <- R6::R6Class(
     node.interval = NULL
   ),
   public = list(
-    
+
     #' @description
     #' Create a new \code{LeafNode} object; synonymous with a clinical outcome.
     #' @param label Character string; a label for the state; must be
@@ -24,12 +24,12 @@ LeafNode <- R6::R6Class(
     #' as a column name in a data frame.
     #' @param utility The incremental utility that a user associates with
     #' being in the health state for the interval.
-    #' Intended for use with cost benefit analysis. Can be \code{numeric} or 
-    #' a type of \code{ModVar}. If the type is \code{numeric}, the allowed 
-    #' range is \code{-Inf} to 1; if it is of type \code{ModVar}, it is 
-    #' unchecked.  
+    #' Intended for use with cost benefit analysis. Can be \code{numeric} or
+    #' a type of \code{ModVar}. If the type is \code{numeric}, the allowed
+    #' range is \code{-Inf} to 1; if it is of type \code{ModVar}, it is
+    #' unchecked.
     #' @param interval The time interval over which the \code{utility}
-    #' parameter applies, expressed as an R \code{difftime} object; default 
+    #' parameter applies, expressed as an R \code{difftime} object; default
     #' 1 year.
     #' @return A new \code{LeafNode} object
     initialize = function(
@@ -38,23 +38,67 @@ LeafNode <- R6::R6Class(
       # check there is a label
       abortifnot(
         !rlang::is_missing(label),
-        message = "Argument label must not be missing", 
+        message = "Argument label must not be missing",
         class = "missing_label"
       )
       # check label and make syntactically valid
       abortifnot(
         is.character(label),
-        message = "Argument label must be a string", 
+        message = "Argument label must be a string",
         class = "non-string_label"
       )
       abortifnot(
         nchar(label) > 0L,
-        message = "Argument label must be defined", 
+        message = "Argument label must be defined",
         class = "empty_label"
       )
       # initialize Node base class
       label <- make.names(label)
       super$initialize(label)
+      # check and set utility
+      self$set_utility(utility)
+      # check and set the interval
+      abortifnot(
+        inherits(interval, what = "difftime"),
+        message = "Argument 'interval' must be of class 'difftime'.",
+        class = "invalid_interval"
+      )
+      private$node.interval <- interval
+      # return updated node object
+      return(invisible(self))
+    },
+
+    #' @description Find all the model variables of type \code{ModVar} that have
+    #' been specified as values associated with this \code{LeafNode}. Includes
+    #' operands of these \code{ModVar}s, if they are expressions.
+    #' @return A list of \code{ModVar}s.
+    modvars = function() {
+      # create lists of input variables and output ModVars
+      iv <- c(private$node.utility)
+      ov <- list()
+      for (v in iv) {
+        if (inherits(v, what = "ModVar")) {
+          ov <- c(ov, v)
+          if (inherits(v, what = "ExprModVar")) {
+            for (o in v$operands()) {
+              ov <- c(ov, o)
+            }
+          }
+        }
+      }
+      # return the unique list
+      return(unique(ov))
+    },
+
+    #' @description Set the incremental utility associated with the node.
+    #' @param utility The incremental utility that a user associates with
+    #' being in the health state for the interval.
+    #' Intended for use with cost benefit analysis. Can be \code{numeric} or
+    #' a type of \code{ModVar}. If the type is \code{numeric}, the allowed
+    #' range is \code{-Inf} to 1; if it is of type \code{ModVar}, it is
+    #' unchecked.
+    #' @return Updated \code{Leaf} object.
+    set_utility = function(utility) {
       # check and set utility
       if (is.numeric(utility)) {
         abortifnot(
@@ -67,55 +111,20 @@ LeafNode <- R6::R6Class(
         private$node.utility <- utility
       } else {
         abortifnot(
-          FALSE, 
+          FALSE,
           message = "Argument 'utility' must be numeric or ModVar",
           class = "invalid_utility"
         )
       }
-      # check and set the interval
-      abortifnot(
-        inherits(interval, what = "difftime"),
-        message = "Argument 'interval' must be of class 'difftime'.",
-        class = "invalid_interval"
-      )
-      private$node.interval <- interval
-      # return updated node object
       return(invisible(self))
-    },
-
-    #' @description 
-    #' Find all the model variables of type \code{ModVar} that have been 
-    #' specified as values associated with this \code{LeafNode}. Includes 
-    #' operands of these \code{ModVar}s, if they are expressions.
-    #' @return A list of \code{ModVar}s.
-    modvars = function() {
-      # create lists of input variables and output ModVars
-      iv <- c(private$node.utility)
-      ov <- list()
-      for (v in iv) {
-        if (inherits(v, what="ModVar")) {
-          ov <- c(ov, v)
-          if (inherits(v, what="ExprModVar")) {
-            for (o in v$operands()) {
-              ov <- c(ov, o)
-            }
-          } 
-        }
-      }
-      # return the unique list
-      return(unique(ov))
     },
 
     #' @description Return the incremental utility associated with being in the
     #' state for the interval.
     #' @return Incremental utility (numeric value).
     utility = function() {
-      if (inherits(private$node.utility, what = "ModVar")) {
-        rv <- private$node.utility$get()
-      } else {
-        rv <- private$node.utility
-      }
-      return(rv)
+      u <- as_numeric(private$node.utility)
+      return(u)
     },
 
     #' @description Return the interval associated with being in the state.
@@ -123,12 +132,12 @@ LeafNode <- R6::R6Class(
     interval = function() {
       return(private$node.interval)
     },
-    
-    #' @description Return the quality adjusted life years associated with 
+
+    #' @description Return the quality adjusted life years associated with
     #' being in the state.
     #' @return \acronym{QALY}.
     QALY = function() {
-      dt <- as.numeric(private$node.interval, units="days")
+      dt <- as.numeric(private$node.interval, units = "days")
       Q <- dt * self$utility() / 365.25
       return(Q)
     }

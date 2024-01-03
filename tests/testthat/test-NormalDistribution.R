@@ -7,9 +7,9 @@ test_that("illegal initializations are rejected", {
 
 test_that("distribution name is correct", {
   sn <- NormalDistribution$new(0.0, 1.0)
-  expect_identical(sn$distribution(), "N(0,1)")  
+  expect_identical(sn$distribution(), "N(0,1)")
   n <- NormalDistribution$new(42.0, 1.0)
-  expect_identical(n$distribution(), "N(42,1)")  
+  expect_identical(n$distribution(), "N(42,1)")
 })
 
 test_that("quantile function checks inputs", {
@@ -17,11 +17,11 @@ test_that("quantile function checks inputs", {
   probs <- c(0.1, 0.2, 0.5)
   expect_silent(x$quantile(probs))
   probs <- c(0.1, NA, 0.5)
-  expect_error(x$quantile(probs), class="probs_not_defined")
+  expect_error(x$quantile(probs), class = "probs_not_defined")
   probs <- c(0.1, "boo", 0.5)
-  expect_error(x$quantile(probs), class="probs_not_numeric")
+  expect_error(x$quantile(probs), class = "probs_not_numeric")
   probs <- c(0.1, 0.4, 1.5)
-  expect_error(x$quantile(probs), class="probs_out_of_range")
+  expect_error(x$quantile(probs), class = "probs_out_of_range")
   probs <- c(0.1, 0.2, 0.5)
   expect_length(x$quantile(probs), 3L)
 })
@@ -45,7 +45,7 @@ test_that("random sampling is from a Normal distribution", {
   expect_identical(sn$r(), 0.0)
   # sample
   n <- 1000L
-  samp <- vapply(seq_len(n), FUN.VALUE = 1.0, FUN=function(i) {
+  samp <- vapply(seq_len(n), FUN.VALUE = 1.0, FUN = function(i) {
     sn$sample()
     rv <- sn$r()
     return(rv)
@@ -54,6 +54,6 @@ test_that("random sampling is from a Normal distribution", {
   # check sample mean and sd are within 99.9% CI based on CLT; this is exact
   # for a normal, and is expected to fail for 0.1% of tests; skip for CRAN
   skip_on_cran()
-  ht <- ks.test(samp, rnorm(n,mean=mu,sd=sigma))
+  ht <- ks.test(samp, rnorm(n, mean = mu, sd = sigma))
   expect_gt(ht$p.value, 0.001)
 })

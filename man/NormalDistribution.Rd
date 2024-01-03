@@ -8,7 +8,7 @@
 An R6 class representing a parametrized Normal distribution.
 }
 \details{
-A Normal distribution with hyperparameters mean (\code{mu}) and 
+A Normal distribution with hyperparameters mean (\code{mu}) and
 standard deviation (\code{sd}). Inherits from class \code{Distribution}.
 }
 \author{
