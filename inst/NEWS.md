@@ -1,6 +1,6 @@
 # rdecision 1.2.0
 
-* Tidied up image file names used by README.md.
+* Tidied up image file names and badges used by README.md.
 * Placed code for the shale gas example in a separate script with test
   expectations and referenced it from the vignette to avoid code duplication
   in the package.
