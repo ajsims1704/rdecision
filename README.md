@@ -4,11 +4,8 @@
 # rdecision
 
 <!-- badges: start -->
-
-[![CRAN
-status](https://www.r-pkg.org/badges/version/rdecision)](https://CRAN.R-project.org/package=rdecision)
-
-[![codecov](https://app.codecov.io/github/ajsims1704/rdecision/branch/master/graph/badge.svg?token=HHZXK56ZAR)](https://app.codecov.io/github/ajsims1704/rdecision)
+[![CRAN status](https://www.r-pkg.org/badges/version/rdecision)](https://cran.r-project.org/package=rdecision)
+[![Codecov test coverage](https://codecov.io/gh/ajsims1704/rdecision/branch/master/graph/badge.svg)](https://app.codecov.io/gh/ajsims1704/rdecision?branch=master)
 <!-- badges: end -->
 
 The goal of `rdecision` is to provide methods for assessing health care
