@@ -45,10 +45,10 @@ pander::pandoc.link(
 #| results = "asis"
 # codecov status
 pander::pandoc.link(
-  url = "https://codecov.io/github/ajsims1704/rdecision",
+  url = "https://app.codecov.io/github/ajsims1704/rdecision",
   text = pander::pandoc.image.return(
     img = paste0(
-      "https://codecov.io/github/ajsims1704/rdecision/branch/master/graph/",
+      "https://app.codecov.io/github/ajsims1704/rdecision/branch/master/graph/",
       "badge.svg?token=HHZXK56ZAR"
     ),
     caption = "codecov"

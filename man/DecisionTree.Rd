@@ -519,7 +519,7 @@ current value prior to calling the function and evaluate the model).}
 (\code{modvars = "random"}); use with \code{modvars} = "expected"
 will be repetitive and uninformative.}
 
-\item{\code{by}}{One of {"path", "strategy", "run"}. If "path", the table has
+\item{\code{by}}{One of \{"path", "strategy", "run"\}. If "path", the table has
 one row per path walked per strategy, per run, and includes the label of
 the terminating leaf node to identify each path. If "strategy" (the
 default), the table is aggregated by strategy, i.e., there is one row per

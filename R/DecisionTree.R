@@ -416,10 +416,10 @@ DecisionTree <- R6::R6Class(
         # find source and target nodes
         n.source <- self$vertex_index(e$source())
         n.target <- self$vertex_index(e$target())
-        x.source <- XY[which(XY[, "n"] == n.source), "x"]
-        y.source <- XY[which(XY[, "n"] == n.source), "y"]
-        x.target <- XY[which(XY[, "n"] == n.target), "x"]
-        y.target <- XY[which(XY[, "n"] == n.target), "y"]
+        x.source <- XY[[which(XY[, "n"] == n.source), "x"]]
+        y.source <- XY[[which(XY[, "n"] == n.source), "y"]]
+        x.target <- XY[[which(XY[, "n"] == n.target), "x"]]
+        y.target <- XY[[which(XY[, "n"] == n.target), "y"]]
         grid::grid.move.to(
           x = grid::unit(gx(x.source), "cm"),
           y = grid::unit(gy(y.source), "cm")
@@ -827,7 +827,7 @@ DecisionTree <- R6::R6Class(
     #' @param N Number of replicates. Intended for use with PSA
     #' (\code{modvars = "random"}); use with \code{modvars} = "expected"
     #' will be repetitive and uninformative.
-    #' @param by One of {"path", "strategy", "run"}. If "path", the table has
+    #' @param by One of \{"path", "strategy", "run"\}. If "path", the table has
     #' one row per path walked per strategy, per run, and includes the label of
     #' the terminating leaf node to identify each path. If "strategy" (the
     #' default), the table is aggregated by strategy, i.e., there is one row per

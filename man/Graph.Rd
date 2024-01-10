@@ -395,7 +395,7 @@ Compute the adjacency matrix for the graph.
 \if{html}{\out{<div class="arguments">}}
 \describe{
 \item{\code{boolean}}{If \code{TRUE}, the adjacency matrix is logical, each
-cell is {\code{FALSE}, \code{TRUE}}.}
+cell is \{\code{FALSE}, \code{TRUE}\}.}
 }
 \if{html}{\out{</div>}}
 }
@@ -543,7 +543,7 @@ Export a representation of the graph in DOT format.
 
 \subsection{Details}{
 Writes the representation in the \code{graphviz} DOT language
-(\url{http://graphviz.org/doc/info/lang.html}) for drawing with one
+(\url{https://graphviz.org/doc/info/lang.html}) for drawing with one
 of the \code{graphviz} tools including \code{dot} (Gansner, 1993).
 }
 

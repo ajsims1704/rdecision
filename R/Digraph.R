@@ -454,7 +454,7 @@ Digraph <- R6::R6Class(
     #' @description Exports the digraph in DOT notation.
     #' @details Writes a representation of the digraph in the
     #' \code{graphviz} DOT language
-    #' (\url{http://graphviz.org/doc/info/lang.html}) for drawing with one
+    #' (\url{https://graphviz.org/doc/info/lang.html}) for drawing with one
     #' of the \code{graphviz} tools, including \code{dot} (Gansner, 1993). If
     #' all nodes have labels, these are used in the graph, otherwise the labels
     #' are the node indices.

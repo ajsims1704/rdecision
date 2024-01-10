@@ -305,7 +305,7 @@ Graph <- R6::R6Class(
     #' self loops being counted twice, unless \code{binary} is \code{TRUE} when
     #' cells are either 0 (not adjacent) or 1 (adjacent).
     #' @param boolean If \code{TRUE}, the adjacency matrix is logical, each
-    #' cell is {\code{FALSE}, \code{TRUE}}.
+    #' cell is \{\code{FALSE}, \code{TRUE}\}.
     #' @return A square integer matrix with the number of rows and columns
     #' equal to the order of the graph. The rows and columns are labelled
     #' with the node labels, if all the nodes in the graph have unique labels,
@@ -511,7 +511,7 @@ Graph <- R6::R6Class(
 
     #' @description Export a representation of the graph in DOT format.
     #' @details Writes the representation in the \code{graphviz} DOT language
-    #' (\url{http://graphviz.org/doc/info/lang.html}) for drawing with one
+    #' (\url{https://graphviz.org/doc/info/lang.html}) for drawing with one
     #' of the \code{graphviz} tools including \code{dot} (Gansner, 1993).
     #' @return A character vector. Intended for passing to \code{writeLines}
     #' for saving as a text file.

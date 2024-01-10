@@ -13,9 +13,8 @@
 #'  sutures. \emph{British Journal of Surgery} 2017;\bold{104}:e134-e144.
 #'
 #'  Swat MJ, Grenon P and Wimalaratne S. Ontology and Knowledge Base of
-#'  Probability Distributions. \acronym{EMBL-EBI} Technical Report
-#'  (ProbOnto 2.5), 13 January 2017,
-#'  \url{https://sites.google.com/site/probonto/download}.
+#'  Probability Distributions. \emph{Bioinformatics} 2016;\bold{32}:2719-2721,
+#'  \doi{10.1093/bioinformatics/btw170}.
 #' }
 #' @docType class
 #' @author Andrew J. Sims \email{andrew.sims@@newcastle.ac.uk}

@@ -33,9 +33,8 @@
 #'  sutures. \emph{British Journal of Surgery} 2017;\bold{104}:e134-e144.
 #'
 #'  Swat MJ, Grenon P and Wimalaratne S. Ontology and Knowledge Base of
-#'  Probability Distributions. \acronym{EMBL-EBI} Technical Report
-#'  (ProbOnto 2.5), 13 January 2017,
-#'  \url{https://sites.google.com/site/probonto/download}.
+#'  Probability Distributions. \emph{Bioinformatics} 2016;\bold{32}:2719-2721,
+#'  \doi{10.1093/bioinformatics/btw170}.
 #' }
 #' @note The log normal distribution may be used to model the uncertainty in
 #' an estimate of relative risk (Briggs 2006, p90). If a relative risk

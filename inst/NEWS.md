@@ -1,5 +1,9 @@
 # rdecision 1.2.0
 
+* Updated citation for ProbOnto in `LogNormModVar` and `LogNormDistribution`
+  to reference the article in `BioInformatics`.
+* Updated URLs for GraphViz and codecov.
+* Escaped brackets in Rd method documentation that are not Rd macros.
 * Tidied up image file names and badges used by README.md.
 * Placed code for the shale gas example in a separate script with test
   expectations and referenced it from the vignette to avoid code duplication
@@ -7,7 +11,7 @@
 * Placed code for the New Scientist digraph puzzle in a separate script with
   test expectations, and referenced it from the vignette, to avoid code
   duplication in the package.
-* Placed code for Sonneberg and Beck's canonical prosthetic heart valve example
+* Placed code for Sonnenberg and Beck's canonical prosthetic heart valve example
   in a separate model script with test expectations. Referenced it in the
   second README example, to avoid code duplication in the package.
 * Changed README decision tree code ("lifestyle" example) to reference code in

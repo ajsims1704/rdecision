@@ -36,7 +36,7 @@ event rates.}
 A Markov model is a directed multidigraph permitting loops (a loop
 multidigraph), optionally labelled, or a \dfn{quiver}. It is a
 multidigraph because there are potentially two edges between each pair of
-nodes {A,B} representing the transition probabilities from A to B and
+nodes \{A,B\} representing the transition probabilities from A to B and
 \emph{vice versa}. It is a directed graph because the transition
 probabilities refer to transitions in one direction. Each edge can be
 optionally labelled. It permits self-loops (edges whose source and target
@@ -62,7 +62,7 @@ Miller and Homan (1994) and Fleurence & Hollenbeak (2007) provide advice
 on estimating probabilities from rates. Jones (2017) and Welton (2005)
 describe methods for estimating probabilities in multi-state,
 multi-transition models, although those methods may not apply to
-semi-Markov models with temporary states. In particular note that the
+semi-Markov models with temporary states. In particular, note that the
 "simple" equation, \eqn{p = 1-e^{-rt}} (Briggs 2006) applies only in a
 two-state, one transition model.
 }

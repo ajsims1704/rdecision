@@ -8,7 +8,7 @@
 [![CRAN
 status](https://www.r-pkg.org/badges/version/rdecision)](https://CRAN.R-project.org/package=rdecision)
 
-[![codecov](https://codecov.io/github/ajsims1704/rdecision/branch/master/graph/badge.svg?token=HHZXK56ZAR)](https://codecov.io/github/ajsims1704/rdecision)
+[![codecov](https://app.codecov.io/github/ajsims1704/rdecision/branch/master/graph/badge.svg?token=HHZXK56ZAR)](https://app.codecov.io/github/ajsims1704/rdecision)
 <!-- badges: end -->
 
 The goal of `rdecision` is to provide methods for assessing health care
@@ -227,7 +227,7 @@ evaluation of the tree, each time sampling from the uncertainty
 distribution of the two probabilities using, for example,
 `DT$evaluate(setvars = "random", N = 1000L)` and inspecting the
 resulting data frame. From 1000 runs, the 95% confidence interval of the
-per patient cost saving is -814.53 GBP to 707.3 GBP, with 47.5% being
+per patient cost saving is -790.27 GBP to 696.68 GBP, with 45.9% being
 cost saving. Although the exercise programme is more costly to provide
 than the dietary advice programme, it is more effective and leads to
 saving overall because fewer costly interventional procedures are
