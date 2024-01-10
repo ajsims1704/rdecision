@@ -40,5 +40,7 @@ License: GPL-3
 Language: en-GB
 Encoding: UTF-8
 RoxygenNote: 7.2.3
+URL: https://github.com/ajsims1704/rdecision
+BugReports: https://github.com/ajsims1704/rdecision/issues
 VignetteBuilder: knitr
 Config/testthat/edition: 3
