@@ -1,3 +1,9 @@
+# rdecision 1.2.0.9001
+
+* Added fields URL and BugReports to DESCRIPTION file, linking to GitHub
+  repository.
+* 
+
 # rdecision 1.2.0
 
 * Updated citation for ProbOnto in `LogNormModVar` and `LogNormDistribution`
