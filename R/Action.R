@@ -27,11 +27,12 @@ Action <- R6::R6Class(
     #' tabulation of strategies. It is recommended to choose labels that are
     #' brief and not punctuated with spaces, dots or underscores.
     #' @param cost Cost associated with traversal of this edge (numeric or
-    #' \code{ModVar}).
-    #' @param benefit Benefit associated with traversal of the edge.
+    #' \code{ModVar}), not NA.
+    #' @param benefit Benefit associated with traversal of the edge, (numeric or
+    #' \code{ModVar}), not NA.
     #' @return A new \code{Action} object.
-    initialize = function(source_node, target_node, label,
-                          cost = 0.0, benefit = 0.0) {
+    initialize = function(source_node, target_node, label, cost = 0.0,
+                          benefit = 0.0) {
       # check label
       abortifnot(
         is.character(label),
@@ -79,7 +80,7 @@ Action <- R6::R6Class(
       return(unique(ov))
     },
 
-    #' @description Return the current value of the edge probability, i.e. the
+    #' @description Return the current value of the edge probability, i.e., the
     #' conditional probability of traversing the edge.
     #' @return Numeric value equal to 1.
     p = function() {
@@ -88,7 +89,7 @@ Action <- R6::R6Class(
 
     #' @description Set the cost associated with the action edge.
     #' @param c Cost associated with traversing the action edge. Of type numeric
-    #' or \code{ModVar}.
+    #' or \code{ModVar}, not NA.
     #' @return Updated \code{Action} object.
     set_cost = function(c = 0.0) {
       abortifnot(
@@ -96,6 +97,13 @@ Action <- R6::R6Class(
         message = "Argument 'c' must be of type 'numeric' or 'ModVar'.",
         class = "invalid_cost"
       )
+      if (inherits(c, what = "numeric")) {
+        abortif(
+          is.na(c),
+          message = "Setting parameter 'c' to NA is not allowed.",
+          class = "invalid_cost"
+        )
+      }
       private$edge_cost <- c
       return(invisible(self))
     },
@@ -117,6 +125,13 @@ Action <- R6::R6Class(
         message = "Argument 'b' must be of type 'numeric' or 'ModVar'.",
         class = "invalid_benefit"
       )
+      if (inherits(b, what = "numeric")) {
+        abortif(
+          is.na(b),
+          message = "Setting parameter 'b' to NA is not allowed.",
+          class = "invalid_benefit"
+        )
+      }
       private$edge_benefit <- b
       return(invisible(self))
     },

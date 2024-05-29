@@ -95,10 +95,10 @@ DiracDistribution <- R6::R6Class(
     #' \code{r()} to be the mean of the distribution.
     #' @return Updated distribution.
     sample = function(expected = FALSE) {
-      if (!expected) {
-        private$.r[[1L]] <- private$c
-      } else {
+      if (expected) {
         private$.r[[1L]] <- self$mean()
+      } else {
+        private$.r[[1L]] <- private$c
       }
       return(invisible(self))
     }

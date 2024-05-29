@@ -3,7 +3,9 @@ test_that("new object arguments are checked", {
   c1 <- ChanceNode$new("c1")
   t1 <- LeafNode$new("t1")
   p <- 0.5
-  expect_error(Reaction$new(c1, t1))
+  expect_silent(Reaction$new(c1, t1))
+  r <- Reaction$new(c1, t1)
+  expect_identical(r$p(), 0.0)
   expect_error(Reaction$new(c1, t1, p, label = 42L), class = "non-string_label")
   expect_error(Reaction$new(t1, c1, p), class = "invalid_source")
   expect_silent(Reaction$new(c1, t1, p))
@@ -27,11 +29,15 @@ test_that("class parameters are updated dynamically", {
   # attempt to set an invalid probability
   expect_error(e1$set_probability("0.42"), class = "invalid_probability")
   expect_error(e1$set_probability(), class = "invalid_probability")
+  # check that probability can be set to NA
+  e1$set_probability(p = NA_real_)
+  expect_true(is.na(e1$p()))
   # set probability and check it
   e1$set_probability(0.42)
   expect_identical(e1$p(), 0.42)
   # attempt to set an invalid cost
   expect_error(e1$set_cost("42"), class = "invalid_cost")
+  expect_error(e1$set_cost(NA_real_), class = "invalid_cost")
   # set cost to default, and check it
   e1$set_cost()
   expect_identical(e1$cost(), 0.0)
@@ -40,6 +46,7 @@ test_that("class parameters are updated dynamically", {
   expect_identical(e1$cost(), 42.0)
   # attempt to set an invalid benefit
   expect_error(e1$set_benefit("42"), class = "invalid_benefit")
+  expect_error(e1$set_benefit(NA_real_), class = "invalid_benefit")
   # set benefit to default, and check it
   e1$set_benefit()
   expect_identical(e1$benefit(), 0.0)

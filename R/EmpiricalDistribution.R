@@ -92,7 +92,9 @@ EmpiricalDistribution <- R6::R6Class(
     #' \code{r()} to be the mean of the distribution.
     #' @return Updated distribution.
     sample = function(expected = FALSE) {
-      if (!expected) {
+      if (expected) {
+        private$.r[[1L]] <- self$mean()
+      } else {
         if (private$interpolate.sample) {
           private$.r[[1L]] <- stats::quantile(
             x = private$x,
@@ -102,8 +104,6 @@ EmpiricalDistribution <- R6::R6Class(
         } else {
           private$.r[[1L]] <- base::sample(x = private$x, size = 1L)
         }
-      } else {
-        private$.r[[1L]] <- self$mean()
       }
       return(invisible(self))
     },

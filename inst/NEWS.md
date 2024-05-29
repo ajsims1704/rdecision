@@ -2,7 +2,33 @@
 
 * Added fields URL and BugReports to DESCRIPTION file, linking to GitHub
   repository.
-* 
+* Added method `set_utility` to class `MarkovState` to allow setting
+  dynamically.
+* Added `get_cycle` to class `SemiMarkovModel` to query the current cycle
+  number.
+* Revised method `draw` of class `DecisionTree` to avoid unintentional clipping
+  of node labels. Modified algorithm to make better use of unit conversions
+  that are implicit in package grid and to ensure that symbols for nodes retain
+  the correct aspect ratio when drawn in plot windows that are not square.
+* Reaction edges have a default conditional probability of 0.
+* Added a test to method `evaluate` in class `DecisionTree` to check that the
+  sum of probabilities for each strategy is one, for each run. Confirmed that
+  the check operates correctly when the conditional probabilities of traversing
+  an edge are scalars or ModVars.
+* Added facility to set the probability of at most one reaction edge from each
+  chance node in a decision tree to NA. The missing value is replaced at each
+  evaluation of the tree by a value which ensures that the sum of probabilities
+  for all reaction edges leaving the node sums to unity. This avoids the need
+  to create expression model variables to represent `1 - p` where `p` is
+  sampled from a Beta distribution, for example. Revised the Tegaderm vignette
+  to demonstrate this feature.
+* Disallowed use of some reserved words for decision node labels when added to
+  a decision tree because they would conflict with column titles used during
+  decision tree evaluation.
+* Added checks to `Action` and `Reaction` to disallow values of NA for cost and
+  benefit.
+* Added `set_interval` to `LeafNode` to allow dynamic setting. Disallowed a
+  utility of NA.
 
 # rdecision 1.2.0
 

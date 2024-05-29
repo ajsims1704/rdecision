@@ -5,7 +5,13 @@
 \alias{MarkovState}
 \title{A state in a Markov model}
 \value{
-Updated \code{MarkovState} object
+Updated \code{MarkovState} object.
+
+Annual cost; numeric.
+
+Updated \code{MarkovState} object.
+
+Utility; numeric.
 }
 \description{
 An R6 class representing a state in a Markov model.
@@ -28,6 +34,7 @@ Andrew J. Sims \email{andrew.sims@newcastle.ac.uk}
 \item \href{#method-MarkovState-name}{\code{MarkovState$name()}}
 \item \href{#method-MarkovState-set_cost}{\code{MarkovState$set_cost()}}
 \item \href{#method-MarkovState-cost}{\code{MarkovState$cost()}}
+\item \href{#method-MarkovState-set_utility}{\code{MarkovState$set_utility()}}
 \item \href{#method-MarkovState-utility}{\code{MarkovState$utility()}}
 \item \href{#method-MarkovState-modvars}{\code{MarkovState$modvars()}}
 \item \href{#method-MarkovState-clone}{\code{MarkovState$clone()}}
@@ -89,7 +96,7 @@ State name.
 \if{html}{\out{<a id="method-MarkovState-set_cost"></a>}}
 \if{latex}{\out{\hypertarget{method-MarkovState-set_cost}{}}}
 \subsection{Method \code{set_cost()}}{
-Set the annual occupancy cost
+Set the annual occupancy cost.
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{MarkovState$set_cost(cost)}\if{html}{\out{</div>}}
 }
@@ -111,8 +118,23 @@ Gets the annual cost of state occupancy.
 \if{html}{\out{<div class="r">}}\preformatted{MarkovState$cost()}\if{html}{\out{</div>}}
 }
 
-\subsection{Returns}{
-Annual cost; numeric.
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-MarkovState-set_utility"></a>}}
+\if{latex}{\out{\hypertarget{method-MarkovState-set_utility}{}}}
+\subsection{Method \code{set_utility()}}{
+Set the utility of the state.
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{MarkovState$set_utility(utility)}\if{html}{\out{</div>}}
+}
+
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{utility}}{The utility associated with being in the state (numeric
+or \code{ModVar}).}
+}
+\if{html}{\out{</div>}}
 }
 }
 \if{html}{\out{<hr>}}
@@ -124,9 +146,6 @@ Gets the utility associated with the state.
 \if{html}{\out{<div class="r">}}\preformatted{MarkovState$utility()}\if{html}{\out{</div>}}
 }
 
-\subsection{Returns}{
-Utility; numeric.
-}
 }
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-MarkovState-modvars"></a>}}

@@ -128,12 +128,12 @@ LogNormDistribution <- R6::R6Class(
     #' \code{r()} to be the mean of the distribution.
     #' @return Updated \code{LogNormDistribution} object.
     sample = function(expected = FALSE) {
-      if (!expected) {
+      if (expected) {
+        private$.r[[1L]] <- self$mean()
+      } else {
         private$.r[[1L]] <- rlnorm(
           n = 1L, mean = private$meanlog, sd = private$sdlog
         )
-      } else {
-        private$.r[[1L]] <- self$mean()
       }
       return(invisible(self))
     },

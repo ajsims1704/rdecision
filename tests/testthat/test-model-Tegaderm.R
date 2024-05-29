@@ -129,44 +129,24 @@ p.CRBSI.S <- ExprModVar$new(
   "P(CRBSI | standard dressing)", "P",
   rlang::quo(r.CRBSI * n.cathdays / 1000.0)
 )
-q.CRBSI.S <- ExprModVar$new(
-  "Q(CRBSI | standard dressing)", "1 - P",  rlang::quo(1.0 - p.CRBSI.S)
-)
 p.CRBSI.T <- ExprModVar$new(
   "P(CRBSI|Tegaderm)", "P",
   rlang::quo(p.CRBSI.S * hr.CRBSI)
-)
-q.CRBSI.T <- ExprModVar$new(
-  "Q(CRBSI | Tegaderm)", "1 - P", rlang::quo(1.0 - p.CRBSI.T)
 )
 p.LSI.S <- ExprModVar$new(
   "P(LSI | Standard)", "/patient",
   rlang::quo(r.LSI * n.cathdays / 1000.0)
 )
-q.LSI.S <- ExprModVar$new(
-  "Q(LSI | Standard)", "1 - P", rlang::quo(1.0 - p.LSI.S)
-)
 p.LSI.T <- ExprModVar$new(
   "P(LSI | Tegaderm)", "P", rlang::quo(p.LSI.S * hr.LSI)
-)
-q.LSI.T <- ExprModVar$new(
-  "Q(LSI | Tegaderm)", "1 - P", rlang::quo(1.0 - p.LSI.T)
 )
 p.Dermatitis.S <- ExprModVar$new(
   "P(dermatitis | standard dressing)", "P",
   rlang::quo(r.Dermatitis)
 )
-q.Dermatitis.S <- ExprModVar$new(
-  "Q(dermatitis | standard dressing)", "1 - P",
-  rlang::quo(1.0 - p.Dermatitis.S)
-)
 p.Dermatitis.T <- ExprModVar$new(
   "P(dermatitis | Tegaderm)", "P",
   rlang::quo(p.Dermatitis.S * rr.Dermatitis)
-)
-q.Dermatitis.T <- ExprModVar$new(
-  "Q(dermatitis | Tegaderm)", "1 - P",
-  rlang::quo(1.0 - p.Dermatitis.T)
 )
 c.Tegaderm <- ExprModVar$new(
   "Tegaderm CHG cost", "GBP", rlang::quo(6.26 * n.dressings)
@@ -186,7 +166,7 @@ e01 <- Reaction$new(
   c01, t01, p = p.Dermatitis.S, cost = c.Dermatitis, label = "Dermatitis"
 )
 e02 <- Reaction$new(
-  c01, t02, p = q.Dermatitis.S, cost = 0.0, label = "No dermatitis"
+  c01, t02, p = NA_real_, cost = 0.0, label = "No dermatitis"
 )
 t03 <- LeafNode$new("t03", interval = th)
 t04 <- LeafNode$new("t04", interval = th)
@@ -195,11 +175,11 @@ e03 <- Reaction$new(
   c02, t03, p = p.Dermatitis.S, cost = c.Dermatitis, label = "Dermatitis"
 )
 e04 <- Reaction$new(
-  c02, t04, p = q.Dermatitis.S, cost = 0.0, label = "No dermatitis"
+  c02, t04, p = NA_real_, cost = 0.0, label = "No dermatitis"
 )
 c03 <- ChanceNode$new()
 e05 <- Reaction$new(c03, c01, p = p.LSI.S, cost = c.LSI, label = "LSI")
-e06 <- Reaction$new(c03, c02, p = q.LSI.S, cost = 0.0, label = "No LSI")
+e06 <- Reaction$new(c03, c02, p = NA_real_, cost = 0.0, label = "No LSI")
 t11 <- LeafNode$new("t11", interval = th)
 t12 <- LeafNode$new("t12", interval = th)
 c11 <- ChanceNode$new()
@@ -207,7 +187,7 @@ e11 <- Reaction$new(
   c11, t11, p = p.Dermatitis.S, cost = c.Dermatitis, label = "Dermatitis"
 )
 e12 <- Reaction$new(
-  c11, t12, p = q.Dermatitis.S, cost = 0.0, label = "No Dermatitis"
+  c11, t12, p = NA_real_, cost = 0.0, label = "No Dermatitis"
 )
 t13 <- LeafNode$new("t13", interval = th)
 t14 <- LeafNode$new("t14", interval = th)
@@ -216,14 +196,14 @@ e13 <- Reaction$new(
   c12, t13, p = p.Dermatitis.S, cost = c.Dermatitis, label = "Dermatitis"
 )
 e14 <- Reaction$new(
-  c12, t14, p = q.Dermatitis.S, cost = 0.0, label = "No dermatitis"
+  c12, t14, p = NA_real_, cost = 0.0, label = "No dermatitis"
 )
 c13 <- ChanceNode$new()
 e15 <- Reaction$new(c13, c11, p = p.LSI.S, cost = c.LSI, label = "LSI")
-e16 <- Reaction$new(c13, c12, p = q.LSI.S, cost = 0.0, label = "No LSI")
+e16 <- Reaction$new(c13, c12, p = NA_real_, cost = 0.0, label = "No LSI")
 c23 <- ChanceNode$new()
 e21 <- Reaction$new(c23, c03, p = p.CRBSI.S, cost = c.CRBSI, label = "CRBSI")
-e22 <- Reaction$new(c23, c13, p = q.CRBSI.S, cost = 0.0, label = "No CRBSI")
+e22 <- Reaction$new(c23, c13, p = NA_real_, cost = 0.0, label = "No CRBSI")
 
 # Tegaderm branch
 t31 <- LeafNode$new("t31", interval = th)
@@ -233,7 +213,7 @@ e31 <- Reaction$new(
   c31, t31, p = p.Dermatitis.T, cost = c.Dermatitis, label = "Dermatitis"
 )
 e32 <- Reaction$new(
-  c31, t32, p = q.Dermatitis.T, cost = 0.0, label = "no dermatitis"
+  c31, t32, p = NA_real_, cost = 0.0, label = "no dermatitis"
 )
 t33 <- LeafNode$new("t33", interval = th)
 t34 <- LeafNode$new("t34", interval = th)
@@ -242,11 +222,11 @@ e33 <- Reaction$new(
   c32, t33, p = p.Dermatitis.T, cost = c.Dermatitis, label = "Dermatitis"
 )
 e34 <- Reaction$new(
-  c32, t34, p = q.Dermatitis.T, cost = 0.0, label = "No dermatitis"
+  c32, t34, p = NA_real_, cost = 0.0, label = "No dermatitis"
 )
 c33 <- ChanceNode$new()
 e35 <- Reaction$new(c33, c31, p = p.LSI.T, cost = c.LSI, label = "LSI")
-e36 <- Reaction$new(c33, c32, p = q.LSI.T, cost = 0.0, label = "No LSI")
+e36 <- Reaction$new(c33, c32, p = NA_real_, cost = 0.0, label = "No LSI")
 t41 <- LeafNode$new("t41", interval = th)
 t42 <- LeafNode$new("t42", interval = th)
 c41 <- ChanceNode$new()
@@ -254,7 +234,7 @@ e41 <- Reaction$new(
   c41, t41, p = p.Dermatitis.T, cost = c.Dermatitis, label = "Dermatitis"
 )
 e42 <- Reaction$new(
-  c41, t42, p = q.Dermatitis.T, cost = 0.0, label = "No dermatitis"
+  c41, t42, p = NA_real_, cost = 0.0, label = "No dermatitis"
 )
 t43 <- LeafNode$new("t43", interval = th)
 t44 <- LeafNode$new("t44", interval = th)
@@ -263,14 +243,14 @@ e43 <- Reaction$new(
   c42, t43, p = p.Dermatitis.T, cost = c.Dermatitis, label = "Dermatitis"
 )
 e44 <- Reaction$new(
-  c42, t44, p = q.Dermatitis.T, cost = 0.0, label = "No dermatitis"
+  c42, t44, p = NA_real_, cost = 0.0, label = "No dermatitis"
 )
 c43 <- ChanceNode$new()
 e45 <- Reaction$new(c43, c41, p = p.LSI.T, cost = c.LSI, label = "LSI")
-e46 <- Reaction$new(c43, c42, p = q.LSI.T, cost = 0.0, label = "No LSI")
+e46 <- Reaction$new(c43, c42, p = NA_real_, cost = 0.0, label = "No LSI")
 c53 <- ChanceNode$new()
 e51 <- Reaction$new(c53, c43, p = p.CRBSI.T, cost = c.CRBSI, label = "CRBSI")
-e52 <- Reaction$new(c53, c33, p = q.CRBSI.T, cost = 0.0, label = "no CRBSI")
+e52 <- Reaction$new(c53, c33, p = NA_real_, cost = 0.0, label = "no CRBSI")
 
 # decision node
 d1 <- DecisionNode$new("d1")
@@ -294,10 +274,10 @@ DT <- DecisionTree$new(V, E)
 ## @knitr ---------------------------------------------------------------------
 test_that("model variables are as expected", {
   mv <- DT$modvars()
-  expect_length(mv, 25L)
+  expect_length(mv, 19L)
   MVT <- DT$modvar_table()
-  expect_identical(nrow(MVT), 25L)
-  expect_identical(sum(MVT$Est), 14L)
+  expect_identical(nrow(MVT), 19L)
+  expect_identical(sum(MVT$Est), 8L)
   MVT <- DT$modvar_table(FALSE)
   expect_identical(nrow(MVT), 11L)
 })
@@ -427,20 +407,14 @@ p.CRBSI.S <- ExprModVar$new(
   "P(CRBSI | standard dressing)", "P",
   rlang::quo(r.CRBSI * n.cathdays / 1000.0)
 )
-q.CRBSI.S <- ExprModVar$new(
-  "Q(CRBSI | standard dressing)", "1 - P",  rlang::quo(1.0 - p.CRBSI.S)
-)
 p.CRBSI.T <- ExprModVar$new(
   "P(CRBSI|Tegaderm)", "P",
   rlang::quo(p.CRBSI.S * hr.CRBSI)
 )
-q.CRBSI.T <- ExprModVar$new(
-  "Q(CRBSI | Tegaderm)", "1 - P", rlang::quo(1.0 - p.CRBSI.T)
-)
 e21 <- Reaction$new(c23, c03, p = p.CRBSI.S, cost = c.CRBSI, label = "CRBSI")
-e22 <- Reaction$new(c23, c13, p = q.CRBSI.S, cost = 0.0, label = "No CRBSI")
+e22 <- Reaction$new(c23, c13, p = NA_real_, cost = 0.0, label = "No CRBSI")
 e51 <- Reaction$new(c53, c43, p = p.CRBSI.T, cost = c.CRBSI, label = "CRBSI")
-e52 <- Reaction$new(c53, c33, p = q.CRBSI.T, cost = 0.0, label = "no CRBSI")
+e52 <- Reaction$new(c53, c33, p = NA_real_, cost = 0.0, label = "no CRBSI")
 E <- list(
   e01, e02, e03, e04, e05, e06, e11, e12, e13, e14, e15, e16, e21, e22,
   e31, e32, e33, e34, e35, e36, e41, e42, e43, e44, e45, e46, e51, e52,
@@ -513,8 +487,8 @@ hr_threshold <- DT$threshold(
   ref = list(e9),
   outcome = "saving",
   mvd = "Tegaderm CRBSI HR",
-  a <- 0.1,
-  b <- 0.9,
+  a = 0.1,
+  b = 0.9,
   tol = 0.01
 )
 
@@ -529,8 +503,8 @@ c_crbsi_threshold <- DT$threshold(
   ref = list(e9),
   outcome = "saving",
   mvd = "CRBSI cost",
-  a <- 0.0,
-  b <- 9900.0,
+  a = 0.0,
+  b = 9900.0,
   tol = 10.0
 )
 

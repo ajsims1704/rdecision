@@ -28,12 +28,12 @@ Reaction <- R6::R6Class(
     #' @param target_node Node which the reaction enters.
     #' @param p Conditional probability of traversing the reaction edge.
     #' @param cost Cost associated with traversal of this edge (numeric or
-    #' \code{ModVar}).
+    #' \code{ModVar}), not NA.
     #' @param benefit Benefit associated with traversal of the edge (numeric or
-    #' \code{ModVar}).
+    #' \code{ModVar}), not NA.
     #' @param label Character string containing the reaction label.
     #' @return A new \code{Reaction} object.
-    initialize = function(source_node, target_node, p, cost = 0.0,
+    initialize = function(source_node, target_node, p = 0.0, cost = 0.0,
                           benefit = 0.0, label = "") {
       # initialize base class
       super$initialize(
@@ -83,22 +83,31 @@ Reaction <- R6::R6Class(
     #' [0,1].
     #' @return Updated \code{Reaction} object.
     set_probability = function(p) {
+      # check argument
       abortifnot(
         !is_missing(p),
         inherits(p, what = c("numeric", "ModVar")),
-        ifelse(inherits(p, "numeric"), p >= 0.0 && p <= 1.0, TRUE),
         message = paste(
-          "Argument 'p' must not be missing, of type 'numeric' or 'ModVar',",
-          "and in range [0,1] if numeric."
+          "Argument 'p' must not be missing, and of type 'numeric' or 'ModVar'."
         ),
         class = "invalid_probability"
       )
+      if (inherits(p, what = "numeric")) {
+        abortif(
+          !is.na(p) && p < 0.0,
+          !is.na(p) && p > 1.0,
+          message = paste(
+            "Argument 'p' must be in range [0,1], or NA_real_ if numeric."
+          ),
+          class = "invalid_probability"
+        )
+      }
       private$edge_p <- p
       return(invisible(self))
     },
 
-    #' @description Return the current value of the edge probability, i.e. the
-    #' conditional' probability of traversing the edge.
+    #' @description Return the current value of the edge probability, i.e., the
+    #' conditional probability of traversing the edge.
     #' @return Numeric value in range [0,1].
     p = function() {
       prob <- as_numeric(private$edge_p)
@@ -115,6 +124,13 @@ Reaction <- R6::R6Class(
         message = "Argument 'c' must be of type 'numeric' or 'ModVar'.",
         class = "invalid_cost"
       )
+      if (inherits(c, what = "numeric")) {
+        abortif(
+          is.na(c),
+          message = "Setting parameter 'c' to NA is not allowed.",
+          class = "invalid_cost"
+        )
+      }
       private$edge_cost <- c
       return(invisible(self))
     },
@@ -136,6 +152,13 @@ Reaction <- R6::R6Class(
         message = "Argument 'b' must be of type 'numeric' or 'ModVar'.",
         class = "invalid_benefit"
       )
+      if (inherits(b, what = "numeric")) {
+        abortif(
+          is.na(b),
+          message = "Setting parameter 'b' to NA is not allowed.",
+          class = "invalid_benefit"
+        )
+      }
       private$edge_benefit <- b
       return(invisible(self))
     },

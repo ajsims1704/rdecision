@@ -35,22 +35,14 @@ LeafNode <- R6::R6Class(
     initialize = function(
       label, utility = 1.0, interval = as.difftime(365.25, units = "days")
     ) {
-      # check there is a label
+      # check there is a valid label
       abortifnot(
         !rlang::is_missing(label),
-        message = "Argument label must not be missing",
-        class = "missing_label"
-      )
-      # check label and make syntactically valid
-      abortifnot(
         is.character(label),
-        message = "Argument label must be a string",
-        class = "non-string_label"
-      )
-      abortifnot(
         nchar(label) > 0L,
-        message = "Argument label must be defined",
-        class = "empty_label"
+        message =
+          "Argument `label` must not be missing and must be a non-empty string",
+        class = "invalid_label"
       )
       # initialize Node base class
       label <- make.names(label)
@@ -58,12 +50,7 @@ LeafNode <- R6::R6Class(
       # check and set utility
       self$set_utility(utility)
       # check and set the interval
-      abortifnot(
-        inherits(interval, what = "difftime"),
-        message = "Argument 'interval' must be of class 'difftime'.",
-        class = "invalid_interval"
-      )
-      private$node.interval <- interval
+      self$set_interval(interval)
       # return updated node object
       return(invisible(self))
     },
@@ -95,27 +82,46 @@ LeafNode <- R6::R6Class(
     #' being in the health state for the interval.
     #' Intended for use with cost benefit analysis. Can be \code{numeric} or
     #' a type of \code{ModVar}. If the type is \code{numeric}, the allowed
-    #' range is \code{-Inf} to 1; if it is of type \code{ModVar}, it is
+    #' range is \code{-Inf} to 1, not NA; if it is of type \code{ModVar}, it is
     #' unchecked.
     #' @return Updated \code{Leaf} object.
     set_utility = function(utility) {
       # check and set utility
+      abortif(
+        rlang::is_missing(utility),
+        !inherits(utility, what = c("numeric", "ModVar")),
+        message = paste(
+          "Argument 'utility' must be provided, and of type numeric or ModVar."
+        ),
+        class = "invalid_utility"
+      )
       if (is.numeric(utility)) {
-        abortifnot(
-          utility <= 1.0,
+        abortif(
+          is.na(utility),
+          utility > 1.0,
           message = "Argument 'utility' must be in the range [-Inf,1].",
           class = "invalid_utility"
         )
-        private$node.utility <- utility
-      } else if (inherits(utility, what = "ModVar")) {
-        private$node.utility <- utility
-      } else {
-        abortifnot(
-          FALSE,
-          message = "Argument 'utility' must be numeric or ModVar",
-          class = "invalid_utility"
-        )
       }
+      private$node.utility <- utility
+      return(invisible(self))
+    },
+
+    #' @description Set the time interval associated with the node.
+    #' @param interval The time interval over which the \code{utility}
+    #' parameter applies, expressed as an R \code{difftime} object; default
+    #' 1 year, not NA.
+    #' @return Updated \code{Leaf} object.
+    set_interval = function(interval) {
+      # check and set interval
+      abortif(
+        rlang::is_missing(interval),
+        is.na(interval),
+        !inherits(interval, what = "difftime"),
+        message = "Argument 'interval' must be of class 'difftime'.",
+        class = "invalid_interval"
+      )
+      private$node.interval <- interval
       return(invisible(self))
     },
 

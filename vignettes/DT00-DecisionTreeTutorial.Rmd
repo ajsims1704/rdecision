@@ -410,8 +410,8 @@ confidence levels are as follows:
 #| purl = FALSE
 knitr::kable(
   data.frame(
-    "Q2.5" = rs_025[, "Cost"],
-    "Q97.5" = rs_975[, "Cost"],
+    Q2.5 = rs_025[, "Cost"],
+    Q97.5 = rs_975[, "Cost"],
     row.names = c("Diet", "Exercise")
   ),
   digits = 2L

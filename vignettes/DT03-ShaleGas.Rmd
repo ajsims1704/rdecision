@@ -118,7 +118,7 @@ knitr::kable(RES, row.names = FALSE)
 imax <- which.max(RES[, "Payoff"])
 popt <- paste(
   RES[[imax, "d1"]], RES[[imax, "d2"]], RES[[imax, "d3"]],
-  sep = "/"
+  sep = ";"
 )
 ```
 The optimal strategy is `r popt`, *i.e.*, test, sell if negative and

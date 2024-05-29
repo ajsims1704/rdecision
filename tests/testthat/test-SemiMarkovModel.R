@@ -346,7 +346,7 @@ test_that("transition cost matrix is correct", {
   Ct <- Ct[snames, snames]
   expect_identical(Ct, ECt)
   # set the starting populations
-  M$reset(populations = c("Well" = 1000L, "Disabled" = 0L, "Dead" = 0L))
+  M$reset(populations = c(Well = 1000L, Disabled = 0L, Dead = 0L))
   # check that transition costs are accumulated
   C1 <- M$cycle(hcc.pop = FALSE, hcc.cost = FALSE)
   ec.disabled <- 0.2 * 1000.0
@@ -566,8 +566,10 @@ test_that("low-level population cycling operates as expected", {
   m <- TestSemiMarkovModel$new(V = list(s.well, s.disabled, s.dead), E)
   m$set_probabilities(Pt)
   m$reset(c(Well = 10000.0, Disabled = 0.0, Dead = 0.0))
+  expect_identical(m$get_cycle(), 0L)
   # run one low-level population cycle and check against expected populations
   n_t <- m$test_cycle_pop()
+  expect_identical(m$get_cycle(), 1L)
   expect_true(is.matrix(n_t))
   expect_identical(nrow(n_t), 3L)
   expect_identical(ncol(n_t), 3L)
@@ -576,6 +578,7 @@ test_that("low-level population cycling operates as expected", {
   expect_intol(n_t[["Well", "Disabled"]], 2000.0, tolerance = 1.0)
   # run one more cycle (to 2 years)
   n_t <- m$test_cycle_pop()
+  expect_identical(m$get_cycle(), 2L)
   expect_intol(n_t[["Well", "Disabled"]], 1200.0, tolerance = 1.0)
   expect_intol(n_t[["Disabled", "Dead"]], 800.0, tolerance = 1.0)
   pop <- m$get_populations()
@@ -586,6 +589,7 @@ test_that("low-level population cycling operates as expected", {
   for (i in 1L : 23L) {
     m$test_cycle_pop()
   }
+  expect_identical(m$get_cycle(), 25L)
   expect_identical(m$get_elapsed(), as.difftime(25.0 * 365.25, units = "days"))
 })
 
@@ -656,7 +660,7 @@ test_that("utilities > 1 are supported via model variables", {
     dimnames = list(source = c("A", "B", "C"), target = c("A", "B", "C"))
   )
   m$set_probabilities(pt)
-  m$reset(populations = c("A" = 1000L, "B" = 0L, "C" = 0L))
+  m$reset(populations = c(A = 1000L, B = 0L, C = 0L))
   tr <- m$cycle(hcc.pop = FALSE, hcc.cost = FALSE)
   expect_intol(
     tr[[which(tr[, "State"] == "C" & tr[, "Cycle"] == 1L), "QALY"]],

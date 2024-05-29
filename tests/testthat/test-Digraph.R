@@ -185,7 +185,7 @@ test_that("arborescences are detected", {
 # (https://www.cs.hmc.edu/~keller/courses/cs60/s98/examples/acyclic/)
 test_that("topological sorting is correct", {
   # attempt to sort an empty graph
-  g <- Digraph$new(V = list(), A <- list())
+  g <- Digraph$new(V = list(), A = list())
   l <- g$topological_sort()
   expect_length(l, 0L)
   # non-trivial DAG with one sort order

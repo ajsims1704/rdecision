@@ -477,10 +477,16 @@ SemiMarkovModel <- R6::R6Class(
       return(invisible(self))
     },
 
-    #' @description Gets the occupancy of each state
+    #' @description Gets the occupancy of each state.
     #' @return A numeric vector of populations, named with state names.
     get_populations = function() {
       return(private$smm.pop)
+    },
+
+    #' @description Gets the current cycle number.
+    #' @return Current cycle count, as an integer.
+    get_cycle = function() {
+      return(private$smm.icycle)
     },
 
     #' @description Gets the current elapsed time.

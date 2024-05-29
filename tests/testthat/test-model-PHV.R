@@ -86,12 +86,12 @@ test_that("cycle results match S&B table 2", {
 
 ## @knitr trace-to-t2 ---------------------------------------------------------
 t2 <- data.frame(
-  "Cycle" = MT[, "Cycle"],
-  "Well" = round(MT[, "Well"], 0L),
-  "Disabled" = round(MT[, "Disabled"], 0L),
-  "Dead" = round(MT[, "Dead"], 0L),
-  "CycleSum" = round(MT[, "QALY"] * 10000.0, 0L),
-  "CumulativeUtility" = round(10000.0 * cumsum(MT[, "QALY"]), 0L)
+  Cycle = MT[, "Cycle"],
+  Well = round(MT[, "Well"], 0L),
+  Disabled = round(MT[, "Disabled"], 0L),
+  Dead = round(MT[, "Dead"], 0L),
+  CycleSum = round(MT[, "QALY"] * 10000.0, 0L),
+  CumulativeUtility = round(10000.0 * cumsum(MT[, "QALY"]), 0L)
 )
 
 ## @knitr ---------------------------------------------------------------------

@@ -173,7 +173,7 @@ test_that("combo therapy transition matrix agrees with Briggs Table 2.2", {
 run_comb <- function(Ptm, cAm, cBm, cCm, Ptc, cAc, cBc, cCc, hcc = FALSE) {
   # set populations
   N <- 1000L
-  populations <- c("A" = N, "B" = 0L, "C" = 0L, "D" = 0L)
+  populations <- c(A = N, B = 0L, C = 0L, D = 0L)
   m$reset(populations)
   # set the transition probabilities accounting for treatment effect
   m$set_probabilities(Ptc)

@@ -95,12 +95,12 @@ BetaDistribution <- R6::R6Class(
     #' \code{r()} to be the mean of the distribution.
     #' @return Updated distribution.
     sample = function(expected = FALSE) {
-      if (!expected) {
+      if (expected) {
+        private$.r[[1L]] <- self$mean()
+      } else {
         private$.r[[1L]] <- rbeta(
           n = 1L, shape1 = private$alpha, shape2 = private$beta
         )
-      } else {
-        private$.r[[1L]] <- self$mean()
       }
       return(invisible(self))
     },

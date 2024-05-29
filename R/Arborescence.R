@@ -590,29 +590,27 @@ Arborescence <- R6::R6Class(
       }
       # determine coordinates for each node in a tree
       POSITIONTREE <- function(iNode) {
-        if (iNode != 0L) {
-          # Initialize the list of previous nodes at each level.
-          INITPREVNODELIST()
-          # Do the preliminary positioning with a postorder walk.
-          FIRSTWALK(iNode, 0L)
-          # Determine how to adjust all the nodes with respect to
-          # the location of the root.
-          if (RootOrientation %in% c("NORTH", "SOUTH")) {
-            xTopAdjustment <- private$XCOORD[[iNode]] - private$PRELIM[[iNode]]
-            yTopAdjustment <- private$YCOORD[[iNode]]
-          } else {
-            xTopAdjustment <- private$XCOORD[[iNode]]
-            yTopAdjustment <- private$YCOORD[[iNode]] + private$PRELIM[[iNode]]
-          }
-          # Do the final positioning with a preorder walk
-          return(SECONDWALK(iNode, 0L, 0L))
+        # check iNode
+        abortif(
+          iNode == 0L,
+          message = "Argument to POSITIONTREE must not be a null pointer",
+          class = "invalid_inode"
+        )
+        # Initialize the list of previous nodes at each level.
+        INITPREVNODELIST()
+        # Do the preliminary positioning with a postorder walk.
+        FIRSTWALK(iNode, 0L)
+        # Determine how to adjust all the nodes with respect to
+        # the location of the root.
+        if (RootOrientation %in% c("NORTH", "SOUTH")) {
+          xTopAdjustment <- private$XCOORD[[iNode]] - private$PRELIM[[iNode]]
+          yTopAdjustment <- private$YCOORD[[iNode]]
         } else {
-          # Trivial: return TRUE if a null pointer was passed.
-          # nocov start
-          # an arborescence must have a root node, so never reach here
-          return(TRUE)
-          # nocov end
+          xTopAdjustment <- private$XCOORD[[iNode]]
+          yTopAdjustment <- private$YCOORD[[iNode]] + private$PRELIM[[iNode]]
         }
+        # Do the final positioning with a preorder walk
+        return(SECONDWALK(iNode, 0L, 0L))
       }
       # call Walker's main function
       iRoot <- self$vertex_index(self$root())

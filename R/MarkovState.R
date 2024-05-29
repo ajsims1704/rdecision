@@ -42,13 +42,8 @@ MarkovState <- R6::R6Class(
       super$initialize(name)
       # check that annual cost is numeric, then set it
       self$set_cost(cost)
-      # check the utility, and in range[-Inf,1] if numeric
-      abortifnot(
-        (is.numeric(utility) && utility <= 1.0) || is_ModVar(utility),
-        message = "If utility is numeric it must be in the range [-Inf,1]",
-        class = "invalid_utility"
-      )
-      private$state.utility <- utility
+      # check the utility, and set it
+      self$set_utility(utility)
       # return invisible MarkovState object
       return(invisible(self))
     },
@@ -59,9 +54,9 @@ MarkovState <- R6::R6Class(
       return(self$label())
     },
 
-    #' @description Set the annual occupancy cost
+    #' @description Set the annual occupancy cost.
     #' @param cost The annual cost of state occupancy
-    #' @returns Updated \code{MarkovState} object
+    #' @returns Updated \code{MarkovState} object.
     set_cost = function(cost) {
       # check that annual cost, then set it
       abortifnot(
@@ -74,14 +69,29 @@ MarkovState <- R6::R6Class(
     },
 
     #' @description Gets the annual cost of state occupancy.
-    #' @return Annual cost; numeric.
+    #' @returns Annual cost; numeric.
     cost = function() {
       rv <- as_numeric(private$state.cost)
       return(rv)
     },
 
+    #' @description Set the utility of the state.
+    #' @param utility The utility associated with being in the state (numeric
+    #' or \code{ModVar}).
+    #' @returns Updated \code{MarkovState} object.
+    set_utility = function(utility) {
+      # check the utility, and in range[-Inf,1] if numeric
+      abortifnot(
+        (is.numeric(utility) && utility <= 1.0) || is_ModVar(utility),
+        message = "If utility is numeric it must be in the range [-Inf,1]",
+        class = "invalid_utility"
+      )
+      private$state.utility <- utility
+      return(invisible(self))
+    },
+
     #' @description Gets the utility associated with the state.
-    #' @return Utility; numeric.
+    #' @returns Utility; numeric.
     utility = function() {
       rv <- as_numeric(private$state.utility)
       return(rv)

@@ -55,6 +55,8 @@ DecisionTree <- R6::R6Class(
     #' @description Create a new decision tree.
     #' @details The tree must consist of a set of nodes and a set of edges
     #' which satisfy the conditions given in the details section of this class.
+    #' In addition, the decision nodes must not be labelled with any of the
+    #' words used as the column headings listed in \code{evaluate}.
     #' @param V A list of nodes.
     #' @param E A list of edges.
     #' @return A \code{DecisionTree} object
@@ -88,9 +90,10 @@ DecisionTree <- R6::R6Class(
         message = "Each edge must inherit from Action or Reaction",
         class = "incorrect_edge_type"
       )
-      # DecisionNode labels must be unique and the labels of the Actions from
-      # each decision node must be unique
-      D.lab <- vapply(D, FUN.VALUE = "x", FUN = function(d) {
+      # DecisionNode labels must be unique, the labels of the Actions from
+      # each decision node must be unique, and the labels must not be reserved
+      # words.
+      d_lab <- vapply(D, FUN.VALUE = "x", FUN = function(d) {
         v <- self$vertex_at(d)
         K <- self$direct_successors(v)
         choices <- vapply(K, FUN.VALUE = "x", FUN = function(k) {
@@ -100,13 +103,18 @@ DecisionTree <- R6::R6Class(
         })
         abortifnot(anyDuplicated(choices) == 0L,
           message = "Labels of actions with common source node must be unique",
-          class = "non_unique_labels"
+          class = "invalid_labels"
         )
         return(v$label())
       })
-      abortifnot(anyDuplicated(D.lab) == 0L,
-        message = "Labels of DecisionNodes must be unique",
-        class = "non_unique_labels"
+      reserved <- c(
+        "Run", "Leaf", "Probability", "Cost", "Benefit", "Utility", "QALY"
+      )
+      abortifnot(
+        anyDuplicated(d_lab) == 0L,
+        all(is.na(match(x = d_lab, table = reserved))),
+        message = "Labels of DecisionNodes must be unique, unreserved words",
+        class = "invalid_labels"
       )
       # return a new DecisionTree object
       return(invisible(self))
@@ -332,115 +340,167 @@ DecisionTree <- R6::R6Class(
     #' @details Uses the algorithm of Walker (1989) to distribute the nodes
     #' compactly (see the \link{Arborescence} class help for details).
     #' @param border If TRUE draw a light grey border around the plot area.
+    #' @param fontsize Font size for labels in point. Symbols for nodes scale
+    #' with font size.
     #' @return No return value.
-    draw = function(border = FALSE) {
-      # margin widths (in tree space)
-      lmargin <- 4.0
-      rmargin <- 2.0
-      tmargin <- 4.0
-      bmargin <- 2.0
-      # node size (in tree space); the radius of a chance node. All node
-      # shapes are scaled to have same area (pi*node.size^2).
-      node.size <- 0.75
-      # fontsize for labels
-      fontsize <- 8.0
-      # fraction of edge that slopes after leading parent (range 0,1)
-      fs <- 0.20
-      # find the aspect ratio (width/height) of the current figure area
-      fig.size <- dev.size("cm")
-      fig.asp <- fig.size[[1L]] / fig.size[[2L]]
-      # find the (x,y) coordinates of nodes using Walker's algorithm
-      LevelSeparation <- 1.0
-      XY <- self$postree(
-        RootOrientation = "EAST",
-        LevelSeparation = LevelSeparation
-      )
-      # adjust level separation to create a tree with an aspect ratio
-      # that approximates the figure aspect ratio
-      xmin <- min(XY[, "x"])
-      xmax <- max(XY[, "x"])
-      ymin <- min(XY[, "y"])
-      ymax <- max(XY[, "y"])
-      tree.asp <- (xmax - xmin) / (ymax - ymin)
-      LevelSeparation <- fig.asp / tree.asp
-      # find the (x,y) coordinates of the nodes with adjusted level separation
-      XY <- self$postree(
-        RootOrientation = "EAST",
-        LevelSeparation = LevelSeparation
-      )
-      # find the extent of the new tree
-      xmin <- min(XY[, "x"])
-      xmax <- max(XY[, "x"])
-      ymin <- min(XY[, "y"])
-      ymax <- max(XY[, "y"])
-      # width and height of the diagram in tree space
-      tw <- (xmax - xmin) + (lmargin + rmargin)
-      th <- (ymax - ymin) + (bmargin + tmargin)
-      # calculate scale factor
-      scale <- max(tw / fig.size[[1L]], th / fig.size[[2L]])
-      # find centre of drawing in tree space
-      cx <- tw / 2.0 + (xmin - lmargin)
-      cy <- th / 2.0 + (ymin - bmargin)
-      # centre of the figure space
-      cx.f <- fig.size[[1L]] / 2.0
-      cy.f <- fig.size[[2L]] / 2.0
-      # functions to transform coordinates and distances in tree space
-      # to grid space (cm)
-      gx <- function(xtree) {
-        xcm <- cx.f + (xtree - cx) / scale
-        return(xcm)
-      }
-      gy <- function(ytree) {
-        ycm <- cy.f + (ytree - cy) / scale
-        return(ycm)
-      }
-      gd <- function(dtree) {
-        dcm <- dtree / scale
-        return(dcm)
-      }
+    draw = function(border = FALSE, fontsize = 8.0) {
       # start new page for drawing
       grid::grid.newpage()
-      # viewport rectangle (border)
+      # fraction of edge that slopes after leading parent (range 0,1)
+      fs <- 0.20
+      # create a root viewport with default gpar settings
+      grid::pushViewport(grid::viewport(gp = grid::gpar(fontsize = fontsize)))
+      # draw border around figure region, if required
       if (border) {
-        grid::grid.rect(
-          x = grid::unit(0.5, "npc"),
-          y = grid::unit(0.5, "npc"),
-          width = grid::unit(1.0, "npc"),
-          height = grid::unit(1.0, "npc"),
-          gp = grid::gpar(col = "lightgray")
+        grid::grid.rect(gp = grid::gpar(col = "lightgrey"))
+      }
+      # create a viewport for the outer margins
+      grid::pushViewport(
+        grid::viewport(
+          width = grid::unit(1.0, "npc") - 2.0 * grid::stringWidth("M"),
+          height = grid::unit(1.0, "npc") - 2.0 * grid::stringWidth("M"),
+          clip = "on"
         )
+      )
+      # find the (x,y) coordinates of nodes using Walker's algorithm and the
+      # unadjusted aspect ratio of the tree
+      XY <- self$postree(RootOrientation = "EAST", LevelSeparation = 1.0)
+      xmin <- min(XY[, "x"])
+      xmax <- max(XY[, "x"])
+      ymin <- min(XY[, "y"])
+      ymax <- max(XY[, "y"])
+      tree_asp <- (xmax - xmin) / (ymax - ymin)
+      # find the label length of the leftmost node
+      inode <- XY[[which.min(XY[, "x"]), "n"]]
+      vnode <- self$vertex_at(inode)
+      llabel <- grid::stringWidth(vnode$label())
+      # calculate margins for the viewport which will contain the node centres,
+      # leaving space for the node shapes and the leftmost label
+      lmargin <- max(llabel, grid::unit(1.5, "char"))
+      rmargin <- grid::unit(1.5, "char")
+      bmargin <- grid::unit(2.0, "char")
+      tmargin <- grid::unit(2.5, "char")
+      # compute the level separation for the tree which will optimise the use
+      # of space in the inner viewport
+      vpgw <- grid::unit(1.0, "npc") - lmargin - rmargin
+      vpgh <- grid::unit(1.0, "npc") - bmargin - tmargin
+      vpg_asp <- grid::convertUnit(vpgw, unitTo = "cm", valueOnly = TRUE) /
+        grid::convertUnit(vpgh, unitTo = "cm", valueOnly = TRUE)
+      # lay out the tree again, with the revised aspect ratio
+      XY <- self$postree(
+        RootOrientation = "EAST", LevelSeparation = vpg_asp / tree_asp
+      )
+      xmin <- min(XY[, "x"])
+      xmax <- max(XY[, "x"])
+      ymin <- min(XY[, "y"])
+      ymax <- max(XY[, "y"])
+      # create a viewport for the inner margins (containing the node centres),
+      # with the postree coordinate system
+      grid::pushViewport(
+        grid::viewport(
+          x = lmargin, y = bmargin, width = vpgw, height = vpgh,
+          just = c("left", "bottom"),
+          xscale = c(xmin, xmax), yscale = c(ymin, ymax),
+          clip = "inherit"
+        )
+      )
+      # function to draw an action or reaction
+      draw_edge <- function(xs, ys, xt, yt, fs = 0.2, label = "") {
+        # draw the articulated line
+        grid::grid.move.to(x = xs, y = ys, default.units = "native")
+        xj <- (xt - xs) * fs + xs
+        yj <- yt
+        grid::grid.line.to(x = xj, yj, default.units = "native")
+        grid::grid.line.to(x = xt, y = yt, default.units = "native")
+        # add label above or below
+        grid::pushViewport(viewport(
+          x = xj, y = yj, default.units = "native", just = c("left", "bottom")
+        ))
+        if (yt < ys) {
+          grid::grid.text(
+            label = label,
+            x = grid::unit(0.2, "char"), y = grid::unit(0.4, "char"),
+            default.units = "char", just = c("left", "bottom")
+          )
+        } else {
+          grid::grid.text(
+            label = label,
+            x = grid::unit(0.2, "char"), y = -grid::unit(0.4, "char"),
+            default.units = "char", just = c("left", "top")
+          )
+        }
+        grid::popViewport()
+      }
+      # function to draw a decision node and label
+      decision_node <- function(x, y, label) {
+        a <- grid::unit(sqrt(pi / 4.0), "char")
+        dy <- grid::unit(0.4, "char")
+        # create a viewport with origin at the centre of the object
+        grid::pushViewport(viewport(
+          x = x, y = y, default.units = "native", just = c("left", "bottom")
+        ))
+        grid::grid.rect(
+          x = 0.0, y = 0.0, width = a * 2.0, height = a * 2.0,
+          default.units = "char",
+          just = c("centre", "centre"),
+          gp = grid::gpar(col = "black", fill = "lightgray")
+        )
+        grid::grid.text(
+          label = label, x = 0.0, y = a  + dy, default.units = "char",
+          just = c("right", "bottom")
+        )
+        grid::popViewport()
+      }
+      # function to draw a chance node and label
+      chance_node <- function(x, y, label) {
+        a <- grid::unit(1.0, "char")
+        dy <- grid::unit(0.4, "char")
+        # create a viewport with origin at the centre of the object
+        grid::pushViewport(viewport(
+          x = x, y = y, default.units = "native", just = c("left", "bottom")
+        ))
+        grid::grid.circle(
+          x = 0.0, y = 0.0, r = a, default.units = "char",
+          gp = grid::gpar(col = "black", fill = "lightgray")
+        )
+        grid::grid.text(
+          label = label, x = 0.0, y = a  + dy, default.units = "char",
+          just = c("right", "bottom")
+        )
+        grid::popViewport()
+      }
+      # function to draw leaf node and label (in char space to keep aspect)
+      leaf_node <- function(x, y, label) {
+        a <- grid::unit(1.5 * sqrt(pi / sqrt(3.0)), "char")
+        dy <- grid::unit(0.4, "char")
+        # create a viewport with origin at the centre of the object
+        grid::pushViewport(viewport(
+          x = x, y = y, default.units = "native", just = c("left", "bottom")
+        ))
+        grid::grid.polygon(
+          x = c(-a / sqrt(3.0), sqrt(3.0) * a / 6.0, sqrt(3.0) * a / 6.0),
+          y = c(0.0, -a / 2.0, a / 2.0),
+          default.units = "char",
+          gp = grid::gpar(fill = "lightgray", col = "black")
+        )
+        grid::grid.text(
+          label = label, x = 0.0, y = a / 3.0 + dy, default.units = "char",
+          just = c("right", "bottom")
+        )
+        grid::popViewport()
       }
       # draw the edges as articulated lines between node centres
       for (ie in self$edge_along()) {
         e <- self$edge_at(ie)
         # find source and target nodes
-        n.source <- self$vertex_index(e$source())
-        n.target <- self$vertex_index(e$target())
-        x.source <- XY[[which(XY[, "n"] == n.source), "x"]]
-        y.source <- XY[[which(XY[, "n"] == n.source), "y"]]
-        x.target <- XY[[which(XY[, "n"] == n.target), "x"]]
-        y.target <- XY[[which(XY[, "n"] == n.target), "y"]]
-        grid::grid.move.to(
-          x = grid::unit(gx(x.source), "cm"),
-          y = grid::unit(gy(y.source), "cm")
-        )
-        x.joint <- (x.target - x.source) * fs + x.source
-        y.joint <- y.target
-        grid::grid.line.to(
-          x = grid::unit(gx(x.joint), "cm"),
-          y = grid::unit(gy(y.joint), "cm")
-        )
-        grid::grid.line.to(
-          x = grid::unit(gx(x.target), "cm"),
-          y = grid::unit(gy(y.target), "cm")
-        )
-        # add label
-        grid::grid.text(
-          label = e$label(),
-          x = grid::unit(gx(x.joint), "cm") + grid::unit(0.2, "char"),
-          y = grid::unit(gy(y.joint), "cm") + grid::unit(0.4, "char"),
-          just = c("left", "bottom"),
-          gp = grid::gpar(fontsize = fontsize)
+        ns <- self$vertex_index(e$source())
+        nt <- self$vertex_index(e$target())
+        xs <- XY[[which(XY[, "n"] == ns), "x"]]
+        ys <- XY[[which(XY[, "n"] == ns), "y"]]
+        xt <- XY[[which(XY[, "n"] == nt), "x"]]
+        yt <- XY[[which(XY[, "n"] == nt), "y"]]
+        draw_edge(
+          xs = xs, ys = ys, xt = xt, yt = yt, fs = fs, label = e$label()
         )
       }
       # draw the nodes
@@ -450,67 +510,11 @@ DecisionTree <- R6::R6Class(
         i <- which(XY[, "n"] == self$vertex_index(v))
         # switch type
         if (inherits(v, what = "DecisionNode")) {
-          a <- sqrt(pi / 4.0) * node.size
-          grid::grid.rect(
-            x = gx(XY[[i, "x"]]),
-            y = gy(XY[[i, "y"]]),
-            width = gd(a * 2.0),
-            height = gd(a * 2.0),
-            default.units = "cm",
-            gp = grid::gpar(col = "black", fill = "lightgray")
-          )
-          # add label
-          grid::grid.text(
-            label = v$label(),
-            x = grid::unit(gx(XY[[i, "x"]]), "cm"),
-            y = grid::unit(gy(XY[[i, "y"]] + a), "cm") +
-              grid::unit(0.4, "char"),
-            just = c("right", "bottom"),
-            gp = grid::gpar(fontsize = fontsize)
-          )
+          decision_node(XY[[i, "x"]], XY[[i, "y"]], v$label())
         } else if (inherits(v, what = "ChanceNode")) {
-          a <- node.size
-          grid::grid.circle(
-            x = gx(XY[[i, "x"]]),
-            y = gy(XY[[i, "y"]]),
-            r = gd(a),
-            default.units = "cm",
-            gp = grid::gpar(col = "black", fill = "lightgray")
-          )
-          # add label
-          grid::grid.text(
-            label = v$label(),
-            x = grid::unit(gx(XY[[i, "x"]]), "cm"),
-            y = grid::unit(gy(XY[[i, "y"]] + a), "cm") +
-              grid::unit(0.4, "char"),
-            just = c("right", "bottom"),
-            gp = grid::gpar(fontsize = fontsize)
-          )
+          chance_node(XY[[i, "x"]], XY[[i, "y"]], v$label())
         } else if (inherits(v, what = "LeafNode")) {
-          a <- 2.0 * sqrt(pi / sqrt(3.0)) * node.size
-          grid::grid.polygon(
-            x = c(
-              gx(XY[[i, "x"]] - a / sqrt(3.0)),
-              gx(XY[[i, "x"]] + sqrt(3.0) * a / 6.0),
-              gx(XY[[i, "x"]] + sqrt(3.0) * a / 6.0)
-            ),
-            y = c(
-              gy(XY[[i, "y"]] + 0.0),
-              gy(XY[[i, "y"]] + a / 2.0),
-              gy(XY[[i, "y"]] - a / 2.0)
-            ),
-            default.units = "cm",
-            gp = grid::gpar(fill = "lightgray", col = "black")
-          )
-          # add label
-          grid::grid.text(
-            label = v$label(),
-            x = grid::unit(gx(XY[[i, "x"]]), "cm"),
-            y = grid::unit(gy(XY[[i, "y"]] + a / 3.0), "cm") +
-              grid::unit(0.4, "char"),
-            just = c("right", "bottom"),
-            gp = grid::gpar(fontsize = fontsize)
-          )
+          leaf_node(XY[[i, "x"]], XY[[i, "y"]], v$label())
         }
       }
       # return updated DecisionTree (unchanged)
@@ -638,7 +642,13 @@ DecisionTree <- R6::R6Class(
 
     #' @description Properties of all actions and reactions as a matrix.
     #' @details Gets the properties (probability, cost, benefit) of each
-    #' action and reaction in the decision tree in matrix form.
+    #' action and reaction in the decision tree in matrix form. If there are
+    #' reactions from chance nodes whose conditional probability of
+    #' traversal set to NA, the missing values are replaced by one minus
+    #' the sum of the conditional probabilities of the other reaction edges
+    #' from that node (provided there is no more than one with NA). If the
+    #' method is called at evaluation, the replacement of NAs happens after
+    #' sampling from model variables.
     #' @return A numeric matrix with one row per edge, and with four columns:
     #' the index of the edge, the conditional probability of traversing the
     #' edge, the cost of traversing the edge and the benefit associated with
@@ -646,13 +656,15 @@ DecisionTree <- R6::R6Class(
     #' \code{probability}, \code{cost}, \code{benefit} and the row names are
     #' the labels of the edges.
     edge_properties = function() {
-      ep <- matrix(data = NA, nrow = self$size(), ncol = 4L)
-      colnames(ep) <- c("index", "probability", "cost", "benefit")
+      # create a matrix with information from each edge
+      ep <- matrix(data = NA, nrow = self$size(), ncol = 5L)
+      colnames(ep) <- c("index", "src", "probability", "cost", "benefit")
       rn <- vector(mode = "character", length = self$size())
       r <- 1L
       for (ie in self$edge_along()) {
         e <- self$edge_at(ie)
         ep[[r, "index"]] <- ie
+        ep[[r, "src"]] <- self$arrow_source(e)
         ep[[r, "probability"]] <- e$p()
         ep[[r, "cost"]] <- e$cost()
         ep[[r, "benefit"]] <- e$benefit()
@@ -660,6 +672,38 @@ DecisionTree <- R6::R6Class(
         r <- r + 1L
       }
       rownames(ep) <- rn
+      # replace probabilities that have been set to NA, checking that there is
+      # at most one NA among the Reactions from each chance node; it is safe to
+      # check this by source because Actions have non-modifiable p = 1, so will
+      # have no NAs.
+      if (anyNA(ep[, "probability"])) {
+        # count probability NAs by source node and raise error if there are > 1
+        sumna <- aggregate(
+          x = as.formula(cbind(nna = is.na(probability)) ~ src),
+          data = ep,
+          FUN = sum
+        )
+        abortif(
+          any(sumna[, "nna"] > 1L),
+          message = "At most 1 Reaction from a chance node may have p = NA.",
+          class = "invalid_probability_sum"
+        )
+        # find the source nodes having one missing reaction probability
+        missp <- with(data = sumna, src[nna == 1L])
+        # find sum of probabilities for source nodes with missing p
+        sump <- aggregate(probability ~ src, data = ep, FUN = sum)
+        sump <- with(data = sump, sump[src %in% missp, ])
+        # replace NAs in ep with balance of probabilities
+        index_na <- which(is.na(ep[, "probability"]))
+        src_na <- ep[index_na, "src"]
+        ep[, "probability"] <- replace(
+          x = ep[, "probability"],
+          list = index_na,
+          values = with(data = sump, 1.0 - probability[match(src_na, src)])
+        )
+      }
+      # remove 'src' column
+      ep <- ep[, colnames(ep) != "src"]
       return(ep)
     },
 
@@ -897,9 +941,19 @@ DecisionTree <- R6::R6Class(
       payoff[, "Run"] <- rep(seq_len(N), each = nrow(TM))
       payoff[, "Leaf"] <- rep(as.integer(rownames(TM)), times = N)
       # find all paths walked for each strategy
-      SW <- self$strategy_paths()
+      sw <- self$strategy_paths()
       # merge with results to get one row per path walked per strategy
-      payoff <- merge(SW, payoff, all.x = TRUE, by = "Leaf")
+      payoff <- merge(sw, payoff, all.x = TRUE, by = "Leaf")
+      # check that the sum of probabilities for each strategy, for each run,
+      # is unity, by aggregating the payoff table by strategy and run
+      f <- paste(c(self$decision_nodes("label"), "Run"), collapse = "+")
+      f <- paste("Probability", f, sep = "~")
+      psum <- aggregate(as.formula(f), data = payoff, FUN = sum)
+      abortifnot(
+        all.equal(psum[, "Probability"], rep(1.0, times = nrow(psum))),
+        message = "Probabilities for each strategy must sum to 1 for each run",
+        class = "invalid_probability_sum"
+      )
       # Replace the edge indexes of the strategy with their edge labels
       dn <- self$decision_nodes("label")
       dn <- sort(dn, na.last = TRUE)

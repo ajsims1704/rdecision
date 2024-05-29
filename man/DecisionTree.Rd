@@ -149,6 +149,8 @@ Create a new decision tree.
 \subsection{Details}{
 The tree must consist of a set of nodes and a set of edges
 which satisfy the conditions given in the details section of this class.
+In addition, the decision nodes must not be labelled with any of the
+words used as the column headings listed in \code{evaluate}.
 }
 
 \subsection{Returns}{
@@ -310,13 +312,16 @@ random sampling.}
 \subsection{Method \code{draw()}}{
 Draw the decision tree to the current graphics output.
 \subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{DecisionTree$draw(border = FALSE)}\if{html}{\out{</div>}}
+\if{html}{\out{<div class="r">}}\preformatted{DecisionTree$draw(border = FALSE, fontsize = 8)}\if{html}{\out{</div>}}
 }
 
 \subsection{Arguments}{
 \if{html}{\out{<div class="arguments">}}
 \describe{
 \item{\code{border}}{If TRUE draw a light grey border around the plot area.}
+
+\item{\code{fontsize}}{Font size for labels in point. Symbols for nodes scale
+with font size.}
 }
 \if{html}{\out{</div>}}
 }
@@ -425,7 +430,13 @@ Properties of all actions and reactions as a matrix.
 
 \subsection{Details}{
 Gets the properties (probability, cost, benefit) of each
-action and reaction in the decision tree in matrix form.
+action and reaction in the decision tree in matrix form. If there are
+reactions from chance nodes whose conditional probability of
+traversal set to NA, the missing values are replaced by one minus
+the sum of the conditional probabilities of the other reaction edges
+from that node (provided there is no more than one with NA). If the
+method is called at evaluation, the replacement of NAs happens after
+sampling from model variables.
 }
 
 \subsection{Returns}{

@@ -118,6 +118,7 @@ Andrew J. Sims \email{andrew.sims@newcastle.ac.uk}
 \item \href{#method-SemiMarkovModel-get_statenames}{\code{SemiMarkovModel$get_statenames()}}
 \item \href{#method-SemiMarkovModel-reset}{\code{SemiMarkovModel$reset()}}
 \item \href{#method-SemiMarkovModel-get_populations}{\code{SemiMarkovModel$get_populations()}}
+\item \href{#method-SemiMarkovModel-get_cycle}{\code{SemiMarkovModel$get_cycle()}}
 \item \href{#method-SemiMarkovModel-get_elapsed}{\code{SemiMarkovModel$get_elapsed()}}
 \item \href{#method-SemiMarkovModel-tabulate_states}{\code{SemiMarkovModel$tabulate_states()}}
 \item \href{#method-SemiMarkovModel-cycle}{\code{SemiMarkovModel$cycle()}}
@@ -342,13 +343,26 @@ Updated \code{SemiMarkovModel} object.
 \if{html}{\out{<a id="method-SemiMarkovModel-get_populations"></a>}}
 \if{latex}{\out{\hypertarget{method-SemiMarkovModel-get_populations}{}}}
 \subsection{Method \code{get_populations()}}{
-Gets the occupancy of each state
+Gets the occupancy of each state.
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{SemiMarkovModel$get_populations()}\if{html}{\out{</div>}}
 }
 
 \subsection{Returns}{
 A numeric vector of populations, named with state names.
+}
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-SemiMarkovModel-get_cycle"></a>}}
+\if{latex}{\out{\hypertarget{method-SemiMarkovModel-get_cycle}{}}}
+\subsection{Method \code{get_cycle()}}{
+Gets the current cycle number.
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{SemiMarkovModel$get_cycle()}\if{html}{\out{</div>}}
+}
+
+\subsection{Returns}{
+Current cycle count, as an integer.
 }
 }
 \if{html}{\out{<hr>}}

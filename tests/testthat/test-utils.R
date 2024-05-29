@@ -17,11 +17,14 @@ test_that("abortif raises an error condition with a single expression", {
   expect_silent(abortif(x > 1L, class = "no"))
   expect_error(abortif(x == 1L, class = "no"), class = "no")
   expect_error(abortif(x == 1L))
+  x <- NA_real_
+  expect_error(abortif(is.na(x), class = "no"), class = "no")
 })
 
 test_that("abortif raises an error condition with > 1 expression", {
   x <- 1L
   y <- "apple"
+  z <- NA_real_
   expect_silent(
     abortif(
       x > 1L,
@@ -47,6 +50,16 @@ test_that("abortif raises an error condition with > 1 expression", {
       x == 1L,
       y %in% c("orange", "pear"),
       class = "no"
+    ),
+    class = "no"
+  )
+  expect_error(
+    abortif(
+      x > 2L,
+      y %in% c("banana", "pear"),
+      is.na(z),
+      class = "no",
+      message = "no NAs"
     ),
     class = "no"
   )

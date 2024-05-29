@@ -94,8 +94,7 @@ expressions, which involve model variables and are themselves
 model variables. Forms of expression involving R functions and
 multiple model variables are supported, provided they conform to R syntax.
 The following code creates the model variable expressions to be used as values
-in the decision tree edges. For probabilities, the convention $q = 1 - p$ is 
-used to ensure that the sum of probabilities leaving each chance node is one.
+in the decision tree edges. 
 
 ```{r}
 #| expressions,
@@ -122,6 +121,12 @@ allows for patients to have more than one adverse event (AE) during their stay
 The rates of AE were estimated independently, and allow for multiple events,
 (figure 1).
 
+In `rdecision`, if the
+probability associated with one of the reactions from any chance node is set
+to missing (`NA`), it will be computed before each evaluation of the tree to
+ensure that the probabilities sum to unity.
+
+
 ```{r}
 #| tree,
 #| echo = TRUE
@@ -139,11 +144,6 @@ of the tree, as follows.
 #| echo = TRUE
 DT$draw(border = TRUE)
 ```
-
-In the company's model, the uncertainties in the probabilities associated
-with the polytomous chance nodes were modelled as independent variables. This is
-not recommended because there is a chance that a particular run of the PSA will
-yield probabilities that are outside the range [0,1]. 
 
 ## Summary of model variables in the tree
 The model variables which will be associated with actions, reactions and leaf 

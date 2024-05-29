@@ -66,9 +66,10 @@ tabulation of strategies. It is recommended to choose labels that are
 brief and not punctuated with spaces, dots or underscores.}
 
 \item{\code{cost}}{Cost associated with traversal of this edge (numeric or
-\code{ModVar}).}
+\code{ModVar}), not NA.}
 
-\item{\code{benefit}}{Benefit associated with traversal of the edge.}
+\item{\code{benefit}}{Benefit associated with traversal of the edge, (numeric or
+\code{ModVar}), not NA.}
 }
 \if{html}{\out{</div>}}
 }
@@ -95,7 +96,7 @@ A list of \code{ModVar}s.
 \if{html}{\out{<a id="method-Action-p"></a>}}
 \if{latex}{\out{\hypertarget{method-Action-p}{}}}
 \subsection{Method \code{p()}}{
-Return the current value of the edge probability, i.e. the
+Return the current value of the edge probability, i.e., the
 conditional probability of traversing the edge.
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{Action$p()}\if{html}{\out{</div>}}
@@ -118,7 +119,7 @@ Set the cost associated with the action edge.
 \if{html}{\out{<div class="arguments">}}
 \describe{
 \item{\code{c}}{Cost associated with traversing the action edge. Of type numeric
-or \code{ModVar}.}
+or \code{ModVar}, not NA.}
 }
 \if{html}{\out{</div>}}
 }

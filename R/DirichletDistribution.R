@@ -144,15 +144,15 @@ DirichletDistribution <- R6::R6Class(
     #' \code{r()} to be the mean of the distribution.
     #' @return Void; sample is retrieved with call to \code{r()}.
     sample = function(expected = FALSE) {
-      if (!expected) {
+      if (expected) {
+        private$.r <- self$mean()
+      } else {
         # sample from gamma distributions
         y <- vapply(seq_len(private$K), FUN.VALUE = 0.5, FUN = function(i) {
           stats::rgamma(n = 1L, shape = private$alpha[[i]], rate = 1.0)
         })
         # normalize and hold
         private$.r <- y / sum(y)
-      } else {
-        private$.r <- self$mean()
       }
       return(invisible(self))
     }

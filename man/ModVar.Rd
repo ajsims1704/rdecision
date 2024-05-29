@@ -260,10 +260,10 @@ as follows:
 distribution;}
 \item{\code{"expected"}}{the mean of the uncertainty distribution;}
 \item{\code{"q2.5"}}{the lower 95\% confidence limit of the uncertainty
-distribution, i.e. the 2.5th percentile;}
+distribution, i.e., the 2.5th percentile;}
 \item{\code{"q50"}}{the median of the uncertainty distribution;}
 \item{\code{"q97.5"}}{the upper 95\% confidence limit of the uncertainty
-distribution, i.e. the 97.5th percentile;}
+distribution, i.e., the 97.5th percentile;}
 \item{\code{"current"}}{leaves the \code{what} parameter of method
 \code{set} unchanged, i.e. the call to \code{set} has no effect on the
 subsequent values returned by \code{get}. It is provided as an option to

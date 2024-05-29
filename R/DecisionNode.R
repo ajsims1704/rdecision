@@ -15,8 +15,7 @@ DecisionNode <- R6::R6Class(
   ),
   public = list(
 
-    #' @description
-    #' Create a new decision node.
+    #' @description Create a new decision node.
     #' @param label A label for the node. Must be defined because the label is
     #' used in tabulation of strategies. The label is automatically converted
     #' to a syntactically valid (in R) name to ensure it can be used as a column

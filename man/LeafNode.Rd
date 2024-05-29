@@ -24,6 +24,7 @@ Andrew J. Sims \email{andrew.sims@newcastle.ac.uk}
 \item \href{#method-LeafNode-new}{\code{LeafNode$new()}}
 \item \href{#method-LeafNode-modvars}{\code{LeafNode$modvars()}}
 \item \href{#method-LeafNode-set_utility}{\code{LeafNode$set_utility()}}
+\item \href{#method-LeafNode-set_interval}{\code{LeafNode$set_interval()}}
 \item \href{#method-LeafNode-utility}{\code{LeafNode$utility()}}
 \item \href{#method-LeafNode-interval}{\code{LeafNode$interval()}}
 \item \href{#method-LeafNode-QALY}{\code{LeafNode$QALY()}}
@@ -107,8 +108,30 @@ Set the incremental utility associated with the node.
 being in the health state for the interval.
 Intended for use with cost benefit analysis. Can be \code{numeric} or
 a type of \code{ModVar}. If the type is \code{numeric}, the allowed
-range is \code{-Inf} to 1; if it is of type \code{ModVar}, it is
+range is \code{-Inf} to 1, not NA; if it is of type \code{ModVar}, it is
 unchecked.}
+}
+\if{html}{\out{</div>}}
+}
+\subsection{Returns}{
+Updated \code{Leaf} object.
+}
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-LeafNode-set_interval"></a>}}
+\if{latex}{\out{\hypertarget{method-LeafNode-set_interval}{}}}
+\subsection{Method \code{set_interval()}}{
+Set the time interval associated with the node.
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{LeafNode$set_interval(interval)}\if{html}{\out{</div>}}
+}
+
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{interval}}{The time interval over which the \code{utility}
+parameter applies, expressed as an R \code{difftime} object; default
+1 year, not NA.}
 }
 \if{html}{\out{</div>}}
 }

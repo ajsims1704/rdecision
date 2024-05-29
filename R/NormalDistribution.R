@@ -54,10 +54,10 @@ NormalDistribution <- R6::R6Class(
     #' \code{r()} to be the mean of the distribution.
     #' @return A sample drawn at random.
     sample = function(expected = FALSE) {
-      if (!expected) {
-        private$.r[[1L]] <- rnorm(n = 1L, mean = private$mu, sd = private$sigma)
-      } else {
+      if (expected) {
         private$.r[[1L]] <- self$mean()
+      } else {
+        private$.r[[1L]] <- rnorm(n = 1L, mean = private$mu, sd = private$sigma)
       }
       # return the updated object
       return(invisible(self))

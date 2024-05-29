@@ -15,6 +15,14 @@ between
 variables. The package terminology follows Briggs \emph{et al} "Decision
 Modelling for Health Economic Evaluation" (2006, ISBN:978-0-19-852662-9).
 }
+\seealso{
+Useful links:
+\itemize{
+  \item \url{https://github.com/ajsims1704/rdecision}
+  \item Report bugs at \url{https://github.com/ajsims1704/rdecision/issues}
+}
+
+}
 \author{
 \strong{Maintainer}: Andrew Sims \email{andrew.sims@newcastle.ac.uk} (\href{https://orcid.org/0000-0002-9553-7278}{ORCID})
 

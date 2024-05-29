@@ -54,7 +54,14 @@ with traversing the edge. A \dfn{pay-off} (benefit-cost) is sometimes
 used in edges of decision trees; the parametrization used here is more
 general.
 \subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{Reaction$new(source_node, target_node, p, cost = 0, benefit = 0, label = "")}\if{html}{\out{</div>}}
+\if{html}{\out{<div class="r">}}\preformatted{Reaction$new(
+  source_node,
+  target_node,
+  p = 0,
+  cost = 0,
+  benefit = 0,
+  label = ""
+)}\if{html}{\out{</div>}}
 }
 
 \subsection{Arguments}{
@@ -67,10 +74,10 @@ general.
 \item{\code{p}}{Conditional probability of traversing the reaction edge.}
 
 \item{\code{cost}}{Cost associated with traversal of this edge (numeric or
-\code{ModVar}).}
+\code{ModVar}), not NA.}
 
 \item{\code{benefit}}{Benefit associated with traversal of the edge (numeric or
-\code{ModVar}).}
+\code{ModVar}), not NA.}
 
 \item{\code{label}}{Character string containing the reaction label.}
 }
@@ -121,8 +128,8 @@ Updated \code{Reaction} object.
 \if{html}{\out{<a id="method-Reaction-p"></a>}}
 \if{latex}{\out{\hypertarget{method-Reaction-p}{}}}
 \subsection{Method \code{p()}}{
-Return the current value of the edge probability, i.e. the
-conditional' probability of traversing the edge.
+Return the current value of the edge probability, i.e., the
+conditional probability of traversing the edge.
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{Reaction$p()}\if{html}{\out{</div>}}
 }

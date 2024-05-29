@@ -14,15 +14,15 @@
 
 ## @knitr state-names ---------------------------------------------------------
 states <- c(
-  "A" = "TKR operation for knee problems",
-  "B" = "TKR with serious complications",
-  "C" = "TKR with minor complications",
-  "D" = "Normal health after primary TKR",
-  "E" = "Complex revision",
-  "F" = "Simple revision",
-  "G" = "Other treatments",
-  "H" = "Normal health after TKR revision",
-  "I" = "Death"
+  A = "TKR operation for knee problems",
+  B = "TKR with serious complications",
+  C = "TKR with minor complications",
+  D = "Normal health after primary TKR",
+  E = "Complex revision",
+  F = "Simple revision",
+  G = "Other treatments",
+  H = "Normal health after TKR revision",
+  I = "Death"
 )
 
 ## @knitr utils-point ----------------------------------------------------------

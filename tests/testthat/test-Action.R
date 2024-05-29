@@ -27,6 +27,7 @@ test_that("class parameters are updated dynamically", {
   expect_identical(e1$benefit(), 0.0)
   # attempt to set an invalid cost
   expect_error(e1$set_cost("42"), class = "invalid_cost")
+  expect_error(e1$set_cost(NA_real_), class = "invalid_cost")
   # set cost to default, and check it
   e1$set_cost()
   expect_identical(e1$cost(), 0.0)
@@ -35,6 +36,7 @@ test_that("class parameters are updated dynamically", {
   expect_identical(e1$cost(), 42.0)
   # attempt to set an invalid benefit
   expect_error(e1$set_benefit("42"), class = "invalid_benefit")
+  expect_error(e1$set_benefit(NA_real_), class = "invalid_benefit")
   # set benefit to default, and check it
   e1$set_benefit()
   expect_identical(e1$benefit(), 0.0)

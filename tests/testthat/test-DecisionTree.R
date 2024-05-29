@@ -48,7 +48,7 @@ test_that("arborescences that are not decision trees are rejected", {
   e4 <- Action$new(d1, t3, label = "e1")
   expect_error(
     DecisionTree$new(V = list(d1, c1, t1, t2, t3), E = list(e1, e2, e3, e4)),
-    class = "non_unique_labels"
+    class = "invalid_labels"
   )
   # decision node labels must be unique
   d2 <- DecisionNode$new("d1")
@@ -58,7 +58,7 @@ test_that("arborescences that are not decision trees are rejected", {
     DecisionTree$new(
       V = list(d1, d2, c1, t1, t2, t3), E = list(e1, e2, e3, e4, e5)
     ),
-    class = "non_unique_labels"
+    class = "invalid_labels"
   )
   # construct a legal tree
   e4 <- Action$new(d1, t3, label = "e4")
@@ -94,6 +94,26 @@ test_that("arborescences that are not decision trees are rejected", {
   grDevices::pdf(file = NULL)
   expect_null(DT$tornado(index = list(e1), ref = list(e4)))
   grDevices::dev.off()
+})
+
+# test that using reserved words for decision nodes is detected
+test_that("invalid decision node labels are detected", {
+  d1 <- DecisionNode$new(label = "Run")
+  l1 <- LeafNode$new(label = "l1")
+  l2 <- LeafNode$new(label = "l2")
+  a1 <- Action$new(source = d1, target = l1, label = "run")
+  a2 <- Action$new(source = d1, target = l2, label = "walk")
+  expect_error(
+    DecisionTree$new(V = list(d1, l1, l2), E = list(a1, a2)),
+    class = "invalid_labels"
+  )
+  d1 <- DecisionNode$new(label = "Benefit")
+  a1 <- Action$new(source = d1, target = l1, label = "run")
+  a2 <- Action$new(source = d1, target = l2, label = "walk")
+  expect_error(
+    DecisionTree$new(V = list(d1, l1, l2), E = list(a1, a2)),
+    class = "invalid_labels"
+  )
 })
 
 # tests of basic tree properties (Kaminski et al CEJOR 2018;26:135-139, fig 1)
@@ -180,6 +200,93 @@ test_that("simple decision trees are modelled correctly", {
   expect_intol(RES[[which(RES[, "Leaf"] == "t1"), "Benefit"]], 22.5, 0.05)
 })
 
+# test that the sum of probabilities from each chance node must be 1, including
+# when probability is modelled as a random variable
+test_that("chance node probabilities sum to unity", {
+  # create a tree
+  d1 <- DecisionNode$new("D1")
+  c1 <- ChanceNode$new()
+  c2 <- ChanceNode$new()
+  l11 <- LeafNode$new("L11")
+  l12 <- LeafNode$new("L12")
+  l21 <- LeafNode$new("L21")
+  l22 <- LeafNode$new("L22")
+  l23 <- LeafNode$new("L23")
+  a1 <- Action$new(source = d1, target = c1, label = "Choice 1")
+  a2 <- Action$new(source = d1, target = c2, label = "Choice 2")
+  r11 <- Reaction$new(source = c1, target = l11)
+  r12 <- Reaction$new(source = c1, target = l12)
+  r21 <- Reaction$new(source = c2, target = l21)
+  r22 <- Reaction$new(source = c2, target = l22)
+  r23 <- Reaction$new(source = c2, target = l23)
+  dt <- DecisionTree$new(
+    V = list(d1, c1, c2, l11, l12, l21, l22, l23),
+    E = list(a1, a2, r11, r12, r21, r22, r23)
+  )
+  # evaluate with default (zero) probabilities
+  expect_error(dt$evaluate(), class = "invalid_probability_sum")
+  # set the probabilities and check that the model evaluates when correct
+  r11$set_probability(0.5)
+  r12$set_probability(0.5)
+  expect_error(dt$evaluate(), class = "invalid_probability_sum")
+  r21$set_probability(1L / 3L)
+  r22$set_probability(1L / 3L)
+  r23$set_probability(2L / 3L)
+  expect_error(dt$evaluate(), class = "invalid_probability_sum")
+  r23$set_probability(1L / 3L)
+  expect_silent(dt$evaluate())
+  # create a Dirichlet distribution and associated ModVars for c1
+  dtwo <- DirichletDistribution$new(c(1L, 9L))
+  pc11 <- ModVar$new("p(success)", "P", D = dtwo, k = 1L)
+  pc12 <- ModVar$new("p(failure)", "P", D = dtwo, k = 2L)
+  r11$set_probability(pc11)
+  r12$set_probability(pc12)
+  expect_silent(dt$evaluate(setvars = "random", N = 20L))
+  # and for c2
+  dthree <- DirichletDistribution$new(c(1L, 9L, 6L))
+  pc21 <- ModVar$new("p(outcome 1)", "P", D = dthree, k = 1L)
+  pc22 <- ModVar$new("p(outcome 2)", "P", D = dthree, k = 2L)
+  pc23 <- ModVar$new("p(outcome 3)", "P", D = dthree, k = 3L)
+  r21$set_probability(pc21)
+  r22$set_probability(pc22)
+  r23$set_probability(pc23)
+  expect_silent(dt$evaluate(setvars = "random", N = 20L))
+})
+
+# test that probabilities of NA are detected and checked
+test_that("probabilities of NA are detected and checked", {
+  # create a tree
+  d1 <- DecisionNode$new("d1")
+  c1 <- ChanceNode$new()
+  c2 <- ChanceNode$new()
+  l1 <- LeafNode$new(label = "l1")
+  l2 <- LeafNode$new(label = "l2")
+  l3 <- LeafNode$new(label = "l3")
+  l4 <- LeafNode$new(label = "l4")
+  a1 <- Action$new(s = d1, t = c1, label = "intervention")
+  a2 <- Action$new(s = d1, t = c2, label = "comparator")
+  r1 <- Reaction$new(s = c1, t = l1)
+  r2 <- Reaction$new(s = c1, t = l2)
+  r3 <- Reaction$new(s = c2, t = l3)
+  r4 <- Reaction$new(s = c2, t = l4)
+  dt <- DecisionTree$new(
+    V = list(d1, c1, c2, l1, l2, l3, l4),
+    E = list(a1, a2, r1, r2, r3, r4)
+  )
+  # check that evaluation fails due to probabilities not summing to 1
+  expect_error(dt$evaluate(), class = "invalid_probability_sum")
+  # check evaluation with NA probabilities from a chance node
+  r1$set_probability(p = NA_real_)
+  r2$set_probability(p = NA_real_)
+  r3$set_probability(p = 0.4)
+  r4$set_probability(p = NA_real_)
+  expect_error(dt$evaluate(), class = "invalid_probability_sum")
+  r1$set_probability(p = 0.5)
+  dte <- dt$evaluate(by = "path")
+  expect_intol(with(dte, Probability[Leaf == "l2"]), 0.5, 0.01)
+  expect_intol(with(dte, Probability[Leaf == "l4"]), 0.6, 0.01)
+})
+
 # test with utility > 1
 test_that("decision trees with utility > 1 are supported", {
   # fictitious scenario
@@ -197,7 +304,7 @@ test_that("decision trees with utility > 1 are supported", {
   ra1 <- Reaction$new(
     source = ca,
     target = ta1,
-    p = 1.0 - p_miscarriage_notest,
+    p = NA_real_,
     cost = c_normdel
   )
   ra2 <- Reaction$new(
@@ -212,7 +319,7 @@ test_that("decision trees with utility > 1 are supported", {
   rb1 <- Reaction$new(
     source = cb,
     target = tb1,
-    p = 1.0 - p_miscarriage_test,
+    p = NA_real_,
     cost = c_normdel
   )
   rb2 <- Reaction$new(
@@ -248,13 +355,10 @@ test_that("decision trees with utility > 1 are supported", {
   expect_intol(oicer, eicer, 100.0)
 })
 
-# ----------------------------------------------------------------------------
 # A decision tree with paths common to >1 strategy
-# ----------------------------------------------------------------------------
 test_that("paths common to >1 strategy are analyzed", {
   # variables
   p.disease <- BetaModVar$new("P(Test+ve)", "P", alpha = 10.0, beta = 40.0)
-  q.disease <- ExprModVar$new("1-P(Test+ve)", "P", rlang::quo(1.0 - p.disease))
   # create tree
   c1 <- ChanceNode$new("c1")
   d1 <- DecisionNode$new("d1")
@@ -264,7 +368,7 @@ test_that("paths common to >1 strategy are analyzed", {
   t3 <- LeafNode$new("watchful waiting")
   t4 <- LeafNode$new("discharge")
   e1 <- Reaction$new(c1, d1, p = p.disease, cost = 0.0, label = "test +ve")
-  e2 <- Reaction$new(c1, t4, p = q.disease, cost = 0.0, label = "test -ve")
+  e2 <- Reaction$new(c1, t4, p = NA_real_, cost = 0.0, label = "test -ve")
   e3 <- Action$new(d1, t1, label = "treat", cost = 1000.0)
   e4 <- Action$new(d1, d2, label = "manage", cost = 0.0)
   e5 <- Action$new(d2, t2, label = "conservatively", cost = 200.0)
@@ -348,4 +452,37 @@ test_that("paths common to >1 strategy are analyzed", {
   )
   cnames <- sprintf("%s.%s", eg[, 1L], eg[, 2L])
   expect_setequal(colnames(RES), c("Run", cnames))
+})
+
+# A decision tree with a long leftmost node label (must be tested by sending
+# the plot file to a pdf and reviewing it)
+test_that("long node labels are not clipped", {
+  d1 <- DecisionNode$new(label = "Home captain decision before the toss")
+  l1 <- LeafNode$new("Bat")
+  l2 <- LeafNode$new("Bowl")
+  l3 <- LeafNode$new("Bat")
+  l4 <- LeafNode$new("Bowl")
+  l5 <- LeafNode$new("Bowl")
+  l6 <- LeafNode$new("Bat")
+  c1 <- ChanceNode$new()
+  c2 <- ChanceNode$new()
+  d2 <- DecisionNode$new("Away captain decision after winning toss")
+  d3 <- DecisionNode$new("Away captain decision after losing toss")
+  a1 <- Action$new(source = d1, target = c1, "Bat first")
+  a2 <- Action$new(source = d1, target = c2, "Bowl first")
+  r1 <- Reaction$new(source = c1, target = l1, p = 0.5, label = "Win toss")
+  r2 <- Reaction$new(source = c1, target = d2, p = 0.5, label = "Lose toss")
+  a3 <- Action$new(source = d2, target = l2, "Elect to bat")
+  a4 <- Action$new(source = d2, target = l3, "Elect to bowl")
+  r3 <- Reaction$new(source = c2, target = l4, p = 0.5, label = "Win toss")
+  r4 <- Reaction$new(source = c2, target = d3, p = 0.5, label = "Lose toss")
+  a5 <- Action$new(source = d3, target = l5, "Elect to bat")
+  a6 <- Action$new(source = d3, target = l6, "Elect to bowl")
+  dt <- DecisionTree$new(
+    V = list(d1, d2, d3, c1, c2, l1, l2, l3, l4, l5, l6),
+    E = list(a1, a2, a3, a4, a5, a6, r1, r2, r3, r4)
+  )
+  grDevices::pdf(NULL, width = 7.0, height = 5.0)
+  expect_no_condition(dt$draw(border = TRUE, fontsize = 10.0))
+  grDevices::dev.off()
 })

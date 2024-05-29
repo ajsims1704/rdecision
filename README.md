@@ -221,9 +221,9 @@ of the tree, each time sampling from the uncertainty distribution of the two
 probabilities using, for example, `DT$evaluate(setvars = "random", N = 1000L)`
 and inspecting the resulting data frame. From 1000 runs, the 95% confidence
 interval of the per patient cost saving
-is -736.5 GBP
-to 726.18 GBP,
-with 45.3% being cost
+is -763.93 GBP
+to 662.84 GBP,
+with 46.3% being cost
 saving. Although the exercise programme is more costly to provide than the
 dietary advice programme, it is more effective and leads to saving overall
 because fewer costly interventional procedures are needed. However, due to the

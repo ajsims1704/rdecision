@@ -13,6 +13,11 @@ test_that("invalid annual costs are rejected", {
     MarkovState$new(name = "Answer", cost = "42"),
     class = "invalid_annual_cost"
   )
+  s <- MarkovState$new(name = "Answer")
+  expect_error(
+    s$set_cost(cost = "42"),
+    class = "invalid_annual_cost"
+  )
 })
 
 test_that("invalid utilities are rejected", {
@@ -22,6 +27,15 @@ test_that("invalid utilities are rejected", {
   )
   expect_error(
     MarkovState$new(name = "Futile", utility = 2.0),
+    class = "invalid_utility"
+  )
+  s <- MarkovState$new(name = "Futile")
+  expect_error(
+    s$set_utility(utility = list(42L)),
+    class = "invalid_utility"
+  )
+  expect_error(
+    s$set_utility(utility = 2.0),
     class = "invalid_utility"
   )
 })
@@ -37,8 +51,12 @@ test_that("costs are set and got", {
   expect_identical(s$cost(), 42.0)
 })
 
-test_that("utilties are set and got", {
+test_that("utilities are set and got", {
   s <- MarkovState$new("S1", utility = 0.5)
+  expect_identical(s$utility(), 0.5)
+  s <- MarkovState$new(name = "S1")
+  expect_identical(s$utility(), 1.0)
+  s$set_utility(0.5)
   expect_identical(s$utility(), 0.5)
 })
 
@@ -56,12 +74,17 @@ test_that("state cost and utility ModVars are recognised", {
   )
 })
 
-test_that("ModVar state utilities whose values exceed 1 cause warnings", {
+test_that("ModVar state utilities whose values exceed 1 don't cause warnings", {
   u.beta <- BetaModVar$new("Utility", "U", alpha = 10L, beta = 10L)
   u.vw <- ExprModVar$new("vwell", "U", rlang::quo(2L + u.beta))
   u.beta$set("random")
   s.vw <- MarkovState$new(name = "Very Well", utility = u.vw)
   expect_silent(s.vw$utility())
+  s <- MarkovState$new("vwell")
+  expect_identical(s$utility(), 1.0)
+  s$set_utility(u.vw)
+  u.beta$set("expected")
+  expect_identical(s$utility(), 2.5)
 })
 
 test_that("ModVars are identified and returned", {
