@@ -178,9 +178,9 @@ done below for the first 20 cycles of the model for monotherapy, with discount.
 For convenience, and future use with probabilistic sensitivity analysis, a
 function, `run_mono` is used to wrap up the steps needed to run 20 cycles of 
 the model for monotherapy. The arguments to the function are the transition
-probability matrix, the occupancy costs for states A, B, and C, and a logical
-variable which determines whether to apply half-cycle correction to the state
-populations.
+probability matrix, the occupancy costs for states A, B, and C, and logical
+variables which determine whether to apply half-cycle correction to the state
+populations, costs and QALYs returned in the Markov trace.
 ```{r}
 #| run-mono,
 #| echo = TRUE

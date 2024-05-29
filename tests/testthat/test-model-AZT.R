@@ -120,7 +120,9 @@ run_mono <- function(Ptm, cAm, cBm, cCm, hcc = FALSE) {
   # set transition probabilities
   m$set_probabilities(Ptm)
   # run 20 cycles
-  tr <- m$cycles(ncycles = 20L, hcc.pop = hcc, hcc.cost = FALSE)
+  tr <- m$cycles(
+    ncycles = 20L, hcc.pop = hcc, hcc.cost = FALSE, hcc.QALY = hcc
+  )
   return(tr)
 }
 
@@ -182,7 +184,7 @@ run_comb <- function(Ptm, cAm, cBm, cCm, Ptc, cAc, cBc, cCc, hcc = FALSE) {
   sB$set_cost(cBc)
   sC$set_cost(cCc)
   # run first 2 yearly cycles with additional drug costs and tx effect
-  tr <- m$cycles(2L, hcc.pop = hcc, hcc.cost = FALSE)
+  tr <- m$cycles(2L, hcc.pop = hcc, hcc.cost = FALSE, hcc.QALY = hcc)
   # save the state populations after 2 years
   populations <- m$get_populations()
   # revert probabilities to those without treatment effect
@@ -199,7 +201,8 @@ run_comb <- function(Ptm, cAm, cBm, cCm, Ptc, cAc, cBc, cCc, hcc = FALSE) {
   )
   # run for next 18 years, combining the traces
   tr <- rbind(
-    tr, m$cycles(ncycles = 18L, hcc.pop = hcc, hcc.cost = FALSE)
+    tr,
+    m$cycles(ncycles = 18L, hcc.pop = hcc, hcc.cost = FALSE, hcc.QALY = hcc)
   )
   # return the trace
   return(tr)

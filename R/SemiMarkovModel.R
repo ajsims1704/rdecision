@@ -123,23 +123,25 @@ SemiMarkovModel <- R6::R6Class(
     },
 
     # @description Low-level model cycling function that calculates values,
-    # using reference costs supplied as arguments, i.e. without doing graph
+    # using reference costs supplied as arguments, i.e., without doing graph
     # traversal to get values which tend not to change between cycles.
     # @details Iterates the model for a single cycle. Updates the state
     # populations, cycle number and elapsed time, and calculates values (costs
     # and utilities).
     # @param hcc.pop See function cycle
-    # @param hcc.cost See fuction cycle
+    # @param hcc.cost See function cycle
+    # @param hcc.QALY See function cycle
     # @param m_transition_costs Square matrix of order number of states, with
     # each cell being the cost of transition between a pair of states, as
     # returned by self$transition_cost().
     # v_state_utilities Vector of utilities, by state.
     # v_state_costs Vector of annual occupancy costs, by state.
-    # @return Matrix with one row per state and columns for population used for
-    # calculating utility, population used for calculating cost, occupancy cost,
+    # @return Matrix with one row per state and columns for population,
     # entry cost, total cost and QALY.
-    cycle_pop_with_values = function(hcc.pop, hcc.cost, m_transition_costs,
-                                     v_state_utilities, v_state_costs) {
+    cycle_pop_with_values = function(
+      hcc.pop, hcc.cost, hcc.QALY, m_transition_costs, v_state_utilities,
+      v_state_costs
+    ) {
       # get the cycle time, in years
       dty <- as.numeric(private$smm.tcycle, units = "days") / 365.25
       # save the state populations and elapsed time before cycling
@@ -155,16 +157,12 @@ SemiMarkovModel <- R6::R6Class(
       # get the state populations and elapsed time after cycling
       v_pop_end <- self$get_populations()
       elapsed_end <- as.numeric(private$smm.elapsed, units = "days") / 365.25
-      # apply half cycle correction to populations and utility
+      # apply half cycle correction to populations
       if (hcc.pop) {
-        v_upop <- (v_pop_start + v_pop_end) / 2.0
-        elapsed_u <- (elapsed_start + elapsed_end) / 2.0
+        v_pop <- (v_pop_start + v_pop_end) / 2.0
       } else {
-        v_upop <- v_pop_end
-        elapsed_u <- elapsed_end
+        v_pop <- v_pop_end
       }
-      dfu <- 1.0 / (1.0 + private$smm.disutil) ^ elapsed_u
-      v_qaly <- v_upop * v_state_utilities * dty * dfu
       # apply half cycle correction to costs
       if (hcc.cost) {
         v_cpop <- (v_pop_start + v_pop_end) / 2.0
@@ -176,21 +174,30 @@ SemiMarkovModel <- R6::R6Class(
       dfc <- 1.0 / (1.0 + private$smm.discost) ^ elapsed_c
       v_oc <- v_cpop * v_state_costs * dty * dfc
       v_ec <- v_ec * dfc
+      # apply half cycle correction to QALYs
+      if (hcc.QALY) {
+        v_upop <- (v_pop_start + v_pop_end) / 2.0
+        elapsed_u <- (elapsed_start + elapsed_end) / 2.0
+      } else {
+        v_upop <- v_pop_end
+        elapsed_u <- elapsed_end
+      }
+      dfu <- 1.0 / (1.0 + private$smm.disutil) ^ elapsed_u
+      v_qaly <- v_upop * v_state_utilities * dty * dfu
       # return the populations, costs and utilities, by state
       N <- sum(v_pop_end)
       rm <- matrix(
         data = c(
-          v_upop,
-          v_cpop,
+          v_pop,
           v_oc / N,
           v_ec / N,
           (v_oc + v_ec) / N,
           v_qaly / N
         ),
-        nrow = length(v_upop), ncol = 6L, byrow = FALSE,
+        nrow = length(v_upop), ncol = 5L, byrow = FALSE,
         dimnames = list(
           rownames(m_transition_costs),
-          c("PopU", "PopC", "OccCost", "EntryCost", "Cost", "QALY")
+          c("Pop", "OccCost", "EntryCost", "Cost", "QALY")
         )
       )
       return(rm)
@@ -525,14 +532,12 @@ SemiMarkovModel <- R6::R6Class(
 
     #' @description Applies one cycle of the model.
     #' @param hcc.pop Determines the state populations returned by this
-    #' function and for calculating incremental utility, and the time at which
-    #' the utility discount is applied. If FALSE, the end of cycle populations
-    #' and time apply; if TRUE the mid-cycle populations and time apply. The
-    #' mid-cycle populations are taken as the mean of the start and end
-    #' populations and the discount time as the mid-point. The value of this
-    #' parameter does not affect the state populations or elapsed time passed
-    #' to the next cycle or available via
-    #' \code{get_populations}; those are always the end cycle values.
+    #' function. If FALSE, the end of cycle populations apply; if TRUE the
+    #' mid-cycle populations and time apply. The mid-cycle populations are
+    #' taken as the mean of the start and end populations and the discount
+    #' time as the mid-point. The value of this parameter does not affect the
+    #' state populations or elapsed time passed to the next cycle or available
+    #' via \code{get_populations}; those are always the end cycle values.
     #' @param hcc.cost Determines the state occupancy costs returned by this
     #' function and the time at which the cost discount is applied to the
     #' occupancy costs and the entry costs. If FALSE, the end of cycle
@@ -541,6 +546,14 @@ SemiMarkovModel <- R6::R6Class(
     #' the state populations or elapsed time passed to the next cycle or
     #' available via \code{get_populations}; those are always the end cycle
     #' values.
+    #' @param hcc.QALY Determines the incremental quality adjusted life years
+    #' returned by this function and the time at which the utility discount is
+    #' applied. If FALSE, the end of cycle population and reference time are
+    #' applied to the utilities of each state; if TRUE the mid-cycle populations
+    #' and time are applied to the state utilities. The value of this parameter
+    #' does not affect the state populations or elapsed time passed to the next
+    #' cycle or available via \code{get_populations}; those are always the
+    #' end cycle values.
     #' @return Calculated values, one row per state, as a data frame with the
     #' following columns:
     #' \describe{
@@ -562,12 +575,13 @@ SemiMarkovModel <- R6::R6Class(
     #' the states during the cycle. Half cycle correction and discounting are
     #' applied, if these options are set. Normalized by the model population.}
     #' }
-    cycle = function(hcc.pop = TRUE, hcc.cost = TRUE) {
+    cycle = function(hcc.pop = TRUE, hcc.cost = TRUE, hcc.QALY = TRUE) {
       # check and set half cycle correction parameters
       abortifnot(
         is.logical(hcc.pop),
         is.logical(hcc.cost),
-        message = "Arguments 'hcc.pop' and 'hcc.cost' must be logical.",
+        is.logical(hcc.QALY),
+        message = "Half cycle correction arguments must be logical.",
         class = "invalid_hcc"
       )
       # get the transition costs (matrix), incremental state occupancy
@@ -583,7 +597,8 @@ SemiMarkovModel <- R6::R6Class(
       }
       # cycle population and calculate values
       m_c <- private$cycle_pop_with_values(
-        hcc.pop, hcc.cost, m_transition_costs, v_state_utilities, v_state_costs
+        hcc.pop, hcc.cost, hcc.QALY, m_transition_costs, v_state_utilities,
+        v_state_costs
       )
       # create return data frame
       rc <- data.frame(
@@ -593,7 +608,7 @@ SemiMarkovModel <- R6::R6Class(
           as.numeric(private$smm.elapsed, units = "days") / 365.25,
           times = nstates
         ),
-        Population = m_c[, "PopU"],
+        Population = m_c[, "Pop"],
         OccCost = m_c[, "OccCost"],
         EntryCost = m_c[, "EntryCost"],
         Cost = m_c[, "Cost"],
@@ -615,14 +630,12 @@ SemiMarkovModel <- R6::R6Class(
     #' states.
     #' @param ncycles Number of cycles to run; default is 2.
     #' @param hcc.pop Determines the state populations returned by this
-    #' function and for calculating incremental utility, and the time at which
-    #' the utility discount is applied. If FALSE, the end of cycle populations
-    #' and time apply; if TRUE the mid-cycle populations and time apply. The
-    #' mid-cycle populations are taken as the mean of the start and end
-    #' populations and the discount time as the mid-point. The value of this
-    #' parameter does not affect the state populations or elapsed time passed
-    #' to the next cycle or available via
-    #' \code{get_populations}; those are always the end cycle values.
+    #' function. If FALSE, the end of cycle populations apply; if TRUE the
+    #' mid-cycle populations and time apply. The mid-cycle populations are
+    #' taken as the mean of the start and end populations and the discount
+    #' time as the mid-point. The value of this parameter does not affect the
+    #' state populations or elapsed time passed to the next cycle or available
+    #' via \code{get_populations}; those are always the end cycle values.
     #' @param hcc.cost Determines the state occupancy costs returned by this
     #' function and the time at which the cost discount is applied to the
     #' occupancy costs and the entry costs. If FALSE, the end of cycle
@@ -631,6 +644,14 @@ SemiMarkovModel <- R6::R6Class(
     #' the state populations or elapsed time passed to the next cycle or
     #' available via \code{get_populations}; those are always the end cycle
     #' values.
+    #' @param hcc.QALY Determines the incremental quality adjusted life years
+    #' returned by this function and the time at which the utility discount is
+    #' applied. If FALSE, the end of cycle population and reference time are
+    #' applied to the utilities of each state; if TRUE the mid-cycle populations
+    #' and time are applied to the state utilities. The value of this parameter
+    #' does not affect the state populations or elapsed time passed to the next
+    #' cycle or available via \code{get_populations}; those are always the
+    #' end cycle values.
     #' @return Data frame with cycle results, with the following columns:
     #' \describe{
     #' \item{\code{Cycle}}{The cycle number.}
@@ -642,7 +663,9 @@ SemiMarkovModel <- R6::R6Class(
     #' \item{\code{<name>}}{Population of state \code{<name>} at the end of
     #' the cycle.}
     #' }
-    cycles = function(ncycles = 2L, hcc.pop = TRUE, hcc.cost = TRUE) {
+    cycles = function(
+      ncycles = 2L, hcc.pop = TRUE, hcc.cost = TRUE, hcc.QALY = TRUE
+    ) {
       # show zero?
       nzero <- as.integer(private$smm.icycle == 0L)
       # list of state names
@@ -671,7 +694,7 @@ SemiMarkovModel <- R6::R6Class(
       for (i in (1L + nzero) : (ncycles + nzero)) {
         # cycle population and calculate values
         m_c <- private$cycle_pop_with_values(
-          hcc.pop, hcc.cost,
+          hcc.pop, hcc.cost, hcc.QALY,
           m_transition_costs, v_state_utilities, v_state_costs
         )
         # add result to the return matrix (one row per state)
@@ -680,7 +703,7 @@ SemiMarkovModel <- R6::R6Class(
           Years = as.numeric(private$smm.elapsed, units = "days") / 365.25,
           Cost = sum(m_c[, "Cost"]),
           QALY = sum(m_c[, "QALY"]),
-          m_c[, "PopU"]
+          m_c[, "Pop"]
         )
       }
       # convert to data frame (note: it is more efficient to return as a matrix)

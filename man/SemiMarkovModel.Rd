@@ -417,21 +417,19 @@ A data frame with the following columns:
 \subsection{Method \code{cycle()}}{
 Applies one cycle of the model.
 \subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{SemiMarkovModel$cycle(hcc.pop = TRUE, hcc.cost = TRUE)}\if{html}{\out{</div>}}
+\if{html}{\out{<div class="r">}}\preformatted{SemiMarkovModel$cycle(hcc.pop = TRUE, hcc.cost = TRUE, hcc.QALY = TRUE)}\if{html}{\out{</div>}}
 }
 
 \subsection{Arguments}{
 \if{html}{\out{<div class="arguments">}}
 \describe{
 \item{\code{hcc.pop}}{Determines the state populations returned by this
-function and for calculating incremental utility, and the time at which
-the utility discount is applied. If FALSE, the end of cycle populations
-and time apply; if TRUE the mid-cycle populations and time apply. The
-mid-cycle populations are taken as the mean of the start and end
-populations and the discount time as the mid-point. The value of this
-parameter does not affect the state populations or elapsed time passed
-to the next cycle or available via
-\code{get_populations}; those are always the end cycle values.}
+function. If FALSE, the end of cycle populations apply; if TRUE the
+mid-cycle populations and time apply. The mid-cycle populations are
+taken as the mean of the start and end populations and the discount
+time as the mid-point. The value of this parameter does not affect the
+state populations or elapsed time passed to the next cycle or available
+via \code{get_populations}; those are always the end cycle values.}
 
 \item{\code{hcc.cost}}{Determines the state occupancy costs returned by this
 function and the time at which the cost discount is applied to the
@@ -441,6 +439,15 @@ apply, as per \code{hcc.pop}. The value of this parameter does not affect
 the state populations or elapsed time passed to the next cycle or
 available via \code{get_populations}; those are always the end cycle
 values.}
+
+\item{\code{hcc.QALY}}{Determines the incremental quality adjusted life years
+returned by this function and the time at which the utility discount is
+applied. If FALSE, the end of cycle population and reference time are
+applied to the utilities of each state; if TRUE the mid-cycle populations
+and time are applied to the state utilities. The value of this parameter
+does not affect the state populations or elapsed time passed to the next
+cycle or available via \code{get_populations}; those are always the
+end cycle values.}
 }
 \if{html}{\out{</div>}}
 }
@@ -474,7 +481,12 @@ applied, if these options are set. Normalized by the model population.}
 \subsection{Method \code{cycles()}}{
 Applies multiple cycles of the model.
 \subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{SemiMarkovModel$cycles(ncycles = 2L, hcc.pop = TRUE, hcc.cost = TRUE)}\if{html}{\out{</div>}}
+\if{html}{\out{<div class="r">}}\preformatted{SemiMarkovModel$cycles(
+  ncycles = 2L,
+  hcc.pop = TRUE,
+  hcc.cost = TRUE,
+  hcc.QALY = TRUE
+)}\if{html}{\out{</div>}}
 }
 
 \subsection{Arguments}{
@@ -483,14 +495,12 @@ Applies multiple cycles of the model.
 \item{\code{ncycles}}{Number of cycles to run; default is 2.}
 
 \item{\code{hcc.pop}}{Determines the state populations returned by this
-function and for calculating incremental utility, and the time at which
-the utility discount is applied. If FALSE, the end of cycle populations
-and time apply; if TRUE the mid-cycle populations and time apply. The
-mid-cycle populations are taken as the mean of the start and end
-populations and the discount time as the mid-point. The value of this
-parameter does not affect the state populations or elapsed time passed
-to the next cycle or available via
-\code{get_populations}; those are always the end cycle values.}
+function. If FALSE, the end of cycle populations apply; if TRUE the
+mid-cycle populations and time apply. The mid-cycle populations are
+taken as the mean of the start and end populations and the discount
+time as the mid-point. The value of this parameter does not affect the
+state populations or elapsed time passed to the next cycle or available
+via \code{get_populations}; those are always the end cycle values.}
 
 \item{\code{hcc.cost}}{Determines the state occupancy costs returned by this
 function and the time at which the cost discount is applied to the
@@ -500,6 +510,15 @@ apply, as per \code{hcc.pop}. The value of this parameter does not affect
 the state populations or elapsed time passed to the next cycle or
 available via \code{get_populations}; those are always the end cycle
 values.}
+
+\item{\code{hcc.QALY}}{Determines the incremental quality adjusted life years
+returned by this function and the time at which the utility discount is
+applied. If FALSE, the end of cycle population and reference time are
+applied to the utilities of each state; if TRUE the mid-cycle populations
+and time are applied to the state utilities. The value of this parameter
+does not affect the state populations or elapsed time passed to the next
+cycle or available via \code{get_populations}; those are always the
+end cycle values.}
 }
 \if{html}{\out{</div>}}
 }

@@ -234,14 +234,14 @@ test_that("chance node probabilities sum to unity", {
   r23$set_probability(2L / 3L)
   expect_error(dt$evaluate(), class = "invalid_probability_sum")
   r23$set_probability(1L / 3L)
-  expect_silent(dt$evaluate())
+  expect_no_condition(dt$evaluate())
   # create a Dirichlet distribution and associated ModVars for c1
   dtwo <- DirichletDistribution$new(c(1L, 9L))
   pc11 <- ModVar$new("p(success)", "P", D = dtwo, k = 1L)
   pc12 <- ModVar$new("p(failure)", "P", D = dtwo, k = 2L)
   r11$set_probability(pc11)
   r12$set_probability(pc12)
-  expect_silent(dt$evaluate(setvars = "random", N = 20L))
+  expect_no_condition(dt$evaluate(setvars = "random", N = 20L))
   # and for c2
   dthree <- DirichletDistribution$new(c(1L, 9L, 6L))
   pc21 <- ModVar$new("p(outcome 1)", "P", D = dthree, k = 1L)
@@ -250,7 +250,7 @@ test_that("chance node probabilities sum to unity", {
   r21$set_probability(pc21)
   r22$set_probability(pc22)
   r23$set_probability(pc23)
-  expect_silent(dt$evaluate(setvars = "random", N = 20L))
+  expect_no_condition(dt$evaluate(setvars = "random", N = 20L))
 })
 
 # test that probabilities of NA are detected and checked

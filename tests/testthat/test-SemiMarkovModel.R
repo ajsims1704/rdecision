@@ -661,7 +661,7 @@ test_that("utilities > 1 are supported via model variables", {
   )
   m$set_probabilities(pt)
   m$reset(populations = c(A = 1000L, B = 0L, C = 0L))
-  tr <- m$cycle(hcc.pop = FALSE, hcc.cost = FALSE)
+  tr <- m$cycle(hcc.pop = FALSE, hcc.cost = FALSE, hcc.QALY = FALSE)
   expect_intol(
     tr[[which(tr[, "State"] == "C" & tr[, "Cycle"] == 1L), "QALY"]],
     (1000.0 * 0.1 * 2.0) / 1000.0,

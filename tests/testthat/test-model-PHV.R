@@ -65,7 +65,7 @@ M$reset(c(Well = 10000.0, Disabled = 0.0, Dead = 0.0))
 
 ## @knitr cycle --------------------------------------------------------------
 # cycle
-MT <- M$cycles(25L, hcc.pop = FALSE, hcc.cost = FALSE)
+MT <- M$cycles(25L, hcc.pop = FALSE, hcc.cost = FALSE, hcc.QALY = FALSE)
 
 ## @knitr --------------------------------------------------------------------
 test_that("cycle results match S&B table 2", {
@@ -98,37 +98,37 @@ t2 <- data.frame(
 test_that("reformatted cycle results match S&B table 2", {
   # cycle 0
   r0 <- which(t2[, "Cycle"] == 0L)
-  expect_identical(t2[r0, "Well"], 10000.0)
-  expect_identical(t2[r0, "Disabled"], 0.0)
-  expect_identical(t2[r0, "Dead"], 0.0)
-  expect_identical(t2[r0, "CycleSum"], 0.0)
-  expect_identical(t2[r0, "CumulativeUtility"], 0.0)
+  expect_identical(t2[[r0, "Well"]], 10000.0)
+  expect_identical(t2[[r0, "Disabled"]], 0.0)
+  expect_identical(t2[[r0, "Dead"]], 0.0)
+  expect_identical(t2[[r0, "CycleSum"]], 0.0)
+  expect_identical(t2[[r0, "CumulativeUtility"]], 0.0)
   # cycle 1
   r <- which(t2[, "Cycle"] == 1L)
-  expect_identical(t2[r, "Well"], 6000.0)
-  expect_identical(t2[r, "Disabled"], 2000.0)
-  expect_identical(t2[r, "Dead"], 2000.0)
-  expect_identical(t2[r, "CycleSum"], 7400.0)
-  expect_identical(t2[r, "CumulativeUtility"], 7400.0)
+  expect_identical(t2[[r, "Well"]], 6000.0)
+  expect_identical(t2[[r, "Disabled"]], 2000.0)
+  expect_identical(t2[[r, "Dead"]], 2000.0)
+  expect_identical(t2[[r, "CycleSum"]], 7400.0)
+  expect_identical(t2[[r, "CumulativeUtility"]], 7400.0)
   # cycle 2
   r <- which(t2[, "Cycle"] == 2L)
-  expect_identical(t2[r, "Well"], 3600.0)
-  expect_identical(t2[r, "Disabled"], 2400.0)
-  expect_identical(t2[r, "Dead"], 4000.0)
-  expect_identical(t2[r, "CycleSum"], 5280.0)
-  expect_identical(t2[r, "CumulativeUtility"], 12680.0)
+  expect_identical(t2[[r, "Well"]], 3600.0)
+  expect_identical(t2[[r, "Disabled"]], 2400.0)
+  expect_identical(t2[[r, "Dead"]], 4000.0)
+  expect_identical(t2[[r, "CycleSum"]], 5280.0)
+  expect_identical(t2[[r, "CumulativeUtility"]], 12680.0)
   # cycle 23
   r <- which(t2[, "Cycle"] == 23L)
-  expect_identical(t2[r, "Well"], 0.0)
-  expect_identical(t2[r, "Disabled"], 1.0)
-  expect_identical(t2[r, "Dead"], 9999.0)
-  expect_identical(t2[r, "CycleSum"], 1.0)  # typo in paper?
-  expect_intol(t2[r, "CumulativeUtility"], 23752.0, tol = 5.0)
+  expect_identical(t2[[r, "Well"]], 0.0)
+  expect_identical(t2[[r, "Disabled"]], 1.0)
+  expect_identical(t2[[r, "Dead"]], 9999.0)
+  expect_identical(t2[[r, "CycleSum"]], 1.0)  # typo in paper?
+  expect_intol(t2[[r, "CumulativeUtility"]], 23752.0, tol = 5.0)
   # cycle 24
   r <- which(t2[, "Cycle"] == 24L)
-  expect_identical(t2[r, "Well"], 0.0)
-  expect_identical(t2[r, "Disabled"], 0.0)
-  expect_identical(t2[r, "Dead"], 10000.0)
-  expect_identical(t2[r, "CycleSum"], 0.0)
-  expect_intol(t2[r, "CumulativeUtility"], 23752.0, tol = 5.0)
+  expect_identical(t2[[r, "Well"]], 0.0)
+  expect_identical(t2[[r, "Disabled"]], 0.0)
+  expect_identical(t2[[r, "Dead"]], 10000.0)
+  expect_identical(t2[[r, "CycleSum"]], 0.0)
+  expect_intol(t2[[r, "CumulativeUtility"]], 23752.0, tol = 5.0)
 })
