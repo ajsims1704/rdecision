@@ -60,7 +60,7 @@ E <- list(
 V <- list(d1, d2, d3,  c1, c2, c3, c4,  t1, t2, t3, t4, t5, t6, t7, t8, t9)
 DT <- DecisionTree$new(V, E)
 
-## @knitr ---------------------------------------------------------------------
+## @knitr ----------------------------------------------------------------------
 test_that("strategies are identified correctly", {
   # strategies
   expect_error(
@@ -102,7 +102,7 @@ test_that("strategies are identified correctly", {
   )
 })
 
-## @knitr ---------------------------------------------------------------------
+## @knitr ----------------------------------------------------------------------
 test_that("root to leaf paths are identified", {
   # evaluate all root-to-leaf paths
   P <- DT$root_to_leaf_paths()

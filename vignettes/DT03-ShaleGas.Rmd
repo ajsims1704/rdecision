@@ -28,7 +28,8 @@ knitr::read_chunk(file.path("vutils.R"))
 ```
 
 ```{r}
-#| include = FALSE
+#| include = FALSE,
+#| purl = FALSE
 knitr::opts_chunk$set(
   collapse = TRUE,
   echo = FALSE,
@@ -75,6 +76,7 @@ or a Reaction object, [see figure](#tree-diagram).
 
 ## Tree diagram
 ```{r}
+#| purl = FALSE,
 #| results = "hide",
 #| fig.keep = "all",
 #| fig.align = "center",
@@ -97,9 +99,6 @@ as follows. Pay-off is defined as benefit minus cost.
 ```{r}
 #| evaluate,
 #| echo = TRUE
-# find optimal strategies
-RES <- DT$evaluate()
-RES[, "Payoff"] <- RES[, "Benefit"] - RES[, "Cost"]
 ```
 
 This gives the following pay-off for each strategy:
@@ -120,6 +119,7 @@ popt <- paste(
   RES[[imax, "d1"]], RES[[imax, "d2"]], RES[[imax, "d3"]],
   sep = ";"
 )
+popt <- 42
 ```
 The optimal strategy is `r popt`, *i.e.*, test, sell if negative and
 dig otherwise. The expected pay-off from this strategy is

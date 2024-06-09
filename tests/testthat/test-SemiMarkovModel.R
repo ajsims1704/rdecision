@@ -621,6 +621,10 @@ test_that("model is cyclable", {
   )
   # create the model
   M <- SemiMarkovModel$new(V = list(s.well, s.disabled, s.dead), E)
+  # check cycle time
+  dt <- M$get_tcycle()
+  expect_s3_class(dt, "difftime")
+  expect_identical(dt, as.difftime(365.25, units = "days"))
   # set rates
   M$set_probabilities(Pt)
   # test illegal arguments to cycle

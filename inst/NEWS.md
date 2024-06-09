@@ -1,4 +1,4 @@
-# rdecision 1.2.0.9002
+# rdecision 1.2.1
 
 * Added fields URL and BugReports to DESCRIPTION file, linking to GitHub
   repository.
@@ -6,14 +6,15 @@
   dynamically.
 * Added `get_cycle` to class `SemiMarkovModel` to query the current cycle
   number.
+* Added `get_tcycle` to class `SemiMarkovModel` to query the cycle duration.
 * Added argument `hcc.QALY` to methods for cycling in class `SemiMarkovModel`.
   The `hcc` arguments control whether half cycle correction is applied to the
   values written to the Markov trace but do not affect the value of the
   end-cycle population passed to the next cycle, or when the state populations
   are queried. The new argument permits half cycle correction to be applied
   independently to the trace values of state populations, costs and QALYs, which
-  can be useful if, for example, wanting to display end-cycle populations with
-  mid-cycle costs and utilities.
+  can be useful if, for example, it is desired to display end-cycle populations
+  with mid-cycle costs and utilities.
 * Revised method `draw` of class `DecisionTree` to avoid unintentional clipping
   of node labels. Modified algorithm to make better use of unit conversions
   that are implicit in package grid and to ensure that symbols for nodes retain

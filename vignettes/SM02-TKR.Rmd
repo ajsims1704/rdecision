@@ -42,6 +42,10 @@ pander::panderOptions("table.split.table", 200L)
 ```
 
 ```{r}
+#| gv2png
+```
+
+```{r}
 #| purl = FALSE
 #nolint start
 ```
@@ -161,10 +165,6 @@ DOT files with the `grViz` function.
 #| purl = FALSE,
 #| eval = FALSE
 DiagrammeR::grViz(SMM_base$as_DOT(rankdir = "TB", width = 7.0, height = 7.0))
-```
-
-```{r}
-#| gv2png
 ```
 
 ```{r}

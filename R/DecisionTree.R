@@ -906,9 +906,6 @@ DecisionTree <- R6::R6Class(
         message = "'by' must be one of {path|strategy|run}.",
         class = "by_invalid"
       )
-      
-      ####
-      
       # find the root-to-leaf paths
       P <- self$root_to_leaf_paths()
       # find the walk for each root-to-leaf path

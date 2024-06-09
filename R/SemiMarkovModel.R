@@ -496,6 +496,12 @@ SemiMarkovModel <- R6::R6Class(
       return(private$smm.icycle)
     },
 
+    #' @description Gets the cycle duration.
+    #' @return Current cycle duration, as a difftime object.
+    get_tcycle = function() {
+      return(private$smm.tcycle)
+    },
+
     #' @description Gets the current elapsed time.
     #' @details The elapsed time is defined as the difference between the
     #' current time in the model and an index time used as the reference

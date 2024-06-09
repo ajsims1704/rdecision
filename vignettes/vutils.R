@@ -72,3 +72,6 @@ gv2png <- function(dot, pngfile = tempfile(fileext = ".png")) {
   }
   return(pngfile)
 }
+
+## @knitr ---------------------------------------------------------------------
+

@@ -39,7 +39,8 @@ knitr::opts_chunk$set(
 ```
 
 ```{r}
-#| gbp
+#| gbp,
+#| purl = FALSE
 ```
 
 ```{r}
