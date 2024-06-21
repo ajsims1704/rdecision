@@ -103,6 +103,50 @@ as_numeric <- function(x) {
   return(rv)
 }
 
+#' @title Write a monetary value
+#' @description Formats a number, or list of numbers, into currency.
+#' @details If x is defined using the c() operator and contains one or more
+#' character elements, all elements of x will be coerced to characters, and this
+#' function will return "NA" for all elements. It is safer to define x as a
+#' list, in which all non-numeric elements will be translated to "NA".
+#' @param x Monetary value, or list of values
+#' @param p Logical; if TRUE show value to nearest penny, cent etc. If FALSE
+#' show it to the nearest pound, dollar, euro etc.
+#' @export
+gbp <- function(x, p = FALSE) {
+  nums <- vapply(X = x, FUN.VALUE = TRUE, FUN = is.numeric)
+  x[which(!nums)] <- NA_real_
+  digits <- if (p) 2L else 0L
+  s <- format(
+    x = vapply(X = x, FUN.VALUE = 1.0, FUN = round, digits = digits),
+    trim = TRUE,
+    digits = NULL,
+    nsmall = digits,
+    scientific = FALSE,
+    big.mark = ","
+  )
+  return(s)
+}
+
+#' @title Render a DOT format graph as a png file.
+#' @description Uses the \code{dot} command line tool from the graphviz project,
+#' if it is available on the host system, or creates a placeholder image if not.
+#' @param dot GraphViz dot representation in character vector form.
+#' @param pngfile path of png file to create.
+#' @return pathname of the png file created (including extension).
+#' @export
+gv2png <- function(dot, pngfile = tempfile(fileext = ".png")) {
+  cmddot <- Sys.which("dot")
+  if (nchar(cmddot["dot"]) > 0L) {
+    dotfile <- tempfile(fileext = ".gv")
+    writeLines(dot, con = dotfile)
+    system2(command = cmddot["dot"], args = c("-Tpng", "-o", pngfile, dotfile))
+  } else {
+    pngfile <- placeholder(pngfile = pngfile)
+  }
+  return(pngfile)
+}
+
 #' @title Is an object of a given class?
 #' @description Tests whether an object inherits from a given class, as
 #' detectable via \code{inherits}. Intended for internal use with
@@ -147,4 +191,36 @@ is_Arrow <- function(x) {
 #' @noRd
 is_ModVar <- function(x) {
   return(is_class(x, "ModVar"))
+}
+
+#' @title Create a placeholder image in a png file
+#' @description Draws a rectangle with a diagonal using the grid package.
+#' @param pngfile name of png file to create.
+#' @param width width of image in pixels
+#' @param height height of image in pixels
+#' @return Name of the png file written to.
+#' @export
+#' @noRd
+placeholder <- function(pngfile = tempfile(fileext = ".png"), width = 480L,
+                        height = 320L) {
+  grDevices::png(pngfile, width = width, height = height)
+  grid::grid.newpage()
+  grid::grid.move.to(
+    x = grid::unit(0.0, "npc"),
+    y = grid::unit(0.0, "npc")
+  )
+  grid::grid.line.to(
+    x = grid::unit(1.0, "npc"),
+    y = grid::unit(1.0, "npc")
+  )
+  grid::grid.move.to(
+    x = grid::unit(0.0, "npc"),
+    y = grid::unit(1.0, "npc")
+  )
+  grid::grid.line.to(
+    x = grid::unit(1.0, "npc"),
+    y = grid::unit(0.0, "npc")
+  )
+  invisible(grDevices::dev.off())
+  return(pngfile)
 }

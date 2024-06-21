@@ -5,7 +5,6 @@
 ^branch$
 ^DMHEE$
 ^tools$
-
 ^.*\.Rproj$
 ^\.Rproj\.user$
 ^\.Rhistory$

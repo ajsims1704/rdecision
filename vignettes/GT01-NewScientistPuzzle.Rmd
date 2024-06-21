@@ -23,8 +23,6 @@ csl: "../inst/nature-no-et-al.csl"
 knitr::read_chunk(
   file.path("..", "tests", "testthat", "test-model-BurgerRun.R")
 )
-# read vignette build utility functions
-knitr::read_chunk(file.path("vutils.R"))
 ```
 
 ```{r}

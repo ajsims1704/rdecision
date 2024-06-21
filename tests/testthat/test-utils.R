@@ -190,7 +190,7 @@ test_that("as_numeric identifies non ModVar objects", {
   expect_true(is.na(xo))
 })
 
-test_that("as_value detects ModVar and derived objects", {
+test_that("as_numeric detects ModVar and derived objects", {
   # scalar ModVars
   xi <- ModVar$new(description = "", units = "")
   xo <- as_numeric(xi)
@@ -221,6 +221,14 @@ test_that("as_value detects ModVar and derived objects", {
   expect_intol(xo[[4L]], 42.0, 0.01)
 })
 
+# tests of gbp
+test_that("gbp returns in currency format", {
+  x <- list(42, 2, 0.002, 4.567, "a")
+  agbp <- gbp(x, p = TRUE)
+  expect_identical(agbp, c("42.00", "2.00", "0.00", "4.57", "NA"))
+})
+
+# tests of class type tests
 test_that("is_class detects missing arguments", {
   expect_error(is_class())
   expect_error(is_class(42L))

@@ -328,7 +328,7 @@ test_that("example of 4 node digraph with cycle has correct properties", {
 })
 
 # create DOT representation of a graph (Sonnenberg & Beck, 1993, Fig 3)
-test_that("DOT file of S&B fig 3 is as expected", {
+test_that("DOT and gml files of S&B fig 3 are as expected", {
   # check that a graph with some unlabelled nodes has nodes labelled without
   # text strings
   s1 <- Node$new("Well")
@@ -344,6 +344,9 @@ test_that("DOT file of S&B fig 3 is as expected", {
   G <- Digraph$new(V = list(s1, s2, s3), A = list(e1, e2, e3, e4, e5, e6))
   dot <- G$as_DOT()
   expect_false(any(grepl(pattern = "Well", fixed = TRUE, x = dot)))
+  gml <- G$as_gml()
+  expect_true(any(grepl(pattern = "Well", fixed = TRUE, x = gml)))
+  expect_true(any(grepl(pattern = "ill", fixed = TRUE, x = gml)))
   # case as described in the paper
   s1 <- Node$new("Well")
   s2 <- Node$new("Disabled")

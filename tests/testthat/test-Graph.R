@@ -412,6 +412,10 @@ test_that("Fig 1.1.1 from Gross & Yellen (2013) is drawn correctly", {
   e <- Edge$new(x, v, "e")
   f <- Edge$new(w, v, "f")
   G <- Graph$new(V = list(u, v, w, x), E = list(a, b, c, d, e, f))
-  # draw it
+  # draw it as a GraphViz dot stream
   expect_silent(G$as_DOT())
+  # draw it as a GML stream
+  gml <- G$as_gml()
+  expect_true(is.character(gml))
+  
 })

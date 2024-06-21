@@ -24,13 +24,6 @@ vignette: >
 knitr::read_chunk(
   file.path("..", "tests", "testthat", "test-model-Sumatriptan.R")
 )
-# read vignette build utility functions
-knitr::read_chunk(file.path("vutils.R"))
-```
-
-```{r}
-#| gbp,
-#| echo = FALSE
 ```
 
 ```{r}

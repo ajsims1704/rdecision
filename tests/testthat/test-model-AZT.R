@@ -41,6 +41,14 @@ m <- SemiMarkovModel$new(
   discount.utility = oDR / 100.0
 )
 
+## @knitr ---------------------------------------------------------------------
+gml <- m$as_gml()
+gmlfile <- "gml.gml" #tempfile(fileext = ".gml")
+writeLines(gml, con = gmlfile)
+gv <- m$as_DOT()
+gvfile <- "gv.dot" #tempfile(fileext = ".gml")
+writeLines(gv, con = gvfile)
+
 ## @knitr costs-det -----------------------------------------------------------
 # drug costs
 cAZT <- 2278.0 # zidovudine drug cost

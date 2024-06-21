@@ -549,6 +549,45 @@ Graph <- R6::R6Class(
       o[[length(o) + 1L]] <- "}"
       # return the stream
       return(o)
+    },
+    
+    #' @description Exports the digraph as a Graph Modelling Language (GML)
+    #' stream.
+    #' @details Intended to work with the DiagrammeR package, which is able to
+    #' import GML files.
+    #' @returns A GML stream as a character vector.
+    as_gml = function() {
+      # create stream vector
+      o <- vector(mode = "character", length = 0L) 
+      # open the graph
+      o <- append(o, "graph [")
+      o <- append(o, "  directed 0")
+      # loop through nodes
+      for (v in self$vertexes()) {
+        o <- append(o, "  node [")
+        o <- append(o, paste("    id", self$vertex_index(v)))
+        label <- v$label()
+        if (nchar(label) > 0L) {
+          o <- append(o, paste0('    label ', '"', label, '"'))
+        }
+        o <- append(o, "  ]")
+      }
+      # loop through edges
+      for (e in self$edges()) {
+        o <- append(o, "  edge [")
+        ends <- e$endpoints()
+        o <- append(o, paste("    source", self$vertex_index(ends[[1L]])))
+        o <- append(o, paste("    target", self$vertex_index(ends[[2L]])))
+        label <- e$label()
+        if (nchar(label) > 0L) {
+          o <- append(o, paste0('    label ', '"', label, '"'))
+        }
+        o <- append(o, "  ]")
+      }
+      # close the graph
+      o <- append(o, "]")
+      # return the stream
+      return(o)    
     }
   )
 )

@@ -16,19 +16,21 @@ vignette: >
 ---
 
 ```{r}
-#| purl = FALSE,
-#| include = FALSE
+#| purl = TRUE,
+#| include = FALSE,
+#| cache = FALSE
+# find package root folder
+roots <- c(file.path("."), file.path(".."), file.path("..", ".."))
+descfile <- file.path(roots, "DESCRIPTION")
+level <- file.exists(descfile)
+stopifnot(sum(level) == 1L)
+root <- roots[[which(level)]]
+root <- normalizePath(root)
+#rm(roots, descfile, level)
 # read vignette source chunks from corresponding testthat script
-knitr::read_chunk(
-  file.path("..", "tests", "testthat", "test-model-Lifestyle.R")
-)
-# read vignette build utility functions
-knitr::read_chunk(file.path("vutils.R"))
-```
-
-```{r}
-#| gbp,
-#| echo = FALSE
+rfile <- file.path(root, "tests", "testthat", "test-model-Lifestyle.R")
+stopifnot(file.exists(rfile))
+knitr::read_chunk(path = rfile)
 ```
 
 ```{r}
@@ -95,8 +97,7 @@ cost of providing an alternative form, attendance at an exercise programme
 need for an interventional procedure. These costs can be defined as scalar
 variables, as follows:
 
-```{r}
-#| cost-vars,
+```{r, cost-vars}
 #| echo = TRUE
 ```
 
@@ -105,7 +106,7 @@ The model for this fictional scenario can be defined by the following elements:
 * Decision node: which programme to enrol the patient in.
 
 ```{r}
-#| decision-node,
+#| label = decision-node,
 #| echo = TRUE
 ```
 
@@ -114,7 +115,7 @@ procedure. This is different for the two programmes, so two chance nodes must
 be defined.
 
 ```{r}
-#| chance-nodes,
+#| label = chance-nodes,
 #| echo = TRUE
 ```
 
@@ -124,7 +125,7 @@ assume that the model has a time horizon of 1 year, and that the utility is the
 same for all patients (the default values).
 
 ```{r}
-#| leaf-nodes,
+#| label = leaf-nodes,
 #| echo = TRUE
 ```
 
@@ -137,7 +138,7 @@ These are the two programmes being tested. The cost of each action, as
 described in the example, is embedded into the action definition.
 
 ```{r}
-#| actions,
+#| label = actions,
 #| echo = TRUE
 ```
 
@@ -162,7 +163,7 @@ proportions of having an adverse event (needing a stent) within one year, for
 each treatment strategy. 
 
 ```{r}
-#| nnt,
+#| label = nnt,
 #| echo = TRUE
 ```
 
@@ -178,7 +179,7 @@ These trial results can be represented as probabilities of outcome success
 results. The probabilities of outcome failure are denoted with "q" prefixes.
 
 ```{r}
-#| prob-vars,
+#| label = prob-vars,
 #| echo = TRUE
 ```
 
@@ -186,7 +187,7 @@ These probabilities, as well as the cost associated with each outcome, can then
 be embedded into the reaction definition.
 
 ```{r}
-#| reactions,
+#| label = reactions,
 #| echo = TRUE
 ```
 
@@ -195,7 +196,7 @@ Tree (see the documentation for the `DecisionTree` class for details), the whole
 model can be built:
 
 ```{r}
-#| decision-tree,
+#| label = decision-tree,
 #| echo = TRUE
 ```
 
@@ -217,7 +218,7 @@ this example, only two strategies (Diet or Exercise) exist in the model and can
 be compared using the `evaluate()` method.
 
 ```{r}
-#| evaluate,
+#| label = evaluate,
 #| echo = TRUE
 ```
 
@@ -230,7 +231,7 @@ has a marginally lower net cost by
 `r round(rs[[2L, "Cost"]] - rs[[1L, "Cost"]], 2L)` GBP.
 
 ```{r}
-#| verify-base
+#| label = verify-base
 ```
 
 Because this example is structurally simple, we can verify the results by
@@ -257,7 +258,7 @@ strategy (for example, the Success and Failure paths of the Diet strategy).
 The option `by = "path"` can be used to evaluate each path separately.
 
 ```{r}
-#| evaluate-by-path,
+#| label = evaluate-by-path,
 #| echo = TRUE
 ```
 
@@ -279,7 +280,7 @@ of two nodes in the tree, and not changing the tree structure, we do not have to
 rebuild the tree.
 
 ```{r}
-#| lower-utility,
+#| label = lower-utility,
 #| echo = TRUE
 ```
 
@@ -295,12 +296,12 @@ QALYs correspond to the Utility values). From these figures, the Incremental
 cost-effectiveness ratio (ICER) can be easily calculated:
 
 ```{r}
-#| icer,
+#| label = icer,
 #| echo = TRUE
 ```
 
 ```{r}
-#| verify-icer
+#| label = verify-icer
 ```
 
 resulting in a cost of `r round(icer, 2L)` GBP per QALY gained in choosing the 
@@ -336,7 +337,7 @@ Fixed costs can be left as numerical values, or also be represented by `ModVar`s
 which ensures that they are included in variable tabulations.
 
 ```{r}
-#| cost-modvars,
+#| label = cost-modvars,
 #| echo = TRUE
 ```
 
@@ -348,7 +349,7 @@ captures the results of the trials can be defined by the _alpha_ (observed
 successes) and _beta_ (observed failures) parameters. 
 
 ```{r}
-#| prob-modvars,
+#| label = prob-modvars,
 #| echo = TRUE
 ```
 
@@ -364,12 +365,12 @@ properties using `set_` calls and those new properties will be used when the
 tree is evaluated.
 
 ```{r}
-#| actions-probabilistic,
+#| label = actions-probabilistic,
 #| echo = TRUE
 ```
 
 ```{r}
-#| reactions-probabilistic,
+#| label = reactions-probabilistic,
 #| echo = TRUE
 ```
 
@@ -385,7 +386,7 @@ A call to the `evaluate()` method with the default settings uses the expected
 (mean) value of each variable, and so replicates the point estimate above.
 
 ```{r}
-#| dt-evaluate-expected,
+#| label = dt-evaluate-expected,
 #| echo = TRUE
 ```
 
@@ -399,7 +400,7 @@ For example, a lower and upper bound can be estimated by setting each variable
 to its 2.5-th or 97.5-th percentile:
 
 ```{r}
-#| dt-evaluate-quantiles,
+#| label = dt-evaluate-quantiles,
 #| echo = TRUE
 ```
 
@@ -426,7 +427,7 @@ definition, which can then be used to calculate ranges and confidence intervals
 of the estimated values.
 
 ```{r}
-#| dt-evaluate-random,
+#| label = dt-evaluate-random,
 #| echo = TRUE
 ```
 
@@ -454,7 +455,7 @@ difference in cost between the two strategies for each run of the
 randomised model:
 
 ```{r}
-#| dt-difference,
+#| label = dt-difference,
 #| echo = TRUE
 ```
 
@@ -483,7 +484,7 @@ identify, for a given variable, the value at which one strategy becomes
 cost saving over the other:
 
 ```{r}
-#| threshold,
+#| label = threshold,
 #| echo = TRUE
 ```
 

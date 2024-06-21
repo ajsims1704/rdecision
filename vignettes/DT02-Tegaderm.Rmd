@@ -24,8 +24,6 @@ vignette: >
 knitr::read_chunk(
   file.path("..", "tests", "testthat", "test-model-Tegaderm.R")
 )
-# read vignette build utility functions
-knitr::read_chunk(file.path("vutils.R"))
 ```
 
 ```{r}
@@ -36,11 +34,6 @@ knitr::opts_chunk$set(
   echo = FALSE,
   comment = "#>"
 )
-```
-
-```{r}
-#| gbp,
-#| purl = FALSE
 ```
 
 ```{r}

@@ -21,8 +21,6 @@ csl: "../inst/nature-no-et-al.csl"
 #| include = FALSE
 # read vignette source chunks from corresponding testthat script
 knitr::read_chunk(file.path("..", "tests", "testthat", "test-model-AZT.R"))
-# read vignette build utility functions
-knitr::read_chunk(file.path("vutils.R"))
 ```
 
 ```{r}
@@ -35,10 +33,6 @@ knitr::opts_chunk$set(
   collapse = TRUE,
   comment = "#>"
 )
-```
-
-```{r}
-#| gbp
 ```
 
 ```{r}
@@ -140,17 +134,36 @@ DiagrammeR::grViz(m$as_DOT())
 ```
 
 ```{r}
-#| gv2png
-```
-
-```{r}
 #| fig.cap = "Markov model for comparison of HIV therapy.
 #|            A: 200 < cd4 < 500, B: cd4 < 200, C: AIDS, D: Death.",
+#| eval = FALSE
 # images created with dot are more compact than DiagrammeR.
 pngfile <- gv2png(
   dot = m$as_DOT(rankdir = "TB", width = 7.0, height = 7.0)
 )
 knitr::include_graphics(pngfile)
+```
+
+```{r}
+#| fig.cap = "Markov model for comparison of HIV therapy.
+#|            A: 200 < cd4 < 500, B: cd4 < 200, C: AIDS, D: Death.",
+local({
+  gml <- m$as_gml()
+  gmlfile <- tempfile(fileext = ".gml")
+  writeLines(gml, con = gmlfile)
+  ig <- igraph::read_graph(gmlfile, format = "gml")
+  pngfile <- tempfile(fileext = ".png")
+#  png(filename = pngfile, width = 1024L, height = 768L)
+  plot(
+    ig
+    #vertex.size = 15L,
+    #vertex.color = "white", vertex.label.color = "black",
+    #edge.color = "black", edge.curved = TRUE,
+    #margin = c(0.1, 0.1, 0.1, 0.1), asp = 0.0
+  )
+#  dev.off()
+#  knitr::include_graphics(pngfile)
+})
 ```
 
 ## Per-cycle transition probabilities

@@ -22,8 +22,6 @@ vignette: >
 #| include = FALSE
 # read vignette source chunks from corresponding testthat script
 knitr::read_chunk(file.path("..", "tests", "testthat", "test-model-TKR.R"))
-# read vignette build utility functions
-knitr::read_chunk(file.path("vutils.R"))
 ```
 
 ```{r}
@@ -35,14 +33,6 @@ knitr::opts_chunk$set(
   comment = "#>"
 )
 pander::panderOptions("table.split.table", 200L)
-```
-
-```{r}
-#| gbp
-```
-
-```{r}
-#| gv2png
 ```
 
 ```{r}

@@ -1,3 +1,11 @@
+# rdecision 1.2.1.9001
+
+* Moved functions `gbp`, `gv2png` and `placeholder` from vutils.R (in vignettes)
+  to utils.R, and removed vutils.R. These functions are now available to the
+  package, and vignettes no longer need to refer to them in an external file.
+
+
+
 # rdecision 1.2.1
 
 * Added fields URL and BugReports to DESCRIPTION file, linking to GitHub
