@@ -18,24 +18,51 @@ knitr::opts_chunk$set(
   echo = FALSE,
   comment = "#>"
 )
-# read vignette build utility functions
-knitr::read_chunk(file.path("vignettes", "vutils.R"))
 ```
 
 ```{r}
 #| gbp
 ```
 
-```{r}
-#| gv2png
-```
-
 # rdecision
 
-<!-- badges: start -->
-[![CRAN status](https://www.r-pkg.org/badges/version/rdecision)](https://cran.r-project.org/package=rdecision)
-[![Codecov test coverage](https://codecov.io/gh/ajsims1704/rdecision/branch/master/graph/badge.svg)](https://app.codecov.io/gh/ajsims1704/rdecision?branch=master)
-<!-- badges: end -->
+```{r}
+#| results = "asis"
+local({
+  writeLines(text = c(
+    "<!-- badges: start -->",
+    pander::pandoc.link.return(
+      url = paste0(
+        c("https:/", "cran.r-project.org", "package-rdecision"), collapse = "/"
+      ),
+      text = pander::pandoc.image.return(
+        img = paste0(
+          c("https:/", "www.r-pkg.org", "badges", "version", "rdecision"),
+          collapse = "/"
+        ),
+        caption = "CRAN status"
+      )
+    ),
+    pander::pandoc.link.return(
+      url = paste0(
+        c(
+          "https:/", "app.codecov.io", "gh", "ajsims1704",
+          "rdecision?branch=master"
+        ),
+        collapse = "/"
+      ),
+      text = pander::pandoc.image.return(
+        img = paste0(
+          c("https:/", "codecov.io", "gh", "ajsims1704", "rdecision", "branch",
+            "master", "graph", "badge.svg"), collapse = "/"
+        ),
+        caption = "Codecov test coverage"
+      )
+    ),
+    "<!-- badges: end -->"
+  ))
+})
+```
 
 The goal of `rdecision` is to provide methods for assessing health care 
 interventions using cohort models (decision trees and semi-Markov models) which
@@ -170,11 +197,11 @@ The decision tree model is constructed from the nodes and edges.
 #| include = FALSE
 # draw the model and save it in a PNG file within the `man` folder of the
 # package, then add a link to it into the README.md script.
-pngfile <- file.path("man", "figures", "README-lifestyle.png")
+pngfile <- file.path("man", "figures", "lifestyle.png")
 withr::with_png(
   new = pngfile,
   code = {
-    dt$draw(border = TRUE)
+    dt$draw()
   }
 )
 ```
@@ -291,17 +318,90 @@ be a temporary state.
 ```
 
 ```{r}
-#| fig.align = "center",
 #| include = FALSE
-# represent the model as a graphviz script and render it to an image file using
-# the `dot` command line tool, if available, or to a placeholder if not. The
-# image file is saved in the `man` folder of the package so it is available to
-# the README.md script, to which a link is added to the README.md file.
-pngfile <- file.path("man", "figures", "README-phv.png")
-gv2png(dot = M$as_DOT(), pngfile = pngfile)
+# represent the model as a GML script and render it to an image file using
+# the igraph package. The image file is saved in the `man` folder of the package
+# so it is available to the README.md script, to which a link is added to the
+# README.md file.
+pngfile <- file.path("man", "figures", "phv.png")
+local({
+  # create an igraph object
+  gml <- M$as_gml()
+  gmlfile <- tempfile(fileext = ".gml")
+  writeLines(gml, con = gmlfile)
+  ig <- igraph::read_graph(gmlfile, format = "gml")
+  # match layout to Sonnenberg and Beck, fig 3
+  vxy <- matrix(
+    data = c(
+      -0.75, +0.75, +0.00,
+      +0.75, +0.75, -0.75
+    ),
+    ncol = 2L,
+    dimnames = list(c("Well", "Disabled", "Dead"), c("x", "y"))
+  )
+  layout <- matrix(
+    data = c(
+      vapply(X = igraph::V(ig), FUN.VALUE = 1.0, FUN = function(v) {
+        lbl <- igraph::vertex_attr(ig, "label", v)
+        return(vxy[[lbl, "x"]])
+      }),
+      vapply(X = igraph::V(ig), FUN.VALUE = 1.0, FUN = function(v) {
+        lbl <- igraph::vertex_attr(ig, "label", v)
+        return(vxy[[lbl, "y"]])
+      })
+    ),
+    byrow = FALSE,
+    ncol = 2L
+  )
+  # loop angles
+  loopa <- vapply(X = igraph::E(ig), FUN.VALUE = 1.0, FUN = function(e) {
+    # find source and target labels
+    trg <- igraph::head_of(ig, e)
+    trgl <- igraph::vertex_attr(ig, name = "label", index = trg)
+    src <- igraph::tail_of(ig, e)
+    srcl <- igraph::vertex_attr(ig, name = "label", index = src)
+    la <- 0.0
+    if (trgl == srcl) {
+      if (trgl == "Well") {
+        la <- pi
+      } else if (trgl == "Dead") {
+        la <- pi / 2.0
+      }
+    }
+    return(la)
+  })
+  # plot into png file
+  withr::with_png(
+    new = pngfile,
+    code = {
+      withr::with_par(
+        new = list(
+          oma = c(0L, 0L, 0L, 0L),
+          mar = c(3L, 3L, 3L, 3L),
+          xpd = NA
+        ),
+        code = {
+          plot(
+            ig,
+            rescale = FALSE, asp = 0L,
+            vertex.shape = "circle", vertex.size = 60.0,
+            vertex.color = "white", vertex.label.color = "black",
+            edge.color = "black",
+            edge.arrow.size = 0.75,
+            frame = FALSE,
+            layout = layout,
+            loop.size = 0.8,
+            edge.loop.angle = loopa
+          )
+        }
+      )
+    }
+  )
+})
 ```
 
 ```{r}
+#| fig.align = "center",
 knitr::include_graphics(path = pngfile)
 ```
 

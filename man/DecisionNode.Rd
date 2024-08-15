@@ -29,6 +29,7 @@ Andrew J. Sims \email{andrew.sims@newcastle.ac.uk}
 <details open><summary>Inherited methods</summary>
 <ul>
 <li><span class="pkg-link" data-pkg="rdecision" data-topic="Node" data-id="label"><a href='../../rdecision/html/Node.html#method-Node-label'><code>rdecision::Node$label()</code></a></span></li>
+<li><span class="pkg-link" data-pkg="rdecision" data-topic="Node" data-id="modvars"><a href='../../rdecision/html/Node.html#method-Node-modvars'><code>rdecision::Node$modvars()</code></a></span></li>
 <li><span class="pkg-link" data-pkg="rdecision" data-topic="Node" data-id="type"><a href='../../rdecision/html/Node.html#method-Node-type'><code>rdecision::Node$type()</code></a></span></li>
 </ul>
 </details>

@@ -4,6 +4,9 @@
 \name{Graph}
 \alias{Graph}
 \title{An undirected graph}
+\value{
+A GML stream as a character vector.
+}
 \description{
 An R6 class to represent a graph (from discrete mathematics).
 }
@@ -51,6 +54,7 @@ Andrew Sims \email{andrew.sims@newcastle.ac.uk}
 \item \href{#method-Graph-degree}{\code{Graph$degree()}}
 \item \href{#method-Graph-neighbours}{\code{Graph$neighbours()}}
 \item \href{#method-Graph-as_DOT}{\code{Graph$as_DOT()}}
+\item \href{#method-Graph-as_gml}{\code{Graph$as_gml()}}
 \item \href{#method-Graph-clone}{\code{Graph$clone()}}
 }
 }
@@ -212,12 +216,13 @@ Test whether a vertex is an element of the graph.
 \subsection{Arguments}{
 \if{html}{\out{<div class="arguments">}}
 \describe{
-\item{\code{v}}{Subject vertex.}
+\item{\code{v}}{Vertex, or list of vertices.}
 }
 \if{html}{\out{</div>}}
 }
 \subsection{Returns}{
-TRUE if v is an element of V(G).
+A logical scalar or logical vector the same length as v if v is
+a vector, with TRUE if v is an element of V(G).
 }
 }
 \if{html}{\out{<hr>}}
@@ -538,9 +543,20 @@ A list of nodes which are joined to the subject.
 \subsection{Method \code{as_DOT()}}{
 Export a representation of the graph in DOT format.
 \subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{Graph$as_DOT()}\if{html}{\out{</div>}}
+\if{html}{\out{<div class="r">}}\preformatted{Graph$as_DOT(rankdir = "LR", width = 7, height = 7)}\if{html}{\out{</div>}}
 }
 
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{rankdir}}{One of "LR" (default), "TB", "RL" or "BT".}
+
+\item{\code{width}}{of the drawing, in inches}
+
+\item{\code{height}}{of the drawing, in inches}
+}
+\if{html}{\out{</div>}}
+}
 \subsection{Details}{
 Writes the representation in the \code{graphviz} DOT language
 (\url{https://graphviz.org/doc/info/lang.html}) for drawing with one
@@ -551,6 +567,22 @@ of the \code{graphviz} tools including \code{dot} (Gansner, 1993).
 A character vector. Intended for passing to \code{writeLines}
 for saving as a text file.
 }
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-Graph-as_gml"></a>}}
+\if{latex}{\out{\hypertarget{method-Graph-as_gml}{}}}
+\subsection{Method \code{as_gml()}}{
+Exports the digraph as a Graph Modelling Language (GML)
+stream.
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{Graph$as_gml()}\if{html}{\out{</div>}}
+}
+
+\subsection{Details}{
+Intended to work with the igraph or DiagrammeR packages, which
+are able to import GML files.
+}
+
 }
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-Graph-clone"></a>}}

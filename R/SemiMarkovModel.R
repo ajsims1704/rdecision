@@ -729,23 +729,17 @@ SemiMarkovModel <- R6::R6Class(
       mv <- list()
       # find the ModVars in the transitions
       for (e in self$edges()) {
-        if (inherits(e, what = "Transition")) {
-          mv <- c(mv, e$modvars())
-        }
+        mv <- c(mv, e$modvars())
       }
       # find the ModVars in the states
       for (v in self$vertexes()){
-        if (inherits(v, what = "MarkovState")) {
-          mv <- c(mv, v$modvars())
-        }
+        mv <- c(mv, v$modvars())
       }
       # return a unique list
       return(unique(mv))
     },
 
     #' @description Tabulate the model variables in the Markov model.
-    #' @param expressions A logical that defines whether expression model
-    #' variables should be included in the tabulation.
     #' @return Data frame with one row per model variable, as follows:
     #' \describe{
     #' \item{\code{Description}}{As given at initialization.}
@@ -766,15 +760,10 @@ SemiMarkovModel <- R6::R6Class(
     #' \item{\code{Est}}{TRUE if the quantiles and SD have been estimated by
     #' random sampling.}
     #' }
-    modvar_table = function(expressions = TRUE) {
+    modvar_table = function() {
       # create list of model variables in this decision tree, excluding
       # expressions if not wanted
       mvlist <- self$modvars()
-      if (!expressions) {
-        mvlist <- mvlist[vapply(mvlist, FUN.VALUE = TRUE, FUN = function(v) {
-          !v$is_expression()
-        })]
-      }
       # create a data frame of model variables
       DF <- data.frame(
         Description = vapply(mvlist, FUN.VALUE = "x", FUN = function(x) {

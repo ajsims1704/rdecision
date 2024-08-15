@@ -5,6 +5,12 @@ test_that("incorrect label types are rejected", {
   expect_error(Node$new(TRUE), class = "non-string_label")
 })
 
+test_that("modvars returns an empty list", {
+  n1 <- Node$new("n1")
+  mv <- n1$modvars()
+  expect_length(mv, 0L)
+})
+
 test_that("node type is returned", {
   n1 <- Node$new()
   expect_identical(n1$type(), "Node")

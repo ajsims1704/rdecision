@@ -21,6 +21,7 @@ Andrew J. Sims \email{andrew.sims@newcastle.ac.uk}
 \item \href{#method-Edge-is_same_edge}{\code{Edge$is_same_edge()}}
 \item \href{#method-Edge-endpoints}{\code{Edge$endpoints()}}
 \item \href{#method-Edge-label}{\code{Edge$label()}}
+\item \href{#method-Edge-modvars}{\code{Edge$modvars()}}
 \item \href{#method-Edge-clone}{\code{Edge$clone()}}
 }
 }
@@ -92,6 +93,20 @@ Access label.
 
 \subsection{Returns}{
 Label of the edge; character string.
+}
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-Edge-modvars"></a>}}
+\if{latex}{\out{\hypertarget{method-Edge-modvars}{}}}
+\subsection{Method \code{modvars()}}{
+Find all the model variables of type \code{ModVar} that have
+been specified as values associated with this \code{Edge}.
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{Edge$modvars()}\if{html}{\out{</div>}}
+}
+
+\subsection{Returns}{
+An empty list for the base class.
 }
 }
 \if{html}{\out{<hr>}}

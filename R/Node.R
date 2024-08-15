@@ -30,6 +30,13 @@ Node <- R6::R6Class(
       return(private$.label)
     },
 
+    #' @description Find all the model variables of type \code{ModVar} that have
+    #' been specified as values associated with this \code{Node}.
+    #' @return An empty list for the base class.
+    modvars = function() {
+      return(list())
+    },
+
     #' @description node type
     #' @return \code{Node} class, as character string.
     type = function() {

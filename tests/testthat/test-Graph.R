@@ -5,22 +5,22 @@ test_that("incorrect node and edge types are rejected", {
   n2 <- Node$new()
   e1 <- Edge$new(n1, n2)
   #
-  expect_error(Graph$new(n1, list(e1)), class = "non-list_vertices")
-  expect_error(Graph$new(list(n1, n2), e1), class = "non-list_edges")
-  expect_error(Graph$new(list(n1, 42L), list(e1)), class = "non-Node_vertex")
-  expect_error(Graph$new(list(n1, n2), list(e1, 42L)), class = "non-Edge_edge")
+  expect_error(Graph$new(n1, list(e1)), class = "invalid_vertexes")
+  expect_error(Graph$new(list(n1, n2), e1), class = "invalid_edges")
+  expect_error(Graph$new(list(n1, 42L), list(e1)), class = "invalid_vertexes")
+  expect_error(Graph$new(list(n1, n2), list(e1, 42L)), class = "invalid_edges")
   expect_error(
-    Graph$new(V = list(n1, n1), E = list(e1)), class = "repeated_nodes"
+    Graph$new(V = list(n1, n1), E = list(e1)), class = "invalid_vertexes"
   )
   expect_error(
     Graph$new(V = list(n1, n2), E = list(e1, e1)),
-    class = "repeated_edges"
+    class = "invalid_edges"
   )
   #
   n3 <- Node$new()
   e2 <- Edge$new(n1, n3)
   expect_error(
-    Graph$new(V = list(n1, n2), E = list(e1, e2)), class = "not_in_graph"
+    Graph$new(V = list(n1, n2), E = list(e1, e2)), class = "invalid_edges"
   )
   #
   n1 <- Node$new("n1")
@@ -414,8 +414,17 @@ test_that("Fig 1.1.1 from Gross & Yellen (2013) is drawn correctly", {
   G <- Graph$new(V = list(u, v, w, x), E = list(a, b, c, d, e, f))
   # draw it as a GraphViz dot stream
   expect_silent(G$as_DOT())
-  # draw it as a GML stream
+  # draw it as a GML stream and check its properties with igraph
+  gmlfile <- tempfile(fileext = ".gml")
   gml <- G$as_gml()
-  expect_true(is.character(gml))
-  
+  writeLines(gml, con = gmlfile)
+  ig <- igraph::read_graph(gmlfile, format = "gml")
+  expect_identical(as.integer(igraph::gorder(ig)), 4L)
+  expect_identical(as.integer(igraph::gsize(ig)), 6L)
+  vlabels <- igraph::vertex_attr(ig, name = "label")
+  expect_setequal(vlabels, c("u", "v", "w", "x"))
+  elabels <- igraph::edge_attr(ig, name = "label")
+  expect_setequal(elabels, c("a", "b", "c", "d", "e", "f"))
+  expect_false(igraph::is_simple(ig))
+  expect_false(igraph::is_dag(ig))
 })

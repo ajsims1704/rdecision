@@ -32,6 +32,7 @@ Andrew J. Sims \email{andrew.sims@newcastle.ac.uk}
 <li><span class="pkg-link" data-pkg="rdecision" data-topic="Edge" data-id="endpoints"><a href='../../rdecision/html/Edge.html#method-Edge-endpoints'><code>rdecision::Edge$endpoints()</code></a></span></li>
 <li><span class="pkg-link" data-pkg="rdecision" data-topic="Edge" data-id="is_same_edge"><a href='../../rdecision/html/Edge.html#method-Edge-is_same_edge'><code>rdecision::Edge$is_same_edge()</code></a></span></li>
 <li><span class="pkg-link" data-pkg="rdecision" data-topic="Edge" data-id="label"><a href='../../rdecision/html/Edge.html#method-Edge-label'><code>rdecision::Edge$label()</code></a></span></li>
+<li><span class="pkg-link" data-pkg="rdecision" data-topic="Edge" data-id="modvars"><a href='../../rdecision/html/Edge.html#method-Edge-modvars'><code>rdecision::Edge$modvars()</code></a></span></li>
 </ul>
 </details>
 }}

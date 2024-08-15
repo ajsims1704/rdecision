@@ -3,8 +3,8 @@ title: "Decision tree with PSA (Jenks 2016)"
 subtitle: "Tegaderm CHG IV Securement Dressing"
 author: "Andrew J. Sims"
 date: "July 2020"
-bibliography: "../inst/REFERENCES.bib"
-csl: "../inst/nature-no-et-al.csl"
+bibliography: "REFERENCES.bib"
+csl: "nature-no-et-al.csl"
 output: 
   rmarkdown::html_vignette:
     fig_width: 7
@@ -18,15 +18,6 @@ vignette: >
 ---
 
 ```{r}
-#| purl = FALSE,
-#| include = FALSE
-# read vignette source chunks from corresponding testthat script
-knitr::read_chunk(
-  file.path("..", "tests", "testthat", "test-model-Tegaderm.R")
-)
-```
-
-```{r}
 #| include = FALSE,
 #| purl = FALSE
 knitr::opts_chunk$set(
@@ -37,7 +28,17 @@ knitr::opts_chunk$set(
 ```
 
 ```{r}
-library("rdecision") # nolint
+#| purl = FALSE
+#nolint start
+```
+
+```{r}
+library(rdecision)
+```
+
+```{r}
+#| purl = FALSE
+#nolint end
 ```
 
 # Introduction
@@ -78,8 +79,141 @@ of Jenks *et al* [-@jenks2016], with the following additional information:
 The model variables were constructed as follows:
 
 ```{r}
-#| variables,
 #| echo = TRUE
+# baseline risk
+r.CRBSI <- GammaModVar$new(
+  "Baseline CRBSI rate",  "/1000 catheter days",
+  shape = (1.48 ^ 2L) / (0.12 ^ 2L),
+  scale = (0.12 ^ 2L) / 1.48
+)
+r.LSI <- GammaModVar$new(
+  "Baseline LSI rate", "/1000 catheter days",
+  shape = (0.14 ^ 2L) / (0.5 ^ 2L),
+  scale = (0.5 ^ 2L) / 0.14
+)
+r.Dermatitis <- BetaModVar$new(
+  "Baseline dermatitis risk", "/catheter", alpha = 1L, beta = 475L
+)
+# relative effectiveness
+hr.CRBSI <- LogNormModVar$new(
+  "Tegaderm CRBSI HR", "HR",
+  p1 = 0.402, p2 = (0.868 - 0.186) / (2L * 1.96), param = "LN7"
+)
+hr.LSI <- LogNormModVar$new(
+  "Tegaderm LSI HR", "HR",
+  p1 = 0.402, p2 = (0.868 - 0.186) / (2L * 1.96), param = "LN7"
+)
+rr.Dermatitis <- LogNormModVar$new(
+  "Tegaderm Dermatitis RR", "RR", p1 = 1.0, p2 = 0.5, param = "LN7"
+)
+# cost variables
+c.CRBSI <- GammaModVar$new(
+  "CRBSI cost", "GBP",
+  shape = (9900.0 ^ 2L) / (3000.0 ^ 2L),
+  scale = (3000.0 ^ 2L) / 9900.0
+)
+c.LSI <- GammaModVar$new(
+  "LSI cost", "GBP",
+  shape = (100.0 ^ 2L) / (30.0 ^ 2L),
+  scale = (30.0 ^ 2L) / 100.0
+)
+c.Dermatitis <- GammaModVar$new(
+  "Dermatitis cost", "GBP",
+  shape = (6.0 ^ 2L) / (3.0 ^ 2L),
+  scale = (3.0 ^ 2L) / 6.0
+)
+# number of dressings and days with catheter
+n.dressings <- GammaModVar$new(
+  "No. dressings", "dressings",
+  shape = (3.0 ^ 2L) / (2.0 ^ 2L),
+  scale = (2.0 ^ 2L) / 3.0
+)
+n.cathdays <- GammaModVar$new(
+  "No. days with catheter", "days",
+  shape = (10.0 ^ 2L) / (5.0 ^ 2L),
+  scale = (5.0 ^ 2L) / 10.0
+)
+```
+
+```{r}
+#| purl = FALSE
+# test that variables have expected values
+local({
+  # baseline CRBSI
+  q <- r.CRBSI$quantile(probs = c(0.025, 0.975))
+  stopifnot(
+    all.equal(r.CRBSI$mean(), 1.48, tolerance = 0.02, scale = 1.0),
+    all.equal(q[[1L]], 1.28, tolerance = 0.05, scale = 1.0),
+    all.equal(q[[2L]], 1.75, tolerance = 0.05, scale = 1.0)
+  )
+  # baseline LSI
+  q <- r.LSI$quantile(probs = c(0.025, 0.975))
+  stopifnot(
+    all.equal(r.LSI$mean(), 0.14, tolerance = 0.01, scale = 1.0),
+    all.equal(q[[1L]], 0.0, tolerance = 0.05, scale = 1.0)
+  )
+  # baseline dermatitis
+  q <- r.Dermatitis$quantile(probs = c(0.025, 0.975))
+  stopifnot(
+    all.equal(r.Dermatitis$mean(), 1L / 476L, tolerance = 0.0001, scale = 1.0),
+    all.equal(q[[1L]], 0.000, tolerance = 0.005, scale = 1.0),
+    all.equal(q[[2L]], 0.010, tolerance = 0.005, scale = 1.0)
+  )
+  # HR of CRBSI for Tegaderm
+  all.equal(hr.CRBSI$mean(), 0.402, 0.010)
+  q <- hr.CRBSI$quantile(probs = c(0.025, 0.975))
+  all.equal(q[[1L]], 0.186, 0.05)
+  all.equal(q[[2L]], 0.868, 0.05)
+  # HR of LSI for Tegaderm
+  q <- hr.LSI$quantile(probs = c(0.025, 0.975))
+  stopifnot(
+    all.equal(hr.LSI$mean(), 0.402, tolerance = 0.010, scale = 1.0),
+    all.equal(q[[1L]], 0.186, tolerance = 0.05, scale = 1.0),
+    all.equal(q[[2L]], 0.868, tolerance = 0.05, scale = 1.0)
+  )
+  # RR of dermatitis
+  q <- rr.Dermatitis$quantile(probs = c(0.025, 0.975))
+  stopifnot(
+    all.equal(rr.Dermatitis$mean(), 1.0, tolerance = 0.010, scale = 1.0),
+    all.equal(q[[1L]], 0.35, tolerance = 0.05, scale = 1.0),
+    all.equal(q[[2L]], 2.26, tolerance = 0.05, scale = 1.0)
+  )
+  # cost of CRBSI
+  q <- c.CRBSI$quantile(probs = c(0.025, 0.975))
+  stopifnot(
+    all.equal(c.CRBSI$mean(), 9900.0, tolerance = 10.0, scale = 1.0),
+    all.equal(q[[1L]], 4921.0, tolerance = 10.0, scale = 1.0),
+    all.equal(q[[2L]], 16589.0, tolerance = 10.0, scale = 1.0)
+  )
+  # cost of LSI
+  q <- c.LSI$quantile(probs = c(0.025, 0.975))
+  stopifnot(
+    all.equal(c.LSI$mean(), 100.0, tolerance = 10.0, scale = 1.0),
+    all.equal(q[[1L]], 50.1, tolerance = 1.0, scale = 1.0),
+    all.equal(q[[2L]], 166.8, tolerance = 1.0, scale = 1.0)
+  )
+  # cost of dermatitis
+  q <- c.Dermatitis$quantile(probs = c(0.025, 0.975))
+  stopifnot(
+    all.equal(c.Dermatitis$mean(), 6.0, tolerance = 0.1, scale = 1.0),
+    all.equal(q[[1L]], 1.64, tolerance = 0.1, scale = 1.0),
+    all.equal(q[[2L]], 13.1, tolerance = 0.1, scale = 1.0)
+  )
+  # number of dressings
+  q <- n.dressings$quantile(probs = c(0.025, 0.975))
+  stopifnot(
+    all.equal(n.dressings$mean(), 3.0, tolerance = 0.1, scale = 1.0),
+    all.equal(q[[1L]], 0.4, tolerance = 0.1, scale = 1.0),
+    all.equal(q[[2L]], 8.0, tolerance = 0.1, scale = 1.0)
+  )
+  # number of catheter days
+  q <- n.cathdays$quantile(probs = c(0.025, 0.975))
+  stopifnot(
+    all.equal(n.cathdays$mean(), 10.0, tolerance = 0.1, scale = 1.0),
+    all.equal(q[[1L]], 2.7, tolerance = 1.0, scale = 1.0),
+    all.equal(q[[2L]], 21.9, tolerance = 1.0, scale = 1.0)
+  )
+})
 ```
 
 ## Model variable expressions
@@ -91,8 +225,36 @@ The following code creates the model variable expressions to be used as values
 in the decision tree edges. 
 
 ```{r}
-#| expressions,
 #| echo = TRUE
+p.CRBSI.S <- ExprModVar$new(
+  "P(CRBSI | standard dressing)", "P",
+  rlang::quo(r.CRBSI * n.cathdays / 1000.0)
+)
+p.CRBSI.T <- ExprModVar$new(
+  "P(CRBSI|Tegaderm)", "P",
+  rlang::quo(p.CRBSI.S * hr.CRBSI)
+)
+p.LSI.S <- ExprModVar$new(
+  "P(LSI | Standard)", "/patient",
+  rlang::quo(r.LSI * n.cathdays / 1000.0)
+)
+p.LSI.T <- ExprModVar$new(
+  "P(LSI | Tegaderm)", "P", rlang::quo(p.LSI.S * hr.LSI)
+)
+p.Dermatitis.S <- ExprModVar$new(
+  "P(dermatitis | standard dressing)", "P",
+  rlang::quo(r.Dermatitis)
+)
+p.Dermatitis.T <- ExprModVar$new(
+  "P(dermatitis | Tegaderm)", "P",
+  rlang::quo(p.Dermatitis.S * rr.Dermatitis)
+)
+c.Tegaderm <- ExprModVar$new(
+  "Tegaderm CHG cost", "GBP", rlang::quo(6.26 * n.dressings)
+)
+c.Standard <- ExprModVar$new(
+  "Standard dressing cost", "GBP", rlang::quo(1.54 * n.dressings)
+)
 ```
 
 # The decision tree
@@ -120,10 +282,138 @@ probability associated with one of the reactions from any chance node is set
 to missing (`NA`), it will be computed before each evaluation of the tree to
 ensure that the probabilities sum to unity.
 
+```{r}
+#| echo = TRUE
+# create decision tree
+th <- as.difftime(7L, units = "days")
+# standard dressing
+t01 <- LeafNode$new("t01", interval = th)
+t02 <- LeafNode$new("t02", interval = th)
+c01 <- ChanceNode$new()
+e01 <- Reaction$new(
+  c01, t01, p = p.Dermatitis.S, cost = c.Dermatitis, label = "Dermatitis"
+)
+e02 <- Reaction$new(
+  c01, t02, p = NA_real_, cost = 0.0, label = "No dermatitis"
+)
+t03 <- LeafNode$new("t03", interval = th)
+t04 <- LeafNode$new("t04", interval = th)
+c02 <- ChanceNode$new()
+e03 <- Reaction$new(
+  c02, t03, p = p.Dermatitis.S, cost = c.Dermatitis, label = "Dermatitis"
+)
+e04 <- Reaction$new(
+  c02, t04, p = NA_real_, cost = 0.0, label = "No dermatitis"
+)
+c03 <- ChanceNode$new()
+e05 <- Reaction$new(c03, c01, p = p.LSI.S, cost = c.LSI, label = "LSI")
+e06 <- Reaction$new(c03, c02, p = NA_real_, cost = 0.0, label = "No LSI")
+t11 <- LeafNode$new("t11", interval = th)
+t12 <- LeafNode$new("t12", interval = th)
+c11 <- ChanceNode$new()
+e11 <- Reaction$new(
+  c11, t11, p = p.Dermatitis.S, cost = c.Dermatitis, label = "Dermatitis"
+)
+e12 <- Reaction$new(
+  c11, t12, p = NA_real_, cost = 0.0, label = "No Dermatitis"
+)
+t13 <- LeafNode$new("t13", interval = th)
+t14 <- LeafNode$new("t14", interval = th)
+c12 <- ChanceNode$new()
+e13 <- Reaction$new(
+  c12, t13, p = p.Dermatitis.S, cost = c.Dermatitis, label = "Dermatitis"
+)
+e14 <- Reaction$new(
+  c12, t14, p = NA_real_, cost = 0.0, label = "No dermatitis"
+)
+c13 <- ChanceNode$new()
+e15 <- Reaction$new(c13, c11, p = p.LSI.S, cost = c.LSI, label = "LSI")
+e16 <- Reaction$new(c13, c12, p = NA_real_, cost = 0.0, label = "No LSI")
+c23 <- ChanceNode$new()
+e21 <- Reaction$new(c23, c03, p = p.CRBSI.S, cost = c.CRBSI, label = "CRBSI")
+e22 <- Reaction$new(c23, c13, p = NA_real_, cost = 0.0, label = "No CRBSI")
+
+# Tegaderm branch
+t31 <- LeafNode$new("t31", interval = th)
+t32 <- LeafNode$new("t32", interval = th)
+c31 <- ChanceNode$new()
+e31 <- Reaction$new(
+  c31, t31, p = p.Dermatitis.T, cost = c.Dermatitis, label = "Dermatitis"
+)
+e32 <- Reaction$new(
+  c31, t32, p = NA_real_, cost = 0.0, label = "no dermatitis"
+)
+t33 <- LeafNode$new("t33", interval = th)
+t34 <- LeafNode$new("t34", interval = th)
+c32 <- ChanceNode$new()
+e33 <- Reaction$new(
+  c32, t33, p = p.Dermatitis.T, cost = c.Dermatitis, label = "Dermatitis"
+)
+e34 <- Reaction$new(
+  c32, t34, p = NA_real_, cost = 0.0, label = "No dermatitis"
+)
+c33 <- ChanceNode$new()
+e35 <- Reaction$new(c33, c31, p = p.LSI.T, cost = c.LSI, label = "LSI")
+e36 <- Reaction$new(c33, c32, p = NA_real_, cost = 0.0, label = "No LSI")
+t41 <- LeafNode$new("t41", interval = th)
+t42 <- LeafNode$new("t42", interval = th)
+c41 <- ChanceNode$new()
+e41 <- Reaction$new(
+  c41, t41, p = p.Dermatitis.T, cost = c.Dermatitis, label = "Dermatitis"
+)
+e42 <- Reaction$new(
+  c41, t42, p = NA_real_, cost = 0.0, label = "No dermatitis"
+)
+t43 <- LeafNode$new("t43", interval = th)
+t44 <- LeafNode$new("t44", interval = th)
+c42 <- ChanceNode$new()
+e43 <- Reaction$new(
+  c42, t43, p = p.Dermatitis.T, cost = c.Dermatitis, label = "Dermatitis"
+)
+e44 <- Reaction$new(
+  c42, t44, p = NA_real_, cost = 0.0, label = "No dermatitis"
+)
+c43 <- ChanceNode$new()
+e45 <- Reaction$new(c43, c41, p = p.LSI.T, cost = c.LSI, label = "LSI")
+e46 <- Reaction$new(c43, c42, p = NA_real_, cost = 0.0, label = "No LSI")
+c53 <- ChanceNode$new()
+e51 <- Reaction$new(c53, c43, p = p.CRBSI.T, cost = c.CRBSI, label = "CRBSI")
+e52 <- Reaction$new(c53, c33, p = NA_real_, cost = 0.0, label = "no CRBSI")
+
+# decision node
+d1 <- DecisionNode$new("d1")
+e9 <- Action$new(d1, c23, label = "Standard", cost = c.Standard)
+e10 <- Action$new(d1, c53, label = "Tegaderm", cost = c.Tegaderm)
+
+# create decision tree
+V <- list(
+  d1,
+  c01, c02, c03, c11, c12, c13, c23, c31, c32, c33, c41, c42, c43, c53,
+  t01, t02, t03, t04, t11, t12, t13, t14, t31, t32, t33, t34,
+  t41, t42, t43, t44
+)
+E <- list(
+  e01, e02, e03, e04, e05, e06, e11, e12, e13, e14, e15, e16, e21, e22,
+  e31, e32, e33, e34, e35, e36, e41, e42, e43, e44, e45, e46, e51, e52,
+  e9, e10
+)
+DT <- DecisionTree$new(V, E)
+```
 
 ```{r}
-#| tree,
-#| echo = TRUE
+#| purl = FALSE
+# test that model variables are as expected
+local({
+  mv <- DT$modvars()
+  stopifnot(
+    all.equal(length(mv), 19L)
+  )
+  MVT <- DT$modvar_table()
+  stopifnot(
+    all.equal(nrow(MVT), 19L),
+    all.equal(sum(MVT$Est), 8L)
+  )
+})
 ```
 
 ## Tree diagram
@@ -131,7 +421,6 @@ The `draw` method of a `DecisionTree` object creates a graphical representation
 of the tree, as follows.
 ```{r}
 #| results = "hide",
-#| purl = FALSE,
 #| fig.keep = "all",
 #| fig.align = "center",
 #| fig.cap = "Figure 1. Decision tree for the Tegaderm model",
@@ -147,28 +436,30 @@ frame describing each variable, its description, units and uncertainty
 distribution. Variables inheriting from type `ModVar` will be included in the
 tabulation unless explicitly excluded, regular numeric values will not be
 listed. In the Tegaderm model, the input model variables are in the following
-table, with expression model variables excluded. 
+table, including those constructed from expressions. 
 
 ```{r}
-#| purl = FALSE
-local({
-  DF <- DT$modvar_table(expressions = FALSE)
-  keep <- c("Description", "Distribution")
-  pander::pander(DF[, keep], row.names = FALSE, digits = 3L, justify = "left")
+with(data = DT$modvar_table(), expr = {
+  data.frame(
+    Description = Description,
+    Distribution = Distribution,
+    stringsAsFactors = FALSE
+  )
 })
 ```
 
-## Point estimates and distributions of model variables
-The point estimates, units and distributional properties are obtained from the
-same call, in the remaining columns. 
+The units, point estimates, lower 95% and upper 9% confidence intervals are
+are obtained from the same call, in the remaining columns. 
 
 ```{r}
-#| purl = FALSE
-local({
-  DF <- DT$modvar_table(expressions = FALSE)
-  DF$Variable <- paste(DF$Description, DF$Units, sep = ", ")
-  keep <- c("Variable", "Mean", "Q2.5", "Q97.5")
-  pander::pander(DF[, keep], row.names = FALSE, digits = 3L, justify = "lrrr")
+with(data = DT$modvar_table(), expr = {
+  data.frame(
+    Variable = paste(Description, Units, sep = ", "),
+    Mean = round(E, digits = 3L),
+    LowerCI = round(Q2.5, digits = 3L),
+    UpperCI = round(Q97.5, digits = 3L),
+    stringsAsFactors = FALSE
+  )
 })
 ```
 
@@ -181,15 +472,76 @@ shown in the table. This model did not consider utility, and the columns
 associated with utility are removed. 
 
 ```{r}
-#| basecase,
 #| echo = TRUE
+RES <- DT$evaluate()
 ```
 
 ```{r}
 #| purl = FALSE
+# test that EAC base case agrees with direct calculation
 local({
-  keep <- c("Run", "d1", "Cost")
-  pander::pander(RES[, keep], round = 2L, justify = "llr")
+  # values from Table 4
+  r_crbsi <- 1.48
+  r_lsi <- 0.14
+  r_derm <- 0.0021
+  hr_crbsi_teg <- 0.402
+  hr_lsi_teg <- 0.402
+  rr_derm_teg <- 1.0
+  c_crbsi <- 9900.0
+  c_derm <- 6.0
+  c_lsi <- 100.0
+  n_cdays <- 10.0
+  n_dress <- 3L
+  c_teg <- 6.26
+  c_std <- 1.54
+  # probabilities
+  p_crbsi_std <- r_crbsi * (n_cdays / 1000.0)
+  p_lsi_std <- r_lsi * (n_cdays / 1000.0)
+  p_derm_std <- r_derm
+  p_crbsi_teg <- p_crbsi_std * hr_crbsi_teg
+  p_lsi_teg <- p_lsi_std * hr_lsi_teg
+  p_derm_teg <- rr_derm_teg * p_derm_std
+  # component costs
+  cdress_std <- c_std * n_dress
+  cdress_teg <- c_teg * n_dress
+  ccrbsi_std <- c_crbsi * p_crbsi_std
+  ccrbsi_teg <- c_crbsi * p_crbsi_teg
+  clsi_std <- c_lsi * p_lsi_std
+  clsi_teg <- c_lsi * p_lsi_teg
+  cderm_std <- c_derm * p_derm_std
+  cderm_teg <- c_derm * p_derm_teg
+  # total costs
+  c_std <- cdress_std + ccrbsi_std + clsi_std + cderm_std
+  c_teg <- cdress_teg + ccrbsi_teg + clsi_teg + cderm_teg
+  with(data = RES, expr = {
+    stopifnot(
+      # check against the model
+      all.equal(
+        Cost[[which(d1 == "Standard")]], c_std, tolerance = 2.0, scale = 1.0
+      ),
+      all.equal(
+        Cost[[which(d1 == "Tegaderm")]], c_teg, tolerance = 2.0, scale = 1.0
+      ),
+      # check against the Excel model
+      all.equal(
+        Cost[[which(d1 == "Standard")]], 151.29, tolerance = 2.0, scale = 1.0
+      ),
+      all.equal(
+        Cost[[which(d1 == "Tegaderm")]], 77.75, tolerance = 2.0, scale = 1.0
+      )
+    )
+  })
+})
+```
+
+```{r}
+with(data = RES, expr = {
+  data.frame(
+    Run = Run,
+    d1 = d1,
+    Cost = gbp(Cost, p = TRUE, char = FALSE),
+    stringsAsFactors = FALSE
+  )
 })
 ```
 
@@ -202,7 +554,6 @@ varied over their 95% confidence limits (figure 2).
 
 ```{r}
 #| results = "hide",
-#| purl = FALSE,
 #| fig.keep = "all",
 #| fig.align = "center",
 #| fig.cap = "Figure 2. Tornado diagram for the Tegaderm model",
@@ -217,11 +568,15 @@ the values of the cost difference when each model variable is univariately at
 the limits of its 95% confidence interval, as follows:
 
 ```{r}
-#| purl = FALSE
-local({
-  to$Variable <- paste(to$Description, to$Units, sep = ", ")
-  keep <- c("Variable", "LL", "UL", "outcome.min", "outcome.max")
-  pander::pander(to[, keep], round = 2L, justify = "lrrrr", row.names = FALSE)
+with(data = to, expr = {
+  data.frame(
+    Variable = paste(Description, Units, sep = ", "),
+    LL = round(x = LL, digits = 2L),
+    UL = round(x = UL, digits = 2L),
+    Min.CostDiff = round(x = outcome.min, digits = 2L),
+    Max.CostDiff = round(x = outcome.max, digits = 2L),
+    stringsAsFactors = FALSE
+  )
 })
 ```
 
@@ -232,36 +587,40 @@ the PSA and save the results in a data frame. Additionally, the cost difference
 is computed for each run of the model, as follows:
 
 ```{r}
-#| PSA,
 #| echo = TRUE
+N <- 1000L
+psa <- DT$evaluate(setvars = "random", by = "run", N = N)
+psa[, "Difference"] <- psa[, "Cost.Standard"] - psa[, "Cost.Tegaderm"]
 ```
 
 The first few runs of PSA are as follows; the `by = "run"` option reshapes the
 table to give one row per simulation, rather than one row per run, per strategy.
 
 ```{r}
-#| purl = FALSE
-keep <- c("Run", "Cost.Tegaderm", "Cost.Standard", "Difference")
-pander::pander(
-  head(psa[, keep], n = 10L),
-  round = 2L,
-  row.names = FALSE,
-  justify = "lrrr"
-)
+with(data = head(psa, n = 10L), expr = {
+  data.frame(
+    Run = Run,
+    Cost.Tegaderm = gbp(Cost.Tegaderm, p = TRUE, char = FALSE),
+    Cost.Standard = gbp(Cost.Standard, p = TRUE, char = FALSE),
+    Cost.Difference = gbp(Difference, p = TRUE, char = FALSE),
+    stringsAsFactors = FALSE  
+  )
+})
 ```
 
 From PSA (`r N` runs), the mean cost of treatment with Tegaderm 
-was `r gbp(mean(psa$Cost.Tegaderm), p = TRUE)` GBP,
-the mean cost of treatment with standard dressings was 
-`r gbp(mean(psa$Cost.Standard), p = TRUE)` GBP
-and the mean cost saving was `r gbp(mean(psa$Difference), p = TRUE)` GBP. The
-95% confidence interval for cost saving was 
-`r gbp(quantile(psa$Difference, probs=c(0.025)), p = TRUE)` GBP to 
-`r gbp(quantile(psa$Difference, probs=c(0.975)), p = TRUE)` GBP; the standard
-deviation of the cost saving was `r gbp(sd(psa$Difference), p = TRUE)` GBP.
-Overall, `r round(100 * sum(psa$Difference > 0.0) / nrow(psa), 2L)`% of runs
-found that Tegaderm was cost saving. These results replicate those reported by
-Jenks *et al* (saving of 72.90 GBP, 97.8% cases cost saving; mean cost of
+was `r gbp(mean(psa[, "Cost.Tegaderm"]), p = TRUE)` GBP,
+the mean cost of treatment with standard dressings was
+`r gbp(mean(psa[, "Cost.Standard"]), p = TRUE)` GBP
+and the mean cost saving was `r gbp(mean(psa[, "Difference"]), p = TRUE)` GBP.
+The 95% confidence interval for cost saving was 
+`r gbp(quantile(psa[, "Difference"], probs = 0.025), p = TRUE)` GBP to 
+`r gbp(quantile(psa[, "Difference"], probs = 0.975), p = TRUE)` GBP; the
+standard deviation of the cost saving was 
+`r gbp(sd(psa[, "Difference"]), p = TRUE)` GBP.
+Overall, `r round(100.0 * sum(psa[, "Difference"] > 0.0) / nrow(psa), 2L)`% of
+runs found that Tegaderm was cost saving. These results replicate those reported
+by Jenks *et al* (saving of 72.90 GBP, 97.8% cases cost saving; mean cost of
 standard dressing 151.29 GBP, mean cost of Tegaderm 77.75 GBP).
 
 ```{r}
@@ -277,30 +636,114 @@ baseline rate of CRBSI, and any other model variables that depend on it via
 expressions, and then reconstruct the model, as follows.
 
 ```{r}
-#| scenario,
 #| echo = TRUE
+r.CRBSI <- GammaModVar$new(
+  "Baseline CRBSI rate",  "/1000 catheter days",
+  shape = (0.30 ^ 2L) / (0.102 ^ 2L),
+  scale = (0.102 ^ 2L) / 0.30
+)
+p.CRBSI.S <- ExprModVar$new(
+  "P(CRBSI | standard dressing)", "P",
+  rlang::quo(r.CRBSI * n.cathdays / 1000.0)
+)
+p.CRBSI.T <- ExprModVar$new(
+  "P(CRBSI|Tegaderm)", "P",
+  rlang::quo(p.CRBSI.S * hr.CRBSI)
+)
+e21 <- Reaction$new(c23, c03, p = p.CRBSI.S, cost = c.CRBSI, label = "CRBSI")
+e22 <- Reaction$new(c23, c13, p = NA_real_, cost = 0.0, label = "No CRBSI")
+e51 <- Reaction$new(c53, c43, p = p.CRBSI.T, cost = c.CRBSI, label = "CRBSI")
+e52 <- Reaction$new(c53, c33, p = NA_real_, cost = 0.0, label = "no CRBSI")
+E <- list(
+  e01, e02, e03, e04, e05, e06, e11, e12, e13, e14, e15, e16, e21, e22,
+  e31, e32, e33, e34, e35, e36, e41, e42, e43, e44, e45, e46, e51, e52,
+  e9, e10
+)
+DT <- DecisionTree$new(V, E)
+```
+
+```{r}
+#| purl = FALSE
+# test that scenario case agrees with direct calculation
+local({
+  # evaluate the scenario as a point estimate
+  s_sco <- DT$evaluate()
+  # values from Table 4
+  r_crbsi <- 0.30
+  r_lsi <- 0.14
+  r_derm <- 0.0021
+  hr_crbsi_teg <- 0.402
+  hr_lsi_teg <- 0.402
+  rr_derm_teg <- 1.0
+  c_crbsi <- 9900.0
+  c_derm <- 6.0
+  c_lsi <- 100.0
+  n_cdays <- 10.0
+  n_dress <- 3L
+  c_teg <- 6.26
+  c_std <- 1.54
+  # probabilities
+  p_crbsi_std <- r_crbsi * (n_cdays / 1000.0)
+  p_lsi_std <- r_lsi * (n_cdays / 1000.0)
+  p_derm_std <- r_derm
+  p_crbsi_teg <- p_crbsi_std * hr_crbsi_teg
+  p_lsi_teg <- p_lsi_std * hr_lsi_teg
+  p_derm_teg <- rr_derm_teg * p_derm_std
+  # component costs
+  cdress_std <- c_std * n_dress
+  cdress_teg <- c_teg * n_dress
+  ccrbsi_std <- c_crbsi * p_crbsi_std
+  ccrbsi_teg <- c_crbsi * p_crbsi_teg
+  clsi_std <- c_lsi * p_lsi_std
+  clsi_teg <- c_lsi * p_lsi_teg
+  cderm_std <- c_derm * p_derm_std
+  cderm_teg <- c_derm * p_derm_teg
+  # total costs
+  c_std <- cdress_std + ccrbsi_std + clsi_std + cderm_std
+  c_teg <- cdress_teg + ccrbsi_teg + clsi_teg + cderm_teg
+  with(data = s_sco, expr = {
+    stopifnot(
+      # check against the model
+      all.equal(
+        Cost[[which(d1 == "Standard")]], c_std, tolerance = 2.0, scale = 1.0
+      ),
+      all.equal(
+        Cost[[which(d1 == "Tegaderm")]], c_teg, tolerance = 2.0, scale = 1.0
+      ),
+      # check against the excel model
+      all.equal(
+        Cost[[which(d1 == "Standard")]], 34.47, tolerance = 2.0, scale = 1.0
+      ),
+      all.equal(
+        Cost[[which(d1 == "Tegaderm")]], 30.79, tolerance = 2.0, scale = 1.0
+      )
+    )
+  })
+})
 ```
 
 The model for this scenario was run under PSA, as for the base case:
 
 ```{r}
-#| scenario-PSA,
 #| echo = TRUE
+N <- 1000L
+psa <- DT$evaluate(setvars = "random", by = "run", N = N)
+psa[, "Difference"] <- psa[, "Cost.Standard"] - psa[, "Cost.Tegaderm"]
 ```
 
 From PSA (`r N` runs), the mean cost of treatment with Tegaderm 
-was `r gbp(mean(psa$Cost.Tegaderm), p = TRUE)` GBP,
+was `r gbp(mean(psa[, "Cost.Tegaderm"]), p = TRUE)` GBP,
 the mean cost of treatment with standard dressings was 
-`r gbp(mean(psa$Cost.Standard), p = TRUE)` GBP
-and the mean cost saving was `r gbp(mean(psa$Difference), p = TRUE)` GBP. The
-95% confidence interval for cost saving was 
-`r gbp(quantile(psa$Difference, probs=c(0.025)), p = TRUE)` GBP to 
-`r gbp(quantile(psa$Difference, probs=c(0.975)), p = TRUE)` GBP; the standard
-deviation
-of the cost saving was `r gbp(sd(psa$Difference), p = TRUE)` GBP.
-Overall, `r round(100 * sum(psa$Difference > 0.0) / nrow(psa), 2L)`% of runs
-found that Tegaderm was cost saving. These results replicate those reported by
-Jenks *et al* (saving of 3.56 GBP, 57.9% cases cost saving; mean cost of
+`r gbp(mean(psa[, "Cost.Standard"]), p = TRUE)` GBP
+and the mean cost saving was `r gbp(mean(psa[, "Difference"]), p = TRUE)` GBP.
+The 95% confidence interval for cost saving was 
+`r gbp(quantile(psa[, "Difference"], probs = 0.025), p = TRUE)` GBP to 
+`r gbp(quantile(psa[, "Difference"], probs = 0.975), p = TRUE)` GBP; the
+standard deviation
+of the cost saving was `r gbp(sd(psa[, "Difference"]), p = TRUE)` GBP.
+Overall, `r round(100.0 * sum(psa[, "Difference"] > 0.0) / nrow(psa), 2L)`% of
+runs found that Tegaderm was cost saving. These results replicate those reported
+by Jenks *et al* (saving of 3.56 GBP, 57.9% cases cost saving; mean cost of
 standard dressing 34.47 GBP, mean cost of Tegaderm 30.79 GBP).
 
 Two threshold analyses were reported for this scenario. This can be achieved
@@ -309,8 +752,26 @@ the threshold hazard ratio of a CRBSI with Tegaderm versus a CRBSI with a
 standard dressing was varied in the range 0.1 to 0.9, as follows:
 
 ```{r}
-#| threshold-hr,
 #| echo = TRUE
+hr_threshold <- DT$threshold(
+  index = list(e10),
+  ref = list(e9),
+  outcome = "saving",
+  mvd = "Tegaderm CRBSI HR",
+  a = 0.1,
+  b = 0.9,
+  tol = 0.01
+)
+```
+
+```{r}
+#| purl = FALSE
+# test that scenario hazard rate threshold agrees with that reported
+local({
+  stopifnot(
+    all.equal(hr_threshold, 0.53, tolerance = 0.05, scale = 1.0)
+  )
+})
 ```
 
 This gave a threshold value of `r round(hr_threshold, 2L)`, above which
@@ -319,12 +780,29 @@ Secondly, the cost of each CRBSI was varied between 0 GBP and 9900 GBP to find
 the threshold of cost saving, as follows:
 
 ```{r}
-#| threshold-ccrbsi,
 #| echo = TRUE
+c_crbsi_threshold <- DT$threshold(
+  index = list(e10),
+  ref = list(e9),
+  outcome = "saving",
+  mvd = "CRBSI cost",
+  a = 0.0,
+  b = 9900.0,
+  tol = 10.0
+)
+```
+
+```{r}
+#| purl = FALSE
+# test_that scenario CRBSI cost threshold agrees with reported value
+local({
+  stopifnot(
+    all.equal(c_crbsi_threshold, 8000.0, tolerance = 300.0, scale = 1.0)
+  )
+})
 ```
 
 This gave a threshold value of `r gbp(c_crbsi_threshold, p = TRUE)` GBP, below
 which Tegaderm became cost incurring (the reported threshold was 8000 GBP).
-
 
 # References

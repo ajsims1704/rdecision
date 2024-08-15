@@ -90,6 +90,12 @@ test_that("arborescences that are not decision trees are rejected", {
   expect_error(DT$evaluate(N = "forty two"), class = "N_not_numeric")
   expect_error(DT$evaluate(by = 42L), class = "by_not_character")
   expect_error(DT$evaluate(by = "forty two"), class = "by_invalid")
+  expect_error(DT$evaluate(setvars = 42L), class = "setvars_not_character")
+  expect_error(DT$evaluate(setvars = "mode"), class = "setvars_invalid")
+  expect_silent(DT$evaluate(setvars = "q2.5"))
+  expect_silent(DT$evaluate(setvars = "q50"))
+  expect_silent(DT$evaluate(setvars = "q97.5"))
+  expect_silent(DT$evaluate(setvars = "current"))
   # tornado with no model variables
   grDevices::pdf(file = NULL)
   expect_null(DT$tornado(index = list(e1), ref = list(e4)))
@@ -359,6 +365,11 @@ test_that("decision trees with utility > 1 are supported", {
 test_that("paths common to >1 strategy are analyzed", {
   # variables
   p.disease <- BetaModVar$new("P(Test+ve)", "P", alpha = 10.0, beta = 40.0)
+  c.drug <- ConstModVar$new("Drug cost", "GBP", 900.0)
+  c.pharm <- ConstModVar$new("Pharmacy cost", "GBP", 100.0)
+  c.treat <- ExprModVar$new(
+    "Treatment cost", "GBP", rlang::quo(c.drug + c.pharm)
+  )
   # create tree
   c1 <- ChanceNode$new("c1")
   d1 <- DecisionNode$new("d1")
@@ -369,13 +380,21 @@ test_that("paths common to >1 strategy are analyzed", {
   t4 <- LeafNode$new("discharge")
   e1 <- Reaction$new(c1, d1, p = p.disease, cost = 0.0, label = "test +ve")
   e2 <- Reaction$new(c1, t4, p = NA_real_, cost = 0.0, label = "test -ve")
-  e3 <- Action$new(d1, t1, label = "treat", cost = 1000.0)
+  e3 <- Action$new(d1, t1, label = "treat", cost = c.treat)
   e4 <- Action$new(d1, d2, label = "manage", cost = 0.0)
   e5 <- Action$new(d2, t2, label = "conservatively", cost = 200.0)
   e6 <- Action$new(d2, t3, label = "watch", cost = 50.0)
   DT <- DecisionTree$new(
     V = list(c1, d1, d2, t1, t2, t3, t4),
     E = list(e1, e2, e3, e4, e5, e6)
+  )
+  # check the modvar table
+  mvtab <- DT$modvar_table()
+  expect_s3_class(mvtab, "data.frame")
+  expect_identical(nrow(mvtab), 4L)
+  expect_setequal(
+    mvtab[, "Description"],
+    c("Treatment cost", "Drug cost", "Pharmacy cost", "P(Test+ve)")
   )
   # there are 8 paths walked by the strategies (two end on leaf t1, one each on
   # t2 and t3 and four on t4) out of 16 possible (4 paths and 4 strategies);
@@ -484,5 +503,81 @@ test_that("long node labels are not clipped", {
   )
   grDevices::pdf(NULL, width = 7.0, height = 5.0)
   expect_no_condition(dt$draw(border = TRUE, fontsize = 10.0))
+  grDevices::dev.off()
+})
+
+# test of tornado plot
+test_that("tornado plots are as expected", {
+  # construct a decision tree
+  v <- list(
+    t1 = LeafNode$new("t1"),
+    t2 = LeafNode$new("t2"),
+    t3 = LeafNode$new("t3"),
+    t4 = LeafNode$new("t4"),
+    c1 = ChanceNode$new(),
+    c2 = ChanceNode$new(),
+    d1 = DecisionNode$new("d1")
+  )
+  e <- list(
+    e1 = Action$new(source = v[["d1"]], target = v[["c1"]], label = "a"),
+    e2 = Action$new(source = v[["d1"]], target = v[["c2"]], label = "b"),
+    e3 = Reaction$new(source = v[["c1"]], target = v[["t1"]]),
+    e4 = Reaction$new(source = v[["c1"]], target = v[["t2"]]),
+    e5 = Reaction$new(source = v[["c2"]], target = v[["t3"]]),
+    e6 = Reaction$new(source = v[["c2"]], target = v[["t4"]])
+  )
+  dt <- DecisionTree$new(V = v, E = e)
+  # add model variables for probabilities at chance nodes
+  p1 <- BetaModVar$new("c1", "probability", alpha = 50L, beta = 950L)
+  e[["e3"]]$set_probability(p = p1)
+  e[["e4"]]$set_probability(p = NA_real_)
+  p2 <- BetaModVar$new("c2", "probability", alpha = 10L, beta = 90L)
+  e[["e5"]]$set_probability(p = p2)
+  e[["e6"]]$set_probability(p = NA_real_)
+  # add costs
+  e[["e3"]]$set_cost(c = 100.0)
+  e[["e4"]]$set_cost(c = 25.0)
+  e[["e5"]]$set_cost(c = 100.0)
+  e[["e6"]]$set_cost(c = 25.0)
+  # tornado
+  grDevices::pdf(file = NULL)
+  expect_error(dt$tornado(), class = "missing_strategy")
+  expect_error(
+    dt$tornado(index = list(e[["e1"]]), ref = list(e[["e3"]])),
+    class = "invalid_strategy"
+  )
+  expect_error(
+    dt$tornado(
+      index = list(e[["e1"]]), ref = list(e[["e2"]]), outcome = "survival"
+    ),
+    class = "invalid_outcome"
+  )
+  expect_error(
+    dt$tornado(index = list(e[["e1"]]), ref = list(e[["e2"]]), draw = 42L),
+    class = "invalid_draw"
+  )
+  expect_error(
+    dt$tornado(
+      index = list(e[["e1"]]), ref = list(e[["e2"]]), exclude = 42L, draw = TRUE
+    ),
+    class = "exclude_not_list"
+  )
+  expect_error(
+    dt$tornado(
+      index = list(e[["e1"]]), ref = list(e[["e2"]]),
+      exclude = list("c1", "cx"), draw = TRUE
+    ),
+    class = "exclude_element_not_modvar"
+  )
+  expect_no_condition(
+    dt$tornado(
+      index = list(e[["e1"]]), ref = list(e[["e2"]]),
+      exclude = list(p1$description()), draw = FALSE
+    )
+  )
+  to <- dt$tornado(
+    index = list(e[["e1"]]), ref = list(e[["e2"]]), draw = TRUE
+  )
+  expect_identical(nrow(to), 2L)
   grDevices::dev.off()
 })

@@ -60,6 +60,13 @@ Edge <- R6::R6Class(
     #' @return Label of the edge; character string.
     label = function() {
       return(private$edgelabel)
+    },
+
+    #' @description Find all the model variables of type \code{ModVar} that have
+    #' been specified as values associated with this \code{Edge}.
+    #' @return An empty list for the base class.
+    modvars = function() {
+      return(list())
     }
   )
 )

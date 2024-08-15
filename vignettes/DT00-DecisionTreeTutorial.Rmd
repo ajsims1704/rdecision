@@ -2,8 +2,8 @@
 title: "Introduction to the construction of decision trees"
 author: "Paola Cognigni and Andrew Sims"
 date: "October 2021"
-bibliography: "../inst/REFERENCES.bib"
-csl: "../inst/nature-no-et-al.csl"
+bibliography: "REFERENCES.bib"
+csl: "nature-no-et-al.csl"
 output: 
   rmarkdown::html_vignette:
     fig_width: 7
@@ -26,7 +26,6 @@ level <- file.exists(descfile)
 stopifnot(sum(level) == 1L)
 root <- roots[[which(level)]]
 root <- normalizePath(root)
-#rm(roots, descfile, level)
 # read vignette source chunks from corresponding testthat script
 rfile <- file.path(root, "tests", "testthat", "test-model-Lifestyle.R")
 stopifnot(file.exists(rfile))

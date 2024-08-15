@@ -51,18 +51,12 @@ Transition <- R6::R6Class(
     #' Includes operands of these \code{ModVar}s, if they are expressions.
     #' @return A list of \code{ModVar}s.
     modvars = function() {
-      # create lists of input variables and output Modvars
+      # build list, possibly including duplicates
       iv <- c(private$transition.cost)
-      ov <- list()
-      for (v in iv) {
-        if (inherits(v, what = "ModVar")) {
-          ov <- c(ov, v)
-          if (inherits(v, what = "ExprModVar")) {
-            for (o in v$operands()) {
-              ov <- c(ov, o)
-            }
-          }
-        }
+      ov <- iv[which(is_class(iv, what = "ModVar"))]
+      ev <- iv[which(is_class(iv, what = "ExprModVar"))]
+      for (v in ev) {
+        ov <- c(ov, unlist(v$operands()))
       }
       # return the unique list
       return(unique(ov))

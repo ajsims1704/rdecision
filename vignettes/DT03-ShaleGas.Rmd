@@ -3,8 +3,8 @@ title: "Decision tree with three decision nodes (Kaminski 2018)"
 subtitle: "Shale gas"
 author: "Andrew J. Sims"
 date: "July 2020"
-bibliography: "../inst/REFERENCES.bib"
-csl: "../inst/nature-no-et-al.csl"
+bibliography: "REFERENCES.bib"
+csl: "nature-no-et-al.csl"
 output: 
   rmarkdown::html_vignette:
     fig_width: 7
@@ -117,7 +117,6 @@ popt <- paste(
   RES[[imax, "d1"]], RES[[imax, "d2"]], RES[[imax, "d3"]],
   sep = ";"
 )
-popt <- 42
 ```
 The optimal strategy is `r popt`, *i.e.*, test, sell if negative and
 dig otherwise. The expected pay-off from this strategy is

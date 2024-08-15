@@ -116,7 +116,8 @@ Set the probability associated with the reaction edge.
 \describe{
 \item{\code{p}}{Conditional probability of traversing the reaction edge. Of type
 numeric or \code{ModVar}. If numeric, \code{p} must be in the range
-[0,1].}
+[0,1], or \code{NA_real_}. Note that setting \code{p = NA} will cause
+an error.}
 }
 \if{html}{\out{</div>}}
 }

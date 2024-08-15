@@ -5,7 +5,7 @@
 
 <!-- badges: start -->
 
-[![CRAN status](https://www.r-pkg.org/badges/version/rdecision)](https://cran.r-project.org/package=rdecision)
+[![CRAN status](https://www.r-pkg.org/badges/version/rdecision)](https://cran.r-project.org/package-rdecision)
 [![Codecov test coverage](https://codecov.io/gh/ajsims1704/rdecision/branch/master/graph/badge.svg)](https://app.codecov.io/gh/ajsims1704/rdecision?branch=master)
 <!-- badges: end -->
 
@@ -172,7 +172,7 @@ dt <- DecisionTree$new(
 )
 ```
 
-<img src="man/figures/README-lifestyle.png" width="480" />
+<img src="man/figures/lifestyle.png" width="480" />
 
 The method `evaluate` is used to calculate the costs and utilities associated
 with the decision problem. By default, it evaluates it once with all the model
@@ -221,9 +221,9 @@ of the tree, each time sampling from the uncertainty distribution of the two
 probabilities using, for example, `DT$evaluate(setvars = "random", N = 1000L)`
 and inspecting the resulting data frame. From 1000 runs, the 95% confidence
 interval of the per patient cost saving
-is -763.93 GBP
-to 662.84 GBP,
-with 46.3% being cost
+is -760.39 GBP
+to 705.17 GBP,
+with 43.2% being cost
 saving. Although the exercise programme is more costly to provide than the
 dietary advice programme, it is more effective and leads to saving overall
 because fewer costly interventional procedures are needed. However, due to the
@@ -283,7 +283,7 @@ Pt <- matrix(
 M$set_probabilities(Pt)
 ```
 
-<img src="man/figures/README-phv.png" width="417" />
+<img src="man/figures/phv.png" width="480" style="display: block; margin: auto;" />
 
 With a starting population of 10,000, the model can be run for 25 years as
 follows.
@@ -295,7 +295,7 @@ M$reset(c(Well = 10000.0, Disabled = 0.0, Dead = 0.0))
 
 ``` r
 # cycle
-MT <- M$cycles(25L, hcc.pop = FALSE, hcc.cost = FALSE)
+MT <- M$cycles(25L, hcc.pop = FALSE, hcc.cost = FALSE, hcc.QALY = FALSE)
 ```
 
 The output, after rounding, of the `cycles` function is the Markov trace, shown

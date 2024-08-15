@@ -4,13 +4,21 @@
 \alias{gbp}
 \title{Write a monetary value}
 \usage{
-gbp(x, p = FALSE)
+gbp(x, p = FALSE, char = TRUE)
 }
 \arguments{
 \item{x}{Monetary value, or list of values}
 
 \item{p}{Logical; if TRUE show value to nearest penny, cent etc. If FALSE
 show it to the nearest pound, dollar, euro etc.}
+
+\item{char}{Logical; if TRUE format the currency values into a character
+vector, with pretty printing, including comma separators for thousands,
+otherwise convert to rounded numeric values.}
+}
+\value{
+A character vector with pretty formatted currency values (if
+\code{char} is TRUE), or a vector of rounded numeric values.
 }
 \description{
 Formats a number, or list of numbers, into currency.

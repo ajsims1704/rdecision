@@ -31,54 +31,29 @@ Graph <- R6::R6Class(
     #' @param E An unordered set of Edges, as a list.
     #' @return A \code{Graph} object.
     initialize = function(V, E) {
-      # check and set nodes
+      # check nodes
       abortifnot(
         is.list(V),
-        message = "V must be a list",
-        class = "non-list_vertices"
-      )
-      vapply(V, FUN.VALUE = TRUE, FUN = function(v) {
-        abortifnot(
-          inherits(v, what = "Node"),
-          message = "Each V must be a Node",
-          class = "non-Node_vertex"
-        )
-        return(TRUE)
-      })
-      abortifnot(
+        all(is_class(x = V, what = "Node")),
         anyDuplicated(V) == 0L,
-        message = "Each V must be unique",
-        class = "repeated_nodes"
+        message = "V must be a unique list of nodes",
+        class = "invalid_vertexes"
       )
-      private$V <- V
-      # check and set edges
+      # save nodes, after removing name attributes
+      private$V <- unname(V)
+      # check edges
       abortifnot(
         is.list(E),
-        message = "E must be a list",
-        class = "non-list_edges"
-      )
-      vapply(E, FUN.VALUE = TRUE, FUN = function(e) {
-        abortifnot(
-          inherits(e, what = "Edge"),
-          message = "Each E must be an Edge",
-          class = "non-Edge_edge"
-        )
-        vapply(e$endpoints(), FUN.VALUE = TRUE, FUN = function(w) {
-          abortifnot(
-            self$has_vertex(w),
-            message = "All edge vertexes must be in graph",
-            class = "not_in_graph"
-          )
-          return(TRUE)
-        })
-        return(TRUE)
-      })
-      abortifnot(
+        all(is_class(x = E, what = "Edge")),
+        all(vapply(E, FUN.VALUE = TRUE, FUN = function(e) {
+          return(all(self$has_vertex(e$endpoints())))
+        })),
         anyDuplicated(E) == 0L,
-        message = "Each E must be unique",
-        class = "repeated_edges"
+        message = "E must be a unique list of edges with endpoints in V",
+        class = "invalid_edges"
       )
-      private$E <- E
+      # save edges, after removing name attributes
+      private$E <- unname(E)
       # reorder the vertices and edges for optimisation of graph algorithms, or
       # during package testing.
       if (private$reorder) {
@@ -179,8 +154,9 @@ Graph <- R6::R6Class(
     },
 
     #' @description Test whether a vertex is an element of the graph.
-    #' @param v Subject vertex.
-    #' @return TRUE if v is an element of V(G).
+    #' @param v Vertex, or list of vertices.
+    #' @return A logical scalar or logical vector the same length as v if v is
+    #' a vector, with TRUE if v is an element of V(G).
     has_vertex = function(v) {
       # vertex_index checks if v is a node
       index <- self$vertex_index(v)
@@ -515,50 +491,75 @@ Graph <- R6::R6Class(
     #' of the \code{graphviz} tools including \code{dot} (Gansner, 1993).
     #' @return A character vector. Intended for passing to \code{writeLines}
     #' for saving as a text file.
-    as_DOT = function() {
-      # check whether all nodes have labels
-      vi <- self$vertex_along()
-      nl <- self$vertex_label(vi)
-      nodelab <- all(nchar(x = nl) > 0L)
-      # create stream vector (header+edges+footer)
+    #' @param rankdir One of "LR" (default), "TB", "RL" or "BT".
+    #' @param width of the drawing, in inches
+    #' @param height of the drawing, in inches
+    as_DOT = function(rankdir = "LR", width = 7.0, height = 7.0) {
+      # check rankdir argument
+      abortifnot(
+        rankdir %in% c("LR", "TB", "RL", "BT"),
+        message = "'rankdir' must be one of 'LR', 'TB', 'RL', 'BT'",
+        class = "invalid_rankdir"
+      )
+      # check width and height
+      abortifnot(
+        is.numeric(width), width > 0.0, is.numeric(height), height > 0.0,
+        message = "'width' and 'height' must be numeric and > 0",
+        class = "invalid_size"
+      )
+      # create stream vector
       indent <- "  "
       o <- vector(mode = "character", length = 0L)
       # write header
-      o[[length(o) + 1L]] <- "graph rdecision {"
-      o[[length(o) + 1L]] <- paste0(indent, 'size="7,7" ;')
-      o[[length(o) + 1L]] <- paste0(indent, "rankdir=LR ;")
+      o <- append(o, "graph rdecision {")
+      # write graph attributes
+      o <- append(o, paste0(
+        indent,
+        "graph [",
+        'rankdir="', rankdir, '"', ", ",
+        'size="', width, ",", height, '"',
+        "]"
+      ))
+      # write node attributes
+      # write node attributes
+      for (v in self$vertexes()) {
+        label <- v$label()
+        if (nchar(label) > 0L) {
+          o <- append(
+            o,
+            paste0(indent, self$vertex_index(v), ' [label="', label, '"]')
+          )
+        }
+      }
       # write edges
       for (e in self$edges()) {
         ep <- e$endpoints()
         s <- ep[[1L]]
         t <- ep[[2L]]
-        o[[length(o) + 1L]] <- paste(
-          indent,
-          ifelse(nodelab, paste0('"', s$label(), '"'), self$vertex_index(s)),
-          "--",
-          ifelse(nodelab, paste0('"', t$label(), '"'), self$vertex_index(t)),
-          ifelse(
-            nchar(e$label()) > 0L,
-            paste("[", "label = ", paste0('"', e$label(), '"'), "]"),
+        label <- e$label()
+        o <- append(o, paste0(
+          indent, self$vertex_index(s), " -- ", self$vertex_index(t),
+          if (nchar(label) > 0L) {
+            paste0(' [label="', label, '"]')
+          } else {
             ""
-          ),
-          ";"
-        )
+          }
+        ))
       }
       # footer
-      o[[length(o) + 1L]] <- "}"
+      o <- append(o, "}")
       # return the stream
       return(o)
     },
-    
+
     #' @description Exports the digraph as a Graph Modelling Language (GML)
     #' stream.
-    #' @details Intended to work with the DiagrammeR package, which is able to
-    #' import GML files.
+    #' @details Intended to work with the igraph or DiagrammeR packages, which
+    #' are able to import GML files.
     #' @returns A GML stream as a character vector.
     as_gml = function() {
       # create stream vector
-      o <- vector(mode = "character", length = 0L) 
+      o <- vector(mode = "character", length = 0L)
       # open the graph
       o <- append(o, "graph [")
       o <- append(o, "  directed 0")
@@ -568,7 +569,7 @@ Graph <- R6::R6Class(
         o <- append(o, paste("    id", self$vertex_index(v)))
         label <- v$label()
         if (nchar(label) > 0L) {
-          o <- append(o, paste0('    label ', '"', label, '"'))
+          o <- append(o, paste0("    label ", '"', label, '"'))
         }
         o <- append(o, "  ]")
       }
@@ -580,14 +581,14 @@ Graph <- R6::R6Class(
         o <- append(o, paste("    target", self$vertex_index(ends[[2L]])))
         label <- e$label()
         if (nchar(label) > 0L) {
-          o <- append(o, paste0('    label ', '"', label, '"'))
+          o <- append(o, paste0("    label ", '"', label, '"'))
         }
         o <- append(o, "  ]")
       }
       # close the graph
       o <- append(o, "]")
       # return the stream
-      return(o)    
+      return(o)
     }
   )
 )

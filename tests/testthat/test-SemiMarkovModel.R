@@ -9,7 +9,7 @@ test_that("incorrect state types are rejected", {
       V = list(s.well, "DISABLED", "STROKE", "DEAD"),
       E = list()
     ),
-    class = "non-Node_vertex"
+    class = "invalid_vertexes"
   )
   n1 <- Node$new()
   e.ww <- Transition$new(s.well, s.well)
@@ -508,8 +508,6 @@ test_that("model variables are detected", {
   expect_length(mv, 9L)
   mvt <- m$modvar_table()
   expect_identical(nrow(mvt), 9L)
-  mvt <- m$modvar_table(expressions = FALSE)
-  expect_identical(nrow(mvt), 6L)
 })
 
 # -----------------------------------------------------------------------------

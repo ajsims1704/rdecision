@@ -29,18 +29,16 @@ Imports:
   withr
 Suggests:
   covr,
-  DiagrammeR,
   grDevices,
   igraph,
   knitr,
-  pander,
   rmarkdown,
   testthat (>= 3.0.0),
   utf8
 License: GPL-3
 Language: en-GB
 Encoding: UTF-8
-RoxygenNote: 7.3.1
+RoxygenNote: 7.3.2
 URL: https://github.com/ajsims1704/rdecision
 BugReports: https://github.com/ajsims1704/rdecision/issues
 VignetteBuilder: knitr

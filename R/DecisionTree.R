@@ -72,21 +72,15 @@ DecisionTree <- R6::R6Class(
         class = "incorrect_node_type"
       )
       # all and only leaf nodes must have no children
-      vi <- self$vertex_along()
-      P <- vi[vapply(vi, FUN.VALUE = TRUE, FUN = function(i) {
-        v <- self$vertex_at(i)
-        self$is_parent(v)
-      })]
+      v <- self$vertexes()
+      P <- self$vertex_index(v[which(self$is_parent(v))])
       abortifnot(setequal(P, union(D, C)),
         message = "All and only leaf nodes must have no children",
         class = "leaf_non-child_sets_unequal"
       )
       # each edge must inherit from action or reaction
-      lv <- vapply(self$edge_along(), FUN.VALUE = TRUE, FUN = function(i) {
-        e <- self$edge_at(i)
-        inherits(e, what = c("Action", "Reaction"))
-      })
-      abortifnot(all(lv),
+      abortifnot(
+        all(is_class(x = self$edges(), what = c("Action", "Reaction"))),
         message = "Each edge must inherit from Action or Reaction",
         class = "incorrect_edge_type"
       )
@@ -239,23 +233,17 @@ DecisionTree <- R6::R6Class(
       mv <- list()
       # find the ModVars in Actions and Reactions
       for (e in self$edges()) {
-        if (inherits(e, what = c("Action", "Reaction"))) {
-          mv <- c(mv, e$modvars())
-        }
+        mv <- c(mv, e$modvars())
       }
       # find the modvars in leaf nodes
-      for (v in private$V){
-        if (inherits(v, what = "LeafNode")) {
-          mv <- c(mv, v$modvars())
-        }
+      for (v in self$vertexes()){
+        mv <- c(mv, v$modvars())
       }
       # return a unique list
       return(unique(mv))
     },
 
     #' @description Tabulate the model variables.
-    #' @param expressions A logical that defines whether expression model
-    #' variables should be included in the tabulation.
     #' @return Data frame with one row per model variable, as follows:
     #' \describe{
     #' \item{\code{Description}}{As given at initialization.}
@@ -276,15 +264,10 @@ DecisionTree <- R6::R6Class(
     #' \item{\code{Est}}{TRUE if the quantiles and SD have been estimated by
     #' random sampling.}
     #' }
-    modvar_table = function(expressions = TRUE) {
+    modvar_table = function() {
       # create list of model variables in this decision tree, excluding
       # expressions if not wanted
       mvlist <- self$modvars()
-      if (!expressions) {
-        mvlist <- mvlist[vapply(mvlist, FUN.VALUE = TRUE, FUN = function(v) {
-          !v$is_expression()
-        })]
-      }
       # create a data frame of model variables
       DF <- data.frame(
         Description = vapply(mvlist, FUN.VALUE = "x", FUN = function(x) {
@@ -1230,8 +1213,8 @@ DecisionTree <- R6::R6Class(
             cex_limit <- min(linner * 0.2 / lw, 1.0)
             # add bars and limits
             for (i in seq_len(nrow(TO))) {
-              xleft <- min(TO[i, "outcome.min"], TO[i, "outcome.max"])
-              xright <- max(TO[i, "outcome.min"], TO[i, "outcome.max"])
+              xleft <- min(TO[[i, "outcome.min"]], TO[[i, "outcome.max"]])
+              xright <- max(TO[[i, "outcome.min"]], TO[[i, "outcome.max"]])
               rect(
                 xleft,
                 xright,
@@ -1241,9 +1224,9 @@ DecisionTree <- R6::R6Class(
                 col = "lightgray",
                 xpd = TRUE
               )
-              LL <- TO[i, "LL"]
-              UL <- TO[i, "UL"]
-              if (TO[i, "outcome.max"] > TO[i, "outcome.min"]) {
+              LL <- TO[[i, "LL"]]
+              UL <- TO[[i, "UL"]]
+              if (TO[[i, "outcome.max"]] > TO[[i, "outcome.min"]]) {
                 labels <- limtxt(c(LL, UL))
               } else {
                 labels <- limtxt(c(UL, LL))

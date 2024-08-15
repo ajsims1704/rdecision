@@ -60,18 +60,12 @@ Reaction <- R6::R6Class(
     #' operands of these \code{ModVar}s, if they are expressions.
     #' @return A list of \code{ModVar}s.
     modvars = function() {
-      # create lists of input variables and output Modvars
+      # build list, possibly including duplicates
       iv <- c(private$edge_cost, private$edge_benefit, private$edge_p)
-      ov <- list()
-      for (v in iv) {
-        if (inherits(v, what = "ModVar")) {
-          ov <- c(ov, v)
-          if (inherits(v, what = "ExprModVar")) {
-            for (o in v$operands()) {
-              ov <- c(ov, o)
-            }
-          }
-        }
+      ov <- iv[which(is_class(iv, what = "ModVar"))]
+      ev <- iv[which(is_class(iv, what = "ExprModVar"))]
+      for (v in ev) {
+        ov <- c(ov, unlist(v$operands()))
       }
       # return the unique list
       return(unique(ov))
@@ -80,7 +74,8 @@ Reaction <- R6::R6Class(
     #' @description Set the probability associated with the reaction edge.
     #' @param p Conditional probability of traversing the reaction edge. Of type
     #' numeric or \code{ModVar}. If numeric, \code{p} must be in the range
-    #' [0,1].
+    #' [0,1], or \code{NA_real_}. Note that setting \code{p = NA} will cause
+    #' an error.
     #' @return Updated \code{Reaction} object.
     set_probability = function(p) {
       # check argument

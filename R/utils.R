@@ -112,39 +112,28 @@ as_numeric <- function(x) {
 #' @param x Monetary value, or list of values
 #' @param p Logical; if TRUE show value to nearest penny, cent etc. If FALSE
 #' show it to the nearest pound, dollar, euro etc.
+#' @param char Logical; if TRUE format the currency values into a character
+#' vector, with pretty printing, including comma separators for thousands,
+#' otherwise convert to rounded numeric values.
+#' @returns A character vector with pretty formatted currency values (if
+#' \code{char} is TRUE), or a vector of rounded numeric values.
 #' @export
-gbp <- function(x, p = FALSE) {
+gbp <- function(x, p = FALSE, char = TRUE) {
   nums <- vapply(X = x, FUN.VALUE = TRUE, FUN = is.numeric)
   x[which(!nums)] <- NA_real_
   digits <- if (p) 2L else 0L
-  s <- format(
-    x = vapply(X = x, FUN.VALUE = 1.0, FUN = round, digits = digits),
-    trim = TRUE,
-    digits = NULL,
-    nsmall = digits,
-    scientific = FALSE,
-    big.mark = ","
-  )
-  return(s)
-}
-
-#' @title Render a DOT format graph as a png file.
-#' @description Uses the \code{dot} command line tool from the graphviz project,
-#' if it is available on the host system, or creates a placeholder image if not.
-#' @param dot GraphViz dot representation in character vector form.
-#' @param pngfile path of png file to create.
-#' @return pathname of the png file created (including extension).
-#' @export
-gv2png <- function(dot, pngfile = tempfile(fileext = ".png")) {
-  cmddot <- Sys.which("dot")
-  if (nchar(cmddot["dot"]) > 0L) {
-    dotfile <- tempfile(fileext = ".gv")
-    writeLines(dot, con = dotfile)
-    system2(command = cmddot["dot"], args = c("-Tpng", "-o", pngfile, dotfile))
-  } else {
-    pngfile <- placeholder(pngfile = pngfile)
+  x <- vapply(X = x, FUN.VALUE = 1.0, FUN = round, digits = digits)
+  if (char) {
+    x <- format(
+      x = x,
+      trim = TRUE,
+      digits = NULL,
+      nsmall = digits,
+      scientific = FALSE,
+      big.mark = ","
+    )
   }
-  return(pngfile)
+  return(x)
 }
 
 #' @title Is an object of a given class?
@@ -153,11 +142,12 @@ gv2png <- function(dot, pngfile = tempfile(fileext = ".png")) {
 #' \pkg{rdecision} and is the template for specific \var{is_X} convenience
 #' functions.
 #' @param x An object to test, possibly a vector.
-#' @param class_name A character string giving the name of the class.
+#' @param what A character vector giving the name(s) of the class.
 #' @return A logical vector of the same length as \var{x} with TRUE values if
-#' the corresponding element of \var{x} inherits from \code{classname}.
+#' the corresponding element of \var{x} inherits from any of the elements of
+#' \code{what}.
 #' @noRd
-is_class <- function(x, class_name) {
+is_class <- function(x, what) {
   # if scalar, coerce to a vector
   if (!is.vector(x)) {
     x <- c(x)
@@ -166,7 +156,7 @@ is_class <- function(x, class_name) {
   rv <- vector(mode = "logical", length = length(x))
   # test each element
   for (i in seq_along(x)) {
-    rv[i] <- inherits(x[[i]], what = class_name)
+    rv[[i]] <- inherits(x[[i]], what = what)
   }
   return(rv)
 }
@@ -191,36 +181,4 @@ is_Arrow <- function(x) {
 #' @noRd
 is_ModVar <- function(x) {
   return(is_class(x, "ModVar"))
-}
-
-#' @title Create a placeholder image in a png file
-#' @description Draws a rectangle with a diagonal using the grid package.
-#' @param pngfile name of png file to create.
-#' @param width width of image in pixels
-#' @param height height of image in pixels
-#' @return Name of the png file written to.
-#' @export
-#' @noRd
-placeholder <- function(pngfile = tempfile(fileext = ".png"), width = 480L,
-                        height = 320L) {
-  grDevices::png(pngfile, width = width, height = height)
-  grid::grid.newpage()
-  grid::grid.move.to(
-    x = grid::unit(0.0, "npc"),
-    y = grid::unit(0.0, "npc")
-  )
-  grid::grid.line.to(
-    x = grid::unit(1.0, "npc"),
-    y = grid::unit(1.0, "npc")
-  )
-  grid::grid.move.to(
-    x = grid::unit(0.0, "npc"),
-    y = grid::unit(1.0, "npc")
-  )
-  grid::grid.line.to(
-    x = grid::unit(1.0, "npc"),
-    y = grid::unit(0.0, "npc")
-  )
-  invisible(grDevices::dev.off())
-  return(pngfile)
 }

@@ -49,7 +49,7 @@ expect_r6_setequal <- function(object, eset) {
 
 # expectation that a numeric value is equal within tolerance. The expectation
 # expect_equal from testthat appears from its documentation to do exactly this,
-# but seems to be configured to ignore small floating point differences. In this
+# but is configured to ignore small floating point differences. In this
 # version any specified tolerance is permitted.
 expect_intol <- function(object, E, tolerance) {
   # capture object and label
@@ -63,14 +63,14 @@ expect_intol <- function(object, E, tolerance) {
   }
   # test if object value is equal to E within tolerance
   testthat::expect(
-    ok = (abs(act$val - E) <= tolerance),
+    ok = isTRUE(all.equal(act$val, E, tolerance = tolerance, scale = 1.0)),
     sprintf("%s (%f) is not within %f of %f", act$lab, act$val, tolerance, E)
   )
   # Invisibly return the value
   invisible(act$val)
 }
 
-# expectation that object, lies in an interval (including its limits).
+# expectation that object lies in an interval (including its limits).
 expect_between <- function(object, lower, upper) {
   # capture object and label
   act <- testthat::quasi_label(rlang::enquo(object), arg = "object")

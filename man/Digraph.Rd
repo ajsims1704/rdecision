@@ -4,6 +4,9 @@
 \name{Digraph}
 \alias{Digraph}
 \title{A directed graph}
+\value{
+A GML stream as a character vector.
+}
 \description{
 An R6 class representing a digraph (a directed graph).
 }
@@ -51,6 +54,7 @@ Andrew Sims \email{andrew.sims@newcastle.ac.uk}
 \item \href{#method-Digraph-paths}{\code{Digraph$paths()}}
 \item \href{#method-Digraph-walk}{\code{Digraph$walk()}}
 \item \href{#method-Digraph-as_DOT}{\code{Digraph$as_DOT()}}
+\item \href{#method-Digraph-as_gml}{\code{Digraph$as_gml()}}
 \item \href{#method-Digraph-clone}{\code{Digraph$clone()}}
 }
 }
@@ -459,15 +463,29 @@ Exports the digraph in DOT notation.
 Writes a representation of the digraph in the
 \code{graphviz} DOT language
 (\url{https://graphviz.org/doc/info/lang.html}) for drawing with one
-of the \code{graphviz} tools, including \code{dot} (Gansner, 1993). If
-all nodes have labels, these are used in the graph, otherwise the labels
-are the node indices.
+of the \code{graphviz} tools, including \code{dot} (Gansner, 1993).
 }
 
 \subsection{Returns}{
 A character vector. Intended for passing to \code{writeLines}
 for saving as a text file.
 }
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-Digraph-as_gml"></a>}}
+\if{latex}{\out{\hypertarget{method-Digraph-as_gml}{}}}
+\subsection{Method \code{as_gml()}}{
+Exports the digraph as a Graph Modelling Language (GML)
+stream.
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{Digraph$as_gml()}\if{html}{\out{</div>}}
+}
+
+\subsection{Details}{
+Intended to work with the igraph or DiagrammeR packages, which
+are able to import GML files.
+}
+
 }
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-Digraph-clone"></a>}}

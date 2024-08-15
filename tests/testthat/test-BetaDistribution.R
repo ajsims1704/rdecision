@@ -27,8 +27,8 @@ test_that("mean, mode, sd and quantiles are returned correctly", {
   expect_intol(b$mode(), o, 0.01)
   probs <- c(0.025, 0.975)
   q <- b$quantile(probs)
-  expect_intol(q[1L], 0.043, 0.01)
-  expect_intol(q[2L], 0.641, 0.01)
+  expect_intol(q[[1L]], 0.043, 0.01)
+  expect_intol(q[[2L]], 0.641, 0.01)
 })
 
 test_that("quantile function checks inputs and has correct output", {

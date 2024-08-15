@@ -4,12 +4,12 @@ test_that("incorrect node and edge types are rejected", {
   n1 <- Node$new()
   n2 <- Node$new()
   a1 <- Arrow$new(n1, n2)
-  expect_error(Digraph$new(n1, list(a1)), class = "non-list_vertices")
-  expect_error(Digraph$new(list(n1, n2), a1), class = "non-list_arrows")
-  expect_error(Digraph$new(list(n1, 42L), list(a1)), class = "non-Node_vertex")
+  expect_error(Digraph$new(n1, list(a1)), class = "invalid_vertexes")
+  expect_error(Digraph$new(list(n1, n2), a1), class = "invalid_edges")
+  expect_error(Digraph$new(list(n1, 42L), list(a1)), class = "invalid_vertexes")
   expect_error(
     Digraph$new(list(n1, n2), list(a1, 42L)),
-    class = "non-Arrow_edge"
+    class = "invalid_edges"
   )
 })
 
@@ -328,7 +328,7 @@ test_that("example of 4 node digraph with cycle has correct properties", {
 })
 
 # create DOT representation of a graph (Sonnenberg & Beck, 1993, Fig 3)
-test_that("DOT and gml files of S&B fig 3 are as expected", {
+test_that("DOT files of S&B fig 3 are as expected", {
   # check that a graph with some unlabelled nodes has nodes labelled without
   # text strings
   s1 <- Node$new("Well")
@@ -342,11 +342,6 @@ test_that("DOT and gml files of S&B fig 3 are as expected", {
   e6 <- Arrow$new(s3, s3)
   s3x <- Node$new()
   G <- Digraph$new(V = list(s1, s2, s3), A = list(e1, e2, e3, e4, e5, e6))
-  dot <- G$as_DOT()
-  expect_false(any(grepl(pattern = "Well", fixed = TRUE, x = dot)))
-  gml <- G$as_gml()
-  expect_true(any(grepl(pattern = "Well", fixed = TRUE, x = gml)))
-  expect_true(any(grepl(pattern = "ill", fixed = TRUE, x = gml)))
   # case as described in the paper
   s1 <- Node$new("Well")
   s2 <- Node$new("Disabled")
@@ -361,13 +356,61 @@ test_that("DOT and gml files of S&B fig 3 are as expected", {
   expect_error(G$as_DOT(rankdir = "TT"), class = "invalid_rankdir")
   expect_error(G$as_DOT(width = "42"), class = "invalid_size")
   dot <- G$as_DOT()
-  expect_true(any(grepl(pattern = 'rankdir = "LR"', fixed = TRUE, x = dot)))
+  expect_true(any(grepl(pattern = 'rankdir="LR"', fixed = TRUE, x = dot)))
   dot <- G$as_DOT(rankdir = "TB")
-  expect_true(any(grepl(pattern = 'rankdir = "TB"', fixed = TRUE, x = dot)))
+  expect_true(any(grepl(pattern = 'rankdir="TB"', fixed = TRUE, x = dot)))
   dot <- G$as_DOT()
-  expect_true(any(grepl(pattern = 'size = "7,7"', fixed = TRUE, x = dot)))
+  expect_true(any(grepl(pattern = 'size="7,7"', fixed = TRUE, x = dot)))
   dot <- G$as_DOT(width = 6.0)
-  expect_true(any(grepl(pattern = 'size = "6,7"', fixed = TRUE, x = dot)))
+  expect_true(any(grepl(pattern = 'size="6,7"', fixed = TRUE, x = dot)))
   dot <- G$as_DOT(rankdir = "TB", width = 6.5, height = 6.5)
-  expect_true(any(grepl(pattern = 'size = "6.5,6.5"', fixed = TRUE, x = dot)))
+  expect_true(any(grepl(pattern = 'size="6.5,6.5"', fixed = TRUE, x = dot)))
+})
+
+# check GML representation of a graph (Sonnenberg & Beck, 1993, Fig 3)
+test_that("gml representation of S&B fig 3 is as expected", {
+  # graph with some unlabelled nodes
+  s1 <- Node$new("Well")
+  s2 <- Node$new("Disabled")
+  s3 <- Node$new()
+  e1 <- Arrow$new(s1, s1)
+  e2 <- Arrow$new(s1, s2, "ill")
+  e3 <- Arrow$new(s1, s3)
+  e4 <- Arrow$new(s2, s2)
+  e5 <- Arrow$new(s2, s3)
+  e6 <- Arrow$new(s3, s3)
+  s3x <- Node$new()
+  G <- Digraph$new(V = list(s1, s2, s3), A = list(e1, e2, e3, e4, e5, e6))
+  # represent in GML format
+  gml <- G$as_gml()
+  expect_true(any(grepl(pattern = "Well", fixed = TRUE, x = gml)))
+  expect_true(any(grepl(pattern = "ill", fixed = TRUE, x = gml)))
+  # check import to igraph
+  gmlfile <- tempfile(fileext = ".gml")
+  writeLines(gml, con = gmlfile)
+  ig <- igraph::read_graph(gmlfile, format = "gml")
+  expect_identical(as.integer(igraph::gorder(ig)), 3L)
+  expect_identical(as.integer(igraph::gsize(ig)), 6L)
+  # case as described in the paper
+  s1 <- Node$new("Well")
+  s2 <- Node$new("Disabled")
+  s3 <- Node$new("Dead")
+  e1 <- Arrow$new(s1, s1)
+  e2 <- Arrow$new(s1, s2, "ill")
+  e3 <- Arrow$new(s1, s3)
+  e4 <- Arrow$new(s2, s2)
+  e5 <- Arrow$new(s2, s3)
+  e6 <- Arrow$new(s3, s3)
+  G <- Digraph$new(V = list(s1, s2, s3), A = list(e1, e2, e3, e4, e5, e6))
+  # check import to igraph
+  gmlfile <- tempfile(fileext = ".gml")
+  gml <- G$as_gml()
+  writeLines(gml, con = gmlfile)
+  ig <- igraph::read_graph(gmlfile, format = "gml")
+  expect_identical(as.integer(igraph::gorder(ig)), 3L)
+  expect_identical(as.integer(igraph::gsize(ig)), 6L)
+  vlabels <- igraph::vertex_attr(ig, name = "label")
+  expect_setequal(vlabels, c("Well", "Disabled", "Dead"))
+  elabels <- igraph::edge_attr(ig, name = "label")
+  expect_setequal(elabels, c(rep("", times = 5L), "ill"))
 })

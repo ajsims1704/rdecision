@@ -223,7 +223,7 @@ test_that("as_numeric detects ModVar and derived objects", {
 
 # tests of gbp
 test_that("gbp returns in currency format", {
-  x <- list(42, 2, 0.002, 4.567, "a")
+  x <- list(42L, 2L, 0.002, 4.567, "a")
   agbp <- gbp(x, p = TRUE)
   expect_identical(agbp, c("42.00", "2.00", "0.00", "4.57", "NA"))
 })
@@ -232,7 +232,33 @@ test_that("gbp returns in currency format", {
 test_that("is_class detects missing arguments", {
   expect_error(is_class())
   expect_error(is_class(42L))
-  expect_error(is_class(class_name = "ModVar"))
+  expect_error(is_class(what = "ModVar"))
+})
+
+test_that("is_class supports vectorized arguments", {
+  n1 <- DecisionNode$new("n1")
+  n2 <- ChanceNode$new()
+  n3 <- LeafNode$new("n3")
+  e1 <- Action$new(source = n1, target = n2, label = "e1")
+  e2 <- Reaction$new(source = n2, target = n3)
+  l <- is_class(x = list(n1, n2, n3, e1, e2), what = "Node")
+  expect_identical(l, c(TRUE, TRUE, TRUE, FALSE, FALSE))
+  l <- is_class(x = list(n1, n2, n3, e1, e2), what = "Edge")
+  expect_identical(l, c(FALSE, FALSE, FALSE, TRUE, TRUE))
+  l <- is_class(x = list(n1, n2, n3, e1, e2), what = "DecisionNode")
+  expect_identical(l, c(TRUE, FALSE, FALSE, FALSE, FALSE))
+  l <- is_class(x = list(n1, n2, n3, e1, e2), what = "Action")
+  expect_identical(l, c(FALSE, FALSE, FALSE, TRUE, FALSE))
+  l <- is_class(
+    x = list(n1, n2, n3, e1, e2),
+    what = c("DecisionNode", "Action")
+  )
+  expect_identical(l, c(TRUE, FALSE, FALSE, TRUE, FALSE))
+  l <- is_class(
+    x = list(n1, n2, n3, e1, e2),
+    what = c("DecisionNode", "Node")
+  )
+  expect_identical(l, c(TRUE, TRUE, TRUE, FALSE, FALSE))
 })
 
 test_that("is_ModVar detects non ModVar objects", {

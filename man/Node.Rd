@@ -18,6 +18,7 @@ Andrew Sims \email{andrew.sims@newcastle.ac.uk}
 \itemize{
 \item \href{#method-Node-new}{\code{Node$new()}}
 \item \href{#method-Node-label}{\code{Node$label()}}
+\item \href{#method-Node-modvars}{\code{Node$modvars()}}
 \item \href{#method-Node-type}{\code{Node$type()}}
 \item \href{#method-Node-clone}{\code{Node$clone()}}
 }
@@ -53,6 +54,20 @@ Return the label of the node.
 
 \subsection{Returns}{
 Label as a character string.
+}
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-Node-modvars"></a>}}
+\if{latex}{\out{\hypertarget{method-Node-modvars}{}}}
+\subsection{Method \code{modvars()}}{
+Find all the model variables of type \code{ModVar} that have
+been specified as values associated with this \code{Node}.
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{Node$modvars()}\if{html}{\out{</div>}}
+}
+
+\subsection{Returns}{
+An empty list for the base class.
 }
 }
 \if{html}{\out{<hr>}}

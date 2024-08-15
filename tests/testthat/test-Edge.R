@@ -27,3 +27,11 @@ test_that("an edge identifies itself", {
   e <- Edge$new(n1, n2, "e1")
   expect_true(e$is_same_edge(e))
 })
+
+test_that("modvars returns an empty list", {
+  n1 <- Node$new("n1")
+  n2 <- Node$new()
+  e <- Edge$new(n1, n2, "e1")
+  mv <- e$modvars()
+  expect_length(mv, 0L)
+})

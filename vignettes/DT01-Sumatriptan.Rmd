@@ -3,8 +3,8 @@ title: "Elementary decision tree (Evans 1997)"
 subtitle: "Sumatriptan versus caffeine for migraine"
 author: "Andrew J. Sims"
 date: "April 2020"
-bibliography: "../inst/REFERENCES.bib"
-csl: "../inst/nature-no-et-al.csl"
+bibliography: "REFERENCES.bib"
+csl: "nature-no-et-al.csl"
 output: 
   rmarkdown::html_vignette:
     fig_width: 7

@@ -109,4 +109,15 @@ test_that("modvars are identified", {
   e$set_cost(c = free)
   mv <- e$modvars()
   expect_length(mv, 2L)
+  # add an expression model variable with two operands
+  o1 <- ConstModVar$new("o1", "GBP", 100.0)
+  o2 <- ConstModVar$new("o2", "GBP", 200.0)
+  c1 <- ExprModVar$new("o1+o2", "GBP", rlang::quo(o1 + o2))
+  e$set_cost(c = c1)
+  mv <- e$modvars()
+  expect_length(mv, 4L)
+  d <- vapply(X = mv, FUN.VALUE = "x", FUN = function(v) {
+    return(v$description())
+  })
+  expect_setequal(d, c("fortytwo", "o1+o2", "o1", "o2"))
 })
