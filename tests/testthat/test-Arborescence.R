@@ -39,6 +39,7 @@ test_that("graphs that are not arborescences are rejected", {
   e2 <- Arrow$new(n1, n3)
   a <- Arborescence$new(V = list(n1, n2, n3), A = list(e1, e2))
   expect_true(a$is_tree())
+  expect_true(a$is_polytree())
   expect_identical(a$root(), n1)
   expect_true(a$is_root(n1))
   expect_identical(a$is_root(list(n1, n2, n3)), c(TRUE, FALSE, FALSE))

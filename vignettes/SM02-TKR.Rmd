@@ -523,7 +523,7 @@ data.frame(
   C = round(SMM_base_10years[0L : 5L, states[["C"]]], digits = 2L),
   D = round(SMM_base_10years[0L : 5L, states[["D"]]], digits = 2L),
   E = round(SMM_base_10years[0L : 5L, states[["E"]]], digits = 2L),
-  "F" = round(SMM_base_10years[0L : 5L, states[["F"]]], digits = 2L),
+  F = round(SMM_base_10years[0L : 5L, states[["F"]]], digits = 2L),
   G = round(SMM_base_10years[0L : 5L, states[["G"]]], digits = 2L),
   H = round(SMM_base_10years[0L : 5L, states[["H"]]], digits = 2L),
   I = round(SMM_base_10years[0L : 5L, states[["I"]]], digits = 2L),
@@ -1031,7 +1031,6 @@ the 95% CI with the values reported in Table 3.
 ```{r}
 #| echo = TRUE
 with(data = SMM_base_PSA$modvar_table(), expr = {
-  is_cost <- grepl(pattern = "^Cost", x = Description)
   data.frame(
     Description = Description,
     Distribution = Distribution,

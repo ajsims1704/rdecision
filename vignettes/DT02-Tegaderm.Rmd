@@ -603,7 +603,7 @@ with(data = head(psa, n = 10L), expr = {
     Cost.Tegaderm = gbp(Cost.Tegaderm, p = TRUE, char = FALSE),
     Cost.Standard = gbp(Cost.Standard, p = TRUE, char = FALSE),
     Cost.Difference = gbp(Difference, p = TRUE, char = FALSE),
-    stringsAsFactors = FALSE  
+    stringsAsFactors = FALSE
   )
 })
 ```
