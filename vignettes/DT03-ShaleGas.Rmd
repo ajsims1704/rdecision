@@ -10,20 +10,12 @@ output:
     fig_width: 7
     fig_height: 5
     fig_caption: true
+    df_print: kable
 vignette: >
   %\VignetteIndexEntry{Decision tree with three decision nodes (Kaminski 2018)}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---
-
-```{r}
-#| purl = FALSE,
-#| include = FALSE
-# read vignette source chunks from corresponding testthat script
-knitr::read_chunk(
-  file.path("..", "tests", "testthat", "test-model-ShaleGas.R")
-)
-```
 
 ```{r}
 #| include = FALSE,
@@ -36,7 +28,17 @@ knitr::opts_chunk$set(
 ```
 
 ```{r}
-library(rdecision) # nolint
+#| purl = FALSE
+#nolint start
+```
+
+```{r}
+library(rdecision)
+```
+
+```{r}
+#| purl = FALSE
+#nolint end
 ```
 
 # Introduction
@@ -68,13 +70,117 @@ probabilities are associated with each edge, which must be an Action
 or a Reaction object, [see figure](#tree-diagram).
 
 ```{r}
-#| create-model,
 #| echo = TRUE
+# nodes
+d1 <- DecisionNode$new("d1")
+d2 <- DecisionNode$new("d2")
+d3 <- DecisionNode$new("d3")
+c1 <- ChanceNode$new("c1")
+c2 <- ChanceNode$new("c2")
+c3 <- ChanceNode$new("c3")
+c4 <- ChanceNode$new("c4")
+t1 <- LeafNode$new("t1")
+t2 <- LeafNode$new("t2")
+t3 <- LeafNode$new("t3")
+t4 <- LeafNode$new("t4")
+t5 <- LeafNode$new("t5")
+t6 <- LeafNode$new("t6")
+t7 <- LeafNode$new("t7")
+t8 <- LeafNode$new("t8")
+t9 <- LeafNode$new("t9")
+# probabilities
+p.sens <- 0.9
+p.spec <- 0.7
+p.gas <- 0.7
+p.nogas <- 1.0 - p.gas
+p.ptest <- p.sens * p.gas + (1.0 - p.spec) * p.nogas
+p.ntest <- (1.0 - p.sens) * p.gas + p.spec * p.nogas
+p.gas.ptest <- p.sens * p.gas / p.ptest
+p.gas.ntest <- (1.0 - p.sens) * p.gas / p.ntest
+# edges
+E <- list(
+  Action$new(d1, t1, "sell", benefit = 800.0),
+  Action$new(d1, c1, "dig", cost = 300.0),
+  Reaction$new(c1, t2, p = p.gas, benefit = 2500.0, label = "gas"),
+  Reaction$new(c1, t3, p = p.nogas, label = "no gas"),
+  Action$new(d1, c2, "test", cost = 50.0),
+  Reaction$new(c2, d2, p = p.ntest, label = "negative"),
+  Action$new(d2, t4, "sell", benefit = 600.0),
+  Action$new(d2, c3, "dig", cost = 300.0),
+  Reaction$new(c3, t5, p = p.gas.ntest, benefit = 2500.0, label = "gas"),
+  Reaction$new(c3, t6, p = (1.0 - p.gas.ntest), label = "no gas"),
+  Reaction$new(c2, d3, p = p.ptest, label = "positive"),
+  Action$new(d3, t7, "sell", benefit = 1000.0),
+  Action$new(d3, c4, "dig", cost = 300.0),
+  Reaction$new(c4, t8, p = p.gas.ptest, benefit = 2500.0, label = "gas"),
+  Reaction$new(c4, t9, p = (1.0 - p.gas.ptest), label = "no gas")
+)
+# tree
+V <- list(d1, d2, d3,  c1, c2, c3, c4,  t1, t2, t3, t4, t5, t6, t7, t8, t9)
+DT <- DecisionTree$new(V, E)
+```
+
+```{r}
+#| purl = FALSE
+# test that strategies are identified correctly
+local({
+  # strategies
+  S <- DT$strategy_table("label")
+  stopifnot(
+    setequal(colnames(S), list("d1", "d2", "d3")),
+    setequal(
+      rownames(S),
+      list(
+        "sell_sell_sell", "sell_sell_dig", "sell_dig_sell", "sell_dig_dig",
+        "dig_sell_sell", "dig_sell_dig", "dig_dig_sell", "dig_dig_dig",
+        "test_sell_sell", "test_sell_dig", "test_dig_sell", "test_dig_dig"
+      )
+    ),
+    all.equal(nrow(S), 12L),
+    all.equal(sum(S[, "d1"] == "sell"), 4L),
+    all.equal(sum(S[, "d2"] == "sell"), 6L),
+    all.equal(sum(S[, "d3"] == "sell"), 6L)
+  )
+  # single strategy
+  s <- list(E[[1L]], E[[7L]], E[[12L]]) # sell sell sell
+  stopifnot(
+    DT$is_strategy(s)
+  )
+  S <- DT$strategy_table("label", select = s)
+  stopifnot(
+    all.equal(nrow(S), 1L),
+    all.equal(S[[1L, "d1"]], "sell"),
+    all.equal(S[[1L, "d2"]], "sell"),
+    all.equal(S[[1L, "d3"]], "sell"),
+    !DT$is_strategy(list(E[[1L]], E[[5L]], E[[7L]]))
+  )
+})
+```
+
+```{r}
+#| purl = FALSE
+# test that root to leaf paths are identified
+local({
+  # evaluate all root-to-leaf paths
+  P <- DT$root_to_leaf_paths()
+  W <- lapply(P, DT$walk)
+  stopifnot(
+    all.equal(length(W), 9L)
+  )
+  M <- DT$evaluate_walks(W)
+  ileaf <- DT$vertex_index(list(t1, t2, t3, t4, t5, t6, t7, t8, t9))
+  it8 <- DT$vertex_index(t8)
+  stopifnot(
+    all.equal(nrow(M), 9L),
+    all.equal(ncol(M), 9L),
+    setequal(rownames(M), as.character(ileaf)),
+    all.equal(M[[as.character(it8), "Cost"]], 220.5, tolerance = 1.0)
+  )
+})
 ```
 
 ## Tree diagram
 ```{r}
-#| purl = FALSE,
 #| results = "hide",
 #| fig.keep = "all",
 #| fig.align = "center",
@@ -95,20 +201,50 @@ by strategy. The results for the gas problem are computed
 as follows. Pay-off is defined as benefit minus cost. 
 
 ```{r}
-#| evaluate,
 #| echo = TRUE
+# find optimal strategies
+RES <- DT$evaluate()
+RES[, "Payoff"] <- RES[, "Benefit"] - RES[, "Cost"]
+```
+
+```{r}
+#| purl = FALSE
+# test that tree identifies the optimal strategy
+local({
+  stopifnot(
+    is.data.frame(RES),
+    setequal(
+      colnames(RES),
+      c("Run", "d1", "d2", "d3", "Probability", "Cost", "Benefit", "Utility",
+        "QALY", "Payoff")
+    ),
+    all.equal(nrow(RES), 12L)
+  )
+  itss <- which(
+    RES[, "d1"] == "test" & RES[, "d2"] == "sell" & RES[, "d3"] == "sell"
+  )
+  stopifnot(
+    all.equal(sum(RES[itss, "Probability"]), 1.0, tolerance = 0.01),
+    all.equal(sum(RES[itss, "Cost"]), 50.0, tolerance = 5.0),
+    all.equal(sum(RES[itss, "Benefit"]), 888.0, tolerance = 5.0)
+  )
+})
 ```
 
 This gives the following pay-off for each strategy:
 
 ```{r}
-#| echo = FALSE,
-#| results = "asis"
-RES[, "Run"] <- NULL
-RES[, "Probability"] <- NULL
-RES[, "Utility"] <- NULL
-RES[, "QALY"] <- NULL
-knitr::kable(RES, row.names = FALSE)
+with(data = RES, expr = {
+  data.frame(
+    d1 = d1,
+    d2 = d2,
+    d3 = d3,
+    Cost = Cost,
+    Benefit = Benefit,
+    Payoff = Payoff,
+    stringsAsFactors = FALSE
+  )
+})
 ```
 
 ```{r}
@@ -118,6 +254,14 @@ popt <- paste(
   sep = ";"
 )
 ```
+
+```{r}
+#| purl = FALSE
+stopifnot(
+  all.equal(popt, "test;sell;dig")
+)
+```
+
 The optimal strategy is `r popt`, *i.e.*, test, sell if negative and
 dig otherwise. The expected pay-off from this strategy is
 `r RES[[imax, "Payoff"]]`.
