@@ -1,3 +1,11 @@
+# rdecision 1.2.1.9004
+
+* Removed dependency on external file for vignette DT01 by direct inclusion of
+  model code from test-model-Sumatriptan.R. Test expectations replaced by
+  `stopifnot` assertions to ensure that the vignette model results agree with
+  published values. Replaced calls to knitr::kable with base R table output
+  for purled output.
+
 # rdecision 1.2.1.9003
 
 * Removed dependency on external file for vignette DT03 by direct inclusion of

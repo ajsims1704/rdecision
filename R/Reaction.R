@@ -26,7 +26,10 @@ Reaction <- R6::R6Class(
     #' general.
     #' @param source_node Chance node from which the reaction leaves.
     #' @param target_node Node which the reaction enters.
-    #' @param p Conditional probability of traversing the reaction edge.
+    #' @param p Conditional probability of traversing the reaction edge. At most
+    #' one Reaction from each chance node may have this set to `NA_real_`, in
+    #' which case it will be replaced by one minus the sum of conditional
+    #' probabilities of the other reaction edges from the node.
     #' @param cost Cost associated with traversal of this edge (numeric or
     #' \code{ModVar}), not NA.
     #' @param benefit Benefit associated with traversal of the edge (numeric or

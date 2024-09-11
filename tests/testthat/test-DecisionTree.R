@@ -506,7 +506,7 @@ test_that("long node labels are not clipped", {
   grDevices::dev.off()
 })
 
-# test of tornado plot
+# test of tornado plot and thresholding
 test_that("tornado plots are as expected", {
   # construct a decision tree
   v <- list(
@@ -527,18 +527,59 @@ test_that("tornado plots are as expected", {
     e6 = Reaction$new(source = v[["c2"]], target = v[["t4"]])
   )
   dt <- DecisionTree$new(V = v, E = e)
-  # add model variables for probabilities at chance nodes
-  p1 <- BetaModVar$new("c1", "probability", alpha = 50L, beta = 950L)
+  # add model variables for probabilities, costs & utilities at chance nodes
+  pcomp <- 0.5
+  p1 <- BetaModVar$new(
+    "c1", "probability", alpha = pcomp * 1000L, beta = (1.0 - pcomp) * 1000L
+  )
   e[["e3"]]$set_probability(p = p1)
   e[["e4"]]$set_probability(p = NA_real_)
-  p2 <- BetaModVar$new("c2", "probability", alpha = 10L, beta = 90L)
+  pint <- 0.6
+  p2 <- BetaModVar$new(
+    "c2", "probability", alpha = pint * 100L, beta = (1.0 - pint) * 100L
+  )
   e[["e5"]]$set_probability(p = p2)
   e[["e6"]]$set_probability(p = NA_real_)
   # add costs
-  e[["e3"]]$set_cost(c = 100.0)
-  e[["e4"]]$set_cost(c = 25.0)
-  e[["e5"]]$set_cost(c = 100.0)
-  e[["e6"]]$set_cost(c = 25.0)
+  ccomp <- 1000.0
+  cfail <- 100.0
+  e[["e3"]]$set_cost(c = ccomp)
+  e[["e4"]]$set_cost(c = ccomp + cfail)
+  cint <- 2500.0
+  e[["e5"]]$set_cost(c = cint)
+  e[["e6"]]$set_cost(c = cint + cfail)
+  # time horizon
+  th <- as.difftime(365.25, units = "days")
+  v[["t1"]]$set_interval(th)
+  v[["t2"]]$set_interval(th)
+  v[["t3"]]$set_interval(th)
+  v[["t4"]]$set_interval(th)
+  # set utilities
+  ucomps <- 0.7
+  ucompf <- 0.6
+  v[["t1"]]$set_utility(ucomps)
+  v[["t2"]]$set_utility(ucompf)
+  uints <- 0.8
+  uintf <- 0.6
+  v[["t3"]]$set_utility(uints)
+  v[["t4"]]$set_utility(uintf)
+
+  # check point estimate calculation
+  edc <- (cint * pint + (cint + cfail) * (1.0 - pint)) -
+    (ccomp * pcomp + (ccomp + cfail) * (1.0 - pcomp))
+  edq <- (uints * pint + uintf * (1.0 - pint)) -
+    (ucomps * pcomp + ucompf * (1.0 - pcomp))
+  eicer <- edc / edq # ~ 21,g00 GBP / QALY for the given costs and utilities
+  o <- dt$evaluate()
+  with(data = o, expr = {
+    odc <- Cost[[which(d1 == "b")]] - Cost[[which(d1 == "a")]]
+    odq <- Utility[[which(d1 == "b")]] - Utility[[which(d1 == "a")]]
+    oicer <- odc / odq
+    expect_intol(odc, edc, tol = 1.0)
+    expect_intol(odq, edq, tol = 0.01)
+    expect_intol(oicer, eicer, tole = 10.0)
+  })
+
   # tornado
   grDevices::pdf(file = NULL)
   expect_error(dt$tornado(), class = "missing_strategy")
@@ -578,6 +619,98 @@ test_that("tornado plots are as expected", {
   to <- dt$tornado(
     index = list(e[["e1"]]), ref = list(e[["e2"]]), draw = TRUE
   )
-  expect_identical(nrow(to), 2L)
+  with(data = to, expr = {
+    # as p1 increases, the cost difference increases
+    expect_lt(
+      object = outcome.min[[which(Description == "c1")]],
+      expected = outcome.max[[which(Description == "c1")]]
+    )
+    # point estimate cost saving must lie in the interval
+    expect_between(
+      object = edc,
+      lower = outcome.min[[which(Description == "c1")]],
+      upper = outcome.max[[which(Description == "c1")]]
+    )
+    # as p2 increases, the cost difference decreases
+    expect_gt(
+      object = outcome.min[[which(Description == "c2")]],
+      expected = outcome.max[[which(Description == "c2")]]
+    )
+    # point estimate cost saving must lie in the interval
+    expect_between(
+      object = edc,
+      lower = outcome.max[[which(Description == "c2")]],
+      upper = outcome.min[[which(Description == "c2")]]
+    )
+  })
+  to <- dt$tornado(
+    index = list(e[["e1"]]), ref = list(e[["e2"]]), outcome = "ICER"
+  )
+  with(data = to, expr = {
+    # as p1 increases, the ICER increases
+    expect_lt(
+      object = outcome.min[[which(Description == "c1")]],
+      expected = outcome.max[[which(Description == "c1")]]
+    )
+    # point estimate ICER must lie in the interval
+    expect_between(
+      object = eicer,
+      lower = outcome.min[[which(Description == "c1")]],
+      upper = outcome.max[[which(Description == "c1")]]
+    )
+    # as p2 increases, the ICER decreases
+    expect_gt(
+      object = outcome.min[[which(Description == "c2")]],
+      expected = outcome.max[[which(Description == "c2")]]
+    )
+    # point estimate ICER must lie in the interval
+    expect_between(
+      object = eicer,
+      lower = outcome.max[[which(Description == "c2")]],
+      upper = outcome.min[[which(Description == "c2")]]
+    )
+  })
   grDevices::dev.off()
+
+  # tests of thresholding
+  expect_error(
+    dt$threshold(
+      index = list(e[["e1"]]), ref = list(e[["e2"]]), outcome = "ICER",
+      mvd = p2$description(),
+      a = pcomp, b = 0.7,
+      lambda = -1.0, tol = 0.001
+    ),
+    class = "invalid_lambda"
+  )
+  expect_error(
+    dt$threshold(
+      index = list(e[["e1"]]), ref = list(e[["e2"]]), outcome = "ICER",
+      mvd = p2$description(),
+      a = pcomp, b = 0.02,
+      lambda = 20000.0, tol = 0.001
+    ),
+    class = "invalid_brackets"
+  )
+  expect_error(
+    dt$threshold(
+      index = list(e[["e1"]]), ref = list(e[["e2"]]), outcome = "ICER",
+      mvd = p2$description(),
+      a = pcomp, b = 0.8,
+      lambda = 20000.0, tol = 0.001, nmax = 5L
+    ),
+    class = "convergence_failure"
+  )
+  pintt <- dt$threshold(
+    index = list(e[["e1"]]), ref = list(e[["e2"]]), outcome = "ICER",
+    mvd = p2$description(),
+    a = pcomp, b = 0.8,
+    lambda = 20000.0, tol = 0.0001
+  )
+  tdc <- (cint * pintt + (cint + cfail) * (1.0 - pintt)) -
+    (ccomp * pcomp + (ccomp + cfail) * (1.0 - pcomp))
+  tdq <- (uints * pintt + uintf * (1.0 - pintt)) -
+    (ucomps * pcomp + ucompf * (1.0 - pcomp))
+  ticer <- tdc / tdq
+  # response rate should be ~61.2% to reduce ICER to WTP threshold
+  expect_intol(ticer, 20000.0, tol = 10.0)
 })

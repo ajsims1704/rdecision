@@ -18,15 +18,6 @@ vignette: >
 ---
 
 ```{r}
-#| purl = FALSE,
-#| include = FALSE
-# read vignette source chunks from corresponding testthat script
-knitr::read_chunk(
-  file.path("..", "tests", "testthat", "test-model-Sumatriptan.R")
-)
-```
-
-```{r}
 #| include = FALSE,
 #| purl = FALSE
 knitr::opts_chunk$set(
@@ -64,8 +55,29 @@ The following code defines the variables for cost, utility and effect that will
 be used in the model. There are 14 variables in total; 4 costs, 4 utilities and
 6 probabilities.
 ```{r}
-#| modvars,
 #| echo = TRUE
+# Time horizon
+th <- as.difftime(24L, units = "hours")
+
+# model variables for cost
+c_sumatriptan <- 16.10
+c_caffeine <- 1.32
+c_ed <- 63.16
+c_admission <- 1093.0
+
+# model variables for utility
+u_relief_norecurrence <- 1.0
+u_relief_recurrence <- 0.9
+u_norelief_endures <- -0.30
+u_norelief_er <- 0.1
+
+# model variables for effect
+p_sumatriptan_recurrence <- 0.594
+p_caffeine_recurrence <- 0.703
+p_sumatriptan_relief <- 0.558
+p_caffeine_relief <- 0.379
+p_er <- 0.08
+p_admitted <- 0.002
 ```
 
 ## Constructing the tree
@@ -76,10 +88,89 @@ root and a unique path from the root to each leaf node. Decision trees
 comprise three types of node: decision, chance and leaf nodes and two
 types of edge: actions (whose sources are decision nodes) and reactions
 (whose sources are chance nodes), [see Figure 1](#tree-diagram).
+If the probability of traversing one reaction edge from any chance node is set
+to `NA_real_`, it will be calculated as 1 minus the sum of probabilities of the
+other reaction edges from that node when the tree is evaluated.
 
 ```{r}
-#| model,
 #| echo = TRUE
+# Sumatriptan branch
+ta <- LeafNode$new("A", utility = u_relief_norecurrence, interval = th)
+tb <- LeafNode$new("B", utility = u_relief_recurrence, interval = th)
+c3 <- ChanceNode$new()
+e1 <- Reaction$new(
+  c3, ta, p = p_sumatriptan_recurrence, label = "No recurrence"
+)
+e2 <- Reaction$new(
+  c3, tb, p = NA_real_, cost = c_sumatriptan, label = "Relieved 2nd dose"
+)
+td <- LeafNode$new("D", utility = u_norelief_er, interval = th)
+te <- LeafNode$new("E", utility = u_norelief_endures, interval = th)
+c7 <- ChanceNode$new()
+e3 <- Reaction$new(c7, td, p = NA_real_, label = "Relief")
+e4 <- Reaction$new(
+  c7, te, p = p_admitted, cost = c_admission, label = "Hospitalization"
+)
+
+tc <- LeafNode$new("C", utility = u_norelief_endures, interval = th)
+c4 <- ChanceNode$new()
+e5 <- Reaction$new(c4, tc, p = NA_real_, label = "Endures attack")
+e6 <- Reaction$new(c4, c7, p = p_er, cost = c_ed, label = "ER")
+
+c1 <- ChanceNode$new()
+e7 <- Reaction$new(c1, c3, p = p_sumatriptan_relief, label = "Relief")
+e8 <- Reaction$new(c1, c4, p = NA_real_, label = "No relief")
+
+# Caffeine/Ergotamine branch
+tf <- LeafNode$new("F", utility = u_relief_norecurrence, interval = th)
+tg <- LeafNode$new("G", utility = u_relief_recurrence, interval = th)
+c5 <- ChanceNode$new()
+e9 <- Reaction$new(c5, tf, p = p_caffeine_recurrence, label = "No recurrence")
+e10 <- Reaction$new(
+  c5, tg, p = NA_real_, cost = c_caffeine, label = "Relieved 2nd dose"
+)
+ti <- LeafNode$new("I", utility = u_norelief_er, interval = th)
+tj <- LeafNode$new("J", utility = u_norelief_endures, interval = th)
+c8 <- ChanceNode$new()
+e11 <- Reaction$new(c8, ti, p = NA_real_, label = "Relief")
+e12 <- Reaction$new(
+  c8, tj, p = p_admitted, cost = c_admission, label = "Hospitalization"
+)
+
+th <- LeafNode$new("H", utility = u_norelief_endures, interval = th)
+c6 <- ChanceNode$new()
+e13 <- Reaction$new(c6, th, p = NA_real_, label = "Endures attack")
+e14 <- Reaction$new(c6, c8, p = p_er, cost = c_ed, label = "ER")
+
+c2 <- ChanceNode$new()
+e15 <- Reaction$new(c2, c5, p = p_caffeine_relief, label = "Relief")
+e16 <- Reaction$new(c2, c6, p = NA_real_, label = "No relief")
+
+# decision node
+d1 <- DecisionNode$new("d1")
+e17 <- Action$new(d1, c1, cost = c_sumatriptan, label = "Sumatriptan")
+e18 <- Action$new(d1, c2, cost = c_caffeine, label = "Caffeine-Ergotamine")
+
+# create lists of nodes and edges
+V <- list(
+  d1, c1, c2, c3, c4, c5, c6, c7, c8,
+  ta, tb, tc, td, te, tf, tg, th, ti, tj
+)
+E <- list(
+  e1, e2, e3, e4, e5, e6, e7, e8, e9, e10, e11, e12, e13, e14, e15, e16,
+  e17, e18
+)
+
+# tree
+dt <- DecisionTree$new(V, E)
+```
+
+```{r}
+#| purl = FALSE
+# test that decision tree structure is as per Evans et al
+stopifnot(
+  all.equal(d1$label(), "d1")
+)
 ```
 
 ```{r}
@@ -87,7 +178,7 @@ types of edge: actions (whose sources are decision nodes) and reactions
 #| fig.keep = "all",
 #| fig.align = "center",
 #| fig.cap = "Figure 1. Decision tree for the Sumatriptan model"
-DT$draw(border = TRUE)
+dt$draw(border = TRUE)
 ```
 
 # Running the model
@@ -110,19 +201,55 @@ aggregate the evaluation by strategy.
 ## Base case
 The evaluation of each pathway, for each strategy, is done as follows:
 ```{r}
-#| eval-by-path,
 #| echo = TRUE
+ep <- dt$evaluate(by = "path")
+```
+
+```{r}
+#| purl = FALSE
+# test that evaluation by path is as per Box 2.3 of Briggs
+local({
+  stopifnot(
+    all.equal(nrow(ep), 10L),
+    setequal(
+      colnames(ep),
+      c(
+        "Leaf", "d1", "Probability", "Cost", "Benefit", "Utility", "QALY",
+        "Run"
+      )
+    ),
+    setequal(ep[, "Leaf"], LETTERS[1L : 10L]),
+    all.equal(sum(ep[, "Probability"]), 2.0, tolerace = 0.01, scale = 1.0)
+  )
+  ia <- which(ep[, "Leaf"] == "A")
+  stopifnot(
+    all.equal(ep[[ia, "d1"]], "Sumatriptan"),
+    all.equal(ep[[ia, "Probability"]], 0.331, tolerance = 0.001, scale = 1.0),
+    all.equal(ep[[ia, "Cost"]], 5.34, tolerance = 0.01, scale = 1.0),
+    all.equal(ep[[ia, "Utility"]], 0.33, tolerance = 0.01, scale = 1.0)
+  )
+  ih <- which(ep[, "Leaf"] == "H")
+  stopifnot(
+    all.equal(ep[[ih, "d1"]], "Caffeine-Ergotamine"),
+    all.equal(ep[[ih, "Probability"]], 0.571, tolerance = 0.001, scale = 1.0),
+    all.equal(ep[[ih, "Cost"]], 0.75, tolerance = 0.01, scale = 1.0),
+    all.equal(ep[[ih, "Utility"]], -0.17, tolerance = 0.01, scale = 1.0)
+  )
+})
 ```
 
 and yields the following table:
 ```{r}
 #| echo = FALSE
-knitr::kable(
-  ep[, c("Leaf", "Probability", "Cost", "Utility")],
-  align = "lrrr",
-  digits = c(2L, 4L, 2L, 5L),
-  format.args = list(scientific = FALSE)
-)
+with(data = ep, expr = {
+  data.frame(
+    Leaf = Leaf,
+    Probability = round(Probability, digits = 4L),
+    Cost = round(Cost, digits = 2L),
+    Utility = round(Utility, digits = 5L),
+    stringsAsFactors = FALSE
+  )
+})
 ```
 
 There are, as expected, ten pathways (5 per strategy). The expected
@@ -132,8 +259,8 @@ above, or by invoking the `evaluate` method of a decision tree object with the
 default parameter `by = "strategy"`. 
 
 ```{r}
-#| eval-by-strategy,
 #| echo = TRUE
+es <- dt$evaluate()
 ```
 
 This gives the following result, consistent with that reported by
@@ -141,18 +268,55 @@ Evans *et al* [-@evans1997].
 
 ```{r}
 #| echo = FALSE
-knitr::kable(
-  es[, c("d1", "Cost", "Utility", "QALY")],
-  align = "lrrr",
-  digits = c(2L, 2L, 4L, 4L),
-  format.args = list(scientific = FALSE)
-)
+with(data = es, expr = {
+  data.frame(
+    d1 = d1,
+    Cost = round(Cost, digits = 2L),
+    Utility = round(Utility, digits = 4L),
+    QALY = round(QALY, digits = 4L),
+    stringsAsFactors = FALSE
+  )
+})
 ```
 
 ```{r}
-#| icer-basecase,
 #| echo = FALSE
+is <- which(es[, "d1"] == "Sumatriptan")
+cost_s <- es[[is, "Cost"]]
+utility_s <- es[[is, "Utility"]]
+qaly_s <- es[[is, "QALY"]]
+
+ic <- which(es[, "d1"] == "Caffeine-Ergotamine")
+cost_c <- es[[ic, "Cost"]]
+utility_c <- es[[ic, "Utility"]]
+qaly_c <- es[[ic, "QALY"]]
+
+delta_c <- cost_s - cost_c
+delta_u <- utility_s - utility_c
+delta_q <- qaly_s - qaly_c
+icer <- delta_c / delta_q
 ```
+
+```{r}
+#| purl = FALSE
+# test that evaluation by strategy is as per Evans et al
+stopifnot(
+  all.equal(nrow(es), 2L),
+  setequal(
+    colnames(es),
+    c("d1", "Run", "Probability", "Cost", "Benefit", "Utility", "QALY")
+  ),
+  setequal(es[, "d1"], c("Sumatriptan", "Caffeine-Ergotamine")),
+  all.equal(sum(es["Probability"]), 2.0, tolerance = 0.01, scale = 1.0),
+  all.equal(cost_s, 22.06, tolerance = 0.01, scale = 1.0),
+  all.equal(utility_s, 0.41, tolerance = 0.01, scale = 1.0),
+  all.equal(cost_c, 4.73, tolerance = 0.02, scale = 1.0),
+  all.equal(utility_c, 0.20, tolerance = 0.01, scale = 1.0),
+  icer / 29366.0 >= 0.95,
+  icer / 29366.0 <= 1.05
+)
+```
+
 The incremental cost was $Can `r gbp(x = delta_c, p = TRUE)`
 (`r gbp(x = cost_s, p = TRUE)` - `r gbp(x = cost_c, p = TRUE)`)
 and the incremental utility was `r round(delta_u, 2L)`
@@ -175,50 +339,255 @@ To calculate these ICERs, we set the value of the model variable
 (with the greater relative increase in effectiveness) is calculated as follows:
 
 ```{r}
-#| relief-threshold-upper,
 #| echo = TRUE
+p_sumatriptan_relief <- p_caffeine_relief + 0.268
+e7$set_probability(p_sumatriptan_relief)
+es <- dt$evaluate()
 ```
+
 ```{r}
-#| icer-upper,
 #| echo = FALSE
+is <- which(es[, "d1"] == "Sumatriptan")
+cost_s_upper <- es[[is, "Cost"]]
+utility_s_upper <- es[[is, "Utility"]]
+qaly_s_upper <- es[[is, "QALY"]]
+
+ic <- which(es[, "d1"] == "Caffeine-Ergotamine")
+cost_c_upper <- es[[ic, "Cost"]]
+utility_c_upper <- es[[ic, "Utility"]]
+qaly_c_upper <- es[[ic, "QALY"]]
+
+delta_c_upper <- cost_s_upper - cost_c_upper
+delta_u_upper <- utility_s_upper - utility_c_upper
+delta_q_upper <- qaly_s_upper - qaly_c_upper
+icer_upper <- delta_c_upper / delta_q_upper
 ```
+
+```{r}
+#| purl = FALSE
+# test that upper relief threshold ICER agrees with Evans et al
+stopifnot(
+  icer_upper / 18950.0 >= 0.95,
+  icer_upper / 18950.0 <= 1.05
+)
+```
+
 This yields the following table, from which the ICER is calculated as 
 `r gbp(icer_upper)` \$Can/QALY, close to the published estimate of
 18,950 \$Can/QALY.
 
 ```{r}
 #| echo = FALSE
-knitr::kable(
-  es[, c("d1", "Cost", "Utility", "QALY")],
-  align = "lrrr",
-  digits = c(2L, 2L, 4L, 4L),
-  format.args = list(scientific = FALSE)
-)
+with(data = es, expr = {
+  data.frame(
+    d1 = d1,
+    Cost = round(Cost, digits = 2L),
+    Utility = round(Utility, digits = 4L),
+    QALY = round(QALY, digits = 4L),
+    stringsAsFactors = FALSE
+  )
+})
 ```
 
 The upper range of ICER (with the smaller relative increase in effectiveness) is
 calculated as follows:
 
 ```{r}
-#| relief-threshold-lower,
 #| echo = TRUE
+p_sumatriptan_relief <- p_caffeine_relief + 0.091
+e7$set_probability(p_sumatriptan_relief)
+es <- dt$evaluate()
 ```
+
 ```{r}
-#| icer-lower,
 #| echo = FALSE
+is <- which(es[, "d1"] == "Sumatriptan")
+cost_s_lower <- es[[is, "Cost"]]
+utility_s_lower <- es[[is, "Utility"]]
+qaly_s_lower <- es[[is, "QALY"]]
+
+ic <- which(es[, "d1"] == "Caffeine-Ergotamine")
+cost_c_lower <- es[[ic, "Cost"]]
+utility_c_lower <- es[[ic, "Utility"]]
+qaly_c_lower <- es[[ic, "QALY"]]
+
+delta_c_lower <- cost_s_lower - cost_c_lower
+delta_u_lower <- utility_s_lower - utility_c_lower
+delta_q_lower <- qaly_s_lower - qaly_c_lower
+icer_lower <- delta_c_lower / delta_q_lower
 ```
+
+```{r}
+#| purl = FALSE
+# test that lower relief threshold ICER agrees with Evans et al
+stopifnot(
+  icer_lower / 60839.0 >= 0.95,
+  icer_lower / 60839.0 <= 1.05
+)
+```
+
 This yields the following table, from which the ICER is calculated as 
 `r gbp(icer_lower)` \$Can/QALY, close to the published estimate of
 60,839 \$Can/QALY.
 
 ```{r}
 #| echo = FALSE
-knitr::kable(
-  es[, c("d1", "Cost", "Utility", "QALY")],
-  align = "lrrr",
-  digits = c(2L, 2L, 4L, 4L),
-  format.args = list(scientific = FALSE)
-)
+with(data = es, expr = {
+  data.frame(
+    d1 = d1,
+    Cost = round(Cost, digits = 2L),
+    Utility = round(Utility, digits = 4L),
+    QALY = round(QALY, digits = 4L),
+    stringsAsFactors = FALSE
+  )
+})
+```
+
+```{r}
+#| purl = FALSE
+# test that upper and lower ICER thresholds can be replicatd with thresholding
+local({
+
+  # model variables with uncertainty
+  p_sumatriptan_relief <- ConstModVar$new(
+    "P(relief|sumatriptan)", "P", 0.558
+  )
+
+  # set probabilities for edges associated with model variables
+  e7$set_probability(p_sumatriptan_relief)
+  e15$set_probability(p_caffeine_relief)
+
+  # upper 95% relief rate threshold for ICER (Table VIII)
+  p_relief_upper <- dt$threshold(
+    index = list(e17), ref = list(e18), outcome = "ICER",
+    mvd = p_sumatriptan_relief$description(),
+    a = 0.6, b = 0.7,
+    lambda = 18950.0, tol = 0.0001
+  )
+  # lower 95% relief rate threshold for ICER (Table VIII)
+  p_relief_lower <- dt$threshold(
+    index = list(e17), ref = list(e18), outcome = "ICER",
+    mvd = p_sumatriptan_relief$description(),
+    a = 0.4, b = 0.5,
+    lambda = 60839.0, tol = 0.0001
+  )
+
+  # check parameters of threshold function
+  # mean relief rate threshold for ICER
+  pt <- dt$threshold(
+    index = list(e17), ref = list(e18), outcome = "ICER",
+    mvd = p_sumatriptan_relief$description(),
+    a = 0.5, b = 0.6,
+    lambda = 29366.0, tol = 0.0001
+  )
+  # check values against Table VIII
+  stopifnot(
+    all.equal(pt, p_caffeine_relief + 0.179, tolerance = 0.02, scale = 1.0),
+    all.equal(
+      p_relief_upper, p_caffeine_relief + 0.268, tolerance = 0.02, scale = 1.0
+    ),
+    all.equal(
+      p_relief_lower, p_caffeine_relief + 0.091, tolerance = 0.02, scale = 1.0
+    )
+  )
+})
+```
+
+```{r}
+#| purl = FALSE
+# test that ICERs computed by tornado function are as expected
+local({
+
+  # probability variables with uncertainty
+  p_sumatriptan_relief <- ConstModVar$new(
+    "P(relief|sumatriptan)", "P", 0.558
+  )
+  e7$set_probability(p_sumatriptan_relief)
+  e15$set_probability(p_caffeine_relief)
+
+  # cost variables with uncertainty
+  c_sumatriptan <- GammaModVar$new(
+    "Sumatriptan", "CAD", shape = 16.10, scale = 1.0
+  )
+  c_caffeine <- GammaModVar$new(
+    "Caffeine", "CAD", shape = 1.32, scale = 1.0
+  )
+  e2$set_cost(c_sumatriptan)
+  e10$set_cost(c_caffeine)
+  e17$set_cost(c_sumatriptan)
+  e18$set_cost(c_caffeine)
+
+  # check ICER ranges in tornado diagram (branches B and G get 2nd dose)
+  TO <- dt$tornado(
+    index = list(e17), ref = list(e18), outcome = "ICER", draw = FALSE
+  )
+  c_sumatriptan$set("expected")
+  c_caffeine$set("expected")
+  x <- qgamma(p = 0.025, shape = 16.10, rate = 1.0)
+  deltac <- (x - c_sumatriptan$get()) * 1.227
+  stopifnot(
+    all.equal(
+      TO[[which(TO$Description == "Sumatriptan"), "LL"]],
+      x,
+      tolerance = 0.01,
+      scale = 1.0
+    ),
+    all.equal(
+      TO[[which(TO$Description == "Sumatriptan"), "outcome.min"]],
+      (cost_s - cost_c + deltac) / delta_q,
+      tolerance = 100.0,
+      scale = 1.0
+    )
+  )
+  x <- qgamma(p = 0.975, shape = 16.10, rate = 1.0)
+  deltac <- (x - c_sumatriptan$get()) * 1.227
+  stopifnot(
+    all.equal(
+      TO[[which(TO$Description == "Sumatriptan"), "UL"]],
+      x,
+      tolerance = 0.01,
+      scale = 1.0
+    ),
+    all.equal(
+      TO[[which(TO$Description == "Sumatriptan"), "outcome.max"]],
+      (cost_s - cost_c + deltac) / delta_q,
+      tolerance = 100.0,
+      scale = 1.0
+    )
+  )
+  x <- qgamma(p = 0.025, shape = 1.32, rate = 1.0)
+  deltac <- (c_caffeine$get() - x) * 1.113
+  stopifnot(
+    all.equal(
+      TO[[which(TO$Description == "Caffeine"), "LL"]],
+      x,
+      tolerance = 0.01,
+      scale = 1.0
+    ),
+    all.equal(
+      TO[[which(TO$Description == "Caffeine"), "outcome.min"]],
+      (cost_s - cost_c + deltac) / delta_q,
+      tolerance = 100.0,
+      scale = 1.0
+    )
+  )
+  x <- qgamma(p = 0.975, shape = 1.32, rate = 1.0)
+  deltac <- (c_caffeine$get() - x) * 1.113
+  stopifnot(
+    all.equal(
+      TO[[which(TO$Description == "Caffeine"), "UL"]],
+      x,
+      tolerance = 0.01,
+      scale = 1.0
+    ),
+    all.equal(
+      TO[[which(TO$Description == "Caffeine"), "outcome.max"]],
+      (cost_s - cost_c + deltac) / delta_q,
+      tolerance = 100.0,
+      scale = 1.0
+    )
+  )
+})
 ```
 
 # References
