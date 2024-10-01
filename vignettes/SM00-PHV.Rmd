@@ -1,0 +1,416 @@
+---
+title: "Introduction to the construction of Markov models"
+author: "Andrew Sims"
+date: "September 2024"
+bibliography: "REFERENCES.bib"
+csl: "nature-no-et-al.csl"
+output: 
+  rmarkdown::html_vignette:
+    fig_width: 7
+    fig_height: 7
+    fig_caption: true
+    df_print: kable
+vignette: >
+  %\VignetteIndexEntry{Introduction to the construction of Markov models}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r}
+#| include = FALSE,
+#| purl = FALSE
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  echo = FALSE,
+  comment = "#>"
+)
+```
+
+```{r}
+#| purl = FALSE
+#nolint start
+```
+
+```{r}
+library("rdecision")
+```
+
+```{r}
+#| purl = FALSE
+#nolint end
+```
+
+# Introduction
+Sonnenberg and Beck's 1993 practical guide to using Markov models in decision
+making [@sonnenberg1993] is widely cited, and describes the principles of
+using Markov models for cohort simulations. As an example, it introduces an
+idealised three health state model applied to patients who have received a 
+prosthetic heart valve (PHV). This vignette explains how to use `rdecision` to
+implement the example case, and replicates the published results.
+
+# Model structure
+In the example, there are three states: "Well", "Disabled" and "Dead", which
+are represented by variables of type `MarkovState`. As a minimum, only the name
+property of each state must be set; the utility and annual occupancy cost can
+be set when a state is created or set later. Because we will be setting these
+properties later, we create the states as named variables. A Markov state object
+is represented in `rdecision` as a node in a graph.
+
+```{r}
+#| echo = TRUE
+s_well <- MarkovState$new(name = "Well")
+s_disabled <- MarkovState$new(name = "Disabled")
+s_dead <- MarkovState$new(name = "Dead")
+```
+
+Each allowed transition between states is represented as an object of type
+`Transition`. In `rdecision`, transitions are the directed edges of a graph.
+Transitions are defined by the source and target states that they join, and
+can have the optional properties of a cost associated with making the
+transition, and a label. In this example, we do not need to set any of the
+optional properties, and can create the transitions as a list of unnamed
+variables. Unless states are temporary states (occupied for one cycle only),
+we must also define transitions from each state to itself, to represent
+people who remain in a state between cycles.
+
+```{r}
+#| echo = TRUE
+E <- list(
+  Transition$new(s_well, s_well),
+  Transition$new(s_dead, s_dead),
+  Transition$new(s_disabled, s_disabled),
+  Transition$new(s_well, s_disabled),
+  Transition$new(s_well, s_dead),
+  Transition$new(s_disabled, s_dead)
+)
+```
+
+The model itself is created as a variable of type `SemiMarkovModel`, which
+represents a directed graph with nodes (states) and edges (transitions).
+Properties of the model, including the cycle time and discount rates can be
+set when the model is created. For this example, we leave these as their
+default values (one year cycle length, no discounting applied to costs or
+utilities).
+
+```{r}
+#| echo = TRUE
+m <- SemiMarkovModel$new(V = list(s_well, s_disabled, s_dead), E)
+```
+
+```{r}
+#| purl = FALSE
+# test that state tabulation is as expected
+local({
+  # check the state tabulation
+  st <- m$tabulate_states()
+  stopifnot(
+    setequal(names(st), c("Name", "Cost", "Utility")),
+    all.equal(nrow(st), 3L)
+  )
+})
+```
+
+The model can be saved as a graph object and rendered as a diagram. Method
+`as_gml()` creates a representation of the graph in GML format, which can 
+be opened and plotted using the `igraph` package, optionally with additional
+manipulation of the graph's appearance to achieve the desired effect, as
+below.
+
+```{r}
+local({
+  # create an igraph object (requires square plot region)
+  gml <- m$as_gml()
+  gmlfile <- tempfile(fileext = ".gml")
+  writeLines(gml, con = gmlfile)
+  ig <- igraph::read_graph(gmlfile, format = "gml")
+  # match layout to Sonnenberg and Beck, fig 3
+  vxy <- matrix(
+    data = c(
+      -0.75, +0.75, +0.00,
+      +0.75, +0.75, -0.75
+    ),
+    ncol = 2L,
+    dimnames = list(c("Well", "Disabled", "Dead"), c("x", "y"))
+  )
+  layout <- matrix(
+    data = c(
+      vapply(X = igraph::V(ig), FUN.VALUE = 1.0, FUN = function(v) {
+        lbl <- igraph::vertex_attr(ig, "label", v)
+        return(vxy[[lbl, "x"]])
+      }),
+      vapply(X = igraph::V(ig), FUN.VALUE = 1.0, FUN = function(v) {
+        lbl <- igraph::vertex_attr(ig, "label", v)
+        return(vxy[[lbl, "y"]])
+      })
+    ),
+    byrow = FALSE,
+    ncol = 2L
+  )
+  # loop angles
+  loopa <- vapply(X = igraph::E(ig), FUN.VALUE = 1.0, FUN = function(e) {
+    # find source and target labels
+    trg <- igraph::head_of(ig, e)
+    trgl <- igraph::vertex_attr(ig, name = "label", index = trg)
+    src <- igraph::tail_of(ig, e)
+    srcl <- igraph::vertex_attr(ig, name = "label", index = src)
+    la <- 0.0
+    if (trgl == srcl) {
+      if (trgl == "Well") {
+        la <- pi
+      } else if (trgl == "Dead") {
+        la <- pi / 2.0
+      }
+    }
+    return(la)
+  })
+  # plot into png file
+  withr::with_par(
+    new = list(
+      oma = c(0L, 0L, 0L, 0L),
+      mar = c(3L, 3L, 3L, 3L),
+      xpd = NA
+    ),
+    code = {
+      plot(
+        ig,
+        rescale = FALSE, asp = 0L,
+        vertex.shape = "circle", vertex.size = 60.0,
+        vertex.color = "white", vertex.label.color = "black",
+        edge.color = "black",
+        edge.arrow.size = 0.75,
+        frame = FALSE,
+        layout = layout,
+        loop.size = 0.8,
+        edge.loop.angle = loopa
+      )
+    }
+  )
+})
+```
+
+# Model variables
+In the prosthetic heart valve example, there are only 4 model variables: three
+probabilities of transition during one cycle, and one utility (disabled state).
+
+The default utility of each state is 1, so we have to set the utilities of the
+disabled and dead states, assuming those in the well state have full utility,
+as follows:
+
+```{r}
+#| echo = TRUE
+s_disabled$set_utility(0.7)
+s_dead$set_utility(0.0)
+```
+
+The probabilities of making a transition between states in a semi-Markov model
+must be defined as a matrix. Specifically, these are the probabilities of
+starting a cycle in one state and finishing it in another. `rdecision` requires
+the matrix to have specific properties:
+
+* Its cells must be numerical values between 0 and 1.
+* There should be as many rows and columns as states.
+* The rows and columns must have names corresponding to the state names.
+* The rows represent the source state and the columns represent the target
+  state.
+* The the sum of probabilities of each row must be 1. We can ensure that the
+  final condition is met by setting at most one value in each row to be `NA`;
+  `rdecision` will replace these by a value to ensure the sum of probabilities
+  is correct; normally this is assigned to self transitions.
+
+In this example there are three values for transition probabilities (well to
+disabled, well to dead, disabled to dead), an assumption that there is no 
+transition from disabled to well, and an assumption that dead is an absorbing
+state. The matrix is created and set as follows:
+
+```{r}
+#| echo = TRUE
+snames <- c("Well", "Disabled", "Dead")
+pt <- matrix(
+  data = c(NA, 0.2, 0.2, 0.0, NA, 0.4, 0.0, 0.0, NA),
+  nrow = 3L, byrow = TRUE,
+  dimnames = list(source = snames, target = snames)
+)
+m$set_probabilities(pt)
+```
+
+```{r}
+with(data = as.data.frame(pt), expr = {
+  data.frame(
+    Well = round(Well, digits = 3L),
+    Disabled = round(Disabled, digits = 3L),
+    Dead = round(Dead, digits = 3L),
+    row.names = row.names(pt),
+    stringsAsFactors = FALSE
+  )
+})
+```
+
+The transition probability matrix can be extracted from the model using the
+function `transition_probabilities()`. The values set as `NA` are replaced 
+as required, and the order of rows and columns may differ from the one provided.
+For this example it is as follows:
+
+```{r}
+local({
+  ptc <- m$transition_probabilities()
+  with(data = as.data.frame(ptc), expr = {
+    data.frame(
+      Well = round(Well, digits = 3L),
+      Disabled = round(Disabled, digits = 3L),
+      Dead = round(Dead, digits = 3L),
+      row.names = row.names(ptc),
+      stringsAsFactors = FALSE
+    )
+  })
+})
+```
+
+```{r}
+#| purl = FALSE
+# test that transition probabilities are as expected
+local({
+  ept <- matrix(
+    data = c(0.6, 0.2, 0.2, 0.0, 0.6, 0.4, 0.0, 0.0, 1.0),
+    nrow = 3L, byrow = TRUE,
+    dimnames = list(source = snames, target = snames)
+  )
+  opt <- m$transition_probabilities()
+  opt <- opt[snames, snames]
+  stopifnot(
+    all.equal(opt, ept)
+  )
+})
+```
+
+# Running the model
+In a cohort Markov model, it is necessary to define the starting populations
+in each state. The total population size is arbitrary; it is the relative
+proportions starting in each state that matters. In Sonnenberg and Beck's
+PHV example, they assume there are 10,000 people who start in the "Well"
+state. In `rdecision` this is achieved by resetting the model; the elapsed
+time and cycle number can be reset with the same call, here we leave them as
+their default values.
+
+In this case, the state populations are given as integers, but in a cohort
+simulation, most practical transition probability matrices lead to state
+occupancies involving fractions of patients as the simulation proceeds. Thus
+the starting populations can also be given as real numbers.
+
+```{r}
+#| echo = TRUE
+m$reset(populations = c(Well = 10000L, Disabled = 0L, Dead = 0L))
+```
+
+To run the model, we call the `cycles()` method. Following the example, there
+are 25 yearly cycles, and there is no half cycle correction. This correction
+can be applied independently to the output to the Markov trace after each cycle
+for the state population, cycle cost and incremental QALYs. 
+
+```{r}
+#| echo = TRUE
+mt <- m$cycles(25L, hcc.pop = FALSE, hcc.cost = FALSE, hcc.QALY = FALSE)
+```
+
+```{r}
+#| purl = FALSE
+# test that cycle results match S&B table 2
+stopifnot(
+  # check structure of data frame
+  all.equal(m$get_elapsed(), as.difftime(25.0 * 365.25, units = "days")),
+  isa(mt, "data.frame"),
+  all.equal(nrow(mt), 26L),
+  # check cycle numbers and times
+  all.equal(mt[, "Cycle"], seq(from = 0L, to = 25L)),
+  all.equal(mt[, "Years"], as.numeric(seq(from = 0L, to = 25L))),
+  # check costs
+  all.equal(mt[, "Cost"], rep(0.0, times = 26L)),
+  # spot check one row
+  all.equal(round(mt[which(mt[, "Cycle"] == 2L), "Well"]), 3600.0),
+  all.equal(round(mt[which(mt[, "Cycle"] == 2L), "Disabled"]), 2400.0),
+  all.equal(round(mt[which(mt[, "Cycle"] == 2L), "Dead"]), 4000.0)
+)
+```
+
+The `cycles()` method returns a Markov trace, a data frame which contains one
+row per cycle with details of state populations, cumulative costs and QALYs.
+The trace for this example is as follows:
+
+```{r}
+t2 <- with(data = mt, expr = {
+  data.frame(
+    Cycle = Cycle,
+    Well = round(Well, digits = 2L),
+    Disabled = round(Disabled, digits = 2L),
+    Dead = round(Dead, digits = 2L),
+    QALY = round(QALY, digits = 4L),
+    cQALY = round(cumsum(QALY), digits = 4L),
+    stringsAsFactors = FALSE
+  )
+})
+t2
+```
+
+The column labelled "QALY" is the per-patient quality adjusted life years
+accumulated at each cycle (in Sonnenberg and Beck's Table 2 this is labelled
+as "Cycle Sum" and is for the whole cohort of 10,000 people), and the column
+labelled "cQALY" is the per-patient cumulative quality adjusted life years
+over the simulation (in Sonnenberg and Beck's Table 2 this is labelled as
+"Cumulative Utility" and is for the whole cohort).
+
+```{r}
+#| purl = FALSE
+# test that reformatted cycle results match S&B table 2
+local({
+  # cycle 0
+  r0 <- which(t2[, "Cycle"] == 0L)
+  stopifnot(
+    all.equal(t2[[r0, "Well"]], 10000.0),
+    all.equal(t2[[r0, "Disabled"]], 0.0),
+    all.equal(t2[[r0, "Dead"]], 0.0),
+    all.equal(t2[[r0, "QALY"]], 0.0),
+    all.equal(t2[[r0, "cQALY"]], 0.0)
+  )
+  # cycle 1
+  r <- which(t2[, "Cycle"] == 1L)
+  stopifnot(
+    all.equal(t2[[r, "Well"]], 6000.0),
+    all.equal(t2[[r, "Disabled"]], 2000.0),
+    all.equal(t2[[r, "Dead"]], 2000.0),
+    all.equal(10000L * t2[[r, "QALY"]], 7400.0, tolerance = 1.0, scale = 1.0),
+    all.equal(10000L * t2[[r, "cQALY"]], 7400.0, tolerance = 1.0, scale = 1.0)
+  )
+  # cycle 2
+  r <- which(t2[, "Cycle"] == 2L)
+  stopifnot(
+    all.equal(t2[[r, "Well"]], 3600.0),
+    all.equal(t2[[r, "Disabled"]], 2400.0),
+    all.equal(t2[[r, "Dead"]], 4000.0),
+    all.equal(10000L * t2[[r, "QALY"]], 5280.0, tolerance = 1.0, scale = 1.0),
+    all.equal(10000L * t2[[r, "cQALY"]], 12680.0, tolerance = 1.0, scale = 1.0)
+  )
+  # cycle 23
+  r <- which(t2[, "Cycle"] == 23L)
+  stopifnot(
+    all.equal(t2[[r, "Well"]], 0.0, tolerance = 1.0, scale = 1.0),
+    all.equal(t2[[r, "Disabled"]], 1.0, tolerance = 1.0, scale = 1.0),
+    all.equal(t2[[r, "Dead"]], 9999.0, tolerance = 1.0, scale = 1.0),
+    all.equal(10000L * t2[[r, "QALY"]], 0.0, tolerance = 1.0, scale = 1.0),
+    all.equal(
+      10000L * t2[[r, "cQALY"]], 23752.0, tolerance = 5.0, scale = 1.0
+    )
+  )
+  # cycle 24
+  r <- which(t2[, "Cycle"] == 24L)
+  stopifnot(
+    all.equal(t2[[r, "Well"]], 0.0, tolerance = 1.0, scale = 1.0),
+    all.equal(t2[[r, "Disabled"]], 0.0, tolerance = 1.0, scale = 1.0),
+    all.equal(t2[[r, "Dead"]], 10000.0, tolerance = 1.0, scale = 1.0),
+    all.equal(t2[[r, "QALY"]], 0.0, tolerance = 1.0, scale = 1.0),
+    all.equal(
+      10000L * t2[[r, "cQALY"]], 23752.0, tolerance = 5.0, scale = 1.0
+    )
+  )
+})
+```
+
+# References

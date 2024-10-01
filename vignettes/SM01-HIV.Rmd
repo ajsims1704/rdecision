@@ -8,6 +8,7 @@ output:
     fig_width: 7
     fig_height: 5
     fig_caption: true
+    df_print: kable
 vignette: >
   %\VignetteIndexEntry{Elementary Semi-Markov Model (Chancellor 1997)}
   %\VignetteEngine{knitr::rmarkdown}
@@ -282,7 +283,16 @@ shown below. This is consistent with the Table 1 of
 Chancellor *et al* [-@chancellor1997].
 ```{r}
 #| purl = FALSE
-knitr::kable(Ptm, align = "lcccc", digits = 3L)
+with(data = as.data.frame(Ptm), expr = {
+  data.frame(
+    A = round(A, digits = 3L),
+    B = round(B, digits = 3L),
+    C = round(C, digits = 3L),
+    D = round(D, digits = 3L),
+    row.names = row.names(Ptm),
+    stringsAsFactors = FALSE
+  )
+})
 ```
 
 # Running the model
@@ -365,11 +375,18 @@ Table 2.3 [-@briggs2006], and the QALY column is consistent with Table 2.4
 (without half cycle correction). No discount was applied to the utilities.
 ```{r}
 #| purl = FALSE
-keep <- c("Years", "A", "B", "C", "D", "Cost", "QALY")
-knitr::kable(
-  MT.mono[, keep], row.names = FALSE, align = "rrrrrrr",
-  digits = c(2L, 0L, 0L, 0L, 0L, 0L, 3L)
-)
+with(data = MT.mono, expr = {
+  data.frame(
+    Years = Years,
+    A = round(A, digits = 0L),
+    B = round(B, digits = 0L),
+    C = round(C, digits = 0L),
+    D = round(D, digits = 0L),
+    Cost = round(Cost, digits = 0L),
+    QALY = round(QALY, digits = 3L),
+    stringsAsFactors = FALSE
+  )
+})
 ```
 
 # Model results
@@ -433,7 +450,16 @@ The resulting per-cycle transition matrix for the combination therapy is as
 follows:
 ```{r}
 #| purl = FALSE
-knitr::kable(Ptc, align = "lcccc", digits = 3L)
+with(data = as.data.frame(Ptc), expr = {
+  data.frame(
+    A = round(A, digits = 3L),
+    B = round(B, digits = 3L),
+    C = round(C, digits = 3L),
+    D = round(D, digits = 3L),
+    row.names = row.names(Ptc),
+    stringsAsFactors = FALSE
+  )
+})
 ```
 
 In this model, lamivudine is given for the first 2 years, with 
@@ -514,11 +540,18 @@ local({
 The Markov trace for combination therapy is as follows:
 ```{r}
 #| purl = FALSE
-keep <- c("Years", "A", "B", "C", "D", "Cost", "QALY")
-knitr::kable(
-  MT.comb[, keep], row.names = FALSE, align = "rrrrrrr",
-  digits = c(2L, 0L, 0L, 0L, 0L, 0L, 3L)
-)
+with(data = MT.comb, expr = {
+  data.frame(
+    Years = Years,
+    A = round(A, digits = 0L),
+    B = round(B, digits = 0L),
+    C = round(C, digits = 0L),
+    D = round(D, digits = 0L),
+    Cost = round(Cost, digits = 0L),
+    QALY = round(QALY, digits = 3L),
+    stringsAsFactors = FALSE
+  )
+})
 ```
 
 ## Comparison of treatments

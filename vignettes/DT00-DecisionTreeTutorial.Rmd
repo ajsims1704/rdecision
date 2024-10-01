@@ -9,6 +9,7 @@ output:
     fig_width: 7
     fig_height: 5
     fig_caption: true
+    df_print: kable
 vignette: >
   %\VignetteIndexEntry{Introduction to the construction of decision trees}
   %\VignetteEngine{knitr::rmarkdown}
@@ -16,24 +17,8 @@ vignette: >
 ---
 
 ```{r}
-#| purl = TRUE,
 #| include = FALSE,
-#| cache = FALSE
-# find package root folder
-roots <- c(file.path("."), file.path(".."), file.path("..", ".."))
-descfile <- file.path(roots, "DESCRIPTION")
-level <- file.exists(descfile)
-stopifnot(sum(level) == 1L)
-root <- roots[[which(level)]]
-root <- normalizePath(root)
-# read vignette source chunks from corresponding testthat script
-rfile <- file.path(root, "tests", "testthat", "test-model-Lifestyle.R")
-stopifnot(file.exists(rfile))
-knitr::read_chunk(path = rfile)
-```
-
-```{r}
-#| include = FALSE
+#| purl = FALSE
 knitr::opts_chunk$set(
   collapse = TRUE,
   echo = FALSE,
@@ -96,8 +81,11 @@ cost of providing an alternative form, attendance at an exercise programme
 need for an interventional procedure. These costs can be defined as scalar
 variables, as follows:
 
-```{r, cost-vars}
+```{r}
 #| echo = TRUE
+cost_diet <- 50.0
+cost_exercise <- 750.0
+cost_stent <- 5000.0
 ```
 
 The model for this fictional scenario can be defined by the following elements:
@@ -105,8 +93,8 @@ The model for this fictional scenario can be defined by the following elements:
 * Decision node: which programme to enrol the patient in.
 
 ```{r}
-#| label = decision-node,
 #| echo = TRUE
+decision_node <- DecisionNode$new("Programme")
 ```
 
 * Chance nodes: the chance that the patient will need an interventional 
@@ -114,8 +102,9 @@ procedure. This is different for the two programmes, so two chance nodes must
 be defined.
 
 ```{r}
-#| label = chance-nodes,
 #| echo = TRUE
+chance_node_diet <- ChanceNode$new("Outcome")
+chance_node_exercise <- ChanceNode$new("Outcome")
 ```
 
 * Leaf nodes: the possible final states of the model, depending both on the
@@ -124,8 +113,11 @@ assume that the model has a time horizon of 1 year, and that the utility is the
 same for all patients (the default values).
 
 ```{r}
-#| label = leaf-nodes,
 #| echo = TRUE
+leaf_node_diet_no_stent <- LeafNode$new("No intervention")
+leaf_node_diet_stent <- LeafNode$new("Intervention")
+leaf_node_exercise_no_stent <- LeafNode$new("No intervention")
+leaf_node_exercise_stent <- LeafNode$new("Intervention")
 ```
 
 These nodes can then be wired into a decision tree graph by defining the edges
@@ -137,8 +129,13 @@ These are the two programmes being tested. The cost of each action, as
 described in the example, is embedded into the action definition.
 
 ```{r}
-#| label = actions,
 #| echo = TRUE
+action_diet <- Action$new(
+  decision_node, chance_node_diet, cost = cost_diet, label = "Diet"
+)
+action_exercise <- Action$new(
+  decision_node, chance_node_exercise, cost = cost_exercise, label = "Exercise"
+)
 ```
 
 ## Reactions
@@ -153,8 +150,11 @@ one year, and in a separate small trial of the “exercise” programme 18 out o
 assumed that the baseline characteristics in the two trials were comparable). 
 
 ```{r}
-#| trial-results,
 #| echo = TRUE
+s_diet <- 12L
+f_diet <- 56L
+s_exercise <- 18L
+f_exercise <- 40L
 ```
 
 Epidemiologically, we can interpret the trial results in terms of the incidence
@@ -162,8 +162,10 @@ proportions of having an adverse event (needing a stent) within one year, for
 each treatment strategy. 
 
 ```{r}
-#| label = nnt,
 #| echo = TRUE
+ip_diet <- f_diet / (s_diet + f_diet)
+ip_exercise <- f_exercise / (s_exercise + f_exercise)
+nnt <- 1.0 / (ip_diet - ip_exercise)
 ```
 
 The incidence proportions are `r round(ip_diet, 2L)` and 
@@ -175,19 +177,42 @@ than the diet programme to save one adverse event.
 
 These trial results can be represented as probabilities of outcome success
 (`p_diet`, `p_exercise`) derived from the incidence proportions of the trial
-results. The probabilities of outcome failure are denoted with "q" prefixes.
+results.
 
 ```{r}
-#| label = prob-vars,
 #| echo = TRUE
+p_diet <- 1.0 - ip_diet
+p_exercise <- 1.0 - ip_exercise
+
 ```
 
 These probabilities, as well as the cost associated with each outcome, can then
-be embedded into the reaction definition.
+be embedded into the reaction definition. The probabilities of traversing the
+reactions for programme failure are set to `NA_real_`, which leaves `rdecision`
+to calculate them at each evaluation of the decision tree, ensuring that the
+total probability of leaving each chance node adds to 1.
 
 ```{r}
-#| label = reactions,
 #| echo = TRUE
+reaction_diet_success <- Reaction$new(
+  chance_node_diet, leaf_node_diet_no_stent,
+  p = p_diet, cost = 0.0, label = "Success"
+)
+
+reaction_diet_failure <- Reaction$new(
+  chance_node_diet, leaf_node_diet_stent,
+  p = NA_real_, cost = cost_stent, label = "Failure"
+)
+
+reaction_exercise_success <- Reaction$new(
+  chance_node_exercise, leaf_node_exercise_no_stent,
+  p = p_exercise, cost = 0.0, label = "Success"
+)
+
+reaction_exercise_failure <- Reaction$new(
+  chance_node_exercise, leaf_node_exercise_stent,
+  p = NA_real_, cost = cost_stent, label = "Failure"
+)
 ```
 
 When all the elements are defined and satisfy the restrictions of a Decision
@@ -195,8 +220,26 @@ Tree (see the documentation for the `DecisionTree` class for details), the whole
 model can be built:
 
 ```{r}
-#| label = decision-tree,
 #| echo = TRUE
+dt <- DecisionTree$new(
+  V = list(
+    decision_node,
+    chance_node_diet,
+    chance_node_exercise,
+    leaf_node_diet_no_stent,
+    leaf_node_diet_stent,
+    leaf_node_exercise_no_stent,
+    leaf_node_exercise_stent
+  ),
+  E = list(
+    action_diet,
+    action_exercise,
+    reaction_diet_success,
+    reaction_diet_failure,
+    reaction_exercise_success,
+    reaction_exercise_failure
+  )
+)
 ```
 
 `rdecision` includes a `draw` method to generate a diagram of a defined
@@ -217,12 +260,19 @@ this example, only two strategies (Diet or Exercise) exist in the model and can
 be compared using the `evaluate()` method.
 
 ```{r}
-#| label = evaluate,
 #| echo = TRUE
+rs <- dt$evaluate()
 ```
 
 ```{r}
-knitr::kable(rs, digits = 2L)
+with(data = rs, expr = {
+  data.frame(
+    Programme = Programme,
+    Probability = round(Probability, digits = 2L),
+    Cost = round(Cost, digits = 2L),
+    stringsAsFactors = FALSE
+  )
+})
 ```
 
 From the evaluation of the two strategies, it is apparent that the Diet strategy
@@ -230,7 +280,26 @@ has a marginally lower net cost by
 `r round(rs[[2L, "Cost"]] - rs[[1L, "Cost"]], 2L)` GBP.
 
 ```{r}
-#| label = verify-base
+o_netc_diet <- rs[[which(rs[, "Programme"] == "Diet"), "Cost"]]
+e_netc_diet <- cost_diet + (1.0 - p_diet) * cost_stent
+o_netc_exercise <- rs[[which(rs[, "Programme"] == "Exercise"), "Cost"]]
+e_netc_exercise <- cost_exercise + (1.0 - p_exercise) * cost_stent
+incc <- nnt * (cost_exercise - cost_diet)
+o_deltac <- o_netc_exercise - o_netc_diet
+e_deltac <- (incc - cost_stent) / nnt
+e_cost_threshold <- (cost_stent / nnt) + cost_diet
+nnt_threshold <- cost_stent / (cost_exercise - cost_diet)
+e_success_threshold <- 1.0 - (ip_diet - (1.0 / nnt_threshold))
+```
+
+```{r}
+#| purl = FALSE
+# test that base case evaluation agrees with direct calculation
+stopifnot(
+  all.equal(o_netc_diet, e_netc_diet, tolerance = 5.0, scale = 1.0),
+  all.equal(o_netc_exercise, e_netc_exercise, tolerance = 5.0, scale = 1.0),
+  all.equal(o_deltac, e_deltac, tolerance = 1.0, scale = 1.0)
+)
 ```
 
 Because this example is structurally simple, we can verify the results by
@@ -238,7 +307,8 @@ direct calculation. The net cost per patient of the diet programme is the cost
 of delivering the advice (`r gbp(cost_diet, p = TRUE)` GBP) plus the cost of
 inserting a stent (`r gbp(cost_stent, p = TRUE)` GBP) multiplied by the
 proportion who require a stent, or the failure rate of the programme,
-`r round(q_diet, 2L)`, equal to `r gbp(e_netc_diet, p = TRUE)` GBP. By a similar
+`r round((1.0 - p_diet), 2L)`, equal to `r gbp(e_netc_diet, p = TRUE)` GBP. By a
+similar
 argument, the net cost per patient of the exercise programme is 
 `r gbp(e_netc_exercise, p = TRUE)` GBP, as the model predicts. If
 `r round(nnt, 2L)` patients are required to change from the diet programme to
@@ -257,12 +327,20 @@ strategy (for example, the Success and Failure paths of the Diet strategy).
 The option `by = "path"` can be used to evaluate each path separately.
 
 ```{r}
-#| label = evaluate-by-path,
 #| echo = TRUE
+rp <- dt$evaluate(by = "path")
 ```
 
 ```{r}
-knitr::kable(rp, digits = c(1L, NA, NA, 3L, 2L, 2L, 3L, 3L))
+with(data = rp, expr = {
+  data.frame(
+    Programme = Programme,
+    Leaf = Leaf,
+    Probability = round(Probability, digits = 2L),
+    Cost = round(Cost, digits = 2L),
+    stringsAsFactors = FALSE
+  )
+})
 ```
 
 ## Adjustment for disutility
@@ -279,12 +357,23 @@ of two nodes in the tree, and not changing the tree structure, we do not have to
 rebuild the tree.
 
 ```{r}
-#| label = lower-utility,
 #| echo = TRUE
+du_stent <- 0.05
+leaf_node_diet_stent$set_utility(1.0 - du_stent)
+leaf_node_exercise_stent$set_utility(1.0 - du_stent)
+rs <- dt$evaluate()
 ```
 
 ```{r}
-knitr::kable(rs, digits = c(1L, NA, 1L, 2L, 2L, 3L, 3L))
+with(data = rs, expr = {
+  data.frame(
+    Programme = Programme,
+    Probability = round(Probability, digits = 2L),
+    Cost = round(Cost, digits = 2L),
+    QALY = round(QALY, digits = 4L),
+    stringsAsFactors = FALSE
+  )
+})
 ```
 
 In this case, while the Diet strategy is preferred from a cost perspective, 
@@ -295,12 +384,25 @@ QALYs correspond to the Utility values). From these figures, the Incremental
 cost-effectiveness ratio (ICER) can be easily calculated:
 
 ```{r}
-#| label = icer,
 #| echo = TRUE
+delta_c <- rs[[which(rs[, "Programme"] == "Exercise"), "Cost"]] -
+  rs[[which(rs[, "Programme"] == "Diet"), "Cost"]]
+delta_u <- rs[[which(rs[, "Programme"] == "Exercise"), "Utility"]] -
+  rs[[which(rs[, "Programme"] == "Diet"), "Utility"]]
+icer <- delta_c / delta_u
 ```
 
 ```{r}
-#| label = verify-icer
+e_du <- du_stent * (p_exercise - p_diet)
+e_icer <- (e_netc_exercise - e_netc_diet) / e_du
+```
+
+```{r}
+#| purl = FALSE
+# test that ICER agrees with direct calculation
+stopifnot(
+  all.equal(icer, e_icer, tolerance = 100.0, scale = 1.0)
+)
 ```
 
 resulting in a cost of `r round(icer, 2L)` GBP per QALY gained in choosing the 
@@ -336,8 +438,10 @@ Fixed costs can be left as numerical values, or also be represented by `ModVar`s
 which ensures that they are included in variable tabulations.
 
 ```{r}
-#| label = cost-modvars,
 #| echo = TRUE
+cost_diet <- ConstModVar$new("Cost of diet programme", "GBP", 50.0)
+cost_exercise <- ConstModVar$new("Cost of exercise programme", "GBP", 750.0)
+cost_stent <- ConstModVar$new("Cost of stent intervention", "GBP", 5000.0)
 ```
 
 In our simplified example, the probability of success of each strategy should
@@ -348,14 +452,20 @@ captures the results of the trials can be defined by the _alpha_ (observed
 successes) and _beta_ (observed failures) parameters. 
 
 ```{r}
-#| label = prob-modvars,
 #| echo = TRUE
+p_diet <- BetaModVar$new(
+  alpha = s_diet, beta = f_diet, description = "P(diet)", units = ""
+)
+p_exercise <- BetaModVar$new(
+  alpha = s_exercise, beta = f_exercise, description = "P(exercise)", units = ""
+)
 ```
 
 These distributions describe the probability of success of each strategy; by
 the constraints of a Decision Tree, the sum of all probabilities associated
-with a chance node must be 1, so the probability of failure should be
-calculated as 1 - p(Success). This can be represented by an `ExprModVar`.
+with a chance node must be 1. By leaving the probabilities of the reaction edges
+as `NA_real`, `rdecision` will ensure this for each run, even when the
+probability of one edge is represented by a model variable.
 
 The newly defined `ModVars` can be incorporated into the Decision Tree model
 using the same grammar as the non-probabilistic model. Because the actions and
@@ -364,13 +474,18 @@ properties using `set_` calls and those new properties will be used when the
 tree is evaluated.
 
 ```{r}
-#| label = actions-probabilistic,
 #| echo = TRUE
+action_diet$set_cost(cost_diet)
+action_exercise$set_cost(cost_exercise)
 ```
 
 ```{r}
-#| label = reactions-probabilistic,
 #| echo = TRUE
+reaction_diet_success$set_probability(p_diet)
+reaction_diet_failure$set_cost(cost_stent)
+
+reaction_exercise_success$set_probability(p_exercise)
+reaction_exercise_failure$set_cost(cost_stent)
 ```
 
 All the probabilistic variables included in the model can be tabulated using
@@ -378,19 +493,55 @@ the `modvar_table()` method, which details the distribution definition and
 some useful parameters, such as mean, SD and 95% CI.
 
 ```{r}
-knitr::kable(dt$modvar_table(), digits = 3L)
+with(data = dt$modvar_table(), expr = {
+  data.frame(
+    Description = Description,
+    Units = Units,
+    Distribution = Distribution,
+    Mean = Mean,
+    SD = SD,
+    Q2.5 = Q2.5,
+    Q97.5 = Q97.5,
+    stringsAsFactors = FALSE
+  )
+})
 ```
 
 A call to the `evaluate()` method with the default settings uses the expected
 (mean) value of each variable, and so replicates the point estimate above.
 
 ```{r}
-#| label = dt-evaluate-expected,
 #| echo = TRUE
+rs <- dt$evaluate()
 ```
 
 ```{r}
-knitr::kable(rs, digits = 2L)
+#| purl = FALSE
+# test that base case evaluation agrees with direct calculation
+local({
+  # direct calculations
+  o_netc_diet <- rs[[which(rs[, "Programme"] == "Diet"), "Cost"]]
+  o_netc_exercise <- rs[[which(rs[, "Programme"] == "Exercise"), "Cost"]]
+  o_deltac <- o_netc_exercise - o_netc_diet
+  # check
+  stopifnot(
+    all.equal(o_netc_diet, e_netc_diet, tolerance = 5.0, scale = 1.0),
+    all.equal(o_netc_exercise, e_netc_exercise, tolerance = 5.0, scale = 1.0),
+    all.equal(o_deltac, e_deltac, tolerance = 1.0, scale = 1.0)
+  )
+})
+```
+
+```{r}
+with(data = rs, expr = {
+  data.frame(
+    Programme = Programme,
+    Probability = round(Probability, digits = 2L),
+    Cost = round(Cost, digits = 2L),
+    QALY = round(QALY, digits = 4L),
+    stringsAsFactors = FALSE
+  )
+})
 ```
 
 However, because each variable is described by a distribution, it is now
@@ -399,8 +550,9 @@ For example, a lower and upper bound can be estimated by setting each variable
 to its 2.5-th or 97.5-th percentile:
 
 ```{r}
-#| label = dt-evaluate-quantiles,
 #| echo = TRUE
+rs_025 <- dt$evaluate(setvars = "q2.5")
+rs_975 <- dt$evaluate(setvars = "q97.5")
 ```
 
 The costs for each choice when all variables are at their upper and lower
@@ -408,13 +560,11 @@ confidence levels are as follows:
 
 ```{r}
 #| purl = FALSE
-knitr::kable(
-  data.frame(
-    Q2.5 = rs_025[, "Cost"],
-    Q97.5 = rs_975[, "Cost"],
-    row.names = c("Diet", "Exercise")
-  ),
-  digits = 2L
+data.frame(
+  Q2.5 = round(rs_025[, "Cost"], digits = 2L),
+  Q97.5 = round(rs_975[, "Cost"], digits = 2L),
+  row.names = c("Diet", "Exercise"),
+  stringsAsFactors = FALSE
 )
 ```
 
@@ -426,8 +576,9 @@ definition, which can then be used to calculate ranges and confidence intervals
 of the estimated values.
 
 ```{r}
-#| label = dt-evaluate-random,
 #| echo = TRUE
+N <- 1000L
+rs <- dt$evaluate(setvars = "random", by = "run", N = N)
 ```
 
 The estimates of cost for each intervention can be plotted as follows:
@@ -446,7 +597,14 @@ abline(a = 0.0, b = 1.0, col = "red")
 
 A tabular summary is as follows:
 ```{r}
-knitr::kable(summary(rs[, c(3L, 8L)]))
+local({
+  data.frame(
+    Cost.Diet = round(unclass(summary(rs[, "Cost.Diet"])), digits = 2L),
+    Cost.Exercise = round(unclass(summary(rs[, "Cost.Exercise"])), digits = 2L),
+    row.names = names(summary(rs[, "Cost.Diet"])),
+    stringsAsFactors = FALSE
+  )
+})
 ```
 
 The variables can be further manipulated, for example calculating the 
@@ -454,21 +612,29 @@ difference in cost between the two strategies for each run of the
 randomised model:
 
 ```{r}
-#| label = dt-difference,
 #| echo = TRUE
+rs[, "Difference"] <- rs[, "Cost.Diet"] - rs[, "Cost.Exercise"]
+CI <- quantile(rs[, "Difference"], c(0.025, 0.975))
 ```
 
 ```{r}
-#| echo = TRUE,
-#| purl = FALSE
+#| echo = TRUE
 hist(
   rs[, "Difference"], 100L,  main = "Distribution of saving",
   xlab = "Saving (GBP)"
 )
-knitr::kable(
-  rs[1L : 10L, c(1L, 3L, 8L, 12L)], digits = 2L,
-  row.names = FALSE
-)
+```
+
+```{r}
+#| echo = FALSE
+with(data = rs[1L : 10L, ], expr = {
+  data.frame(
+    Run = Run,
+    Cost.Diet = round(Cost.Diet, digits = 2L),
+    Cost.Exercise = round(Cost.Exercise, digits = 2L),
+    Difference = round(Difference, digits = 2L)
+  )
+})
 ```
 
 Plotting the distribution of the difference of the two costs reveals that, in
@@ -483,8 +649,33 @@ identify, for a given variable, the value at which one strategy becomes
 cost saving over the other:
 
 ```{r}
-#| label = threshold,
 #| echo = TRUE
+cost_threshold <- dt$threshold(
+  index = list(action_exercise),
+  ref = list(action_diet),
+  outcome = "saving",
+  mvd = cost_exercise$description(),
+  a = 0.0, b = 5000.0, tol = 0.1
+)
+
+success_threshold <- dt$threshold(
+  index = list(action_exercise),
+  ref = list(action_diet),
+  outcome = "saving",
+  mvd = p_exercise$description(),
+  a = 0.0, b = 1.0, tol = 0.001
+)
+```
+
+```{r}
+#| purl = FALSE
+# test that thresholds are evaluated correctly
+stopifnot(
+  all.equal(cost_threshold, e_cost_threshold, tolerance = 5.0, scale = 1.0),
+  all.equal(
+    success_threshold, e_success_threshold, tolerance = 0.03, scale = 1.0
+  )
+)
 ```
 
 By univariate threshold analysis, the exercise program will be cost saving 

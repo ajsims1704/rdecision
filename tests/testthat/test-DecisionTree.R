@@ -700,6 +700,7 @@ test_that("tornado plots are as expected", {
     ),
     class = "convergence_failure"
   )
+  # icer threshold (should be ~61.2% to reduce ICER to WTP threshold)
   pintt <- dt$threshold(
     index = list(e[["e1"]]), ref = list(e[["e2"]]), outcome = "ICER",
     mvd = p2$description(),
@@ -711,6 +712,18 @@ test_that("tornado plots are as expected", {
   tdq <- (uints * pintt + uintf * (1.0 - pintt)) -
     (ucomps * pcomp + ucompf * (1.0 - pcomp))
   ticer <- tdc / tdq
-  # response rate should be ~61.2% to reduce ICER to WTP threshold
   expect_intol(ticer, 20000.0, tol = 10.0)
+  # cost saving threshold (cost of intervention must fall to 1010)
+  mvcint_s <- ConstModVar$new("", "", cint)
+  mvcint_f <- ExprModVar$new("", "", quo = rlang::quo(mvcint_s + cfail))
+  e[["e5"]]$set_cost(c = mvcint_s)
+  e[["e6"]]$set_cost(c = mvcint_f)
+  cintt <- dt$threshold(
+    index = list(e[["e1"]]), ref = list(e[["e2"]]), outcome = "saving",
+    mvd = mvcint_s$description(),
+    a = pcomp, b = cint, tol = 0.0001
+  )
+  tdc <- (cintt * pint + (cintt + cfail) * (1.0 - pint)) -
+    (ccomp * pcomp + (ccomp + cfail) * (1.0 - pcomp))
+  expect_intol(tdc, 0.0, tol = 1.0)
 })

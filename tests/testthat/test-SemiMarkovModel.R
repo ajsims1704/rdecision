@@ -160,6 +160,38 @@ test_that("invalid discount rates are detected", {
   )
 })
 
+test_that("states are tabulated as expected", {
+  v <- list(
+    s_well = MarkovState$new("Well"),
+    s_disabled = MarkovState$new("Disabled"),
+    s_dead = MarkovState$new("Dead")
+  )
+  v[["s_dead"]]$set_utility(0.0)
+  v[["s_disabled"]]$set_utility(0.7)
+  e <- list(
+    Transition$new(v[["s_well"]], v[["s_well"]]),
+    Transition$new(v[["s_well"]], v[["s_dead"]]),
+    Transition$new(v[["s_well"]], v[["s_disabled"]]),
+    Transition$new(v[["s_disabled"]], v[["s_dead"]]),
+    Transition$new(v[["s_disabled"]], v[["s_disabled"]]),
+    Transition$new(v[["s_dead"]], v[["s_dead"]])
+  )
+  m <- SemiMarkovModel$new(V = v, E = e)
+  expect_s3_class(m, "Digraph")
+  st <- m$tabulate_states()
+  expect_s3_class(st, "data.frame")
+  expect_identical(nrow(st), 3L)
+  with(data = st, expr = {
+    expect_setequal(Name, c("Well", "Disabled", "Dead"))
+    expect_identical(Cost[[which(Name == "Dead")]], 0.0)
+    expect_identical(Cost[[which(Name == "Disabled")]], 0.0)
+    expect_identical(Cost[[which(Name == "Well")]], 0.0)
+    expect_identical(Utility[[which(Name == "Dead")]], 0.0)
+    expect_identical(Utility[[which(Name == "Disabled")]], 0.7)
+    expect_identical(Utility[[which(Name == "Well")]], 1.0)
+  })
+})
+
 # -----------------------------------------------------------------------------
 # tests of setting transition probabilities
 # -----------------------------------------------------------------------------
@@ -348,7 +380,7 @@ test_that("transition cost matrix is correct", {
   # set the starting populations
   M$reset(populations = c(Well = 1000L, Disabled = 0L, Dead = 0L))
   # check that transition costs are accumulated
-  C1 <- M$cycle(hcc.pop = FALSE, hcc.cost = FALSE)
+  C1 <- M$cycle(hcc.pop = FALSE, hcc.cost = FALSE, hcc.QALY = FALSE)
   ec.disabled <- 0.2 * 1000.0
   expect_identical(
     round(C1[[which(C1[, "State"] == "Disabled"), "EntryCost"]], 2L),
@@ -593,57 +625,113 @@ test_that("low-level population cycling operates as expected", {
 
 test_that("model is cyclable", {
   # create states
-  s.well <- MarkovState$new(name = "Well")
-  s.disabled <- MarkovState$new(name = "Disabled")
-  s.dead <- MarkovState$new(name = "Dead")
+  s_well <- MarkovState$new(name = "Well")
+  s_disabled <- MarkovState$new(name = "Disabled")
+  s_dead <- MarkovState$new(name = "Dead")
+  # create transitions
+  e <- list(
+    Transition$new(s_well, s_well),
+    Transition$new(s_dead, s_dead),
+    Transition$new(s_disabled, s_disabled),
+    Transition$new(s_well, s_disabled),
+    Transition$new(s_well, s_dead),
+    Transition$new(s_disabled, s_dead)
+  )
+  # detect illegal parameters to cycle()
+  expect_error(
+    SemiMarkovModel$new(
+      V = list(s_well, s_disabled, s_dead), E = e, tcycle = 42L
+    ),
+    class = "invalid_tcycle"
+  )
+  # create the model
+  m <- SemiMarkovModel$new(V = list(s_well, s_disabled, s_dead), E = e)
+  # check cycle time
+  dt <- m$get_tcycle()
+  expect_s3_class(dt, "difftime")
+  expect_identical(dt, as.difftime(365.25, units = "days"))
+  # set utilities
+  s_disabled$set_utility(0.7)
+  s_dead$set_utility(0.0)
   # use S&B per-cycle transition probabilities and calculate rates
   snames <- c("Well", "Disabled", "Dead")
-  Pt <- matrix(
+  pt <- matrix(
     data = c(0.6, 0.2, 0.2, 0.0, 0.6, 0.4, 0.0, 0.0, 1.0),
     nrow = 3L, byrow = TRUE,
     dimnames = list(source = snames, target = snames)
   )
-  # create transitions
-  E <- list(
-    Transition$new(s.well, s.well),
-    Transition$new(s.dead, s.dead),
-    Transition$new(s.disabled, s.disabled),
-    Transition$new(s.well, s.disabled),
-    Transition$new(s.well, s.dead),
-    Transition$new(s.disabled, s.dead)
-  )
-  # detect illegal parameters to cycle()
-  expect_error(
-    SemiMarkovModel$new(V = list(s.well, s.disabled, s.dead), E, tcycle = 42L),
-    class = "invalid_tcycle"
-  )
-  # create the model
-  M <- SemiMarkovModel$new(V = list(s.well, s.disabled, s.dead), E)
-  # check cycle time
-  dt <- M$get_tcycle()
-  expect_s3_class(dt, "difftime")
-  expect_identical(dt, as.difftime(365.25, units = "days"))
-  # set rates
-  M$set_probabilities(Pt)
+  m$set_probabilities(pt)
+  pto <- m$transition_probabilities()
   # test illegal arguments to cycle
-  expect_error(M$cycle(hcc.pop = 3.0), class = "invalid_hcc")
-  expect_error(M$cycle(hcc.cost = 3.0), class = "invalid_hcc")
-  # check return object from cycle()
-  DF <- M$cycle()
-  expect_identical(M$get_elapsed(), as.difftime(365.25, units = "days"))
-  expect_s3_class(DF, "data.frame")
+  expect_error(m$cycle(hcc.pop = 3.0), class = "invalid_hcc")
+  expect_error(m$cycle(hcc.cost = 3.0), class = "invalid_hcc")
+  # run one cycle with cycle()
+  m$reset(populations = c(Well = 10000L, Disabled = 0L, Dead = 0L))
+  df <- m$cycle(hcc.pop = FALSE, hcc.cost = FALSE, hcc.QALY = FALSE)
+  expect_identical(m$get_elapsed(), as.difftime(365.25, units = "days"))
+  expect_s3_class(df, "data.frame")
   expect_setequal(
-    names(DF),
+    names(df),
     c("State", "Cycle", "Time", "Population", "EntryCost", "OccCost", "Cost",
       "QALY")
   )
-  expect_identical(nrow(DF), 3L)
-  expect_setequal(
-    DF[, "State"], c("Well", "Disabled", "Dead")
+  expect_identical(nrow(df), 3L)
+  with(data = df, expr = {
+    expect_setequal(State, c("Well", "Disabled", "Dead"))
+    expect_identical(Population[[which(State == "Well")]], 6000.0)
+    expect_identical(Population[[which(State == "Disabled")]], 2000.0)
+    expect_identical(Population[[which(State == "Dead")]], 2000.0)
+    expect_identical(QALY[[which(State == "Well")]], 0.6)
+    expect_intol(QALY[[which(State == "Disabled")]], 0.2 * 0.7, tol = 0.01)
+    expect_identical(QALY[[which(State == "Dead")]], 0.0)
+  })
+  # run one cycle with cycles()
+  m$reset(populations = c(Well = 10000L, Disabled = 0L, Dead = 0L))
+  mt <- m$cycles(
+    ncycles = 1L, hcc.pop = FALSE, hcc.cost = FALSE, hcc.QALY = FALSE
   )
+  with(data = mt, expr = {
+    expect_identical(Well[[which(Cycle == 1L)]], 6000.0)
+    expect_identical(Disabled[[which(Cycle == 1L)]], 2000.0)
+    expect_identical(Dead[[which(Cycle == 1L)]], 2000.0)
+    expect_intol(QALY[[which(Cycle == 1L)]], 0.6 + 0.2 * 0.7, tol = 0.01)
+  })
+  # run a further 23 cycles
+  mt <- m$cycles(
+    ncycles = 23L, hcc.pop = FALSE, hcc.cost = FALSE, hcc.QALY = FALSE
+  )
+  with(data = mt, expr = {
+    expect_intol(Well[[which(Cycle == 24L)]], 0.0, tol = 1.0)
+    expect_intol(Disabled[[which(Cycle == 24L)]], 0.0, tol = 1.0)
+    expect_intol(Dead[[which(Cycle == 24L)]], 10000.0, tol = 1.0)
+  })
+  # reset and run all cycles in one call
+  m$reset(populations = c(Well = 10000L, Disabled = 0L, Dead = 0L))
+  mt <- m$cycles(
+    ncycles = 24L, hcc.pop = FALSE, hcc.cost = FALSE, hcc.QALY = FALSE
+  )
+  with(data = mt, expr = {
+    expect_intol(sum(QALY), 2.3752, tol = 0.0005)
+  })
+  # check half cycle correction for population, costs and utilities, including
+  # comparing with S&B's estimated QALY gain with HCC after 24 cycles
+  cdis <- 2000.0
+  s_disabled$set_cost(cdis)
+  m$reset(populations = c(Well = 10000L, Disabled = 0L, Dead = 0L))
+  mt <- m$cycles(
+    ncycles = 24L, hcc.pop = TRUE, hcc.cost = TRUE, hcc.QALY = TRUE
+  )
+  mt[, "cQALY"] <- cumsum(mt[, "QALY"])
+  with(data = mt, expr = {
+    expect_intol(Well[[which(Cycle == 1L)]], 8000.0, tol = 1.0)
+    expect_intol(Disabled[[which(Cycle == 1L)]], 1000.0, tol = 1.0)
+    expect_intol(Dead[[which(Cycle == 1L)]], 1000.0, tol = 1.0)
+    expect_intol(Cost[[which(Cycle == 1L)]], cdis * 1000.0 / 10000.0, tol = 1.0)
+    expect_intol(cQALY[[which(Cycle == 24L)]], 2.875, tol = 0.01)
+  })
 })
 
-# cyclng with utilities > 1
+# cycling with utilities > 1
 test_that("utilities > 1 are supported via model variables", {
   cv <- ConstModVar$new(description = "", units = "", const = 2.0)
   a <- MarkovState$new(name = "A", cost = 0.0, utility = 0.9)

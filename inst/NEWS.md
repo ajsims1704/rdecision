@@ -1,3 +1,16 @@
+# rdecision 1.2.1.9005
+
+* Added vignette `SM00`, a narrative explanation of replicating Sonnenberg 
+  and Beck's three-state model of people having a prosthetic heart valve. 
+  Removed dependency of the package readme file on test-model-Lifestyle.R
+  and test-model-PHV.R, and revised, simplified and corrected the readme
+  file.
+* Removed dependency on external file for vignette DT00 by direct inclusion of
+  model code from test-model-Lifestyle.R. Test expectations replaced by
+  `stopifnot` assertions to ensure that the vignette model results agree with
+  published values. Replaced calls to knitr::kable with base R table output
+  for purled output.
+
 # rdecision 1.2.1.9004
 
 * Removed dependency on external file for vignette DT01 by direct inclusion of

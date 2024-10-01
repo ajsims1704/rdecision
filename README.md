@@ -72,9 +72,7 @@ f_exercise <- 40L
 The proportions of the two programmes being successful (i.e., avoiding
 an interventional procedure) are uncertain due to the finite size of each trial
 and are represented by model variables with uncertainties which follow Beta
-distributions. Probabilities of the failure of the programmes are calculated
-using expression model variables to ensure that the total probability
-associated with each chance node is one.
+distributions.
 
 ``` r
 p_diet <- BetaModVar$new(
@@ -82,13 +80,6 @@ p_diet <- BetaModVar$new(
 )
 p_exercise <- BetaModVar$new(
   alpha = s_exercise, beta = f_exercise, description = "P(exercise)", units = ""
-)
-
-q_diet <- ExprModVar$new(
-  rlang::quo(1.0 - p_diet), description = "1 - P(diet)", units = ""
-)
-q_exercise <- ExprModVar$new(
-  rlang::quo(1.0 - p_exercise), description = "1 - P(exercise)", units = ""
 )
 ```
 
@@ -114,8 +105,7 @@ leaf_node_exercise_stent <- LeafNode$new("Intervention")
 ```
 
 There are two action edges emanating from the decision node, which represent the
-two choices, and four reaction edges, representing the consequences of the
-success and failure of each programme.
+two choices, each with an associated cost.
 
 ``` r
 action_diet <- Action$new(
@@ -126,6 +116,13 @@ action_exercise <- Action$new(
 )
 ```
 
+There are four reaction edges, representing the consequences of the
+success and failure of each programme. Edges representing success are associated
+with the probability of programmme success, and those representing programme
+failure are assigned a probability of `NA` (to ensure that the total probability
+associated with each chance node is one) and a failure cost (of fitting a
+stent).
+
 ``` r
 reaction_diet_success <- Reaction$new(
   chance_node_diet, leaf_node_diet_no_stent,
@@ -134,7 +131,7 @@ reaction_diet_success <- Reaction$new(
 
 reaction_diet_failure <- Reaction$new(
   chance_node_diet, leaf_node_diet_stent,
-  p = q_diet, cost = cost_stent, label = "Failure"
+  p = NA_real_, cost = cost_stent, label = "Failure"
 )
 
 reaction_exercise_success <- Reaction$new(
@@ -144,7 +141,7 @@ reaction_exercise_success <- Reaction$new(
 
 reaction_exercise_failure <- Reaction$new(
   chance_node_exercise, leaf_node_exercise_stent,
-  p = q_exercise, cost = cost_stent, label = "Failure"
+  p = NA_real_, cost = cost_stent, label = "Failure"
 )
 ```
 
@@ -189,47 +186,28 @@ exercise programme exceeds the diet programme by 31 GBP per
 patient. The savings associated with the greater efficacy of the exercise
 programme do not offset the increased cost of delivering it.
 
-To estimate the uncertainty of the relative effectiveness, the probabilities of
-the success proportions of the two treatments can be represented as model
-variables who uncertainty follows a Beta distribution, and the decision tree
-re-evaluated.
-
-``` r
-action_diet$set_cost(cost_diet)
-action_exercise$set_cost(cost_exercise)
-```
-
-``` r
-reaction_diet_success$set_probability(p_diet)
-
-reaction_diet_failure$set_probability(q_diet)
-reaction_diet_failure$set_cost(cost_stent)
-
-reaction_exercise_success$set_probability(p_exercise)
-
-reaction_exercise_failure$set_probability(q_exercise)
-reaction_exercise_failure$set_cost(cost_stent)
-```
+Because the probabilities of the success proportions of the two treatments have
+been represented as model variables with an uncertainty distribution, the
+uncertainty of the relative effectiveness is estimated by repeated evaluation
+of the decision tree.
 
 ``` r
 N <- 1000L
 rs <- dt$evaluate(setvars = "random", by = "run", N = N)
 ```
 
-The confidence interval of the cost saving is estimated by repeated evaluation
-of the tree, each time sampling from the uncertainty distribution of the two
-probabilities using, for example, `DT$evaluate(setvars = "random", N = 1000L)`
-and inspecting the resulting data frame. From 1000 runs, the 95% confidence
-interval of the per patient cost saving
-is -760.39 GBP
-to 705.17 GBP,
-with 43.2% being cost
-saving. Although the exercise programme is more costly to provide than the
-dietary advice programme, it is more effective and leads to saving overall
-because fewer costly interventional procedures are needed. However, due to the
-uncertainties of the effectiveness of each programme, it can be concluded that
-more evidence is required to be confident that the exercise programme is cost
-saving overall.
+The confidence interval of the net cost difference (net cost of the diet
+programme minus the net cost of the exercise programme) is estimated from
+the resulting data frame. From 1000 runs, the mean net cost difference is
+-37.81 GBP with 95% confidence interval
+-794.3 GBP
+to 686.71 GBP,
+with 47.1% runs having a lower
+net cost for the exercise programme. Although the point estimate net cost of
+the exercise programme exceeds that of the diet programme, due to the
+uncertainties of the effectiveness of
+each programme, it can be concluded that there is insufficient evidence
+that the net costs differ.
 
 The method `threshold` is used to find the threshold of one of the model
 variables at which the cost difference reaches zero. By univariate
@@ -285,7 +263,7 @@ M$set_probabilities(Pt)
 
 <img src="man/figures/phv.png" width="480" style="display: block; margin: auto;" />
 
-With a starting population of 10,000, the model can be run for 25 years as
+With a starting population of 10,000, the model can be run for 24 years as
 follows.
 
 ``` r
@@ -295,7 +273,7 @@ M$reset(c(Well = 10000.0, Disabled = 0.0, Dead = 0.0))
 
 ``` r
 # cycle
-MT <- M$cycles(25L, hcc.pop = FALSE, hcc.cost = FALSE, hcc.QALY = FALSE)
+MT <- M$cycles(24L, hcc.pop = FALSE, hcc.cost = FALSE, hcc.QALY = FALSE)
 ```
 
 The output, after rounding, of the `cycles` function is the Markov trace, shown
@@ -303,36 +281,39 @@ below, which replicates Table 2<sup>2</sup>. In more recent usage,
 cumulative utility is normally called incremental utility, and expressed per
 patient (i.e., divided by 10,000).
 
-| Years |  Well | Disabled |  Dead | Cumulative Utility |
-|------:|------:|---------:|------:|-------------------:|
-|     0 | 10000 |        0 |     0 |                  0 |
-|     1 |  6000 |     2000 |  2000 |               7400 |
-|     2 |  3600 |     2400 |  4000 |              12680 |
-|     3 |  2160 |     2160 |  5680 |              16352 |
-|    23 |     0 |        1 |  9999 |              23749 |
-|    24 |     0 |        0 | 10000 |              23749 |
-|    25 |     0 |        0 | 10000 |              23750 |
+<div class="kable-table">
+
+| Years |  Well | Disabled | Cumulative.Utility |
+|------:|------:|---------:|-------------------:|
+|     0 | 10000 |        0 |                  0 |
+|     1 |  6000 |     2000 |               7400 |
+|     2 |  3600 |     2400 |              12680 |
+|     3 |  2160 |     2160 |              16352 |
+|    23 |     0 |        1 |              23749 |
+|    24 |     0 |        0 |              23749 |
+
+</div>
 
 # Acknowledgements
 
-In addition to using base R<sup>3</sup>, `redecision` relies heavily on
+In addition to using base R<sup>3</sup>, `redecision` relies on
 the `R6` implementation of classes<sup>4</sup> and the `rlang` package for
 error handling and non-standard evaluation used in expression model variables<sup>5</sup>. Building the package vignettes and documentation relies on the
-`testthat` package<sup>6</sup>, the `devtools` package<sup>7</sup> and
-`rmarkdown`<sup>10</sup>.
+`testthat` package<sup>6</sup>, the `devtools` package<sup>7</sup>,
+`rmarkdown`<sup>10</sup> and `knitr`<sup>11</sup>.
 
 Underpinning graph theory is based on terminology, definitions and
-algorithms from Gross *et al*<sup>11</sup>, the Wikipedia
-glossary<sup>12</sup> and links therein. Topological sorting of graphs
-is based on Kahn’s algorithm<sup>13</sup>. Some of the terminology for decision
-trees was based on the work of Kaminski *et al*<sup>14</sup> and an
-efficient tree drawing algorithm was based on the work of Walker<sup>15</sup>.
+algorithms from Gross *et al*<sup>12</sup>, the Wikipedia
+glossary<sup>13</sup> and links therein. Topological sorting of graphs
+is based on Kahn’s algorithm<sup>14</sup>. Some of the terminology for decision
+trees was based on the work of Kaminski *et al*<sup>15</sup> and an
+efficient tree drawing algorithm was based on the work of Walker<sup>16</sup>.
 In semi-Markov models, representations are exported in the
-DOT language<sup>16</sup>.
+DOT language<sup>17</sup>.
 
 Terminology for decision trees and Markov models in health economic evaluation
 was based on the book by Briggs *et al*<sup>1</sup> and the output format
-and terminology follows ISPOR recommendations<sup>18</sup>.
+and terminology follows ISPOR recommendations<sup>19</sup>.
 
 Citations for examples used in vignettes are given in applicable vignette
 files.
@@ -355,19 +336,19 @@ files.
 
 <div id="ref-rcoreteam" class="csl-entry">
 
-<span class="csl-left-margin">3. </span><span class="csl-right-inline">R Core Team. *R: A language and environment for statistical computing*. (2021). at \<<https://www.R-project.org/>\></span>
+<span class="csl-left-margin">3. </span><span class="csl-right-inline">R Core Team. R: A language and environment for statistical computing. (2021). at \<<https://www.R-project.org/>\></span>
 
 </div>
 
 <div id="ref-chang2020" class="csl-entry">
 
-<span class="csl-left-margin">4. </span><span class="csl-right-inline">Chang, W. *R6: Encapsulated classes with reference semantics*. (2020). at \<<https://CRAN.R-project.org/package=R6>\></span>
+<span class="csl-left-margin">4. </span><span class="csl-right-inline">Chang, W. R6: Encapsulated classes with reference semantics. (2020). at \<<https://CRAN.R-project.org/package=R6>\></span>
 
 </div>
 
 <div id="ref-henry2020" class="csl-entry">
 
-<span class="csl-left-margin">5. </span><span class="csl-right-inline">Henry, L. & Wickham, H. *Rlang: Functions for base types and core r and tidyverse features*. (2020). at \<<https://CRAN.R-project.org/package=rlang>\></span>
+<span class="csl-left-margin">5. </span><span class="csl-right-inline">Henry, L. & Wickham, H. Rlang: Functions for base types and core r and tidyverse features. (2020). at \<<https://CRAN.R-project.org/package=rlang>\></span>
 
 </div>
 
@@ -379,7 +360,7 @@ files.
 
 <div id="ref-wickham2020" class="csl-entry">
 
-<span class="csl-left-margin">7. </span><span class="csl-right-inline">Wickham, H., Hester, J. & Chang, W. *Devtools: Tools to make developing r packages easier*. (2020). at \<<https://CRAN.R-project.org/package=devtools>\></span>
+<span class="csl-left-margin">7. </span><span class="csl-right-inline">Wickham, H., Hester, J. & Chang, W. Devtools: Tools to make developing r packages easier. (2020). at \<<https://CRAN.R-project.org/package=devtools>\></span>
 
 </div>
 
@@ -391,7 +372,7 @@ files.
 
 <div id="ref-allaire2020" class="csl-entry">
 
-<span class="csl-left-margin">9. </span><span class="csl-right-inline">Allaire, J., Xie, Y., McPherson, J., Luraschi, J., Ushey, K., Atkins, A., Wickham, H., Cheng, J., Chang, W. & Iannone, R. *Rmarkdown: Dynamic documents for r*. (2020). at \<<https://github.com/rstudio/rmarkdown>\></span>
+<span class="csl-left-margin">9. </span><span class="csl-right-inline">Allaire, J., Xie, Y., McPherson, J., Luraschi, J., Ushey, K., Atkins, A., Wickham, H., Cheng, J., Chang, W. & Iannone, R. Rmarkdown: Dynamic documents for r. (2020). at \<<https://github.com/rstudio/rmarkdown>\></span>
 
 </div>
 
@@ -401,51 +382,57 @@ files.
 
 </div>
 
+<div id="ref-xie2024" class="csl-entry">
+
+<span class="csl-left-margin">11. </span><span class="csl-right-inline">Xie, Y. Knitr: A general-purpose package for dynamic report generation in r. (2024). at \<<https://yihui.org/knitr/>\></span>
+
+</div>
+
 <div id="ref-gross2013" class="csl-entry">
 
-<span class="csl-left-margin">11. </span><span class="csl-right-inline">Gross, J. L., Yellen, J. & Zhang, P. *Handbook of graph theory*. (Chapman; Hall/CRC., 2013). at \<<https://doi.org/10.1201/b16132>\></span>
+<span class="csl-left-margin">12. </span><span class="csl-right-inline">Gross, J. L., Yellen, J. & Zhang, P. *Handbook of graph theory*. (Chapman; Hall/CRC., 2013). at \<<https://doi.org/10.1201/b16132>\></span>
 
 </div>
 
 <div id="ref-wikipedia2021" class="csl-entry">
 
-<span class="csl-left-margin">12. </span><span class="csl-right-inline">Wikipedia. Glossary of graph theory. *Wikipedia* (2021). at \<<https://en.wikipedia.org/wiki/Glossary_of_graph_theory>\></span>
+<span class="csl-left-margin">13. </span><span class="csl-right-inline">Wikipedia. Glossary of graph theory. *Wikipedia* (2021). at \<<https://en.wikipedia.org/wiki/Glossary_of_graph_theory>\></span>
 
 </div>
 
 <div id="ref-kahn1962" class="csl-entry">
 
-<span class="csl-left-margin">13. </span><span class="csl-right-inline">Kahn, A. B. [Topological sorting of large networks](https://doi.org/10.1145/368996.369025). *Communications of the ACM* **5,** 558–562 (1962).</span>
+<span class="csl-left-margin">14. </span><span class="csl-right-inline">Kahn, A. B. [Topological sorting of large networks](https://doi.org/10.1145/368996.369025). *Communications of the ACM* **5,** 558–562 (1962).</span>
 
 </div>
 
 <div id="ref-kaminski2018" class="csl-entry">
 
-<span class="csl-left-margin">14. </span><span class="csl-right-inline">Kamiński, B., Jakubczyk, M. & Szufel, P. [A framework for sensitivity analysis of decision trees](https://doi.org/10.1007/s10100-017-0479-6). *Central European Journal of Operational Research* **26,** 135–159 (2018).</span>
+<span class="csl-left-margin">15. </span><span class="csl-right-inline">Kamiński, B., Jakubczyk, M. & Szufel, P. [A framework for sensitivity analysis of decision trees](https://doi.org/10.1007/s10100-017-0479-6). *Central European Journal of Operational Research* **26,** 135–159 (2018).</span>
 
 </div>
 
 <div id="ref-walker1989" class="csl-entry">
 
-<span class="csl-left-margin">15. </span><span class="csl-right-inline">Walker, J. Q. *A node-positioning algorithm for general trees*. (University of North Carolina, 1989). at \<<http://www.cs.unc.edu/techreports/89-034.pdf>\></span>
+<span class="csl-left-margin">16. </span><span class="csl-right-inline">Walker, J. Q. *A node-positioning algorithm for general trees*. (University of North Carolina, 1989). at \<<http://www.cs.unc.edu/techreports/89-034.pdf>\></span>
 
 </div>
 
 <div id="ref-gansner1993" class="csl-entry">
 
-<span class="csl-left-margin">16. </span><span class="csl-right-inline">Gansner, E. R., Koutsofios, E., North, S. C. & Vo, K.-P. [A technique for drawing directed graphs](https://doi.org/10.1109/32.221135). *IEEE Transactions on Software Engineering* **19,** 214–230 (1993).</span>
+<span class="csl-left-margin">17. </span><span class="csl-right-inline">Gansner, E. R., Koutsofios, E., North, S. C. & Vo, K.-P. [A technique for drawing directed graphs](https://doi.org/10.1109/32.221135). *IEEE Transactions on Software Engineering* **19,** 214–230 (1993).</span>
 
 </div>
 
 <div id="ref-briggs2012a" class="csl-entry">
 
-<span class="csl-left-margin">17. </span><span class="csl-right-inline">Briggs, A. H., Weinstein, M. C., Fenwick, E. A. L., Karnon, J., Sculpher, M. J. & Paltiel, A. D. [Model parameter estimation and uncertainty: A report of the ISPOR-SMDM modeling good research practices task force-6](https://doi.org/10.1016/j.jval.2012.04.014). *Value in Health* **15,** 835–842 (2012).</span>
+<span class="csl-left-margin">18. </span><span class="csl-right-inline">Briggs, A. H., Weinstein, M. C., Fenwick, E. A. L., Karnon, J., Sculpher, M. J. & Paltiel, A. D. [Model parameter estimation and uncertainty: A report of the ISPOR-SMDM modeling good research practices task force-6](https://doi.org/10.1016/j.jval.2012.04.014). *Value in Health* **15,** 835–842 (2012).</span>
 
 </div>
 
 <div id="ref-siebert2012" class="csl-entry">
 
-<span class="csl-left-margin">18. </span><span class="csl-right-inline">Siebert, U., Alagoz, O., Bayoumi, A. M., Jahn, B., Owens, D. K., Cohen, D. J. & Kuntz, K. M. [State-transition modeling: A report of the ISPOR-SMDM modeling good research practices task force-3](https://doi.org/10.1016/j.jval.2012.06.014). *Value in Health* **15,** 812–820 (2012).</span>
+<span class="csl-left-margin">19. </span><span class="csl-right-inline">Siebert, U., Alagoz, O., Bayoumi, A. M., Jahn, B., Owens, D. K., Cohen, D. J. & Kuntz, K. M. [State-transition modeling: A report of the ISPOR-SMDM modeling good research practices task force-3](https://doi.org/10.1016/j.jval.2012.06.014). *Value in Health* **15,** 812–820 (2012).</span>
 
 </div>
 
