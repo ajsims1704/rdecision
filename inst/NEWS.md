@@ -1,3 +1,9 @@
+# rdecision 1.2.1.9006
+
+* Moved code to plot a tornado diagram into 'utils.R` to make it available
+  for creating such diagrams given any input source (e.g., Markov models),
+  rather than restricing its use to `ModVar`s in decision trees.
+
 # rdecision 1.2.1.9005
 
 * Added vignette `SM00`, a narrative explanation of replicating Sonnenberg 

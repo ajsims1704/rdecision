@@ -1141,111 +1141,17 @@ DecisionTree <- R6::R6Class(
       O <- t(O)
       # append to the data frame
       TO <- cbind(TO, O)
-
       # re-order it with least variation first
       TO[, "range"] <- abs(TO[, "outcome.max"] - TO[, "outcome.min"])
       TO <- TO[order(TO[, "range"], decreasing = FALSE), ]
       TO[, "range"] <- NULL
-
       # plot the graph, if required
       if (draw) {
         # x axis label
-        xlab <- ifelse(outcome == "saving", "Mean cost saving", "Mean ICER")
-        # make labels (description + units)
-        TO[, "Label"] <- paste(TO[, "Description"], TO[, "Units"], sep = ", ")
-        # width and height of the plot in inches
-        dsize <- dev.size(unit = "in")
-        figw <- dsize[[1L]]
-        figh <- dsize[[2L]]
-        # width of the left outer margin as a proportion of figw
-        louter <- 0.4
-        # size of the inner margins as lines of text (0.2 inches per line)
-        binner <- 4.1
-        linner <- 2.1
-        tinner <- 1.1
-        rinner <- linner
-        # create the plot frame
-        withr::with_par(
-          new = list(
-            omi = c(0.0, figw * louter, 0.0, 0.0),
-            mar = c(binner, linner, tinner, rinner),  # lines of text
-            cex = 0.75
-          ),
-          code = {
-            # set up the plot axes
-            plot(
-              x = NULL,
-              y = NULL,
-              xlim = c(
-                min(min(TO$outcome.min), min(TO$outcome.max)),
-                max(max(TO$outcome.min), max(TO$outcome.max))
-              ),
-              ylim = c(0.5, nrow(TO) + 0.5),
-              xlab = xlab,
-              ylab = "",
-              yaxt = "n",
-              frame.plot = FALSE
-            )
-            # find the longest label and scale text size accordingly
-            lw <- max(strwidth(s = TO[, "Label"], unit = "in"))
-            lw <- lw + strwidth("MM", unit = "in")
-            cex_axis <- min((louter * figw) / lw, 1.0)
-            # label the y axis
-            axis(
-              side = 2L,
-              at = seq_len(nrow(TO)),
-              labels = TO$Label,
-              lty = 0L,
-              tick = FALSE,
-              las = 2L,
-              hadj = 1.0,
-              cex.axis = cex_axis,
-              outer = TRUE
-            )
-            # function to return a limit value (vectorized)
-            limtxt <- function(x) {
-              txt <- signif(x, 3L)
-            }
-            # find longest limit labels and adjust label text size
-            lmin <- max(strwidth(s = limtxt(TO[, "outcome.min"]), unit = "in"))
-            lmax <- max(strwidth(s = limtxt(TO[, "outcome.max"]), unit = "in"))
-            lw <- max(lmin, lmax)
-            cex_limit <- min(linner * 0.2 / lw, 1.0)
-            # add bars and limits
-            for (i in seq_len(nrow(TO))) {
-              xleft <- min(TO[[i, "outcome.min"]], TO[[i, "outcome.max"]])
-              xright <- max(TO[[i, "outcome.min"]], TO[[i, "outcome.max"]])
-              rect(
-                xleft,
-                xright,
-                ybottom = i - 0.25,
-                ytop = i + 0.25,
-                border = "black",
-                col = "lightgray",
-                xpd = TRUE
-              )
-              LL <- TO[[i, "LL"]]
-              UL <- TO[[i, "UL"]]
-              if (TO[[i, "outcome.max"]] > TO[[i, "outcome.min"]]) {
-                labels <- limtxt(c(LL, UL))
-              } else {
-                labels <- limtxt(c(UL, LL))
-              }
-              text(
-                x = c(xleft, xright),
-                y = c(i, i),
-                labels = labels,
-                pos = c(2.0, 4.0),
-                offset = 0.25,
-                cex = cex_limit,
-                xpd = TRUE
-              )
-            }
-            # add mean (base case)
-            abline(v = TO[[1L, "outcome.mean"]], lty = "dashed")
-            # remove label column
-            TO[, "Label"] <- NULL
-          }
+        xlab <- if (outcome == "saving") "Mean cost saving" else "Mean ICER"
+        # plot it
+        tornado_plot(
+          to = TO, outcome_mean = TO[[1L, "outcome.mean"]], xlab = xlab
         )
       }
       # re-order it with greatest variation first

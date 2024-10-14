@@ -303,3 +303,68 @@ test_that("is_Arrow detects objects of type Arrow", {
   expect_false(is_Arrow(s))
   expect_true(is_Arrow(a))
 })
+
+test_that("tornado plot checks arguments as expected", {
+  # to is not a data frame
+  to <- 42L
+  expect_error(
+    tornado_plot(to = to, outcome_mean = 0.0),
+    class = "invalid_parameter"
+  )
+  # data frame with missing column
+  to <- data.frame(
+    Description = "p1",
+    Units = "%",
+    LL = 25.0,
+    UL = 29.0,
+    outcome.min = 100.0,
+    stringsAsFactors = FALSE
+  )
+  expect_error(
+    tornado_plot(to = to, outcome_mean = 0.0),
+    class = "invalid_parameter"
+  )
+  # data frame with column of incorrect type
+  to <- data.frame(
+    Description = "p1",
+    Units = "%",
+    LL = 25.0,
+    UL = 29.0,
+    outcome.min = 100.0,
+    outcome.max = FALSE,
+    stringsAsFactors = FALSE
+  )
+  expect_error(
+    tornado_plot(to = to, outcome_mean = 0.0),
+    class = "invalid_parameter"
+  )
+  # data frame with an NA
+  to <- data.frame(
+    Description = "p1",
+    Units = "%",
+    LL = 25.0,
+    UL = NA_real_,
+    outcome.min = 100.0,
+    outcome.max = 120.0,
+    stringsAsFactors = FALSE
+  )
+  expect_error(
+    tornado_plot(to = to, outcome_mean = 0.0),
+    class = "invalid_parameter"
+  )
+  # valid data frame
+  to <- data.frame(
+    Description = "p1",
+    Units = "%",
+    LL = 25.0,
+    UL = 27.0,
+    outcome.min = 100.0,
+    outcome.max = 120.0,
+    stringsAsFactors = FALSE
+  )
+  grDevices::pdf(file = NULL)
+  expect_no_condition(
+    tornado_plot(to = to, outcome_mean = 0.0)
+  )
+  grDevices::dev.off()
+})

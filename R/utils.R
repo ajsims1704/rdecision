@@ -182,3 +182,133 @@ is_Arrow <- function(x) {
 is_ModVar <- function(x) {
   return(is_class(x, "ModVar"))
 }
+
+#' @title Draw a tornado diagram.
+#' @description A function to plot a tornado diagram, given a data frame of
+#' model variable names, their confidence limits and the values of the outcome
+#' variable for each. The outcome measure (x axis) is expected to be cost, ICER,
+#' net monetary benefit, etc., but can be any meaningful quantity.
+#' @param to A data frame with one row per horizontal bar of the tornado plot,
+#' with columns
+#' \describe{
+#'   \item{\code{Description}Description of the variable.}
+#'   \item{\code{Units}Units of the variable.}
+#'   \item{\code{LL}Lower limit of the variable.}
+#'   \item{\code{UL}Upper limit of the variable.}
+#'   \item{\code{outcome.min}Minimum value of the outcome measure.}
+#'   \item{\code{outcome.max}Maximum value of the outcome measure.}
+#' }
+#' @param outcome_mean Mean (base case) outcome.
+#' @param xlab Label for x axis
+tornado_plot <- function(to, outcome_mean, xlab = "") {
+  # check the arguments
+  abortifnot(
+    is.data.frame(to),
+    all(is.element(
+      c("Description", "Units", "LL", "UL", "outcome.min", "outcome.max"),
+      names(to)
+    )),
+    is.character(to[, "Description"]),
+    is.character(to[, "Units"]),
+    is.numeric(to[, "LL"]),
+    is.numeric(to[, "UL"]),
+    is.numeric(to[, "outcome.min"]),
+    is.numeric(to[, "outcome.max"]),
+    all(complete.cases(to)),
+    message = "'to' must be a data frame with specific columns and types",
+    class = "invalid_parameter"
+  )
+  # make labels (description + units)
+  to[, "Label"] <- paste(to[, "Description"], to[, "Units"], sep = ", ")
+  # width of the plot in inches
+  dsize <- dev.size(unit = "in")
+  figw <- dsize[[1L]]
+  # width of the left outer margin as a proportion of figw
+  louter <- 0.4
+  # size of the inner margins as lines of text (0.2 inches per line)
+  binner <- 4.1
+  linner <- 2.1
+  tinner <- 1.1
+  rinner <- linner
+  # create the plot frame
+  withr::with_par(
+    new = list(
+      omi = c(0.0, figw * louter, 0.0, 0.0),
+      mar = c(binner, linner, tinner, rinner),  # lines of text
+      cex = 0.75
+    ),
+    code = {
+      # set up the plot axes
+      plot(
+        x = NULL,
+        y = NULL,
+        xlim = c(
+          min(min(to[, "outcome.min"]), min(to[, "outcome.max"])),
+          max(max(to[, "outcome.min"]), max(to[, "outcome.max"]))
+        ),
+        ylim = c(0.5, nrow(to) + 0.5),
+        xlab = xlab,
+        ylab = "",
+        yaxt = "n",
+        frame.plot = FALSE
+      )
+      # find the longest label and scale text size accordingly
+      lw <- max(strwidth(s = to[, "Label"], unit = "in"))
+      lw <- lw + strwidth("MM", unit = "in")
+      cex_axis <- min((louter * figw) / lw, 1.0)
+      # label the y axis
+      axis(
+        side = 2L,
+        at = seq_len(nrow(to)),
+        labels = to$Label,
+        lty = 0L,
+        tick = FALSE,
+        las = 2L,
+        hadj = 1.0,
+        cex.axis = cex_axis,
+        outer = TRUE
+      )
+      # function to return a limit value (vectorized)
+      limtxt <- function(x) {
+        signif(x, 3L)
+      }
+      # find longest limit labels and adjust label text size
+      lmin <- max(strwidth(s = limtxt(to[, "outcome.min"]), unit = "in"))
+      lmax <- max(strwidth(s = limtxt(to[, "outcome.max"]), unit = "in"))
+      lw <- max(lmin, lmax)
+      # add bars and limits
+      for (i in seq_len(nrow(to))) {
+        xleft <- min(to[[i, "outcome.min"]], to[[i, "outcome.max"]])
+        xright <- max(to[[i, "outcome.min"]], to[[i, "outcome.max"]])
+        rect(
+          xleft,
+          xright,
+          ybottom = i - 0.25,
+          ytop = i + 0.25,
+          border = "black",
+          col = "lightgray",
+          xpd = TRUE
+        )
+        ll <- to[[i, "LL"]]
+        ul <- to[[i, "UL"]]
+        if (to[[i, "outcome.max"]] > to[[i, "outcome.min"]]) {
+          labels <- limtxt(c(ll, ul))
+        } else {
+          labels <- limtxt(c(ul, ll))
+        }
+        text(
+          x = c(xleft, xright),
+          y = c(i, i),
+          labels = labels,
+          pos = c(2.0, 4.0),
+          offset = 0.25,
+          xpd = TRUE
+        )
+      }
+      # add mean (base case)
+      abline(v = outcome_mean, lty = "dashed")
+      # remove label column
+      to[, "Label"] <- NULL
+    }
+  )
+}

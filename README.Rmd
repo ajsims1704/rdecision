@@ -187,7 +187,7 @@ action_exercise <- Action$new(
 
 There are four reaction edges, representing the consequences of the
 success and failure of each programme. Edges representing success are associated
-with the probability of programmme success, and those representing programme
+with the probability of programme success, and those representing programme
 failure are assigned a probability of `NA` (to ensure that the total probability
 associated with each chance node is one) and a failure cost (of fitting a
 stent).

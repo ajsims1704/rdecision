@@ -251,7 +251,7 @@ with(data = SMM_base$tabulate_states(), expr = {
 ```
 
 The `SemiMarkovModel` object can be represented graphically in the DOT format
-using the `as_DOT()` method for drawing with the `dot` tool from GraphViz, or
+using the `as_DOT()` method for drawing with the `dot` tool from Graphviz, or
 with the `DiagrammeR` package. Alternatively it can be exported with the
 `as_gml()` method for drawing with the `igraph` package or other package
 which imports GML graph representations.

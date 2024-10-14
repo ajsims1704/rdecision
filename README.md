@@ -118,7 +118,7 @@ action_exercise <- Action$new(
 
 There are four reaction edges, representing the consequences of the
 success and failure of each programme. Edges representing success are associated
-with the probability of programmme success, and those representing programme
+with the probability of programme success, and those representing programme
 failure are assigned a probability of `NA` (to ensure that the total probability
 associated with each chance node is one) and a failure cost (of fitting a
 stent).
@@ -199,10 +199,10 @@ rs <- dt$evaluate(setvars = "random", by = "run", N = N)
 The confidence interval of the net cost difference (net cost of the diet
 programme minus the net cost of the exercise programme) is estimated from
 the resulting data frame. From 1000 runs, the mean net cost difference is
--37.81 GBP with 95% confidence interval
--794.3 GBP
-to 686.71 GBP,
-with 47.1% runs having a lower
+-55.16 GBP with 95% confidence interval
+-815.89 GBP
+to 738.7 GBP,
+with 43% runs having a lower
 net cost for the exercise programme. Although the point estimate net cost of
 the exercise programme exceeds that of the diet programme, due to the
 uncertainties of the effectiveness of
