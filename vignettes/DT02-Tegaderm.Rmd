@@ -549,7 +549,14 @@ with(data = RES, expr = {
 The sensitivity of the decision tree results to each source model variable,
 varied independently of the others, is demonstrated by a tornado diagram. The
 method `tornado` can be used to generate such a plot (and also provides a
-tabulated version of the values used in the plot). Source variables are
+tabulated version of the values used in the plot).
+
+Tornado diagrams compare
+outcomes for two interventions, labelled as `index` and `ref`. In a decision
+tree, an intervention is defined as a strategy for traversing the tree,
+expressed as a list of the action edges emanating from each decision node. In
+trees with a single decision node, the `index` and `ref` parameters may be
+expressed as a single action edge. Source variables are
 varied over their 95% confidence limits (figure 2).
 
 ```{r}
@@ -558,9 +565,7 @@ varied over their 95% confidence limits (figure 2).
 #| fig.align = "center",
 #| fig.cap = "Figure 2. Tornado diagram for the Tegaderm model",
 #| echo = TRUE
-to <- DT$tornado(
-  index = list(e10), ref = list(e9), draw = TRUE
-)
+to <- DT$tornado(index = e10, ref = e9, draw = TRUE)
 ```
 
 The object returned from method `tornado` (`to`) is a data frame which includes

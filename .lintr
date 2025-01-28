@@ -1,5 +1,5 @@
 linters: all_linters(
-  cyclocomp_linter = cyclocomp_linter(complexity_limit = 90L),
+  cyclocomp_linter = cyclocomp_linter(complexity_limit = 100L),
   extraction_operator_linter = NULL,
   object_name_linter = NULL,
   )

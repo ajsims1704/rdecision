@@ -1,3 +1,12 @@
+# rdecision 1.2.1.9008
+
+* Arguments `index` and `ref` in the `tornado` method of `DecisionTree` may
+  now each be expressed as a single Action edge, rather than a list of action
+  edges, if there is one decision node in the tree. As many decision problems
+  are a choice between two strategies, this is a common usage of `tornado`,
+  and will lead to more compact code. Method `is_strategy` also modified to
+  permit compact notation of index and reference strategies.
+
 # rdecision 1.2.1.9007
 
 * Decision tree drawing algorithm improved to place leaf node labels to the

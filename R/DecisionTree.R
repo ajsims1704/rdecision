@@ -60,7 +60,7 @@ DecisionTree <- R6::R6Class(
     # as a vector 4 units: left, right, bottom, top.
     decision_grob = function(x, y, label, bb = FALSE) {
       # check
-      stopifnot(
+      abortifnot(
         grid::is.unit(x),
         grid::is.unit(y)
       )
@@ -68,13 +68,8 @@ DecisionTree <- R6::R6Class(
       a <- grid::unit(sqrt(pi / 4.0), "char")
       dy <- grid::unit(0.4, "char")
       # find the bounding box relative to (0, 0) for the node and its symbol
-      if (nchar(label) > 0L) {
-        sw <- grid::stringWidth(label)
-        sh <- grid::stringHeight(label) + dy
-      } else {
-        sw <- grid::unit(0.0, "char")
-        sh <- grid::unit(0.0, "char")
-      }
+      sw <- grid::stringWidth(label)
+      sh <- grid::stringHeight(label) + dy
       bbxl <- -max(sw, a)
       bbxr <- a
       bbyb <- -a
@@ -111,7 +106,7 @@ DecisionTree <- R6::R6Class(
     # as a vector 4 units: left, right, bottom, top.
     chance_grob = function(x, y, label, bb = FALSE) {
       # check arguments
-      stopifnot(
+      abortifnot(
         grid::is.unit(x),
         grid::is.unit(y)
       )
@@ -164,7 +159,7 @@ DecisionTree <- R6::R6Class(
     # as a vector 4 units: left, right, bottom, top.
     leaf_grob = function(x, y, label, bb = FALSE) {
       # check arguments
-      stopifnot(
+      abortifnot(
         grid::is.unit(x),
         grid::is.unit(y)
       )
@@ -172,13 +167,8 @@ DecisionTree <- R6::R6Class(
       a <- grid::unit(1.5 * sqrt(pi / sqrt(3.0)), "char")
       dx <- grid::unit(0.25, "char")
       # find the bounding box relative to (0, 0) for the node and its symbol
-      if (nchar(label) > 0L) {
-        sw <- grid::stringWidth(label) + dx
-        sh <- grid::stringHeight(label)
-      } else {
-        sw <- grid::unit(0.0, "char")
-        sh <- grid::unit(0.0, "char")
-      }
+      sw <- grid::stringWidth(label) + dx
+      sh <- grid::stringHeight(label)
       bbxl <- -a / sqrt(3.0)
       bbxr <- sw + sqrt(3.0) * a / 6.0
       bbyb <- -max(a / 2.0, sh / 2.0)
@@ -220,7 +210,7 @@ DecisionTree <- R6::R6Class(
     # @returns A grob containing the symbol and label.
     edge_grob = function(xs, ys, xt, yt, fs = 0.2, label = "") {
       # check arguments
-      stopifnot(
+      abortifnot(
         grid::is.unit(xs),
         grid::is.unit(ys),
         grid::is.unit(xt),
@@ -662,10 +652,15 @@ DecisionTree <- R6::R6Class(
     #' @details A strategy is a unanimous prescription of an action taken at
     #' each decision node, coded as a list of action edges. This checks
     #' whether the strategy is valid for this decision tree.
-    #' @param strategy A list of Action edges.
+    #' @param strategy A list of Action edges, or a single Action edge for
+    #' decision trees with one decision node.
     #' @return TRUE if the strategy is valid for this tree. Returns
     #' FALSE if the list of Action edges are not a valid strategy.
     is_strategy = function(strategy) {
+      # coerce to vector
+      if (!is.vector(strategy)) {
+        strategy <- c(strategy)
+      }
       # find the set of source nodes for the action edges in the strategy
       iS <- vapply(X = strategy, FUN.VALUE = 1L, FUN = self$arrow_source)
       # find the list of Decision nodes
@@ -682,8 +677,9 @@ DecisionTree <- R6::R6Class(
     #' be unique.
     #' @param what A character string defining what to return. Must be one
     #' of "label" or "index".
-    #' @param select A single strategy (given as a list of action edges, with
-    #' one action edge per decision node). If provided, only that strategy
+    #' @param select A single strategy, given as a list of action edges, with
+    #' one action edge per decision node, or as a single action edge if there
+    #' is one decision node in the tree. If provided, only that strategy
     #' is selected from the returned table. Intended for tabulating a
     #' single strategy into a readable form.
     #' @return A data frame where each row is a potential strategy
@@ -715,6 +711,10 @@ DecisionTree <- R6::R6Class(
       tti <- expand.grid(aei, KEEP.OUT.ATTRS = FALSE)
       # select a single strategy, if required
       if (!is.null(select)) {
+        # coerce select into a list
+        if (!is.vector(select)) {
+          select <- c(select)
+        }
         # indexes of action edges in 'select' argument
         ss <- vapply(X = select, FUN.VALUE = 1L, FUN = self$edge_index)
         # test whether each table row has the same action edges as 'select'

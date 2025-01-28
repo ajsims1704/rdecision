@@ -518,9 +518,7 @@ local({
   e18$set_cost(c_caffeine)
 
   # check ICER ranges in tornado diagram (branches B and G get 2nd dose)
-  TO <- dt$tornado(
-    index = list(e17), ref = list(e18), outcome = "ICER", draw = FALSE
-  )
+  TO <- dt$tornado(index = e17, ref = e18, outcome = "ICER", draw = FALSE)
   c_sumatriptan$set("expected")
   c_caffeine$set("expected")
   x <- qgamma(p = 0.025, shape = 16.10, rate = 1.0)

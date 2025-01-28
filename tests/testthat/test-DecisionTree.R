@@ -165,6 +165,10 @@ test_that("simple decision trees are modelled correctly", {
   expect_silent(DT$draw(border = TRUE))
   grDevices::dev.off()
   # strategy validity
+  expect_true(DT$is_strategy(list(e1)))
+  expect_true(DT$is_strategy(e1))
+  expect_false(DT$is_strategy(e2))
+  expect_true(DT$is_strategy(list(e4)))
   expect_false(DT$is_strategy(list(e2, e3)))
   expect_false(DT$is_strategy(list()))
   expect_false(DT$is_strategy(list(e1, e4)))
@@ -183,7 +187,7 @@ test_that("simple decision trees are modelled correctly", {
   S <- DT$strategy_table()
   expect_identical(nrow(S), 2L)
   expect_setequal(rownames(S), c("e1", "e4"))
-  S <- DT$strategy_table("label", select = list(e1))
+  S <- DT$strategy_table("label", select = e1)
   expect_identical(S[[1L, "d.1"]], "e1")
   expect_setequal(rownames(S), "e1")
   # evaluate valid walks
@@ -588,6 +592,10 @@ test_that("tornado plots are as expected", {
     class = "invalid_strategy"
   )
   expect_error(
+    dt$tornado(index = e[["e1"]], ref = e[["e3"]]),
+    class = "invalid_strategy"
+  )
+  expect_error(
     dt$tornado(
       index = list(e[["e1"]]), ref = list(e[["e2"]]), outcome = "survival"
     ),
@@ -615,6 +623,9 @@ test_that("tornado plots are as expected", {
       index = list(e[["e1"]]), ref = list(e[["e2"]]),
       exclude = list(p1$description()), draw = FALSE
     )
+  )
+  expect_no_condition(
+    dt$tornado(index = e[["e1"]], ref = e[["e2"]], draw = FALSE)
   )
   to <- dt$tornado(
     index = list(e[["e1"]]), ref = list(e[["e2"]]), draw = TRUE
