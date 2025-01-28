@@ -260,7 +260,7 @@ which imports GML graph representations.
 #| fig.cap = "Markov state transition model for total knee replacement (TKR)",
 #| echo = FALSE,
 #| fig.height = 7,
-#| purl = FALSE
+#| purl = TRUE
 local({
   # create an igraph object
   gml <- SMM_base$as_gml()
@@ -535,7 +535,7 @@ This progression can also be visualised using the base graphics function
 
 ```{r}
 #| fig.cap = "State occupancy progression for conventional surgery.",
-#| purl = FALSE
+#| purl = TRUE
 plot_occupancy <- function(SMM) {
   withr::with_par(
     new = list(mar = c(5L, 4L, 1L, 14L) + 0.1),
@@ -1342,7 +1342,7 @@ figure below (for comparison with figure 2 of the paper).
 
 ```{r}
 #| fig.cap = "Cost-effectiveness plane. QALY = Quality-adjusted life year",
-#| purl = FALSE
+#| purl = TRUE
 withr::with_par(
   new = list(mar = c(1L, 2L, 2L, 1L)),
   code = {

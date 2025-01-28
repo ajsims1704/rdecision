@@ -212,7 +212,7 @@ as a graph. This method offers more options for adjusting the appearance of
 the model. The Markov model is shown in the figure below.
 
 ```{r}
-#| purl = FALSE,
+#| purl = TRUE,
 #| fig.cap = "Markov model for comparison of HIV therapy.
 #|            A: 200 < cd4 < 500, B: cd4 < 200, C: AIDS, D: Death.",
 local({
@@ -282,7 +282,7 @@ transition matrix. For the monotherapy model, the transition matrix is
 shown below. This is consistent with the Table 1 of 
 Chancellor *et al* [-@chancellor1997].
 ```{r}
-#| purl = FALSE
+#| purl = TRUE
 with(data = as.data.frame(Ptm), expr = {
   data.frame(
     A = round(A, digits = 3L),
@@ -374,7 +374,7 @@ The populations and discounted costs are consistent with Briggs *et al*,
 Table 2.3 [-@briggs2006], and the QALY column is consistent with Table 2.4
 (without half cycle correction). No discount was applied to the utilities.
 ```{r}
-#| purl = FALSE
+#| purl = TRUE
 with(data = MT.mono, expr = {
   data.frame(
     Years = Years,
@@ -449,7 +449,7 @@ local({
 The resulting per-cycle transition matrix for the combination therapy is as
 follows:
 ```{r}
-#| purl = FALSE
+#| purl = TRUE
 with(data = as.data.frame(Ptc), expr = {
   data.frame(
     A = round(A, digits = 3L),
@@ -539,7 +539,7 @@ local({
 
 The Markov trace for combination therapy is as follows:
 ```{r}
-#| purl = FALSE
+#| purl = TRUE
 with(data = MT.comb, expr = {
   data.frame(
     Years = Years,

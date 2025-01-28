@@ -50,6 +50,224 @@ DecisionTree <- R6::R6Class(
   lock_class = TRUE,
   inherit = Arborescence,
 
+  private = list(
+
+    # @description Creates a grid::grob for a decision node.
+    # @param x Centre of the symbol, x coordinate, unit object.
+    # @param y Centre of the symbol, y coordinate, unit object.
+    # @param bb Logical. If TRUE, function returns the bounding box.
+    # @returns A grob containing the symbol and label, or a bounding box
+    # as a vector 4 units: left, right, bottom, top.
+    decision_grob = function(x, y, label, bb = FALSE) {
+      # check
+      stopifnot(
+        grid::is.unit(x),
+        grid::is.unit(y)
+      )
+      # size of symbol
+      a <- grid::unit(sqrt(pi / 4.0), "char")
+      dy <- grid::unit(0.4, "char")
+      # find the bounding box relative to (0, 0) for the node and its symbol
+      if (nchar(label) > 0L) {
+        sw <- grid::stringWidth(label)
+        sh <- grid::stringHeight(label) + dy
+      } else {
+        sw <- grid::unit(0.0, "char")
+        sh <- grid::unit(0.0, "char")
+      }
+      bbxl <- -max(sw, a)
+      bbxr <- a
+      bbyb <- -a
+      bbyt <- sh + a
+      # symbol
+      gsym <- grid::rectGrob(
+        x = x, y = y,
+        width = a * 2.0, height = a * 2.0,
+        just = c("centre", "centre"),
+        gp = grid::gpar(col = "black", fill = "lightgray"),
+        vp = NULL
+      )
+      # label
+      glab <- grid::textGrob(
+        label = label, x = x, y = y + a + dy,
+        just = c("right", "bottom"),
+        vp = NULL
+      )
+      # return the leaf object as a gTree, or its bounding box
+      if (bb) {
+        rv <- grid::unit.c(x + bbxl, x + bbxr, y + bbyb, y + bbyt)
+      } else {
+        rv <- grid::gTree(children = grid::gList(gsym, glab))
+      }
+      return(rv)
+    },
+
+    # @description Creates a grid::grob for a chance node.
+    # @param x Centre of the symbol, x coordinate, unit object.
+    # @param y Centre of the symbol, y coordinate, unit object.
+    # @param label Text string of label.
+    # @param bb Logical. If TRUE, function returns the bounding box.
+    # @returns A grob containing the symbol and label, or a bounding box
+    # as a vector 4 units: left, right, bottom, top.
+    chance_grob = function(x, y, label, bb = FALSE) {
+      # check arguments
+      stopifnot(
+        grid::is.unit(x),
+        grid::is.unit(y)
+      )
+      # size of symbol
+      a <- grid::unit(1.0, "char")
+      dy <- grid::unit(0.4, "char")
+      # find the bounding box relative to (0, 0) for the node and its symbol
+      if (nchar(label) > 0L) {
+        sw <- grid::stringWidth(label)
+        sh <- grid::stringHeight(label) + dy
+      } else {
+        sw <- grid::unit(0.0, "char")
+        sh <- grid::unit(0.0, "char")
+      }
+      bbxl <- -max(sw, a)
+      bbxr <- a
+      bbyb <- -a
+      bbyt <- sh + a
+      # symbol
+      gsym <- grid::circleGrob(
+        x = x,
+        y = y,
+        r = a,
+        gp = grid::gpar(col = "black", fill = "lightgray"),
+        vp = NULL
+      )
+      # label
+      glab <- grid::textGrob(
+        label = label,
+        x = x,
+        y = y + a + dy,
+        just = c("right", "bottom"),
+        vp = NULL
+      )
+      # return the leaf object as a gTree, or its bounding box
+      if (bb) {
+        rv <- grid::unit.c(x + bbxl, x + bbxr, y + bbyb, y + bbyt)
+      } else {
+        rv <- grid::gTree(children = grid::gList(gsym, glab))
+      }
+      return(rv)
+    },
+
+    # @description Creates a grid::grob for a leaf node.
+    # @param x Centre of the symbol, x coordinate, unit object.
+    # @param y Centre of the symbol, y coordinate, unit object.
+    # @param label Text string of label.
+    # @param bb Logical. If TRUE, function returns the bounding box.
+    # @returns A grob containing the symbol and label, or a bounding box
+    # as a vector 4 units: left, right, bottom, top.
+    leaf_grob = function(x, y, label, bb = FALSE) {
+      # check arguments
+      stopifnot(
+        grid::is.unit(x),
+        grid::is.unit(y)
+      )
+      # symbol size
+      a <- grid::unit(1.5 * sqrt(pi / sqrt(3.0)), "char")
+      dx <- grid::unit(0.25, "char")
+      # find the bounding box relative to (0, 0) for the node and its symbol
+      if (nchar(label) > 0L) {
+        sw <- grid::stringWidth(label) + dx
+        sh <- grid::stringHeight(label)
+      } else {
+        sw <- grid::unit(0.0, "char")
+        sh <- grid::unit(0.0, "char")
+      }
+      bbxl <- -a / sqrt(3.0)
+      bbxr <- sw + sqrt(3.0) * a / 6.0
+      bbyb <- -max(a / 2.0, sh / 2.0)
+      bbyt <- max(a / 2.0, sh / 2.0)
+      # symbol
+      gsym <- grid::polygonGrob(
+        x = grid::unit.c(
+          x - a / sqrt(3.0),
+          x + sqrt(3.0) * a / 6.0,
+          x + sqrt(3.0) * a / 6.0
+        ),
+        y = grid::unit.c(
+          y, y + a / 2.0, y - a / 2.0
+        ),
+        gp = grid::gpar(fill = "lightgray", col = "black")
+      )
+      # label
+      glab <- grid::textGrob(
+        label = label,
+        x = x + dx + sqrt(3.0) * a / 6.0, y = y,
+        just = c("left", "centre")
+      )
+      # return the leaf object as a gTree, or its bounding box
+      if (bb) {
+        rv <- grid::unit.c(x + bbxl, x + bbxr, y + bbyb, y + bbyt)
+      } else {
+        rv <- grid::gTree(children = grid::gList(gsym, glab))
+      }
+      return(rv)
+    },
+
+    # @description Creates a grid::grob for an action or reaction edge.
+    # @param xs x coordinate of source of edge, unit object.
+    # @param ys y coordinate of source of edge, unit object.
+    # @param xt x coordinate of target of edge, unit object.
+    # @param yt y coordinate of target of edge, unit object.
+    # @param fs Fraction of the edge which slopes
+    # @param label Text string of label.
+    # @returns A grob containing the symbol and label.
+    edge_grob = function(xs, ys, xt, yt, fs = 0.2, label = "") {
+      # check arguments
+      stopifnot(
+        grid::is.unit(xs),
+        grid::is.unit(ys),
+        grid::is.unit(xt),
+        grid::is.unit(yt)
+      )
+      # create a gTree object for the line and its label
+      gedge <- grid::grobTree()
+      # draw the articulated line
+      gedge <- grid::addGrob(
+        gTree = gedge,
+        child = grid::moveToGrob(x = xs, y = ys)
+      )
+      xj <- (xt - xs) * fs + xs
+      yj <- yt
+      gedge <- grid::addGrob(
+        gTree = gedge,
+        child = grid::lineToGrob(x = xj, y = yj)
+      )
+      gedge <- grid::addGrob(
+        gTree = gedge,
+        child = lineToGrob(x = xt, y = yt)
+      )
+      # add label above or below
+      vp <- grid::viewport(
+        x = xj, y = yj, just = c("left", "bottom")
+      )
+      ytn <- grid::convertUnit(yt, "native", valueOnly = TRUE)
+      ysn <- grid::convertUnit(ys, "native", valueOnly = TRUE)
+      if (ytn < ysn) {
+        yl <- grid::unit(0.4, "char")
+        jl <- c("left", "bottom")
+      } else {
+        yl <- grid::unit(-0.4, "char")
+        jl <- c("left", "top")
+      }
+      gedge <- grid::addGrob(
+        gTree = gedge,
+        child = grid::textGrob(
+          label = label,
+          x = grid::unit(0.2, "char"), y = yl, just = jl,
+          vp = vp
+        )
+      )
+      return(gedge)
+    }
+  ),
+
   public = list(
 
     #' @description Create a new decision tree.
@@ -337,14 +555,6 @@ DecisionTree <- R6::R6Class(
       if (border) {
         grid::grid.rect(gp = grid::gpar(col = "lightgrey"))
       }
-      # create a viewport for the outer margins
-      grid::pushViewport(
-        grid::viewport(
-          width = grid::unit(1.0, "npc") - 2.0 * grid::stringWidth("M"),
-          height = grid::unit(1.0, "npc") - 2.0 * grid::stringWidth("M"),
-          clip = "on"
-        )
-      )
       # find the (x,y) coordinates of nodes using Walker's algorithm and the
       # unadjusted aspect ratio of the tree
       XY <- self$postree(RootOrientation = "EAST", LevelSeparation = 1.0)
@@ -352,31 +562,54 @@ DecisionTree <- R6::R6Class(
       xmax <- max(XY[, "x"])
       ymin <- min(XY[, "y"])
       ymax <- max(XY[, "y"])
-      tree_asp <- (xmax - xmin) / (ymax - ymin)
-      # find the label length of the leftmost node
-      inode <- XY[[which.min(XY[, "x"]), "n"]]
-      vnode <- self$vertex_at(inode)
-      llabel <- grid::stringWidth(vnode$label())
-      # calculate margins for the viewport which will contain the node centres,
-      # leaving space for the node shapes and the leftmost label
-      lmargin <- max(llabel, grid::unit(1.5, "char"))
-      rmargin <- grid::unit(1.5, "char")
-      bmargin <- grid::unit(2.0, "char")
-      tmargin <- grid::unit(2.5, "char")
+      # create a viewport natively scaled to the coordinates from postree
+      grid::pushViewport(
+        grid::viewport(
+          x = grid::unit(0.0, "npc"), y = grid::unit(0.0, "npc"),
+          width = grid::unit(1.0, "npc"), height = grid::unit(1.0, "npc"),
+          just = c("left", "bottom"),
+          xscale = c(xmin, xmax), yscale = c(ymin, ymax),
+          clip = "off"
+        )
+      )
+      # find the minimum margins required to accommodate the node symbols and
+      # labels that extend outside the rectangle containing the node centres
+      gxmin <- grid::unit(min(XY[, "x"]), "native")
+      gxmax <- grid::unit(max(XY[, "x"]), "native")
+      gymin <- grid::unit(min(XY[, "y"]), "native")
+      gymax <- grid::unit(max(XY[, "y"]), "native")
+      for (v in self$vertexes()) {
+        # find the node from its index
+        i <- which(XY[, "n"] == self$vertex_index(v))
+        # get the node centre location
+        xc <- grid::unit(XY[[i, "x"]], "native")
+        yc <- grid::unit(XY[[i, "y"]], "native")
+        # find the bounding box of the grob representing the node
+        if (inherits(v, what = "DecisionNode")) {
+          bb <- private$decision_grob(xc, yc, v$label(), bb = TRUE)
+        } else if (inherits(v, what = "ChanceNode")) {
+          bb <- private$chance_grob(xc, yc, v$label(), bb = TRUE)
+        } else if (inherits(v, what = "LeafNode")) {
+          bb <- private$leaf_grob(xc, yc, v$label(), bb = TRUE)
+        }
+        # calculate limits of the symbol and its label in native coordinates
+        # update the limits of the drawing area
+        gxmin <- min(gxmin, bb[[1L]])
+        gxmax <- max(gxmax, bb[[2L]])
+        gymin <- min(gymin, bb[[3L]])
+        gymax <- max(gymax, bb[[4L]])
+      }
+      # calculate margins
+      lmargin <- grid::unit(min(XY[, "x"]), "native") - gxmin
+      rmargin <- gxmax - grid::unit(max(XY[, "x"]), "native")
+      bmargin <- grid::unit(min(XY[, "y"]), "native") - gymin
+      tmargin <- gymax - grid::unit(max(XY[, "y"]), "native")
+      # pop the viewport, recalculate margins
+      grid::popViewport()
       # compute the level separation for the tree which will optimise the use
       # of space in the inner viewport
       vpgw <- grid::unit(1.0, "npc") - lmargin - rmargin
       vpgh <- grid::unit(1.0, "npc") - bmargin - tmargin
-      vpg_asp <- grid::convertUnit(vpgw, unitTo = "cm", valueOnly = TRUE) /
-        grid::convertUnit(vpgh, unitTo = "cm", valueOnly = TRUE)
-      # lay out the tree again, with the revised aspect ratio
-      XY <- self$postree(
-        RootOrientation = "EAST", LevelSeparation = vpg_asp / tree_asp
-      )
-      xmin <- min(XY[, "x"])
-      xmax <- max(XY[, "x"])
-      ymin <- min(XY[, "y"])
-      ymax <- max(XY[, "y"])
       # create a viewport for the inner margins (containing the node centres),
       # with the postree coordinate system
       grid::pushViewport(
@@ -384,107 +617,23 @@ DecisionTree <- R6::R6Class(
           x = lmargin, y = bmargin, width = vpgw, height = vpgh,
           just = c("left", "bottom"),
           xscale = c(xmin, xmax), yscale = c(ymin, ymax),
-          clip = "inherit"
+          clip = "off"
         )
       )
-      # function to draw an action or reaction
-      draw_edge <- function(xs, ys, xt, yt, fs = 0.2, label = "") {
-        # draw the articulated line
-        grid::grid.move.to(x = xs, y = ys, default.units = "native")
-        xj <- (xt - xs) * fs + xs
-        yj <- yt
-        grid::grid.line.to(x = xj, yj, default.units = "native")
-        grid::grid.line.to(x = xt, y = yt, default.units = "native")
-        # add label above or below
-        grid::pushViewport(viewport(
-          x = xj, y = yj, default.units = "native", just = c("left", "bottom")
-        ))
-        if (yt < ys) {
-          grid::grid.text(
-            label = label,
-            x = grid::unit(0.2, "char"), y = grid::unit(0.4, "char"),
-            default.units = "char", just = c("left", "bottom")
-          )
-        } else {
-          grid::grid.text(
-            label = label,
-            x = grid::unit(0.2, "char"), y = -grid::unit(0.4, "char"),
-            default.units = "char", just = c("left", "top")
-          )
-        }
-        grid::popViewport()
-      }
-      # function to draw a decision node and label
-      decision_node <- function(x, y, label) {
-        a <- grid::unit(sqrt(pi / 4.0), "char")
-        dy <- grid::unit(0.4, "char")
-        # create a viewport with origin at the centre of the object
-        grid::pushViewport(viewport(
-          x = x, y = y, default.units = "native", just = c("left", "bottom")
-        ))
-        grid::grid.rect(
-          x = 0.0, y = 0.0, width = a * 2.0, height = a * 2.0,
-          default.units = "char",
-          just = c("centre", "centre"),
-          gp = grid::gpar(col = "black", fill = "lightgray")
-        )
-        grid::grid.text(
-          label = label, x = 0.0, y = a  + dy, default.units = "char",
-          just = c("right", "bottom")
-        )
-        grid::popViewport()
-      }
-      # function to draw a chance node and label
-      chance_node <- function(x, y, label) {
-        a <- grid::unit(1.0, "char")
-        dy <- grid::unit(0.4, "char")
-        # create a viewport with origin at the centre of the object
-        grid::pushViewport(viewport(
-          x = x, y = y, default.units = "native", just = c("left", "bottom")
-        ))
-        grid::grid.circle(
-          x = 0.0, y = 0.0, r = a, default.units = "char",
-          gp = grid::gpar(col = "black", fill = "lightgray")
-        )
-        grid::grid.text(
-          label = label, x = 0.0, y = a  + dy, default.units = "char",
-          just = c("right", "bottom")
-        )
-        grid::popViewport()
-      }
-      # function to draw leaf node and label (in char space to keep aspect)
-      leaf_node <- function(x, y, label) {
-        a <- grid::unit(1.5 * sqrt(pi / sqrt(3.0)), "char")
-        dy <- grid::unit(0.4, "char")
-        # create a viewport with origin at the centre of the object
-        grid::pushViewport(viewport(
-          x = x, y = y, default.units = "native", just = c("left", "bottom")
-        ))
-        grid::grid.polygon(
-          x = c(-a / sqrt(3.0), sqrt(3.0) * a / 6.0, sqrt(3.0) * a / 6.0),
-          y = c(0.0, -a / 2.0, a / 2.0),
-          default.units = "char",
-          gp = grid::gpar(fill = "lightgray", col = "black")
-        )
-        grid::grid.text(
-          label = label, x = 0.0, y = a / 3.0 + dy, default.units = "char",
-          just = c("right", "bottom")
-        )
-        grid::popViewport()
-      }
       # draw the edges as articulated lines between node centres
       for (ie in self$edge_along()) {
         e <- self$edge_at(ie)
         # find source and target nodes
         ns <- self$vertex_index(e$source())
         nt <- self$vertex_index(e$target())
-        xs <- XY[[which(XY[, "n"] == ns), "x"]]
-        ys <- XY[[which(XY[, "n"] == ns), "y"]]
-        xt <- XY[[which(XY[, "n"] == nt), "x"]]
-        yt <- XY[[which(XY[, "n"] == nt), "y"]]
-        draw_edge(
+        xs <- grid::unit(XY[[which(XY[, "n"] == ns), "x"]], "native")
+        ys <- grid::unit(XY[[which(XY[, "n"] == ns), "y"]], "native")
+        xt <- grid::unit(XY[[which(XY[, "n"] == nt), "x"]], "native")
+        yt <- grid::unit(XY[[which(XY[, "n"] == nt), "y"]], "native")
+        gedge <- private$edge_grob(
           xs = xs, ys = ys, xt = xt, yt = yt, fs = fs, label = e$label()
         )
+        grid::grid.draw(gedge)
       }
       # draw the nodes
       for (iv in self$vertex_along()) {
@@ -492,12 +641,17 @@ DecisionTree <- R6::R6Class(
         # find the node from its index
         i <- which(XY[, "n"] == self$vertex_index(v))
         # switch type
+        xc <- grid::unit(XY[[i, "x"]], "native")
+        yc <- grid::unit(XY[[i, "y"]], "native")
         if (inherits(v, what = "DecisionNode")) {
-          decision_node(XY[[i, "x"]], XY[[i, "y"]], v$label())
+          gdecision <- private$decision_grob(xc, yc, v$label())
+          grid::grid.draw(gdecision)
         } else if (inherits(v, what = "ChanceNode")) {
-          chance_node(XY[[i, "x"]], XY[[i, "y"]], v$label())
+          gchance <- private$chance_grob(xc, yc, v$label())
+          grid::grid.draw(gchance)
         } else if (inherits(v, what = "LeafNode")) {
-          leaf_node(XY[[i, "x"]], XY[[i, "y"]], v$label())
+          gleaf <- private$leaf_grob(xc, yc, v$label())
+          grid::grid.draw(gleaf)
         }
       }
       # return updated DecisionTree (unchanged)
@@ -708,7 +862,7 @@ DecisionTree <- R6::R6Class(
     #' @return A pay-off table, represented as a matrix of numeric values
     #' with response columns as follows:
     #' \describe{
-    #' \item{\code{Probability}}{The probability of traversing the pathway. }
+    #' \item{\code{Probability}}{The probability of traversing the pathway.}
     #' \item{\code{Path.Cost}}{The cost of traversing the pathway.}
     #' \item{\code{Path.Benefit}}{The benefit derived from traversing the
     #'       pathway.}

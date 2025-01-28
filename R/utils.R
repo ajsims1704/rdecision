@@ -189,14 +189,14 @@ is_ModVar <- function(x) {
 #' variable for each. The outcome measure (x axis) is expected to be cost, ICER,
 #' net monetary benefit, etc., but can be any meaningful quantity.
 #' @param to A data frame with one row per horizontal bar of the tornado plot,
-#' with columns
+#' with columns:
 #' \describe{
-#'   \item{\code{Description}Description of the variable.}
-#'   \item{\code{Units}Units of the variable.}
-#'   \item{\code{LL}Lower limit of the variable.}
-#'   \item{\code{UL}Upper limit of the variable.}
-#'   \item{\code{outcome.min}Minimum value of the outcome measure.}
-#'   \item{\code{outcome.max}Maximum value of the outcome measure.}
+#'   \item{Description}{Description of the variable.}
+#'   \item{Units}{Units of the variable.}
+#'   \item{LL}{Lower limit of the variable.}
+#'   \item{UL}{Upper limit of the variable.}
+#'   \item{outcome.min}{Minimum value of the outcome measure.}
+#'   \item{outcome.max}{Maximum value of the outcome measure.}
 #' }
 #' @param outcome_mean Mean (base case) outcome.
 #' @param xlab Label for x axis
@@ -221,7 +221,7 @@ tornado_plot <- function(to, outcome_mean, xlab = "") {
   # make labels (description + units)
   to[, "Label"] <- paste(to[, "Description"], to[, "Units"], sep = ", ")
   # width of the plot in inches
-  dsize <- dev.size(unit = "in")
+  dsize <- grDevices::dev.size(unit = "in")
   figw <- dsize[[1L]]
   # width of the left outer margin as a proportion of figw
   louter <- 0.4
@@ -253,11 +253,11 @@ tornado_plot <- function(to, outcome_mean, xlab = "") {
         frame.plot = FALSE
       )
       # find the longest label and scale text size accordingly
-      lw <- max(strwidth(s = to[, "Label"], unit = "in"))
-      lw <- lw + strwidth("MM", unit = "in")
+      lw <- max(graphics::strwidth(s = to[, "Label"], unit = "in"))
+      lw <- lw + graphics::strwidth("MM", unit = "in")
       cex_axis <- min((louter * figw) / lw, 1.0)
       # label the y axis
-      axis(
+      graphics::axis(
         side = 2L,
         at = seq_len(nrow(to)),
         labels = to$Label,
@@ -273,14 +273,18 @@ tornado_plot <- function(to, outcome_mean, xlab = "") {
         signif(x, 3L)
       }
       # find longest limit labels and adjust label text size
-      lmin <- max(strwidth(s = limtxt(to[, "outcome.min"]), unit = "in"))
-      lmax <- max(strwidth(s = limtxt(to[, "outcome.max"]), unit = "in"))
+      lmin <- max(
+        graphics::strwidth(s = limtxt(to[, "outcome.min"]), unit = "in")
+      )
+      lmax <- max(
+        graphics::strwidth(s = limtxt(to[, "outcome.max"]), unit = "in")
+      )
       lw <- max(lmin, lmax)
       # add bars and limits
       for (i in seq_len(nrow(to))) {
         xleft <- min(to[[i, "outcome.min"]], to[[i, "outcome.max"]])
         xright <- max(to[[i, "outcome.min"]], to[[i, "outcome.max"]])
-        rect(
+        graphics::rect(
           xleft,
           xright,
           ybottom = i - 0.25,
@@ -296,7 +300,7 @@ tornado_plot <- function(to, outcome_mean, xlab = "") {
         } else {
           labels <- limtxt(c(ul, ll))
         }
-        text(
+        graphics::text(
           x = c(xleft, xright),
           y = c(i, i),
           labels = labels,
@@ -306,7 +310,7 @@ tornado_plot <- function(to, outcome_mean, xlab = "") {
         )
       }
       # add mean (base case)
-      abline(v = outcome_mean, lty = "dashed")
+      graphics::abline(v = outcome_mean, lty = "dashed")
       # remove label column
       to[, "Label"] <- NULL
     }

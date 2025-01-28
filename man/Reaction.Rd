@@ -71,7 +71,10 @@ general.
 
 \item{\code{target_node}}{Node which the reaction enters.}
 
-\item{\code{p}}{Conditional probability of traversing the reaction edge.}
+\item{\code{p}}{Conditional probability of traversing the reaction edge. At most
+one Reaction from each chance node may have this set to `NA_real_`, in
+which case it will be replaced by one minus the sum of conditional
+probabilities of the other reaction edges from the node.}
 
 \item{\code{cost}}{Cost associated with traversal of this edge (numeric or
 \code{ModVar}), not NA.}

@@ -1,6 +1,11 @@
-inst/doc
+archive
+branch
+DMHEE
 doc
+inst/doc
+literature
 Meta
+tools
 .Rhistory
 .RData
 .Rproj.user

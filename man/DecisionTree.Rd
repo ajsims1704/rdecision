@@ -478,7 +478,7 @@ including PSA.
 A pay-off table, represented as a matrix of numeric values
 with response columns as follows:
 \describe{
-\item{\code{Probability}}{The probability of traversing the pathway. }
+\item{\code{Probability}}{The probability of traversing the pathway.}
 \item{\code{Path.Cost}}{The cost of traversing the pathway.}
 \item{\code{Path.Benefit}}{The benefit derived from traversing the
       pathway.}

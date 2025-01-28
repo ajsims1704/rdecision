@@ -464,6 +464,13 @@ Writes a representation of the digraph in the
 \code{graphviz} DOT language
 (\url{https://graphviz.org/doc/info/lang.html}) for drawing with one
 of the \code{graphviz} tools, including \code{dot} (Gansner, 1993).
+This option is recommended if it is desired to rapidly plot a graph;
+however it gives limited control over details of the appearance. In
+addition, the appearance may vary between calls if the node order changes
+(specifically, if there is no Hamiltonian path). For greater control over
+the appearance of a graph, use the \code{as_gml} function and manipulate
+the graph using igraph or DiagrammeR; please refer to the vignettes for
+examples.
 }
 
 \subsection{Returns}{
