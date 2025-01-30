@@ -7,11 +7,11 @@
 \description{
 An R6 class to represent a decision tree model.
 }
-\details{
-A class to represent a decision tree. An object contains a tree of
-decision nodes, chance nodes and leaf nodes, connected by edges
-(either actions or reactions). It inherits from class \code{Arborescence} and
-satisfies the following conditions:
+\section{Constructing the tree}{
+
+A \code{DecisionTree} object contains decision nodes, chance nodes and leaf
+nodes, connected by edges (either actions or reactions). It inherits from
+class \code{Arborescence} and satisfies the following conditions:
 \enumerate{
 \item{Nodes and edges must form a tree with a single root and
 there must be a unique path from the root to each node.
@@ -36,6 +36,21 @@ with a common source endpoint must be 1.}
 \code{Action}s that share a common source endpoint must be unique.}
 }
 }
+
+\section{Time}{
+
+The timing of events is not explicitly modelled in decision trees
+(O'Mahony, 2015). \code{rdecision} makes the assumption that all costs are
+incurred at time \eqn{t = 0} and that QALYs are gained during the
+time intervals defined for each leaf node. Discounting of future costs to
+present values is therefore not applicable. Future utilities may be
+discounted to present values by setting a discount rate for
+each leaf node (in usual circumstances the interval and discount rate should
+be the same for each leaf node). The QALYs gained are calculated by
+integrating the continuously discounted utility over the interval for each
+ leaf node.
+}
+
 \references{
 {
   Briggs A, Claxton K, Sculpher M. Decision modelling for health economic
@@ -50,6 +65,11 @@ with a common source endpoint must be 1.}
   Kaminski B, Jakubczyk M, Szufel P. A framework for sensitivity analysis of
   decision trees. \emph{Central European Journal of Operational Research}
   2018;\bold{26}:135–59, \doi{10.1007/s10100-017-0479-6}.
+
+  O'Mahony JF, Newall AT, van Rosmalen J. Dealing with time in health
+  economic evaluation: methodological issues and recommendations for
+  practice. \emph{PharmacoEconomics} 2015;\bold{33}:1255-1268,
+  \doi{10.1007/s40273-015-0309-4}.
 }
 }
 \author{
@@ -339,7 +359,8 @@ Tests whether an object is a valid strategy.
 \subsection{Arguments}{
 \if{html}{\out{<div class="arguments">}}
 \describe{
-\item{\code{strategy}}{A list of Action edges.}
+\item{\code{strategy}}{A list of Action edges, or a single Action edge for
+decision trees with one decision node.}
 }
 \if{html}{\out{</div>}}
 }
@@ -369,8 +390,9 @@ Find all potential strategies for the decision tree.
 \item{\code{what}}{A character string defining what to return. Must be one
 of "label" or "index".}
 
-\item{\code{select}}{A single strategy (given as a list of action edges, with
-one action edge per decision node). If provided, only that strategy
+\item{\code{select}}{A single strategy, given as a list of action edges, with
+one action edge per decision node, or as a single action edge if there
+is one decision node in the tree. If provided, only that strategy
 is selected from the returned table. Intended for tabulating a
 single strategy into a readable form.}
 }
@@ -471,7 +493,8 @@ avoid repeated conversion of edges to indices.}
 For each walk, probability, cost, benefit and utility are
 calculated. There is minimal checking of the argument because this
 function is intended to be called repeatedly during tree evaluation,
-including PSA.
+including PSA. Discounts are applied to calculate the present value of
+future costs and health effects.
 }
 
 \subsection{Returns}{
@@ -548,10 +571,10 @@ The columns of the returned data frame are:
       leaving the node}
     \item{\code{Leaf}}{The label of terminating leaf node}
     \item{\code{Probability}}{Probability of traversing the path}
-    \item{\code{Cost}}{Cost of traversing the path}
-    \item{\code{Benefit}}{Benefit of traversing the path}
-    \item{\code{Utility}}{Utility of traversing the path}
-    \item{\code{QALY}}{QALY of traversing the path}
+    \item{\code{Cost}}{Cost of traversing the path x probability}
+    \item{\code{Benefit}}{Benefit of traversing the path x probability}
+    \item{\code{Utility}}{Utility of traversing the path x probability}
+    \item{\code{QALY}}{QALYs gained by those traversing the path}
   }
 }
 

@@ -297,6 +297,50 @@ test_that("probabilities of NA are detected and checked", {
   expect_intol(with(dte, Probability[Leaf == "l4"]), 0.6, 0.01)
 })
 
+# ICER with discounted utility
+test_that("ICER with discounted utility is as expected", {
+  # variables
+  ur <- 1.0
+  unr <- 0.7
+  dt <- as.difftime(tim = 365.25 * 2.0, units = "days")
+  r <- 3.5 / 100.0
+  pa <- 0.8
+  pb <- 0.7
+  ca <- 10000.0
+  cb <- 8000.0
+  # tree for treatment A versus treatment B, with effect over 2 years
+  a_resp <- LeafNode$new(label = "R", utility = ur, interval = dt, ru = r)
+  b_resp <- LeafNode$new(label = "R", utility = ur, interval = dt, ru = r)
+  a_noresp <- LeafNode$new(label = "NR", utility = unr, interval = dt, ru = r)
+  b_noresp <- LeafNode$new(label = "NR", utility = unr, interval = dt, ru = r)
+  a_effect <- ChanceNode$new()
+  b_effect <- ChanceNode$new()
+  d <- DecisionNode$new(label = "Treatment")
+  txa <- Action$new(source = d, target = a_effect, label = "a", cost = ca)
+  txb <- Action$new(source = d, target = b_effect, label = "b", cost = cb)
+  ay <- Reaction$new(source = a_effect, target = a_resp, p = pa)
+  an <- Reaction$new(source = a_effect, target = a_noresp, p = NA_real_)
+  by <- Reaction$new(source = b_effect, target = b_resp, p = pb)
+  bn <- Reaction$new(source = b_effect, target = b_noresp, p = NA_real_)
+  dt <- DecisionTree$new(
+    V = list(d, a_effect, b_effect, a_resp, b_resp, a_noresp, b_noresp),
+    E = list(txa, txb, ay, an, by, bn)
+  )
+  # evaluate
+  res <- dt$evaluate(by = "run")
+  # observed ICER
+  dc <- res[[1L, "Cost.a"]] - res[[1L, "Cost.b"]]
+  dq <- res[[1L, "QALY.a"]] - res[[1L, "QALY.b"]]
+  icero <- dc / dq
+  # expected ICER
+  dc <- ca - cb
+  df <- (1.0 - exp(-r * 2.0)) / r
+  qa <- pa * ur * df + (1.0 - pa) * unr * df
+  qb <- pb * ur * df + (1.0 - pb) * unr * df
+  icere <- dc / (qa - qb)
+  expect_intol(icero, icere, tol = 1.0)
+})
+
 # test with utility > 1
 test_that("decision trees with utility > 1 are supported", {
   # fictitious scenario

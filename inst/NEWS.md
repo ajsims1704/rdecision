@@ -1,3 +1,19 @@
+# rdecision 1.2.1.9009
+
+* Added utility discount rate argument to `LeafNode` class, and modified
+  method `QALY` in `LeafNode` to calculate QALYs gained, assuming present
+  value of future utility under a continuous discount assumption.
+  Revised documentation of `DecisionTree` and `LeafNode` to clarify the
+  timing assumptions used by `rdecision` in decision tree modelling (that
+  all costs are incurred at time t = 0, and that QALYs are gained over the
+  time horizons defined in the leaf nodes).
+* Added citation to O'Mahony et al (2015) to HIV vignette, and `SemiMarkovModel`
+  and `DecisionTree` documentation.
+* Calling methods `set_cost` and `set_utility` in class `MarkovState` without
+  an argument is trapped as an error.
+* Calling method `set_cost` in class `Transition` without an argument is
+  trapped as an error.
+
 # rdecision 1.2.1.9008
 
 * Arguments `index` and `ref` in the `tornado` method of `DecisionTree` may

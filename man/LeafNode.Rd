@@ -12,6 +12,13 @@ tree.
 Represents a terminal state in a tree, and is associated with an
 incremental utility. Inherits from class \code{Node}.
 }
+\references{
+{
+  O'Mahony JF, Newall AT, van Rosmalen J. Dealing with time in health
+  economic evaluation: methodological issues and recommendations for
+  practice. \emph{PharmacoEconomics} 2015;\strong{33}:1255--1268.
+}
+}
 \author{
 Andrew J. Sims \email{andrew.sims@newcastle.ac.uk}
 }
@@ -43,12 +50,14 @@ Andrew J. Sims \email{andrew.sims@newcastle.ac.uk}
 \if{html}{\out{<a id="method-LeafNode-new"></a>}}
 \if{latex}{\out{\hypertarget{method-LeafNode-new}{}}}
 \subsection{Method \code{new()}}{
-Create a new \code{LeafNode} object; synonymous with a clinical outcome.
+Create a new \code{LeafNode} object; synonymous with a
+health state.
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{LeafNode$new(
   label,
   utility = 1,
-  interval = as.difftime(365.25, units = "days")
+  interval = as.difftime(365.25, units = "days"),
+  ru = 0
 )}\if{html}{\out{</div>}}
 }
 
@@ -60,16 +69,19 @@ defined because it is used in tabulations. The label is automatically
 converted to a syntactically valid (in R) name to ensure it can be used
 as a column name in a data frame.}
 
-\item{\code{utility}}{The incremental utility that a user associates with
-being in the health state for the interval.
-Intended for use with cost benefit analysis. Can be \code{numeric} or
+\item{\code{utility}}{The utility that a user associates with being in the
+health state for the interval. Can be \code{numeric} or
 a type of \code{ModVar}. If the type is \code{numeric}, the allowed
 range is \code{-Inf} to 1; if it is of type \code{ModVar}, it is
 unchecked.}
 
-\item{\code{interval}}{The time interval over which the \code{utility}
-parameter applies, expressed as an R \code{difftime} object; default
-1 year.}
+\item{\code{interval}}{The time horizon, or duration for which a user is
+expected to occupy the health state and experience a health-related
+quality of life of \code{utility}, expressed as an R \code{difftime}
+object; default 1 year.}
+
+\item{\code{ru}}{Annual discount rate for future utility. Note
+this is a rate, not a probability (i.e., use 0.035 for 3.5\%).}
 }
 \if{html}{\out{</div>}}
 }
@@ -96,7 +108,7 @@ A list of \code{ModVar}s.
 \if{html}{\out{<a id="method-LeafNode-set_utility"></a>}}
 \if{latex}{\out{\hypertarget{method-LeafNode-set_utility}{}}}
 \subsection{Method \code{set_utility()}}{
-Set the incremental utility associated with the node.
+Set the utility associated with the node.
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{LeafNode$set_utility(utility)}\if{html}{\out{</div>}}
 }
@@ -104,9 +116,8 @@ Set the incremental utility associated with the node.
 \subsection{Arguments}{
 \if{html}{\out{<div class="arguments">}}
 \describe{
-\item{\code{utility}}{The incremental utility that a user associates with
-being in the health state for the interval.
-Intended for use with cost benefit analysis. Can be \code{numeric} or
+\item{\code{utility}}{The utility that a user associates with being in the
+health state for the interval. Can be \code{numeric} or
 a type of \code{ModVar}. If the type is \code{numeric}, the allowed
 range is \code{-Inf} to 1, not NA; if it is of type \code{ModVar}, it is
 unchecked.}
@@ -143,14 +154,14 @@ Updated \code{Leaf} object.
 \if{html}{\out{<a id="method-LeafNode-utility"></a>}}
 \if{latex}{\out{\hypertarget{method-LeafNode-utility}{}}}
 \subsection{Method \code{utility()}}{
-Return the incremental utility associated with being in the
+Return the utility associated with being in the
 state for the interval.
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{LeafNode$utility()}\if{html}{\out{</div>}}
 }
 
 \subsection{Returns}{
-Incremental utility (numeric value).
+Utility (numeric value).
 }
 }
 \if{html}{\out{<hr>}}
@@ -170,10 +181,24 @@ Interval (as a \code{difftime}).
 \if{html}{\out{<a id="method-LeafNode-QALY"></a>}}
 \if{latex}{\out{\hypertarget{method-LeafNode-QALY}{}}}
 \subsection{Method \code{QALY()}}{
-Return the quality adjusted life years associated with
-being in the state.
+Return the discounted quality adjusted life years
+associated with being in the state.
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{LeafNode$QALY()}\if{html}{\out{</div>}}
+}
+
+\subsection{Details}{
+The present value of utility at future time \eqn{t} can be expressed as
+\eqn{u_t = u_0 e^{-rt}}, where \eqn{u_0} is the utility at time
+\eqn{t = 0} and \eqn{r} is the discount rate for utility
+(O'Mahony, 2015), under the assumption of continuous discount. The
+quality adjusted life years (QALYs) gained by occupying the state for
+time \eqn{t'} is \deqn{\int_{0}^{t'} u_t dt.} For \eqn{r > 0}, the QALY
+gain is equal to \deqn{\frac{u_0}{r}(1 - e^{-rt'}),} and for
+\eqn{r=0}, it is \eqn{u_0 t}'. For example, at a discount rate of 3.5\%,
+the number of QALYs gained after occupying a state for 1 year with a
+present value utility of 0.75 is 0.983 \eqn{\times} 0.75 \eqn{\approx}
+0.737 QALYs, and after 2 years the gain is 1.449 QALYs.
 }
 
 \subsection{Returns}{

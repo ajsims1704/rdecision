@@ -14,10 +14,8 @@ test_that("invalid annual costs are rejected", {
     class = "invalid_annual_cost"
   )
   s <- MarkovState$new(name = "Answer")
-  expect_error(
-    s$set_cost(cost = "42"),
-    class = "invalid_annual_cost"
-  )
+  expect_error(s$set_cost(), class = "invalid_annual_cost")
+  expect_error(s$set_cost(cost = "42"), class = "invalid_annual_cost")
 })
 
 test_that("invalid utilities are rejected", {
@@ -30,6 +28,7 @@ test_that("invalid utilities are rejected", {
     class = "invalid_utility"
   )
   s <- MarkovState$new(name = "Futile")
+  expect_error(s$set_utility(), class = "invalid_utility")
   expect_error(
     s$set_utility(utility = list(42L)),
     class = "invalid_utility"

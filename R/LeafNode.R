@@ -12,30 +12,36 @@ LeafNode <- R6::R6Class(
   inherit = Node,
   private = list(
     node.utility = NULL,
-    node.interval = NULL
+    node.interval = NULL,
+    ru = NULL
   ),
   public = list(
 
-    #' @description
-    #' Create a new \code{LeafNode} object; synonymous with a clinical outcome.
+    #' @description Create a new \code{LeafNode} object; synonymous with a
+    #' health state.
     #' @param label Character string; a label for the state; must be
     #' defined because it is used in tabulations. The label is automatically
     #' converted to a syntactically valid (in R) name to ensure it can be used
     #' as a column name in a data frame.
-    #' @param utility The incremental utility that a user associates with
-    #' being in the health state for the interval.
-    #' Intended for use with cost benefit analysis. Can be \code{numeric} or
+    #' @param utility The utility that a user associates with being in the
+    #' health state for the interval. Can be \code{numeric} or
     #' a type of \code{ModVar}. If the type is \code{numeric}, the allowed
     #' range is \code{-Inf} to 1; if it is of type \code{ModVar}, it is
     #' unchecked.
-    #' @param interval The time interval over which the \code{utility}
-    #' parameter applies, expressed as an R \code{difftime} object; default
-    #' 1 year.
+    #' @param interval The time horizon, or duration for which a user is
+    #' expected to occupy the health state and experience a health-related
+    #' quality of life of \code{utility}, expressed as an R \code{difftime}
+    #' object; default 1 year.
+    #' @param ru Annual discount rate for future utility. Note
+    #' this is a rate, not a probability (i.e., use 0.035 for 3.5\%).
     #' @return A new \code{LeafNode} object
     initialize = function(
-      label, utility = 1.0, interval = as.difftime(365.25, units = "days")
+      label,
+      utility = 1.0,
+      interval = as.difftime(365.25, units = "days"),
+      ru = 0.0
     ) {
-      # check there is a valid label
+      # check arguments
       abortifnot(
         !rlang::is_missing(label),
         is.character(label),
@@ -44,6 +50,16 @@ LeafNode <- R6::R6Class(
           "Argument `label` must not be missing and must be a non-empty string",
         class = "invalid_label"
       )
+      abortifnot(
+        inherits(interval, what = "difftime"),
+        message = "Argument 'interval' must be of class 'difftime'.",
+        class = "invalid_interval"
+      )
+      abortifnot(
+        is.numeric(ru),
+        message = "Discount rate must be of type numeric",
+        class = "invalid_discount"
+      )
       # initialize Node base class
       label <- make.names(label)
       super$initialize(label)
@@ -51,6 +67,8 @@ LeafNode <- R6::R6Class(
       self$set_utility(utility)
       # check and set the interval
       self$set_interval(interval)
+      # set the utility discount
+      private$ru <- ru
       # return updated node object
       return(invisible(self))
     },
@@ -71,10 +89,9 @@ LeafNode <- R6::R6Class(
       return(unique(ov))
     },
 
-    #' @description Set the incremental utility associated with the node.
-    #' @param utility The incremental utility that a user associates with
-    #' being in the health state for the interval.
-    #' Intended for use with cost benefit analysis. Can be \code{numeric} or
+    #' @description Set the utility associated with the node.
+    #' @param utility The utility that a user associates with being in the
+    #' health state for the interval. Can be \code{numeric} or
     #' a type of \code{ModVar}. If the type is \code{numeric}, the allowed
     #' range is \code{-Inf} to 1, not NA; if it is of type \code{ModVar}, it is
     #' unchecked.
@@ -83,20 +100,16 @@ LeafNode <- R6::R6Class(
       # check and set utility
       abortif(
         rlang::is_missing(utility),
-        !inherits(utility, what = c("numeric", "ModVar")),
+        !(
+          (is.numeric(utility) && !is.na(utility) && utility <= 1.0) ||
+            (inherits(utility, what = "ModVar"))
+        ),
         message = paste(
-          "Argument 'utility' must be provided, and of type numeric or ModVar."
+          "Argument 'utility' must be provided, of type numeric or ModVar,",
+          "and in range [-Inf,1} if numeric."
         ),
         class = "invalid_utility"
       )
-      if (is.numeric(utility)) {
-        abortif(
-          is.na(utility),
-          utility > 1.0,
-          message = "Argument 'utility' must be in the range [-Inf,1].",
-          class = "invalid_utility"
-        )
-      }
       private$node.utility <- utility
       return(invisible(self))
     },
@@ -119,9 +132,9 @@ LeafNode <- R6::R6Class(
       return(invisible(self))
     },
 
-    #' @description Return the incremental utility associated with being in the
+    #' @description Return the utility associated with being in the
     #' state for the interval.
-    #' @return Incremental utility (numeric value).
+    #' @return Utility (numeric value).
     utility = function() {
       u <- as_numeric(private$node.utility)
       return(u)
@@ -133,12 +146,35 @@ LeafNode <- R6::R6Class(
       return(private$node.interval)
     },
 
-    #' @description Return the quality adjusted life years associated with
-    #' being in the state.
+    #' @description Return the discounted quality adjusted life years
+    #' associated with being in the state.
+    #' @details
+    #' The present value of utility at future time \eqn{t} can be expressed as
+    #' \eqn{u_t = u_0 e^{-rt}}, where \eqn{u_0} is the utility at time
+    #' \eqn{t = 0} and \eqn{r} is the discount rate for utility
+    #' (O'Mahony, 2015), under the assumption of continuous discount. The
+    #' quality adjusted life years (QALYs) gained by occupying the state for
+    #' time \eqn{t'} is \deqn{\int_{0}^{t'} u_t dt.} For \eqn{r > 0}, the QALY
+    #' gain is equal to \deqn{\frac{u_0}{r}(1 - e^{-rt'}),} and for
+    #' \eqn{r=0}, it is \eqn{u_0 t}'. For example, at a discount rate of 3.5\%,
+    #' the number of QALYs gained after occupying a state for 1 year with a
+    #' present value utility of 0.75 is 0.983 \eqn{\times} 0.75 \eqn{\approx}
+    #' 0.737 QALYs, and after 2 years the gain is 1.449 QALYs.
+    #' @references{
+    #'   O'Mahony JF, Newall AT, van Rosmalen J. Dealing with time in health
+    #'   economic evaluation: methodological issues and recommendations for
+    #'   practice. \emph{PharmacoEconomics} 2015;\strong{33}:1255--1268.
+    #' }
     #' @return \acronym{QALY}.
     QALY = function() {
-      dt <- as.numeric(private$node.interval, units = "days")
-      Q <- dt * self$utility() / 365.25
+      tp <- as.numeric(private$node.interval, units = "days") / 365.25
+      u0 <- self$utility()
+      ru <- private$ru
+      if (ru > 0.0) {
+        Q <- (u0 / ru) * (1.0 - exp(-ru * tp))
+      } else {
+        Q <- u0 * tp
+      }
       return(Q)
     }
   )

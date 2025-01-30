@@ -66,8 +66,10 @@ Transition <- R6::R6Class(
     #' @param c Cost associated with the transition.
     #' @return Updated \code{Transition} object.
     set_cost = function(c = 0.0) {
-      abortifnot(inherits(c, what = c("numeric", "ModVar")),
-        message = "Argument 'c' must be of type 'numeric' or 'ModVar'.",
+      abortifnot(
+        !missing(c),
+        inherits(c, what = c("numeric", "ModVar")),
+        message = "Argument 'c' must be defined and 'numeric' or 'ModVar'.",
         class = "invalid_cost"
       )
       private$transition.cost <- c

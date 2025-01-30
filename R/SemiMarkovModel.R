@@ -49,9 +49,9 @@
 #' on estimating probabilities from rates. Jones (2017) and Welton (2005)
 #' describe methods for estimating probabilities in multi-state,
 #' multi-transition models, although those methods may not apply to
-#' semi-Markov models with temporary states. In particular, note that the
+#' semi-Markov models with temporary states. In particular, the
 #' "simple" equation, \eqn{p = 1-e^{-rt}} (Briggs 2006) applies only in a
-#' two-state, one transition model.
+#' two-state, one transition model (O'Mahony 2015).
 #' }
 #' \subsection{Uncertainty in rates}{
 #' In semi-Markov models, the conditional probabilities of the transitions
@@ -76,6 +76,10 @@
 #'
 #'   Miller DK and Homan SM. Determining transition probabilities: confusion
 #'   and suggestions. \emph{Medical Decision Making} 1994;\strong{14}:52-58.
+#'
+#'   O'Mahony JF, Newall AT, van Rosmalen J. Dealing with time in health
+#'   economic evaluation: methodological issues and recommendations for
+#'   practice. \emph{PharmacoEconomics} 2015;\strong{33}:1255--1268.
 #'
 #'   Sonnenberg FA, Beck JR. Markov models in medical decision making: a
 #'   practical guide. \emph{Medical Decision Making}, 1993:\strong{13}:322.
@@ -233,7 +237,7 @@ SemiMarkovModel <- R6::R6Class(
     #' @param tcycle Cycle length, expressed as an R \code{difftime} object.
     #' @param discount.cost Annual discount rate for future costs. Note this
     #' is a rate, not a probability (i.e. use 0.035 for 3.5\%).
-    #' @param discount.utility Annual discount rate for future incremental
+    #' @param discount.utility Annual discount rate for future
     #' utility. Note this is a rate, not a probability (i.e. use 0.035
     #' for 3.5\%).
     #' @return A \code{SemiMarkovModel} object. The population of the first

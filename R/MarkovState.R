@@ -60,8 +60,9 @@ MarkovState <- R6::R6Class(
     set_cost = function(cost) {
       # check that annual cost, then set it
       abortifnot(
+        !missing(cost),
         is.numeric(cost) || is_ModVar(cost),
-        message = "'cost' must be of type 'numeric' or 'ModVar'",
+        message = "'cost' must be provided and of type 'numeric' or 'ModVar'",
         class = "invalid_annual_cost"
       )
       private$state.cost <- cost
@@ -82,6 +83,7 @@ MarkovState <- R6::R6Class(
     set_utility = function(utility) {
       # check the utility, and in range[-Inf,1] if numeric
       abortifnot(
+        !missing(utility),
         (is.numeric(utility) && utility <= 1.0) || is_ModVar(utility),
         message = "If utility is numeric it must be in the range [-Inf,1]",
         class = "invalid_utility"

@@ -194,10 +194,10 @@ observation time, and can lead to rates with values which exceed 1. In contrast,
 the difference between a census of the number of individuals in each state at
 the start of the interval and a census at the end is directly related to the
 per-cycle probability. As Miller and Homan [-@miller1994], Welton and Ades
-[-@welton2005], Jones *et al* [-@jones2017] and others note, conversion between
-rates and probabilities for multi-state Markov models is non-trivial
-[@jones2017] and care is needed when modellers calculate probabilities from
-published rates for use in `SemiMarkoModel`s.
+[-@welton2005], O'Mahony *et al* [-@omahony2015], Jones *et al* [-@jones2017]
+and others note, conversion between rates and probabilities for multi-state
+Markov models is non-trivial and care is needed when modellers calculate
+probabilities from published rates for use in `SemiMarkoModel`s.
 
 # Checking the model
 

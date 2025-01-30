@@ -35,6 +35,8 @@ test_that("costs can be modified", {
   expect_identical(t$cost(), 42.0)
   t$set_cost(1000.0)
   expect_identical(t$cost(), 1000.0)
+  # invalid arguments
+  expect_error(t$set_cost(), class = "invalid_cost")
   # modvars
   c <- ConstModVar$new("c1", "GBP", 42.0)
   t <- Transition$new(s1, s2, cost = c)

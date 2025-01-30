@@ -72,4 +72,16 @@ test_that("QALYs are calculated correctly", {
     "QALY", utility = 0.5, interval = as.difftime(365.25 / 2.0, units = "days")
   )
   expect_intol(t1$QALY(), 0.25, 0.01)
+  r <- 3.5 / 100.0
+  t2 <- LeafNode$new(
+    "QALY", utility = 1.0, interval = as.difftime(365.25, units = "days"),
+    ru = r
+  )
+  expect_intol(t2$QALY(), ((1.0 - exp(-r)) / r), 0.001)
+  u <- ConstModVar$new("", "", 1.0)
+  t3 <- LeafNode$new(
+    "QALY", utility = u, interval = as.difftime(365.25, units = "days"),
+    ru = r
+  )
+  expect_intol(t3$QALY(), ((1.0 - exp(-r)) / r), 0.001)
 })
