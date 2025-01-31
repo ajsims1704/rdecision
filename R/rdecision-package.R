@@ -13,9 +13,13 @@
 "_PACKAGE"
 #'
 #' @import grid
+#' @import igraph
+#' @import knitr
 #' @import R6
 #' @import rlang
+#' @import rmarkdown
 #' @import stats
+#' @import testthat
 #' @import utils
 #' @importFrom withr with_par
 #'
