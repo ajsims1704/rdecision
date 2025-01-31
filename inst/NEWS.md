@@ -1,6 +1,13 @@
 # rdecision 1.3.0
 
 * Added rhub workflow to git repository.
+* Increased minimum version of R in DESCRIPTION to 3.6.0 to be consistent with
+  functions `str2lang` and `hcl.colors` which require it, and added backport
+  linter to list of linters to identify any future requirements of the
+  DESCRIPTION file.
+* Moved packages `igraph`, `knitr`, `rmarkdown` and `testthat` to Imports
+  section of DESCRIPTION to avoid R CMD build and R CMD test failures on some
+  architectures via `rhub`.
 * Added utility discount rate argument to `LeafNode` class, and modified
   method `QALY` in `LeafNode` to calculate QALYs gained, assuming present
   value of future utility under a continuous discount assumption.
