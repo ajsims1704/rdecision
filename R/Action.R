@@ -58,6 +58,62 @@ Action <- R6::R6Class(
       return(invisible(self))
     },
 
+    #' @description Creates a grid::grob for an action edge.
+    #' @param xs x coordinate of source of edge, grid::unit object.
+    #' @param ys y coordinate of source of edge, grid::unit object.
+    #' @param xt x coordinate of target of edge, grid::unit object.
+    #' @param yt y coordinate of target of edge, grid::unit object.
+    #' @param fs Fraction of the edge which slopes.
+    #' @return A grid::grob containing the symbol and label.
+    grob = function(xs, ys, xt, yt, fs = 0.2) {
+      # check arguments
+      abortifnot(
+        grid::is.unit(xs),
+        grid::is.unit(ys),
+        grid::is.unit(xt),
+        grid::is.unit(yt)
+      )
+      # create a gTree object for the line and its label
+      gedge <- grid::grobTree()
+      # draw the articulated line
+      gedge <- grid::addGrob(
+        gTree = gedge,
+        child = grid::moveToGrob(x = xs, y = ys)
+      )
+      xj <- (xt - xs) * fs + xs
+      yj <- yt
+      gedge <- grid::addGrob(
+        gTree = gedge,
+        child = grid::lineToGrob(x = xj, y = yj)
+      )
+      gedge <- grid::addGrob(
+        gTree = gedge,
+        child = lineToGrob(x = xt, y = yt)
+      )
+      # add label above or below
+      vp <- grid::viewport(
+        x = xj, y = yj, just = c("left", "bottom")
+      )
+      ytn <- grid::convertUnit(yt, "native", valueOnly = TRUE)
+      ysn <- grid::convertUnit(ys, "native", valueOnly = TRUE)
+      if (ytn < ysn) {
+        yl <- grid::unit(0.4, "char")
+        jl <- c("left", "bottom")
+      } else {
+        yl <- grid::unit(-0.4, "char")
+        jl <- c("left", "top")
+      }
+      gedge <- grid::addGrob(
+        gTree = gedge,
+        child = grid::textGrob(
+          label = self$label(),
+          x = grid::unit(0.2, "char"), y = yl, just = jl,
+          vp = vp
+        )
+      )
+      return(gedge)
+    },
+
     #' @description Find all the model variables of type \code{ModVar} that have
     #' been specified as values associated with this \code{Action}. Includes
     #' operands of these \code{ModVar}s, if they are expressions.

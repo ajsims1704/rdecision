@@ -1,5 +1,6 @@
-# rdecision 1.2.1.9009
+# rdecision 1.3.0
 
+* Added rhub workflow to git repository.
 * Added utility discount rate argument to `LeafNode` class, and modified
   method `QALY` in `LeafNode` to calculate QALYs gained, assuming present
   value of future utility under a continuous discount assumption.
@@ -13,32 +14,21 @@
   an argument is trapped as an error.
 * Calling method `set_cost` in class `Transition` without an argument is
   trapped as an error.
-
-# rdecision 1.2.1.9008
-
 * Arguments `index` and `ref` in the `tornado` method of `DecisionTree` may
   now each be expressed as a single Action edge, rather than a list of action
   edges, if there is one decision node in the tree. As many decision problems
   are a choice between two strategies, this is a common usage of `tornado`,
   and will lead to more compact code. Method `is_strategy` also modified to
   permit compact notation of index and reference strategies.
-
-# rdecision 1.2.1.9007
-
 * Decision tree drawing algorithm improved to place leaf node labels to the
   right of the symbol, and to accurately calculate margin sizes required to
-  accommodate symbols and labels efficiently.
+  accommodate symbols and labels efficiently. Node and edge grid drawing
+  functions moved to classes for those objects.
 * Added package qualifier for function dev.size in grDevices, and functions
   abline, axis, rect, strwidth and text in package graphics.
-
-# rdecision 1.2.1.9006
-
 * Moved code to plot a tornado diagram into 'utils.R` to make it available
   for creating such diagrams given any input source (e.g., Markov models),
   rather than restricting its use to `ModVar`s in decision trees.
-
-# rdecision 1.2.1.9005
-
 * Added vignette `SM00`, a narrative explanation of replicating Sonnenberg 
   and Beck's three-state model of people having a prosthetic heart valve. 
   Removed dependency of the package readme file on test-model-Lifestyle.R
@@ -49,33 +39,21 @@
   `stopifnot` assertions to ensure that the vignette model results agree with
   published values. Replaced calls to knitr::kable with base R table output
   for purled output.
-
-# rdecision 1.2.1.9004
-
 * Removed dependency on external file for vignette DT01 by direct inclusion of
   model code from test-model-Sumatriptan.R. Test expectations replaced by
   `stopifnot` assertions to ensure that the vignette model results agree with
   published values. Replaced calls to knitr::kable with base R table output
   for purled output.
-
-# rdecision 1.2.1.9003
-
 * Removed dependency on external file for vignette DT03 by direct inclusion of
   model code from test-model-ShaleGas.R. Test expectations replaced by
   `stopifnot` assertions to ensure that the vignette model results agree with
   published values. Replaced calls to knitr::kable with base R table output
   for purled output.
-
-# rdecision 1.2.1.9002
-
 * Removed dependency on external file for vignette GT01 by direct inclusion of
   model code from test-model-BurgerRun.R. Test expectations replaced by
   `stopifnot` assertions to ensure that the vignette model results agree with
   published values. Replaced calls to knitr::kable with base R table output
   for purled output.
-
-# rdecision 1.2.1.9001
-
 * Removed dependency on external R files from vignette SM02-TKR by direct
   inclusion of model code from test-model-SM02.R. Test expectations replaced
   by `stopifnot` assertions in the vignette to ensure that vignette model

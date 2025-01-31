@@ -23,6 +23,7 @@ Andrew Sims \email{andrew.sims@newcastle.ac.uk}
 \subsection{Public methods}{
 \itemize{
 \item \href{#method-ChanceNode-new}{\code{ChanceNode$new()}}
+\item \href{#method-ChanceNode-grob}{\code{ChanceNode$grob()}}
 \item \href{#method-ChanceNode-clone}{\code{ChanceNode$clone()}}
 }
 }
@@ -53,6 +54,31 @@ Create a new \code{ChanceNode} object
 }
 \subsection{Returns}{
 A new \code{ChanceNode} object
+}
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-ChanceNode-grob"></a>}}
+\if{latex}{\out{\hypertarget{method-ChanceNode-grob}{}}}
+\subsection{Method \code{grob()}}{
+Creates a grid::grob for a chance node.
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{ChanceNode$grob(x, y, bb = FALSE)}\if{html}{\out{</div>}}
+}
+
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{x}}{x coordinate of the node, grid::unit object.}
+
+\item{\code{y}}{y coordinate of the node, grid::unit object.}
+
+\item{\code{bb}}{Logical. If TRUE, function returns the bounding box.}
+}
+\if{html}{\out{</div>}}
+}
+\subsection{Returns}{
+A grob containing the symbol and label, or a bounding box
+as a grid::unit vector with elements: left, right, bottom, top.
 }
 }
 \if{html}{\out{<hr>}}

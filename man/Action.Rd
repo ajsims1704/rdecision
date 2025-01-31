@@ -21,6 +21,7 @@ Andrew J. Sims \email{andrew.sims@newcastle.ac.uk}
 \subsection{Public methods}{
 \itemize{
 \item \href{#method-Action-new}{\code{Action$new()}}
+\item \href{#method-Action-grob}{\code{Action$grob()}}
 \item \href{#method-Action-modvars}{\code{Action$modvars()}}
 \item \href{#method-Action-p}{\code{Action$p()}}
 \item \href{#method-Action-set_cost}{\code{Action$set_cost()}}
@@ -75,6 +76,34 @@ brief and not punctuated with spaces, dots or underscores.}
 }
 \subsection{Returns}{
 A new \code{Action} object.
+}
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-Action-grob"></a>}}
+\if{latex}{\out{\hypertarget{method-Action-grob}{}}}
+\subsection{Method \code{grob()}}{
+Creates a grid::grob for an action edge.
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{Action$grob(xs, ys, xt, yt, fs = 0.2)}\if{html}{\out{</div>}}
+}
+
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{xs}}{x coordinate of source of edge, grid::unit object.}
+
+\item{\code{ys}}{y coordinate of source of edge, grid::unit object.}
+
+\item{\code{xt}}{x coordinate of target of edge, grid::unit object.}
+
+\item{\code{yt}}{y coordinate of target of edge, grid::unit object.}
+
+\item{\code{fs}}{Fraction of the edge which slopes.}
+}
+\if{html}{\out{</div>}}
+}
+\subsection{Returns}{
+A grid::grob containing the symbol and label.
 }
 }
 \if{html}{\out{<hr>}}

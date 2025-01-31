@@ -29,6 +29,7 @@ Andrew J. Sims \email{andrew.sims@newcastle.ac.uk}
 \subsection{Public methods}{
 \itemize{
 \item \href{#method-LeafNode-new}{\code{LeafNode$new()}}
+\item \href{#method-LeafNode-grob}{\code{LeafNode$grob()}}
 \item \href{#method-LeafNode-modvars}{\code{LeafNode$modvars()}}
 \item \href{#method-LeafNode-set_utility}{\code{LeafNode$set_utility()}}
 \item \href{#method-LeafNode-set_interval}{\code{LeafNode$set_interval()}}
@@ -87,6 +88,31 @@ this is a rate, not a probability (i.e., use 0.035 for 3.5\%).}
 }
 \subsection{Returns}{
 A new \code{LeafNode} object
+}
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-LeafNode-grob"></a>}}
+\if{latex}{\out{\hypertarget{method-LeafNode-grob}{}}}
+\subsection{Method \code{grob()}}{
+Creates a grid::grob for a leaf node.
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{LeafNode$grob(x, y, bb = FALSE)}\if{html}{\out{</div>}}
+}
+
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{x}}{x coordinate of the node, grid::unit object.}
+
+\item{\code{y}}{y coordinate of the node, grid::unit object.}
+
+\item{\code{bb}}{Logical. If TRUE, function returns the bounding box.}
+}
+\if{html}{\out{</div>}}
+}
+\subsection{Returns}{
+A grid::grob containing the symbol and label, or a bounding box
+as a grid::unit vector with 4 elements: left, right, bottom, top.
 }
 }
 \if{html}{\out{<hr>}}

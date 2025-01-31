@@ -199,10 +199,10 @@ rs <- dt$evaluate(setvars = "random", by = "run", N = N)
 The confidence interval of the net cost difference (net cost of the diet
 programme minus the net cost of the exercise programme) is estimated from
 the resulting data frame. From 1000 runs, the mean net cost difference is
--55.16 GBP with 95% confidence interval
--815.89 GBP
-to 738.7 GBP,
-with 43% runs having a lower
+-35.85 GBP with 95% confidence interval
+-779.95 GBP
+to 740.39 GBP,
+with 45% runs having a lower
 net cost for the exercise programme. Although the point estimate net cost of
 the exercise programme exceeds that of the diet programme, due to the
 uncertainties of the effectiveness of

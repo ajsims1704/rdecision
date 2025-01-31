@@ -100,3 +100,24 @@ test_that("modvars are identified", {
   })
   expect_setequal(d, c("fortytwo", "o1+o2", "o1", "o2"))
 })
+
+test_that("graphical representation of the edge is as expected", {
+  # source and target nodes
+  n1 <- DecisionNode$new("d")
+  n2 <- LeafNode$new("n2")
+  # one modvar
+  e <- Action$new(n1, n2, "label")
+  grDevices::pdf(file = NULL)
+  grid::grid.newpage()
+  vp <- grid::viewport()
+  grid::pushViewport(vp)
+  xs <- grid::unit(0.25, "npc")
+  ys <- grid::unit(0.5, "npc")
+  xt <- grid::unit(0.75, "npc")
+  yt <- grid::unit(0.75, "npc")
+  eg <- e$grob(xs = xs, ys = ys, xt = xt, yt = yt)
+  expect_s3_class(eg, "grob")
+  grid::grid.draw(eg)
+  grid::popViewport()
+  grDevices::dev.off()
+})

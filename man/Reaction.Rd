@@ -22,6 +22,7 @@ Andrew J. Sims \email{andrew.sims@newcastle.ac.uk}
 \subsection{Public methods}{
 \itemize{
 \item \href{#method-Reaction-new}{\code{Reaction$new()}}
+\item \href{#method-Reaction-grob}{\code{Reaction$grob()}}
 \item \href{#method-Reaction-modvars}{\code{Reaction$modvars()}}
 \item \href{#method-Reaction-set_probability}{\code{Reaction$set_probability()}}
 \item \href{#method-Reaction-p}{\code{Reaction$p()}}
@@ -88,6 +89,34 @@ probabilities of the other reaction edges from the node.}
 }
 \subsection{Returns}{
 A new \code{Reaction} object.
+}
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-Reaction-grob"></a>}}
+\if{latex}{\out{\hypertarget{method-Reaction-grob}{}}}
+\subsection{Method \code{grob()}}{
+Creates a grid::grob for a reaction edge.
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{Reaction$grob(xs, ys, xt, yt, fs = 0.2)}\if{html}{\out{</div>}}
+}
+
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{xs}}{x coordinate of source of edge, grid::unit object.}
+
+\item{\code{ys}}{y coordinate of source of edge, grid::unit object.}
+
+\item{\code{xt}}{x coordinate of target of edge, grid::unit object.}
+
+\item{\code{yt}}{y coordinate of target of edge, grid::unit object.}
+
+\item{\code{fs}}{Fraction of the edge which slopes.}
+}
+\if{html}{\out{</div>}}
+}
+\subsection{Returns}{
+A grid::grob containing the symbol and label.
 }
 }
 \if{html}{\out{<hr>}}

@@ -73,6 +73,55 @@ LeafNode <- R6::R6Class(
       return(invisible(self))
     },
 
+    #' @description Creates a grid::grob for a leaf node.
+    #' @param x x coordinate of the node, grid::unit object.
+    #' @param y y coordinate of the node, grid::unit object.
+    #' @param bb Logical. If TRUE, function returns the bounding box.
+    #' @return A grid::grob containing the symbol and label, or a bounding box
+    #' as a grid::unit vector with 4 elements: left, right, bottom, top.
+    grob = function(x, y, bb = FALSE) {
+      # check arguments
+      abortifnot(
+        grid::is.unit(x),
+        grid::is.unit(y)
+      )
+      # symbol size
+      a <- grid::unit(1.5 * sqrt(pi / sqrt(3.0)), "char")
+      dx <- grid::unit(0.25, "char")
+      # find the bounding box relative to (0, 0) for the node and its symbol
+      sw <- grid::stringWidth(self$label()) + dx
+      sh <- grid::stringHeight(self$label())
+      bbxl <- -a / sqrt(3.0)
+      bbxr <- sw + sqrt(3.0) * a / 6.0
+      bbyb <- -max(a / 2.0, sh / 2.0)
+      bbyt <- max(a / 2.0, sh / 2.0)
+      # symbol
+      gsym <- grid::polygonGrob(
+        x = grid::unit.c(
+          x - a / sqrt(3.0),
+          x + sqrt(3.0) * a / 6.0,
+          x + sqrt(3.0) * a / 6.0
+        ),
+        y = grid::unit.c(
+          y, y + a / 2.0, y - a / 2.0
+        ),
+        gp = grid::gpar(fill = "lightgray", col = "black")
+      )
+      # label
+      glab <- grid::textGrob(
+        label = self$label(),
+        x = x + dx + sqrt(3.0) * a / 6.0, y = y,
+        just = c("left", "centre")
+      )
+      # return the leaf object as a gTree, or its bounding box
+      if (bb) {
+        rv <- grid::unit.c(x + bbxl, x + bbxr, y + bbyb, y + bbyt)
+      } else {
+        rv <- grid::gTree(children = grid::gList(gsym, glab))
+      }
+      return(rv)
+    },
+
     #' @description Find all the model variables of type \code{ModVar} that have
     #' been specified as values associated with this \code{LeafNode}. Includes
     #' operands of these \code{ModVar}s, if they are expressions.

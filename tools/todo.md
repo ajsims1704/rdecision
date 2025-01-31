@@ -14,7 +14,7 @@
   from DecisionTree/SemiMarkovModel, so that a list of ModVars (from any 
   source) can be tabulated. This requires each ModVar to have an ID assigned
   at creation, otherwise an individual ModVar cannot be identified from the
-  set (map). See ModVarSet in *branch* for test implementation. 
+  set (map).
 * In SemiMarkovModel$transition_cost, generate more informative error message
   if `e$cost()` is NA in `Ic[is,it] <- e$cost()`.
 * In LogNormModVar, add an option to fit using erfi function and quantiles given
@@ -54,17 +54,17 @@
 ## Documentation
 * In method/class documentation, type signatures of the parameters would be 
   helpful (e.g. the tornado method expects lists as index and ref, this is not
-  documented anywhere)
+  documented anywhere) **done**.
 * In method documentation, each method should include executable examples
 * Some of the help is extremely obscure (e.g. parametrisation options for 
   LogNormModVar, which is also blocked in the Trust)
 * In vignettes, all code (including e.g. plotting) should be displayed 
-  (not everyone knows how to access the vignette source code)
+  (not everyone knows how to access the vignette source code) **no action**.
 * Vignettes don’t always clarify what is being done with the package, 
   describing instead the underlying statistical model or problem
 * There should be an introductory vignette on the basics of how to use the 
   package - note that the README file is not included in the installed package
-  library
+  library **done**.
 
 ### Functionality/display
 * Error messages could be more informative (e.g. when DT fails because not all
