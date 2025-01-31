@@ -20,7 +20,7 @@ Description: Classes and functions for modelling health care interventions
   ensuring transparency of the mathematical relationships between variables.
   The package terminology follows Briggs "Decision Modelling for Health
   Economic Evaluation" (2006, ISBN:978-0-19-852662-9).
-Depends: R (>= 3.6.0)
+Depends: R (>= 3.6.1)
 Imports:
   graphics,
   grDevices,
