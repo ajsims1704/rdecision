@@ -3,8 +3,8 @@
 * Added rhub workflow to git repository.
 * Increased minimum version of R in DESCRIPTION to 3.6.0 to be consistent with
   functions `str2lang` and `hcl.colors` which require it, and added backport
-  linter to list of linters to identify any future requirements of the
-  DESCRIPTION file.
+  linter to list of linters to identify whether the minimum version of R is
+  required to be changed in future builds.
 * Moved packages `igraph`, `knitr`, `rmarkdown` and `testthat` to Imports
   section of DESCRIPTION to avoid R CMD build and R CMD test failures on some
   architectures via `rhub`.
