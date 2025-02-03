@@ -13,6 +13,7 @@ vignette: >
   %\VignetteIndexEntry{Elementary Semi-Markov Model (Chancellor 1997)}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
+  %\VignetteDepends{rmarkdown}
 bibliography: "REFERENCES.bib"
 csl: "nature-no-et-al.csl"
 ---

@@ -15,6 +15,7 @@ vignette: >
   %\VignetteIndexEntry{Decision tree with three decision nodes (Kaminski 2018)}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
+  %\VignetteDepends{rmarkdown}
 ---
 
 ```{r}

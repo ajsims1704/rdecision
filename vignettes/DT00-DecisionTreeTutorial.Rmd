@@ -14,6 +14,7 @@ vignette: >
   %\VignetteIndexEntry{Introduction to the construction of decision trees}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
+  %\VignetteDepends{rmarkdown}
 ---
 
 ```{r}

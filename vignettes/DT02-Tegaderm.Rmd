@@ -15,6 +15,7 @@ vignette: >
   %\VignetteIndexEntry{Decision tree with PSA (Jenks 2016)}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
+  %\VignetteDepends{rmarkdown}
 ---
 
 ```{r}

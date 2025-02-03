@@ -1,3 +1,5 @@
+# ensure suggested packages needed for testing are loaded
+requireNamespace("igraph", quietly = TRUE)
 
 # tests of graph creation
 test_that("incorrect node and edge types are rejected", {
