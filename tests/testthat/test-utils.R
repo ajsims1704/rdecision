@@ -69,7 +69,7 @@ test_that("abortif error message with >1 expression is correct", {
   f <- function(x) {
     abortif(FALSE, x > 2L, FALSE, message = "failed inequality condition")
   }
-  tmpenv <- env(errmsg = "")
+  tmpenv <- rlang::env(errmsg = "")
   tryCatch(
     f(3L),
     error = function(e) {
@@ -142,7 +142,7 @@ test_that("abortifnot error message with >1 expression is correct", {
   f <- function(x) {
     abortifnot(TRUE, x > 2L, TRUE, message = "failed inequality condition")
   }
-  tmpenv <- env(errmsg = "")
+  tmpenv <- rlang::env(errmsg = "")
   tryCatch(
     f(1L),
     error = function(e) {

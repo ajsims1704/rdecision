@@ -88,7 +88,7 @@ Reaction <- R6::R6Class(
       )
       gedge <- grid::addGrob(
         gTree = gedge,
-        child = lineToGrob(x = xt, y = yt)
+        child = grid::lineToGrob(x = xt, y = yt)
       )
       # add label above or below
       vp <- grid::viewport(
@@ -139,7 +139,7 @@ Reaction <- R6::R6Class(
     set_probability = function(p) {
       # check argument
       abortifnot(
-        !is_missing(p),
+        !rlang::is_missing(p),
         inherits(p, what = c("numeric", "ModVar")),
         message = paste(
           "Argument 'p' must not be missing, and of type 'numeric' or 'ModVar'."

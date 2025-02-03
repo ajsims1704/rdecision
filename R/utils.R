@@ -214,7 +214,7 @@ tornado_plot <- function(to, outcome_mean, xlab = "") {
     is.numeric(to[, "UL"]),
     is.numeric(to[, "outcome.min"]),
     is.numeric(to[, "outcome.max"]),
-    all(complete.cases(to)),
+    all(stats::complete.cases(to)),
     message = "'to' must be a data frame with specific columns and types",
     class = "invalid_parameter"
   )

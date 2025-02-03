@@ -88,7 +88,7 @@ Action <- R6::R6Class(
       )
       gedge <- grid::addGrob(
         gTree = gedge,
-        child = lineToGrob(x = xt, y = yt)
+        child = grid::lineToGrob(x = xt, y = yt)
       )
       # add label above or below
       vp <- grid::viewport(

@@ -568,7 +568,7 @@ test_that("low-level population cycling operates as expected", {
     Transition$new(s.disabled, s.dead)
   )
   # use a subclass to add a test wrapper for method cycle_pop
-  TestSemiMarkovModel <- R6Class(
+  TestSemiMarkovModel <- R6::R6Class(
     classname = "TestSemiMarkovModel",
     inherit = SemiMarkovModel,
     public = list(

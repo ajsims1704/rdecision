@@ -48,7 +48,7 @@ discounted to present values by setting a discount rate for
 each leaf node (in usual circumstances the interval and discount rate should
 be the same for each leaf node). The QALYs gained are calculated by
 integrating the continuously discounted utility over the interval for each
- leaf node.
+leaf node.
 }
 
 \references{

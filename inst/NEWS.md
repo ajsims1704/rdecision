@@ -1,7 +1,7 @@
 # rdecision 1.3.0
 
 * Added rhub workflow to git repository.
-* Increased minimum version of R in DESCRIPTION to 3.6.1 to be consistent with
+* Increased minimum version of R in DESCRIPTION to 3.6.0 to be consistent with
   functions `str2lang` and `hcl.colors` which require it, and added backport
   linter to list of linters to identify whether the minimum version of R is
   required to be changed in future builds.
