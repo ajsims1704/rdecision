@@ -138,24 +138,18 @@ Reaction <- R6::R6Class(
     #' @return Updated \code{Reaction} object.
     set_probability = function(p) {
       # check argument
-      abortifnot(
-        !rlang::is_missing(p),
-        inherits(p, what = c("numeric", "ModVar")),
+      abortif(
+        missing(p),
+        !inherits(p, what = c("numeric", "ModVar")),
+        inherits(p, what = "numeric") && !is.na(p) && (p < 0.0 || p > 1.0),
         message = paste(
-          "Argument 'p' must not be missing, and of type 'numeric' or 'ModVar'."
+          "'p' must not be missing",
+          "NA_real_ or in range [0,1] if type 'numeric'",
+          "or of type 'ModVar",
+          sep = ","
         ),
         class = "invalid_probability"
       )
-      if (inherits(p, what = "numeric")) {
-        abortif(
-          !is.na(p) && p < 0.0,
-          !is.na(p) && p > 1.0,
-          message = paste(
-            "Argument 'p' must be in range [0,1], or NA_real_ if numeric."
-          ),
-          class = "invalid_probability"
-        )
-      }
       private$edge_p <- p
       return(invisible(self))
     },

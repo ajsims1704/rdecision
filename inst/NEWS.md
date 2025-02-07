@@ -5,9 +5,9 @@
   functions `str2lang` and `hcl.colors` which require it, and added backport
   linter to list of linters to identify whether the minimum version of R is
   required to be changed in future builds.
-* Moved packages `igraph`, `knitr`, `rmarkdown` and `testthat` to Imports
-  section of DESCRIPTION to avoid R CMD build and R CMD test failures on some
-  architectures via `rhub`.
+* Changed internal functions `abortif` and `abortifnot` to use base R rather
+  then `rlang`. Replaced legacy calls to rlang::abort in classes with calls
+  to `abortif` or `abortifnot`.
 * Added utility discount rate argument to `LeafNode` class, and modified
   method `QALY` in `LeafNode` to calculate QALYs gained, assuming present
   value of future utility under a continuous discount assumption.

@@ -13,7 +13,6 @@ vignette: >
   %\VignetteIndexEntry{A directed graph puzzle (Bodycombe 2020)}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
-  %\VignetteDepends{rmarkdown}
 bibliography: "REFERENCES.bib"
 csl: "nature-no-et-al.csl"
 ---

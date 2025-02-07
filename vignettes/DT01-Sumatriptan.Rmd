@@ -15,7 +15,6 @@ vignette: >
   %\VignetteIndexEntry{Elementary decision tree (Evans 1997)}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
-  %\VignetteDepends{rmarkdown}
 ---
 
 ```{r}

@@ -69,18 +69,11 @@ test_that("abortif error message with >1 expression is correct", {
   f <- function(x) {
     abortif(FALSE, x > 2L, FALSE, message = "failed inequality condition")
   }
-  tmpenv <- rlang::env(errmsg = "")
-  tryCatch(
+  expect_error(
     f(3L),
-    error = function(e) {
-      assign("errmsg", rlang::cnd_message(e), env = tmpenv)
-    }
+    regexp = "failed inequality condition x > 2L is not FALSE",
+    class = NULL
   )
-  expect_identical(
-    tmpenv$errmsg,
-    "failed inequality condition\n* x > 2L is not FALSE"
-  )
-  expect_true(TRUE)
 })
 
 # tests of abortifnot
@@ -142,18 +135,11 @@ test_that("abortifnot error message with >1 expression is correct", {
   f <- function(x) {
     abortifnot(TRUE, x > 2L, TRUE, message = "failed inequality condition")
   }
-  tmpenv <- rlang::env(errmsg = "")
-  tryCatch(
+  expect_error(
     f(1L),
-    error = function(e) {
-      assign("errmsg", rlang::cnd_message(e), env = tmpenv)
-    }
+    regexp = "failed inequality condition x > 2L is not TRUE",
+    class = NULL
   )
-  expect_identical(
-    tmpenv$errmsg,
-    "failed inequality condition\n* x > 2L is not TRUE"
-  )
-  expect_true(TRUE)
 })
 
 # tests of as_numeric
@@ -367,4 +353,20 @@ test_that("tornado plot checks arguments as expected", {
     tornado_plot(to = to, outcome_mean = 0.0)
   )
   grDevices::dev.off()
+})
+
+
+test_that("vigtable behaves as expected", {
+  # create test data frame
+  df <- data.frame(
+    Strategy = c("Intervention", "Comparator"),
+    Cost = c(2700.0, 2500.0),
+    LYG = c(0.2345, 0.00026),
+    QALY = c(6.5, 6.2),
+    stringsAsFactors = FALSE
+  )
+  # test arguments
+  expect_error(vigtable(x = 3L))
+  # create text for table
+  expect_output(vigtable(df))
 })

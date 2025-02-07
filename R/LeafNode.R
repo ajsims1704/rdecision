@@ -43,7 +43,7 @@ LeafNode <- R6::R6Class(
     ) {
       # check arguments
       abortifnot(
-        !rlang::is_missing(label),
+        !missing(label),
         is.character(label),
         nchar(label) > 0L,
         message =
@@ -148,7 +148,7 @@ LeafNode <- R6::R6Class(
     set_utility = function(utility) {
       # check and set utility
       abortif(
-        rlang::is_missing(utility),
+        missing(utility),
         !(
           (is.numeric(utility) && !is.na(utility) && utility <= 1.0) ||
             (inherits(utility, what = "ModVar"))
@@ -171,7 +171,7 @@ LeafNode <- R6::R6Class(
     set_interval = function(interval) {
       # check and set interval
       abortif(
-        rlang::is_missing(interval),
+        missing(interval),
         is.na(interval),
         !inherits(interval, what = "difftime"),
         message = "Argument 'interval' must be of class 'difftime'.",

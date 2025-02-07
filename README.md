@@ -199,10 +199,10 @@ rs <- dt$evaluate(setvars = "random", by = "run", N = N)
 The confidence interval of the net cost difference (net cost of the diet
 programme minus the net cost of the exercise programme) is estimated from
 the resulting data frame. From 1000 runs, the mean net cost difference is
--35.85 GBP with 95% confidence interval
--779.95 GBP
-to 740.39 GBP,
-with 45% runs having a lower
+-39.21 GBP with 95% confidence interval
+-786.68 GBP
+to 651.84 GBP,
+with 47.2% runs having a lower
 net cost for the exercise programme. Although the point estimate net cost of
 the exercise programme exceeds that of the diet programme, due to the
 uncertainties of the effectiveness of
@@ -330,7 +330,7 @@ files.
 
 <div id="ref-sonnenberg1993" class="csl-entry">
 
-<span class="csl-left-margin">2. </span><span class="csl-right-inline">Sonnenberg, F. A. & Beck, J. R. [Markov models in medical decision making: A practical guide](https://doi.org/10.1177/0272989X9301300409). *Medical Decision Making* **13,** 322–338 (1993).</span>
+<span class="csl-left-margin">2. </span><span class="csl-right-inline">Sonnenberg, F. A. & Beck, J. R. [Markov Models in Medical Decision Making: A Practical Guide](https://doi.org/10.1177/0272989X9301300409). *Medical Decision Making* **13,** 322–338 (1993).</span>
 
 </div>
 
@@ -384,13 +384,13 @@ files.
 
 <div id="ref-xie2024" class="csl-entry">
 
-<span class="csl-left-margin">11. </span><span class="csl-right-inline">Xie, Y. Knitr: A general-purpose package for dynamic report generation in r. (2024). at \<<https://yihui.org/knitr/>\></span>
+<span class="csl-left-margin">11. </span><span class="csl-right-inline">Xie, Y. Knitr: A General-Purpose Package for Dynamic Report Generation in R. (2024). at \<<https://yihui.org/knitr/>\></span>
 
 </div>
 
 <div id="ref-gross2013" class="csl-entry">
 
-<span class="csl-left-margin">12. </span><span class="csl-right-inline">Gross, J. L., Yellen, J. & Zhang, P. *Handbook of graph theory*. (Chapman; Hall/CRC., 2013). at \<<https://doi.org/10.1201/b16132>\></span>
+<span class="csl-left-margin">12. </span><span class="csl-right-inline">Gross, J. L., Yellen, J. & Zhang, P. *Handbook of Graph Theory*. (Chapman; Hall/CRC., 2013). at \<<https://doi.org/10.1201/b16132>\></span>
 
 </div>
 
@@ -426,13 +426,13 @@ files.
 
 <div id="ref-briggs2012a" class="csl-entry">
 
-<span class="csl-left-margin">18. </span><span class="csl-right-inline">Briggs, A. H., Weinstein, M. C., Fenwick, E. A. L., Karnon, J., Sculpher, M. J. & Paltiel, A. D. [Model parameter estimation and uncertainty: A report of the ISPOR-SMDM modeling good research practices task force-6](https://doi.org/10.1016/j.jval.2012.04.014). *Value in Health* **15,** 835–842 (2012).</span>
+<span class="csl-left-margin">18. </span><span class="csl-right-inline">Briggs, A. H., Weinstein, M. C., Fenwick, E. A. L., Karnon, J., Sculpher, M. J. & Paltiel, A. D. [Model Parameter Estimation and Uncertainty: A Report of the ISPOR-SMDM Modeling Good Research Practices Task Force-6](https://doi.org/10.1016/j.jval.2012.04.014). *Value in Health* **15,** 835–842 (2012).</span>
 
 </div>
 
 <div id="ref-siebert2012" class="csl-entry">
 
-<span class="csl-left-margin">19. </span><span class="csl-right-inline">Siebert, U., Alagoz, O., Bayoumi, A. M., Jahn, B., Owens, D. K., Cohen, D. J. & Kuntz, K. M. [State-transition modeling: A report of the ISPOR-SMDM modeling good research practices task force-3](https://doi.org/10.1016/j.jval.2012.06.014). *Value in Health* **15,** 812–820 (2012).</span>
+<span class="csl-left-margin">19. </span><span class="csl-right-inline">Siebert, U., Alagoz, O., Bayoumi, A. M., Jahn, B., Owens, D. K., Cohen, D. J. & Kuntz, K. M. [State-Transition Modeling: A Report of the ISPOR-SMDM Modeling Good Research Practices Task Force-3](https://doi.org/10.1016/j.jval.2012.06.014). *Value in Health* **15,** 812–820 (2012).</span>
 
 </div>
 

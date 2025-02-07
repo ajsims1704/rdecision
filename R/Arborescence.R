@@ -615,12 +615,9 @@ Arborescence <- R6::R6Class(
       # call Walker's main function
       iRoot <- self$vertex_index(self$root())
       rc <- POSITIONTREE(iRoot)
-      if (!rc) {
-        rlang::abort(
-          "Error in POSITIONTREE",
-          class = "POSITIONTREE_error"
-        )
-      }
+      abortifnot(
+        rc, message = "Error in POSITIONTREE", class = "POSITIONTREE_error"
+      )
       # create and populate the coordinate data frame
       XY <- data.frame(
         n = seq_len(self$order()),

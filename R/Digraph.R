@@ -355,13 +355,13 @@ Digraph <- R6::R6Class(
     paths = function(s, t) {
       # check arguments
       is <- self$vertex_index(s)
-      if (is.na(is)) {
-        rlang::abort("Argument 's' is not in graph", class = "not_in_graph")
-      }
       it <- self$vertex_index(t)
-      if (is.na(it)) {
-        rlang::abort("Argument 't' is not in graph", class = "not_in_graph")
-      }
+      abortif(
+        is.na(is),
+        is.na(it),
+        message = "Both the source and target nodes must be in graph",
+        class = "not_in_graph"
+      )
       # AA is the adjacency matrix
       AA <- self$digraph_adjacency_matrix(boolean = TRUE)
       # P is current path

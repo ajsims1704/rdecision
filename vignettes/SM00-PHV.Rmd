@@ -14,7 +14,6 @@ vignette: >
   %\VignetteIndexEntry{Introduction to the construction of Markov models}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
-  %\VignetteDepends{rmarkdown}
 ---
 
 ```{r}

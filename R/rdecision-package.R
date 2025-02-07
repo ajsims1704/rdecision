@@ -15,7 +15,7 @@
 #' @importFrom graphics
 #'   abline
 #'   axis
-#'   rect 
+#'   rect
 #'   strwidth
 #'   text
 #' @importFrom grDevices
@@ -32,12 +32,8 @@
 #' @importFrom R6
 #'   R6Class
 #' @importFrom rlang
-#'   abort
 #'   eval_bare
 #'   eval_tidy
-#'   expr_deparse
-#'   is_logical
-#'   is_missing
 #'   is_quosure
 #'   new_quosure
 #'   quo

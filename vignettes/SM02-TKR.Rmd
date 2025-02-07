@@ -15,7 +15,6 @@ vignette: >
   %\VignetteIndexEntry{Markov model with probabilistic sensitivity analysis}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
-  %\VignetteDepends{rmarkdown}
 ---
 
 ```{r}

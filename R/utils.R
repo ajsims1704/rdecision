@@ -1,71 +1,58 @@
-#' @title rlang analogue of base::stopifnot with negated condition
+#' @title Variant of base::stopifnot with negated condition which raises a
+#' classed error condition.
 #' @description If the value of any of the conditions is TRUE, execution is
-#' halted via the \code{rlang::abort} system.
-#' @details Raises the condition \code{rlang::rlang_error}, optionally with
-#' subclass as defined by parameter \code{class}. The header of
-#' the message is the \code{message} argument and the body is the first
-#' expression that evaluated to \code{TRUE}.
+#' halted via the \code{stop} call.
+#' @details Raises the condition \code{base::errorCondition}, optionally with
+#' a subclass as defined by parameter \code{class}. The message is the
+#' \code{message} argument prepended to the first expression which evaluated
+#' to \code{TRUE}.
 #' @param ... A number of R expressions which should all evaluate to FALSE. If
 #' any expression does not evaluate to a boolean value, it will be treated as
-#' TRUE. If there are no expressions, no condition will be raised.
+#' TRUE. If there are no expressions no condition will be raised.
 #' @param message The message to display (used as the condition header)
 #' @param class Subclass of the condition
 #' @noRd
-abortif <- function(..., message = NULL, class = NULL,
-                    call = rlang::caller_env()) {
-  # get the arguments as a list of quosures before they are evaluated
-  qargs <- rlang::quos(...)
+abortif <- function(..., message = NULL, class = NULL) {
+  # capture the call as a list of symbols
+  ma <- as.list(match.call(expand.dots = FALSE))
+  dotarg <- ma[["..."]]
   # test each argument
   for (i in seq_len(...length())) {
     arg <- ...elt(i)
-    if (!rlang::is_logical(arg) || arg) {
-      rlang::abort(
-        message = c(
-          ifelse(!is.null(message), message, ""),
-          paste(
-            rlang::expr_deparse(rlang::quo_get_expr(qargs[[i]])),
-            "is not FALSE"
-          )
-        ),
-        class = class,
-        call = call
-      )
+    if (!is.logical(arg) || arg) {
+      argname <- deparse(dotarg[[i]], width.cutoff = 500L, nlines = 1L)
+      msg <- paste(message, argname, "is not FALSE")
+      e <- errorCondition(message = msg, class = class)
+      stop(e)
     }
   }
 }
 
-#' @title rlang analogue of base::stopifnot
+#' @title Variant of base::stopifnot which raises a classed error condition.
 #' @description If the value of any of the conditions is FALSE, execution is
-#' halted via the \code{rlang::abort} system.
-#' @details Raises the condition \code{rlang::rlang_error}, optionally with
-#' subclass as defined by parameter \code{class}. The header of
-#' the message is the \code{message} argument and the body is the first
-#' expression that evaluated to \code{FALSE}.
+#' halted via the \code{stop} call.
+#' @details Raises the condition \code{base::errorCondition}, optionally with
+#' a subclass as defined by parameter \code{class}. The message is the
+#' \code{message} argument prepended to the first expression which evaluated
+#' to \code{FALSE}.
 #' @param ... A number of R expressions which should all evaluate to TRUE. If
 #' any expression does not evaluate to a boolean value, it will be treated as
 #' FALSE. If there are no expressions no condition will be raised.
 #' @param message The message to display (used as the condition header)
 #' @param class Subclass of the condition
 #' @noRd
-abortifnot <- function(..., message = NULL, class = NULL,
-                       call = rlang::caller_env()) {
-  # get the arguments as a list of quosures before they are evaluated
-  qargs <- rlang::quos(...)
+abortifnot <- function(..., message = NULL, class = NULL) {
+  # capture the call as a list of symbols
+  ma <- as.list(match.call(expand.dots = FALSE))
+  dotarg <- ma[["..."]]
   # test each argument
   for (i in seq_len(...length())) {
     arg <- ...elt(i)
-    if (!rlang::is_logical(arg) || !arg) {
-      rlang::abort(
-        message = c(
-          ifelse(!is.null(message), message, ""),
-          paste(
-            rlang::expr_deparse(rlang::quo_get_expr(qargs[[i]])),
-            "is not TRUE"
-          )
-        ),
-        class = class,
-        call = call
-      )
+    if (!is.logical(arg) || !arg) {
+      argname <- deparse(dotarg[[i]], width.cutoff = 500L, nlines = 1L)
+      msg <- paste(message, argname, "is not TRUE")
+      e <- errorCondition(message = msg, class = class)
+      stop(e)
     }
   }
 }
@@ -315,4 +302,42 @@ tornado_plot <- function(to, outcome_mean, xlab = "") {
       to[, "Label"] <- NULL
     }
   )
+}
+
+#' @title Print a data frame.
+#' @description A lightweight function to write a data frame as a text stream
+#' in LaTeX or (in future) HTML format.
+#' @details Intended for use with rudimentary data frames which are to be
+#' written to vignettes. Packages such as \pkg{xtable} do this more
+#' comprehensively, but provide more capabilities than required for the
+#' vignettes in this package. This function avoids introducing an additional
+#' package dependency. No additional LaTeX packages are imported.
+#' @param x A data frame.
+#' @noRd
+vigtable <- function(x) {
+  # check arguments
+  abortifnot(
+    is.data.frame(x)
+  )
+  # create table spec
+  tspec <- vapply(x, FUN.VALUE = NA_character_, FUN = typeof)
+  tspec[grepl(pattern = "^character$", x = tspec)] <- "l"
+  tspec[!grepl(pattern = "^l$", x = tspec)] <- "r"
+  tspec <- paste(tspec, collapse = "")
+  # start the tabular environment
+  writeLines(text = paste0("\\begin{tabular}{", tspec, "}"))
+  # header
+  writeLines(text = "\\hline\\noalign{\\smallskip}")
+  cn <- paste0("\\emph{", colnames(x), "}")
+  writeLines(text = paste(paste(cn, collapse = " & "), "\\\\"))
+  writeLines(text = "\\hline\\noalign{\\smallskip}")
+  # rows
+  for (i in seq_len(nrow(x))) {
+    r <- vapply(X = x[i, ], FUN.VALUE = "", FUN = format, scientific = FALSE)
+    writeLines(text = paste(paste(r, collapse = " & "), "\\\\"))
+  }
+  # footer
+  writeLines(text = "\\hline\\noalign{\\smallskip}")
+  # end the tabular environment
+  writeLines(text = "\\end{tabular}")
 }
