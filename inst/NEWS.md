@@ -5,6 +5,8 @@
   functions `str2lang` and `hcl.colors` which require it, and added backport
   linter to list of linters to identify whether the minimum version of R is
   required to be changed in future builds.
+* Added packages `rmarkdown` and `igraph` to `VignetteBuilder` field because
+  these are required to bulid the vignettes.
 * Changed internal functions `abortif` and `abortifnot` to use base R rather
   then `rlang`. Replaced legacy calls to rlang::abort in classes with calls
   to `abortif` or `abortifnot`.
