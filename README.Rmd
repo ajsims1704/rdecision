@@ -30,7 +30,7 @@ local({
     "<!-- badges: start -->",
     pander::pandoc.link.return(
       url = paste0(
-        c("https:/", "cran.r-project.org", "package-rdecision"), collapse = "/"
+        c("https:/", "cran.r-project.org", "package=rdecision"), collapse = "/"
       ),
       text = pander::pandoc.image.return(
         img = paste0(

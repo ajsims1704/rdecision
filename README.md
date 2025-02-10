@@ -5,7 +5,7 @@
 
 <!-- badges: start -->
 
-[![CRAN status](https://www.r-pkg.org/badges/version/rdecision)](https://cran.r-project.org/package-rdecision)
+[![CRAN status](https://www.r-pkg.org/badges/version/rdecision)](https://cran.r-project.org/package=rdecision)
 [![Codecov test coverage](https://codecov.io/gh/ajsims1704/rdecision/branch/master/graph/badge.svg)](https://app.codecov.io/gh/ajsims1704/rdecision?branch=master)
 <!-- badges: end -->
 
@@ -199,10 +199,10 @@ rs <- dt$evaluate(setvars = "random", by = "run", N = N)
 The confidence interval of the net cost difference (net cost of the diet
 programme minus the net cost of the exercise programme) is estimated from
 the resulting data frame. From 1000 runs, the mean net cost difference is
--39.21 GBP with 95% confidence interval
--786.68 GBP
-to 651.84 GBP,
-with 47.2% runs having a lower
+-18.98 GBP with 95% confidence interval
+-775.04 GBP
+to 766.98 GBP,
+with 47% runs having a lower
 net cost for the exercise programme. Although the point estimate net cost of
 the exercise programme exceeds that of the diet programme, due to the
 uncertainties of the effectiveness of
