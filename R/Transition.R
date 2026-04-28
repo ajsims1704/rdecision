@@ -30,19 +30,21 @@ Transition <- R6::R6Class(
         source_node = source_state, target_node = target_state, label = label
       )
       # check that source inherits from MarkovState
-      abortifnot(inherits(source_state, what = "MarkovState"),
+      abortifnot(
+        inherits(source_state, what = "MarkovState"),
         message = "Node 'source_state' must be a MarkovState",
         class = "invalid_source"
       )
       # check that target inherits from MarkovState
-      abortifnot(inherits(target_state, what = "MarkovState"),
+      abortifnot(
+        inherits(target_state, what = "MarkovState"),
         message = "Node 'target_state' must be a MarkovState",
         class = "invalid_target"
       )
       # check and set cost, ensuring initialization
       self$set_cost(cost)
       # Return reaction node
-      return(invisible(self))
+      invisible(self)
     },
 
     #' @description Find all the model variables.
@@ -59,7 +61,7 @@ Transition <- R6::R6Class(
         ov <- c(ov, unlist(v$operands()))
       }
       # return the unique list
-      return(unique(ov))
+      unique(ov)
     },
 
     #' @description Set the cost associated with the transition.
@@ -73,14 +75,11 @@ Transition <- R6::R6Class(
         class = "invalid_cost"
       )
       private$transition.cost <- c
-      return(invisible(self))
+      invisible(self)
     },
 
     #' @description Return the cost associated with traversing the edge.
     #' @return Cost.
-    cost = function() {
-      rv <- as_numeric(private$transition.cost)
-      return(rv)
-    }
+    cost = function() as_numeric(private$transition.cost)
   )
 )

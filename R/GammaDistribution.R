@@ -54,7 +54,7 @@ GammaDistribution <- R6::R6Class(
       # initial sample
       self$sample(TRUE)
       # return object
-      return(invisible(self))
+      invisible(self)
     },
 
     #' @description Accessor function for the name of the distribution.
@@ -65,31 +65,26 @@ GammaDistribution <- R6::R6Class(
         round(private$shape, digits = 3L), ",",
         round(private$scale, digits = 3L), ")"
       )
-      return(rv)
     },
 
     #' @description
     #' Return the expected value of the distribution.
     #' @return Expected value as a numeric value.
-    mean = function() {
-      return(private$shape * private$scale)
-    },
+    mean = function() private$shape * private$scale,
 
     #' @description Return the mode of the distribution (if \code{shape} >= 1)
     #' @return mode as a numeric value.
     mode = function() {
-      rv <- NA_real_
       if (private$shape >= 1.0) {
-        rv <- (private$shape - 1.0) * private$scale
+        (private$shape - 1.0) * private$scale
+      } else {
+        NA_real_
       }
-      return(rv)
     },
 
     #' @description Return the standard deviation of the distribution.
     #' @return Standard deviation as a numeric value
-    SD = function() {
-      return(sqrt(private$shape) * private$scale)
-    },
+    SD = function() sqrt(private$shape) * private$scale,
 
     #' @description Draw and hold a random sample from the distribution.
     #' @param expected If TRUE, sets the next value retrieved by a call to
@@ -105,7 +100,7 @@ GammaDistribution <- R6::R6Class(
           scale = private$scale
         )
       }
-      return(invisible(self))
+      invisible(self)
     },
 
     #' @description Return the quantiles of the Gamma uncertainty distribution.
@@ -113,23 +108,21 @@ GammaDistribution <- R6::R6Class(
     #' @return Vector of quantiles.
     quantile = function(probs) {
       # test argument
-      vapply(probs, FUN.VALUE = TRUE, FUN = function(x) {
-        abortif(is.na(x),
-          message = "All elements of 'probs' must be defined",
-          class = "probs_not_defined"
-        )
-        abortifnot(is.numeric(x),
-          message = "Argument 'probs' must be a numeric vector",
-          class = "probs_not_numeric"
-        )
-        abortifnot(x >= 0.0 && x <= 1.0,
-          message = "Elements of 'probs' must be in range[0,1]",
-          class = "probs_out_of_range"
-        )
-        return(TRUE)
-      })
-      q <- qgamma(probs, shape = private$shape, scale = private$scale)
-      return(q)
+      abortif(
+        is.na(probs),
+        message = "All elements of 'probs' must be defined",
+        class = "probs_not_defined"
+      )
+      abortifnot(is.numeric(probs),
+        message = "Argument 'probs' must be a numeric vector",
+        class = "probs_not_numeric"
+      )
+      abortifnot(probs >= 0.0 & probs <= 1.0,
+        message = "Elements of 'probs' must be in range[0,1]",
+        class = "probs_out_of_range"
+      )
+      # return the quantiles
+      stats::qgamma(probs, shape = private$shape, scale = private$scale)
     }
   )
 )

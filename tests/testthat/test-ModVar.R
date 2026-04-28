@@ -24,10 +24,7 @@ test_that("ModVar description is saved", {
   }
   f()
   # parent environment
-  g <- function() {
-    y <- ModVar$new("y", "GBP")
-    return(y)
-  }
+  g <- function() ModVar$new("y", "GBP")
   yy <- g()
   expect_identical(yy$description(), "y")
 })

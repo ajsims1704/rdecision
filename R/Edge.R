@@ -40,33 +40,25 @@ Edge <- R6::R6Class(
       )
       private$edgelabel <- label
       # return Edge object
-      return(invisible(self))
+      invisible(self)
     },
 
     #' @description Is this edge the same as the argument?
     #' @param e edge to compare with this one
     #' @return \code{TRUE} if \code{e} is also this one.
-    is_same_edge = function(e) {
-      return(identical(self, e))
-    },
+    is_same_edge = function(e) identical(self, e),
 
     #' @description Retrieve the endpoints of the edge.
     #' @return List of two nodes to which the edge is connected.
-    endpoints = function() {
-      return(c(private$v1, private$v2))
-    },
+    endpoints = function() c(private$v1, private$v2),
 
     #' @description Access label.
     #' @return Label of the edge; character string.
-    label = function() {
-      return(private$edgelabel)
-    },
+    label = function() private$edgelabel,
 
     #' @description Find all the model variables of type \code{ModVar} that have
     #' been specified as values associated with this \code{Edge}.
     #' @return An empty list for the base class.
-    modvars = function() {
-      return(list())
-    }
+    modvars = function() list()
   )
 )

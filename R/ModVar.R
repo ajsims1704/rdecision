@@ -89,36 +89,28 @@ ModVar <- R6::R6Class(
       # value to return on first get
       private$.whatnext <- "expected"
       # return new object
-      return(invisible(self))
+      invisible(self)
     },
 
     #' @description Is this \code{ModVar} an expression?
     #' @return \code{TRUE} if it inherits from \code{ExprModVar}, \code{FALSE}
     #' otherwise.
-    is_expression = function() {
-      return(inherits(self, what = "ExprModVar"))
-    },
+    is_expression = function() inherits(self, what = "ExprModVar"),
 
     #' @description Is the model variable probabilistic?
     #' @details Tests whether the model variable is probabilistic, i.e. a
     #' random variable that follows a distribution, or an expression involving
     #' random variables, some of which follow distributions.
     #' @return \code{TRUE} if probabilistic
-    is_probabilistic = function() {
-      return(FALSE)
-    },
+    is_probabilistic = function() FALSE,
 
     #' @description Accessor function for the description.
     #' @return Description of model variable as character string.
-    description = function() {
-      return(private$.description)
-    },
+    description = function() private$.description,
 
     #' @description Accessor function for units.
     #' @return Description of units as character string.
-    units = function() {
-      return(private$.units)
-    },
+    units = function() private$.units,
 
     #' @description Name and parameters of the uncertainty distribution.
     #' @details If \eqn{K > 1} the dimension of the distribution associated
@@ -127,36 +119,29 @@ ModVar <- R6::R6Class(
     #' of a 2D Dirichlet distribution with alpha parameters 2 and 3.
     #' @return Distribution name as character string.
     distribution = function() {
-      dname <- private$.D$distribution()
-      if (private$.D$order() > 1L) {
-        dname <- paste0(dname, "[", private$.k, "]")
+      if (is.na(private$.D$distribution())) {
+        NA_character_
+      } else if (private$.D$order() > 1L) {
+        paste0(private$.D$distribution(), "[", private$.k, "]")
+      } else {
+        private$.D$distribution()
       }
-      return(dname)
     },
 
     #' @description Mean value of the model variable.
     #' @return Mean value as a numeric value.
-    mean = function() {
-      mvmean <- private$.D$mean()
-      return(mvmean[private$.k])
-    },
+    mean = function() private$.D$mean()[private$.k],
 
     #' @description The mode of the variable.
-    #' @details By default returns \code{NA}, which will be the case for
+    #' @details May return \code{NA}, which will be the case for
     #' most \code{ModVar} variables, because arbitrary distributions are
     #' not guaranteed to be unimodal.
     #' @return Mode as a numeric value.
-    mode = function() {
-      mvmode <- private$.D$mode()
-      return(mvmode[private$.k])
-    },
+    mode = function() private$.D$mode()[private$.k],
 
     #' @description Standard deviation of the model variable.
     #' @return Standard deviation as a numeric value
-    SD = function() {
-      mvsd <- private$.D$SD()
-      return(mvsd[private$.k])
-    },
+    SD = function() private$.D$SD()[private$.k],
 
     #' @description Quantiles of the uncertainty distribution.
     #' @param probs Numeric vector of probabilities, each in range [0,1].
@@ -164,13 +149,11 @@ ModVar <- R6::R6Class(
     quantile = function(probs) {
       # matrix for multivariate, vector for univariate distributions; argument
       # is checked in .D$quantiles()
-      q <- private$.D$quantile(probs)
       if (private$.D$order() > 1L) {
-        rv <- q[, private$.k]
+        private$.D$quantile(probs)[, private$.k]
       } else {
-        rv <- q
+        private$.D$quantile(probs)
       }
-      return(rv)
     },
 
     #' @description Draw a random sample from the model variable.
@@ -181,9 +164,7 @@ ModVar <- R6::R6Class(
       # fetch the sample from the distribution
       rd <- private$.D$r()
       # get random sample for this dimension
-      rv <- rd[private$.k]
-      # return the sample
-      return(rv)
+      rd[private$.k]
     },
 
     #' @description Sets the value of the \code{ModVar}.
@@ -241,7 +222,7 @@ ModVar <- R6::R6Class(
         private$.whatnext <- what
       }
       # silently return updated object
-      return(invisible(self))
+      invisible(self)
     },
 
     #' @description Get the value of the \code{ModVar}.
@@ -249,15 +230,10 @@ ModVar <- R6::R6Class(
     #' to \code{set()}.
     #' @return Value determined by last \code{set()}.
     get = function() {
-      # if random, fetch the sample
-      if (private$.whatnext == "random") {
-        rv <- self$r()
-        private$.value["random"] <- rv
-      } else {
-        rv <- private$.value[[private$.whatnext]]
-      }
-      # return the stored value
-      return(rv)
+      # if random, fetch the next sample
+      if (private$.whatnext == "random") private$.value["random"] <- self$r()
+      # return the value slot requested
+      private$.value[[private$.whatnext]]
     }
   )
 )

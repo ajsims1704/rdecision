@@ -110,7 +110,7 @@ SemiMarkovModel <- R6::R6Class(
     # @description Low-level model cycling function
     # @details Iterates the model for a single cycle. Updates the state
     # populations, cycle number and elapsed time.
-    # return Matrix of transition counts between states. Row and column names
+    # @return Matrix of transition counts between states. Row and column names
     # are state names.
     cycle_pop = function() {
       # find the number of transitions between each pair of states by
@@ -123,7 +123,7 @@ SemiMarkovModel <- R6::R6Class(
       private$smm.icycle <- private$smm.icycle + 1L
       private$smm.elapsed <- private$smm.elapsed + private$smm.tcycle
       # return the transition matrix
-      return(n_t)
+      n_t
     },
 
     # @description Low-level model cycling function that calculates values,
@@ -190,7 +190,7 @@ SemiMarkovModel <- R6::R6Class(
       v_qaly <- v_upop * v_state_utilities * dty * dfu
       # return the populations, costs and utilities, by state
       N <- sum(v_pop_end)
-      rm <- matrix(
+      matrix(
         data = c(
           v_pop,
           v_oc / N,
@@ -204,7 +204,6 @@ SemiMarkovModel <- R6::R6Class(
           c("Pop", "OccCost", "EntryCost", "Cost", "QALY")
         )
       )
-      return(rm)
     }
   ),
 
@@ -315,16 +314,16 @@ SemiMarkovModel <- R6::R6Class(
         )
       )
       for (e in self$edges()) {
-        is <- self$vertex_index(e$source())
-        it <- self$vertex_index(e$target())
-        Pt[is, it] <- 1.0
+        isource <- self$vertex_index(e$source())
+        itarget <- self$vertex_index(e$target())
+        Pt[[isource, itarget]] <- 1.0
       }
       Pt <- Pt / rowSums(Pt)
       self$set_probabilities(Pt)
       # reset the model to its ground state
       self$reset()
       # return a new SemiMarkovModel object
-      return(invisible(self))
+      invisible(self)
     },
 
     #' @description Sets transition probabilities.
@@ -364,8 +363,8 @@ SemiMarkovModel <- R6::R6Class(
       }
       # check that all cells are a probability
       abortif(
-        any(Pt < 0.0),
-        any(Pt > 1.0),
+        Pt < 0.0,
+        Pt > 1.0,
         message = "All elements of 'Pt' must be probabilities",
         class = "invalid_Pt"
       )
@@ -388,15 +387,13 @@ SemiMarkovModel <- R6::R6Class(
       # set the class variable
       private$smm.Pt <- Pt
       # return updated model
-      return(invisible(self))
+      invisible(self)
     },
 
     #' @description Per-cycle transition probability matrix for the model.
     #' @return A square matrix of size equal to the number of states. If all
     #' states are labelled, the dimnames take the names of the states.
-    transition_probabilities = function() {
-      return(private$smm.Pt)
-    },
+    transition_probabilities = function() private$smm.Pt,
 
     #' @description Return the per-cycle transition costs for the model.
     #' @return A square matrix of size equal to the number of states. If all
@@ -414,19 +411,18 @@ SemiMarkovModel <- R6::R6Class(
       # populate the cells with costs
       for (ie in self$edge_along()) {
         e <- self$edge_at(ie)
-        is <- self$vertex_index(e$source())
-        it <- self$vertex_index(e$target())
-        Ic[[is, it]] <- e$cost()
+        isource <- self$vertex_index(e$source())
+        itarget <- self$vertex_index(e$target())
+        Ic[[isource, itarget]] <- e$cost()
       }
-      return(Ic)
+      Ic
     },
 
     #' @description Returns a character list of state names.
     #' @return List of the names of each state.
     get_statenames = function() {
       iv <- self$vertex_along()
-      statenames <- self$vertex_label(iv)
-      return(statenames)
+      self$vertex_label(iv)
     },
 
     #' @description Resets the model counters.
@@ -485,26 +481,20 @@ SemiMarkovModel <- R6::R6Class(
       )
       private$smm.elapsed <- elapsed
       # return updated object
-      return(invisible(self))
+      invisible(self)
     },
 
     #' @description Gets the occupancy of each state.
     #' @return A numeric vector of populations, named with state names.
-    get_populations = function() {
-      return(private$smm.pop)
-    },
+    get_populations = function() private$smm.pop,
 
     #' @description Gets the current cycle number.
     #' @return Current cycle count, as an integer.
-    get_cycle = function() {
-      return(private$smm.icycle)
-    },
+    get_cycle = function() private$smm.icycle,
 
     #' @description Gets the cycle duration.
     #' @return Current cycle duration, as a difftime object.
-    get_tcycle = function() {
-      return(private$smm.tcycle)
-    },
+    get_tcycle = function() private$smm.tcycle,
 
     #' @description Gets the current elapsed time.
     #' @details The elapsed time is defined as the difference between the
@@ -516,9 +506,7 @@ SemiMarkovModel <- R6::R6Class(
     #' \code{reset} and \code{cycle} methods, the time of each cycle relative
     #' to the discounting index and its duration can be controlled arbitrarily.
     #' @return Elapsed time as an R \code{difftime} object.
-    get_elapsed = function() {
-      return(private$smm.elapsed)
-    },
+    get_elapsed = function() private$smm.elapsed,
 
     #' @description Tabulation of states
     #' @details Creates a data frame summary of each state in the model.
@@ -530,14 +518,13 @@ SemiMarkovModel <- R6::R6Class(
     #' }
     tabulate_states = function() {
       v <- self$vertexes()
-      df <- data.frame(
+      data.frame(
         Name = vapply(X = v, FUN.VALUE = "x", FUN = function(x) x$name()),
         Cost = vapply(X = v, FUN.VALUE = 1.0, FUN = function(x) x$cost()),
         Utility = vapply(X = v, FUN.VALUE = 1.0, FUN = function(x) {
           x$utility()
         })
       )
-      return(df)
     },
 
     #' @description Applies one cycle of the model.
@@ -611,7 +598,7 @@ SemiMarkovModel <- R6::R6Class(
         v_state_costs
       )
       # create return data frame
-      rc <- data.frame(
+      data.frame(
         State = rownames(m_c),
         Cycle = rep(private$smm.icycle, times = nstates),
         Time = rep(
@@ -624,7 +611,6 @@ SemiMarkovModel <- R6::R6Class(
         Cost = m_c[, "Cost"],
         QALY = m_c[, "QALY"]
       )
-      return(rc)
     },
 
     #' @description Applies multiple cycles of the model.
@@ -665,7 +651,7 @@ SemiMarkovModel <- R6::R6Class(
     #' @return Data frame with cycle results, with the following columns:
     #' \describe{
     #' \item{\code{Cycle}}{The cycle number.}
-    #' \item{\code{Years}}{Elapsed time at end of cycle, years}
+    #' \item{\code{Years}}{Elapsed time at end of cycle, years.}
     #' \item{\code{Cost}}{Cost associated with occupancy and transitions between
     #' states during the cycle.}
     #' \item{\code{QALY}}{Quality adjusted life years associated with occupancy
@@ -681,13 +667,13 @@ SemiMarkovModel <- R6::R6Class(
       # list of state names
       statenames <- self$get_statenames()
       # construct output matrix
-      rm <- matrix(
+      mt <- matrix(
         nrow = ncycles + nzero, ncol = 4L + length(statenames),
         dimnames = list(NULL, c("Cycle", "Years", "Cost", "QALY", statenames))
       )
       # add zero
       if (nzero > 0L) {
-        rm[1L, ] <- c(0L, 0.0, 0.0, 0.0, private$smm.pop)
+        mt[1L, ] <- c(0L, 0.0, 0.0, 0.0, private$smm.pop)
       }
       # get the transition costs (matrix), incremental state occupancy
       # costs and per-cycle incremental state utilities (vectors)
@@ -708,7 +694,7 @@ SemiMarkovModel <- R6::R6Class(
           m_transition_costs, v_state_utilities, v_state_costs
         )
         # add result to the return matrix (one row per state)
-        rm[i, ] <- c(
+        mt[i, ] <- c(
           Cycle = private$smm.icycle,
           Years = as.numeric(private$smm.elapsed, units = "days") / 365.25,
           Cost = sum(m_c[, "Cost"]),
@@ -717,10 +703,10 @@ SemiMarkovModel <- R6::R6Class(
         )
       }
       # convert to data frame (note: it is more efficient to return as a matrix)
-      DF <- as.data.frame(rm)
+      DF <- as.data.frame(mt)
       DF$Cycle <- as.integer(DF$Cycle)
       # return summary data frame
-      return(DF)
+      DF
     },
 
     #' @description Find all the model variables in the Markov model.
@@ -740,7 +726,7 @@ SemiMarkovModel <- R6::R6Class(
         mv <- c(mv, v$modvars())
       }
       # return a unique list
-      return(unique(mv))
+      unique(mv)
     },
 
     #' @description Tabulate the model variables in the Markov model.
@@ -769,7 +755,7 @@ SemiMarkovModel <- R6::R6Class(
       # expressions if not wanted
       mvlist <- self$modvars()
       # create a data frame of model variables
-      DF <- data.frame(
+      data.frame(
         Description = vapply(mvlist, FUN.VALUE = "x", FUN = function(x) {
           x$description()
         }),
@@ -783,35 +769,29 @@ SemiMarkovModel <- R6::R6Class(
           x$mean()
         }),
         E = vapply(mvlist, FUN.VALUE = 1.0, FUN = function(x) {
-          rv <- ifelse(x$is_expression(), x$mu_hat(), x$mean())
-          return(rv)
+          if (x$is_expression()) x$mu_hat() else x$mean()
         }),
         SD = vapply(mvlist, FUN.VALUE = 1.0, FUN = function(x) {
-          rv <- ifelse(x$is_expression(), x$sigma_hat(), x$SD())
-          return(rv)
+          if (x$is_expression()) x$sigma_hat() else x$SD()
         }),
         Q2.5 = vapply(mvlist, FUN.VALUE = 1.0, FUN = function(x) {
-          rv <- ifelse(
-            x$is_expression(),
-            x$q_hat(probs = 0.025),
+          if (x$is_expression()) {
+            x$q_hat(probs = 0.025)
+          } else {
             x$quantile(probs = 0.025)
-          )
-          return(rv)
+          }
         }),
         Q97.5 = vapply(mvlist, FUN.VALUE = 1.0, FUN = function(x) {
-          rv <- ifelse(
-            x$is_expression(),
-            x$q_hat(probs = 0.975),
+          if (x$is_expression()) {
+            x$q_hat(probs = 0.975)
+          } else {
             x$quantile(probs = 0.975)
-          )
-          return(rv)
+          }
         }),
         Est = vapply(mvlist, FUN.VALUE = TRUE, FUN = function(exp) {
           exp$is_expression()
         })
       )
-      # Return the table
-      return(DF)
     }
   )
 )

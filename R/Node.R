@@ -21,27 +21,20 @@ Node <- R6::R6Class(
         class = "non-string_label"
       )
       private$.label <- label
-      return(invisible(self))
+      invisible(self)
     },
 
     #' @description Return the label of the node.
     #' @return Label as a character string.
-    label = function() {
-      return(private$.label)
-    },
+    label = function() private$.label,
 
     #' @description Find all the model variables of type \code{ModVar} that have
     #' been specified as values associated with this \code{Node}.
     #' @return An empty list for the base class.
-    modvars = function() {
-      return(list())
-    },
+    modvars = function() list(),
 
     #' @description node type
     #' @return \code{Node} class, as character string.
-    type = function() {
-      c <- class(self)[[1L]]
-      return(c)
-    }
+    type = function() class(self)[[1L]]
   )
 )

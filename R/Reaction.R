@@ -55,7 +55,7 @@ Reaction <- R6::R6Class(
       # check and set benefit, ensuring initialization
       self$set_benefit(benefit)
       # Return reaction node
-      return(invisible(self))
+      invisible(self)
     },
 
     #' @description Creates a grid::grob for a reaction edge.
@@ -111,7 +111,6 @@ Reaction <- R6::R6Class(
           vp = vp
         )
       )
-      return(gedge)
     },
 
     #' @description Find all the model variables of type \code{ModVar} that
@@ -127,7 +126,7 @@ Reaction <- R6::R6Class(
         ov <- c(ov, unlist(v$operands()))
       }
       # return the unique list
-      return(unique(ov))
+      unique(ov)
     },
 
     #' @description Set the probability associated with the reaction edge.
@@ -151,16 +150,13 @@ Reaction <- R6::R6Class(
         class = "invalid_probability"
       )
       private$edge_p <- p
-      return(invisible(self))
+      invisible(self)
     },
 
     #' @description Return the current value of the edge probability, i.e., the
     #' conditional probability of traversing the edge.
     #' @return Numeric value in range [0,1].
-    p = function() {
-      prob <- as_numeric(private$edge_p)
-      return(prob)
-    },
+    p = function() as_numeric(private$edge_p),
 
     #' @description Set the cost associated with the reaction edge.
     #' @param c Cost associated with traversing the reaction edge. Of type
@@ -180,15 +176,12 @@ Reaction <- R6::R6Class(
         )
       }
       private$edge_cost <- c
-      return(invisible(self))
+      invisible(self)
     },
 
     #' @description Return the cost associated with traversing the edge.
     #' @return Cost.
-    cost = function() {
-      rv <- as_numeric(private$edge_cost)
-      return(rv)
-    },
+    cost = function() as_numeric(private$edge_cost),
 
     #' @description Set the benefit associated with the reaction edge.
     #' @param b Benefit associated with traversing the reaction edge. Of type
@@ -208,14 +201,11 @@ Reaction <- R6::R6Class(
         )
       }
       private$edge_benefit <- b
-      return(invisible(self))
+      invisible(self)
     },
 
     #' @description Return the benefit associated with traversing the edge.
     #' @return Benefit.
-    benefit = function() {
-      rv <- as_numeric(private$edge_benefit)
-      return(rv)
-    }
+    benefit = function() as_numeric(private$edge_benefit)
   )
 )

@@ -136,11 +136,11 @@ local({
     data = c(
       vapply(X = igraph::V(ig), FUN.VALUE = 1.0, FUN = function(v) {
         lbl <- igraph::vertex_attr(ig, "label", v)
-        return(vxy[[lbl, "x"]])
+        vxy[[lbl, "x"]]
       }),
       vapply(X = igraph::V(ig), FUN.VALUE = 1.0, FUN = function(v) {
         lbl <- igraph::vertex_attr(ig, "label", v)
-        return(vxy[[lbl, "y"]])
+        vxy[[lbl, "y"]]
       })
     ),
     byrow = FALSE,
@@ -153,15 +153,17 @@ local({
     trgl <- igraph::vertex_attr(ig, name = "label", index = trg)
     src <- igraph::tail_of(ig, e)
     srcl <- igraph::vertex_attr(ig, name = "label", index = src)
-    la <- 0.0
-    if (trgl == srcl) {
+    la <- if (trgl == srcl) {
       if (trgl == "Well") {
-        la <- pi
+        pi
       } else if (trgl == "Dead") {
-        la <- pi / 2.0
+        pi / 2.0
+      } else {
+        0.0
       }
+    } else {
+      0.0
     }
-    return(la)
   })
   # plot into png file
   withr::with_par(
@@ -170,20 +172,18 @@ local({
       mar = c(3L, 3L, 3L, 3L),
       xpd = NA
     ),
-    code = {
-      plot(
-        ig,
-        rescale = FALSE, asp = 0L,
-        vertex.shape = "circle", vertex.size = 60.0,
-        vertex.color = "white", vertex.label.color = "black",
-        edge.color = "black",
-        edge.arrow.size = 0.75,
-        frame = FALSE,
-        layout = layout,
-        loop.size = 0.8,
-        edge.loop.angle = loopa
-      )
-    }
+    code = plot(
+      ig,
+      rescale = FALSE, asp = 0L,
+      vertex.shape = "circle", vertex.size = 60.0,
+      vertex.color = "white", vertex.label.color = "black",
+      edge.color = "black",
+      edge.arrow.size = 0.75,
+      frame = FALSE,
+      layout = layout,
+      loop.size = 0.8,
+      edge.loop.angle = loopa
+    )
   )
 })
 ```

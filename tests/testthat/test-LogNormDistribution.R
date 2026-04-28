@@ -59,8 +59,7 @@ test_that("random sampling is from a log normal distribution", {
   # check sampling
   samp <- vapply(seq_len(n), FUN.VALUE = 1.0, FUN = function(i) {
     ln$sample()
-    rv <- ln$r()
-    return(rv)
+    ln$r()
   })
   expect_length(samp, n)
   # expect sample mean and sd to fall within 99.9% CI; test

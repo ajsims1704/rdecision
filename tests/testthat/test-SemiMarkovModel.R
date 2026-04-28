@@ -588,7 +588,7 @@ test_that("low-level population cycling operates as expected", {
         expect_identical(private$smm.icycle, icycle_pre + 1L)
         expect_identical(private$smm.elapsed, elapsed_pre + private$smm.tcycle)
         # return the transition count
-        return(n_t)
+        n_t
       }
     )
   )

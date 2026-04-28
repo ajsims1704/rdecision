@@ -36,17 +36,16 @@ NormalDistribution <- R6::R6Class(
       # initial sample
       self$sample(TRUE)
       # return
-      return(invisible(self))
+      invisible(self)
     },
 
     #' @description Accessor function for the name of the distribution.
     #' @return Distribution name as character string.
     distribution = function() {
-      rv <- paste0(
+      paste0(
         "N(", format(private$mu, digits = 4L, scientific = FALSE),
         ",",  format(private$sigma, digits = 4L, scientific = FALSE), ")"
       )
-      return(rv)
     },
 
     #' @description Draw a random sample from the model variable.
@@ -54,50 +53,42 @@ NormalDistribution <- R6::R6Class(
     #' \code{r()} to be the mean of the distribution.
     #' @return A sample drawn at random.
     sample = function(expected = FALSE) {
-      if (expected) {
-        private$.r[[1L]] <- self$mean()
+      private$.r[[1L]] <- if (expected) {
+        self$mean()
       } else {
-        private$.r[[1L]] <- rnorm(n = 1L, mean = private$mu, sd = private$sigma)
+        rnorm(n = 1L, mean = private$mu, sd = private$sigma)
       }
       # return the updated object
-      return(invisible(self))
+      invisible(self)
     },
 
     #' @description Return the mean value of the distribution.
     #' @return Expected value as a numeric value.
-    mean = function() {
-      return(private$mu)
-    },
+    mean = function() private$mu,
 
     #' @description Return the standard deviation of the distribution.
     #' @return Standard deviation as a numeric value
-    SD = function() {
-      return(private$sigma)
-    },
+    SD = function() private$sigma,
 
     #' @description Return the quantiles of the Normal uncertainty distribution.
     #' @param probs Vector of probabilities, in range [0,1].
     #' @return Vector of quantiles.
     quantile = function(probs) {
       # test argument
-      vapply(probs, FUN.VALUE = TRUE, FUN = function(x) {
-        abortif(is.na(x),
-          message = "All elements of 'probs' must be defined",
-          class = "probs_not_defined"
-        )
-        abortifnot(is.numeric(x),
-          message = "Argument 'probs' must be a numeric vector",
-          class = "probs_not_numeric"
-        )
-        abortifnot(x >= 0.0 && x <= 1.0,
-          message = "Elements of 'probs' must be in range[0,1]",
-          class = "probs_out_of_range"
-        )
-        return(TRUE)
-      })
+      abortif(is.na(probs),
+        message = "All elements of 'probs' must be defined",
+        class = "probs_not_defined"
+      )
+      abortifnot(is.numeric(probs),
+        message = "Argument 'probs' must be a numeric vector",
+        class = "probs_not_numeric"
+      )
+      abortifnot(probs >= 0.0 & probs <= 1.0,
+        message = "Elements of 'probs' must be in range[0,1]",
+        class = "probs_out_of_range"
+      )
       # quantiles of the normal distribution
-      q <- qnorm(probs, mean = private$mu, sd = private$sigma)
-      return(q)
+      qnorm(probs, mean = private$mu, sd = private$sigma)
     }
   )
 )

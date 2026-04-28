@@ -49,7 +49,7 @@ Digraph <- R6::R6Class(
       # compute and save the incidence matrix
       private$BD <- self$digraph_incidence_matrix()
       # return new Digraph object
-      return(invisible(self))
+      invisible(self)
     },
 
     #' @description Compute the adjacency matrix for the digraph.
@@ -69,38 +69,27 @@ Digraph <- R6::R6Class(
         message = "Argument 'boolean' must be 'logical'.",
         class = "non-logical_boolean"
       )
-      # create if not saved
+      # create if not already calculated
       if (is.null(private$AD)) {
         # create matrix
-        vi <- self$vertex_along()
-        L <- self$vertex_label(vi)
+        vindexes <- self$vertex_along()
         n <- self$order()
-        if (anyDuplicated(L) == 0L && all(nchar(L) > 0L)) {
-          A <- matrix(
-            rep(0L, times = n * n),
-            nrow = n,
-            dimnames = list(out.node = L, in.node = L)
-          )
-        } else {
-          A <- matrix(rep(0L, times = n * n), nrow = n)
+        A <- matrix(rep(0L, times = n * n), nrow = n)
+        L <- self$vertex_label(vindexes)
+        if (!anyNA(L) && all(nzchar(L)) && anyDuplicated(L) == 0L) {
+          dimnames(A) <- list(out.node = L, in.node = L)
         }
         # populate it
         for (e in self$edges()) {
-          s <- self$vertex_index(e$source())
-          t <- self$vertex_index(e$target())
-          A[[s, t]] <- A[[s, t]] + 1L
+          src <- self$vertex_index(e$source())
+          tgt <- self$vertex_index(e$target())
+          A[[src, tgt]] <- A[[src, tgt]] + 1L
         }
         # save it
         private$AD <- A
-      } else {
-        # read it
-        A <- private$AD
       }
-      # convert to logical, if required
-      if (boolean) {
-        A <- A >= 1L
-      }
-      return(A)
+      # return as requested
+      if (boolean) private$AD >= 1L else private$AD
     },
 
     #' @description Compute the incidence matrix for the digraph.
@@ -113,44 +102,36 @@ Digraph <- R6::R6Class(
     digraph_incidence_matrix = function() {
       # create, if NULL
       if (is.null(private$BD)) {
-        # create matrix
-        LV <- self$vertex_label(self$vertex_along())
-        LE <- self$edge_label(self$edge_along())
+        # create matrix if not already calculated
         nv <- self$order()
         ne <- self$size()
-        if (anyDuplicated(LV) == 0L && anyDuplicated(LE) == 0L &&
-            all(nchar(LV) > 0L) && all(nchar(LE) > 0L)
-        ) {
-          B <- matrix(
-            rep(0L, times = nv * ne),
-            nrow = nv,
-            dimnames = list(vertex = LV, edge = LE)
-          )
-        } else {
-          B <- matrix(rep(0L, times = nv * ne), nrow = nv)
+        B <- matrix(rep(0L, times = nv * ne), nrow = nv)
+        # add labels, if they are valid row and column names
+        LV <- self$vertex_label(self$vertex_along())
+        LE <- self$edge_label(self$edge_along())
+        if (!anyNA(LV) && all(nzchar(LV)) && anyDuplicated(LV) == 0L &&
+              !anyNA(LE) && all(nzchar(LE)) && anyDuplicated(LE) == 0L) {
+          dimnames(B) <- list(vertex = LV, edge = LE)
         }
         # populate it
         for (e in self$edges()) {
-          s <- self$vertex_index(e$source())
-          t <- self$vertex_index(e$target())
+          src <- self$vertex_index(e$source())
+          tgt <- self$vertex_index(e$target())
           ei <- self$edge_index(e)
-          if (s == t) {
+          if (src == tgt) {
             # self loop
-            B[[s, ei]] <- 0L
+            B[[src, ei]] <- 0L
           } else {
             # not self loop
-            B[[s, ei]] <- -1L
-            B[[t, ei]] <- 1L
+            B[[src, ei]] <- -1L
+            B[[tgt, ei]] <- 1L
           }
         }
         # save it
         private$BD <- B
-      } else {
-        # read it
-        B <- private$BD
       }
-      # return matrix
-      return(B)
+      # return it
+      private$BD
     },
 
     #' @description Topologically sort the vertexes in the digraph.
@@ -187,8 +168,7 @@ Digraph <- R6::R6Class(
         }
       }
       # return list of nodes indexed by L
-      LL <- lapply(L$as_list(), self$vertex_at)
-      return(LL)
+      lapply(L$as_list(), self$vertex_at)
     },
 
     #' @description Test whether the graph is connected.
@@ -196,17 +176,12 @@ Digraph <- R6::R6Class(
     #' \dfn{connected} is not defined. Function \code{weakly_connected}
     #' calculates whether the underlying graph is connected.
     #' @return \code{TRUE} if connected, \code{FALSE} if not.
-    is_connected = function() {
-      return(FALSE)
-    },
+    is_connected = function() FALSE,
 
     #' @description Test whether the digraph is weakly connected, i.e. if the
     #' underlying graph is connected.
     #' @return \code{TRUE} if connected, \code{FALSE} if not.
-    is_weakly_connected = function() {
-      connected <- super$is_connected()
-      return(connected)
-    },
+    is_weakly_connected = function() super$is_connected(),
 
     #' @description Checks for the presence of a cycle in the graph.
     #' @details Attempts to do a topological sort. If the sort does not contain
@@ -215,7 +190,7 @@ Digraph <- R6::R6Class(
     #' @return \code{TRUE} if no cycles detected.
     is_acyclic = function() {
       L <- self$topological_sort()
-      return(length(L) == self$order())
+      length(L) == self$order()
     },
 
     #' @description Is the digraph's underlying graph a tree?
@@ -223,7 +198,7 @@ Digraph <- R6::R6Class(
     #' @return \code{TRUE} if the underlying graph is a tree; \code{FALSE}
     #' if not.
     is_tree = function() {
-      return(self$is_weakly_connected() && super$is_acyclic())
+      self$is_weakly_connected() && super$is_acyclic()
     },
 
     #' @description Is the digraph's underlying graph a polytree?
@@ -232,9 +207,7 @@ Digraph <- R6::R6Class(
     #' \code{tree}.
     #' @return \code{TRUE} if the underlying graph is a tree; \code{FALSE}
     #' if not.
-    is_polytree = function() {
-      return(self$is_tree())
-    },
+    is_polytree = function() self$is_tree(),
 
     #' @description Is the digraph an arborescence?
     #' @details An \dfn{arborescence} is a tree with a single root and unique
@@ -248,20 +221,14 @@ Digraph <- R6::R6Class(
       if (length(u) != 1L) {
         return(FALSE)
       }
-      # there must be exactly one path from the root to all other vertexes
+      # count paths from the root to all other vertexes
       np <- vapply(
         setdiff(self$vertex_along(), u),
         FUN.VAL = 1L,
-        function(v) {
-          P <- self$paths(self$vertex_at(u), self$vertex_at(v))
-          return(length(P))
-        }
+        function(v) length(self$paths(self$vertex_at(u), self$vertex_at(v)))
       )
-      if (any(np != 1L)) {
-        return(FALSE)
-      }
-      # otherwise return TRUE
-      return(TRUE)
+      # return TRUE if there is one path to each vertex
+      all(np == 1L)
     },
 
     #' @description Find the direct successors of a node.
@@ -278,8 +245,7 @@ Digraph <- R6::R6Class(
       )
       AA <- self$digraph_adjacency_matrix()
       iw <- which(AA[iv, ] >= 1L)
-      successors <- self$vertex_at(iw, as_list = TRUE)
-      return(successors)
+      self$vertex_at(iw, as_list = TRUE)
     },
 
     #' @description Find the direct predecessors of a node.
@@ -296,8 +262,7 @@ Digraph <- R6::R6Class(
       )
       AA <- self$digraph_adjacency_matrix()
       iw <- which(AA[, iv] >= 1L)
-      pred <- self$vertex_at(iw, as_list = TRUE)
-      return(pred)
+      self$vertex_at(iw, as_list = TRUE)
     },
 
     #' @description Find the node that is the source of the given arrow.
@@ -318,9 +283,8 @@ Digraph <- R6::R6Class(
         message = "Argument 'a' is not an Arrow in the graph",
         class = "not_in_graph"
       )
-      # find the index of the source node
-      sn <- self$vertex_index(a$source())
-      return(sn)
+      # return the index of the source node
+      self$vertex_index(a$source())
     },
 
     #' @description Find the node that is the target of the given arrow.
@@ -341,9 +305,8 @@ Digraph <- R6::R6Class(
         message = "Argument 'a' is not an Arrow in the graph",
         class = "not_in_graph"
       )
-      # find the target node or its index (checks if a$target is in the graph)
-      tn <- self$vertex_index(a$target())
-      return(tn)
+      # return the target node or its index (checks if a$target is in the graph)
+      self$vertex_index(a$target())
     },
 
     #' @description Find all directed simple paths from source to target.
@@ -354,11 +317,11 @@ Digraph <- R6::R6Class(
     #' @return A list of ordered node lists.
     paths = function(s, t) {
       # check arguments
-      is <- self$vertex_index(s)
-      it <- self$vertex_index(t)
+      isrc <- self$vertex_index(s)
+      itgt <- self$vertex_index(t)
       abortif(
-        is.na(is),
-        is.na(it),
+        is.na(isrc),
+        is.na(itgt),
         message = "Both the source and target nodes must be in graph",
         class = "not_in_graph"
       )
@@ -373,7 +336,7 @@ Digraph <- R6::R6Class(
       # recursive DFS, avoiding global variables by using Stacks
       dfs <- function(v) {
         P$push(v)
-        if (v == it) {
+        if (v == itgt) {
           PLS$push(P$as_list())
         } else {
           for (w in which(AA[v, ])) {
@@ -385,12 +348,11 @@ Digraph <- R6::R6Class(
         }
         P$pop()
       }
-      dfs(is)
-      # convert vertex indices into vertices before returning
-      VPL <- lapply(PLS$as_list(), function(p) {
+      dfs(isrc)
+      # convert vertex indices into vertices before returning them
+      lapply(PLS$as_list(), function(p) {
         vp <- lapply(p, self$vertex_at)
       })
-      return(VPL)
     },
 
     #' @description Sequence of edges which join the specified path.
@@ -423,12 +385,12 @@ Digraph <- R6::R6Class(
       # loop through the ordered vertexes
       W <- list()
       if (length(P) > 1L) {
-        pairs <- data.frame(
+        prs <- data.frame(
           s = p[1L : (length(P) - 1L)],
           t = p[2L : length(P)]
         )
         B <- self$digraph_incidence_matrix()
-        W <- apply(pairs, MARGIN = 1L, function(r) {
+        W <- apply(prs, MARGIN = 1L, function(r) {
           # look for edges leaving s and entering t
           e <- which((B[r[[1L]], ] == -1L) & (B[r[[2L]], ] == 1L))
           abortifnot(
@@ -436,15 +398,15 @@ Digraph <- R6::R6Class(
             message = "There must be an edge between adjacent nodes in 'P'",
             class = "missing_edge"
           )
-          return(e[[1L]])
+          e[[1L]]
         })
       }
-      # convert edge indices into edges, if required
-      if (what == "edge") {
-        W <- lapply(X = W, FUN = self$edge_at)
-      }
       # return the walk
-      return(W)
+      switch(
+        what,
+        index = W,
+        edge = lapply(X = W, FUN = self$edge_at)
+      )
     },
 
     #' @description Exports the digraph in DOT notation.
@@ -493,7 +455,7 @@ Digraph <- R6::R6Class(
       # write node attributes
       for (v in self$vertexes()) {
         label <- v$label()
-        if (nchar(label) > 0L) {
+        if (!is.na(label) && nzchar(label)) {
           o <- append(
             o,
             paste0(indent, self$vertex_index(v), ' [label="', label, '"]')
@@ -502,22 +464,20 @@ Digraph <- R6::R6Class(
       }
       # write edges
       for (e in self$edges()) {
-        s <- e$source()
-        t <- e$target()
+        src <- e$source()
+        tgt <- e$target()
         label <- e$label()
         o <- append(o, paste0(
-          indent, self$vertex_index(s), " -> ", self$vertex_index(t),
-          if (nchar(label) > 0L) {
+          indent, self$vertex_index(src), " -> ", self$vertex_index(tgt),
+          if (!is.na(label) && nzchar(label)) {
             paste0(' [label="', label, '"]')
           } else {
             ""
           }
         ))
       }
-      # footer
+      # append footer and return
       o <- append(o, "}")
-      # return the stream
-      return(o)
     },
 
     #' @description Exports the digraph as a Graph Modelling Language (GML)
@@ -536,7 +496,7 @@ Digraph <- R6::R6Class(
         o <- append(o, "  node [")
         o <- append(o, paste("    id", self$vertex_index(v)))
         label <- v$label()
-        if (nchar(label) > 0L) {
+        if (!is.na(label) && nzchar(label)) {
           o <- append(o, paste0("    label ", '"', label, '"'))
         }
         o <- append(o, "  ]")
@@ -547,15 +507,13 @@ Digraph <- R6::R6Class(
         o <- append(o, paste("    source", self$vertex_index(e$source())))
         o <- append(o, paste("    target", self$vertex_index(e$target())))
         label <- e$label()
-        if (nchar(label) > 0L) {
+        if (!is.na(label) && nzchar(label)) {
           o <- append(o, paste0("    label ", '"', label, '"'))
         }
         o <- append(o, "  ]")
       }
-      # close the graph
+      # close the graph and return the string representation
       o <- append(o, "]")
-      # return the stream
-      return(o)
     }
   )
 )

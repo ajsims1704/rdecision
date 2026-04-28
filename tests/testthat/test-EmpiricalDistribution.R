@@ -61,8 +61,7 @@ test_that("random draw sampling is from the supplied distribution", {
   n <- 20L
   samp <- vapply(seq_len(n), FUN.VALUE = 1.0, FUN = function(i) {
     e$sample()
-    rv <- e$r()
-    return(rv)
+    e$r()
   })
   expect_length(samp, n)
   # test all values are from x
@@ -80,8 +79,7 @@ test_that("random interpolated sampling is from a supplied Gamma dist", {
   # random sampling
   samp <- vapply(seq_len(n), FUN.VALUE = 1.0, FUN = function(i) {
     e$sample()
-    rv <- e$r()
-    return(rv)
+    e$r()
   })
   expect_length(samp, n)
   # 99.9% confidence limits; expected test failure rate is 0.1%;

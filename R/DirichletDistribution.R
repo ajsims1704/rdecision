@@ -26,54 +26,48 @@ DirichletDistribution <- R6::R6Class(
         message = "'alpha' must have at least 2 elements",
         class = "alpha_unsupported"
       )
-      vapply(alpha, FUN.VALUE = TRUE, FUN = function(x) {
-        abortifnot(!is.na(x),
-          message = "All elements of 'alpha' must be defined",
-          class = "alpha_not_defined"
-        )
-        abortifnot(is.numeric(x),
-          message = "Argument 'alpha' must be a numeric vector",
-          class = "alpha_not_numeric"
-        )
-        abortifnot(x > 0.0,
-          message = "Elements of 'alpha' must be > 0",
-          class = "alpha_unsupported"
-        )
-        return(TRUE)
-      })
+      abortifnot(!is.na(alpha),
+        message = "All elements of 'alpha' must be defined",
+        class = "alpha_not_defined"
+      )
+      abortifnot(is.numeric(alpha),
+        message = "Argument 'alpha' must be a numeric vector",
+        class = "alpha_not_numeric"
+      )
+      abortifnot(alpha > 0.0,
+        message = "Elements of 'alpha' must be > 0",
+        class = "alpha_unsupported"
+      )
       private$alpha <- alpha
       # create subclass object and check parameter
       super$initialize("Dir", K = length(alpha))
       # set random sample to mean
       self$sample(TRUE)
       # return Dirichlet distribution object
-      return(invisible(self))
+      invisible(self)
     },
 
     #' @description Accessor function for the name of the distribution.
     #' @return Distribution name as character string.
     distribution = function() {
-      rv <- paste0("Dir(", paste(private$alpha, collapse = ","), ")")
-      return(rv)
+      paste0("Dir(", paste(private$alpha, collapse = ","), ")")
     },
 
     #' @description Mean value of each dimension of the distribution.
     #' @return A numerical vector of length K.
     mean = function() {
-      alpha0 <- sum(private$alpha)
-      return(private$alpha / alpha0)
+      private$alpha / sum(private$alpha)
     },
 
     #' @description Return the mode of the distribution.
     #' @details Undefined if any alpha is \eqn{\le 1}.
     #' @return Mode as a vector of length \code{K}.
     mode = function() {
-      rv <- rep(NA_real_, times = private$K)
       if (all(private$alpha > 1.0)) {
-        alpha0 <- sum(private$alpha)
-        rv <- (private$alpha - 1.0) / (alpha0 - private$K)
+        (private$alpha - 1.0) / (sum(private$alpha) - private$K)
+      } else {
+        rep(NA_real_, times = private$K)
       }
-      return(rv)
     },
 
     #' @description Quantiles of the univariate marginal distributions.
@@ -87,21 +81,18 @@ DirichletDistribution <- R6::R6Class(
     #' are labelled with quantiles and columns with the dimension (1, 2, etc).
     quantile = function(probs) {
       # test argument
-      vapply(probs, FUN.VALUE = TRUE, FUN = function(x) {
-        abortifnot(!is.na(x),
-          message = "All elements of 'probs' must be defined",
-          class = "probs_not_defined"
-        )
-        abortifnot(is.numeric(x),
-          message = "Argument 'probs' must be a numeric vector",
-          class = "probs_not_numeric"
-        )
-        abortifnot(x >= 0.0 && x <= 1.0,
-          message = "Elements of 'probs' must be in range[0,1]",
-          class = "probs_out_of_range"
-        )
-        return(TRUE)
-      })
+      abortifnot(!is.na(probs),
+        message = "All elements of 'probs' must be defined",
+        class = "probs_not_defined"
+      )
+      abortifnot(is.numeric(probs),
+        message = "Argument 'probs' must be a numeric vector",
+        class = "probs_not_numeric"
+      )
+      abortifnot(probs >= 0.0 & probs <= 1.0,
+        message = "Elements of 'probs' must be in range[0,1]",
+        class = "probs_out_of_range"
+      )
       # create output object
       rv <- matrix(
         rep(NA_real_, times = length(probs) * private$K),
@@ -112,14 +103,14 @@ DirichletDistribution <- R6::R6Class(
       # populate it
       alpha0 <- sum(private$alpha)
       for (k in seq_len(private$K)) {
-        q <- stats::qbeta(
+        quan <- stats::qbeta(
           probs,
           shape1 = private$alpha[[k]],
           shape2 = alpha0 - private$alpha[[k]]
         )
-        rv[, k] <- q
+        rv[, k] <- quan
       }
-      return(rv)
+      rv
     },
 
     #' @description Variance-covariance matrix.
@@ -136,7 +127,7 @@ DirichletDistribution <- R6::R6Class(
           VC[[i, j]] <- VC[[i, j]] / (alpha0 + 1L)
         }
       }
-      return(VC)
+      VC
     },
 
     #' @description Draw and hold a random sample from the distribution.
@@ -154,7 +145,7 @@ DirichletDistribution <- R6::R6Class(
         # normalize and hold
         private$.r <- y / sum(y)
       }
-      return(invisible(self))
+      invisible(self)
     }
   )
 )

@@ -44,8 +44,9 @@ LeafNode <- R6::R6Class(
       # check arguments
       abortifnot(
         !missing(label),
+        !is.na(label),
         is.character(label),
-        nchar(label) > 0L,
+        nzchar(label),
         message =
           "Argument `label` must not be missing and must be a non-empty string",
         class = "invalid_label"
@@ -70,7 +71,7 @@ LeafNode <- R6::R6Class(
       # set the utility discount
       private$ru <- ru
       # return updated node object
-      return(invisible(self))
+      invisible(self)
     },
 
     #' @description Creates a grid::grob for a leaf node.
@@ -115,11 +116,10 @@ LeafNode <- R6::R6Class(
       )
       # return the leaf object as a gTree, or its bounding box
       if (bb) {
-        rv <- grid::unit.c(x + bbxl, x + bbxr, y + bbyb, y + bbyt)
+        grid::unit.c(x + bbxl, x + bbxr, y + bbyb, y + bbyt)
       } else {
-        rv <- grid::gTree(children = grid::gList(gsym, glab))
+        grid::gTree(children = grid::gList(gsym, glab))
       }
-      return(rv)
     },
 
     #' @description Find all the model variables of type \code{ModVar} that have
@@ -135,7 +135,7 @@ LeafNode <- R6::R6Class(
         ov <- c(ov, unlist(v$operands()))
       }
       # return the unique list
-      return(unique(ov))
+      unique(ov)
     },
 
     #' @description Set the utility associated with the node.
@@ -160,7 +160,7 @@ LeafNode <- R6::R6Class(
         class = "invalid_utility"
       )
       private$node.utility <- utility
-      return(invisible(self))
+      invisible(self)
     },
 
     #' @description Set the time interval associated with the node.
@@ -178,22 +178,17 @@ LeafNode <- R6::R6Class(
         class = "invalid_interval"
       )
       private$node.interval <- interval
-      return(invisible(self))
+      invisible(self)
     },
 
     #' @description Return the utility associated with being in the
     #' state for the interval.
     #' @return Utility (numeric value).
-    utility = function() {
-      u <- as_numeric(private$node.utility)
-      return(u)
-    },
+    utility = function() as_numeric(private$node.utility),
 
     #' @description Return the interval associated with being in the state.
     #' @return Interval (as a \code{difftime}).
-    interval = function() {
-      return(private$node.interval)
-    },
+    interval = function() private$node.interval,
 
     #' @description Return the discounted quality adjusted life years
     #' associated with being in the state.
@@ -220,11 +215,10 @@ LeafNode <- R6::R6Class(
       u0 <- self$utility()
       ru <- private$ru
       if (ru > 0.0) {
-        Q <- (u0 / ru) * (1.0 - exp(-ru * tp))
+        (u0 / ru) * (1.0 - exp(-ru * tp))
       } else {
-        Q <- u0 * tp
+        u0 * tp
       }
-      return(Q)
     }
   )
 )

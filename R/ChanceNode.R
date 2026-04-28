@@ -26,7 +26,7 @@ ChanceNode <- R6::R6Class(
       # ensure base class fields are initialized
       super$initialize(label)
       # return a ChanceNode object
-      return(invisible(self))
+      invisible(self)
     },
 
     #' @description Creates a grid::grob for a chance node.
@@ -45,7 +45,7 @@ ChanceNode <- R6::R6Class(
       a <- grid::unit(1.0, "char")
       dy <- grid::unit(0.4, "char")
       # find the bounding box relative to (0, 0) for the node and its symbol
-      if (nchar(self$label()) > 0L) {
+      if (!is.na(self$label()) && nzchar(self$label())) {
         sw <- grid::stringWidth(self$label())
         sh <- grid::stringHeight(self$label()) + dy
       } else {
@@ -78,7 +78,7 @@ ChanceNode <- R6::R6Class(
       } else {
         rv <- grid::gTree(children = grid::gList(gsym, glab))
       }
-      return(rv)
+      rv
     }
   )
 )

@@ -105,12 +105,11 @@ ExprModVar <- R6::R6Class(
         for (o in private$.operands) o$set("random")
         # compute the value using the random value for each operand
         # using the pre-packaged expression
-        rv <- rlang::eval_tidy(private$q.get)
-        return(rv)
+        rlang::eval_tidy(private$q.get)
       })
-      D <- EmpiricalDistribution$new(x = samp)
+      demp <- EmpiricalDistribution$new(x = samp)
       # initialize the base class
-      super$initialize(description, units, D = D)
+      super$initialize(description, units, D = demp)
       # save the components of .value that do not change
       private$.value[["expected"]] <- self$mean()
       for (o in private$.operands) o$set("q2.5")
@@ -120,7 +119,7 @@ ExprModVar <- R6::R6Class(
       for (o in private$.operands) o$set("q97.5")
       private$.value[["q97.5"]] <- rlang::eval_tidy(private$q.get)
       # return
-      return(invisible(self))
+      invisible(self)
     },
 
     #' @description Create a new \verb{quosure} from that supplied in
@@ -146,21 +145,19 @@ ExprModVar <- R6::R6Class(
       mv <- list()
       for (v in base::all.vars(private$expr)) {
         vv <- rlang::eval_bare(expr = rlang::sym(v), env = private$env)
-        rep <- v
+        repstr <- v
         # build replacement string if necessary
         if (is_ModVar(vv)) {
-          rep <- gsub(v, paste(v, method, sep = "$"), v)
+          repstr <- gsub(v, paste(v, method, sep = "$"), v)
         }
         # create symbol from the modified string
-        mv[[v]] <- str2lang(rep)
+        mv[[v]] <- str2lang(repstr)
       }
       emod <- eval(
         substitute(substitute(e, env = mv), env = list(e = private$expr))
       )
-      # create new quosure
-      q <- rlang::new_quosure(expr = emod, env = private$env)
-      # return the quosure
-      return(q)
+      # return the new quosure
+      rlang::new_quosure(expr = emod, env = private$env)
     },
 
     #' @description Tests whether the model variable is probabilistic, i.e.
@@ -169,19 +166,20 @@ ExprModVar <- R6::R6Class(
     #' @return \code{TRUE} if probabilistic
     is_probabilistic = function() {
       # test each operand for whether it is probabilistic
-      lv <- vapply(
-        base::all.vars(private$expr),
-        FUN.VALUE = TRUE,
-        FUN = function(v) {
-          rv <- FALSE
-          vv <- rlang::eval_bare(expr = rlang::sym(v), env = private$env)
-          if (is_ModVar(vv)) {
-            rv <- vv$is_probabilistic()
+      any(
+        vapply(
+          base::all.vars(private$expr),
+          FUN.VALUE = TRUE,
+          FUN = function(v) {
+            vv <- rlang::eval_bare(expr = rlang::sym(v), env = private$env)
+            if (is_ModVar(vv)) {
+              vv$is_probabilistic()
+            } else {
+              FALSE
+            }
           }
-          return(rv)
-        }
+        )
       )
-      return(any(lv))
     },
 
     #' @description Return a list of operands.
@@ -206,10 +204,8 @@ ExprModVar <- R6::R6Class(
           }
         }
       }
-      # find the unique variables
-      mvlist <- unique(mvlist)
-      # return the list
-      return(mvlist)
+      # return the unique variables
+      unique(mvlist)
     },
 
     #' @description Accessor function for the name of the expression model
@@ -221,35 +217,25 @@ ExprModVar <- R6::R6Class(
         rlang::new_quosure(expr = private$expr, env = private$env)
       )
       estr <- gsub("[[:cntrl:]]", "", estr)
-      return(estr)
     },
 
     #' @description Return the value of the expression when its operands take
     #' their mean value (i.e. value returned by call to \code{mean} or their
     #' value, if numeric). See notes on this class for further explanation.
     #' @return Mean value as a numeric value.
-    mean = function() {
-      # evaluate the pre-packaged expression
-      rv <- rlang::eval_tidy(private$q.mean)
-      # return it
-      return(rv)
-    },
+    mean = function() rlang::eval_tidy(private$q.mean),
 
     #' @description Return the mode of the variable. By default returns
     #' \code{NA}, which will be the case for most \code{ExprModVar} variables,
     #' because an arbitrary expression is not guaranteed to be unimodal.
     #' @return Mode as a numeric value.
-    mode = function() {
-      return(NA_real_)
-    },
+    mode = function() NA_real_,
 
     #' @description Return the standard deviation of the distribution as
     #' \code{NA} because the variance is not available as a closed form for
     #' all functions of distributions.
     #' @return Standard deviation as a numeric value
-    SD = function() {
-      return(NA_real_)
-    },
+    SD = function() NA_real_,
 
     #' @description Find quantiles of the uncertainty distribution. Not
     #' available as a closed form, and returned as \code{NA}.
@@ -270,9 +256,9 @@ ExprModVar <- R6::R6Class(
           message = "Elements of 'probs' must be in range[0,1]",
           class = "probs_out_of_range"
         )
-        return(TRUE)
+        TRUE
       })
-      return(rep(NA_real_, length(probs)))
+      rep(NA_real_, length(probs))
     },
 
     #' @description Return the estimated expected value of the variable.
@@ -281,10 +267,7 @@ ExprModVar <- R6::R6Class(
     #' distributions. It is derived from the empirical distribution associated
     #' with the object.
     #' @return Expected value as a numeric value.
-    mu_hat = function() {
-      rv <- private$.D$mean()
-      return(rv)
-    },
+    mu_hat = function() private$.D$mean(),
 
     #' @description Return the estimated standard deviation of the distribution.
     #' @details This is computed by numerical simulation because there is, in
@@ -292,10 +275,7 @@ ExprModVar <- R6::R6Class(
     #' distributions. It is derived from the empirical distribution associated
     #' with the object.
     #' @return Standard deviation as a numeric value.
-    sigma_hat = function() {
-      rv <- private$.D$SD()
-      return(rv)
-    },
+    sigma_hat = function() private$.D$SD(),
 
     #' @description Return the estimated quantiles by sampling the variable.
     #' @details This is computed by numerical simulation because there is, in
@@ -304,10 +284,7 @@ ExprModVar <- R6::R6Class(
     #' associated with the object.
     #' @param probs Vector of probabilities, in range [0,1].
     #' @return Vector of quantiles.
-    q_hat = function(probs) {
-      q <- private$.D$quantile(probs)
-      return(q)
-    },
+    q_hat = function(probs) private$.D$quantile(probs),
 
     #' @description Sets the value of the \code{ExprModVar}.
     #' @details The available options for parameter \code{what} are identical to
@@ -384,12 +361,11 @@ ExprModVar <- R6::R6Class(
       # update the whatnext field
       private$.whatnext <- what
       # return the updated object
-      return(invisible(self))
+      invisible(self)
     },
 
-    #' @description
-    #' Gets the value of the \code{ExprModVar} that was set by the most recent
-    #' call to \code{set()}.
+    #' @description Gets the value of the \code{ExprModVar} that was set by the
+    #' most recent call to \code{set()}.
     #' @return Value determined by last \code{set()}.
     get = function() {
       if (private$.whatnext == "random") {
@@ -401,7 +377,7 @@ ExprModVar <- R6::R6Class(
         rv <- private$.value[[private$.whatnext]]
       }
       # return it
-      return(rv)
+      rv
     }
   )
 )

@@ -71,9 +71,7 @@ test_that("operands are identified correctly", {
   e <- ExprModVar$new("e", "GBP", quo = rlang::quo(x * y + z))
   mv <- e$operands()
   expect_length(mv, 2L)  # y and z
-  d <- vapply(mv, FUN.VALUE = "x", FUN = function(v) {
-    return(v$description())
-  })
+  d <- vapply(mv, FUN.VALUE = "x", FUN = function(v) v$description())
   expect_setequal(d, c("y", "z"))
   # nested case, with repeats
   e1 <- ExprModVar$new("e1", "GBP", quo = rlang::quo(x * y + z))
@@ -81,22 +79,16 @@ test_that("operands are identified correctly", {
   e3 <- ExprModVar$new("e3", "GBP", quo = rlang::quo(e1 + e2))
   mv <- e3$operands()
   expect_length(mv, 4L)  # y, z, e1, e2
-  d <- vapply(mv, FUN.VALUE = "x", FUN = function(v) {
-    return(v$description())
-  })
+  d <- vapply(mv, FUN.VALUE = "x", FUN = function(v) v$description())
   expect_setequal(d, c("e1", "e2", "y", "z"))
   # deeper nesting
   e4 <- ExprModVar$new("e4", "", quo = rlang::quo(2.0 * e3))
   mv <- e4$operands()
-  d <- vapply(mv, FUN.VALUE = "x", FUN = function(v) {
-    return(v$description())
-  })
+  d <- vapply(mv, FUN.VALUE = "x", FUN = function(v) v$description())
   expect_setequal(d, c("e1", "e2", "e3", "y", "z"))
   # nesting without recursion
   mv <- e3$operands(recursive = FALSE)
-  d <- vapply(mv, FUN.VALUE = "x", FUN = function(v) {
-    return(v$description())
-  })
+  d <- vapply(mv, FUN.VALUE = "x", FUN = function(v) v$description())
   expect_setequal(d, c("e1", "e2"))
 })
 
@@ -167,8 +159,7 @@ test_that("modified expressions are created correctly", {
   n <- 1000L
   samp <- vapply(seq_len(n), FUN.VALUE = 1.0, FUN = function(i) {
     q$set("random")
-    rv <- q$get()
-    return(rv)
+    q$get()
   })
   expect_length(samp, n)
   skip_on_cran()
@@ -288,8 +279,7 @@ test_that("expression chi square from SN is correct", {
   n <- 1000L
   samp <- vapply(seq_len(n), FUN.VALUE = 1.0, FUN = function(i) {
     y$set("random")
-    rv <- y$get()
-    return(rv)
+    y$get()
   })
   ht <- ks.test(samp, rchisq(n, df = 1L))
   expect_gt(ht$p.value, 0.001)

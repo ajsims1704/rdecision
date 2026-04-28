@@ -38,19 +38,17 @@ GammaModVar <- R6::R6Class(
     #' @return An object of class \code{GammaModVar}.
     initialize = function(description, units, shape, scale) {
       # create a Gamma distribution (and check arguments)
-      D <- GammaDistribution$new(shape, scale)
+      gdist <- GammaDistribution$new(shape, scale)
       # create the base class model variable
-      super$initialize(description, units, D = D, k = 1L)
+      super$initialize(description, units, D = gdist, k = 1L)
       # return object
-      return(invisible(self))
+      invisible(self)
     },
 
     #' @description Tests whether the model variable is probabilistic, i.e.,
     #' a random variable that follows a distribution, or an expression
     #' involving random variables, some of which follow distributions.
     #' @return \code{TRUE} if probabilistic
-    is_probabilistic = function() {
-      return(TRUE)
-    }
+    is_probabilistic = function() TRUE
   )
 )

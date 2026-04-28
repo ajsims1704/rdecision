@@ -24,11 +24,11 @@ BetaModVar <- R6::R6Class(
     #' @return An object of class \code{BetaModVar}.
     initialize = function(description, units, alpha, beta) {
       # create Beta distribution (also checks arguments)
-      D <- BetaDistribution$new(alpha = alpha, beta = beta)
+      db <- BetaDistribution$new(alpha = alpha, beta = beta)
       # create BetaModVar
-      super$initialize(description, units, D = D, k = 1L)
+      super$initialize(description, units, D = db, k = 1L)
       # return BetaModVar
-      return(invisible(self))
+      invisible(self)
     },
 
     #' @description Tests whether the model variable is probabilistic,
@@ -36,7 +36,7 @@ BetaModVar <- R6::R6Class(
     #' involving random variables, some of which follow distributions.
     #' @return TRUE if probabilistic
     is_probabilistic = function() {
-      return(TRUE)
+      TRUE
     }
   )
 )

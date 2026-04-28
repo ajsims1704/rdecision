@@ -45,14 +45,12 @@ MarkovState <- R6::R6Class(
       # check the utility, and set it
       self$set_utility(utility)
       # return invisible MarkovState object
-      return(invisible(self))
+      invisible(self)
     },
 
     #' @description Accessor function to retrieve the state name.
     #' @return State name.
-    name = function() {
-      return(self$label())
-    },
+    name = function() self$label(),
 
     #' @description Set the annual occupancy cost.
     #' @param cost The annual cost of state occupancy
@@ -66,15 +64,12 @@ MarkovState <- R6::R6Class(
         class = "invalid_annual_cost"
       )
       private$state.cost <- cost
-      return(invisible(self))
+      invisible(self)
     },
 
     #' @description Gets the annual cost of state occupancy.
     #' @returns Annual cost; numeric.
-    cost = function() {
-      rv <- as_numeric(private$state.cost)
-      return(rv)
-    },
+    cost = function() as_numeric(private$state.cost),
 
     #' @description Set the utility of the state.
     #' @param utility The utility associated with being in the state (numeric
@@ -89,15 +84,12 @@ MarkovState <- R6::R6Class(
         class = "invalid_utility"
       )
       private$state.utility <- utility
-      return(invisible(self))
+      invisible(self)
     },
 
     #' @description Gets the utility associated with the state.
     #' @returns Utility; numeric.
-    utility = function() {
-      rv <- as_numeric(private$state.utility)
-      return(rv)
-    },
+    utility = function() as_numeric(private$state.utility),
 
     #' @description Find all the model variables.
     #' @details Find variables of type \code{ModVar} that have been
@@ -113,7 +105,7 @@ MarkovState <- R6::R6Class(
         ov <- c(ov, unlist(v$operands()))
       }
       # return the unique list
-      return(unique(ov))
+      unique(ov)
     }
   )
 )

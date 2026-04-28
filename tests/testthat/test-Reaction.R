@@ -85,9 +85,7 @@ test_that("modvars are identified", {
   )
   mv <- e$modvars()
   expect_length(mv, 2L)
-  d <- vapply(mv, FUN.VALUE = "x", FUN = function(v) {
-    return(v$description())
-  })
+  d <- vapply(mv, FUN.VALUE = "x", FUN = function(v) v$description())
   expect_setequal(d, c("fortytwo", "free"))
   # three modvars
   e <- Reaction$new(
@@ -95,9 +93,7 @@ test_that("modvars are identified", {
   )
   mv <- e$modvars()
   expect_length(mv, 3L)
-  d <- vapply(mv, FUN.VALUE = "x", FUN = function(v) {
-    return(v$description())
-  })
+  d <- vapply(mv, FUN.VALUE = "x", FUN = function(v) v$description())
   expect_setequal(d, c("evens", "fortytwo", "free"))
   expect_identical(e$benefit(), 42.0)
   # add a modvar dynamically
@@ -116,9 +112,7 @@ test_that("modvars are identified", {
   e$set_cost(c = c1)
   mv <- e$modvars()
   expect_length(mv, 4L)
-  d <- vapply(X = mv, FUN.VALUE = "x", FUN = function(v) {
-    return(v$description())
-  })
+  d <- vapply(X = mv, FUN.VALUE = "x", FUN = function(v) v$description())
   expect_setequal(d, c("fortytwo", "o1+o2", "o1", "o2"))
 })
 

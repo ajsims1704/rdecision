@@ -46,7 +46,6 @@ test_that("quantile function checks inputs and has correct output", {
   probs <- c(0.1, 0.2, 0.5)
   q <- b$quantile(probs)
   expect_length(q, 3L)
-  expect_setequal(names(q), c("0.1", "0.2", "0.5"))
 })
 
 test_that("Extreme mode values are defined", {
@@ -80,8 +79,7 @@ test_that("random sampling is from a Beta distribution", {
   n <- 1000L
   osamp <- vapply(seq(n), FUN.VALUE = 1.0, FUN = function(i) {
     b$sample()
-    rv <- b$r()
-    return(rv)
+    b$r()
   })
   expect_length(osamp, n)
   # 99.9% confidence limits; expected test failure rate is 0.1%,

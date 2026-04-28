@@ -1,7 +1,7 @@
 
 # is.element function for R6 objects
 r6_is_element <- function(e, x) {
-  return(any(vapply(x, FUN.VALUE = TRUE, FUN = identical, y = e)))
+  any(vapply(x, FUN.VALUE = TRUE, FUN = identical, y = e))
 }
 
 # setequal function for R6 objects
@@ -13,7 +13,7 @@ r6_setequal <- function(A, B) {
   BinA <- all(
     vapply(B, FUN.VALUE = TRUE, FUN = r6_is_element, x = A)
   )
-  return(AinB & BinA)
+  AinB && BinA
 }
 
 # custom expectation to compare two sets of R6 objects

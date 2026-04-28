@@ -27,17 +27,15 @@ NormModVar <- R6::R6Class(
     #' @return A \code{NormModVar} object.
     initialize = function(description, units, mu, sigma) {
       # create a normal distribution and check arguments
-      D <- NormalDistribution$new(mu, sigma)
+      ndist <- NormalDistribution$new(mu, sigma)
       # initialize the base class
-      super$initialize(description, units, D = D, k = 1L)
+      super$initialize(description, units, D = ndist, k = 1L)
       # return
-      return(invisible(self))
+      invisible(self)
     },
 
     #' @description Tests whether the model variable is probabilistic.
     #' @return \code{TRUE} if probabilistic.
-    is_probabilistic = function() {
-      return(TRUE)
-    }
+    is_probabilistic = function() TRUE
   )
 )

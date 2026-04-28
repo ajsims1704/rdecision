@@ -80,8 +80,7 @@ test_that("random sampling is from a log normal distribution", {
   ln <- LogNormModVar$new("ln", "GBP", mu, sigma, "LN1")
   samp <- vapply(seq_len(n), FUN.VALUE = 1.0, FUN = function(i) {
     ln$set("random")
-    rv <- ln$get()
-    return(rv)
+    ln$get()
   })
   expect_length(samp, n)
   # expect sample mean and sd to fall within 99.9% CI; test

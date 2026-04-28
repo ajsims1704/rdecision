@@ -35,8 +35,9 @@ Action <- R6::R6Class(
                           benefit = 0.0) {
       # check label
       abortifnot(
+        !is.na(label),
         is.character(label),
-        nchar(label) > 0L,
+        nzchar(label),
         message = "Argument 'label' must be a string",
         class = "invalid_label"
       )
@@ -55,7 +56,7 @@ Action <- R6::R6Class(
       # check and set benefit, ensuring initialization
       self$set_benefit(benefit)
       # Return Action node
-      return(invisible(self))
+      invisible(self)
     },
 
     #' @description Creates a grid::grob for an action edge.
@@ -111,7 +112,7 @@ Action <- R6::R6Class(
           vp = vp
         )
       )
-      return(gedge)
+      gedge
     },
 
     #' @description Find all the model variables of type \code{ModVar} that have
@@ -127,14 +128,14 @@ Action <- R6::R6Class(
         ov <- c(ov, unlist(v$operands()))
       }
       # return the unique list
-      return(unique(ov))
+      unique(ov)
     },
 
     #' @description Return the current value of the edge probability, i.e., the
     #' conditional probability of traversing the edge.
     #' @return Numeric value equal to 1.
     p = function() {
-      return(1.0)
+      1.0
     },
 
     #' @description Set the cost associated with the action edge.
@@ -155,14 +156,14 @@ Action <- R6::R6Class(
         )
       }
       private$edge_cost <- c
-      return(invisible(self))
+      invisible(self)
     },
 
     #' @description Return the cost associated with traversing the edge.
     #' @return Cost.
     cost = function() {
       rv <- as_numeric(private$edge_cost)
-      return(rv)
+      rv
     },
 
     #' @description Set the benefit associated with the action edge.
@@ -183,14 +184,14 @@ Action <- R6::R6Class(
         )
       }
       private$edge_benefit <- b
-      return(invisible(self))
+      invisible(self)
     },
 
     #' @description Return the benefit associated with traversing the edge.
     #' @return Benefit.
     benefit = function() {
       rv <- as_numeric(private$edge_benefit)
-      return(rv)
+      rv
     }
   )
 )

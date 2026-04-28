@@ -52,37 +52,25 @@ EmpiricalDistribution <- R6::R6Class(
       # initial sample
       self$sample(TRUE)
       # return object
-      return(invisible(self))
+      invisible(self)
     },
 
     #' @description Accessor function for the name of the distribution.
     #' @return Distribution name as character string.
-    distribution = function() {
-      rv <- "Emp"
-      return(rv)
-    },
+    distribution = function() "Emp",
 
     #' @description Return the expected value of the distribution.
     #' @return Expected value as a numeric value.
-    mean = function() {
-      rv <- base::mean(private$x)
-      return(rv)
-    },
+    mean = function() base::mean(private$x),
 
     #' @description Return the mode of the distribution,
     #' @return NA because an empirical distribution is not guaranteed to be
     #' unimodal.
-    mode = function() {
-      rv <- NA_real_
-      return(rv)
-    },
+    mode = function() NA_real_,
 
     #' @description Return the standard deviation of the distribution.
     #' @return Standard deviation as a numeric value
-    SD = function() {
-      rv <- stats::sd(private$x)
-      return(rv)
-    },
+    SD = function() stats::sd(private$x),
 
     #' @description Draw and hold a random sample from the distribution.
     #' @details Samples with interpolation or by random draw from the
@@ -94,18 +82,16 @@ EmpiricalDistribution <- R6::R6Class(
     sample = function(expected = FALSE) {
       if (expected) {
         private$.r[[1L]] <- self$mean()
+      } else if (private$interpolate.sample) {
+        private$.r[[1L]] <- stats::quantile(
+          x = private$x,
+          probs = stats::runif(n = 1L),
+          type = 7L
+        )
       } else {
-        if (private$interpolate.sample) {
-          private$.r[[1L]] <- stats::quantile(
-            x = private$x,
-            probs = stats::runif(n = 1L),
-            type = 7L
-          )
-        } else {
-          private$.r[[1L]] <- base::sample(x = private$x, size = 1L)
-        }
+        private$.r[[1L]] <- base::sample(x = private$x, size = 1L)
       }
-      return(invisible(self))
+      invisible(self)
     },
 
     #' @description
@@ -127,10 +113,9 @@ EmpiricalDistribution <- R6::R6Class(
           message = "Elements of 'probs' must be in range[0,1]",
           class = "probs_out_of_range"
         )
-        return(TRUE)
+        TRUE
       })
-      q <- stats::quantile(x = private$x, probs, names = FALSE)
-      return(q)
+      stats::quantile(x = private$x, probs, names = FALSE)
     }
   )
 )

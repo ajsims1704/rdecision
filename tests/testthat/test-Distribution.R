@@ -110,7 +110,7 @@ test_that("invalid arguments to sample are detected", {
 
 test_that("univariate samples are scalars", {
   D <- Distribution$new("Base", K = 1L)
-  R <- D$r()
-  expect_true(is.vector(R))
-  expect_length(R, 1L)
+  rndsample <- D$r()
+  expect_true(is.vector(rndsample))
+  expect_length(rndsample, 1L)
 })

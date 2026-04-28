@@ -1,3 +1,11 @@
+# redecision 1.3.0.9000
+
+* Modified source to comply with default linters added since previous build,
+  mostly involving removal of unnecessary return statements.
+* Modified internal functions `abortif` and `abortifnot` to accept arguments
+  that are logical vectors, as well as logical scalars. This is consistent with
+  the behaviour of `stopifnot`.
+
 # rdecision 1.3.0
 
 * Added rhub workflow to git repository.
@@ -35,7 +43,7 @@
   functions moved to classes for those objects.
 * Added package qualifier for function dev.size in grDevices, and functions
   abline, axis, rect, strwidth and text in package graphics.
-* Moved code to plot a tornado diagram into 'utils.R` to make it available
+* Moved code to plot a tornado diagram into `utils.R` to make it available
   for creating such diagrams given any input source (e.g., Markov models),
   rather than restricting its use to `ModVar`s in decision trees.
 * Added vignette `SM00`, a narrative explanation of replicating Sonnenberg 

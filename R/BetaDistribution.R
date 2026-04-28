@@ -45,7 +45,7 @@ BetaDistribution <- R6::R6Class(
       # initial sample
       self$sample(expected = TRUE)
       # return BetaDistribution
-      return(invisible(self))
+      invisible(self)
     },
 
     #' @description Accessor function for the name of the uncertainty
@@ -53,13 +53,12 @@ BetaDistribution <- R6::R6Class(
     #' @return Distribution name as character string.
     distribution = function() {
       rv <- paste0("Be(", private$alpha, ",", private$beta, ")")
-      return(rv)
     },
 
     #' @description The expected value of the distribution.
     #' @return Expected value as a numeric value.
     mean = function() {
-      return(private$alpha / (private$alpha + private$beta))
+      private$alpha / (private$alpha + private$beta)
     },
 
     #' @description The mode of the distribution (if
@@ -78,7 +77,7 @@ BetaDistribution <- R6::R6Class(
       } else {
         rv <- (private$alpha - 1.0) / (private$alpha + private$beta - 2.0)
       }
-      return(rv)
+      rv
     },
 
     #' @description The standard deviation of the distribution.
@@ -87,7 +86,7 @@ BetaDistribution <- R6::R6Class(
       a <- private$alpha
       b <- private$beta
       v <- (a * b) / ((a + b) ^ 2L * (a + b + 1L))
-      return(sqrt(v))
+      sqrt(v)
     },
 
     #' @description Draw and hold a random sample from the model variable.
@@ -102,7 +101,7 @@ BetaDistribution <- R6::R6Class(
           n = 1L, shape1 = private$alpha, shape2 = private$beta
         )
       }
-      return(invisible(self))
+      invisible(self)
     },
 
     #' @description The quantiles of the Beta distribution.
@@ -110,24 +109,20 @@ BetaDistribution <- R6::R6Class(
     #' @return Vector of quantiles.
     quantile = function(probs) {
       # test argument
-      vapply(probs, FUN.VALUE = TRUE, FUN = function(x) {
-        abortifnot(!is.na(x),
-          message = "All elements of 'probs' must be defined",
-          class = "probs_not_defined"
-        )
-        abortifnot(is.numeric(x),
-          message = "Argument 'probs' must be a numeric vector",
-          class = "probs_not_numeric"
-        )
-        abortifnot(x >= 0.0 && x <= 1.0,
-          message = "Elements of 'probs' must be in range[0,1]",
-          class = "probs_out_of_range"
-        )
-        return(TRUE)
-      })
-      q <- qbeta(probs, shape1 = private$alpha, shape2 = private$beta)
-      names(q) <- probs
-      return(q)
+      abortifnot(!is.na(probs),
+        message = "All elements of 'probs' must be defined",
+        class = "probs_not_defined"
+      )
+      abortifnot(is.numeric(probs),
+        message = "Argument 'probs' must be a numeric vector",
+        class = "probs_not_numeric"
+      )
+      abortifnot(probs >= 0.0 & probs <= 1.0,
+        message = "Elements of 'probs' must be in range[0,1]",
+        class = "probs_out_of_range"
+      )
+      # return the quantiles
+      stats::qbeta(probs, shape1 = private$alpha, shape2 = private$beta)
     }
   )
 )

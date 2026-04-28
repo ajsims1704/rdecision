@@ -57,8 +57,7 @@ test_that("random sampling is from a Gamma distribution", {
   # random sampling
   samp <- vapply(seq_len(n), FUN.VALUE = 1.0, FUN = function(i) {
     g$sample()
-    rv <- g$r()
-    return(rv)
+    g$r()
   })
   expect_length(samp, n)
   # 99.9% confidence limits; expected test failure rate is 0.1%;

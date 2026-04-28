@@ -1,4 +1,3 @@
-
 test_that("illegal initializations are rejected", {
   a <- 2L
   b <- 5L
@@ -125,8 +124,7 @@ test_that("random sampling is from a Beta distribution", {
   b <- BetaModVar$new("beta", "GBP", alpha, beta)
   osamp <- vapply(seq_len(n), FUN.VALUE = 1.0, FUN = function(i) {
     b$set("random")
-    rv <- b$get()
-    return(rv)
+    b$get()
   })
   expect_length(osamp, n)
   # 99.9% confidence limits; expected test failure rate is 0.1%,

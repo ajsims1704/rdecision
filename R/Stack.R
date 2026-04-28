@@ -21,7 +21,7 @@ Stack <- R6::R6Class(
     #' @return A new \code{Stack} object.
     initialize = function() {
       private$items <- list()
-      return(invisible(self))
+      invisible(self)
     },
 
     #' @description Push an item onto the stack.
@@ -31,35 +31,28 @@ Stack <- R6::R6Class(
     #' @return An updated \code{Stack} object
     push = function(x) {
       private$items[[length(private$items) + 1L]] <- x
-      return(invisible(self))
+      invisible(self)
     },
 
-    #' @description Pop an item from the stack. Stack underflow and
-    #' raises an error.
+    #' @description Pop an item from the stack. Stack underflow raises an error.
     #' @return The item previously at the top of the stack.
     pop = function() {
-      if (length(private$items) > 0L) {
-        x <- private$items[[length(private$items)]]
-        private$items[[length(private$items)]] <- NULL
-      } else {
-        abortifnot(FALSE,
-          message = "Stack underflow",
-          class = "underflow"
-        )
-      }
-      return(x)
+      abortifnot(
+        length(private$items) > 0L,
+        message = "Stack underflow",
+        class = "underflow"
+      )
+      x <- private$items[[length(private$items)]]
+      private$items[[length(private$items)]] <- NULL
+      x
     },
 
     #' @description Gets the number of items on the stack.
     #' @return Number of items.
-    size = function() {
-      return(length(private$items))
-    },
+    size = function() length(private$items),
 
     #' @description Inspect items in the stack.
     #' @return A list of items.
-    as_list = function() {
-      return(private$items)
-    }
+    as_list = function() private$items
   )
 )

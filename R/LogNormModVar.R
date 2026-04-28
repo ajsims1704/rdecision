@@ -32,27 +32,23 @@ LogNormModVar <- R6::R6Class(
     #' @param description A character string describing the variable.
     #' @param units Units of the quantity; character string.
     #' @param p1 First hyperparameter, a measure of location.
-    #' See \emph{Details}.
     #' @param p2 Second hyperparameter, a measure of spread.
-    #' See \emph{Details}.
     #' @param parametrization A character string taking one of the values
     #' \verb{"LN1"} (default) through \verb{"LN7"} (see \emph{Details}).
     #' @return A \code{LogNormModVar} object.
     initialize = function(description, units, p1, p2, parametrization = "LN1") {
       # create a log normal distribution and check parameters
-      D <- LogNormDistribution$new(p1 = p1, p2 = p2, parametrization)
+      dln <- LogNormDistribution$new(p1 = p1, p2 = p2, parametrization)
       # initialize the base class
-      super$initialize(description, units, D = D, k = 1L)
+      super$initialize(description, units, D = dln, k = 1L)
       # return new object
-      return(invisible(self))
+      invisible(self)
     },
 
     #' @description Tests whether the model variable is probabilistic, i.e., a
     #' random variable that follows a distribution, or an expression involving
     #' random variables, some of which follow distributions.
     #' @return \code{TRUE} if probabilistic
-    is_probabilistic = function() {
-      return(TRUE)
-    }
+    is_probabilistic = function() TRUE
   )
 )

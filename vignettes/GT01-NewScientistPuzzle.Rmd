@@ -65,16 +65,13 @@ grid::grid.newpage()
 fig.size <- dev.size("cm")
 scale <- max(300.0 / fig.size[[1L]], 300.0 / fig.size[[2L]])
 gx <- function(x) {
-  xcm <- fig.size[[1L]] / 2.0 + (x - 150.0) / scale
-  return(xcm)
+  fig.size[[1L]] / 2.0 + (x - 150.0) / scale
 }
 gy <- function(y) {
-  ycm <- fig.size[[2L]] / 2.0 + (y - 150.0) / scale
-  return(ycm)
+  fig.size[[2L]] / 2.0 + (y - 150.0) / scale
 }
 gd <- function(d) {
-  dcm <- d / scale
-  return(dcm)
+  d / scale
 }
 # grid
 for (x in seq(50L, 250L, 50L)) {
@@ -144,7 +141,7 @@ the vertical edges similarly as $V_{i,j}$.
 #| echo = TRUE
 # node index function
 idx <- function(i, j) {
-  return(5L * (i - 1L) + j)
+  5L * (i - 1L) + j
 }
 # create vertices
 N <- vector(mode = "list", length = 5L * 4L)
@@ -221,7 +218,7 @@ W <- lapply(P, FUN = G$walk)
 BB <- c("V11", "H22", "V25", "H33", "V32", "H44", "V43")
 nw <- vapply(W, FUN.VALUE = 1L, FUN = function(w) {
   lv <- vapply(w, FUN.VALUE = TRUE, FUN = function(e) e$label() %in% BB)
-  return(sum(lv))
+  sum(lv)
 })
 # tabulate
 ct <- as.data.frame(table(nw))

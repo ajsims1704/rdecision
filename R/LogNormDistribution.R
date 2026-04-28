@@ -78,49 +78,43 @@ LogNormDistribution <- R6::R6Class(
         message = "Argument 'p2' must be numeric",
         class = "p2_not_numeric"
       )
+      # check that parametrization is supported
+      abortifnot(
+        parametrization %in% paste0("LN", seq_len(7L)),
+        message = "'parametrization' must be one of 'LN1' through 'LN7'",
+        class = "parametrization_not_supported"
+      )
       # transform parameters according to parametrization
-      private$parametrization <- parametrization
-      if (parametrization == "LN1") {
-        private$meanlog <- p1
-        private$sdlog <- p2
-      } else if (parametrization == "LN2") {
-        private$meanlog <- p1
-        private$sdlog <- sqrt(p2)
-      } else if (parametrization == "LN3") {
-        private$meanlog <- log(p1)
-        private$sdlog <- p2
-      } else if (parametrization == "LN4") {
-        private$meanlog <- log(p1)
-        private$sdlog <- sqrt(log(p2 ^ 2L + 1L))
-      } else if (parametrization == "LN5") {
-        private$meanlog <- p1
-        private$sdlog <- 1L / sqrt(p2)
-      } else if (parametrization == "LN6") {
-        private$meanlog <- log(p1)
-        private$sdlog <- log(p2)
-      } else if (parametrization == "LN7") {
-        private$meanlog <- log(p1 / sqrt(1L + (p2 ^ 2L) / (p1 ^ 2L)))
-        private$sdlog <- sqrt(log(1L + (p2 ^ 2L) / (p1 ^ 2L)))
-      } else {
-        abortif(TRUE,
-          message = "'parametrization' must be one of 'LN1' through 'LN7'",
-          class = "parametrization_not_supported"
+      msd <- switch(
+        parametrization,
+        LN1 = c(p1, p2),
+        LN2 = c(p1, sqrt(p2)),
+        LN3 = c(log(p1), p2),
+        LN4 = c(log(p1), sqrt(log(p2 ^ 2L + 1L))),
+        LN5 = c(p1, 1L / sqrt(p2)),
+        LN6 = log(c(p1, p2)),
+        LN7 = c(
+          log(p1 / sqrt(1L + (p2 ^ 2L) / (p1 ^ 2L))),
+          sqrt(log(1L + (p2 ^ 2L) / (p1 ^ 2L)))
         )
-      }
+      )
+      # save the parametrization, and the mean and sd in log space
+      private$parametrization <- parametrization
+      private$meanlog <- msd[1L]
+      private$sdlog <- msd[2L]
       # initial sample
       self$sample(TRUE)
       # return new object
-      return(invisible(self))
+      invisible(self)
     },
 
     #' @description Accessor function for the name of the distribution.
     #' @return Distribution name as character string (\verb{"LN1"}, \verb{"LN2"}
     #' etc.).
     distribution = function() {
-      rv <- paste0(
+      paste0(
         "LN(", round(private$meanlog, 3L), ",", round(private$sdlog, 3L), ")"
       )
-      return(rv)
     },
 
     #' @description Draw a random sample from the model variable.
@@ -135,28 +129,22 @@ LogNormDistribution <- R6::R6Class(
           n = 1L, mean = private$meanlog, sd = private$sdlog
         )
       }
-      return(invisible(self))
+      invisible(self)
     },
 
     #' @description Return the expected value of the distribution.
     #' @return Expected value as a numeric value.
-    mean = function() {
-      E <- exp(private$meanlog + 0.5 * private$sdlog ^ 2L)
-      return(E)
-    },
+    mean = function() exp(private$meanlog + 0.5 * private$sdlog ^ 2L),
 
     #' @description Return the point estimate of the variable.
     #' @return Point estimate (mode) of the log normal distribution.
-    mode = function() {
-      return(exp(private$meanlog - private$sdlog ^ 2L))
-    },
+    mode = function() exp(private$meanlog - private$sdlog ^ 2L),
 
     #' @description Return the standard deviation of the distribution.
     #' @return Standard deviation as a numeric value
     SD = function() {
-      S <- exp(private$meanlog + 0.5 * private$sdlog ^ 2L) *
+      exp(private$meanlog + 0.5 * private$sdlog ^ 2L) *
         sqrt(exp(private$sdlog ^ 2L) - 1L)
-      return(S)
     },
 
     #' @description Return the quantiles of the log normal distribution.
@@ -164,23 +152,19 @@ LogNormDistribution <- R6::R6Class(
     #' @return Vector of quantiles.
     quantile = function(probs) {
       # test argument
-      vapply(probs, FUN.VALUE = TRUE, FUN = function(x) {
-        abortif(is.na(x),
-          message = "All elements of 'probs' must be defined",
-          class = "probs_not_defined"
-        )
-        abortifnot(is.numeric(x),
-          message = "Argument 'probs' must be a numeric vector",
-          class = "probs_not_numeric"
-        )
-        abortifnot(x >= 0.0 && x <= 1.0,
-          message = "Elements of 'probs' must be in range[0,1]",
-          class = "probs_out_of_range"
-        )
-        return(TRUE)
-      })
-      q <- qlnorm(probs, mean = private$meanlog, sd = private$sdlog)
-      return(q)
+      abortif(is.na(probs),
+        message = "All elements of 'probs' must be defined",
+        class = "probs_not_defined"
+      )
+      abortifnot(is.numeric(probs),
+        message = "Argument 'probs' must be a numeric vector",
+        class = "probs_not_numeric"
+      )
+      abortifnot(probs >= 0.0 & probs <= 1.0,
+        message = "Elements of 'probs' must be in range[0,1]",
+        class = "probs_out_of_range"
+      )
+      qlnorm(probs, mean = private$meanlog, sd = private$sdlog)
     }
   )
 )

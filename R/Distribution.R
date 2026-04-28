@@ -44,59 +44,46 @@ Distribution <- R6::R6Class(
       # create space for a random draw and populate it with NA
       private$.r <- rep(NA_real_, times = K)
       # return Distribution
-      return(invisible(self))
+      invisible(self)
     },
 
     #' @description Order of the distribution
     #' @return Order (\code{K}).
-    order = function() {
-      return(private$K)
-    },
+    order = function() private$K,
 
     #' @description Description of the uncertainty distribution.
     #' @details Includes the distribution name and its parameters.
     #' @return Distribution name and parameters as character string.
-    distribution = function() {
-      return(NA_character_)
-    },
+    distribution = function() NA_character_,
 
     #' @description Mean value of the distribution.
     #' @return Mean value as a numeric scalar (\code{K = 1L}) or vector of
     #' length \code{K}.
-    mean = function() {
-      rv <- rep(NA_real_, times = private$K)
-      return(rv)
-    },
+    mean = function() rep(NA_real_, times = private$K),
 
     #' @description Return the mode of the distribution.
     #' @details By default returns \code{NA}, which will be the case for most
     #' because an arbitrary distribution is not guaranteed to be unimodal.
     #' @return Mode as a numeric scalar (\code{K = 1L}) or vector of
     #' length \code{K}.
-    mode = function() {
-      rv <- rep(NA_real_, times = private$K)
-      return(rv)
-    },
+    mode = function() rep(NA_real_, times = private$K),
 
     #' @description Return the standard deviation of a univariate distribution.
     #' @details Only defined for univariate (\code{K = 1L}) distributions; for
     #' multivariate distributions, function \code{varcov} returns the
     #' variance-covariance matrix.
     #' @return Standard deviation as a numeric value.
-    SD = function() {
-      rv <- rep(NA_real_, times = private$K)
-      return(rv)
-    },
+    SD = function() rep(NA_real_, times = private$K),
 
     #' @description Variance-covariance matrix.
     #' @return A positive definite symmetric matrix of size \code{K} by
     #' \code{K}, or a scalar for \code{K = 1L}, equal to the variance.
     varcov = function() {
-      rv <- NA_real_
       if (private$K > 1L) {
-        rv <- matrix(data = NA_real_, nrow = private$K, ncol = private$K)
+        matrix(data = NA_real_, nrow = private$K, ncol = private$K)
+      } else {
+        NA_real_
       }
-      return(rv)
     },
 
     #' @description Marginal quantiles of the distribution.
@@ -134,7 +121,7 @@ Distribution <- R6::R6Class(
           message = "Elements of 'probs' must be in range[0,1]",
           class = "probs_out_of_range"
         )
-        return(TRUE)
+        TRUE
       })
       # create output object
       if (private$K == 1L) {
@@ -148,7 +135,7 @@ Distribution <- R6::R6Class(
           dimnames = list(probs, seq_len(private$K))
         )
       }
-      return(rv)
+      rv
     },
 
     #' @description Draw and hold a random sample from the distribution.
@@ -160,15 +147,12 @@ Distribution <- R6::R6Class(
         message = "'expected' must be logical",
         class = "invalid_expected"
       )
-      return(invisible(self))
+      invisible(self)
     },
 
     #' @description Return a random sample drawn from the distribution.
     #' @details Returns the sample generated at the last call to \code{sample}.
     #' @return A vector of length \code{K} representing one sample.
-    r = function() {
-      # return the sample
-      return(private$.r)
-    }
+    r = function() private$.r
   )
 )

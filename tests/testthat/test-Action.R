@@ -74,9 +74,7 @@ test_that("modvars are identified", {
   e <- Action$new(n1, n2, "label", cost = free, benefit = fortytwo)
   mv <- e$modvars()
   expect_length(mv, 2L)
-  d <- vapply(X = mv, FUN.VALUE = "x", FUN = function(v) {
-    return(v$description())
-  })
+  d <- vapply(X = mv, FUN.VALUE = "x", FUN = function(v) v$description())
   expect_setequal(d, c("fortytwo", "free"))
   expect_intol(e$benefit(), 42.0, 0.01)
   # add a modvar dynamically
@@ -95,9 +93,7 @@ test_that("modvars are identified", {
   e$set_cost(c = c1)
   mv <- e$modvars()
   expect_length(mv, 4L)
-  d <- vapply(X = mv, FUN.VALUE = "x", FUN = function(v) {
-    return(v$description())
-  })
+  d <- vapply(X = mv, FUN.VALUE = "x", FUN = function(v) v$description())
   expect_setequal(d, c("fortytwo", "o1+o2", "o1", "o2"))
 })
 

@@ -280,11 +280,11 @@ local({
     data = c(
       vapply(X = igraph::V(ig), FUN.VALUE = 1.0, FUN = function(v) {
         lbl <- igraph::vertex_attr(ig, "label", v)
-        return(vxy[[lbl, "x"]])
+        vxy[[lbl, "x"]]
       }),
       vapply(X = igraph::V(ig), FUN.VALUE = 1.0, FUN = function(v) {
         lbl <- igraph::vertex_attr(ig, "label", v)
-        return(vxy[[lbl, "y"]])
+        vxy[[lbl, "y"]]
       })
     ),
     byrow = FALSE,
@@ -293,7 +293,7 @@ local({
   # vertex widths
   vwidth <- vapply(X = igraph::V(ig), FUN.VALUE = 1.0, FUN = function(v) {
     lbl <- igraph::vertex_attr(ig, "label", v)
-    return(nchar(lbl) * 4.0 + 2.0)
+    nchar(lbl) * 4.0 + 2.0
   })
   # edge curvatures
   cm <- matrix(
@@ -318,7 +318,6 @@ local({
     src <- igraph::tail_of(ig, e)
     srcl <- igraph::vertex_attr(ig, name = "label", index = src)
     cr <- cm[[srcl, trgl]]
-    return(cr)
   })
 
   # plot the igraph
@@ -328,19 +327,17 @@ local({
       mar = c(1L, 6L, 1L, 6L),
       xpd = NA
     ),
-    code = {
-      plot(
-        ig,
-        rescale = FALSE, asp = 0L,
-        vertex.shape = "rectangle", vertex.size = vwidth,
-        vertex.color = "white", vertex.label.color = "black",
-        edge.color = "black", edge.curved = curves,
-        edge.arrow.size = 0.75,
-        frame = FALSE,
-        layout = layout,
-        loop.size = 0.8
-      )
-    }
+    code = plot(
+      ig,
+      rescale = FALSE, asp = 0L,
+      vertex.shape = "rectangle", vertex.size = vwidth,
+      vertex.color = "white", vertex.label.color = "black",
+      edge.color = "black", edge.curved = curves,
+      edge.arrow.size = 0.75,
+      frame = FALSE,
+      layout = layout,
+      loop.size = 0.8
+    )
   )
 })
 ```
@@ -453,7 +450,7 @@ txeffect <- function(Pt, rr) {
     uprisk <- states[[uprisks[[i]]]]
     pr[[s, uprisk]] <- pr[[s, uprisk]] + dpb[[i]]
   }
-  return(pr)
+  pr
 }
 ```
 
@@ -600,7 +597,7 @@ as_table4 <- function(m_trace) {
   )
   # return in table 4 format
   yearly <- (1L:10L) * 12L + 1L
-  return(m_t4[yearly, ])
+  m_t4[yearly, ]
 }
 ```
 
@@ -1100,7 +1097,7 @@ dirichletify <- function(Pt, population = 1L) {
     is.matrix(Pt),
     is.numeric(Pt),
     nrow(Pt) == ncol(Pt),
-    all(dimnames(Pt)[[2L]] == dimnames(Pt)[[1L]])
+    dimnames(Pt)[[2L]] == dimnames(Pt)[[1L]]
   )
   nNA <- rowSums(is.na(Pt))
   sumP <- rowSums(Pt, na.rm = TRUE)
@@ -1108,12 +1105,12 @@ dirichletify <- function(Pt, population = 1L) {
   is_count <- any(Pt > 1.0, na.rm = TRUE)
   if (is_count) {
     # counts cannot have NAs
-    stopifnot(all(nNA == 0L))
+    stopifnot(nNA == 0L)
     # normalise into proportions
     Pt <- Pt / rowSums(Pt)
   } else {
     # proportions can have NA values, but only 1/row
-    stopifnot(all(nNA <= 1L))
+    stopifnot(nNA <= 1L)
     # store information about which variable was set as NA
     whichNA <- apply(Pt, 1L, function(row) which(is.na(row)))
     # populate missing values to a total of 1
@@ -1126,13 +1123,13 @@ dirichletify <- function(Pt, population = 1L) {
     non0 <- which(Pt[r, ] != 0.0)
     # if multiple outgoing transitions are possible, model as Dirichlet
     if (length(non0) > 1L) {
-      dist <- DirichletDistribution$new(Pt[r, non0] * population)
-      dist$sample() # randomise
-      Pt[r, non0] <- dist$r()
+      dd <- DirichletDistribution$new(Pt[r, non0] * population)
+      dd$sample() # randomise
+      Pt[r, non0] <- dd$r()
     }
     # if only 1 transition is possible, leave as given originally
   }
-  return(Pt)
+  Pt
 }
 ```
 

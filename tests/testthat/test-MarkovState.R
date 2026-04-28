@@ -97,9 +97,7 @@ test_that("ModVars are identified and returned", {
   s <- MarkovState$new("Ill", cost = fortytwo, utility = poorly)
   mv <- s$modvars()
   expect_length(mv, 2L)
-  d <- vapply(mv, FUN.VALUE = "x", FUN = function(v) {
-    return(v$description())
-  })
+  d <- vapply(mv, FUN.VALUE = "x", FUN = function(v) v$description())
   expect_setequal(d, c("fortytwo", "poorly"))
   expect_identical(s$cost(), 42.0)     # mean
   expect_identical(s$utility(), 0.2) # mean
@@ -110,8 +108,6 @@ test_that("ModVars are identified and returned", {
   s$set_cost(c = c1)
   mv <- s$modvars()
   expect_length(mv, 4L)
-  d <- vapply(X = mv, FUN.VALUE = "x", FUN = function(v) {
-    return(v$description())
-  })
+  d <- vapply(X = mv, FUN.VALUE = "x", FUN = function(v) v$description())
   expect_setequal(d, c("poorly", "o1+o2", "o1", "o2"))
 })

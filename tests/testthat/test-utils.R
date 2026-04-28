@@ -65,6 +65,11 @@ test_that("abortif raises an error condition with > 1 expression", {
   )
 })
 
+test_that("abortif with a vector argument is correct", {
+  probs <- c(0.05, NA, 0.95)
+  expect_error(abortif(is.na(probs), class = "no"), class = "no")
+})
+
 test_that("abortif error message with >1 expression is correct", {
   f <- function(x) {
     abortif(FALSE, x > 2L, FALSE, message = "failed inequality condition")
@@ -129,6 +134,11 @@ test_that("abortifnot raises an error condition with > 1 expression", {
     ),
     class = "no"
   )
+})
+
+test_that("abortifnot with a vector argument is correct", {
+  probs <- c(0.05, NA, 0.95)
+  expect_error(abortifnot(!is.na(probs), class = "no"), class = "no")
 })
 
 test_that("abortifnot error message with >1 expression is correct", {
@@ -219,6 +229,33 @@ test_that("is_class detects missing arguments", {
   expect_error(is_class())
   expect_error(is_class(42L))
   expect_error(is_class(what = "ModVar"))
+})
+
+# is_class works with R implicit classes
+test_that("is_class detects R implicit classes", {
+  expect_true(is_class(TRUE, "logical"))
+  expect_false(is_class(42L, "logical"))
+  expect_true(is_class(3L, "integer"))
+  expect_false(is_class(3.0, "integer"))
+  expect_true(is_class(3.2, "numeric"))
+  expect_false(is_class(3L, "numeric"))
+  expect_true(is_class("string", "character"))
+})
+
+# is_class works with vectorized implicit classes
+test_that("is_class detects vectorized implicit classes", {
+  expect_identical(
+    is_class(c(TRUE, TRUE, FALSE), "logical"),
+    c(TRUE, TRUE, TRUE)
+  )
+  expect_identical(
+    is_class(list(TRUE, TRUE, "red"), "logical"),
+    c(TRUE, TRUE, FALSE)
+  )
+  expect_identical(
+    is_class(list(TRUE, FALSE, "red"), "character"),
+    c(FALSE, FALSE, TRUE)
+  )
 })
 
 test_that("is_class supports vectorized arguments", {

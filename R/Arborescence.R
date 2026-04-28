@@ -39,7 +39,7 @@ Arborescence <- R6::R6Class(
         class = "not_arborescence"
       )
       # return new Arborescence object
-      return(invisible(self))
+      invisible(self)
     },
 
     #' @description Find the parent of a Node.
@@ -61,11 +61,10 @@ Arborescence <- R6::R6Class(
         } else {
           p <- NA
         }
-        return(p)
+        p
       })
       # coerce to scalar if necessary
       pnodes <- if (length(pnodes) == 1L) pnodes[[1L]] else pnodes
-      return(pnodes)
     },
 
     #' @description Test whether the given node(s) is (are) parent(s).
@@ -83,9 +82,8 @@ Arborescence <- R6::R6Class(
         # the graph and is a single node)
         children <- self$direct_successors(n)
         # an empty list means no children
-        return(!identical(children, list()))
+        !identical(children, list())
       })
-      return(isp)
     },
 
     #' @description Test whether the given node is a leaf.
@@ -103,9 +101,8 @@ Arborescence <- R6::R6Class(
         # the graph and is a single node)
         children <- self$direct_successors(n)
         # an empty list means no children
-        return(identical(children, list()))
+        identical(children, list())
       })
-      return(isp)
     },
 
     #' @description Find the root vertex of the arborescence.
@@ -117,7 +114,6 @@ Arborescence <- R6::R6Class(
         apply(B, MARGIN = 1L, function(r) !any(r > 0L))
       )
       u <- self$vertex_at(iu)
-      return(u)
     },
 
     #' @description Is the specified node the root?
@@ -128,9 +124,8 @@ Arborescence <- R6::R6Class(
       # coerce v to a list, if it is not
       v <- if (is.list(v)) v else list(v)
       isr <- vapply(X = v, FUN.VALUE = FALSE, FUN = function(n) {
-        return(identical(n, self$root()))
+        identical(n, self$root())
       })
-      return(isr)
     },
 
     #' @description Find the siblings of a vertex in the arborescence.
@@ -150,16 +145,16 @@ Arborescence <- R6::R6Class(
         # there will only be a single parent (if v is not the root).
         p <- self$direct_predecessors(v)
         # get all children of the parent, which includes v
-        C <- self$direct_successors(p[[1L]])
+        children <- self$direct_successors(p[[1L]])
         # exclude self
-        for (c in C) {
+        for (c in children) {
           if (!identical(c, v)) {
             S <- c(S, c)
           }
         }
       }
       # return the list of siblings
-      return(S)
+      S
     },
 
     #' @description Find all directed paths from the root of the tree to the
@@ -177,7 +172,7 @@ Arborescence <- R6::R6Class(
         }
       }
       # return the paths
-      return(P)
+      P
     },
 
     #' @description Implements function \verb{POSITIONTREE} (Walker, 1989) to
@@ -249,7 +244,7 @@ Arborescence <- R6::R6Class(
       # get previous node at this level
       GETPREVNODEATLEVEL <- function(Level) {
         # Level is zero-based
-        return(private$PREVNODE[[Level + 1L]])
+        private$PREVNODE[[Level + 1L]]
       }
       # set an element in the list
       SETPREVNODEATLEVEL <- function(Level, iNode) {
@@ -259,23 +254,23 @@ Arborescence <- R6::R6Class(
       # test if node is a leaf
       ISLEAF <- function(iNode) {
         v <- self$vertex_at(iNode)
-        return(self$is_leaf(v))
+        self$is_leaf(v)
       }
       # left size of each node
       LEFTSIZE <- function(iNode) {
-        return(1.0)
+        1.0
       }
       # right size of each node
       RIGHTSIZE <- function(iNode) {
-        return(1.0)
+        1.0
       }
       # top size of each node (EAST/WEST trees)
       TOPSIZE <- function(iNode) {
-        return(1.0)
+        1.0
       }
       # bottom size of each node (EAST/WEST trees)
       BOTTOMSIZE <- function(iNode) {
-        return(1.0)
+        1.0
       }
       # mean node size
       MEANNODESIZE <- function(LeftNode, RightNode) {
@@ -287,7 +282,7 @@ Arborescence <- R6::R6Class(
           NodeSize <- NodeSize + TOPSIZE(LeftNode)
           NodeSize <- NodeSize + BOTTOMSIZE(RightNode)
         }
-        return(NodeSize)
+        NodeSize
       }
       # @description Definition of order for tree drawing
       # @param children a list of nodes
@@ -303,7 +298,7 @@ Arborescence <- R6::R6Class(
         if (anyDuplicated(lkids) == 0L) {
           okids <- rank(lkids)
         }
-        return(okids)
+        okids
       }
       # test if a node has a left sibling
       HASLEFTSIBLING <- function(iNode) {
@@ -315,7 +310,7 @@ Arborescence <- R6::R6Class(
           okids <- childorder(children)
           hasleft <- (okids[[1L]] > 1L)
         }
-        return(hasleft)
+        hasleft
       }
       # find the node's closest sibling on the left (0 if none)
       LEFTSIBLING <- function(iNode) {
@@ -337,7 +332,7 @@ Arborescence <- R6::R6Class(
         if (any(isibs < iNode)) {
           rno <- max(lsibs)
         }
-        return(rn)
+        rn
       }
       # test if a node has a right sibling
       HASRIGHTSIBLING <- function(iNode) {
@@ -349,7 +344,7 @@ Arborescence <- R6::R6Class(
           okids <- childorder(children)
           hasright <- (okids[[1L]] < length(okids))
         }
-        return(hasright)
+        hasright
       }
       # find the node's closest sibling on the right (0 if none)
       RIGHTSIBLING <- function(iNode) {
@@ -371,7 +366,7 @@ Arborescence <- R6::R6Class(
         if (any(isibs > iNode)) {
           rno <- min(rs)
         }
-        return(rn)
+        rn
       }
       # parent of the node (0 if none)
       PARENT <- function(iNode) {
@@ -381,14 +376,14 @@ Arborescence <- R6::R6Class(
           p <- self$parent(v)
           rn <- self$vertex_index(p)
         }
-        return(rn)
+        rn
       }
       # does the specified node have a child?
       HASCHILD <- function(iNode) {
         v <- self$vertex_at(iNode)
         children <- self$direct_successors(v)
         ichildren <- self$vertex_index(children)
-        return(length(ichildren) > 0L)
+        length(ichildren) > 0L
       }
       # find the first child of iNode (0 if none)
       FIRSTCHILD <- function(iNode) {
@@ -400,14 +395,15 @@ Arborescence <- R6::R6Class(
           okids <- childorder(children)
           rn <- ichildren[[which(okids == 1L)]]
         }
-        return(rn)
+        rn
       }
       # Leftmost descendant of a node at a given depth
       GETLEFTMOST <- function(iNode, Level, Depth) {
+        rc <- 0L
         if (Level >= Depth) {
-          return(iNode)
+          rc <- iNode
         } else if (ISLEAF(iNode)) {
-          return(0L)
+          rc <- 0L
         } else {
           Rightmost <- FIRSTCHILD(iNode)
           Leftmost <- GETLEFTMOST(Rightmost, Level + 1L, Depth)
@@ -416,8 +412,9 @@ Arborescence <- R6::R6Class(
             Rightmost <- RIGHTSIBLING(Rightmost)
             Leftmost <- GETLEFTMOST(Rightmost, Level + 1L, Depth)
           }
-          return(Leftmost)
+          rc <- Leftmost
         }
+        rc
       }
       # clean up small sibling subtrees
       APPORTION <- function(iNode, Level) {
@@ -537,24 +534,25 @@ Arborescence <- R6::R6Class(
       # assumed that the tree will be scaled to the window, and this
       # implementation always returns TRUE.
       CHECKEXTENTSRANGE <- function(xValue, yValue) {
-        return(TRUE)
+        TRUE
       }
       # second walk
       SECONDWALK <- function(iNode, Level, Modsum) {
         if (Level <= MaxDepth) {
-          if (RootOrientation == "NORTH") {
-            xTemp <- xTopAdjustment + (private$PRELIM[[iNode]] + Modsum)
-            yTemp <- yTopAdjustment - (Level * LevelSeparation)
-          } else if (RootOrientation == "SOUTH") {
-            xTemp <- xTopAdjustment + (private$PRELIM[[iNode]] + Modsum)
-            yTemp <- yTopAdjustment + (Level * LevelSeparation)
-          } else if (RootOrientation == "EAST") {
-            xTemp <- xTopAdjustment + (Level * LevelSeparation)
-            yTemp <- yTopAdjustment - (private$PRELIM[[iNode]] + Modsum)
-          } else if (RootOrientation == "WEST") {
-            xTemp <- xTopAdjustment - (Level * LevelSeparation)
-            yTemp <- yTopAdjustment - (private$PRELIM[[iNode]] + Modsum)
-          }
+          xTemp <- switch(
+            RootOrientation,
+            NORTH = xTopAdjustment + (private$PRELIM[[iNode]] + Modsum),
+            SOUTH = xTopAdjustment + (private$PRELIM[[iNode]] + Modsum),
+            EAST = xTopAdjustment + (Level * LevelSeparation),
+            WEST = xTopAdjustment - (Level * LevelSeparation)
+          )
+          yTemp <- switch(
+            RootOrientation,
+            NORTH = yTopAdjustment - (Level * LevelSeparation),
+            SOUTH = yTopAdjustment + (Level * LevelSeparation),
+            EAST = yTopAdjustment - (private$PRELIM[[iNode]] + Modsum),
+            WEST = yTopAdjustment - (private$PRELIM[[iNode]] + Modsum)
+          )
           # Check to see that xTemp and yTemp are of the proper
           # size for your application.
           if (CHECKEXTENTSRANGE(xTemp, yTemp)) {
@@ -586,7 +584,7 @@ Arborescence <- R6::R6Class(
           # We are at a level deeper than that we want to draw.
           Result <- FALSE
         }
-        return(Result)
+        Result
       }
       # determine coordinates for each node in a tree
       POSITIONTREE <- function(iNode) {
@@ -610,7 +608,7 @@ Arborescence <- R6::R6Class(
           yTopAdjustment <- private$YCOORD[[iNode]] + private$PRELIM[[iNode]]
         }
         # Do the final positioning with a preorder walk
-        return(SECONDWALK(iNode, 0L, 0L))
+        SECONDWALK(iNode, 0L, 0L)
       }
       # call Walker's main function
       iRoot <- self$vertex_index(self$root())
@@ -624,8 +622,6 @@ Arborescence <- R6::R6Class(
         x = private$XCOORD,
         y = private$YCOORD
       )
-      # return the coordinate data frame
-      return(XY)
     }
   )
 )

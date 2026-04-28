@@ -34,35 +34,28 @@ DiracDistribution <- R6::R6Class(
       # initial sample
       self$sample(expected = TRUE)
       # return object
-      return(invisible(self))
+      invisible(self)
     },
 
     #' @description Accessor function for the name of the distribution.
     #' @return Distribution name as character string.
     distribution = function() {
-      rv <- paste0(
+      paste0(
         "Const(", format(private$c, digits = 4L, scientific = FALSE), ")"
       )
-      return(rv)
     },
 
     #' @description Return the mode of the distribution.
     #' @return Numeric Value where the distribution is centered.
-    mode = function() {
-      return(private$c)
-    },
+    mode = function() private$c,
 
     #' @description Return the expected value of the distribution.
     #' @return Expected value as a numeric value.
-    mean = function() {
-      return(private$c)
-    },
+    mean = function() private$c,
 
     #' @description  Return the standard deviation of the distribution.
     #' @return Standard deviation as a numeric value
-    SD = function() {
-      return(0.0)
-    },
+    SD = function() 0.0,
 
     #' @description Quantiles of the distribution.
     #' @details For a Dirac Delta Function all quantiles are returned as the
@@ -71,23 +64,20 @@ DiracDistribution <- R6::R6Class(
     #' @return Vector of numeric values of the same length as \code{probs}.
     quantile = function(probs) {
       # test argument
-      vapply(probs, FUN.VALUE = TRUE, FUN = function(x) {
-        abortifnot(!is.na(x),
-          message = "All elements of 'probs' must be defined",
-          class = "probs_not_defined"
-        )
-        abortifnot(is.numeric(x),
-          message = "Argument 'probs' must be a numeric vector",
-          class = "probs_not_numeric"
-        )
-        abortifnot(x >= 0.0 && x <= 1.0,
-          message = "Elements of 'probs' must be in range[0,1]",
-          class = "probs_out_of_range"
-        )
-        return(TRUE)
-      })
-      q <- rep(private$c, times = length(probs))
-      return(q)
+      abortifnot(!is.na(probs),
+        message = "All elements of 'probs' must be defined",
+        class = "probs_not_defined"
+      )
+      abortifnot(is.numeric(probs),
+        message = "Argument 'probs' must be a numeric vector",
+        class = "probs_not_numeric"
+      )
+      abortifnot(probs >= 0.0 & probs <= 1.0,
+        message = "Elements of 'probs' must be in range[0,1]",
+        class = "probs_out_of_range"
+      )
+      # return the quantiles
+      rep(private$c, times = length(probs))
     },
 
     #' @description Draw and hold a random sample from the model variable.
@@ -100,7 +90,7 @@ DiracDistribution <- R6::R6Class(
       } else {
         private$.r[[1L]] <- private$c
       }
-      return(invisible(self))
+      invisible(self)
     }
 
   )

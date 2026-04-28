@@ -23,15 +23,16 @@ DecisionNode <- R6::R6Class(
       # check there is a valid label
       abortif(
         missing(label),
+        is.na(label),
         !is.character(label),
-        nchar(label) == 0L,
+        !nzchar(label),
         message = "'label' must be syntactically valid with length > 0",
         class = "invalid_label"
       )
       label <- make.names(label)
       # ensure base class fields are initialized
       super$initialize(label)
-      return(invisible(self))
+      invisible(self)
     },
 
     #' @description Creates a grid::grob for drawing a decision node.
@@ -76,7 +77,7 @@ DecisionNode <- R6::R6Class(
       } else {
         rv <- grid::gTree(children = grid::gList(gsym, glab))
       }
-      return(rv)
+      rv
     }
   )
 )

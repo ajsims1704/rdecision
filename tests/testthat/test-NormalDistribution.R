@@ -47,8 +47,7 @@ test_that("random sampling is from a Normal distribution", {
   n <- 1000L
   samp <- vapply(seq_len(n), FUN.VALUE = 1.0, FUN = function(i) {
     sn$sample()
-    rv <- sn$r()
-    return(rv)
+    sn$r()
   })
   expect_length(samp, n)
   # check sample mean and sd are within 99.9% CI based on CLT; this is exact

@@ -24,19 +24,19 @@ Arrow <- R6::R6Class(
     initialize = function(source_node, target_node, label = "") {
       # base class
       super$initialize(v1 = source_node, v2 = target_node, label = label)
-      return(invisible(self))
+      invisible(self)
     },
 
     #' @description Access source node.
     #' @return Node from which the arrow leads.
     source = function() {
-      return(private$v1)
+      private$v1
     },
 
     #' @description Access target node.
     #' @return Node to which the arrow points.
     target = function() {
-      return(private$v2)
+      private$v2
     }
   )
 )

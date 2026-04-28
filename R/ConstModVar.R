@@ -27,11 +27,11 @@ ConstModVar <- R6::R6Class(
     #' @return A new \code{ConstModVar} object.
     initialize = function(description, units, const) {
       # initialize the distribution (also checks argument)
-      D <- DiracDistribution$new(const)
+      cdist <- DiracDistribution$new(const)
       # initialize the base class
-      super$initialize(description, units, D, k = 1L)
+      super$initialize(description, units, D = cdist, k = 1L)
       # return object
-      return(invisible(self))
+      invisible(self)
     },
 
     #' @description Tests whether the model variable is probabilistic.
@@ -40,7 +40,7 @@ ConstModVar <- R6::R6Class(
     #' distributions?
     #' @return TRUE if probabilistic
     is_probabilistic = function() {
-      return(FALSE)
+      FALSE
     }
   )
 )

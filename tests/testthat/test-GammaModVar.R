@@ -75,8 +75,7 @@ test_that("random sampling is from a Gamma distribution", {
   g <- GammaModVar$new("gamma", "GBP", k, theta)
   samp <- vapply(seq_len(n), FUN.VALUE = 1.0, FUN = function(i) {
     g$set("random")
-    rv <- g$get()
-    return(rv)
+    g$get()
   })
   expect_length(samp, n)
   # 99.9% confidence limits; expected test failure rate is 0.1%;

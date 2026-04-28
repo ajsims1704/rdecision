@@ -229,7 +229,7 @@ local({
       0L, 0L, 0L, 0L,
       vapply(X = igraph::V(ig), FUN.VALUE = 1.0, FUN = function(v) {
         lbl <- igraph::vertex_attr(ig, "label", v)
-        return(yv[[lbl]])
+        yv[[lbl]]
       })
     ),
     byrow = FALSE,
@@ -251,7 +251,6 @@ local({
     src <- igraph::tail_of(ig, e)
     srcl <- igraph::vertex_attr(ig, name = "label", index = src)
     cr <- cm[[srcl, trgl]]
-    return(cr)
   })
   # plot the igraph
   withr::with_par(
@@ -260,18 +259,16 @@ local({
       mar = c(1L, 1L, 1L, 1L),
       xpd = NA
     ),
-    code = {
-      plot(
-        ig,
-        rescale = FALSE, asp = 0L,
-        vertex.color = "white", vertex.label.color = "black",
-        edge.color = "black", edge.curved = curves,
-        edge.arrow.size = 0.75,
-        frame = FALSE,
-        layout = layout,
-        loop.size = 0.8
-      )
-    }
+    code = plot(
+      ig,
+      rescale = FALSE, asp = 0L,
+      vertex.color = "white", vertex.label.color = "black",
+      edge.color = "black", edge.curved = curves,
+      edge.arrow.size = 0.75,
+      frame = FALSE,
+      layout = layout,
+      loop.size = 0.8
+    )
   )
 })
 ```
@@ -328,10 +325,9 @@ run_mono <- function(Ptm, cAm, cBm, cCm, hcc = FALSE) {
   # set transition probabilities
   m$set_probabilities(Ptm)
   # run 20 cycles
-  tr <- m$cycles(
+  m$cycles(
     ncycles = 20L, hcc.pop = hcc, hcc.cost = FALSE, hcc.QALY = hcc
   )
-  return(tr)
 }
 ```
 
@@ -503,12 +499,10 @@ run_comb <- function(Ptm, cAm, cBm, cCm, Ptc, cAc, cBc, cCc, hcc = FALSE) {
     elapsed = as.difftime(365.25 * 2.0, units = "days")
   )
   # run for next 18 years, combining the traces
-  tr <- rbind(
+  rbind(
     tr,
     m$cycles(ncycles = 18L, hcc.pop = hcc, hcc.cost = FALSE, hcc.QALY = hcc)
   )
-  # return the trace
-  return(tr)
 }
 ```
 
@@ -676,8 +670,8 @@ pt_prob <- function() {
   DA$sample()
   DB$sample()
   DC$sample()
-  # create the transition matrix
-  Pt <- matrix(
+  # create and return the transition matrix
+  matrix(
     c(DA$r(), c(0.0, DB$r()), c(0.0, 0.0, DC$r()), c(0.0, 0.0, 0.0, 1.0)),
     byrow = TRUE,
     nrow = 4L,
@@ -685,7 +679,6 @@ pt_prob <- function() {
       source = c("A", "B", "C", "D"), target = c("A", "B", "C", "D")
     )
   )
-  return(Pt)
 }
 ```
 
