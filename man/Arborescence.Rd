@@ -23,295 +23,305 @@ unique directed paths from the root. Inherits from class \code{Digraph}.
 Andrew Sims \email{andrew.sims@newcastle.ac.uk}
 }
 \section{Super classes}{
-\code{\link[rdecision:Graph]{rdecision::Graph}} -> \code{\link[rdecision:Digraph]{rdecision::Digraph}} -> \code{Arborescence}
+\code{\link[rdecision:Graph]{Graph}} -> \code{\link[rdecision:Digraph]{Digraph}} -> \code{Arborescence}
 }
 \section{Methods}{
 \subsection{Public methods}{
-\itemize{
-\item \href{#method-Arborescence-new}{\code{Arborescence$new()}}
-\item \href{#method-Arborescence-parent}{\code{Arborescence$parent()}}
-\item \href{#method-Arborescence-is_parent}{\code{Arborescence$is_parent()}}
-\item \href{#method-Arborescence-is_leaf}{\code{Arborescence$is_leaf()}}
-\item \href{#method-Arborescence-root}{\code{Arborescence$root()}}
-\item \href{#method-Arborescence-is_root}{\code{Arborescence$is_root()}}
-\item \href{#method-Arborescence-siblings}{\code{Arborescence$siblings()}}
-\item \href{#method-Arborescence-root_to_leaf_paths}{\code{Arborescence$root_to_leaf_paths()}}
-\item \href{#method-Arborescence-postree}{\code{Arborescence$postree()}}
-\item \href{#method-Arborescence-clone}{\code{Arborescence$clone()}}
+  \itemize{
+    \item \href{#method-Arborescence-initialize}{\code{Arborescence$new()}}
+    \item \href{#method-Arborescence-parent}{\code{Arborescence$parent()}}
+    \item \href{#method-Arborescence-is_parent}{\code{Arborescence$is_parent()}}
+    \item \href{#method-Arborescence-is_leaf}{\code{Arborescence$is_leaf()}}
+    \item \href{#method-Arborescence-root}{\code{Arborescence$root()}}
+    \item \href{#method-Arborescence-is_root}{\code{Arborescence$is_root()}}
+    \item \href{#method-Arborescence-siblings}{\code{Arborescence$siblings()}}
+    \item \href{#method-Arborescence-root_to_leaf_paths}{\code{Arborescence$root_to_leaf_paths()}}
+    \item \href{#method-Arborescence-postree}{\code{Arborescence$postree()}}
+    \item \href{#method-Arborescence-clone}{\code{Arborescence$clone()}}
+  }
 }
-}
-\if{html}{\out{
-<details><summary>Inherited methods</summary>
+\if{html}{\out{<details><summary>Inherited methods</summary>
 <ul>
-<li><span class="pkg-link" data-pkg="rdecision" data-topic="Graph" data-id="degree"><a href='../../rdecision/html/Graph.html#method-Graph-degree'><code>rdecision::Graph$degree()</code></a></span></li>
-<li><span class="pkg-link" data-pkg="rdecision" data-topic="Graph" data-id="edge_along"><a href='../../rdecision/html/Graph.html#method-Graph-edge_along'><code>rdecision::Graph$edge_along()</code></a></span></li>
-<li><span class="pkg-link" data-pkg="rdecision" data-topic="Graph" data-id="edge_at"><a href='../../rdecision/html/Graph.html#method-Graph-edge_at'><code>rdecision::Graph$edge_at()</code></a></span></li>
-<li><span class="pkg-link" data-pkg="rdecision" data-topic="Graph" data-id="edge_index"><a href='../../rdecision/html/Graph.html#method-Graph-edge_index'><code>rdecision::Graph$edge_index()</code></a></span></li>
-<li><span class="pkg-link" data-pkg="rdecision" data-topic="Graph" data-id="edge_label"><a href='../../rdecision/html/Graph.html#method-Graph-edge_label'><code>rdecision::Graph$edge_label()</code></a></span></li>
-<li><span class="pkg-link" data-pkg="rdecision" data-topic="Graph" data-id="edges"><a href='../../rdecision/html/Graph.html#method-Graph-edges'><code>rdecision::Graph$edges()</code></a></span></li>
-<li><span class="pkg-link" data-pkg="rdecision" data-topic="Graph" data-id="graph_adjacency_matrix"><a href='../../rdecision/html/Graph.html#method-Graph-graph_adjacency_matrix'><code>rdecision::Graph$graph_adjacency_matrix()</code></a></span></li>
-<li><span class="pkg-link" data-pkg="rdecision" data-topic="Graph" data-id="has_edge"><a href='../../rdecision/html/Graph.html#method-Graph-has_edge'><code>rdecision::Graph$has_edge()</code></a></span></li>
-<li><span class="pkg-link" data-pkg="rdecision" data-topic="Graph" data-id="has_vertex"><a href='../../rdecision/html/Graph.html#method-Graph-has_vertex'><code>rdecision::Graph$has_vertex()</code></a></span></li>
-<li><span class="pkg-link" data-pkg="rdecision" data-topic="Graph" data-id="is_simple"><a href='../../rdecision/html/Graph.html#method-Graph-is_simple'><code>rdecision::Graph$is_simple()</code></a></span></li>
-<li><span class="pkg-link" data-pkg="rdecision" data-topic="Graph" data-id="neighbours"><a href='../../rdecision/html/Graph.html#method-Graph-neighbours'><code>rdecision::Graph$neighbours()</code></a></span></li>
-<li><span class="pkg-link" data-pkg="rdecision" data-topic="Graph" data-id="order"><a href='../../rdecision/html/Graph.html#method-Graph-order'><code>rdecision::Graph$order()</code></a></span></li>
-<li><span class="pkg-link" data-pkg="rdecision" data-topic="Graph" data-id="size"><a href='../../rdecision/html/Graph.html#method-Graph-size'><code>rdecision::Graph$size()</code></a></span></li>
-<li><span class="pkg-link" data-pkg="rdecision" data-topic="Graph" data-id="vertex_along"><a href='../../rdecision/html/Graph.html#method-Graph-vertex_along'><code>rdecision::Graph$vertex_along()</code></a></span></li>
-<li><span class="pkg-link" data-pkg="rdecision" data-topic="Graph" data-id="vertex_at"><a href='../../rdecision/html/Graph.html#method-Graph-vertex_at'><code>rdecision::Graph$vertex_at()</code></a></span></li>
-<li><span class="pkg-link" data-pkg="rdecision" data-topic="Graph" data-id="vertex_index"><a href='../../rdecision/html/Graph.html#method-Graph-vertex_index'><code>rdecision::Graph$vertex_index()</code></a></span></li>
-<li><span class="pkg-link" data-pkg="rdecision" data-topic="Graph" data-id="vertex_label"><a href='../../rdecision/html/Graph.html#method-Graph-vertex_label'><code>rdecision::Graph$vertex_label()</code></a></span></li>
-<li><span class="pkg-link" data-pkg="rdecision" data-topic="Graph" data-id="vertexes"><a href='../../rdecision/html/Graph.html#method-Graph-vertexes'><code>rdecision::Graph$vertexes()</code></a></span></li>
-<li><span class="pkg-link" data-pkg="rdecision" data-topic="Digraph" data-id="arrow_source"><a href='../../rdecision/html/Digraph.html#method-Digraph-arrow_source'><code>rdecision::Digraph$arrow_source()</code></a></span></li>
-<li><span class="pkg-link" data-pkg="rdecision" data-topic="Digraph" data-id="arrow_target"><a href='../../rdecision/html/Digraph.html#method-Digraph-arrow_target'><code>rdecision::Digraph$arrow_target()</code></a></span></li>
-<li><span class="pkg-link" data-pkg="rdecision" data-topic="Digraph" data-id="as_DOT"><a href='../../rdecision/html/Digraph.html#method-Digraph-as_DOT'><code>rdecision::Digraph$as_DOT()</code></a></span></li>
-<li><span class="pkg-link" data-pkg="rdecision" data-topic="Digraph" data-id="as_gml"><a href='../../rdecision/html/Digraph.html#method-Digraph-as_gml'><code>rdecision::Digraph$as_gml()</code></a></span></li>
-<li><span class="pkg-link" data-pkg="rdecision" data-topic="Digraph" data-id="digraph_adjacency_matrix"><a href='../../rdecision/html/Digraph.html#method-Digraph-digraph_adjacency_matrix'><code>rdecision::Digraph$digraph_adjacency_matrix()</code></a></span></li>
-<li><span class="pkg-link" data-pkg="rdecision" data-topic="Digraph" data-id="digraph_incidence_matrix"><a href='../../rdecision/html/Digraph.html#method-Digraph-digraph_incidence_matrix'><code>rdecision::Digraph$digraph_incidence_matrix()</code></a></span></li>
-<li><span class="pkg-link" data-pkg="rdecision" data-topic="Digraph" data-id="direct_predecessors"><a href='../../rdecision/html/Digraph.html#method-Digraph-direct_predecessors'><code>rdecision::Digraph$direct_predecessors()</code></a></span></li>
-<li><span class="pkg-link" data-pkg="rdecision" data-topic="Digraph" data-id="direct_successors"><a href='../../rdecision/html/Digraph.html#method-Digraph-direct_successors'><code>rdecision::Digraph$direct_successors()</code></a></span></li>
-<li><span class="pkg-link" data-pkg="rdecision" data-topic="Digraph" data-id="is_acyclic"><a href='../../rdecision/html/Digraph.html#method-Digraph-is_acyclic'><code>rdecision::Digraph$is_acyclic()</code></a></span></li>
-<li><span class="pkg-link" data-pkg="rdecision" data-topic="Digraph" data-id="is_arborescence"><a href='../../rdecision/html/Digraph.html#method-Digraph-is_arborescence'><code>rdecision::Digraph$is_arborescence()</code></a></span></li>
-<li><span class="pkg-link" data-pkg="rdecision" data-topic="Digraph" data-id="is_connected"><a href='../../rdecision/html/Digraph.html#method-Digraph-is_connected'><code>rdecision::Digraph$is_connected()</code></a></span></li>
-<li><span class="pkg-link" data-pkg="rdecision" data-topic="Digraph" data-id="is_polytree"><a href='../../rdecision/html/Digraph.html#method-Digraph-is_polytree'><code>rdecision::Digraph$is_polytree()</code></a></span></li>
-<li><span class="pkg-link" data-pkg="rdecision" data-topic="Digraph" data-id="is_tree"><a href='../../rdecision/html/Digraph.html#method-Digraph-is_tree'><code>rdecision::Digraph$is_tree()</code></a></span></li>
-<li><span class="pkg-link" data-pkg="rdecision" data-topic="Digraph" data-id="is_weakly_connected"><a href='../../rdecision/html/Digraph.html#method-Digraph-is_weakly_connected'><code>rdecision::Digraph$is_weakly_connected()</code></a></span></li>
-<li><span class="pkg-link" data-pkg="rdecision" data-topic="Digraph" data-id="paths"><a href='../../rdecision/html/Digraph.html#method-Digraph-paths'><code>rdecision::Digraph$paths()</code></a></span></li>
-<li><span class="pkg-link" data-pkg="rdecision" data-topic="Digraph" data-id="topological_sort"><a href='../../rdecision/html/Digraph.html#method-Digraph-topological_sort'><code>rdecision::Digraph$topological_sort()</code></a></span></li>
-<li><span class="pkg-link" data-pkg="rdecision" data-topic="Digraph" data-id="walk"><a href='../../rdecision/html/Digraph.html#method-Digraph-walk'><code>rdecision::Digraph$walk()</code></a></span></li>
+  <li><span class="pkg-link" data-pkg="rdecision" data-topic="Graph" data-id="degree"><a href='../../rdecision/html/Graph.html#method-Graph-degree'><code>Graph$degree()</code></a></span></li>
+  <li><span class="pkg-link" data-pkg="rdecision" data-topic="Graph" data-id="edge_along"><a href='../../rdecision/html/Graph.html#method-Graph-edge_along'><code>Graph$edge_along()</code></a></span></li>
+  <li><span class="pkg-link" data-pkg="rdecision" data-topic="Graph" data-id="edge_at"><a href='../../rdecision/html/Graph.html#method-Graph-edge_at'><code>Graph$edge_at()</code></a></span></li>
+  <li><span class="pkg-link" data-pkg="rdecision" data-topic="Graph" data-id="edge_index"><a href='../../rdecision/html/Graph.html#method-Graph-edge_index'><code>Graph$edge_index()</code></a></span></li>
+  <li><span class="pkg-link" data-pkg="rdecision" data-topic="Graph" data-id="edge_label"><a href='../../rdecision/html/Graph.html#method-Graph-edge_label'><code>Graph$edge_label()</code></a></span></li>
+  <li><span class="pkg-link" data-pkg="rdecision" data-topic="Graph" data-id="edges"><a href='../../rdecision/html/Graph.html#method-Graph-edges'><code>Graph$edges()</code></a></span></li>
+  <li><span class="pkg-link" data-pkg="rdecision" data-topic="Graph" data-id="graph_adjacency_matrix"><a href='../../rdecision/html/Graph.html#method-Graph-graph_adjacency_matrix'><code>Graph$graph_adjacency_matrix()</code></a></span></li>
+  <li><span class="pkg-link" data-pkg="rdecision" data-topic="Graph" data-id="has_edge"><a href='../../rdecision/html/Graph.html#method-Graph-has_edge'><code>Graph$has_edge()</code></a></span></li>
+  <li><span class="pkg-link" data-pkg="rdecision" data-topic="Graph" data-id="has_vertex"><a href='../../rdecision/html/Graph.html#method-Graph-has_vertex'><code>Graph$has_vertex()</code></a></span></li>
+  <li><span class="pkg-link" data-pkg="rdecision" data-topic="Graph" data-id="is_simple"><a href='../../rdecision/html/Graph.html#method-Graph-is_simple'><code>Graph$is_simple()</code></a></span></li>
+  <li><span class="pkg-link" data-pkg="rdecision" data-topic="Graph" data-id="neighbours"><a href='../../rdecision/html/Graph.html#method-Graph-neighbours'><code>Graph$neighbours()</code></a></span></li>
+  <li><span class="pkg-link" data-pkg="rdecision" data-topic="Graph" data-id="order"><a href='../../rdecision/html/Graph.html#method-Graph-order'><code>Graph$order()</code></a></span></li>
+  <li><span class="pkg-link" data-pkg="rdecision" data-topic="Graph" data-id="size"><a href='../../rdecision/html/Graph.html#method-Graph-size'><code>Graph$size()</code></a></span></li>
+  <li><span class="pkg-link" data-pkg="rdecision" data-topic="Graph" data-id="vertex_along"><a href='../../rdecision/html/Graph.html#method-Graph-vertex_along'><code>Graph$vertex_along()</code></a></span></li>
+  <li><span class="pkg-link" data-pkg="rdecision" data-topic="Graph" data-id="vertex_at"><a href='../../rdecision/html/Graph.html#method-Graph-vertex_at'><code>Graph$vertex_at()</code></a></span></li>
+  <li><span class="pkg-link" data-pkg="rdecision" data-topic="Graph" data-id="vertex_index"><a href='../../rdecision/html/Graph.html#method-Graph-vertex_index'><code>Graph$vertex_index()</code></a></span></li>
+  <li><span class="pkg-link" data-pkg="rdecision" data-topic="Graph" data-id="vertex_label"><a href='../../rdecision/html/Graph.html#method-Graph-vertex_label'><code>Graph$vertex_label()</code></a></span></li>
+  <li><span class="pkg-link" data-pkg="rdecision" data-topic="Graph" data-id="vertexes"><a href='../../rdecision/html/Graph.html#method-Graph-vertexes'><code>Graph$vertexes()</code></a></span></li>
+  <li><span class="pkg-link" data-pkg="rdecision" data-topic="Digraph" data-id="arrow_source"><a href='../../rdecision/html/Digraph.html#method-Digraph-arrow_source'><code>Digraph$arrow_source()</code></a></span></li>
+  <li><span class="pkg-link" data-pkg="rdecision" data-topic="Digraph" data-id="arrow_target"><a href='../../rdecision/html/Digraph.html#method-Digraph-arrow_target'><code>Digraph$arrow_target()</code></a></span></li>
+  <li><span class="pkg-link" data-pkg="rdecision" data-topic="Digraph" data-id="as_DOT"><a href='../../rdecision/html/Digraph.html#method-Digraph-as_DOT'><code>Digraph$as_DOT()</code></a></span></li>
+  <li><span class="pkg-link" data-pkg="rdecision" data-topic="Digraph" data-id="as_gml"><a href='../../rdecision/html/Digraph.html#method-Digraph-as_gml'><code>Digraph$as_gml()</code></a></span></li>
+  <li><span class="pkg-link" data-pkg="rdecision" data-topic="Digraph" data-id="digraph_adjacency_matrix"><a href='../../rdecision/html/Digraph.html#method-Digraph-digraph_adjacency_matrix'><code>Digraph$digraph_adjacency_matrix()</code></a></span></li>
+  <li><span class="pkg-link" data-pkg="rdecision" data-topic="Digraph" data-id="digraph_incidence_matrix"><a href='../../rdecision/html/Digraph.html#method-Digraph-digraph_incidence_matrix'><code>Digraph$digraph_incidence_matrix()</code></a></span></li>
+  <li><span class="pkg-link" data-pkg="rdecision" data-topic="Digraph" data-id="direct_predecessors"><a href='../../rdecision/html/Digraph.html#method-Digraph-direct_predecessors'><code>Digraph$direct_predecessors()</code></a></span></li>
+  <li><span class="pkg-link" data-pkg="rdecision" data-topic="Digraph" data-id="direct_successors"><a href='../../rdecision/html/Digraph.html#method-Digraph-direct_successors'><code>Digraph$direct_successors()</code></a></span></li>
+  <li><span class="pkg-link" data-pkg="rdecision" data-topic="Digraph" data-id="is_acyclic"><a href='../../rdecision/html/Digraph.html#method-Digraph-is_acyclic'><code>Digraph$is_acyclic()</code></a></span></li>
+  <li><span class="pkg-link" data-pkg="rdecision" data-topic="Digraph" data-id="is_arborescence"><a href='../../rdecision/html/Digraph.html#method-Digraph-is_arborescence'><code>Digraph$is_arborescence()</code></a></span></li>
+  <li><span class="pkg-link" data-pkg="rdecision" data-topic="Digraph" data-id="is_connected"><a href='../../rdecision/html/Digraph.html#method-Digraph-is_connected'><code>Digraph$is_connected()</code></a></span></li>
+  <li><span class="pkg-link" data-pkg="rdecision" data-topic="Digraph" data-id="is_polytree"><a href='../../rdecision/html/Digraph.html#method-Digraph-is_polytree'><code>Digraph$is_polytree()</code></a></span></li>
+  <li><span class="pkg-link" data-pkg="rdecision" data-topic="Digraph" data-id="is_tree"><a href='../../rdecision/html/Digraph.html#method-Digraph-is_tree'><code>Digraph$is_tree()</code></a></span></li>
+  <li><span class="pkg-link" data-pkg="rdecision" data-topic="Digraph" data-id="is_weakly_connected"><a href='../../rdecision/html/Digraph.html#method-Digraph-is_weakly_connected'><code>Digraph$is_weakly_connected()</code></a></span></li>
+  <li><span class="pkg-link" data-pkg="rdecision" data-topic="Digraph" data-id="paths"><a href='../../rdecision/html/Digraph.html#method-Digraph-paths'><code>Digraph$paths()</code></a></span></li>
+  <li><span class="pkg-link" data-pkg="rdecision" data-topic="Digraph" data-id="topological_sort"><a href='../../rdecision/html/Digraph.html#method-Digraph-topological_sort'><code>Digraph$topological_sort()</code></a></span></li>
+  <li><span class="pkg-link" data-pkg="rdecision" data-topic="Digraph" data-id="walk"><a href='../../rdecision/html/Digraph.html#method-Digraph-walk'><code>Digraph$walk()</code></a></span></li>
 </ul>
-</details>
-}}
+</details>}}
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-Arborescence-new"></a>}}
-\if{latex}{\out{\hypertarget{method-Arborescence-new}{}}}
-\subsection{Method \code{new()}}{
-Create a new \code{Arborescence} object from sets of nodes
+\if{html}{\out{<a id="method-Arborescence-initialize"></a>}}
+\if{latex}{\out{\hypertarget{method-Arborescence-initialize}{}}}
+\subsection{\code{Arborescence$new()}}{
+  Create a new \code{Arborescence} object from sets of nodes
 and edges.
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{Arborescence$new(V, A)}\if{html}{\out{</div>}}
+  \subsection{Usage}{
+    \if{html}{\out{<div class="r">}}
+    \preformatted{Arborescence$new(V, A)}
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Arguments}{
+    \if{html}{\out{<div class="arguments">}}
+    \describe{
+      \item{\code{V}}{A list of Nodes.}
+      \item{\code{A}}{A list of Arrows.}
+    }
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Returns}{
+    An \code{Arborescence} object.
+  }
 }
 
-\subsection{Arguments}{
-\if{html}{\out{<div class="arguments">}}
-\describe{
-\item{\code{V}}{A list of Nodes.}
-
-\item{\code{A}}{A list of Arrows.}
-}
-\if{html}{\out{</div>}}
-}
-\subsection{Returns}{
-An \code{Arborescence} object.
-}
-}
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-Arborescence-parent"></a>}}
 \if{latex}{\out{\hypertarget{method-Arborescence-parent}{}}}
-\subsection{Method \code{parent()}}{
-Find the parent of a Node.
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{Arborescence$parent(v)}\if{html}{\out{</div>}}
-}
-
-\subsection{Arguments}{
-\if{html}{\out{<div class="arguments">}}
-\describe{
-\item{\code{v}}{Index node, or a list of index Nodes.}
-}
-\if{html}{\out{</div>}}
-}
-\subsection{Returns}{
-A list of Nodes of the same length as v, if v is a list, or a
+\subsection{\code{Arborescence$parent()}}{
+  Find the parent of a Node.
+  \subsection{Usage}{
+    \if{html}{\out{<div class="r">}}
+    \preformatted{Arborescence$parent(v)}
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Arguments}{
+    \if{html}{\out{<div class="arguments">}}
+    \describe{
+      \item{\code{v}}{Index node, or a list of index Nodes.}
+    }
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Returns}{
+    A list of Nodes of the same length as v, if v is a list, or a
 scalar Node if v is a single node. NA if v (or an element of v) is the
 root node.
+  }
 }
-}
+
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-Arborescence-is_parent"></a>}}
 \if{latex}{\out{\hypertarget{method-Arborescence-is_parent}{}}}
-\subsection{Method \code{is_parent()}}{
-Test whether the given node(s) is (are) parent(s).
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{Arborescence$is_parent(v)}\if{html}{\out{</div>}}
-}
-
-\subsection{Arguments}{
-\if{html}{\out{<div class="arguments">}}
-\describe{
-\item{\code{v}}{Node to test, or a list of Nodes.}
-}
-\if{html}{\out{</div>}}
-}
-\subsection{Details}{
-In an arborescence, \code{is_parent()} and \code{is_leaf()} are
+\subsection{\code{Arborescence$is_parent()}}{
+  Test whether the given node(s) is (are) parent(s).
+  \subsection{Usage}{
+    \if{html}{\out{<div class="r">}}
+    \preformatted{Arborescence$is_parent(v)}
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Arguments}{
+    \if{html}{\out{<div class="arguments">}}
+    \describe{
+      \item{\code{v}}{Node to test, or a list of Nodes.}
+    }
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Details}{
+    In an arborescence, \code{is_parent()} and \code{is_leaf()} are
 mutually exclusive.
+  }
+  \subsection{Returns}{
+    A logical vector of the same length as v, if v is a list, or a
+logical scalar if v is a single node.
+  }
 }
 
-\subsection{Returns}{
-A logical vector of the same length as v, if v is a list, or a
-logical scalar if v is a single node.
-}
-}
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-Arborescence-is_leaf"></a>}}
 \if{latex}{\out{\hypertarget{method-Arborescence-is_leaf}{}}}
-\subsection{Method \code{is_leaf()}}{
-Test whether the given node is a leaf.
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{Arborescence$is_leaf(v)}\if{html}{\out{</div>}}
-}
-
-\subsection{Arguments}{
-\if{html}{\out{<div class="arguments">}}
-\describe{
-\item{\code{v}}{Node to test, or a list of Nodes.}
-}
-\if{html}{\out{</div>}}
-}
-\subsection{Details}{
-In an arborescence, \code{is_parent()} and \code{is_leaf()} are
+\subsection{\code{Arborescence$is_leaf()}}{
+  Test whether the given node is a leaf.
+  \subsection{Usage}{
+    \if{html}{\out{<div class="r">}}
+    \preformatted{Arborescence$is_leaf(v)}
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Arguments}{
+    \if{html}{\out{<div class="arguments">}}
+    \describe{
+      \item{\code{v}}{Node to test, or a list of Nodes.}
+    }
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Details}{
+    In an arborescence, \code{is_parent()} and \code{is_leaf()} are
 mutually exclusive.
+  }
+  \subsection{Returns}{
+    A logical vector of the same length as v, if v is a list, or a
+logical scalar is v is a single node.
+  }
 }
 
-\subsection{Returns}{
-A logical vector of the same length as v, if v is a list, or a
-logical scalar is v is a single node.
-}
-}
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-Arborescence-root"></a>}}
 \if{latex}{\out{\hypertarget{method-Arborescence-root}{}}}
-\subsection{Method \code{root()}}{
-Find the root vertex of the arborescence.
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{Arborescence$root()}\if{html}{\out{</div>}}
+\subsection{\code{Arborescence$root()}}{
+  Find the root vertex of the arborescence.
+  \subsection{Usage}{
+    \if{html}{\out{<div class="r">}}
+    \preformatted{Arborescence$root()}
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Returns}{
+    The root vertex.
+  }
 }
 
-\subsection{Returns}{
-The root vertex.
-}
-}
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-Arborescence-is_root"></a>}}
 \if{latex}{\out{\hypertarget{method-Arborescence-is_root}{}}}
-\subsection{Method \code{is_root()}}{
-Is the specified node the root?
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{Arborescence$is_root(v)}\if{html}{\out{</div>}}
+\subsection{\code{Arborescence$is_root()}}{
+  Is the specified node the root?
+  \subsection{Usage}{
+    \if{html}{\out{<div class="r">}}
+    \preformatted{Arborescence$is_root(v)}
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Arguments}{
+    \if{html}{\out{<div class="arguments">}}
+    \describe{
+      \item{\code{v}}{Vertex to test, or list of vertexes}
+    }
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Returns}{
+    A logical vector if v is a list, or a logical scalar if v is a
+single node.
+  }
 }
 
-\subsection{Arguments}{
-\if{html}{\out{<div class="arguments">}}
-\describe{
-\item{\code{v}}{Vertex to test, or list of vertexes}
-}
-\if{html}{\out{</div>}}
-}
-\subsection{Returns}{
-A logical vector if v is a list, or a logical scalar if v is a
-single node.
-}
-}
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-Arborescence-siblings"></a>}}
 \if{latex}{\out{\hypertarget{method-Arborescence-siblings}{}}}
-\subsection{Method \code{siblings()}}{
-Find the siblings of a vertex in the arborescence.
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{Arborescence$siblings(v)}\if{html}{\out{</div>}}
+\subsection{\code{Arborescence$siblings()}}{
+  Find the siblings of a vertex in the arborescence.
+  \subsection{Usage}{
+    \if{html}{\out{<div class="r">}}
+    \preformatted{Arborescence$siblings(v)}
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Arguments}{
+    \if{html}{\out{<div class="arguments">}}
+    \describe{
+      \item{\code{v}}{Vertex to test (only accepts a scalar Node).}
+    }
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Returns}{
+    A (possibly empty) list of siblings.
+  }
 }
 
-\subsection{Arguments}{
-\if{html}{\out{<div class="arguments">}}
-\describe{
-\item{\code{v}}{Vertex to test (only accepts a scalar Node).}
-}
-\if{html}{\out{</div>}}
-}
-\subsection{Returns}{
-A (possibly empty) list of siblings.
-}
-}
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-Arborescence-root_to_leaf_paths"></a>}}
 \if{latex}{\out{\hypertarget{method-Arborescence-root_to_leaf_paths}{}}}
-\subsection{Method \code{root_to_leaf_paths()}}{
-Find all directed paths from the root of the tree to the
+\subsection{\code{Arborescence$root_to_leaf_paths()}}{
+  Find all directed paths from the root of the tree to the
 leaves.
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{Arborescence$root_to_leaf_paths()}\if{html}{\out{</div>}}
+  \subsection{Usage}{
+    \if{html}{\out{<div class="r">}}
+    \preformatted{Arborescence$root_to_leaf_paths()}
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Returns}{
+    A list of ordered node lists.
+  }
 }
 
-\subsection{Returns}{
-A list of ordered node lists.
-}
-}
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-Arborescence-postree"></a>}}
 \if{latex}{\out{\hypertarget{method-Arborescence-postree}{}}}
-\subsection{Method \code{postree()}}{
-Implements function \verb{POSITIONTREE} (Walker, 1989) to
+\subsection{\code{Arborescence$postree()}}{
+  Implements function \verb{POSITIONTREE} (Walker, 1989) to
 determine the coordinates for each node in an arborescence.
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{Arborescence$postree(
+  \subsection{Usage}{
+    \if{html}{\out{<div class="r">}}
+    \preformatted{Arborescence$postree(
   SiblingSeparation = 4,
   SubtreeSeparation = 4,
   LevelSeparation = 1,
   RootOrientation = "SOUTH",
   MaxDepth = Inf
-)}\if{html}{\out{</div>}}
-}
-
-\subsection{Arguments}{
-\if{html}{\out{<div class="arguments">}}
-\describe{
-\item{\code{SiblingSeparation}}{Distance in arbitrary units for the
+)}
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Arguments}{
+    \if{html}{\out{<div class="arguments">}}
+    \describe{
+      \item{\code{SiblingSeparation}}{Distance in arbitrary units for the
 distance between siblings.}
-
-\item{\code{SubtreeSeparation}}{Distance in arbitrary units for the
+      \item{\code{SubtreeSeparation}}{Distance in arbitrary units for the
 distance between neighbouring subtrees.}
-
-\item{\code{LevelSeparation}}{Distance in arbitrary units for the
+      \item{\code{LevelSeparation}}{Distance in arbitrary units for the
 separation between adjacent levels.}
-
-\item{\code{RootOrientation}}{Must be one of "NORTH", "SOUTH", "EAST", "WEST".
+      \item{\code{RootOrientation}}{Must be one of "NORTH", "SOUTH", "EAST", "WEST".
 Defined as per Walker (1989), but noting that Walker assumed that
 y increased down the page. Thus the meaning of NORTH and SOUTH are
 opposite to his, with the default (SOUTH) having the child nodes at
 positive y value and root at zero, as per his example (figure 12).}
-
-\item{\code{MaxDepth}}{The maximum depth (number of levels) to be drawn; if
+      \item{\code{MaxDepth}}{The maximum depth (number of levels) to be drawn; if
 the tree exceeds this, an error will be raised.}
-}
-\if{html}{\out{</div>}}
-}
-\subsection{Details}{
-In the \code{rdecision} implementation, the
+    }
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Details}{
+    In the \code{rdecision} implementation, the
 sibling order is taken to be the lexicographic order of the node
 labels, if they are unique among siblings, or the node indexes otherwise.
-}
-
-\subsection{Returns}{
-A data frame with one row per node and three columns (n, x
+  }
+  \subsection{Returns}{
+    A data frame with one row per node and three columns (n, x
 and y) where \code{n} gives the node index given by the
 \code{Graph::vertex_index()} function.
+  }
 }
-}
+
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-Arborescence-clone"></a>}}
 \if{latex}{\out{\hypertarget{method-Arborescence-clone}{}}}
-\subsection{Method \code{clone()}}{
-The objects of this class are cloneable with this method.
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{Arborescence$clone(deep = FALSE)}\if{html}{\out{</div>}}
+\subsection{\code{Arborescence$clone()}}{
+  The objects of this class are cloneable with this method.
+  \subsection{Usage}{
+    \if{html}{\out{<div class="r">}}
+    \preformatted{Arborescence$clone(deep = FALSE)}
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Arguments}{
+    \if{html}{\out{<div class="arguments">}}
+    \describe{
+      \item{\code{deep}}{Whether to make a deep clone.}
+    }
+    \if{html}{\out{</div>}}
+  }
 }
 
-\subsection{Arguments}{
-\if{html}{\out{<div class="arguments">}}
-\describe{
-\item{\code{deep}}{Whether to make a deep clone.}
-}
-\if{html}{\out{</div>}}
-}
-}
 }

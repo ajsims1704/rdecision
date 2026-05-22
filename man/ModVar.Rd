@@ -19,240 +19,255 @@ Andrew Sims \email{andrew.sims@newcastle.ac.uk}
 }
 \section{Methods}{
 \subsection{Public methods}{
-\itemize{
-\item \href{#method-ModVar-new}{\code{ModVar$new()}}
-\item \href{#method-ModVar-is_expression}{\code{ModVar$is_expression()}}
-\item \href{#method-ModVar-is_probabilistic}{\code{ModVar$is_probabilistic()}}
-\item \href{#method-ModVar-description}{\code{ModVar$description()}}
-\item \href{#method-ModVar-units}{\code{ModVar$units()}}
-\item \href{#method-ModVar-distribution}{\code{ModVar$distribution()}}
-\item \href{#method-ModVar-mean}{\code{ModVar$mean()}}
-\item \href{#method-ModVar-mode}{\code{ModVar$mode()}}
-\item \href{#method-ModVar-SD}{\code{ModVar$SD()}}
-\item \href{#method-ModVar-quantile}{\code{ModVar$quantile()}}
-\item \href{#method-ModVar-r}{\code{ModVar$r()}}
-\item \href{#method-ModVar-set}{\code{ModVar$set()}}
-\item \href{#method-ModVar-get}{\code{ModVar$get()}}
-\item \href{#method-ModVar-clone}{\code{ModVar$clone()}}
-}
+  \itemize{
+    \item \href{#method-ModVar-initialize}{\code{ModVar$new()}}
+    \item \href{#method-ModVar-is_expression}{\code{ModVar$is_expression()}}
+    \item \href{#method-ModVar-is_probabilistic}{\code{ModVar$is_probabilistic()}}
+    \item \href{#method-ModVar-description}{\code{ModVar$description()}}
+    \item \href{#method-ModVar-units}{\code{ModVar$units()}}
+    \item \href{#method-ModVar-distribution}{\code{ModVar$distribution()}}
+    \item \href{#method-ModVar-mean}{\code{ModVar$mean()}}
+    \item \href{#method-ModVar-mode}{\code{ModVar$mode()}}
+    \item \href{#method-ModVar-SD}{\code{ModVar$SD()}}
+    \item \href{#method-ModVar-quantile}{\code{ModVar$quantile()}}
+    \item \href{#method-ModVar-r}{\code{ModVar$r()}}
+    \item \href{#method-ModVar-set}{\code{ModVar$set()}}
+    \item \href{#method-ModVar-get}{\code{ModVar$get()}}
+    \item \href{#method-ModVar-clone}{\code{ModVar$clone()}}
+  }
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-ModVar-new"></a>}}
-\if{latex}{\out{\hypertarget{method-ModVar-new}{}}}
-\subsection{Method \code{new()}}{
-Create an object of type \code{ModVar}.
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{ModVar$new(description, units, D = NULL, k = 1L)}\if{html}{\out{</div>}}
-}
-
-\subsection{Arguments}{
-\if{html}{\out{<div class="arguments">}}
-\describe{
-\item{\code{description}}{A character string description of the variable
+\if{html}{\out{<a id="method-ModVar-initialize"></a>}}
+\if{latex}{\out{\hypertarget{method-ModVar-initialize}{}}}
+\subsection{\code{ModVar$new()}}{
+  Create an object of type \code{ModVar}.
+  \subsection{Usage}{
+    \if{html}{\out{<div class="r">}}
+    \preformatted{ModVar$new(description, units, D = NULL, k = 1L)}
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Arguments}{
+    \if{html}{\out{<div class="arguments">}}
+    \describe{
+      \item{\code{description}}{A character string description of the variable
 and its role in the model. This description will be used in a
 tabulation of the variables linked to a model.}
-
-\item{\code{units}}{A character string description of the units, e.g.
+      \item{\code{units}}{A character string description of the units, e.g.
 \code{"GBP"}, \code{"per year"}.}
-
-\item{\code{D}}{The distribution representing the uncertainty in the variable.
+      \item{\code{D}}{The distribution representing the uncertainty in the variable.
 Should inherit from class \code{Distribution}, or NULL if none is
 defined.}
-
-\item{\code{k}}{The index of the dimension of the multivariate distribution
+      \item{\code{k}}{The index of the dimension of the multivariate distribution
 that applies to this model variable.}
-}
-\if{html}{\out{</div>}}
-}
-\subsection{Details}{
-A \code{ModVar} is associated with an uncertainty distribution
+    }
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Details}{
+    A \code{ModVar} is associated with an uncertainty distribution
 (a "has-a" relationship in object-oriented terminology). There can be a
 1-1 mapping of \code{ModVar}s to \code{Distribution}s, or several
 model variables can be linked to the same distribution in a
 many-1 mapping, e.g. when each transition probability from a Markov state
 is represented as a \code{ModVar} and each can be linked to the \code{k}
 dimensions of a common multivariate Dirichlet distribution.
+  }
+  \subsection{Returns}{
+    A new \verb{ModVar} object.
+  }
 }
 
-\subsection{Returns}{
-A new \verb{ModVar} object.
-}
-}
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-ModVar-is_expression"></a>}}
 \if{latex}{\out{\hypertarget{method-ModVar-is_expression}{}}}
-\subsection{Method \code{is_expression()}}{
-Is this \code{ModVar} an expression?
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{ModVar$is_expression()}\if{html}{\out{</div>}}
+\subsection{\code{ModVar$is_expression()}}{
+  Is this \code{ModVar} an expression?
+  \subsection{Usage}{
+    \if{html}{\out{<div class="r">}}
+    \preformatted{ModVar$is_expression()}
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Returns}{
+    \code{TRUE} if it inherits from \code{ExprModVar}, \code{FALSE}
+otherwise.
+  }
 }
 
-\subsection{Returns}{
-\code{TRUE} if it inherits from \code{ExprModVar}, \code{FALSE}
-otherwise.
-}
-}
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-ModVar-is_probabilistic"></a>}}
 \if{latex}{\out{\hypertarget{method-ModVar-is_probabilistic}{}}}
-\subsection{Method \code{is_probabilistic()}}{
-Is the model variable probabilistic?
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{ModVar$is_probabilistic()}\if{html}{\out{</div>}}
-}
-
-\subsection{Details}{
-Tests whether the model variable is probabilistic, i.e. a
+\subsection{\code{ModVar$is_probabilistic()}}{
+  Is the model variable probabilistic?
+  \subsection{Usage}{
+    \if{html}{\out{<div class="r">}}
+    \preformatted{ModVar$is_probabilistic()}
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Details}{
+    Tests whether the model variable is probabilistic, i.e. a
 random variable that follows a distribution, or an expression involving
 random variables, some of which follow distributions.
+  }
+  \subsection{Returns}{
+    \code{TRUE} if probabilistic
+  }
 }
 
-\subsection{Returns}{
-\code{TRUE} if probabilistic
-}
-}
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-ModVar-description"></a>}}
 \if{latex}{\out{\hypertarget{method-ModVar-description}{}}}
-\subsection{Method \code{description()}}{
-Accessor function for the description.
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{ModVar$description()}\if{html}{\out{</div>}}
+\subsection{\code{ModVar$description()}}{
+  Accessor function for the description.
+  \subsection{Usage}{
+    \if{html}{\out{<div class="r">}}
+    \preformatted{ModVar$description()}
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Returns}{
+    Description of model variable as character string.
+  }
 }
 
-\subsection{Returns}{
-Description of model variable as character string.
-}
-}
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-ModVar-units"></a>}}
 \if{latex}{\out{\hypertarget{method-ModVar-units}{}}}
-\subsection{Method \code{units()}}{
-Accessor function for units.
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{ModVar$units()}\if{html}{\out{</div>}}
+\subsection{\code{ModVar$units()}}{
+  Accessor function for units.
+  \subsection{Usage}{
+    \if{html}{\out{<div class="r">}}
+    \preformatted{ModVar$units()}
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Returns}{
+    Description of units as character string.
+  }
 }
 
-\subsection{Returns}{
-Description of units as character string.
-}
-}
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-ModVar-distribution"></a>}}
 \if{latex}{\out{\hypertarget{method-ModVar-distribution}{}}}
-\subsection{Method \code{distribution()}}{
-Name and parameters of the uncertainty distribution.
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{ModVar$distribution()}\if{html}{\out{</div>}}
-}
-
-\subsection{Details}{
-If \eqn{K > 1} the dimension of the distribution associated
+\subsection{\code{ModVar$distribution()}}{
+  Name and parameters of the uncertainty distribution.
+  \subsection{Usage}{
+    \if{html}{\out{<div class="r">}}
+    \preformatted{ModVar$distribution()}
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Details}{
+    If \eqn{K > 1} the dimension of the distribution associated
 with this model variable is appended, e.g. \code{Dir(2,3)[1]}
 means that the model variable is associated with the first dimension
 of a 2D Dirichlet distribution with alpha parameters 2 and 3.
+  }
+  \subsection{Returns}{
+    Distribution name as character string.
+  }
 }
 
-\subsection{Returns}{
-Distribution name as character string.
-}
-}
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-ModVar-mean"></a>}}
 \if{latex}{\out{\hypertarget{method-ModVar-mean}{}}}
-\subsection{Method \code{mean()}}{
-Mean value of the model variable.
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{ModVar$mean()}\if{html}{\out{</div>}}
+\subsection{\code{ModVar$mean()}}{
+  Mean value of the model variable.
+  \subsection{Usage}{
+    \if{html}{\out{<div class="r">}}
+    \preformatted{ModVar$mean()}
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Returns}{
+    Mean value as a numeric value.
+  }
 }
 
-\subsection{Returns}{
-Mean value as a numeric value.
-}
-}
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-ModVar-mode"></a>}}
 \if{latex}{\out{\hypertarget{method-ModVar-mode}{}}}
-\subsection{Method \code{mode()}}{
-The mode of the variable.
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{ModVar$mode()}\if{html}{\out{</div>}}
-}
-
-\subsection{Details}{
-By default returns \code{NA}, which will be the case for
+\subsection{\code{ModVar$mode()}}{
+  The mode of the variable.
+  \subsection{Usage}{
+    \if{html}{\out{<div class="r">}}
+    \preformatted{ModVar$mode()}
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Details}{
+    May return \code{NA}, which will be the case for
 most \code{ModVar} variables, because arbitrary distributions are
 not guaranteed to be unimodal.
+  }
+  \subsection{Returns}{
+    Mode as a numeric value.
+  }
 }
 
-\subsection{Returns}{
-Mode as a numeric value.
-}
-}
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-ModVar-SD"></a>}}
 \if{latex}{\out{\hypertarget{method-ModVar-SD}{}}}
-\subsection{Method \code{SD()}}{
-Standard deviation of the model variable.
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{ModVar$SD()}\if{html}{\out{</div>}}
+\subsection{\code{ModVar$SD()}}{
+  Standard deviation of the model variable.
+  \subsection{Usage}{
+    \if{html}{\out{<div class="r">}}
+    \preformatted{ModVar$SD()}
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Returns}{
+    Standard deviation as a numeric value
+  }
 }
 
-\subsection{Returns}{
-Standard deviation as a numeric value
-}
-}
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-ModVar-quantile"></a>}}
 \if{latex}{\out{\hypertarget{method-ModVar-quantile}{}}}
-\subsection{Method \code{quantile()}}{
-Quantiles of the uncertainty distribution.
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{ModVar$quantile(probs)}\if{html}{\out{</div>}}
+\subsection{\code{ModVar$quantile()}}{
+  Quantiles of the uncertainty distribution.
+  \subsection{Usage}{
+    \if{html}{\out{<div class="r">}}
+    \preformatted{ModVar$quantile(probs)}
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Arguments}{
+    \if{html}{\out{<div class="arguments">}}
+    \describe{
+      \item{\code{probs}}{Numeric vector of probabilities, each in range [0,1].}
+    }
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Returns}{
+    Vector of numeric values of the same length as \code{probs}.
+  }
 }
 
-\subsection{Arguments}{
-\if{html}{\out{<div class="arguments">}}
-\describe{
-\item{\code{probs}}{Numeric vector of probabilities, each in range [0,1].}
-}
-\if{html}{\out{</div>}}
-}
-\subsection{Returns}{
-Vector of numeric values of the same length as \code{probs}.
-}
-}
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-ModVar-r"></a>}}
 \if{latex}{\out{\hypertarget{method-ModVar-r}{}}}
-\subsection{Method \code{r()}}{
-Draw a random sample from the model variable.
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{ModVar$r()}\if{html}{\out{</div>}}
-}
-
-\subsection{Details}{
-The same random sample will be returned until \code{set} is
+\subsection{\code{ModVar$r()}}{
+  Draw a random sample from the model variable.
+  \subsection{Usage}{
+    \if{html}{\out{<div class="r">}}
+    \preformatted{ModVar$r()}
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Details}{
+    The same random sample will be returned until \code{set} is
 called to force a resample.
+  }
+  \subsection{Returns}{
+    A sample drawn at random.
+  }
 }
 
-\subsection{Returns}{
-A sample drawn at random.
-}
-}
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-ModVar-set"></a>}}
 \if{latex}{\out{\hypertarget{method-ModVar-set}{}}}
-\subsection{Method \code{set()}}{
-Sets the value of the \code{ModVar}.
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{ModVar$set(what = "random", val = NULL)}\if{html}{\out{</div>}}
-}
-
-\subsection{Arguments}{
-\if{html}{\out{<div class="arguments">}}
-\describe{
-\item{\code{what}}{Until \code{set} is called again, subsequent calls to
+\subsection{\code{ModVar$set()}}{
+  Sets the value of the \code{ModVar}.
+  \subsection{Usage}{
+    \if{html}{\out{<div class="r">}}
+    \preformatted{ModVar$set(what = "random", val = NULL)}
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Arguments}{
+    \if{html}{\out{<div class="arguments">}}
+    \describe{
+      \item{\code{what}}{Until \code{set} is called again, subsequent calls to
 \code{get} will return a value determined by the \code{what} parameter
 as follows:
 \describe{
@@ -274,49 +289,52 @@ the model variable to be set to an implausible value, based on its
 defined uncertainty. An example of where this may be needed is in
 threshold finding.}
 }}
-
-\item{\code{val}}{A numeric value, only used with \code{what}=\code{"value"},
+      \item{\code{val}}{A numeric value, only used with \code{what}=\code{"value"},
 ignored otherwise.}
+    }
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Returns}{
+    Updated \code{ModVar}.
+  }
 }
-\if{html}{\out{</div>}}
-}
-\subsection{Returns}{
-Updated \code{ModVar}.
-}
-}
+
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-ModVar-get"></a>}}
 \if{latex}{\out{\hypertarget{method-ModVar-get}{}}}
-\subsection{Method \code{get()}}{
-Get the value of the \code{ModVar}.
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{ModVar$get()}\if{html}{\out{</div>}}
-}
-
-\subsection{Details}{
-Returns the value defined by the most recent call
+\subsection{\code{ModVar$get()}}{
+  Get the value of the \code{ModVar}.
+  \subsection{Usage}{
+    \if{html}{\out{<div class="r">}}
+    \preformatted{ModVar$get()}
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Details}{
+    Returns the value defined by the most recent call
 to \code{set()}.
+  }
+  \subsection{Returns}{
+    Value determined by last \code{set()}.
+  }
 }
 
-\subsection{Returns}{
-Value determined by last \code{set()}.
-}
-}
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-ModVar-clone"></a>}}
 \if{latex}{\out{\hypertarget{method-ModVar-clone}{}}}
-\subsection{Method \code{clone()}}{
-The objects of this class are cloneable with this method.
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{ModVar$clone(deep = FALSE)}\if{html}{\out{</div>}}
+\subsection{\code{ModVar$clone()}}{
+  The objects of this class are cloneable with this method.
+  \subsection{Usage}{
+    \if{html}{\out{<div class="r">}}
+    \preformatted{ModVar$clone(deep = FALSE)}
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Arguments}{
+    \if{html}{\out{<div class="arguments">}}
+    \describe{
+      \item{\code{deep}}{Whether to make a deep clone.}
+    }
+    \if{html}{\out{</div>}}
+  }
 }
 
-\subsection{Arguments}{
-\if{html}{\out{<div class="arguments">}}
-\describe{
-\item{\code{deep}}{Whether to make a deep clone.}
-}
-\if{html}{\out{</div>}}
-}
-}
 }

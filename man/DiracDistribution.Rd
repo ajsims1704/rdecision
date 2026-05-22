@@ -20,163 +20,176 @@ this case. Inherits from class \code{Distribution}.
 Andrew Sims \email{andrew.sims@newcastle.ac.uk}
 }
 \section{Super class}{
-\code{\link[rdecision:Distribution]{rdecision::Distribution}} -> \code{DiracDistribution}
+\code{\link[rdecision:Distribution]{Distribution}} -> \code{DiracDistribution}
 }
 \section{Methods}{
 \subsection{Public methods}{
-\itemize{
-\item \href{#method-DiracDistribution-new}{\code{DiracDistribution$new()}}
-\item \href{#method-DiracDistribution-distribution}{\code{DiracDistribution$distribution()}}
-\item \href{#method-DiracDistribution-mode}{\code{DiracDistribution$mode()}}
-\item \href{#method-DiracDistribution-mean}{\code{DiracDistribution$mean()}}
-\item \href{#method-DiracDistribution-SD}{\code{DiracDistribution$SD()}}
-\item \href{#method-DiracDistribution-quantile}{\code{DiracDistribution$quantile()}}
-\item \href{#method-DiracDistribution-sample}{\code{DiracDistribution$sample()}}
-\item \href{#method-DiracDistribution-clone}{\code{DiracDistribution$clone()}}
+  \itemize{
+    \item \href{#method-DiracDistribution-initialize}{\code{DiracDistribution$new()}}
+    \item \href{#method-DiracDistribution-distribution}{\code{DiracDistribution$distribution()}}
+    \item \href{#method-DiracDistribution-mode}{\code{DiracDistribution$mode()}}
+    \item \href{#method-DiracDistribution-mean}{\code{DiracDistribution$mean()}}
+    \item \href{#method-DiracDistribution-SD}{\code{DiracDistribution$SD()}}
+    \item \href{#method-DiracDistribution-quantile}{\code{DiracDistribution$quantile()}}
+    \item \href{#method-DiracDistribution-sample}{\code{DiracDistribution$sample()}}
+    \item \href{#method-DiracDistribution-clone}{\code{DiracDistribution$clone()}}
+  }
 }
-}
-\if{html}{\out{
-<details open><summary>Inherited methods</summary>
+\if{html}{\out{<details open><summary>Inherited methods</summary>
 <ul>
-<li><span class="pkg-link" data-pkg="rdecision" data-topic="Distribution" data-id="order"><a href='../../rdecision/html/Distribution.html#method-Distribution-order'><code>rdecision::Distribution$order()</code></a></span></li>
-<li><span class="pkg-link" data-pkg="rdecision" data-topic="Distribution" data-id="r"><a href='../../rdecision/html/Distribution.html#method-Distribution-r'><code>rdecision::Distribution$r()</code></a></span></li>
-<li><span class="pkg-link" data-pkg="rdecision" data-topic="Distribution" data-id="varcov"><a href='../../rdecision/html/Distribution.html#method-Distribution-varcov'><code>rdecision::Distribution$varcov()</code></a></span></li>
+  <li><span class="pkg-link" data-pkg="rdecision" data-topic="Distribution" data-id="order"><a href='../../rdecision/html/Distribution.html#method-Distribution-order'><code>Distribution$order()</code></a></span></li>
+  <li><span class="pkg-link" data-pkg="rdecision" data-topic="Distribution" data-id="r"><a href='../../rdecision/html/Distribution.html#method-Distribution-r'><code>Distribution$r()</code></a></span></li>
+  <li><span class="pkg-link" data-pkg="rdecision" data-topic="Distribution" data-id="varcov"><a href='../../rdecision/html/Distribution.html#method-Distribution-varcov'><code>Distribution$varcov()</code></a></span></li>
 </ul>
-</details>
-}}
+</details>}}
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-DiracDistribution-new"></a>}}
-\if{latex}{\out{\hypertarget{method-DiracDistribution-new}{}}}
-\subsection{Method \code{new()}}{
-Create a new Dirac Delta function distribution.
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{DiracDistribution$new(const)}\if{html}{\out{</div>}}
+\if{html}{\out{<a id="method-DiracDistribution-initialize"></a>}}
+\if{latex}{\out{\hypertarget{method-DiracDistribution-initialize}{}}}
+\subsection{\code{DiracDistribution$new()}}{
+  Create a new Dirac Delta function distribution.
+  \subsection{Usage}{
+    \if{html}{\out{<div class="r">}}
+    \preformatted{DiracDistribution$new(const)}
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Arguments}{
+    \if{html}{\out{<div class="arguments">}}
+    \describe{
+      \item{\code{const}}{The value at which the distribution is centred.}
+    }
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Returns}{
+    A new \code{DiracDistribution} object.
+  }
 }
 
-\subsection{Arguments}{
-\if{html}{\out{<div class="arguments">}}
-\describe{
-\item{\code{const}}{The value at which the distribution is centred.}
-}
-\if{html}{\out{</div>}}
-}
-\subsection{Returns}{
-A new \code{DiracDistribution} object.
-}
-}
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-DiracDistribution-distribution"></a>}}
 \if{latex}{\out{\hypertarget{method-DiracDistribution-distribution}{}}}
-\subsection{Method \code{distribution()}}{
-Accessor function for the name of the distribution.
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{DiracDistribution$distribution()}\if{html}{\out{</div>}}
+\subsection{\code{DiracDistribution$distribution()}}{
+  Accessor function for the name of the distribution.
+  \subsection{Usage}{
+    \if{html}{\out{<div class="r">}}
+    \preformatted{DiracDistribution$distribution()}
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Returns}{
+    Distribution name as character string.
+  }
 }
 
-\subsection{Returns}{
-Distribution name as character string.
-}
-}
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-DiracDistribution-mode"></a>}}
 \if{latex}{\out{\hypertarget{method-DiracDistribution-mode}{}}}
-\subsection{Method \code{mode()}}{
-Return the mode of the distribution.
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{DiracDistribution$mode()}\if{html}{\out{</div>}}
+\subsection{\code{DiracDistribution$mode()}}{
+  Return the mode of the distribution.
+  \subsection{Usage}{
+    \if{html}{\out{<div class="r">}}
+    \preformatted{DiracDistribution$mode()}
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Returns}{
+    Numeric Value where the distribution is centered.
+  }
 }
 
-\subsection{Returns}{
-Numeric Value where the distribution is centered.
-}
-}
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-DiracDistribution-mean"></a>}}
 \if{latex}{\out{\hypertarget{method-DiracDistribution-mean}{}}}
-\subsection{Method \code{mean()}}{
-Return the expected value of the distribution.
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{DiracDistribution$mean()}\if{html}{\out{</div>}}
+\subsection{\code{DiracDistribution$mean()}}{
+  Return the expected value of the distribution.
+  \subsection{Usage}{
+    \if{html}{\out{<div class="r">}}
+    \preformatted{DiracDistribution$mean()}
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Returns}{
+    Expected value as a numeric value.
+  }
 }
 
-\subsection{Returns}{
-Expected value as a numeric value.
-}
-}
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-DiracDistribution-SD"></a>}}
 \if{latex}{\out{\hypertarget{method-DiracDistribution-SD}{}}}
-\subsection{Method \code{SD()}}{
-Return the standard deviation of the distribution.
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{DiracDistribution$SD()}\if{html}{\out{</div>}}
+\subsection{\code{DiracDistribution$SD()}}{
+  Return the standard deviation of the distribution.
+  \subsection{Usage}{
+    \if{html}{\out{<div class="r">}}
+    \preformatted{DiracDistribution$SD()}
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Returns}{
+    Standard deviation as a numeric value
+  }
 }
 
-\subsection{Returns}{
-Standard deviation as a numeric value
-}
-}
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-DiracDistribution-quantile"></a>}}
 \if{latex}{\out{\hypertarget{method-DiracDistribution-quantile}{}}}
-\subsection{Method \code{quantile()}}{
-Quantiles of the distribution.
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{DiracDistribution$quantile(probs)}\if{html}{\out{</div>}}
-}
-
-\subsection{Arguments}{
-\if{html}{\out{<div class="arguments">}}
-\describe{
-\item{\code{probs}}{Numeric vector of probabilities, each in range [0,1].}
-}
-\if{html}{\out{</div>}}
-}
-\subsection{Details}{
-For a Dirac Delta Function all quantiles are returned as the
+\subsection{\code{DiracDistribution$quantile()}}{
+  Quantiles of the distribution.
+  \subsection{Usage}{
+    \if{html}{\out{<div class="r">}}
+    \preformatted{DiracDistribution$quantile(probs)}
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Arguments}{
+    \if{html}{\out{<div class="arguments">}}
+    \describe{
+      \item{\code{probs}}{Numeric vector of probabilities, each in range [0,1].}
+    }
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Details}{
+    For a Dirac Delta Function all quantiles are returned as the
 value at which the distribution is centred.
+  }
+  \subsection{Returns}{
+    Vector of numeric values of the same length as \code{probs}.
+  }
 }
 
-\subsection{Returns}{
-Vector of numeric values of the same length as \code{probs}.
-}
-}
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-DiracDistribution-sample"></a>}}
 \if{latex}{\out{\hypertarget{method-DiracDistribution-sample}{}}}
-\subsection{Method \code{sample()}}{
-Draw and hold a random sample from the model variable.
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{DiracDistribution$sample(expected = FALSE)}\if{html}{\out{</div>}}
+\subsection{\code{DiracDistribution$sample()}}{
+  Draw and hold a random sample from the model variable.
+  \subsection{Usage}{
+    \if{html}{\out{<div class="r">}}
+    \preformatted{DiracDistribution$sample(expected = FALSE)}
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Arguments}{
+    \if{html}{\out{<div class="arguments">}}
+    \describe{
+      \item{\code{expected}}{If TRUE, sets the next value retrieved by a call to
+\code{r()} to be the mean of the distribution.}
+    }
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Returns}{
+    Updated distribution.
+  }
 }
 
-\subsection{Arguments}{
-\if{html}{\out{<div class="arguments">}}
-\describe{
-\item{\code{expected}}{If TRUE, sets the next value retrieved by a call to
-\code{r()} to be the mean of the distribution.}
-}
-\if{html}{\out{</div>}}
-}
-\subsection{Returns}{
-Updated distribution.
-}
-}
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-DiracDistribution-clone"></a>}}
 \if{latex}{\out{\hypertarget{method-DiracDistribution-clone}{}}}
-\subsection{Method \code{clone()}}{
-The objects of this class are cloneable with this method.
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{DiracDistribution$clone(deep = FALSE)}\if{html}{\out{</div>}}
+\subsection{\code{DiracDistribution$clone()}}{
+  The objects of this class are cloneable with this method.
+  \subsection{Usage}{
+    \if{html}{\out{<div class="r">}}
+    \preformatted{DiracDistribution$clone(deep = FALSE)}
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Arguments}{
+    \if{html}{\out{<div class="arguments">}}
+    \describe{
+      \item{\code{deep}}{Whether to make a deep clone.}
+    }
+    \if{html}{\out{</div>}}
+  }
 }
 
-\subsection{Arguments}{
-\if{html}{\out{<div class="arguments">}}
-\describe{
-\item{\code{deep}}{Whether to make a deep clone.}
-}
-\if{html}{\out{</div>}}
-}
-}
 }

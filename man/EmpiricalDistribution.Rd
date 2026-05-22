@@ -15,177 +15,188 @@ from class \code{Distribution}.
 Andrew J. Sims \email{andrew.sims@newcastle.ac.uk}
 }
 \section{Super class}{
-\code{\link[rdecision:Distribution]{rdecision::Distribution}} -> \code{EmpiricalDistribution}
+\code{\link[rdecision:Distribution]{Distribution}} -> \code{EmpiricalDistribution}
 }
 \section{Methods}{
 \subsection{Public methods}{
-\itemize{
-\item \href{#method-EmpiricalDistribution-new}{\code{EmpiricalDistribution$new()}}
-\item \href{#method-EmpiricalDistribution-distribution}{\code{EmpiricalDistribution$distribution()}}
-\item \href{#method-EmpiricalDistribution-mean}{\code{EmpiricalDistribution$mean()}}
-\item \href{#method-EmpiricalDistribution-mode}{\code{EmpiricalDistribution$mode()}}
-\item \href{#method-EmpiricalDistribution-SD}{\code{EmpiricalDistribution$SD()}}
-\item \href{#method-EmpiricalDistribution-sample}{\code{EmpiricalDistribution$sample()}}
-\item \href{#method-EmpiricalDistribution-quantile}{\code{EmpiricalDistribution$quantile()}}
-\item \href{#method-EmpiricalDistribution-clone}{\code{EmpiricalDistribution$clone()}}
+  \itemize{
+    \item \href{#method-EmpiricalDistribution-initialize}{\code{EmpiricalDistribution$new()}}
+    \item \href{#method-EmpiricalDistribution-distribution}{\code{EmpiricalDistribution$distribution()}}
+    \item \href{#method-EmpiricalDistribution-mean}{\code{EmpiricalDistribution$mean()}}
+    \item \href{#method-EmpiricalDistribution-mode}{\code{EmpiricalDistribution$mode()}}
+    \item \href{#method-EmpiricalDistribution-SD}{\code{EmpiricalDistribution$SD()}}
+    \item \href{#method-EmpiricalDistribution-sample}{\code{EmpiricalDistribution$sample()}}
+    \item \href{#method-EmpiricalDistribution-quantile}{\code{EmpiricalDistribution$quantile()}}
+    \item \href{#method-EmpiricalDistribution-clone}{\code{EmpiricalDistribution$clone()}}
+  }
 }
-}
-\if{html}{\out{
-<details open><summary>Inherited methods</summary>
+\if{html}{\out{<details open><summary>Inherited methods</summary>
 <ul>
-<li><span class="pkg-link" data-pkg="rdecision" data-topic="Distribution" data-id="order"><a href='../../rdecision/html/Distribution.html#method-Distribution-order'><code>rdecision::Distribution$order()</code></a></span></li>
-<li><span class="pkg-link" data-pkg="rdecision" data-topic="Distribution" data-id="r"><a href='../../rdecision/html/Distribution.html#method-Distribution-r'><code>rdecision::Distribution$r()</code></a></span></li>
-<li><span class="pkg-link" data-pkg="rdecision" data-topic="Distribution" data-id="varcov"><a href='../../rdecision/html/Distribution.html#method-Distribution-varcov'><code>rdecision::Distribution$varcov()</code></a></span></li>
+  <li><span class="pkg-link" data-pkg="rdecision" data-topic="Distribution" data-id="order"><a href='../../rdecision/html/Distribution.html#method-Distribution-order'><code>Distribution$order()</code></a></span></li>
+  <li><span class="pkg-link" data-pkg="rdecision" data-topic="Distribution" data-id="r"><a href='../../rdecision/html/Distribution.html#method-Distribution-r'><code>Distribution$r()</code></a></span></li>
+  <li><span class="pkg-link" data-pkg="rdecision" data-topic="Distribution" data-id="varcov"><a href='../../rdecision/html/Distribution.html#method-Distribution-varcov'><code>Distribution$varcov()</code></a></span></li>
 </ul>
-</details>
-}}
+</details>}}
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-EmpiricalDistribution-new"></a>}}
-\if{latex}{\out{\hypertarget{method-EmpiricalDistribution-new}{}}}
-\subsection{Method \code{new()}}{
-Create an object of class \code{EmpiricalDistribution}.
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{EmpiricalDistribution$new(x, interpolate.sample = TRUE)}\if{html}{\out{</div>}}
-}
-
-\subsection{Arguments}{
-\if{html}{\out{<div class="arguments">}}
-\describe{
-\item{\code{x}}{a sample of at least 1 numerical value from the population
+\if{html}{\out{<a id="method-EmpiricalDistribution-initialize"></a>}}
+\if{latex}{\out{\hypertarget{method-EmpiricalDistribution-initialize}{}}}
+\subsection{\code{EmpiricalDistribution$new()}}{
+  Create an object of class \code{EmpiricalDistribution}.
+  \subsection{Usage}{
+    \if{html}{\out{<div class="r">}}
+    \preformatted{EmpiricalDistribution$new(x, interpolate.sample = TRUE)}
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Arguments}{
+    \if{html}{\out{<div class="arguments">}}
+    \describe{
+      \item{\code{x}}{a sample of at least 1 numerical value from the population
 of interest.}
-
-\item{\code{interpolate.sample}}{Logical; if true, each call to \code{sample()}
+      \item{\code{interpolate.sample}}{Logical; if true, each call to \code{sample()}
 make a random draw from \eqn{U_{0,1}} to find a \eqn{p} value, then
 finds that quantile of the sample, using the \code{quantile} function
 in R, via interpolation from the eCDF. If false, the \code{sample()}
 function makes a random draw from \code{x}.}
-}
-\if{html}{\out{</div>}}
-}
-\subsection{Details}{
-Empirical distributions based on very small sample sizes are
+    }
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Details}{
+    Empirical distributions based on very small sample sizes are
 supported, but not recommended.
+  }
+  \subsection{Returns}{
+    An object of class \code{EmpiricalDistribution}.
+  }
 }
 
-\subsection{Returns}{
-An object of class \code{EmpiricalDistribution}.
-}
-}
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-EmpiricalDistribution-distribution"></a>}}
 \if{latex}{\out{\hypertarget{method-EmpiricalDistribution-distribution}{}}}
-\subsection{Method \code{distribution()}}{
-Accessor function for the name of the distribution.
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{EmpiricalDistribution$distribution()}\if{html}{\out{</div>}}
+\subsection{\code{EmpiricalDistribution$distribution()}}{
+  Accessor function for the name of the distribution.
+  \subsection{Usage}{
+    \if{html}{\out{<div class="r">}}
+    \preformatted{EmpiricalDistribution$distribution()}
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Returns}{
+    Distribution name as character string.
+  }
 }
 
-\subsection{Returns}{
-Distribution name as character string.
-}
-}
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-EmpiricalDistribution-mean"></a>}}
 \if{latex}{\out{\hypertarget{method-EmpiricalDistribution-mean}{}}}
-\subsection{Method \code{mean()}}{
-Return the expected value of the distribution.
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{EmpiricalDistribution$mean()}\if{html}{\out{</div>}}
+\subsection{\code{EmpiricalDistribution$mean()}}{
+  Return the expected value of the distribution.
+  \subsection{Usage}{
+    \if{html}{\out{<div class="r">}}
+    \preformatted{EmpiricalDistribution$mean()}
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Returns}{
+    Expected value as a numeric value.
+  }
 }
 
-\subsection{Returns}{
-Expected value as a numeric value.
-}
-}
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-EmpiricalDistribution-mode"></a>}}
 \if{latex}{\out{\hypertarget{method-EmpiricalDistribution-mode}{}}}
-\subsection{Method \code{mode()}}{
-Return the mode of the distribution,
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{EmpiricalDistribution$mode()}\if{html}{\out{</div>}}
+\subsection{\code{EmpiricalDistribution$mode()}}{
+  Return the mode of the distribution,
+  \subsection{Usage}{
+    \if{html}{\out{<div class="r">}}
+    \preformatted{EmpiricalDistribution$mode()}
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Returns}{
+    NA because an empirical distribution is not guaranteed to be
+unimodal.
+  }
 }
 
-\subsection{Returns}{
-NA because an empirical distribution is not guaranteed to be
-unimodal.
-}
-}
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-EmpiricalDistribution-SD"></a>}}
 \if{latex}{\out{\hypertarget{method-EmpiricalDistribution-SD}{}}}
-\subsection{Method \code{SD()}}{
-Return the standard deviation of the distribution.
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{EmpiricalDistribution$SD()}\if{html}{\out{</div>}}
+\subsection{\code{EmpiricalDistribution$SD()}}{
+  Return the standard deviation of the distribution.
+  \subsection{Usage}{
+    \if{html}{\out{<div class="r">}}
+    \preformatted{EmpiricalDistribution$SD()}
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Returns}{
+    Standard deviation as a numeric value
+  }
 }
 
-\subsection{Returns}{
-Standard deviation as a numeric value
-}
-}
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-EmpiricalDistribution-sample"></a>}}
 \if{latex}{\out{\hypertarget{method-EmpiricalDistribution-sample}{}}}
-\subsection{Method \code{sample()}}{
-Draw and hold a random sample from the distribution.
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{EmpiricalDistribution$sample(expected = FALSE)}\if{html}{\out{</div>}}
-}
-
-\subsection{Arguments}{
-\if{html}{\out{<div class="arguments">}}
-\describe{
-\item{\code{expected}}{If TRUE, sets the next value retrieved by a call to
+\subsection{\code{EmpiricalDistribution$sample()}}{
+  Draw and hold a random sample from the distribution.
+  \subsection{Usage}{
+    \if{html}{\out{<div class="r">}}
+    \preformatted{EmpiricalDistribution$sample(expected = FALSE)}
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Arguments}{
+    \if{html}{\out{<div class="arguments">}}
+    \describe{
+      \item{\code{expected}}{If TRUE, sets the next value retrieved by a call to
 \code{r()} to be the mean of the distribution.}
-}
-\if{html}{\out{</div>}}
-}
-\subsection{Details}{
-Samples with interpolation or by random draw from the
+    }
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Details}{
+    Samples with interpolation or by random draw from the
 supplied distribution (see parameter \code{interpolate.sample} in
 \code{new()}).
+  }
+  \subsection{Returns}{
+    Updated distribution.
+  }
 }
 
-\subsection{Returns}{
-Updated distribution.
-}
-}
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-EmpiricalDistribution-quantile"></a>}}
 \if{latex}{\out{\hypertarget{method-EmpiricalDistribution-quantile}{}}}
-\subsection{Method \code{quantile()}}{
-Return the quantiles of the empirical uncertainty distribution.
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{EmpiricalDistribution$quantile(probs)}\if{html}{\out{</div>}}
+\subsection{\code{EmpiricalDistribution$quantile()}}{
+  Return the quantiles of the empirical uncertainty distribution.
+  \subsection{Usage}{
+    \if{html}{\out{<div class="r">}}
+    \preformatted{EmpiricalDistribution$quantile(probs)}
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Arguments}{
+    \if{html}{\out{<div class="arguments">}}
+    \describe{
+      \item{\code{probs}}{Vector of probabilities, in range [0,1].}
+    }
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Returns}{
+    Vector of quantiles.
+  }
 }
 
-\subsection{Arguments}{
-\if{html}{\out{<div class="arguments">}}
-\describe{
-\item{\code{probs}}{Vector of probabilities, in range [0,1].}
-}
-\if{html}{\out{</div>}}
-}
-\subsection{Returns}{
-Vector of quantiles.
-}
-}
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-EmpiricalDistribution-clone"></a>}}
 \if{latex}{\out{\hypertarget{method-EmpiricalDistribution-clone}{}}}
-\subsection{Method \code{clone()}}{
-The objects of this class are cloneable with this method.
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{EmpiricalDistribution$clone(deep = FALSE)}\if{html}{\out{</div>}}
+\subsection{\code{EmpiricalDistribution$clone()}}{
+  The objects of this class are cloneable with this method.
+  \subsection{Usage}{
+    \if{html}{\out{<div class="r">}}
+    \preformatted{EmpiricalDistribution$clone(deep = FALSE)}
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Arguments}{
+    \if{html}{\out{<div class="arguments">}}
+    \describe{
+      \item{\code{deep}}{Whether to make a deep clone.}
+    }
+    \if{html}{\out{</div>}}
+  }
 }
 
-\subsection{Arguments}{
-\if{html}{\out{<div class="arguments">}}
-\describe{
-\item{\code{deep}}{Whether to make a deep clone.}
-}
-\if{html}{\out{</div>}}
-}
-}
 }

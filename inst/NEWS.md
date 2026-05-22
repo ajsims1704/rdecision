@@ -1,5 +1,11 @@
-# redecision 1.3.0.9000
+# redecision 1.3.0.9001
 
+* Switched random node reordering in `Graph` off by default.
+* Modified vignettes to create diagrams in SVG format.
+* Modified vignette graphs to use DiagrammeR.
+* Modified `readme.Rmd` to create and reference diagrams in SVG format.
+* Revised `readme.Rmd` to generate pandoc markdown which validates with
+  the markdown linter in Visual Code.
 * Modified source to comply with default linters added since previous build,
   mostly involving removal of unnecessary return statements.
 * Modified internal functions `abortif` and `abortifnot` to accept arguments

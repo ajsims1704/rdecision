@@ -19,94 +19,95 @@ explicitly documented as a model input. Inherits from class \code{ModVar}.
 Andrew Sims \email{andrew.sims@newcastle.ac.uk}
 }
 \section{Super class}{
-\code{\link[rdecision:ModVar]{rdecision::ModVar}} -> \code{ConstModVar}
+\code{\link[rdecision:ModVar]{ModVar}} -> \code{ConstModVar}
 }
 \section{Methods}{
 \subsection{Public methods}{
-\itemize{
-\item \href{#method-ConstModVar-new}{\code{ConstModVar$new()}}
-\item \href{#method-ConstModVar-is_probabilistic}{\code{ConstModVar$is_probabilistic()}}
-\item \href{#method-ConstModVar-clone}{\code{ConstModVar$clone()}}
+  \itemize{
+    \item \href{#method-ConstModVar-initialize}{\code{ConstModVar$new()}}
+    \item \href{#method-ConstModVar-is_probabilistic}{\code{ConstModVar$is_probabilistic()}}
+    \item \href{#method-ConstModVar-clone}{\code{ConstModVar$clone()}}
+  }
 }
-}
-\if{html}{\out{
-<details><summary>Inherited methods</summary>
+\if{html}{\out{<details><summary>Inherited methods</summary>
 <ul>
-<li><span class="pkg-link" data-pkg="rdecision" data-topic="ModVar" data-id="SD"><a href='../../rdecision/html/ModVar.html#method-ModVar-SD'><code>rdecision::ModVar$SD()</code></a></span></li>
-<li><span class="pkg-link" data-pkg="rdecision" data-topic="ModVar" data-id="description"><a href='../../rdecision/html/ModVar.html#method-ModVar-description'><code>rdecision::ModVar$description()</code></a></span></li>
-<li><span class="pkg-link" data-pkg="rdecision" data-topic="ModVar" data-id="distribution"><a href='../../rdecision/html/ModVar.html#method-ModVar-distribution'><code>rdecision::ModVar$distribution()</code></a></span></li>
-<li><span class="pkg-link" data-pkg="rdecision" data-topic="ModVar" data-id="get"><a href='../../rdecision/html/ModVar.html#method-ModVar-get'><code>rdecision::ModVar$get()</code></a></span></li>
-<li><span class="pkg-link" data-pkg="rdecision" data-topic="ModVar" data-id="is_expression"><a href='../../rdecision/html/ModVar.html#method-ModVar-is_expression'><code>rdecision::ModVar$is_expression()</code></a></span></li>
-<li><span class="pkg-link" data-pkg="rdecision" data-topic="ModVar" data-id="mean"><a href='../../rdecision/html/ModVar.html#method-ModVar-mean'><code>rdecision::ModVar$mean()</code></a></span></li>
-<li><span class="pkg-link" data-pkg="rdecision" data-topic="ModVar" data-id="mode"><a href='../../rdecision/html/ModVar.html#method-ModVar-mode'><code>rdecision::ModVar$mode()</code></a></span></li>
-<li><span class="pkg-link" data-pkg="rdecision" data-topic="ModVar" data-id="quantile"><a href='../../rdecision/html/ModVar.html#method-ModVar-quantile'><code>rdecision::ModVar$quantile()</code></a></span></li>
-<li><span class="pkg-link" data-pkg="rdecision" data-topic="ModVar" data-id="r"><a href='../../rdecision/html/ModVar.html#method-ModVar-r'><code>rdecision::ModVar$r()</code></a></span></li>
-<li><span class="pkg-link" data-pkg="rdecision" data-topic="ModVar" data-id="set"><a href='../../rdecision/html/ModVar.html#method-ModVar-set'><code>rdecision::ModVar$set()</code></a></span></li>
-<li><span class="pkg-link" data-pkg="rdecision" data-topic="ModVar" data-id="units"><a href='../../rdecision/html/ModVar.html#method-ModVar-units'><code>rdecision::ModVar$units()</code></a></span></li>
+  <li><span class="pkg-link" data-pkg="rdecision" data-topic="ModVar" data-id="SD"><a href='../../rdecision/html/ModVar.html#method-ModVar-SD'><code>ModVar$SD()</code></a></span></li>
+  <li><span class="pkg-link" data-pkg="rdecision" data-topic="ModVar" data-id="description"><a href='../../rdecision/html/ModVar.html#method-ModVar-description'><code>ModVar$description()</code></a></span></li>
+  <li><span class="pkg-link" data-pkg="rdecision" data-topic="ModVar" data-id="distribution"><a href='../../rdecision/html/ModVar.html#method-ModVar-distribution'><code>ModVar$distribution()</code></a></span></li>
+  <li><span class="pkg-link" data-pkg="rdecision" data-topic="ModVar" data-id="get"><a href='../../rdecision/html/ModVar.html#method-ModVar-get'><code>ModVar$get()</code></a></span></li>
+  <li><span class="pkg-link" data-pkg="rdecision" data-topic="ModVar" data-id="is_expression"><a href='../../rdecision/html/ModVar.html#method-ModVar-is_expression'><code>ModVar$is_expression()</code></a></span></li>
+  <li><span class="pkg-link" data-pkg="rdecision" data-topic="ModVar" data-id="mean"><a href='../../rdecision/html/ModVar.html#method-ModVar-mean'><code>ModVar$mean()</code></a></span></li>
+  <li><span class="pkg-link" data-pkg="rdecision" data-topic="ModVar" data-id="mode"><a href='../../rdecision/html/ModVar.html#method-ModVar-mode'><code>ModVar$mode()</code></a></span></li>
+  <li><span class="pkg-link" data-pkg="rdecision" data-topic="ModVar" data-id="quantile"><a href='../../rdecision/html/ModVar.html#method-ModVar-quantile'><code>ModVar$quantile()</code></a></span></li>
+  <li><span class="pkg-link" data-pkg="rdecision" data-topic="ModVar" data-id="r"><a href='../../rdecision/html/ModVar.html#method-ModVar-r'><code>ModVar$r()</code></a></span></li>
+  <li><span class="pkg-link" data-pkg="rdecision" data-topic="ModVar" data-id="set"><a href='../../rdecision/html/ModVar.html#method-ModVar-set'><code>ModVar$set()</code></a></span></li>
+  <li><span class="pkg-link" data-pkg="rdecision" data-topic="ModVar" data-id="units"><a href='../../rdecision/html/ModVar.html#method-ModVar-units'><code>ModVar$units()</code></a></span></li>
 </ul>
-</details>
-}}
+</details>}}
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-ConstModVar-new"></a>}}
-\if{latex}{\out{\hypertarget{method-ConstModVar-new}{}}}
-\subsection{Method \code{new()}}{
-Create a new constant model variable.
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{ConstModVar$new(description, units, const)}\if{html}{\out{</div>}}
-}
-
-\subsection{Arguments}{
-\if{html}{\out{<div class="arguments">}}
-\describe{
-\item{\code{description}}{A character string description of the variable
+\if{html}{\out{<a id="method-ConstModVar-initialize"></a>}}
+\if{latex}{\out{\hypertarget{method-ConstModVar-initialize}{}}}
+\subsection{\code{ConstModVar$new()}}{
+  Create a new constant model variable.
+  \subsection{Usage}{
+    \if{html}{\out{<div class="r">}}
+    \preformatted{ConstModVar$new(description, units, const)}
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Arguments}{
+    \if{html}{\out{<div class="arguments">}}
+    \describe{
+      \item{\code{description}}{A character string description of the variable
 and its role in the model. This description will be used in a tabulation
 of the variables linked to a model.}
-
-\item{\code{units}}{A character string description of the units, e.g. "GBP",
+      \item{\code{units}}{A character string description of the units, e.g. "GBP",
 "per year".}
+      \item{\code{const}}{The constant numerical value of the object.}
+    }
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Returns}{
+    A new \code{ConstModVar} object.
+  }
+}
 
-\item{\code{const}}{The constant numerical value of the object.}
-}
-\if{html}{\out{</div>}}
-}
-\subsection{Returns}{
-A new \code{ConstModVar} object.
-}
-}
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-ConstModVar-is_probabilistic"></a>}}
 \if{latex}{\out{\hypertarget{method-ConstModVar-is_probabilistic}{}}}
-\subsection{Method \code{is_probabilistic()}}{
-Tests whether the model variable is probabilistic.
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{ConstModVar$is_probabilistic()}\if{html}{\out{</div>}}
-}
-
-\subsection{Details}{
-Does the random variable follow a distribution, or is it an
+\subsection{\code{ConstModVar$is_probabilistic()}}{
+  Tests whether the model variable is probabilistic.
+  \subsection{Usage}{
+    \if{html}{\out{<div class="r">}}
+    \preformatted{ConstModVar$is_probabilistic()}
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Details}{
+    Does the random variable follow a distribution, or is it an
 expression involving' random variables, some of which follow
 distributions?
+  }
+  \subsection{Returns}{
+    TRUE if probabilistic
+  }
 }
 
-\subsection{Returns}{
-TRUE if probabilistic
-}
-}
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-ConstModVar-clone"></a>}}
 \if{latex}{\out{\hypertarget{method-ConstModVar-clone}{}}}
-\subsection{Method \code{clone()}}{
-The objects of this class are cloneable with this method.
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{ConstModVar$clone(deep = FALSE)}\if{html}{\out{</div>}}
+\subsection{\code{ConstModVar$clone()}}{
+  The objects of this class are cloneable with this method.
+  \subsection{Usage}{
+    \if{html}{\out{<div class="r">}}
+    \preformatted{ConstModVar$clone(deep = FALSE)}
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Arguments}{
+    \if{html}{\out{<div class="arguments">}}
+    \describe{
+      \item{\code{deep}}{Whether to make a deep clone.}
+    }
+    \if{html}{\out{</div>}}
+  }
 }
 
-\subsection{Arguments}{
-\if{html}{\out{<div class="arguments">}}
-\describe{
-\item{\code{deep}}{Whether to make a deep clone.}
-}
-\if{html}{\out{</div>}}
-}
-}
 }

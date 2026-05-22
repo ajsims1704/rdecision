@@ -110,105 +110,100 @@ optionally create model variables for each conditional probability
 Andrew J. Sims \email{andrew.sims@newcastle.ac.uk}
 }
 \section{Super classes}{
-\code{\link[rdecision:Graph]{rdecision::Graph}} -> \code{\link[rdecision:Digraph]{rdecision::Digraph}} -> \code{SemiMarkovModel}
+\code{\link[rdecision:Graph]{Graph}} -> \code{\link[rdecision:Digraph]{Digraph}} -> \code{SemiMarkovModel}
 }
 \section{Methods}{
 \subsection{Public methods}{
-\itemize{
-\item \href{#method-SemiMarkovModel-new}{\code{SemiMarkovModel$new()}}
-\item \href{#method-SemiMarkovModel-set_probabilities}{\code{SemiMarkovModel$set_probabilities()}}
-\item \href{#method-SemiMarkovModel-transition_probabilities}{\code{SemiMarkovModel$transition_probabilities()}}
-\item \href{#method-SemiMarkovModel-transition_cost}{\code{SemiMarkovModel$transition_cost()}}
-\item \href{#method-SemiMarkovModel-get_statenames}{\code{SemiMarkovModel$get_statenames()}}
-\item \href{#method-SemiMarkovModel-reset}{\code{SemiMarkovModel$reset()}}
-\item \href{#method-SemiMarkovModel-get_populations}{\code{SemiMarkovModel$get_populations()}}
-\item \href{#method-SemiMarkovModel-get_cycle}{\code{SemiMarkovModel$get_cycle()}}
-\item \href{#method-SemiMarkovModel-get_tcycle}{\code{SemiMarkovModel$get_tcycle()}}
-\item \href{#method-SemiMarkovModel-get_elapsed}{\code{SemiMarkovModel$get_elapsed()}}
-\item \href{#method-SemiMarkovModel-tabulate_states}{\code{SemiMarkovModel$tabulate_states()}}
-\item \href{#method-SemiMarkovModel-cycle}{\code{SemiMarkovModel$cycle()}}
-\item \href{#method-SemiMarkovModel-cycles}{\code{SemiMarkovModel$cycles()}}
-\item \href{#method-SemiMarkovModel-modvars}{\code{SemiMarkovModel$modvars()}}
-\item \href{#method-SemiMarkovModel-modvar_table}{\code{SemiMarkovModel$modvar_table()}}
-\item \href{#method-SemiMarkovModel-clone}{\code{SemiMarkovModel$clone()}}
+  \itemize{
+    \item \href{#method-SemiMarkovModel-initialize}{\code{SemiMarkovModel$new()}}
+    \item \href{#method-SemiMarkovModel-set_probabilities}{\code{SemiMarkovModel$set_probabilities()}}
+    \item \href{#method-SemiMarkovModel-transition_probabilities}{\code{SemiMarkovModel$transition_probabilities()}}
+    \item \href{#method-SemiMarkovModel-transition_cost}{\code{SemiMarkovModel$transition_cost()}}
+    \item \href{#method-SemiMarkovModel-get_statenames}{\code{SemiMarkovModel$get_statenames()}}
+    \item \href{#method-SemiMarkovModel-reset}{\code{SemiMarkovModel$reset()}}
+    \item \href{#method-SemiMarkovModel-get_populations}{\code{SemiMarkovModel$get_populations()}}
+    \item \href{#method-SemiMarkovModel-get_cycle}{\code{SemiMarkovModel$get_cycle()}}
+    \item \href{#method-SemiMarkovModel-get_tcycle}{\code{SemiMarkovModel$get_tcycle()}}
+    \item \href{#method-SemiMarkovModel-get_elapsed}{\code{SemiMarkovModel$get_elapsed()}}
+    \item \href{#method-SemiMarkovModel-tabulate_states}{\code{SemiMarkovModel$tabulate_states()}}
+    \item \href{#method-SemiMarkovModel-cycle}{\code{SemiMarkovModel$cycle()}}
+    \item \href{#method-SemiMarkovModel-cycles}{\code{SemiMarkovModel$cycles()}}
+    \item \href{#method-SemiMarkovModel-modvars}{\code{SemiMarkovModel$modvars()}}
+    \item \href{#method-SemiMarkovModel-modvar_table}{\code{SemiMarkovModel$modvar_table()}}
+    \item \href{#method-SemiMarkovModel-clone}{\code{SemiMarkovModel$clone()}}
+  }
 }
-}
-\if{html}{\out{
-<details><summary>Inherited methods</summary>
+\if{html}{\out{<details><summary>Inherited methods</summary>
 <ul>
-<li><span class="pkg-link" data-pkg="rdecision" data-topic="Graph" data-id="degree"><a href='../../rdecision/html/Graph.html#method-Graph-degree'><code>rdecision::Graph$degree()</code></a></span></li>
-<li><span class="pkg-link" data-pkg="rdecision" data-topic="Graph" data-id="edge_along"><a href='../../rdecision/html/Graph.html#method-Graph-edge_along'><code>rdecision::Graph$edge_along()</code></a></span></li>
-<li><span class="pkg-link" data-pkg="rdecision" data-topic="Graph" data-id="edge_at"><a href='../../rdecision/html/Graph.html#method-Graph-edge_at'><code>rdecision::Graph$edge_at()</code></a></span></li>
-<li><span class="pkg-link" data-pkg="rdecision" data-topic="Graph" data-id="edge_index"><a href='../../rdecision/html/Graph.html#method-Graph-edge_index'><code>rdecision::Graph$edge_index()</code></a></span></li>
-<li><span class="pkg-link" data-pkg="rdecision" data-topic="Graph" data-id="edge_label"><a href='../../rdecision/html/Graph.html#method-Graph-edge_label'><code>rdecision::Graph$edge_label()</code></a></span></li>
-<li><span class="pkg-link" data-pkg="rdecision" data-topic="Graph" data-id="edges"><a href='../../rdecision/html/Graph.html#method-Graph-edges'><code>rdecision::Graph$edges()</code></a></span></li>
-<li><span class="pkg-link" data-pkg="rdecision" data-topic="Graph" data-id="graph_adjacency_matrix"><a href='../../rdecision/html/Graph.html#method-Graph-graph_adjacency_matrix'><code>rdecision::Graph$graph_adjacency_matrix()</code></a></span></li>
-<li><span class="pkg-link" data-pkg="rdecision" data-topic="Graph" data-id="has_edge"><a href='../../rdecision/html/Graph.html#method-Graph-has_edge'><code>rdecision::Graph$has_edge()</code></a></span></li>
-<li><span class="pkg-link" data-pkg="rdecision" data-topic="Graph" data-id="has_vertex"><a href='../../rdecision/html/Graph.html#method-Graph-has_vertex'><code>rdecision::Graph$has_vertex()</code></a></span></li>
-<li><span class="pkg-link" data-pkg="rdecision" data-topic="Graph" data-id="is_simple"><a href='../../rdecision/html/Graph.html#method-Graph-is_simple'><code>rdecision::Graph$is_simple()</code></a></span></li>
-<li><span class="pkg-link" data-pkg="rdecision" data-topic="Graph" data-id="neighbours"><a href='../../rdecision/html/Graph.html#method-Graph-neighbours'><code>rdecision::Graph$neighbours()</code></a></span></li>
-<li><span class="pkg-link" data-pkg="rdecision" data-topic="Graph" data-id="order"><a href='../../rdecision/html/Graph.html#method-Graph-order'><code>rdecision::Graph$order()</code></a></span></li>
-<li><span class="pkg-link" data-pkg="rdecision" data-topic="Graph" data-id="size"><a href='../../rdecision/html/Graph.html#method-Graph-size'><code>rdecision::Graph$size()</code></a></span></li>
-<li><span class="pkg-link" data-pkg="rdecision" data-topic="Graph" data-id="vertex_along"><a href='../../rdecision/html/Graph.html#method-Graph-vertex_along'><code>rdecision::Graph$vertex_along()</code></a></span></li>
-<li><span class="pkg-link" data-pkg="rdecision" data-topic="Graph" data-id="vertex_at"><a href='../../rdecision/html/Graph.html#method-Graph-vertex_at'><code>rdecision::Graph$vertex_at()</code></a></span></li>
-<li><span class="pkg-link" data-pkg="rdecision" data-topic="Graph" data-id="vertex_index"><a href='../../rdecision/html/Graph.html#method-Graph-vertex_index'><code>rdecision::Graph$vertex_index()</code></a></span></li>
-<li><span class="pkg-link" data-pkg="rdecision" data-topic="Graph" data-id="vertex_label"><a href='../../rdecision/html/Graph.html#method-Graph-vertex_label'><code>rdecision::Graph$vertex_label()</code></a></span></li>
-<li><span class="pkg-link" data-pkg="rdecision" data-topic="Graph" data-id="vertexes"><a href='../../rdecision/html/Graph.html#method-Graph-vertexes'><code>rdecision::Graph$vertexes()</code></a></span></li>
-<li><span class="pkg-link" data-pkg="rdecision" data-topic="Digraph" data-id="arrow_source"><a href='../../rdecision/html/Digraph.html#method-Digraph-arrow_source'><code>rdecision::Digraph$arrow_source()</code></a></span></li>
-<li><span class="pkg-link" data-pkg="rdecision" data-topic="Digraph" data-id="arrow_target"><a href='../../rdecision/html/Digraph.html#method-Digraph-arrow_target'><code>rdecision::Digraph$arrow_target()</code></a></span></li>
-<li><span class="pkg-link" data-pkg="rdecision" data-topic="Digraph" data-id="as_DOT"><a href='../../rdecision/html/Digraph.html#method-Digraph-as_DOT'><code>rdecision::Digraph$as_DOT()</code></a></span></li>
-<li><span class="pkg-link" data-pkg="rdecision" data-topic="Digraph" data-id="as_gml"><a href='../../rdecision/html/Digraph.html#method-Digraph-as_gml'><code>rdecision::Digraph$as_gml()</code></a></span></li>
-<li><span class="pkg-link" data-pkg="rdecision" data-topic="Digraph" data-id="digraph_adjacency_matrix"><a href='../../rdecision/html/Digraph.html#method-Digraph-digraph_adjacency_matrix'><code>rdecision::Digraph$digraph_adjacency_matrix()</code></a></span></li>
-<li><span class="pkg-link" data-pkg="rdecision" data-topic="Digraph" data-id="digraph_incidence_matrix"><a href='../../rdecision/html/Digraph.html#method-Digraph-digraph_incidence_matrix'><code>rdecision::Digraph$digraph_incidence_matrix()</code></a></span></li>
-<li><span class="pkg-link" data-pkg="rdecision" data-topic="Digraph" data-id="direct_predecessors"><a href='../../rdecision/html/Digraph.html#method-Digraph-direct_predecessors'><code>rdecision::Digraph$direct_predecessors()</code></a></span></li>
-<li><span class="pkg-link" data-pkg="rdecision" data-topic="Digraph" data-id="direct_successors"><a href='../../rdecision/html/Digraph.html#method-Digraph-direct_successors'><code>rdecision::Digraph$direct_successors()</code></a></span></li>
-<li><span class="pkg-link" data-pkg="rdecision" data-topic="Digraph" data-id="is_acyclic"><a href='../../rdecision/html/Digraph.html#method-Digraph-is_acyclic'><code>rdecision::Digraph$is_acyclic()</code></a></span></li>
-<li><span class="pkg-link" data-pkg="rdecision" data-topic="Digraph" data-id="is_arborescence"><a href='../../rdecision/html/Digraph.html#method-Digraph-is_arborescence'><code>rdecision::Digraph$is_arborescence()</code></a></span></li>
-<li><span class="pkg-link" data-pkg="rdecision" data-topic="Digraph" data-id="is_connected"><a href='../../rdecision/html/Digraph.html#method-Digraph-is_connected'><code>rdecision::Digraph$is_connected()</code></a></span></li>
-<li><span class="pkg-link" data-pkg="rdecision" data-topic="Digraph" data-id="is_polytree"><a href='../../rdecision/html/Digraph.html#method-Digraph-is_polytree'><code>rdecision::Digraph$is_polytree()</code></a></span></li>
-<li><span class="pkg-link" data-pkg="rdecision" data-topic="Digraph" data-id="is_tree"><a href='../../rdecision/html/Digraph.html#method-Digraph-is_tree'><code>rdecision::Digraph$is_tree()</code></a></span></li>
-<li><span class="pkg-link" data-pkg="rdecision" data-topic="Digraph" data-id="is_weakly_connected"><a href='../../rdecision/html/Digraph.html#method-Digraph-is_weakly_connected'><code>rdecision::Digraph$is_weakly_connected()</code></a></span></li>
-<li><span class="pkg-link" data-pkg="rdecision" data-topic="Digraph" data-id="paths"><a href='../../rdecision/html/Digraph.html#method-Digraph-paths'><code>rdecision::Digraph$paths()</code></a></span></li>
-<li><span class="pkg-link" data-pkg="rdecision" data-topic="Digraph" data-id="topological_sort"><a href='../../rdecision/html/Digraph.html#method-Digraph-topological_sort'><code>rdecision::Digraph$topological_sort()</code></a></span></li>
-<li><span class="pkg-link" data-pkg="rdecision" data-topic="Digraph" data-id="walk"><a href='../../rdecision/html/Digraph.html#method-Digraph-walk'><code>rdecision::Digraph$walk()</code></a></span></li>
+  <li><span class="pkg-link" data-pkg="rdecision" data-topic="Graph" data-id="degree"><a href='../../rdecision/html/Graph.html#method-Graph-degree'><code>Graph$degree()</code></a></span></li>
+  <li><span class="pkg-link" data-pkg="rdecision" data-topic="Graph" data-id="edge_along"><a href='../../rdecision/html/Graph.html#method-Graph-edge_along'><code>Graph$edge_along()</code></a></span></li>
+  <li><span class="pkg-link" data-pkg="rdecision" data-topic="Graph" data-id="edge_at"><a href='../../rdecision/html/Graph.html#method-Graph-edge_at'><code>Graph$edge_at()</code></a></span></li>
+  <li><span class="pkg-link" data-pkg="rdecision" data-topic="Graph" data-id="edge_index"><a href='../../rdecision/html/Graph.html#method-Graph-edge_index'><code>Graph$edge_index()</code></a></span></li>
+  <li><span class="pkg-link" data-pkg="rdecision" data-topic="Graph" data-id="edge_label"><a href='../../rdecision/html/Graph.html#method-Graph-edge_label'><code>Graph$edge_label()</code></a></span></li>
+  <li><span class="pkg-link" data-pkg="rdecision" data-topic="Graph" data-id="edges"><a href='../../rdecision/html/Graph.html#method-Graph-edges'><code>Graph$edges()</code></a></span></li>
+  <li><span class="pkg-link" data-pkg="rdecision" data-topic="Graph" data-id="graph_adjacency_matrix"><a href='../../rdecision/html/Graph.html#method-Graph-graph_adjacency_matrix'><code>Graph$graph_adjacency_matrix()</code></a></span></li>
+  <li><span class="pkg-link" data-pkg="rdecision" data-topic="Graph" data-id="has_edge"><a href='../../rdecision/html/Graph.html#method-Graph-has_edge'><code>Graph$has_edge()</code></a></span></li>
+  <li><span class="pkg-link" data-pkg="rdecision" data-topic="Graph" data-id="has_vertex"><a href='../../rdecision/html/Graph.html#method-Graph-has_vertex'><code>Graph$has_vertex()</code></a></span></li>
+  <li><span class="pkg-link" data-pkg="rdecision" data-topic="Graph" data-id="is_simple"><a href='../../rdecision/html/Graph.html#method-Graph-is_simple'><code>Graph$is_simple()</code></a></span></li>
+  <li><span class="pkg-link" data-pkg="rdecision" data-topic="Graph" data-id="neighbours"><a href='../../rdecision/html/Graph.html#method-Graph-neighbours'><code>Graph$neighbours()</code></a></span></li>
+  <li><span class="pkg-link" data-pkg="rdecision" data-topic="Graph" data-id="order"><a href='../../rdecision/html/Graph.html#method-Graph-order'><code>Graph$order()</code></a></span></li>
+  <li><span class="pkg-link" data-pkg="rdecision" data-topic="Graph" data-id="size"><a href='../../rdecision/html/Graph.html#method-Graph-size'><code>Graph$size()</code></a></span></li>
+  <li><span class="pkg-link" data-pkg="rdecision" data-topic="Graph" data-id="vertex_along"><a href='../../rdecision/html/Graph.html#method-Graph-vertex_along'><code>Graph$vertex_along()</code></a></span></li>
+  <li><span class="pkg-link" data-pkg="rdecision" data-topic="Graph" data-id="vertex_at"><a href='../../rdecision/html/Graph.html#method-Graph-vertex_at'><code>Graph$vertex_at()</code></a></span></li>
+  <li><span class="pkg-link" data-pkg="rdecision" data-topic="Graph" data-id="vertex_index"><a href='../../rdecision/html/Graph.html#method-Graph-vertex_index'><code>Graph$vertex_index()</code></a></span></li>
+  <li><span class="pkg-link" data-pkg="rdecision" data-topic="Graph" data-id="vertex_label"><a href='../../rdecision/html/Graph.html#method-Graph-vertex_label'><code>Graph$vertex_label()</code></a></span></li>
+  <li><span class="pkg-link" data-pkg="rdecision" data-topic="Graph" data-id="vertexes"><a href='../../rdecision/html/Graph.html#method-Graph-vertexes'><code>Graph$vertexes()</code></a></span></li>
+  <li><span class="pkg-link" data-pkg="rdecision" data-topic="Digraph" data-id="arrow_source"><a href='../../rdecision/html/Digraph.html#method-Digraph-arrow_source'><code>Digraph$arrow_source()</code></a></span></li>
+  <li><span class="pkg-link" data-pkg="rdecision" data-topic="Digraph" data-id="arrow_target"><a href='../../rdecision/html/Digraph.html#method-Digraph-arrow_target'><code>Digraph$arrow_target()</code></a></span></li>
+  <li><span class="pkg-link" data-pkg="rdecision" data-topic="Digraph" data-id="as_DOT"><a href='../../rdecision/html/Digraph.html#method-Digraph-as_DOT'><code>Digraph$as_DOT()</code></a></span></li>
+  <li><span class="pkg-link" data-pkg="rdecision" data-topic="Digraph" data-id="as_gml"><a href='../../rdecision/html/Digraph.html#method-Digraph-as_gml'><code>Digraph$as_gml()</code></a></span></li>
+  <li><span class="pkg-link" data-pkg="rdecision" data-topic="Digraph" data-id="digraph_adjacency_matrix"><a href='../../rdecision/html/Digraph.html#method-Digraph-digraph_adjacency_matrix'><code>Digraph$digraph_adjacency_matrix()</code></a></span></li>
+  <li><span class="pkg-link" data-pkg="rdecision" data-topic="Digraph" data-id="digraph_incidence_matrix"><a href='../../rdecision/html/Digraph.html#method-Digraph-digraph_incidence_matrix'><code>Digraph$digraph_incidence_matrix()</code></a></span></li>
+  <li><span class="pkg-link" data-pkg="rdecision" data-topic="Digraph" data-id="direct_predecessors"><a href='../../rdecision/html/Digraph.html#method-Digraph-direct_predecessors'><code>Digraph$direct_predecessors()</code></a></span></li>
+  <li><span class="pkg-link" data-pkg="rdecision" data-topic="Digraph" data-id="direct_successors"><a href='../../rdecision/html/Digraph.html#method-Digraph-direct_successors'><code>Digraph$direct_successors()</code></a></span></li>
+  <li><span class="pkg-link" data-pkg="rdecision" data-topic="Digraph" data-id="is_acyclic"><a href='../../rdecision/html/Digraph.html#method-Digraph-is_acyclic'><code>Digraph$is_acyclic()</code></a></span></li>
+  <li><span class="pkg-link" data-pkg="rdecision" data-topic="Digraph" data-id="is_arborescence"><a href='../../rdecision/html/Digraph.html#method-Digraph-is_arborescence'><code>Digraph$is_arborescence()</code></a></span></li>
+  <li><span class="pkg-link" data-pkg="rdecision" data-topic="Digraph" data-id="is_connected"><a href='../../rdecision/html/Digraph.html#method-Digraph-is_connected'><code>Digraph$is_connected()</code></a></span></li>
+  <li><span class="pkg-link" data-pkg="rdecision" data-topic="Digraph" data-id="is_polytree"><a href='../../rdecision/html/Digraph.html#method-Digraph-is_polytree'><code>Digraph$is_polytree()</code></a></span></li>
+  <li><span class="pkg-link" data-pkg="rdecision" data-topic="Digraph" data-id="is_tree"><a href='../../rdecision/html/Digraph.html#method-Digraph-is_tree'><code>Digraph$is_tree()</code></a></span></li>
+  <li><span class="pkg-link" data-pkg="rdecision" data-topic="Digraph" data-id="is_weakly_connected"><a href='../../rdecision/html/Digraph.html#method-Digraph-is_weakly_connected'><code>Digraph$is_weakly_connected()</code></a></span></li>
+  <li><span class="pkg-link" data-pkg="rdecision" data-topic="Digraph" data-id="paths"><a href='../../rdecision/html/Digraph.html#method-Digraph-paths'><code>Digraph$paths()</code></a></span></li>
+  <li><span class="pkg-link" data-pkg="rdecision" data-topic="Digraph" data-id="topological_sort"><a href='../../rdecision/html/Digraph.html#method-Digraph-topological_sort'><code>Digraph$topological_sort()</code></a></span></li>
+  <li><span class="pkg-link" data-pkg="rdecision" data-topic="Digraph" data-id="walk"><a href='../../rdecision/html/Digraph.html#method-Digraph-walk'><code>Digraph$walk()</code></a></span></li>
 </ul>
-</details>
-}}
+</details>}}
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-SemiMarkovModel-new"></a>}}
-\if{latex}{\out{\hypertarget{method-SemiMarkovModel-new}{}}}
-\subsection{Method \code{new()}}{
-Creates a semi-Markov model for cohort simulation.
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{SemiMarkovModel$new(
+\if{html}{\out{<a id="method-SemiMarkovModel-initialize"></a>}}
+\if{latex}{\out{\hypertarget{method-SemiMarkovModel-initialize}{}}}
+\subsection{\code{SemiMarkovModel$new()}}{
+  Creates a semi-Markov model for cohort simulation.
+  \subsection{Usage}{
+    \if{html}{\out{<div class="r">}}
+    \preformatted{SemiMarkovModel$new(
   V,
   E,
   tcycle = as.difftime(365.25, units = "days"),
   discount.cost = 0,
   discount.utility = 0
-)}\if{html}{\out{</div>}}
-}
-
-\subsection{Arguments}{
-\if{html}{\out{<div class="arguments">}}
-\describe{
-\item{\code{V}}{A list of nodes (\code{MarkovState}s).}
-
-\item{\code{E}}{A list of edges (\code{Transition}s).}
-
-\item{\code{tcycle}}{Cycle length, expressed as an R \code{difftime} object.}
-
-\item{\code{discount.cost}}{Annual discount rate for future costs. Note this
+)}
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Arguments}{
+    \if{html}{\out{<div class="arguments">}}
+    \describe{
+      \item{\code{V}}{A list of nodes (\code{MarkovState}s).}
+      \item{\code{E}}{A list of edges (\code{Transition}s).}
+      \item{\code{tcycle}}{Cycle length, expressed as an R \code{difftime} object.}
+      \item{\code{discount.cost}}{Annual discount rate for future costs. Note this
 is a rate, not a probability (i.e. use 0.035 for 3.5\%).}
-
-\item{\code{discount.utility}}{Annual discount rate for future
+      \item{\code{discount.utility}}{Annual discount rate for future
 utility. Note this is a rate, not a probability (i.e. use 0.035
 for 3.5\%).}
-}
-\if{html}{\out{</div>}}
-}
-\subsection{Details}{
-A semi-Markov model must meet the following conditions:
+    }
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Details}{
+    A semi-Markov model must meet the following conditions:
 \enumerate{
   \item It must have at least one node and at least one edge.
   \item All nodes must be of class \code{MarkovState};
@@ -229,172 +224,186 @@ A semi-Markov model must meet the following conditions:
   are no more transitions than cells in the transition matrix.
   \item The node labels must be unique to the graph.
 }
-}
-
-\subsection{Returns}{
-A \code{SemiMarkovModel} object. The population of the first
+  }
+  \subsection{Returns}{
+    A \code{SemiMarkovModel} object. The population of the first
 state is set to 1000 and from each state there is an equal
 conditional probability of each allowed transition.
+  }
 }
-}
+
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-SemiMarkovModel-set_probabilities"></a>}}
 \if{latex}{\out{\hypertarget{method-SemiMarkovModel-set_probabilities}{}}}
-\subsection{Method \code{set_probabilities()}}{
-Sets transition probabilities.
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{SemiMarkovModel$set_probabilities(Pt)}\if{html}{\out{</div>}}
-}
-
-\subsection{Arguments}{
-\if{html}{\out{<div class="arguments">}}
-\describe{
-\item{\code{Pt}}{Per-cycle transition probability matrix. The row and
+\subsection{\code{SemiMarkovModel$set_probabilities()}}{
+  Sets transition probabilities.
+  \subsection{Usage}{
+    \if{html}{\out{<div class="r">}}
+    \preformatted{SemiMarkovModel$set_probabilities(Pt)}
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Arguments}{
+    \if{html}{\out{<div class="arguments">}}
+    \describe{
+      \item{\code{Pt}}{Per-cycle transition probability matrix. The row and
 column labels must be the state names and each row must sum to one.
 Non-zero probabilities for undefined transitions are not allowed. At
 most one \code{NA} may appear in each row. If an NA is present in a row,
 it is replaced by 1 minus the sum of the defined probabilities.}
+    }
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Returns}{
+    Updated \code{SemiMarkovModel} object
+  }
 }
-\if{html}{\out{</div>}}
-}
-\subsection{Returns}{
-Updated \code{SemiMarkovModel} object
-}
-}
+
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-SemiMarkovModel-transition_probabilities"></a>}}
 \if{latex}{\out{\hypertarget{method-SemiMarkovModel-transition_probabilities}{}}}
-\subsection{Method \code{transition_probabilities()}}{
-Per-cycle transition probability matrix for the model.
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{SemiMarkovModel$transition_probabilities()}\if{html}{\out{</div>}}
+\subsection{\code{SemiMarkovModel$transition_probabilities()}}{
+  Per-cycle transition probability matrix for the model.
+  \subsection{Usage}{
+    \if{html}{\out{<div class="r">}}
+    \preformatted{SemiMarkovModel$transition_probabilities()}
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Returns}{
+    A square matrix of size equal to the number of states. If all
+states are labelled, the dimnames take the names of the states.
+  }
 }
 
-\subsection{Returns}{
-A square matrix of size equal to the number of states. If all
-states are labelled, the dimnames take the names of the states.
-}
-}
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-SemiMarkovModel-transition_cost"></a>}}
 \if{latex}{\out{\hypertarget{method-SemiMarkovModel-transition_cost}{}}}
-\subsection{Method \code{transition_cost()}}{
-Return the per-cycle transition costs for the model.
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{SemiMarkovModel$transition_cost()}\if{html}{\out{</div>}}
+\subsection{\code{SemiMarkovModel$transition_cost()}}{
+  Return the per-cycle transition costs for the model.
+  \subsection{Usage}{
+    \if{html}{\out{<div class="r">}}
+    \preformatted{SemiMarkovModel$transition_cost()}
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Returns}{
+    A square matrix of size equal to the number of states. If all
+states are labelled, the dimnames take the names of the states.
+  }
 }
 
-\subsection{Returns}{
-A square matrix of size equal to the number of states. If all
-states are labelled, the dimnames take the names of the states.
-}
-}
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-SemiMarkovModel-get_statenames"></a>}}
 \if{latex}{\out{\hypertarget{method-SemiMarkovModel-get_statenames}{}}}
-\subsection{Method \code{get_statenames()}}{
-Returns a character list of state names.
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{SemiMarkovModel$get_statenames()}\if{html}{\out{</div>}}
+\subsection{\code{SemiMarkovModel$get_statenames()}}{
+  Returns a character list of state names.
+  \subsection{Usage}{
+    \if{html}{\out{<div class="r">}}
+    \preformatted{SemiMarkovModel$get_statenames()}
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Returns}{
+    List of the names of each state.
+  }
 }
 
-\subsection{Returns}{
-List of the names of each state.
-}
-}
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-SemiMarkovModel-reset"></a>}}
 \if{latex}{\out{\hypertarget{method-SemiMarkovModel-reset}{}}}
-\subsection{Method \code{reset()}}{
-Resets the model counters.
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{SemiMarkovModel$reset(
+\subsection{\code{SemiMarkovModel$reset()}}{
+  Resets the model counters.
+  \subsection{Usage}{
+    \if{html}{\out{<div class="r">}}
+    \preformatted{SemiMarkovModel$reset(
   populations = NULL,
   icycle = 0L,
   elapsed = as.difftime(0, units = "days")
-)}\if{html}{\out{</div>}}
-}
-
-\subsection{Arguments}{
-\if{html}{\out{<div class="arguments">}}
-\describe{
-\item{\code{populations}}{A named vector of populations for
+)}
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Arguments}{
+    \if{html}{\out{<div class="arguments">}}
+    \describe{
+      \item{\code{populations}}{A named vector of populations for
 the start of the state. The names should be the state names.
 Due to the R implementation of matrix algebra, \code{populations}
 must be a numeric type and is not restricted to being an integer. If
 NULL, the population of all states is set to zero.}
-
-\item{\code{icycle}}{Cycle number at which to start/restart.}
-
-\item{\code{elapsed}}{Elapsed time since the index (reference) time used for
+      \item{\code{icycle}}{Cycle number at which to start/restart.}
+      \item{\code{elapsed}}{Elapsed time since the index (reference) time used for
 discounting as an R \code{difftime} object.}
-}
-\if{html}{\out{</div>}}
-}
-\subsection{Details}{
-Resets the state populations, next cycle number and elapsed time
+    }
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Details}{
+    Resets the state populations, next cycle number and elapsed time
 of the model. By default the model is returned to its ground state (zero
 people in the all states; next cycle is labelled
 zero; elapsed time (years) is zero). Any or all of these can be set via
 this function. \code{icycle} is simply an integer counter label for each
 cycle, \code{elapsed} sets the elapsed time in years from the index time
 from which discounting is assumed to apply.
+  }
+  \subsection{Returns}{
+    Updated \code{SemiMarkovModel} object.
+  }
 }
 
-\subsection{Returns}{
-Updated \code{SemiMarkovModel} object.
-}
-}
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-SemiMarkovModel-get_populations"></a>}}
 \if{latex}{\out{\hypertarget{method-SemiMarkovModel-get_populations}{}}}
-\subsection{Method \code{get_populations()}}{
-Gets the occupancy of each state.
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{SemiMarkovModel$get_populations()}\if{html}{\out{</div>}}
+\subsection{\code{SemiMarkovModel$get_populations()}}{
+  Gets the occupancy of each state.
+  \subsection{Usage}{
+    \if{html}{\out{<div class="r">}}
+    \preformatted{SemiMarkovModel$get_populations()}
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Returns}{
+    A numeric vector of populations, named with state names.
+  }
 }
 
-\subsection{Returns}{
-A numeric vector of populations, named with state names.
-}
-}
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-SemiMarkovModel-get_cycle"></a>}}
 \if{latex}{\out{\hypertarget{method-SemiMarkovModel-get_cycle}{}}}
-\subsection{Method \code{get_cycle()}}{
-Gets the current cycle number.
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{SemiMarkovModel$get_cycle()}\if{html}{\out{</div>}}
+\subsection{\code{SemiMarkovModel$get_cycle()}}{
+  Gets the current cycle number.
+  \subsection{Usage}{
+    \if{html}{\out{<div class="r">}}
+    \preformatted{SemiMarkovModel$get_cycle()}
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Returns}{
+    Current cycle count, as an integer.
+  }
 }
 
-\subsection{Returns}{
-Current cycle count, as an integer.
-}
-}
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-SemiMarkovModel-get_tcycle"></a>}}
 \if{latex}{\out{\hypertarget{method-SemiMarkovModel-get_tcycle}{}}}
-\subsection{Method \code{get_tcycle()}}{
-Gets the cycle duration.
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{SemiMarkovModel$get_tcycle()}\if{html}{\out{</div>}}
+\subsection{\code{SemiMarkovModel$get_tcycle()}}{
+  Gets the cycle duration.
+  \subsection{Usage}{
+    \if{html}{\out{<div class="r">}}
+    \preformatted{SemiMarkovModel$get_tcycle()}
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Returns}{
+    Current cycle duration, as a difftime object.
+  }
 }
 
-\subsection{Returns}{
-Current cycle duration, as a difftime object.
-}
-}
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-SemiMarkovModel-get_elapsed"></a>}}
 \if{latex}{\out{\hypertarget{method-SemiMarkovModel-get_elapsed}{}}}
-\subsection{Method \code{get_elapsed()}}{
-Gets the current elapsed time.
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{SemiMarkovModel$get_elapsed()}\if{html}{\out{</div>}}
-}
-
-\subsection{Details}{
-The elapsed time is defined as the difference between the
+\subsection{\code{SemiMarkovModel$get_elapsed()}}{
+  Gets the current elapsed time.
+  \subsection{Usage}{
+    \if{html}{\out{<div class="r">}}
+    \preformatted{SemiMarkovModel$get_elapsed()}
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Details}{
+    The elapsed time is defined as the difference between the
 current time in the model and an index time used as the reference
 time for applying discounting. By default the elapsed time starts at
 zero. It can be set directly by calling \code{reset}. It is incremented
@@ -402,55 +411,56 @@ after each call to \code{cycle} by the cycle duration to the time at the
 end of the cycle (even if half cycle correction is used). Thus, via the
 \code{reset} and \code{cycle} methods, the time of each cycle relative
 to the discounting index and its duration can be controlled arbitrarily.
+  }
+  \subsection{Returns}{
+    Elapsed time as an R \code{difftime} object.
+  }
 }
 
-\subsection{Returns}{
-Elapsed time as an R \code{difftime} object.
-}
-}
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-SemiMarkovModel-tabulate_states"></a>}}
 \if{latex}{\out{\hypertarget{method-SemiMarkovModel-tabulate_states}{}}}
-\subsection{Method \code{tabulate_states()}}{
-Tabulation of states
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{SemiMarkovModel$tabulate_states()}\if{html}{\out{</div>}}
-}
-
-\subsection{Details}{
-Creates a data frame summary of each state in the model.
-}
-
-\subsection{Returns}{
-A data frame with the following columns:
+\subsection{\code{SemiMarkovModel$tabulate_states()}}{
+  Tabulation of states
+  \subsection{Usage}{
+    \if{html}{\out{<div class="r">}}
+    \preformatted{SemiMarkovModel$tabulate_states()}
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Details}{
+    Creates a data frame summary of each state in the model.
+  }
+  \subsection{Returns}{
+    A data frame with the following columns:
 \describe{
 \item{Name}{State name}
 \item{Cost}{Annual cost of occupying the state}
 \item{Utility}{Incremental utility associated with being in the state.}
 }
+  }
 }
-}
+
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-SemiMarkovModel-cycle"></a>}}
 \if{latex}{\out{\hypertarget{method-SemiMarkovModel-cycle}{}}}
-\subsection{Method \code{cycle()}}{
-Applies one cycle of the model.
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{SemiMarkovModel$cycle(hcc.pop = TRUE, hcc.cost = TRUE, hcc.QALY = TRUE)}\if{html}{\out{</div>}}
-}
-
-\subsection{Arguments}{
-\if{html}{\out{<div class="arguments">}}
-\describe{
-\item{\code{hcc.pop}}{Determines the state populations returned by this
+\subsection{\code{SemiMarkovModel$cycle()}}{
+  Applies one cycle of the model.
+  \subsection{Usage}{
+    \if{html}{\out{<div class="r">}}
+    \preformatted{SemiMarkovModel$cycle(hcc.pop = TRUE, hcc.cost = TRUE, hcc.QALY = TRUE)}
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Arguments}{
+    \if{html}{\out{<div class="arguments">}}
+    \describe{
+      \item{\code{hcc.pop}}{Determines the state populations returned by this
 function. If FALSE, the end of cycle populations apply; if TRUE the
 mid-cycle populations and time apply. The mid-cycle populations are
 taken as the mean of the start and end populations and the discount
 time as the mid-point. The value of this parameter does not affect the
 state populations or elapsed time passed to the next cycle or available
 via \code{get_populations}; those are always the end cycle values.}
-
-\item{\code{hcc.cost}}{Determines the state occupancy costs returned by this
+      \item{\code{hcc.cost}}{Determines the state occupancy costs returned by this
 function and the time at which the cost discount is applied to the
 occupancy costs and the entry costs. If FALSE, the end of cycle
 populations and time apply; if TRUE the mid-cycle populations and time
@@ -458,8 +468,7 @@ apply, as per \code{hcc.pop}. The value of this parameter does not affect
 the state populations or elapsed time passed to the next cycle or
 available via \code{get_populations}; those are always the end cycle
 values.}
-
-\item{\code{hcc.QALY}}{Determines the incremental quality adjusted life years
+      \item{\code{hcc.QALY}}{Determines the incremental quality adjusted life years
 returned by this function and the time at which the utility discount is
 applied. If FALSE, the end of cycle population and reference time are
 applied to the utilities of each state; if TRUE the mid-cycle populations
@@ -467,11 +476,11 @@ and time are applied to the state utilities. The value of this parameter
 does not affect the state populations or elapsed time passed to the next
 cycle or available via \code{get_populations}; those are always the
 end cycle values.}
-}
-\if{html}{\out{</div>}}
-}
-\subsection{Returns}{
-Calculated values, one row per state, as a data frame with the
+    }
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Returns}{
+    Calculated values, one row per state, as a data frame with the
 following columns:
 \describe{
 \item{\code{State}}{Name of the state.}
@@ -492,36 +501,36 @@ are derived from \code{Transition} costs.}
 the states during the cycle. Half cycle correction and discounting are
 applied, if these options are set. Normalized by the model population.}
 }
+  }
 }
-}
+
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-SemiMarkovModel-cycles"></a>}}
 \if{latex}{\out{\hypertarget{method-SemiMarkovModel-cycles}{}}}
-\subsection{Method \code{cycles()}}{
-Applies multiple cycles of the model.
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{SemiMarkovModel$cycles(
+\subsection{\code{SemiMarkovModel$cycles()}}{
+  Applies multiple cycles of the model.
+  \subsection{Usage}{
+    \if{html}{\out{<div class="r">}}
+    \preformatted{SemiMarkovModel$cycles(
   ncycles = 2L,
   hcc.pop = TRUE,
   hcc.cost = TRUE,
   hcc.QALY = TRUE
-)}\if{html}{\out{</div>}}
-}
-
-\subsection{Arguments}{
-\if{html}{\out{<div class="arguments">}}
-\describe{
-\item{\code{ncycles}}{Number of cycles to run; default is 2.}
-
-\item{\code{hcc.pop}}{Determines the state populations returned by this
+)}
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Arguments}{
+    \if{html}{\out{<div class="arguments">}}
+    \describe{
+      \item{\code{ncycles}}{Number of cycles to run; default is 2.}
+      \item{\code{hcc.pop}}{Determines the state populations returned by this
 function. If FALSE, the end of cycle populations apply; if TRUE the
 mid-cycle populations and time apply. The mid-cycle populations are
 taken as the mean of the start and end populations and the discount
 time as the mid-point. The value of this parameter does not affect the
 state populations or elapsed time passed to the next cycle or available
 via \code{get_populations}; those are always the end cycle values.}
-
-\item{\code{hcc.cost}}{Determines the state occupancy costs returned by this
+      \item{\code{hcc.cost}}{Determines the state occupancy costs returned by this
 function and the time at which the cost discount is applied to the
 occupancy costs and the entry costs. If FALSE, the end of cycle
 populations and time apply; if TRUE the mid-cycle populations and time
@@ -529,8 +538,7 @@ apply, as per \code{hcc.pop}. The value of this parameter does not affect
 the state populations or elapsed time passed to the next cycle or
 available via \code{get_populations}; those are always the end cycle
 values.}
-
-\item{\code{hcc.QALY}}{Determines the incremental quality adjusted life years
+      \item{\code{hcc.QALY}}{Determines the incremental quality adjusted life years
 returned by this function and the time at which the utility discount is
 applied. If FALSE, the end of cycle population and reference time are
 applied to the utilities of each state; if TRUE the mid-cycle populations
@@ -538,11 +546,11 @@ and time are applied to the state utilities. The value of this parameter
 does not affect the state populations or elapsed time passed to the next
 cycle or available via \code{get_populations}; those are always the
 end cycle values.}
-}
-\if{html}{\out{</div>}}
-}
-\subsection{Details}{
-The starting populations are redistributed through the
+    }
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Details}{
+    The starting populations are redistributed through the
 transition probabilities and the state occupancy costs are
 calculated, using function \code{cycle}. The end populations are
 then fed back into the model for a further cycle and the
@@ -552,13 +560,12 @@ returned data frame, with the cycle number. If the cycle count
 for the model is zero when called, the first cycle reported
 will be cycle zero, i.e. the distribution of patients to starting
 states.
-}
-
-\subsection{Returns}{
-Data frame with cycle results, with the following columns:
+  }
+  \subsection{Returns}{
+    Data frame with cycle results, with the following columns:
 \describe{
 \item{\code{Cycle}}{The cycle number.}
-\item{\code{Years}}{Elapsed time at end of cycle, years}
+\item{\code{Years}}{Elapsed time at end of cycle, years.}
 \item{\code{Cost}}{Cost associated with occupancy and transitions between
 states during the cycle.}
 \item{\code{QALY}}{Quality adjusted life years associated with occupancy
@@ -566,38 +573,41 @@ of the states in the cycle.}
 \item{\code{<name>}}{Population of state \code{<name>} at the end of
 the cycle.}
 }
+  }
 }
-}
+
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-SemiMarkovModel-modvars"></a>}}
 \if{latex}{\out{\hypertarget{method-SemiMarkovModel-modvars}{}}}
-\subsection{Method \code{modvars()}}{
-Find all the model variables in the Markov model.
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{SemiMarkovModel$modvars()}\if{html}{\out{</div>}}
-}
-
-\subsection{Details}{
-Returns variables of type \code{ModVar} that have been
+\subsection{\code{SemiMarkovModel$modvars()}}{
+  Find all the model variables in the Markov model.
+  \subsection{Usage}{
+    \if{html}{\out{<div class="r">}}
+    \preformatted{SemiMarkovModel$modvars()}
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Details}{
+    Returns variables of type \code{ModVar} that have been
 specified as values associated with transition rates and costs and
 the state occupancy costs and utilities.
+  }
+  \subsection{Returns}{
+    A list of \code{ModVar}s.
+  }
 }
 
-\subsection{Returns}{
-A list of \code{ModVar}s.
-}
-}
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-SemiMarkovModel-modvar_table"></a>}}
 \if{latex}{\out{\hypertarget{method-SemiMarkovModel-modvar_table}{}}}
-\subsection{Method \code{modvar_table()}}{
-Tabulate the model variables in the Markov model.
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{SemiMarkovModel$modvar_table()}\if{html}{\out{</div>}}
-}
-
-\subsection{Returns}{
-Data frame with one row per model variable, as follows:
+\subsection{\code{SemiMarkovModel$modvar_table()}}{
+  Tabulate the model variables in the Markov model.
+  \subsection{Usage}{
+    \if{html}{\out{<div class="r">}}
+    \preformatted{SemiMarkovModel$modvar_table()}
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Returns}{
+    Data frame with one row per model variable, as follows:
 \describe{
 \item{\code{Description}}{As given at initialization.}
 \item{\code{Units}}{Units of the variable.}
@@ -617,23 +627,26 @@ expression, exact value otherwise.}
 \item{\code{Est}}{TRUE if the quantiles and SD have been estimated by
 random sampling.}
 }
+  }
 }
-}
+
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-SemiMarkovModel-clone"></a>}}
 \if{latex}{\out{\hypertarget{method-SemiMarkovModel-clone}{}}}
-\subsection{Method \code{clone()}}{
-The objects of this class are cloneable with this method.
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{SemiMarkovModel$clone(deep = FALSE)}\if{html}{\out{</div>}}
+\subsection{\code{SemiMarkovModel$clone()}}{
+  The objects of this class are cloneable with this method.
+  \subsection{Usage}{
+    \if{html}{\out{<div class="r">}}
+    \preformatted{SemiMarkovModel$clone(deep = FALSE)}
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Arguments}{
+    \if{html}{\out{<div class="arguments">}}
+    \describe{
+      \item{\code{deep}}{Whether to make a deep clone.}
+    }
+    \if{html}{\out{</div>}}
+  }
 }
 
-\subsection{Arguments}{
-\if{html}{\out{<div class="arguments">}}
-\describe{
-\item{\code{deep}}{Whether to make a deep clone.}
-}
-\if{html}{\out{</div>}}
-}
-}
 }

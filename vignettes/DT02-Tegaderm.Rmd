@@ -23,7 +23,8 @@ vignette: >
 knitr::opts_chunk$set(
   collapse = TRUE,
   echo = FALSE,
-  comment = "#>"
+  comment = "#>",
+  dev = "svg"
 )
 ```
 
@@ -424,6 +425,7 @@ of the tree, as follows.
 #| fig.keep = "all",
 #| fig.align = "center",
 #| fig.cap = "Figure 1. Decision tree for the Tegaderm model",
+#| out.width = "90%",
 #| echo = TRUE
 DT$draw(border = TRUE)
 ```
@@ -561,11 +563,12 @@ varied over their 95% confidence limits (figure 2).
 
 ```{r}
 #| results = "hide",
-#| fig.keep = "all",
 #| fig.align = "center",
 #| fig.cap = "Figure 2. Tornado diagram for the Tegaderm model",
+#| out.width = "90%",
 #| echo = TRUE
 to <- DT$tornado(index = e10, ref = e9, draw = TRUE)
+box(which = "outer")
 ```
 
 The object returned from method `tornado` (`to`) is a data frame which includes

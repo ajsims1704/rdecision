@@ -16,173 +16,185 @@ Inherits from class \code{Distribution}.
 Andrew J. Sims \email{andrew.sims@newcastle.ac.uk}
 }
 \section{Super class}{
-\code{\link[rdecision:Distribution]{rdecision::Distribution}} -> \code{DirichletDistribution}
+\code{\link[rdecision:Distribution]{Distribution}} -> \code{DirichletDistribution}
 }
 \section{Methods}{
 \subsection{Public methods}{
-\itemize{
-\item \href{#method-DirichletDistribution-new}{\code{DirichletDistribution$new()}}
-\item \href{#method-DirichletDistribution-distribution}{\code{DirichletDistribution$distribution()}}
-\item \href{#method-DirichletDistribution-mean}{\code{DirichletDistribution$mean()}}
-\item \href{#method-DirichletDistribution-mode}{\code{DirichletDistribution$mode()}}
-\item \href{#method-DirichletDistribution-quantile}{\code{DirichletDistribution$quantile()}}
-\item \href{#method-DirichletDistribution-varcov}{\code{DirichletDistribution$varcov()}}
-\item \href{#method-DirichletDistribution-sample}{\code{DirichletDistribution$sample()}}
-\item \href{#method-DirichletDistribution-clone}{\code{DirichletDistribution$clone()}}
+  \itemize{
+    \item \href{#method-DirichletDistribution-initialize}{\code{DirichletDistribution$new()}}
+    \item \href{#method-DirichletDistribution-distribution}{\code{DirichletDistribution$distribution()}}
+    \item \href{#method-DirichletDistribution-mean}{\code{DirichletDistribution$mean()}}
+    \item \href{#method-DirichletDistribution-mode}{\code{DirichletDistribution$mode()}}
+    \item \href{#method-DirichletDistribution-quantile}{\code{DirichletDistribution$quantile()}}
+    \item \href{#method-DirichletDistribution-varcov}{\code{DirichletDistribution$varcov()}}
+    \item \href{#method-DirichletDistribution-sample}{\code{DirichletDistribution$sample()}}
+    \item \href{#method-DirichletDistribution-clone}{\code{DirichletDistribution$clone()}}
+  }
 }
-}
-\if{html}{\out{
-<details open><summary>Inherited methods</summary>
+\if{html}{\out{<details open><summary>Inherited methods</summary>
 <ul>
-<li><span class="pkg-link" data-pkg="rdecision" data-topic="Distribution" data-id="SD"><a href='../../rdecision/html/Distribution.html#method-Distribution-SD'><code>rdecision::Distribution$SD()</code></a></span></li>
-<li><span class="pkg-link" data-pkg="rdecision" data-topic="Distribution" data-id="order"><a href='../../rdecision/html/Distribution.html#method-Distribution-order'><code>rdecision::Distribution$order()</code></a></span></li>
-<li><span class="pkg-link" data-pkg="rdecision" data-topic="Distribution" data-id="r"><a href='../../rdecision/html/Distribution.html#method-Distribution-r'><code>rdecision::Distribution$r()</code></a></span></li>
+  <li><span class="pkg-link" data-pkg="rdecision" data-topic="Distribution" data-id="SD"><a href='../../rdecision/html/Distribution.html#method-Distribution-SD'><code>Distribution$SD()</code></a></span></li>
+  <li><span class="pkg-link" data-pkg="rdecision" data-topic="Distribution" data-id="order"><a href='../../rdecision/html/Distribution.html#method-Distribution-order'><code>Distribution$order()</code></a></span></li>
+  <li><span class="pkg-link" data-pkg="rdecision" data-topic="Distribution" data-id="r"><a href='../../rdecision/html/Distribution.html#method-Distribution-r'><code>Distribution$r()</code></a></span></li>
 </ul>
-</details>
-}}
+</details>}}
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-DirichletDistribution-new"></a>}}
-\if{latex}{\out{\hypertarget{method-DirichletDistribution-new}{}}}
-\subsection{Method \code{new()}}{
-Create an object of class \code{DirichletDistribution}.
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{DirichletDistribution$new(alpha)}\if{html}{\out{</div>}}
+\if{html}{\out{<a id="method-DirichletDistribution-initialize"></a>}}
+\if{latex}{\out{\hypertarget{method-DirichletDistribution-initialize}{}}}
+\subsection{\code{DirichletDistribution$new()}}{
+  Create an object of class \code{DirichletDistribution}.
+  \subsection{Usage}{
+    \if{html}{\out{<div class="r">}}
+    \preformatted{DirichletDistribution$new(alpha)}
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Arguments}{
+    \if{html}{\out{<div class="arguments">}}
+    \describe{
+      \item{\code{alpha}}{Parameters of the distribution; a vector of \code{K} numeric
+values each > 0, with \eqn{K > 1}.}
+    }
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Returns}{
+    An object of class \code{DirichletDistribution}.
+  }
 }
 
-\subsection{Arguments}{
-\if{html}{\out{<div class="arguments">}}
-\describe{
-\item{\code{alpha}}{Parameters of the distribution; a vector of \code{K} numeric
-values each > 0, with \eqn{K > 1}.}
-}
-\if{html}{\out{</div>}}
-}
-\subsection{Returns}{
-An object of class \code{DirichletDistribution}.
-}
-}
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-DirichletDistribution-distribution"></a>}}
 \if{latex}{\out{\hypertarget{method-DirichletDistribution-distribution}{}}}
-\subsection{Method \code{distribution()}}{
-Accessor function for the name of the distribution.
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{DirichletDistribution$distribution()}\if{html}{\out{</div>}}
+\subsection{\code{DirichletDistribution$distribution()}}{
+  Accessor function for the name of the distribution.
+  \subsection{Usage}{
+    \if{html}{\out{<div class="r">}}
+    \preformatted{DirichletDistribution$distribution()}
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Returns}{
+    Distribution name as character string.
+  }
 }
 
-\subsection{Returns}{
-Distribution name as character string.
-}
-}
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-DirichletDistribution-mean"></a>}}
 \if{latex}{\out{\hypertarget{method-DirichletDistribution-mean}{}}}
-\subsection{Method \code{mean()}}{
-Mean value of each dimension of the distribution.
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{DirichletDistribution$mean()}\if{html}{\out{</div>}}
+\subsection{\code{DirichletDistribution$mean()}}{
+  Mean value of each dimension of the distribution.
+  \subsection{Usage}{
+    \if{html}{\out{<div class="r">}}
+    \preformatted{DirichletDistribution$mean()}
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Returns}{
+    A numerical vector of length K.
+  }
 }
 
-\subsection{Returns}{
-A numerical vector of length K.
-}
-}
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-DirichletDistribution-mode"></a>}}
 \if{latex}{\out{\hypertarget{method-DirichletDistribution-mode}{}}}
-\subsection{Method \code{mode()}}{
-Return the mode of the distribution.
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{DirichletDistribution$mode()}\if{html}{\out{</div>}}
+\subsection{\code{DirichletDistribution$mode()}}{
+  Return the mode of the distribution.
+  \subsection{Usage}{
+    \if{html}{\out{<div class="r">}}
+    \preformatted{DirichletDistribution$mode()}
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Details}{
+    Undefined if any alpha is \eqn{\le 1}.
+  }
+  \subsection{Returns}{
+    Mode as a vector of length \code{K}.
+  }
 }
 
-\subsection{Details}{
-Undefined if any alpha is \eqn{\le 1}.
-}
-
-\subsection{Returns}{
-Mode as a vector of length \code{K}.
-}
-}
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-DirichletDistribution-quantile"></a>}}
 \if{latex}{\out{\hypertarget{method-DirichletDistribution-quantile}{}}}
-\subsection{Method \code{quantile()}}{
-Quantiles of the univariate marginal distributions.
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{DirichletDistribution$quantile(probs)}\if{html}{\out{</div>}}
-}
-
-\subsection{Arguments}{
-\if{html}{\out{<div class="arguments">}}
-\describe{
-\item{\code{probs}}{Numeric vector of probabilities, each in range [0,1].}
-}
-\if{html}{\out{</div>}}
-}
-\subsection{Details}{
-The univariate marginal distributions of a Dirichlet
+\subsection{\code{DirichletDistribution$quantile()}}{
+  Quantiles of the univariate marginal distributions.
+  \subsection{Usage}{
+    \if{html}{\out{<div class="r">}}
+    \preformatted{DirichletDistribution$quantile(probs)}
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Arguments}{
+    \if{html}{\out{<div class="arguments">}}
+    \describe{
+      \item{\code{probs}}{Numeric vector of probabilities, each in range [0,1].}
+    }
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Details}{
+    The univariate marginal distributions of a Dirichlet
 distribution are Beta distributions. This function returns the
 quantiles of each marginal. Note that these are not the true
 quantiles of the multivariate Dirichlet.
-}
-
-\subsection{Returns}{
-A matrix of numeric values with the number of rows equal to the
+  }
+  \subsection{Returns}{
+    A matrix of numeric values with the number of rows equal to the
 length of \code{probs}, the number of columns equal to the order; rows
 are labelled with quantiles and columns with the dimension (1, 2, etc).
+  }
 }
-}
+
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-DirichletDistribution-varcov"></a>}}
 \if{latex}{\out{\hypertarget{method-DirichletDistribution-varcov}{}}}
-\subsection{Method \code{varcov()}}{
-Variance-covariance matrix.
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{DirichletDistribution$varcov()}\if{html}{\out{</div>}}
+\subsection{\code{DirichletDistribution$varcov()}}{
+  Variance-covariance matrix.
+  \subsection{Usage}{
+    \if{html}{\out{<div class="r">}}
+    \preformatted{DirichletDistribution$varcov()}
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Returns}{
+    A positive definite symmetric matrix of size \code{K} by
+\code{K}.
+  }
 }
 
-\subsection{Returns}{
-A positive definite symmetric matrix of size \code{K} by
-\code{K}.
-}
-}
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-DirichletDistribution-sample"></a>}}
 \if{latex}{\out{\hypertarget{method-DirichletDistribution-sample}{}}}
-\subsection{Method \code{sample()}}{
-Draw and hold a random sample from the distribution.
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{DirichletDistribution$sample(expected = FALSE)}\if{html}{\out{</div>}}
+\subsection{\code{DirichletDistribution$sample()}}{
+  Draw and hold a random sample from the distribution.
+  \subsection{Usage}{
+    \if{html}{\out{<div class="r">}}
+    \preformatted{DirichletDistribution$sample(expected = FALSE)}
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Arguments}{
+    \if{html}{\out{<div class="arguments">}}
+    \describe{
+      \item{\code{expected}}{If TRUE, sets the next value retrieved by a call to
+\code{r()} to be the mean of the distribution.}
+    }
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Returns}{
+    Void; sample is retrieved with call to \code{r()}.
+  }
 }
 
-\subsection{Arguments}{
-\if{html}{\out{<div class="arguments">}}
-\describe{
-\item{\code{expected}}{If TRUE, sets the next value retrieved by a call to
-\code{r()} to be the mean of the distribution.}
-}
-\if{html}{\out{</div>}}
-}
-\subsection{Returns}{
-Void; sample is retrieved with call to \code{r()}.
-}
-}
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-DirichletDistribution-clone"></a>}}
 \if{latex}{\out{\hypertarget{method-DirichletDistribution-clone}{}}}
-\subsection{Method \code{clone()}}{
-The objects of this class are cloneable with this method.
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{DirichletDistribution$clone(deep = FALSE)}\if{html}{\out{</div>}}
+\subsection{\code{DirichletDistribution$clone()}}{
+  The objects of this class are cloneable with this method.
+  \subsection{Usage}{
+    \if{html}{\out{<div class="r">}}
+    \preformatted{DirichletDistribution$clone(deep = FALSE)}
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Arguments}{
+    \if{html}{\out{<div class="arguments">}}
+    \describe{
+      \item{\code{deep}}{Whether to make a deep clone.}
+    }
+    \if{html}{\out{</div>}}
+  }
 }
 
-\subsection{Arguments}{
-\if{html}{\out{<div class="arguments">}}
-\describe{
-\item{\code{deep}}{Whether to make a deep clone.}
-}
-\if{html}{\out{</div>}}
-}
-}
 }

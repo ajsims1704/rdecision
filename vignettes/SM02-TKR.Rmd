@@ -23,7 +23,8 @@ vignette: >
 knitr::opts_chunk$set(
   collapse = TRUE,
   echo = FALSE,
-  comment = "#>"
+  comment = "#>",
+  dev = "svg"
 )
 ```
 
@@ -253,92 +254,88 @@ with(data = SMM_base$tabulate_states(), expr = {
 The `SemiMarkovModel` object can be represented graphically in the DOT format
 using the `as_DOT()` method for drawing with the `dot` tool from Graphviz, or
 with the `DiagrammeR` package. Alternatively it can be exported with the
-`as_gml()` method for drawing with the `igraph` package or other package
-which imports GML graph representations.
+`as_gml()` method for drawing with the `DiagrammeR` or `igraph` package, or
+other package which imports GML graph representations, and permits modification
+of the graph appearance as required.
 
 ```{r}
+#| purl = TRUE,
 #| fig.cap = "Markov state transition model for total knee replacement (TKR)",
-#| echo = FALSE,
-#| fig.height = 7,
-#| purl = TRUE
+#| fig.align = "center",
+#| out.width = "90%"
 local({
-  # create an igraph object
+  # set name of SVG file
+  svgfile <- tempfile(fileext = ".svg")
+  # save the graph as a GML file
   gml <- SMM_base$as_gml()
   gmlfile <- tempfile(fileext = ".gml")
   writeLines(gml, con = gmlfile)
-  ig <- igraph::read_graph(gmlfile, format = "gml")
-  # match layout to Dong & Buxton, fig 1
-  vxy <- matrix(
-    data = c(
-      +0.00, -0.75, +0.00, +0.75, -1.00, -0.25, +0.50, -0.75, +1.25,
-      +1.00, +0.05, +0.50, +0.00, -0.50, -0.50, -0.50, -1.00, -0.75
-    ),
-    ncol = 2L,
-    dimnames = list(states, c("x", "y"))
+  # import it to DiagrammeR
+  g <- DiagrammeR::import_graph(gmlfile, file_type = "gml", attr_theme = "tb")
+  # set global attributes
+  g <- DiagrammeR::add_global_graph_attrs(
+    g,
+    attr = "layout",
+    value = "dot",
+    attr_type = "graph"
   )
-  layout <- matrix(
-    data = c(
-      vapply(X = igraph::V(ig), FUN.VALUE = 1.0, FUN = function(v) {
-        lbl <- igraph::vertex_attr(ig, "label", v)
-        vxy[[lbl, "x"]]
-      }),
-      vapply(X = igraph::V(ig), FUN.VALUE = 1.0, FUN = function(v) {
-        lbl <- igraph::vertex_attr(ig, "label", v)
-        vxy[[lbl, "y"]]
-      })
-    ),
-    byrow = FALSE,
-    ncol = 2L
+  g <- DiagrammeR::add_global_graph_attrs(
+    g,
+    attr = "color",
+    value = "black",
+    attr_type = "graph"
   )
-  # vertex widths
-  vwidth <- vapply(X = igraph::V(ig), FUN.VALUE = 1.0, FUN = function(v) {
-    lbl <- igraph::vertex_attr(ig, "label", v)
-    nchar(lbl) * 4.0 + 2.0
-  })
-  # edge curvatures
-  cm <- matrix(
-    data = 0.0, nrow = length(states), ncol = length(states),
-    dimnames = list(states, states)
+  g <- DiagrammeR::add_global_graph_attrs(
+    g,
+    attr = "fontsize",
+    value = 8L,
+    attr_type = "node"
   )
-  cm[[
-    "TKR operation for knee problems", "TKR with serious complications"
-  ]] <- -0.7
-  cm[[
-    "TKR operation for knee problems", "Normal health after primary TKR"
-  ]] <- +1.4
-  cm[["Complex revision", "Death"]] <- -0.3
-  cm[["Simple revision", "Death"]] <- -0.2
-  cm[["Other treatments", "Death"]] <- -0.1
-  cm[["TKR with minor complications", "Death"]] <- +2.5
-  cm[["TKR with serious complications", "Death"]] <- +0.4
-  curves <- vapply(X = igraph::E(ig), FUN.VALUE = 1.0, FUN = function(e) {
-    # find source and target labels
-    trg <- igraph::head_of(ig, e)
-    trgl <- igraph::vertex_attr(ig, name = "label", index = trg)
-    src <- igraph::tail_of(ig, e)
-    srcl <- igraph::vertex_attr(ig, name = "label", index = src)
-    cr <- cm[[srcl, trgl]]
-  })
-
-  # plot the igraph
-  withr::with_par(
-    new = list(
-      oma = c(0L, 0L, 0L, 0L),
-      mar = c(1L, 6L, 1L, 6L),
-      xpd = NA
-    ),
-    code = plot(
-      ig,
-      rescale = FALSE, asp = 0L,
-      vertex.shape = "rectangle", vertex.size = vwidth,
-      vertex.color = "white", vertex.label.color = "black",
-      edge.color = "black", edge.curved = curves,
-      edge.arrow.size = 0.75,
-      frame = FALSE,
-      layout = layout,
-      loop.size = 0.8
-    )
+  g <- DiagrammeR::add_global_graph_attrs(
+    g,
+    attr = "shape",
+    value = "rectangle",
+    attr_type = "node"
   )
+  g <- DiagrammeR::add_global_graph_attrs(
+    g,
+    attr = "fixedsize",
+    value = FALSE,
+    attr_type = "node"
+  )
+  g <- DiagrammeR::add_global_graph_attrs(
+    g,
+    attr = "color",
+    value = "black",
+    attr_type = "node"
+  )
+  g <- DiagrammeR::add_global_graph_attrs(
+    g,
+    attr = "fillcolor",
+    value = "white",
+    attr_type = "node"
+  )
+  g <- DiagrammeR::add_global_graph_attrs(
+    g,
+    attr = "fontcolor",
+    value = "black",
+    attr_type = "node"
+  )
+  g <- DiagrammeR::add_global_graph_attrs(
+    g,
+    attr = "color",
+    value = "black",
+    attr_type = "edge"
+  )
+  # render it as an svg file
+  DiagrammeR::export_graph(
+    g,
+    file_name = svgfile,
+    file_type = "svg",
+    width = 480L
+  )
+  # draw it
+  knitr::include_graphics(path = svgfile, rel_path = FALSE)
 })
 ```
 
@@ -532,6 +529,8 @@ This progression can also be visualised using the base graphics function
 
 ```{r}
 #| fig.cap = "State occupancy progression for conventional surgery.",
+#| fig.pos = "center",
+#| out.width = "90%",
 #| purl = TRUE
 plot_occupancy <- function(SMM) {
   withr::with_par(
@@ -550,6 +549,7 @@ plot_occupancy <- function(SMM) {
         "topright", legend = states, fill = pal, bty = "n",
         inset = c(-0.75, 0.0), xpd = TRUE
       )
+      box(which = "outer")
     }
   )
 }
@@ -1339,6 +1339,7 @@ figure below (for comparison with figure 2 of the paper).
 
 ```{r}
 #| fig.cap = "Cost-effectiveness plane. QALY = Quality-adjusted life year",
+#| fig.align = "center",
 #| purl = TRUE
 withr::with_par(
   new = list(mar = c(1L, 2L, 2L, 1L)),
@@ -1362,4 +1363,5 @@ withr::with_par(
     )
   }
 )
+box(which = "outer")
 ```

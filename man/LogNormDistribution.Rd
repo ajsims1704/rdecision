@@ -62,165 +62,177 @@ p2=(0.84-0.53)/(2*1.96)), "LN7")}.
 Andrew J. Sims \email{andrew.sims@newcastle.ac.uk}
 }
 \section{Super class}{
-\code{\link[rdecision:Distribution]{rdecision::Distribution}} -> \code{LogNormDistribution}
+\code{\link[rdecision:Distribution]{Distribution}} -> \code{LogNormDistribution}
 }
 \section{Methods}{
 \subsection{Public methods}{
-\itemize{
-\item \href{#method-LogNormDistribution-new}{\code{LogNormDistribution$new()}}
-\item \href{#method-LogNormDistribution-distribution}{\code{LogNormDistribution$distribution()}}
-\item \href{#method-LogNormDistribution-sample}{\code{LogNormDistribution$sample()}}
-\item \href{#method-LogNormDistribution-mean}{\code{LogNormDistribution$mean()}}
-\item \href{#method-LogNormDistribution-mode}{\code{LogNormDistribution$mode()}}
-\item \href{#method-LogNormDistribution-SD}{\code{LogNormDistribution$SD()}}
-\item \href{#method-LogNormDistribution-quantile}{\code{LogNormDistribution$quantile()}}
-\item \href{#method-LogNormDistribution-clone}{\code{LogNormDistribution$clone()}}
+  \itemize{
+    \item \href{#method-LogNormDistribution-initialize}{\code{LogNormDistribution$new()}}
+    \item \href{#method-LogNormDistribution-distribution}{\code{LogNormDistribution$distribution()}}
+    \item \href{#method-LogNormDistribution-sample}{\code{LogNormDistribution$sample()}}
+    \item \href{#method-LogNormDistribution-mean}{\code{LogNormDistribution$mean()}}
+    \item \href{#method-LogNormDistribution-mode}{\code{LogNormDistribution$mode()}}
+    \item \href{#method-LogNormDistribution-SD}{\code{LogNormDistribution$SD()}}
+    \item \href{#method-LogNormDistribution-quantile}{\code{LogNormDistribution$quantile()}}
+    \item \href{#method-LogNormDistribution-clone}{\code{LogNormDistribution$clone()}}
+  }
 }
-}
-\if{html}{\out{
-<details open><summary>Inherited methods</summary>
+\if{html}{\out{<details open><summary>Inherited methods</summary>
 <ul>
-<li><span class="pkg-link" data-pkg="rdecision" data-topic="Distribution" data-id="order"><a href='../../rdecision/html/Distribution.html#method-Distribution-order'><code>rdecision::Distribution$order()</code></a></span></li>
-<li><span class="pkg-link" data-pkg="rdecision" data-topic="Distribution" data-id="r"><a href='../../rdecision/html/Distribution.html#method-Distribution-r'><code>rdecision::Distribution$r()</code></a></span></li>
-<li><span class="pkg-link" data-pkg="rdecision" data-topic="Distribution" data-id="varcov"><a href='../../rdecision/html/Distribution.html#method-Distribution-varcov'><code>rdecision::Distribution$varcov()</code></a></span></li>
+  <li><span class="pkg-link" data-pkg="rdecision" data-topic="Distribution" data-id="order"><a href='../../rdecision/html/Distribution.html#method-Distribution-order'><code>Distribution$order()</code></a></span></li>
+  <li><span class="pkg-link" data-pkg="rdecision" data-topic="Distribution" data-id="r"><a href='../../rdecision/html/Distribution.html#method-Distribution-r'><code>Distribution$r()</code></a></span></li>
+  <li><span class="pkg-link" data-pkg="rdecision" data-topic="Distribution" data-id="varcov"><a href='../../rdecision/html/Distribution.html#method-Distribution-varcov'><code>Distribution$varcov()</code></a></span></li>
 </ul>
-</details>
-}}
+</details>}}
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-LogNormDistribution-new"></a>}}
-\if{latex}{\out{\hypertarget{method-LogNormDistribution-new}{}}}
-\subsection{Method \code{new()}}{
-Create a log normal distribution.
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{LogNormDistribution$new(p1, p2, parametrization = "LN1")}\if{html}{\out{</div>}}
-}
-
-\subsection{Arguments}{
-\if{html}{\out{<div class="arguments">}}
-\describe{
-\item{\code{p1}}{First hyperparameter, a measure of location. See
+\if{html}{\out{<a id="method-LogNormDistribution-initialize"></a>}}
+\if{latex}{\out{\hypertarget{method-LogNormDistribution-initialize}{}}}
+\subsection{\code{LogNormDistribution$new()}}{
+  Create a log normal distribution.
+  \subsection{Usage}{
+    \if{html}{\out{<div class="r">}}
+    \preformatted{LogNormDistribution$new(p1, p2, parametrization = "LN1")}
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Arguments}{
+    \if{html}{\out{<div class="arguments">}}
+    \describe{
+      \item{\code{p1}}{First hyperparameter, a measure of location. See
 \emph{Details}.}
-
-\item{\code{p2}}{Second hyperparameter, a measure of spread. See \emph{Details}.}
-
-\item{\code{parametrization}}{A character string taking one of the values
+      \item{\code{p2}}{Second hyperparameter, a measure of spread. See \emph{Details}.}
+      \item{\code{parametrization}}{A character string taking one of the values
 \verb{"LN1"} (default) through \verb{"LN7"} (see \emph{Details}).}
+    }
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Returns}{
+    A \code{LogNormDistribution} object.
+  }
 }
-\if{html}{\out{</div>}}
-}
-\subsection{Returns}{
-A \code{LogNormDistribution} object.
-}
-}
+
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-LogNormDistribution-distribution"></a>}}
 \if{latex}{\out{\hypertarget{method-LogNormDistribution-distribution}{}}}
-\subsection{Method \code{distribution()}}{
-Accessor function for the name of the distribution.
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{LogNormDistribution$distribution()}\if{html}{\out{</div>}}
+\subsection{\code{LogNormDistribution$distribution()}}{
+  Accessor function for the name of the distribution.
+  \subsection{Usage}{
+    \if{html}{\out{<div class="r">}}
+    \preformatted{LogNormDistribution$distribution()}
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Returns}{
+    Distribution name as character string (\verb{"LN1"}, \verb{"LN2"}
+etc.).
+  }
 }
 
-\subsection{Returns}{
-Distribution name as character string (\verb{"LN1"}, \verb{"LN2"}
-etc.).
-}
-}
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-LogNormDistribution-sample"></a>}}
 \if{latex}{\out{\hypertarget{method-LogNormDistribution-sample}{}}}
-\subsection{Method \code{sample()}}{
-Draw a random sample from the model variable.
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{LogNormDistribution$sample(expected = FALSE)}\if{html}{\out{</div>}}
+\subsection{\code{LogNormDistribution$sample()}}{
+  Draw a random sample from the model variable.
+  \subsection{Usage}{
+    \if{html}{\out{<div class="r">}}
+    \preformatted{LogNormDistribution$sample(expected = FALSE)}
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Arguments}{
+    \if{html}{\out{<div class="arguments">}}
+    \describe{
+      \item{\code{expected}}{If TRUE, sets the next value retrieved by a call to
+\code{r()} to be the mean of the distribution.}
+    }
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Returns}{
+    Updated \code{LogNormDistribution} object.
+  }
 }
 
-\subsection{Arguments}{
-\if{html}{\out{<div class="arguments">}}
-\describe{
-\item{\code{expected}}{If TRUE, sets the next value retrieved by a call to
-\code{r()} to be the mean of the distribution.}
-}
-\if{html}{\out{</div>}}
-}
-\subsection{Returns}{
-Updated \code{LogNormDistribution} object.
-}
-}
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-LogNormDistribution-mean"></a>}}
 \if{latex}{\out{\hypertarget{method-LogNormDistribution-mean}{}}}
-\subsection{Method \code{mean()}}{
-Return the expected value of the distribution.
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{LogNormDistribution$mean()}\if{html}{\out{</div>}}
+\subsection{\code{LogNormDistribution$mean()}}{
+  Return the expected value of the distribution.
+  \subsection{Usage}{
+    \if{html}{\out{<div class="r">}}
+    \preformatted{LogNormDistribution$mean()}
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Returns}{
+    Expected value as a numeric value.
+  }
 }
 
-\subsection{Returns}{
-Expected value as a numeric value.
-}
-}
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-LogNormDistribution-mode"></a>}}
 \if{latex}{\out{\hypertarget{method-LogNormDistribution-mode}{}}}
-\subsection{Method \code{mode()}}{
-Return the point estimate of the variable.
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{LogNormDistribution$mode()}\if{html}{\out{</div>}}
+\subsection{\code{LogNormDistribution$mode()}}{
+  Return the point estimate of the variable.
+  \subsection{Usage}{
+    \if{html}{\out{<div class="r">}}
+    \preformatted{LogNormDistribution$mode()}
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Returns}{
+    Point estimate (mode) of the log normal distribution.
+  }
 }
 
-\subsection{Returns}{
-Point estimate (mode) of the log normal distribution.
-}
-}
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-LogNormDistribution-SD"></a>}}
 \if{latex}{\out{\hypertarget{method-LogNormDistribution-SD}{}}}
-\subsection{Method \code{SD()}}{
-Return the standard deviation of the distribution.
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{LogNormDistribution$SD()}\if{html}{\out{</div>}}
+\subsection{\code{LogNormDistribution$SD()}}{
+  Return the standard deviation of the distribution.
+  \subsection{Usage}{
+    \if{html}{\out{<div class="r">}}
+    \preformatted{LogNormDistribution$SD()}
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Returns}{
+    Standard deviation as a numeric value
+  }
 }
 
-\subsection{Returns}{
-Standard deviation as a numeric value
-}
-}
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-LogNormDistribution-quantile"></a>}}
 \if{latex}{\out{\hypertarget{method-LogNormDistribution-quantile}{}}}
-\subsection{Method \code{quantile()}}{
-Return the quantiles of the log normal distribution.
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{LogNormDistribution$quantile(probs)}\if{html}{\out{</div>}}
+\subsection{\code{LogNormDistribution$quantile()}}{
+  Return the quantiles of the log normal distribution.
+  \subsection{Usage}{
+    \if{html}{\out{<div class="r">}}
+    \preformatted{LogNormDistribution$quantile(probs)}
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Arguments}{
+    \if{html}{\out{<div class="arguments">}}
+    \describe{
+      \item{\code{probs}}{Vector of probabilities, in range [0,1].}
+    }
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Returns}{
+    Vector of quantiles.
+  }
 }
 
-\subsection{Arguments}{
-\if{html}{\out{<div class="arguments">}}
-\describe{
-\item{\code{probs}}{Vector of probabilities, in range [0,1].}
-}
-\if{html}{\out{</div>}}
-}
-\subsection{Returns}{
-Vector of quantiles.
-}
-}
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-LogNormDistribution-clone"></a>}}
 \if{latex}{\out{\hypertarget{method-LogNormDistribution-clone}{}}}
-\subsection{Method \code{clone()}}{
-The objects of this class are cloneable with this method.
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{LogNormDistribution$clone(deep = FALSE)}\if{html}{\out{</div>}}
+\subsection{\code{LogNormDistribution$clone()}}{
+  The objects of this class are cloneable with this method.
+  \subsection{Usage}{
+    \if{html}{\out{<div class="r">}}
+    \preformatted{LogNormDistribution$clone(deep = FALSE)}
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Arguments}{
+    \if{html}{\out{<div class="arguments">}}
+    \describe{
+      \item{\code{deep}}{Whether to make a deep clone.}
+    }
+    \if{html}{\out{</div>}}
+  }
 }
 
-\subsection{Arguments}{
-\if{html}{\out{<div class="arguments">}}
-\describe{
-\item{\code{deep}}{Whether to make a deep clone.}
-}
-\if{html}{\out{</div>}}
-}
-}
 }

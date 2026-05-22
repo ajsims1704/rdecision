@@ -21,7 +21,7 @@ Graph <- R6::R6Class(
     V = NULL,
     E = NULL,
     AG = NULL,
-    reorder = TRUE
+    reorder = FALSE
   ),
   public = list(
 

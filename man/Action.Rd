@@ -15,209 +15,217 @@ to represent an edge whose source node is a \code{DecisionNode}.
 Andrew J. Sims \email{andrew.sims@newcastle.ac.uk}
 }
 \section{Super classes}{
-\code{\link[rdecision:Edge]{rdecision::Edge}} -> \code{\link[rdecision:Arrow]{rdecision::Arrow}} -> \code{Action}
+\code{\link[rdecision:Edge]{Edge}} -> \code{\link[rdecision:Arrow]{Arrow}} -> \code{Action}
 }
 \section{Methods}{
 \subsection{Public methods}{
-\itemize{
-\item \href{#method-Action-new}{\code{Action$new()}}
-\item \href{#method-Action-grob}{\code{Action$grob()}}
-\item \href{#method-Action-modvars}{\code{Action$modvars()}}
-\item \href{#method-Action-p}{\code{Action$p()}}
-\item \href{#method-Action-set_cost}{\code{Action$set_cost()}}
-\item \href{#method-Action-cost}{\code{Action$cost()}}
-\item \href{#method-Action-set_benefit}{\code{Action$set_benefit()}}
-\item \href{#method-Action-benefit}{\code{Action$benefit()}}
-\item \href{#method-Action-clone}{\code{Action$clone()}}
+  \itemize{
+    \item \href{#method-Action-initialize}{\code{Action$new()}}
+    \item \href{#method-Action-grob}{\code{Action$grob()}}
+    \item \href{#method-Action-modvars}{\code{Action$modvars()}}
+    \item \href{#method-Action-p}{\code{Action$p()}}
+    \item \href{#method-Action-set_cost}{\code{Action$set_cost()}}
+    \item \href{#method-Action-cost}{\code{Action$cost()}}
+    \item \href{#method-Action-set_benefit}{\code{Action$set_benefit()}}
+    \item \href{#method-Action-benefit}{\code{Action$benefit()}}
+    \item \href{#method-Action-clone}{\code{Action$clone()}}
+  }
 }
-}
-\if{html}{\out{
-<details open><summary>Inherited methods</summary>
+\if{html}{\out{<details open><summary>Inherited methods</summary>
 <ul>
-<li><span class="pkg-link" data-pkg="rdecision" data-topic="Edge" data-id="endpoints"><a href='../../rdecision/html/Edge.html#method-Edge-endpoints'><code>rdecision::Edge$endpoints()</code></a></span></li>
-<li><span class="pkg-link" data-pkg="rdecision" data-topic="Edge" data-id="is_same_edge"><a href='../../rdecision/html/Edge.html#method-Edge-is_same_edge'><code>rdecision::Edge$is_same_edge()</code></a></span></li>
-<li><span class="pkg-link" data-pkg="rdecision" data-topic="Edge" data-id="label"><a href='../../rdecision/html/Edge.html#method-Edge-label'><code>rdecision::Edge$label()</code></a></span></li>
-<li><span class="pkg-link" data-pkg="rdecision" data-topic="Arrow" data-id="source"><a href='../../rdecision/html/Arrow.html#method-Arrow-source'><code>rdecision::Arrow$source()</code></a></span></li>
-<li><span class="pkg-link" data-pkg="rdecision" data-topic="Arrow" data-id="target"><a href='../../rdecision/html/Arrow.html#method-Arrow-target'><code>rdecision::Arrow$target()</code></a></span></li>
+  <li><span class="pkg-link" data-pkg="rdecision" data-topic="Edge" data-id="endpoints"><a href='../../rdecision/html/Edge.html#method-Edge-endpoints'><code>Edge$endpoints()</code></a></span></li>
+  <li><span class="pkg-link" data-pkg="rdecision" data-topic="Edge" data-id="is_same_edge"><a href='../../rdecision/html/Edge.html#method-Edge-is_same_edge'><code>Edge$is_same_edge()</code></a></span></li>
+  <li><span class="pkg-link" data-pkg="rdecision" data-topic="Edge" data-id="label"><a href='../../rdecision/html/Edge.html#method-Edge-label'><code>Edge$label()</code></a></span></li>
+  <li><span class="pkg-link" data-pkg="rdecision" data-topic="Arrow" data-id="source"><a href='../../rdecision/html/Arrow.html#method-Arrow-source'><code>Arrow$source()</code></a></span></li>
+  <li><span class="pkg-link" data-pkg="rdecision" data-topic="Arrow" data-id="target"><a href='../../rdecision/html/Arrow.html#method-Arrow-target'><code>Arrow$target()</code></a></span></li>
 </ul>
-</details>
-}}
+</details>}}
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-Action-new"></a>}}
-\if{latex}{\out{\hypertarget{method-Action-new}{}}}
-\subsection{Method \code{new()}}{
-Create an object of type \code{Action}. Optionally, a cost
+\if{html}{\out{<a id="method-Action-initialize"></a>}}
+\if{latex}{\out{\hypertarget{method-Action-initialize}{}}}
+\subsection{\code{Action$new()}}{
+  Create an object of type \code{Action}. Optionally, a cost
 and a benefit may be associated with traversing the edge. A \dfn{pay-off}
 (benefit minus cost)  is sometimes used in edges of decision trees; the
 parametrization used here is more general.
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{Action$new(source_node, target_node, label, cost = 0, benefit = 0)}\if{html}{\out{</div>}}
-}
-
-\subsection{Arguments}{
-\if{html}{\out{<div class="arguments">}}
-\describe{
-\item{\code{source_node}}{Decision node from which the arrow leaves.}
-
-\item{\code{target_node}}{Node to which the arrow points.}
-
-\item{\code{label}}{Character string containing the arrow label. This
+  \subsection{Usage}{
+    \if{html}{\out{<div class="r">}}
+    \preformatted{Action$new(source_node, target_node, label, cost = 0, benefit = 0)}
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Arguments}{
+    \if{html}{\out{<div class="arguments">}}
+    \describe{
+      \item{\code{source_node}}{Decision node from which the arrow leaves.}
+      \item{\code{target_node}}{Node to which the arrow points.}
+      \item{\code{label}}{Character string containing the arrow label. This
 must be defined for an action because the label is used in
 tabulation of strategies. It is recommended to choose labels that are
 brief and not punctuated with spaces, dots or underscores.}
-
-\item{\code{cost}}{Cost associated with traversal of this edge (numeric or
+      \item{\code{cost}}{Cost associated with traversal of this edge (numeric or
 \code{ModVar}), not NA.}
-
-\item{\code{benefit}}{Benefit associated with traversal of the edge, (numeric or
+      \item{\code{benefit}}{Benefit associated with traversal of the edge, (numeric or
 \code{ModVar}), not NA.}
+    }
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Returns}{
+    A new \code{Action} object.
+  }
 }
-\if{html}{\out{</div>}}
-}
-\subsection{Returns}{
-A new \code{Action} object.
-}
-}
+
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-Action-grob"></a>}}
 \if{latex}{\out{\hypertarget{method-Action-grob}{}}}
-\subsection{Method \code{grob()}}{
-Creates a grid::grob for an action edge.
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{Action$grob(xs, ys, xt, yt, fs = 0.2)}\if{html}{\out{</div>}}
+\subsection{\code{Action$grob()}}{
+  Creates a grid::grob for an action edge.
+  \subsection{Usage}{
+    \if{html}{\out{<div class="r">}}
+    \preformatted{Action$grob(xs, ys, xt, yt, fs = 0.2)}
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Arguments}{
+    \if{html}{\out{<div class="arguments">}}
+    \describe{
+      \item{\code{xs}}{x coordinate of source of edge, grid::unit object.}
+      \item{\code{ys}}{y coordinate of source of edge, grid::unit object.}
+      \item{\code{xt}}{x coordinate of target of edge, grid::unit object.}
+      \item{\code{yt}}{y coordinate of target of edge, grid::unit object.}
+      \item{\code{fs}}{Fraction of the edge which slopes.}
+    }
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Returns}{
+    A grid::grob containing the symbol and label.
+  }
 }
 
-\subsection{Arguments}{
-\if{html}{\out{<div class="arguments">}}
-\describe{
-\item{\code{xs}}{x coordinate of source of edge, grid::unit object.}
-
-\item{\code{ys}}{y coordinate of source of edge, grid::unit object.}
-
-\item{\code{xt}}{x coordinate of target of edge, grid::unit object.}
-
-\item{\code{yt}}{y coordinate of target of edge, grid::unit object.}
-
-\item{\code{fs}}{Fraction of the edge which slopes.}
-}
-\if{html}{\out{</div>}}
-}
-\subsection{Returns}{
-A grid::grob containing the symbol and label.
-}
-}
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-Action-modvars"></a>}}
 \if{latex}{\out{\hypertarget{method-Action-modvars}{}}}
-\subsection{Method \code{modvars()}}{
-Find all the model variables of type \code{ModVar} that have
+\subsection{\code{Action$modvars()}}{
+  Find all the model variables of type \code{ModVar} that have
 been specified as values associated with this \code{Action}. Includes
 operands of these \code{ModVar}s, if they are expressions.
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{Action$modvars()}\if{html}{\out{</div>}}
+  \subsection{Usage}{
+    \if{html}{\out{<div class="r">}}
+    \preformatted{Action$modvars()}
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Returns}{
+    A list of \code{ModVar}s.
+  }
 }
 
-\subsection{Returns}{
-A list of \code{ModVar}s.
-}
-}
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-Action-p"></a>}}
 \if{latex}{\out{\hypertarget{method-Action-p}{}}}
-\subsection{Method \code{p()}}{
-Return the current value of the edge probability, i.e., the
+\subsection{\code{Action$p()}}{
+  Return the current value of the edge probability, i.e., the
 conditional probability of traversing the edge.
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{Action$p()}\if{html}{\out{</div>}}
+  \subsection{Usage}{
+    \if{html}{\out{<div class="r">}}
+    \preformatted{Action$p()}
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Returns}{
+    Numeric value equal to 1.
+  }
 }
 
-\subsection{Returns}{
-Numeric value equal to 1.
-}
-}
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-Action-set_cost"></a>}}
 \if{latex}{\out{\hypertarget{method-Action-set_cost}{}}}
-\subsection{Method \code{set_cost()}}{
-Set the cost associated with the action edge.
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{Action$set_cost(c = 0)}\if{html}{\out{</div>}}
+\subsection{\code{Action$set_cost()}}{
+  Set the cost associated with the action edge.
+  \subsection{Usage}{
+    \if{html}{\out{<div class="r">}}
+    \preformatted{Action$set_cost(c = 0)}
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Arguments}{
+    \if{html}{\out{<div class="arguments">}}
+    \describe{
+      \item{\code{c}}{Cost associated with traversing the action edge. Of type numeric
+or \code{ModVar}, not NA.}
+    }
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Returns}{
+    Updated \code{Action} object.
+  }
 }
 
-\subsection{Arguments}{
-\if{html}{\out{<div class="arguments">}}
-\describe{
-\item{\code{c}}{Cost associated with traversing the action edge. Of type numeric
-or \code{ModVar}, not NA.}
-}
-\if{html}{\out{</div>}}
-}
-\subsection{Returns}{
-Updated \code{Action} object.
-}
-}
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-Action-cost"></a>}}
 \if{latex}{\out{\hypertarget{method-Action-cost}{}}}
-\subsection{Method \code{cost()}}{
-Return the cost associated with traversing the edge.
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{Action$cost()}\if{html}{\out{</div>}}
+\subsection{\code{Action$cost()}}{
+  Return the cost associated with traversing the edge.
+  \subsection{Usage}{
+    \if{html}{\out{<div class="r">}}
+    \preformatted{Action$cost()}
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Returns}{
+    Cost.
+  }
 }
 
-\subsection{Returns}{
-Cost.
-}
-}
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-Action-set_benefit"></a>}}
 \if{latex}{\out{\hypertarget{method-Action-set_benefit}{}}}
-\subsection{Method \code{set_benefit()}}{
-Set the benefit associated with the action edge.
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{Action$set_benefit(b = 0)}\if{html}{\out{</div>}}
+\subsection{\code{Action$set_benefit()}}{
+  Set the benefit associated with the action edge.
+  \subsection{Usage}{
+    \if{html}{\out{<div class="r">}}
+    \preformatted{Action$set_benefit(b = 0)}
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Arguments}{
+    \if{html}{\out{<div class="arguments">}}
+    \describe{
+      \item{\code{b}}{Benefit associated with traversing the action edge. Of type
+numeric or \code{ModVar}.}
+    }
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Returns}{
+    Updated \code{Action} object.
+  }
 }
 
-\subsection{Arguments}{
-\if{html}{\out{<div class="arguments">}}
-\describe{
-\item{\code{b}}{Benefit associated with traversing the action edge. Of type
-numeric or \code{ModVar}.}
-}
-\if{html}{\out{</div>}}
-}
-\subsection{Returns}{
-Updated \code{Action} object.
-}
-}
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-Action-benefit"></a>}}
 \if{latex}{\out{\hypertarget{method-Action-benefit}{}}}
-\subsection{Method \code{benefit()}}{
-Return the benefit associated with traversing the edge.
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{Action$benefit()}\if{html}{\out{</div>}}
+\subsection{\code{Action$benefit()}}{
+  Return the benefit associated with traversing the edge.
+  \subsection{Usage}{
+    \if{html}{\out{<div class="r">}}
+    \preformatted{Action$benefit()}
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Returns}{
+    Benefit.
+  }
 }
 
-\subsection{Returns}{
-Benefit.
-}
-}
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-Action-clone"></a>}}
 \if{latex}{\out{\hypertarget{method-Action-clone}{}}}
-\subsection{Method \code{clone()}}{
-The objects of this class are cloneable with this method.
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{Action$clone(deep = FALSE)}\if{html}{\out{</div>}}
+\subsection{\code{Action$clone()}}{
+  The objects of this class are cloneable with this method.
+  \subsection{Usage}{
+    \if{html}{\out{<div class="r">}}
+    \preformatted{Action$clone(deep = FALSE)}
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Arguments}{
+    \if{html}{\out{<div class="arguments">}}
+    \describe{
+      \item{\code{deep}}{Whether to make a deep clone.}
+    }
+    \if{html}{\out{</div>}}
+  }
 }
 
-\subsection{Arguments}{
-\if{html}{\out{<div class="arguments">}}
-\describe{
-\item{\code{deep}}{Whether to make a deep clone.}
-}
-\if{html}{\out{</div>}}
-}
-}
 }

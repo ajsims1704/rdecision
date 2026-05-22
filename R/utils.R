@@ -184,6 +184,7 @@ is_ModVar <- function(x) is_class(x, "ModVar")
 #' }
 #' @param outcome_mean Mean (base case) outcome.
 #' @param xlab Label for x axis
+#' @export
 tornado_plot <- function(to, outcome_mean, xlab = "") {
   # check the arguments
   abortifnot(

@@ -34,94 +34,92 @@ defined by Swat \emph{et al} can be used. Inherits from \code{ModVar}.
 Andrew J. Sims \email{andrew.sims@newcastle.ac.uk}
 }
 \section{Super class}{
-\code{\link[rdecision:ModVar]{rdecision::ModVar}} -> \code{LogNormModVar}
+\code{\link[rdecision:ModVar]{ModVar}} -> \code{LogNormModVar}
 }
 \section{Methods}{
 \subsection{Public methods}{
-\itemize{
-\item \href{#method-LogNormModVar-new}{\code{LogNormModVar$new()}}
-\item \href{#method-LogNormModVar-is_probabilistic}{\code{LogNormModVar$is_probabilistic()}}
-\item \href{#method-LogNormModVar-clone}{\code{LogNormModVar$clone()}}
+  \itemize{
+    \item \href{#method-LogNormModVar-initialize}{\code{LogNormModVar$new()}}
+    \item \href{#method-LogNormModVar-is_probabilistic}{\code{LogNormModVar$is_probabilistic()}}
+    \item \href{#method-LogNormModVar-clone}{\code{LogNormModVar$clone()}}
+  }
 }
-}
-\if{html}{\out{
-<details><summary>Inherited methods</summary>
+\if{html}{\out{<details><summary>Inherited methods</summary>
 <ul>
-<li><span class="pkg-link" data-pkg="rdecision" data-topic="ModVar" data-id="SD"><a href='../../rdecision/html/ModVar.html#method-ModVar-SD'><code>rdecision::ModVar$SD()</code></a></span></li>
-<li><span class="pkg-link" data-pkg="rdecision" data-topic="ModVar" data-id="description"><a href='../../rdecision/html/ModVar.html#method-ModVar-description'><code>rdecision::ModVar$description()</code></a></span></li>
-<li><span class="pkg-link" data-pkg="rdecision" data-topic="ModVar" data-id="distribution"><a href='../../rdecision/html/ModVar.html#method-ModVar-distribution'><code>rdecision::ModVar$distribution()</code></a></span></li>
-<li><span class="pkg-link" data-pkg="rdecision" data-topic="ModVar" data-id="get"><a href='../../rdecision/html/ModVar.html#method-ModVar-get'><code>rdecision::ModVar$get()</code></a></span></li>
-<li><span class="pkg-link" data-pkg="rdecision" data-topic="ModVar" data-id="is_expression"><a href='../../rdecision/html/ModVar.html#method-ModVar-is_expression'><code>rdecision::ModVar$is_expression()</code></a></span></li>
-<li><span class="pkg-link" data-pkg="rdecision" data-topic="ModVar" data-id="mean"><a href='../../rdecision/html/ModVar.html#method-ModVar-mean'><code>rdecision::ModVar$mean()</code></a></span></li>
-<li><span class="pkg-link" data-pkg="rdecision" data-topic="ModVar" data-id="mode"><a href='../../rdecision/html/ModVar.html#method-ModVar-mode'><code>rdecision::ModVar$mode()</code></a></span></li>
-<li><span class="pkg-link" data-pkg="rdecision" data-topic="ModVar" data-id="quantile"><a href='../../rdecision/html/ModVar.html#method-ModVar-quantile'><code>rdecision::ModVar$quantile()</code></a></span></li>
-<li><span class="pkg-link" data-pkg="rdecision" data-topic="ModVar" data-id="r"><a href='../../rdecision/html/ModVar.html#method-ModVar-r'><code>rdecision::ModVar$r()</code></a></span></li>
-<li><span class="pkg-link" data-pkg="rdecision" data-topic="ModVar" data-id="set"><a href='../../rdecision/html/ModVar.html#method-ModVar-set'><code>rdecision::ModVar$set()</code></a></span></li>
-<li><span class="pkg-link" data-pkg="rdecision" data-topic="ModVar" data-id="units"><a href='../../rdecision/html/ModVar.html#method-ModVar-units'><code>rdecision::ModVar$units()</code></a></span></li>
+  <li><span class="pkg-link" data-pkg="rdecision" data-topic="ModVar" data-id="SD"><a href='../../rdecision/html/ModVar.html#method-ModVar-SD'><code>ModVar$SD()</code></a></span></li>
+  <li><span class="pkg-link" data-pkg="rdecision" data-topic="ModVar" data-id="description"><a href='../../rdecision/html/ModVar.html#method-ModVar-description'><code>ModVar$description()</code></a></span></li>
+  <li><span class="pkg-link" data-pkg="rdecision" data-topic="ModVar" data-id="distribution"><a href='../../rdecision/html/ModVar.html#method-ModVar-distribution'><code>ModVar$distribution()</code></a></span></li>
+  <li><span class="pkg-link" data-pkg="rdecision" data-topic="ModVar" data-id="get"><a href='../../rdecision/html/ModVar.html#method-ModVar-get'><code>ModVar$get()</code></a></span></li>
+  <li><span class="pkg-link" data-pkg="rdecision" data-topic="ModVar" data-id="is_expression"><a href='../../rdecision/html/ModVar.html#method-ModVar-is_expression'><code>ModVar$is_expression()</code></a></span></li>
+  <li><span class="pkg-link" data-pkg="rdecision" data-topic="ModVar" data-id="mean"><a href='../../rdecision/html/ModVar.html#method-ModVar-mean'><code>ModVar$mean()</code></a></span></li>
+  <li><span class="pkg-link" data-pkg="rdecision" data-topic="ModVar" data-id="mode"><a href='../../rdecision/html/ModVar.html#method-ModVar-mode'><code>ModVar$mode()</code></a></span></li>
+  <li><span class="pkg-link" data-pkg="rdecision" data-topic="ModVar" data-id="quantile"><a href='../../rdecision/html/ModVar.html#method-ModVar-quantile'><code>ModVar$quantile()</code></a></span></li>
+  <li><span class="pkg-link" data-pkg="rdecision" data-topic="ModVar" data-id="r"><a href='../../rdecision/html/ModVar.html#method-ModVar-r'><code>ModVar$r()</code></a></span></li>
+  <li><span class="pkg-link" data-pkg="rdecision" data-topic="ModVar" data-id="set"><a href='../../rdecision/html/ModVar.html#method-ModVar-set'><code>ModVar$set()</code></a></span></li>
+  <li><span class="pkg-link" data-pkg="rdecision" data-topic="ModVar" data-id="units"><a href='../../rdecision/html/ModVar.html#method-ModVar-units'><code>ModVar$units()</code></a></span></li>
 </ul>
-</details>
-}}
+</details>}}
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-LogNormModVar-new"></a>}}
-\if{latex}{\out{\hypertarget{method-LogNormModVar-new}{}}}
-\subsection{Method \code{new()}}{
-Create a model variable with log normal uncertainty.
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{LogNormModVar$new(description, units, p1, p2, parametrization = "LN1")}\if{html}{\out{</div>}}
-}
-
-\subsection{Arguments}{
-\if{html}{\out{<div class="arguments">}}
-\describe{
-\item{\code{description}}{A character string describing the variable.}
-
-\item{\code{units}}{Units of the quantity; character string.}
-
-\item{\code{p1}}{First hyperparameter, a measure of location.
-See \emph{Details}.}
-
-\item{\code{p2}}{Second hyperparameter, a measure of spread.
-See \emph{Details}.}
-
-\item{\code{parametrization}}{A character string taking one of the values
+\if{html}{\out{<a id="method-LogNormModVar-initialize"></a>}}
+\if{latex}{\out{\hypertarget{method-LogNormModVar-initialize}{}}}
+\subsection{\code{LogNormModVar$new()}}{
+  Create a model variable with log normal uncertainty.
+  \subsection{Usage}{
+    \if{html}{\out{<div class="r">}}
+    \preformatted{LogNormModVar$new(description, units, p1, p2, parametrization = "LN1")}
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Arguments}{
+    \if{html}{\out{<div class="arguments">}}
+    \describe{
+      \item{\code{description}}{A character string describing the variable.}
+      \item{\code{units}}{Units of the quantity; character string.}
+      \item{\code{p1}}{First hyperparameter, a measure of location.}
+      \item{\code{p2}}{Second hyperparameter, a measure of spread.}
+      \item{\code{parametrization}}{A character string taking one of the values
 \verb{"LN1"} (default) through \verb{"LN7"} (see \emph{Details}).}
+    }
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Returns}{
+    A \code{LogNormModVar} object.
+  }
 }
-\if{html}{\out{</div>}}
-}
-\subsection{Returns}{
-A \code{LogNormModVar} object.
-}
-}
+
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-LogNormModVar-is_probabilistic"></a>}}
 \if{latex}{\out{\hypertarget{method-LogNormModVar-is_probabilistic}{}}}
-\subsection{Method \code{is_probabilistic()}}{
-Tests whether the model variable is probabilistic, i.e., a
+\subsection{\code{LogNormModVar$is_probabilistic()}}{
+  Tests whether the model variable is probabilistic, i.e., a
 random variable that follows a distribution, or an expression involving
 random variables, some of which follow distributions.
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{LogNormModVar$is_probabilistic()}\if{html}{\out{</div>}}
+  \subsection{Usage}{
+    \if{html}{\out{<div class="r">}}
+    \preformatted{LogNormModVar$is_probabilistic()}
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Returns}{
+    \code{TRUE} if probabilistic
+  }
 }
 
-\subsection{Returns}{
-\code{TRUE} if probabilistic
-}
-}
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-LogNormModVar-clone"></a>}}
 \if{latex}{\out{\hypertarget{method-LogNormModVar-clone}{}}}
-\subsection{Method \code{clone()}}{
-The objects of this class are cloneable with this method.
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{LogNormModVar$clone(deep = FALSE)}\if{html}{\out{</div>}}
+\subsection{\code{LogNormModVar$clone()}}{
+  The objects of this class are cloneable with this method.
+  \subsection{Usage}{
+    \if{html}{\out{<div class="r">}}
+    \preformatted{LogNormModVar$clone(deep = FALSE)}
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Arguments}{
+    \if{html}{\out{<div class="arguments">}}
+    \describe{
+      \item{\code{deep}}{Whether to make a deep clone.}
+    }
+    \if{html}{\out{</div>}}
+  }
 }
 
-\subsection{Arguments}{
-\if{html}{\out{<div class="arguments">}}
-\describe{
-\item{\code{deep}}{Whether to make a deep clone.}
-}
-\if{html}{\out{</div>}}
-}
-}
 }

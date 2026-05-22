@@ -17,85 +17,87 @@ class \code{Node}.
 Andrew Sims \email{andrew.sims@newcastle.ac.uk}
 }
 \section{Super class}{
-\code{\link[rdecision:Node]{rdecision::Node}} -> \code{ChanceNode}
+\code{\link[rdecision:Node]{Node}} -> \code{ChanceNode}
 }
 \section{Methods}{
 \subsection{Public methods}{
-\itemize{
-\item \href{#method-ChanceNode-new}{\code{ChanceNode$new()}}
-\item \href{#method-ChanceNode-grob}{\code{ChanceNode$grob()}}
-\item \href{#method-ChanceNode-clone}{\code{ChanceNode$clone()}}
+  \itemize{
+    \item \href{#method-ChanceNode-initialize}{\code{ChanceNode$new()}}
+    \item \href{#method-ChanceNode-grob}{\code{ChanceNode$grob()}}
+    \item \href{#method-ChanceNode-clone}{\code{ChanceNode$clone()}}
+  }
 }
-}
-\if{html}{\out{
-<details open><summary>Inherited methods</summary>
+\if{html}{\out{<details open><summary>Inherited methods</summary>
 <ul>
-<li><span class="pkg-link" data-pkg="rdecision" data-topic="Node" data-id="label"><a href='../../rdecision/html/Node.html#method-Node-label'><code>rdecision::Node$label()</code></a></span></li>
-<li><span class="pkg-link" data-pkg="rdecision" data-topic="Node" data-id="modvars"><a href='../../rdecision/html/Node.html#method-Node-modvars'><code>rdecision::Node$modvars()</code></a></span></li>
-<li><span class="pkg-link" data-pkg="rdecision" data-topic="Node" data-id="type"><a href='../../rdecision/html/Node.html#method-Node-type'><code>rdecision::Node$type()</code></a></span></li>
+  <li><span class="pkg-link" data-pkg="rdecision" data-topic="Node" data-id="label"><a href='../../rdecision/html/Node.html#method-Node-label'><code>Node$label()</code></a></span></li>
+  <li><span class="pkg-link" data-pkg="rdecision" data-topic="Node" data-id="modvars"><a href='../../rdecision/html/Node.html#method-Node-modvars'><code>Node$modvars()</code></a></span></li>
+  <li><span class="pkg-link" data-pkg="rdecision" data-topic="Node" data-id="type"><a href='../../rdecision/html/Node.html#method-Node-type'><code>Node$type()</code></a></span></li>
 </ul>
-</details>
-}}
+</details>}}
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-ChanceNode-new"></a>}}
-\if{latex}{\out{\hypertarget{method-ChanceNode-new}{}}}
-\subsection{Method \code{new()}}{
-Create a new \code{ChanceNode} object
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{ChanceNode$new(label = "")}\if{html}{\out{</div>}}
+\if{html}{\out{<a id="method-ChanceNode-initialize"></a>}}
+\if{latex}{\out{\hypertarget{method-ChanceNode-initialize}{}}}
+\subsection{\code{ChanceNode$new()}}{
+  Create a new \code{ChanceNode} object
+  \subsection{Usage}{
+    \if{html}{\out{<div class="r">}}
+    \preformatted{ChanceNode$new(label = "")}
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Arguments}{
+    \if{html}{\out{<div class="arguments">}}
+    \describe{
+      \item{\code{label}}{An optional label for the chance node.}
+    }
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Returns}{
+    A new \code{ChanceNode} object
+  }
 }
 
-\subsection{Arguments}{
-\if{html}{\out{<div class="arguments">}}
-\describe{
-\item{\code{label}}{An optional label for the chance node.}
-}
-\if{html}{\out{</div>}}
-}
-\subsection{Returns}{
-A new \code{ChanceNode} object
-}
-}
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-ChanceNode-grob"></a>}}
 \if{latex}{\out{\hypertarget{method-ChanceNode-grob}{}}}
-\subsection{Method \code{grob()}}{
-Creates a grid::grob for a chance node.
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{ChanceNode$grob(x, y, bb = FALSE)}\if{html}{\out{</div>}}
-}
-
-\subsection{Arguments}{
-\if{html}{\out{<div class="arguments">}}
-\describe{
-\item{\code{x}}{x coordinate of the node, grid::unit object.}
-
-\item{\code{y}}{y coordinate of the node, grid::unit object.}
-
-\item{\code{bb}}{Logical. If TRUE, function returns the bounding box.}
-}
-\if{html}{\out{</div>}}
-}
-\subsection{Returns}{
-A grob containing the symbol and label, or a bounding box
+\subsection{\code{ChanceNode$grob()}}{
+  Creates a grid::grob for a chance node.
+  \subsection{Usage}{
+    \if{html}{\out{<div class="r">}}
+    \preformatted{ChanceNode$grob(x, y, bb = FALSE)}
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Arguments}{
+    \if{html}{\out{<div class="arguments">}}
+    \describe{
+      \item{\code{x}}{x coordinate of the node, grid::unit object.}
+      \item{\code{y}}{y coordinate of the node, grid::unit object.}
+      \item{\code{bb}}{Logical. If TRUE, function returns the bounding box.}
+    }
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Returns}{
+    A grob containing the symbol and label, or a bounding box
 as a grid::unit vector with elements: left, right, bottom, top.
+  }
 }
-}
+
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-ChanceNode-clone"></a>}}
 \if{latex}{\out{\hypertarget{method-ChanceNode-clone}{}}}
-\subsection{Method \code{clone()}}{
-The objects of this class are cloneable with this method.
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{ChanceNode$clone(deep = FALSE)}\if{html}{\out{</div>}}
+\subsection{\code{ChanceNode$clone()}}{
+  The objects of this class are cloneable with this method.
+  \subsection{Usage}{
+    \if{html}{\out{<div class="r">}}
+    \preformatted{ChanceNode$clone(deep = FALSE)}
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Arguments}{
+    \if{html}{\out{<div class="arguments">}}
+    \describe{
+      \item{\code{deep}}{Whether to make a deep clone.}
+    }
+    \if{html}{\out{</div>}}
+  }
 }
 
-\subsection{Arguments}{
-\if{html}{\out{<div class="arguments">}}
-\describe{
-\item{\code{deep}}{Whether to make a deep clone.}
-}
-\if{html}{\out{</div>}}
-}
-}
 }

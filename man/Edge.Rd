@@ -16,114 +16,124 @@ Andrew J. Sims \email{andrew.sims@newcastle.ac.uk}
 }
 \section{Methods}{
 \subsection{Public methods}{
-\itemize{
-\item \href{#method-Edge-new}{\code{Edge$new()}}
-\item \href{#method-Edge-is_same_edge}{\code{Edge$is_same_edge()}}
-\item \href{#method-Edge-endpoints}{\code{Edge$endpoints()}}
-\item \href{#method-Edge-label}{\code{Edge$label()}}
-\item \href{#method-Edge-modvars}{\code{Edge$modvars()}}
-\item \href{#method-Edge-clone}{\code{Edge$clone()}}
-}
+  \itemize{
+    \item \href{#method-Edge-initialize}{\code{Edge$new()}}
+    \item \href{#method-Edge-is_same_edge}{\code{Edge$is_same_edge()}}
+    \item \href{#method-Edge-endpoints}{\code{Edge$endpoints()}}
+    \item \href{#method-Edge-label}{\code{Edge$label()}}
+    \item \href{#method-Edge-modvars}{\code{Edge$modvars()}}
+    \item \href{#method-Edge-clone}{\code{Edge$clone()}}
+  }
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-Edge-new"></a>}}
-\if{latex}{\out{\hypertarget{method-Edge-new}{}}}
-\subsection{Method \code{new()}}{
-Create an object of type \code{Edge}.
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{Edge$new(v1, v2, label = "")}\if{html}{\out{</div>}}
+\if{html}{\out{<a id="method-Edge-initialize"></a>}}
+\if{latex}{\out{\hypertarget{method-Edge-initialize}{}}}
+\subsection{\code{Edge$new()}}{
+  Create an object of type \code{Edge}.
+  \subsection{Usage}{
+    \if{html}{\out{<div class="r">}}
+    \preformatted{Edge$new(v1, v2, label = "")}
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Arguments}{
+    \if{html}{\out{<div class="arguments">}}
+    \describe{
+      \item{\code{v1}}{Node at one endpoint of the edge.}
+      \item{\code{v2}}{Node at the other endpoint of the edge.}
+      \item{\code{label}}{Character string containing the edge label.}
+    }
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Returns}{
+    A new \code{Edge} object.
+  }
 }
 
-\subsection{Arguments}{
-\if{html}{\out{<div class="arguments">}}
-\describe{
-\item{\code{v1}}{Node at one endpoint of the edge.}
-
-\item{\code{v2}}{Node at the other endpoint of the edge.}
-
-\item{\code{label}}{Character string containing the edge label.}
-}
-\if{html}{\out{</div>}}
-}
-\subsection{Returns}{
-A new \code{Edge} object.
-}
-}
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-Edge-is_same_edge"></a>}}
 \if{latex}{\out{\hypertarget{method-Edge-is_same_edge}{}}}
-\subsection{Method \code{is_same_edge()}}{
-Is this edge the same as the argument?
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{Edge$is_same_edge(e)}\if{html}{\out{</div>}}
+\subsection{\code{Edge$is_same_edge()}}{
+  Is this edge the same as the argument?
+  \subsection{Usage}{
+    \if{html}{\out{<div class="r">}}
+    \preformatted{Edge$is_same_edge(e)}
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Arguments}{
+    \if{html}{\out{<div class="arguments">}}
+    \describe{
+      \item{\code{e}}{edge to compare with this one}
+    }
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Returns}{
+    \code{TRUE} if \code{e} is also this one.
+  }
 }
 
-\subsection{Arguments}{
-\if{html}{\out{<div class="arguments">}}
-\describe{
-\item{\code{e}}{edge to compare with this one}
-}
-\if{html}{\out{</div>}}
-}
-\subsection{Returns}{
-\code{TRUE} if \code{e} is also this one.
-}
-}
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-Edge-endpoints"></a>}}
 \if{latex}{\out{\hypertarget{method-Edge-endpoints}{}}}
-\subsection{Method \code{endpoints()}}{
-Retrieve the endpoints of the edge.
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{Edge$endpoints()}\if{html}{\out{</div>}}
+\subsection{\code{Edge$endpoints()}}{
+  Retrieve the endpoints of the edge.
+  \subsection{Usage}{
+    \if{html}{\out{<div class="r">}}
+    \preformatted{Edge$endpoints()}
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Returns}{
+    List of two nodes to which the edge is connected.
+  }
 }
 
-\subsection{Returns}{
-List of two nodes to which the edge is connected.
-}
-}
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-Edge-label"></a>}}
 \if{latex}{\out{\hypertarget{method-Edge-label}{}}}
-\subsection{Method \code{label()}}{
-Access label.
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{Edge$label()}\if{html}{\out{</div>}}
+\subsection{\code{Edge$label()}}{
+  Access label.
+  \subsection{Usage}{
+    \if{html}{\out{<div class="r">}}
+    \preformatted{Edge$label()}
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Returns}{
+    Label of the edge; character string.
+  }
 }
 
-\subsection{Returns}{
-Label of the edge; character string.
-}
-}
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-Edge-modvars"></a>}}
 \if{latex}{\out{\hypertarget{method-Edge-modvars}{}}}
-\subsection{Method \code{modvars()}}{
-Find all the model variables of type \code{ModVar} that have
+\subsection{\code{Edge$modvars()}}{
+  Find all the model variables of type \code{ModVar} that have
 been specified as values associated with this \code{Edge}.
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{Edge$modvars()}\if{html}{\out{</div>}}
+  \subsection{Usage}{
+    \if{html}{\out{<div class="r">}}
+    \preformatted{Edge$modvars()}
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Returns}{
+    An empty list for the base class.
+  }
 }
 
-\subsection{Returns}{
-An empty list for the base class.
-}
-}
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-Edge-clone"></a>}}
 \if{latex}{\out{\hypertarget{method-Edge-clone}{}}}
-\subsection{Method \code{clone()}}{
-The objects of this class are cloneable with this method.
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{Edge$clone(deep = FALSE)}\if{html}{\out{</div>}}
+\subsection{\code{Edge$clone()}}{
+  The objects of this class are cloneable with this method.
+  \subsection{Usage}{
+    \if{html}{\out{<div class="r">}}
+    \preformatted{Edge$clone(deep = FALSE)}
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Arguments}{
+    \if{html}{\out{<div class="arguments">}}
+    \describe{
+      \item{\code{deep}}{Whether to make a deep clone.}
+    }
+    \if{html}{\out{</div>}}
+  }
 }
 
-\subsection{Arguments}{
-\if{html}{\out{<div class="arguments">}}
-\describe{
-\item{\code{deep}}{Whether to make a deep clone.}
-}
-\if{html}{\out{</div>}}
-}
-}
 }

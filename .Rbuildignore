@@ -15,3 +15,6 @@
 ^README\.Rmd$
 ^codecov\.yml$
 ^CRAN-SUBMISSION$
+^inst/doc/\.install_extras$
+^\.positai$
+^\.claude$

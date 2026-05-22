@@ -16,157 +16,168 @@ Andrew J. Sims \email{andrew.sims@newcastle.ac.uk}
 }
 \section{Methods}{
 \subsection{Public methods}{
-\itemize{
-\item \href{#method-Distribution-new}{\code{Distribution$new()}}
-\item \href{#method-Distribution-order}{\code{Distribution$order()}}
-\item \href{#method-Distribution-distribution}{\code{Distribution$distribution()}}
-\item \href{#method-Distribution-mean}{\code{Distribution$mean()}}
-\item \href{#method-Distribution-mode}{\code{Distribution$mode()}}
-\item \href{#method-Distribution-SD}{\code{Distribution$SD()}}
-\item \href{#method-Distribution-varcov}{\code{Distribution$varcov()}}
-\item \href{#method-Distribution-quantile}{\code{Distribution$quantile()}}
-\item \href{#method-Distribution-sample}{\code{Distribution$sample()}}
-\item \href{#method-Distribution-r}{\code{Distribution$r()}}
-\item \href{#method-Distribution-clone}{\code{Distribution$clone()}}
-}
+  \itemize{
+    \item \href{#method-Distribution-initialize}{\code{Distribution$new()}}
+    \item \href{#method-Distribution-order}{\code{Distribution$order()}}
+    \item \href{#method-Distribution-distribution}{\code{Distribution$distribution()}}
+    \item \href{#method-Distribution-mean}{\code{Distribution$mean()}}
+    \item \href{#method-Distribution-mode}{\code{Distribution$mode()}}
+    \item \href{#method-Distribution-SD}{\code{Distribution$SD()}}
+    \item \href{#method-Distribution-varcov}{\code{Distribution$varcov()}}
+    \item \href{#method-Distribution-quantile}{\code{Distribution$quantile()}}
+    \item \href{#method-Distribution-sample}{\code{Distribution$sample()}}
+    \item \href{#method-Distribution-r}{\code{Distribution$r()}}
+    \item \href{#method-Distribution-clone}{\code{Distribution$clone()}}
+  }
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-Distribution-new"></a>}}
-\if{latex}{\out{\hypertarget{method-Distribution-new}{}}}
-\subsection{Method \code{new()}}{
-Create an object of class \code{Distribution}.
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{Distribution$new(name, K = 1L)}\if{html}{\out{</div>}}
-}
-
-\subsection{Arguments}{
-\if{html}{\out{<div class="arguments">}}
-\describe{
-\item{\code{name}}{Name of the distribution ("Beta" etc.)}
-
-\item{\code{K}}{Order of the distribution (1 = univariate, 2 = bivariate etc.).
+\if{html}{\out{<a id="method-Distribution-initialize"></a>}}
+\if{latex}{\out{\hypertarget{method-Distribution-initialize}{}}}
+\subsection{\code{Distribution$new()}}{
+  Create an object of class \code{Distribution}.
+  \subsection{Usage}{
+    \if{html}{\out{<div class="r">}}
+    \preformatted{Distribution$new(name, K = 1L)}
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Arguments}{
+    \if{html}{\out{<div class="arguments">}}
+    \describe{
+      \item{\code{name}}{Name of the distribution ("Beta" etc.)}
+      \item{\code{K}}{Order of the distribution (1 = univariate, 2 = bivariate etc.).
 Must be an integer; use 1L, 3L etc. to avoid an error.}
+    }
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Returns}{
+    An object of class \code{Distribution}.
+  }
 }
-\if{html}{\out{</div>}}
-}
-\subsection{Returns}{
-An object of class \code{Distribution}.
-}
-}
+
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-Distribution-order"></a>}}
 \if{latex}{\out{\hypertarget{method-Distribution-order}{}}}
-\subsection{Method \code{order()}}{
-Order of the distribution
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{Distribution$order()}\if{html}{\out{</div>}}
+\subsection{\code{Distribution$order()}}{
+  Order of the distribution
+  \subsection{Usage}{
+    \if{html}{\out{<div class="r">}}
+    \preformatted{Distribution$order()}
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Returns}{
+    Order (\code{K}).
+  }
 }
 
-\subsection{Returns}{
-Order (\code{K}).
-}
-}
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-Distribution-distribution"></a>}}
 \if{latex}{\out{\hypertarget{method-Distribution-distribution}{}}}
-\subsection{Method \code{distribution()}}{
-Description of the uncertainty distribution.
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{Distribution$distribution()}\if{html}{\out{</div>}}
+\subsection{\code{Distribution$distribution()}}{
+  Description of the uncertainty distribution.
+  \subsection{Usage}{
+    \if{html}{\out{<div class="r">}}
+    \preformatted{Distribution$distribution()}
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Details}{
+    Includes the distribution name and its parameters.
+  }
+  \subsection{Returns}{
+    Distribution name and parameters as character string.
+  }
 }
 
-\subsection{Details}{
-Includes the distribution name and its parameters.
-}
-
-\subsection{Returns}{
-Distribution name and parameters as character string.
-}
-}
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-Distribution-mean"></a>}}
 \if{latex}{\out{\hypertarget{method-Distribution-mean}{}}}
-\subsection{Method \code{mean()}}{
-Mean value of the distribution.
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{Distribution$mean()}\if{html}{\out{</div>}}
+\subsection{\code{Distribution$mean()}}{
+  Mean value of the distribution.
+  \subsection{Usage}{
+    \if{html}{\out{<div class="r">}}
+    \preformatted{Distribution$mean()}
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Returns}{
+    Mean value as a numeric scalar (\code{K = 1L}) or vector of
+length \code{K}.
+  }
 }
 
-\subsection{Returns}{
-Mean value as a numeric scalar (\code{K = 1L}) or vector of
-length \code{K}.
-}
-}
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-Distribution-mode"></a>}}
 \if{latex}{\out{\hypertarget{method-Distribution-mode}{}}}
-\subsection{Method \code{mode()}}{
-Return the mode of the distribution.
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{Distribution$mode()}\if{html}{\out{</div>}}
-}
-
-\subsection{Details}{
-By default returns \code{NA}, which will be the case for most
+\subsection{\code{Distribution$mode()}}{
+  Return the mode of the distribution.
+  \subsection{Usage}{
+    \if{html}{\out{<div class="r">}}
+    \preformatted{Distribution$mode()}
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Details}{
+    By default returns \code{NA}, which will be the case for most
 because an arbitrary distribution is not guaranteed to be unimodal.
+  }
+  \subsection{Returns}{
+    Mode as a numeric scalar (\code{K = 1L}) or vector of
+length \code{K}.
+  }
 }
 
-\subsection{Returns}{
-Mode as a numeric scalar (\code{K = 1L}) or vector of
-length \code{K}.
-}
-}
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-Distribution-SD"></a>}}
 \if{latex}{\out{\hypertarget{method-Distribution-SD}{}}}
-\subsection{Method \code{SD()}}{
-Return the standard deviation of a univariate distribution.
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{Distribution$SD()}\if{html}{\out{</div>}}
-}
-
-\subsection{Details}{
-Only defined for univariate (\code{K = 1L}) distributions; for
+\subsection{\code{Distribution$SD()}}{
+  Return the standard deviation of a univariate distribution.
+  \subsection{Usage}{
+    \if{html}{\out{<div class="r">}}
+    \preformatted{Distribution$SD()}
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Details}{
+    Only defined for univariate (\code{K = 1L}) distributions; for
 multivariate distributions, function \code{varcov} returns the
 variance-covariance matrix.
+  }
+  \subsection{Returns}{
+    Standard deviation as a numeric value.
+  }
 }
 
-\subsection{Returns}{
-Standard deviation as a numeric value.
-}
-}
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-Distribution-varcov"></a>}}
 \if{latex}{\out{\hypertarget{method-Distribution-varcov}{}}}
-\subsection{Method \code{varcov()}}{
-Variance-covariance matrix.
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{Distribution$varcov()}\if{html}{\out{</div>}}
+\subsection{\code{Distribution$varcov()}}{
+  Variance-covariance matrix.
+  \subsection{Usage}{
+    \if{html}{\out{<div class="r">}}
+    \preformatted{Distribution$varcov()}
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Returns}{
+    A positive definite symmetric matrix of size \code{K} by
+\code{K}, or a scalar for \code{K = 1L}, equal to the variance.
+  }
 }
 
-\subsection{Returns}{
-A positive definite symmetric matrix of size \code{K} by
-\code{K}, or a scalar for \code{K = 1L}, equal to the variance.
-}
-}
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-Distribution-quantile"></a>}}
 \if{latex}{\out{\hypertarget{method-Distribution-quantile}{}}}
-\subsection{Method \code{quantile()}}{
-Marginal quantiles of the distribution.
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{Distribution$quantile(probs)}\if{html}{\out{</div>}}
-}
-
-\subsection{Arguments}{
-\if{html}{\out{<div class="arguments">}}
-\describe{
-\item{\code{probs}}{Numeric vector of probabilities, each in range [0,1].}
-}
-\if{html}{\out{</div>}}
-}
-\subsection{Details}{
-If they are defined, this function returns the marginal
+\subsection{\code{Distribution$quantile()}}{
+  Marginal quantiles of the distribution.
+  \subsection{Usage}{
+    \if{html}{\out{<div class="r">}}
+    \preformatted{Distribution$quantile(probs)}
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Arguments}{
+    \if{html}{\out{<div class="arguments">}}
+    \describe{
+      \item{\code{probs}}{Numeric vector of probabilities, each in range [0,1].}
+    }
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Details}{
+    If they are defined, this function returns the marginal
 quantiles of the multivariate distribution; i.e. the quantiles of each
 univariate marginal distribution of the multivariate distribution. For
 example, the univariate marginal distributions of a multivariate
@@ -178,70 +189,75 @@ for \code{K = 2L}, surfaces for \code{K = 3L}, etc. For example, the
 define a rectangle in \eqn{x_1, x_2} space that will include more than
 95\% of the distribution, whereas the contour containing 95\% of the
 distribution is an ellipse.
-}
-
-\subsection{Returns}{
-For \code{K = 1L} a numeric vector of length equal to the length
+  }
+  \subsection{Returns}{
+    For \code{K = 1L} a numeric vector of length equal to the length
 of \code{probs}, with each entry labelled with the quantile. For
 \code{K > 1L} a matrix of numeric values with the number of rows equal
 to the length of \code{probs}, the number of columns equal to the order;
 rows are labelled with probabilities and columns with the dimension
 (1, 2, etc).
+  }
 }
-}
+
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-Distribution-sample"></a>}}
 \if{latex}{\out{\hypertarget{method-Distribution-sample}{}}}
-\subsection{Method \code{sample()}}{
-Draw and hold a random sample from the distribution.
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{Distribution$sample(expected = FALSE)}\if{html}{\out{</div>}}
+\subsection{\code{Distribution$sample()}}{
+  Draw and hold a random sample from the distribution.
+  \subsection{Usage}{
+    \if{html}{\out{<div class="r">}}
+    \preformatted{Distribution$sample(expected = FALSE)}
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Arguments}{
+    \if{html}{\out{<div class="arguments">}}
+    \describe{
+      \item{\code{expected}}{If TRUE, sets the next value retrieved by a call to
+\code{r()} to be the mean of the distribution.}
+    }
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Returns}{
+    Void
+  }
 }
 
-\subsection{Arguments}{
-\if{html}{\out{<div class="arguments">}}
-\describe{
-\item{\code{expected}}{If TRUE, sets the next value retrieved by a call to
-\code{r()} to be the mean of the distribution.}
-}
-\if{html}{\out{</div>}}
-}
-\subsection{Returns}{
-Void
-}
-}
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-Distribution-r"></a>}}
 \if{latex}{\out{\hypertarget{method-Distribution-r}{}}}
-\subsection{Method \code{r()}}{
-Return a random sample drawn from the distribution.
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{Distribution$r()}\if{html}{\out{</div>}}
+\subsection{\code{Distribution$r()}}{
+  Return a random sample drawn from the distribution.
+  \subsection{Usage}{
+    \if{html}{\out{<div class="r">}}
+    \preformatted{Distribution$r()}
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Details}{
+    Returns the sample generated at the last call to \code{sample}.
+  }
+  \subsection{Returns}{
+    A vector of length \code{K} representing one sample.
+  }
 }
 
-\subsection{Details}{
-Returns the sample generated at the last call to \code{sample}.
-}
-
-\subsection{Returns}{
-A vector of length \code{K} representing one sample.
-}
-}
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-Distribution-clone"></a>}}
 \if{latex}{\out{\hypertarget{method-Distribution-clone}{}}}
-\subsection{Method \code{clone()}}{
-The objects of this class are cloneable with this method.
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{Distribution$clone(deep = FALSE)}\if{html}{\out{</div>}}
+\subsection{\code{Distribution$clone()}}{
+  The objects of this class are cloneable with this method.
+  \subsection{Usage}{
+    \if{html}{\out{<div class="r">}}
+    \preformatted{Distribution$clone(deep = FALSE)}
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Arguments}{
+    \if{html}{\out{<div class="arguments">}}
+    \describe{
+      \item{\code{deep}}{Whether to make a deep clone.}
+    }
+    \if{html}{\out{</div>}}
+  }
 }
 
-\subsection{Arguments}{
-\if{html}{\out{<div class="arguments">}}
-\describe{
-\item{\code{deep}}{Whether to make a deep clone.}
-}
-\if{html}{\out{</div>}}
-}
-}
 }

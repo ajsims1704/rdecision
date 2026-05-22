@@ -15,92 +15,96 @@ directed graph. Inherits from class \code{Edge}.
 Andrew J. Sims \email{andrew.sims@newcastle.ac.uk}
 }
 \section{Super class}{
-\code{\link[rdecision:Edge]{rdecision::Edge}} -> \code{Arrow}
+\code{\link[rdecision:Edge]{Edge}} -> \code{Arrow}
 }
 \section{Methods}{
 \subsection{Public methods}{
-\itemize{
-\item \href{#method-Arrow-new}{\code{Arrow$new()}}
-\item \href{#method-Arrow-source}{\code{Arrow$source()}}
-\item \href{#method-Arrow-target}{\code{Arrow$target()}}
-\item \href{#method-Arrow-clone}{\code{Arrow$clone()}}
+  \itemize{
+    \item \href{#method-Arrow-initialize}{\code{Arrow$new()}}
+    \item \href{#method-Arrow-source}{\code{Arrow$source()}}
+    \item \href{#method-Arrow-target}{\code{Arrow$target()}}
+    \item \href{#method-Arrow-clone}{\code{Arrow$clone()}}
+  }
 }
-}
-\if{html}{\out{
-<details open><summary>Inherited methods</summary>
+\if{html}{\out{<details open><summary>Inherited methods</summary>
 <ul>
-<li><span class="pkg-link" data-pkg="rdecision" data-topic="Edge" data-id="endpoints"><a href='../../rdecision/html/Edge.html#method-Edge-endpoints'><code>rdecision::Edge$endpoints()</code></a></span></li>
-<li><span class="pkg-link" data-pkg="rdecision" data-topic="Edge" data-id="is_same_edge"><a href='../../rdecision/html/Edge.html#method-Edge-is_same_edge'><code>rdecision::Edge$is_same_edge()</code></a></span></li>
-<li><span class="pkg-link" data-pkg="rdecision" data-topic="Edge" data-id="label"><a href='../../rdecision/html/Edge.html#method-Edge-label'><code>rdecision::Edge$label()</code></a></span></li>
-<li><span class="pkg-link" data-pkg="rdecision" data-topic="Edge" data-id="modvars"><a href='../../rdecision/html/Edge.html#method-Edge-modvars'><code>rdecision::Edge$modvars()</code></a></span></li>
+  <li><span class="pkg-link" data-pkg="rdecision" data-topic="Edge" data-id="endpoints"><a href='../../rdecision/html/Edge.html#method-Edge-endpoints'><code>Edge$endpoints()</code></a></span></li>
+  <li><span class="pkg-link" data-pkg="rdecision" data-topic="Edge" data-id="is_same_edge"><a href='../../rdecision/html/Edge.html#method-Edge-is_same_edge'><code>Edge$is_same_edge()</code></a></span></li>
+  <li><span class="pkg-link" data-pkg="rdecision" data-topic="Edge" data-id="label"><a href='../../rdecision/html/Edge.html#method-Edge-label'><code>Edge$label()</code></a></span></li>
+  <li><span class="pkg-link" data-pkg="rdecision" data-topic="Edge" data-id="modvars"><a href='../../rdecision/html/Edge.html#method-Edge-modvars'><code>Edge$modvars()</code></a></span></li>
 </ul>
-</details>
-}}
+</details>}}
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-Arrow-new"></a>}}
-\if{latex}{\out{\hypertarget{method-Arrow-new}{}}}
-\subsection{Method \code{new()}}{
-Create an object of type \code{Arrow}.
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{Arrow$new(source_node, target_node, label = "")}\if{html}{\out{</div>}}
+\if{html}{\out{<a id="method-Arrow-initialize"></a>}}
+\if{latex}{\out{\hypertarget{method-Arrow-initialize}{}}}
+\subsection{\code{Arrow$new()}}{
+  Create an object of type \code{Arrow}.
+  \subsection{Usage}{
+    \if{html}{\out{<div class="r">}}
+    \preformatted{Arrow$new(source_node, target_node, label = "")}
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Arguments}{
+    \if{html}{\out{<div class="arguments">}}
+    \describe{
+      \item{\code{source_node}}{Node from which the arrow leaves.}
+      \item{\code{target_node}}{Node to which the arrow points.}
+      \item{\code{label}}{Character string containing the arrow label.}
+    }
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Returns}{
+    A new \code{Arrow} object.
+  }
 }
 
-\subsection{Arguments}{
-\if{html}{\out{<div class="arguments">}}
-\describe{
-\item{\code{source_node}}{Node from which the arrow leaves.}
-
-\item{\code{target_node}}{Node to which the arrow points.}
-
-\item{\code{label}}{Character string containing the arrow label.}
-}
-\if{html}{\out{</div>}}
-}
-\subsection{Returns}{
-A new \code{Arrow} object.
-}
-}
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-Arrow-source"></a>}}
 \if{latex}{\out{\hypertarget{method-Arrow-source}{}}}
-\subsection{Method \code{source()}}{
-Access source node.
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{Arrow$source()}\if{html}{\out{</div>}}
+\subsection{\code{Arrow$source()}}{
+  Access source node.
+  \subsection{Usage}{
+    \if{html}{\out{<div class="r">}}
+    \preformatted{Arrow$source()}
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Returns}{
+    Node from which the arrow leads.
+  }
 }
 
-\subsection{Returns}{
-Node from which the arrow leads.
-}
-}
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-Arrow-target"></a>}}
 \if{latex}{\out{\hypertarget{method-Arrow-target}{}}}
-\subsection{Method \code{target()}}{
-Access target node.
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{Arrow$target()}\if{html}{\out{</div>}}
+\subsection{\code{Arrow$target()}}{
+  Access target node.
+  \subsection{Usage}{
+    \if{html}{\out{<div class="r">}}
+    \preformatted{Arrow$target()}
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Returns}{
+    Node to which the arrow points.
+  }
 }
 
-\subsection{Returns}{
-Node to which the arrow points.
-}
-}
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-Arrow-clone"></a>}}
 \if{latex}{\out{\hypertarget{method-Arrow-clone}{}}}
-\subsection{Method \code{clone()}}{
-The objects of this class are cloneable with this method.
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{Arrow$clone(deep = FALSE)}\if{html}{\out{</div>}}
+\subsection{\code{Arrow$clone()}}{
+  The objects of this class are cloneable with this method.
+  \subsection{Usage}{
+    \if{html}{\out{<div class="r">}}
+    \preformatted{Arrow$clone(deep = FALSE)}
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Arguments}{
+    \if{html}{\out{<div class="arguments">}}
+    \describe{
+      \item{\code{deep}}{Whether to make a deep clone.}
+    }
+    \if{html}{\out{</div>}}
+  }
 }
 
-\subsection{Arguments}{
-\if{html}{\out{<div class="arguments">}}
-\describe{
-\item{\code{deep}}{Whether to make a deep clone.}
-}
-\if{html}{\out{</div>}}
-}
-}
 }

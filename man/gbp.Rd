@@ -24,8 +24,7 @@ A character vector with pretty formatted currency values (if
 Formats a number, or list of numbers, into currency.
 }
 \details{
-If x is defined using the c() operator and contains one or more
-character elements, all elements of x will be coerced to characters, and this
-function will return "NA" for all elements. It is safer to define x as a
-list, in which all non-numeric elements will be translated to "NA".
+If x is defined using the c() operator and contains elements of
+different mode, it will coerce all elements to a common mode. It is safer to
+define x as a list because R does not do implicit coercion.
 }

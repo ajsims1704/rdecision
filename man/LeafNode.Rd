@@ -23,198 +23,206 @@ incremental utility. Inherits from class \code{Node}.
 Andrew J. Sims \email{andrew.sims@newcastle.ac.uk}
 }
 \section{Super class}{
-\code{\link[rdecision:Node]{rdecision::Node}} -> \code{LeafNode}
+\code{\link[rdecision:Node]{Node}} -> \code{LeafNode}
 }
 \section{Methods}{
 \subsection{Public methods}{
-\itemize{
-\item \href{#method-LeafNode-new}{\code{LeafNode$new()}}
-\item \href{#method-LeafNode-grob}{\code{LeafNode$grob()}}
-\item \href{#method-LeafNode-modvars}{\code{LeafNode$modvars()}}
-\item \href{#method-LeafNode-set_utility}{\code{LeafNode$set_utility()}}
-\item \href{#method-LeafNode-set_interval}{\code{LeafNode$set_interval()}}
-\item \href{#method-LeafNode-utility}{\code{LeafNode$utility()}}
-\item \href{#method-LeafNode-interval}{\code{LeafNode$interval()}}
-\item \href{#method-LeafNode-QALY}{\code{LeafNode$QALY()}}
-\item \href{#method-LeafNode-clone}{\code{LeafNode$clone()}}
+  \itemize{
+    \item \href{#method-LeafNode-initialize}{\code{LeafNode$new()}}
+    \item \href{#method-LeafNode-grob}{\code{LeafNode$grob()}}
+    \item \href{#method-LeafNode-modvars}{\code{LeafNode$modvars()}}
+    \item \href{#method-LeafNode-set_utility}{\code{LeafNode$set_utility()}}
+    \item \href{#method-LeafNode-set_interval}{\code{LeafNode$set_interval()}}
+    \item \href{#method-LeafNode-utility}{\code{LeafNode$utility()}}
+    \item \href{#method-LeafNode-interval}{\code{LeafNode$interval()}}
+    \item \href{#method-LeafNode-QALY}{\code{LeafNode$QALY()}}
+    \item \href{#method-LeafNode-clone}{\code{LeafNode$clone()}}
+  }
 }
-}
-\if{html}{\out{
-<details open><summary>Inherited methods</summary>
+\if{html}{\out{<details open><summary>Inherited methods</summary>
 <ul>
-<li><span class="pkg-link" data-pkg="rdecision" data-topic="Node" data-id="label"><a href='../../rdecision/html/Node.html#method-Node-label'><code>rdecision::Node$label()</code></a></span></li>
-<li><span class="pkg-link" data-pkg="rdecision" data-topic="Node" data-id="type"><a href='../../rdecision/html/Node.html#method-Node-type'><code>rdecision::Node$type()</code></a></span></li>
+  <li><span class="pkg-link" data-pkg="rdecision" data-topic="Node" data-id="label"><a href='../../rdecision/html/Node.html#method-Node-label'><code>Node$label()</code></a></span></li>
+  <li><span class="pkg-link" data-pkg="rdecision" data-topic="Node" data-id="type"><a href='../../rdecision/html/Node.html#method-Node-type'><code>Node$type()</code></a></span></li>
 </ul>
-</details>
-}}
+</details>}}
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-LeafNode-new"></a>}}
-\if{latex}{\out{\hypertarget{method-LeafNode-new}{}}}
-\subsection{Method \code{new()}}{
-Create a new \code{LeafNode} object; synonymous with a
+\if{html}{\out{<a id="method-LeafNode-initialize"></a>}}
+\if{latex}{\out{\hypertarget{method-LeafNode-initialize}{}}}
+\subsection{\code{LeafNode$new()}}{
+  Create a new \code{LeafNode} object; synonymous with a
 health state.
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{LeafNode$new(
+  \subsection{Usage}{
+    \if{html}{\out{<div class="r">}}
+    \preformatted{LeafNode$new(
   label,
   utility = 1,
   interval = as.difftime(365.25, units = "days"),
   ru = 0
-)}\if{html}{\out{</div>}}
-}
-
-\subsection{Arguments}{
-\if{html}{\out{<div class="arguments">}}
-\describe{
-\item{\code{label}}{Character string; a label for the state; must be
+)}
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Arguments}{
+    \if{html}{\out{<div class="arguments">}}
+    \describe{
+      \item{\code{label}}{Character string; a label for the state; must be
 defined because it is used in tabulations. The label is automatically
 converted to a syntactically valid (in R) name to ensure it can be used
 as a column name in a data frame.}
-
-\item{\code{utility}}{The utility that a user associates with being in the
+      \item{\code{utility}}{The utility that a user associates with being in the
 health state for the interval. Can be \code{numeric} or
 a type of \code{ModVar}. If the type is \code{numeric}, the allowed
 range is \code{-Inf} to 1; if it is of type \code{ModVar}, it is
 unchecked.}
-
-\item{\code{interval}}{The time horizon, or duration for which a user is
+      \item{\code{interval}}{The time horizon, or duration for which a user is
 expected to occupy the health state and experience a health-related
 quality of life of \code{utility}, expressed as an R \code{difftime}
 object; default 1 year.}
-
-\item{\code{ru}}{Annual discount rate for future utility. Note
+      \item{\code{ru}}{Annual discount rate for future utility. Note
 this is a rate, not a probability (i.e., use 0.035 for 3.5\%).}
+    }
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Returns}{
+    A new \code{LeafNode} object
+  }
 }
-\if{html}{\out{</div>}}
-}
-\subsection{Returns}{
-A new \code{LeafNode} object
-}
-}
+
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-LeafNode-grob"></a>}}
 \if{latex}{\out{\hypertarget{method-LeafNode-grob}{}}}
-\subsection{Method \code{grob()}}{
-Creates a grid::grob for a leaf node.
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{LeafNode$grob(x, y, bb = FALSE)}\if{html}{\out{</div>}}
-}
-
-\subsection{Arguments}{
-\if{html}{\out{<div class="arguments">}}
-\describe{
-\item{\code{x}}{x coordinate of the node, grid::unit object.}
-
-\item{\code{y}}{y coordinate of the node, grid::unit object.}
-
-\item{\code{bb}}{Logical. If TRUE, function returns the bounding box.}
-}
-\if{html}{\out{</div>}}
-}
-\subsection{Returns}{
-A grid::grob containing the symbol and label, or a bounding box
+\subsection{\code{LeafNode$grob()}}{
+  Creates a grid::grob for a leaf node.
+  \subsection{Usage}{
+    \if{html}{\out{<div class="r">}}
+    \preformatted{LeafNode$grob(x, y, bb = FALSE)}
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Arguments}{
+    \if{html}{\out{<div class="arguments">}}
+    \describe{
+      \item{\code{x}}{x coordinate of the node, grid::unit object.}
+      \item{\code{y}}{y coordinate of the node, grid::unit object.}
+      \item{\code{bb}}{Logical. If TRUE, function returns the bounding box.}
+    }
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Returns}{
+    A grid::grob containing the symbol and label, or a bounding box
 as a grid::unit vector with 4 elements: left, right, bottom, top.
+  }
 }
-}
+
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-LeafNode-modvars"></a>}}
 \if{latex}{\out{\hypertarget{method-LeafNode-modvars}{}}}
-\subsection{Method \code{modvars()}}{
-Find all the model variables of type \code{ModVar} that have
+\subsection{\code{LeafNode$modvars()}}{
+  Find all the model variables of type \code{ModVar} that have
 been specified as values associated with this \code{LeafNode}. Includes
 operands of these \code{ModVar}s, if they are expressions.
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{LeafNode$modvars()}\if{html}{\out{</div>}}
+  \subsection{Usage}{
+    \if{html}{\out{<div class="r">}}
+    \preformatted{LeafNode$modvars()}
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Returns}{
+    A list of \code{ModVar}s.
+  }
 }
 
-\subsection{Returns}{
-A list of \code{ModVar}s.
-}
-}
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-LeafNode-set_utility"></a>}}
 \if{latex}{\out{\hypertarget{method-LeafNode-set_utility}{}}}
-\subsection{Method \code{set_utility()}}{
-Set the utility associated with the node.
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{LeafNode$set_utility(utility)}\if{html}{\out{</div>}}
-}
-
-\subsection{Arguments}{
-\if{html}{\out{<div class="arguments">}}
-\describe{
-\item{\code{utility}}{The utility that a user associates with being in the
+\subsection{\code{LeafNode$set_utility()}}{
+  Set the utility associated with the node.
+  \subsection{Usage}{
+    \if{html}{\out{<div class="r">}}
+    \preformatted{LeafNode$set_utility(utility)}
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Arguments}{
+    \if{html}{\out{<div class="arguments">}}
+    \describe{
+      \item{\code{utility}}{The utility that a user associates with being in the
 health state for the interval. Can be \code{numeric} or
 a type of \code{ModVar}. If the type is \code{numeric}, the allowed
 range is \code{-Inf} to 1, not NA; if it is of type \code{ModVar}, it is
 unchecked.}
+    }
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Returns}{
+    Updated \code{Leaf} object.
+  }
 }
-\if{html}{\out{</div>}}
-}
-\subsection{Returns}{
-Updated \code{Leaf} object.
-}
-}
+
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-LeafNode-set_interval"></a>}}
 \if{latex}{\out{\hypertarget{method-LeafNode-set_interval}{}}}
-\subsection{Method \code{set_interval()}}{
-Set the time interval associated with the node.
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{LeafNode$set_interval(interval)}\if{html}{\out{</div>}}
-}
-
-\subsection{Arguments}{
-\if{html}{\out{<div class="arguments">}}
-\describe{
-\item{\code{interval}}{The time interval over which the \code{utility}
+\subsection{\code{LeafNode$set_interval()}}{
+  Set the time interval associated with the node.
+  \subsection{Usage}{
+    \if{html}{\out{<div class="r">}}
+    \preformatted{LeafNode$set_interval(interval)}
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Arguments}{
+    \if{html}{\out{<div class="arguments">}}
+    \describe{
+      \item{\code{interval}}{The time interval over which the \code{utility}
 parameter applies, expressed as an R \code{difftime} object; default
 1 year, not NA.}
+    }
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Returns}{
+    Updated \code{Leaf} object.
+  }
 }
-\if{html}{\out{</div>}}
-}
-\subsection{Returns}{
-Updated \code{Leaf} object.
-}
-}
+
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-LeafNode-utility"></a>}}
 \if{latex}{\out{\hypertarget{method-LeafNode-utility}{}}}
-\subsection{Method \code{utility()}}{
-Return the utility associated with being in the
+\subsection{\code{LeafNode$utility()}}{
+  Return the utility associated with being in the
 state for the interval.
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{LeafNode$utility()}\if{html}{\out{</div>}}
+  \subsection{Usage}{
+    \if{html}{\out{<div class="r">}}
+    \preformatted{LeafNode$utility()}
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Returns}{
+    Utility (numeric value).
+  }
 }
 
-\subsection{Returns}{
-Utility (numeric value).
-}
-}
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-LeafNode-interval"></a>}}
 \if{latex}{\out{\hypertarget{method-LeafNode-interval}{}}}
-\subsection{Method \code{interval()}}{
-Return the interval associated with being in the state.
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{LeafNode$interval()}\if{html}{\out{</div>}}
+\subsection{\code{LeafNode$interval()}}{
+  Return the interval associated with being in the state.
+  \subsection{Usage}{
+    \if{html}{\out{<div class="r">}}
+    \preformatted{LeafNode$interval()}
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Returns}{
+    Interval (as a \code{difftime}).
+  }
 }
 
-\subsection{Returns}{
-Interval (as a \code{difftime}).
-}
-}
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-LeafNode-QALY"></a>}}
 \if{latex}{\out{\hypertarget{method-LeafNode-QALY}{}}}
-\subsection{Method \code{QALY()}}{
-Return the discounted quality adjusted life years
+\subsection{\code{LeafNode$QALY()}}{
+  Return the discounted quality adjusted life years
 associated with being in the state.
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{LeafNode$QALY()}\if{html}{\out{</div>}}
-}
-
-\subsection{Details}{
-The present value of utility at future time \eqn{t} can be expressed as
+  \subsection{Usage}{
+    \if{html}{\out{<div class="r">}}
+    \preformatted{LeafNode$QALY()}
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Details}{
+    The present value of utility at future time \eqn{t} can be expressed as
 \eqn{u_t = u_0 e^{-rt}}, where \eqn{u_0} is the utility at time
 \eqn{t = 0} and \eqn{r} is the discount rate for utility
 (O'Mahony, 2015), under the assumption of continuous discount. The
@@ -225,27 +233,29 @@ gain is equal to \deqn{\frac{u_0}{r}(1 - e^{-rt'}),} and for
 the number of QALYs gained after occupying a state for 1 year with a
 present value utility of 0.75 is 0.983 \eqn{\times} 0.75 \eqn{\approx}
 0.737 QALYs, and after 2 years the gain is 1.449 QALYs.
+  }
+  \subsection{Returns}{
+    \acronym{QALY}.
+  }
 }
 
-\subsection{Returns}{
-\acronym{QALY}.
-}
-}
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-LeafNode-clone"></a>}}
 \if{latex}{\out{\hypertarget{method-LeafNode-clone}{}}}
-\subsection{Method \code{clone()}}{
-The objects of this class are cloneable with this method.
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{LeafNode$clone(deep = FALSE)}\if{html}{\out{</div>}}
+\subsection{\code{LeafNode$clone()}}{
+  The objects of this class are cloneable with this method.
+  \subsection{Usage}{
+    \if{html}{\out{<div class="r">}}
+    \preformatted{LeafNode$clone(deep = FALSE)}
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Arguments}{
+    \if{html}{\out{<div class="arguments">}}
+    \describe{
+      \item{\code{deep}}{Whether to make a deep clone.}
+    }
+    \if{html}{\out{</div>}}
+  }
 }
 
-\subsection{Arguments}{
-\if{html}{\out{<div class="arguments">}}
-\describe{
-\item{\code{deep}}{Whether to make a deep clone.}
-}
-\if{html}{\out{</div>}}
-}
-}
 }

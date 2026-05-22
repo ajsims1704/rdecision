@@ -15,147 +15,158 @@ standard deviation (\code{sd}). Inherits from class \code{Distribution}.
 Andrew J. Sims \email{andrew.sims@newcastle.ac.uk}
 }
 \section{Super class}{
-\code{\link[rdecision:Distribution]{rdecision::Distribution}} -> \code{NormalDistribution}
+\code{\link[rdecision:Distribution]{Distribution}} -> \code{NormalDistribution}
 }
 \section{Methods}{
 \subsection{Public methods}{
-\itemize{
-\item \href{#method-NormalDistribution-new}{\code{NormalDistribution$new()}}
-\item \href{#method-NormalDistribution-distribution}{\code{NormalDistribution$distribution()}}
-\item \href{#method-NormalDistribution-sample}{\code{NormalDistribution$sample()}}
-\item \href{#method-NormalDistribution-mean}{\code{NormalDistribution$mean()}}
-\item \href{#method-NormalDistribution-SD}{\code{NormalDistribution$SD()}}
-\item \href{#method-NormalDistribution-quantile}{\code{NormalDistribution$quantile()}}
-\item \href{#method-NormalDistribution-clone}{\code{NormalDistribution$clone()}}
+  \itemize{
+    \item \href{#method-NormalDistribution-initialize}{\code{NormalDistribution$new()}}
+    \item \href{#method-NormalDistribution-distribution}{\code{NormalDistribution$distribution()}}
+    \item \href{#method-NormalDistribution-sample}{\code{NormalDistribution$sample()}}
+    \item \href{#method-NormalDistribution-mean}{\code{NormalDistribution$mean()}}
+    \item \href{#method-NormalDistribution-SD}{\code{NormalDistribution$SD()}}
+    \item \href{#method-NormalDistribution-quantile}{\code{NormalDistribution$quantile()}}
+    \item \href{#method-NormalDistribution-clone}{\code{NormalDistribution$clone()}}
+  }
 }
-}
-\if{html}{\out{
-<details open><summary>Inherited methods</summary>
+\if{html}{\out{<details open><summary>Inherited methods</summary>
 <ul>
-<li><span class="pkg-link" data-pkg="rdecision" data-topic="Distribution" data-id="mode"><a href='../../rdecision/html/Distribution.html#method-Distribution-mode'><code>rdecision::Distribution$mode()</code></a></span></li>
-<li><span class="pkg-link" data-pkg="rdecision" data-topic="Distribution" data-id="order"><a href='../../rdecision/html/Distribution.html#method-Distribution-order'><code>rdecision::Distribution$order()</code></a></span></li>
-<li><span class="pkg-link" data-pkg="rdecision" data-topic="Distribution" data-id="r"><a href='../../rdecision/html/Distribution.html#method-Distribution-r'><code>rdecision::Distribution$r()</code></a></span></li>
-<li><span class="pkg-link" data-pkg="rdecision" data-topic="Distribution" data-id="varcov"><a href='../../rdecision/html/Distribution.html#method-Distribution-varcov'><code>rdecision::Distribution$varcov()</code></a></span></li>
+  <li><span class="pkg-link" data-pkg="rdecision" data-topic="Distribution" data-id="mode"><a href='../../rdecision/html/Distribution.html#method-Distribution-mode'><code>Distribution$mode()</code></a></span></li>
+  <li><span class="pkg-link" data-pkg="rdecision" data-topic="Distribution" data-id="order"><a href='../../rdecision/html/Distribution.html#method-Distribution-order'><code>Distribution$order()</code></a></span></li>
+  <li><span class="pkg-link" data-pkg="rdecision" data-topic="Distribution" data-id="r"><a href='../../rdecision/html/Distribution.html#method-Distribution-r'><code>Distribution$r()</code></a></span></li>
+  <li><span class="pkg-link" data-pkg="rdecision" data-topic="Distribution" data-id="varcov"><a href='../../rdecision/html/Distribution.html#method-Distribution-varcov'><code>Distribution$varcov()</code></a></span></li>
 </ul>
-</details>
-}}
+</details>}}
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-NormalDistribution-new"></a>}}
-\if{latex}{\out{\hypertarget{method-NormalDistribution-new}{}}}
-\subsection{Method \code{new()}}{
-Create a parametrized normal distribution.
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{NormalDistribution$new(mu, sigma)}\if{html}{\out{</div>}}
+\if{html}{\out{<a id="method-NormalDistribution-initialize"></a>}}
+\if{latex}{\out{\hypertarget{method-NormalDistribution-initialize}{}}}
+\subsection{\code{NormalDistribution$new()}}{
+  Create a parametrized normal distribution.
+  \subsection{Usage}{
+    \if{html}{\out{<div class="r">}}
+    \preformatted{NormalDistribution$new(mu, sigma)}
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Arguments}{
+    \if{html}{\out{<div class="arguments">}}
+    \describe{
+      \item{\code{mu}}{Mean of the Normal distribution.}
+      \item{\code{sigma}}{Standard deviation of the Normal distribution.}
+    }
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Returns}{
+    A \code{NormalDistribution} object.
+  }
 }
 
-\subsection{Arguments}{
-\if{html}{\out{<div class="arguments">}}
-\describe{
-\item{\code{mu}}{Mean of the Normal distribution.}
-
-\item{\code{sigma}}{Standard deviation of the Normal distribution.}
-}
-\if{html}{\out{</div>}}
-}
-\subsection{Returns}{
-A \code{NormalDistribution} object.
-}
-}
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-NormalDistribution-distribution"></a>}}
 \if{latex}{\out{\hypertarget{method-NormalDistribution-distribution}{}}}
-\subsection{Method \code{distribution()}}{
-Accessor function for the name of the distribution.
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{NormalDistribution$distribution()}\if{html}{\out{</div>}}
+\subsection{\code{NormalDistribution$distribution()}}{
+  Accessor function for the name of the distribution.
+  \subsection{Usage}{
+    \if{html}{\out{<div class="r">}}
+    \preformatted{NormalDistribution$distribution()}
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Returns}{
+    Distribution name as character string.
+  }
 }
 
-\subsection{Returns}{
-Distribution name as character string.
-}
-}
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-NormalDistribution-sample"></a>}}
 \if{latex}{\out{\hypertarget{method-NormalDistribution-sample}{}}}
-\subsection{Method \code{sample()}}{
-Draw a random sample from the model variable.
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{NormalDistribution$sample(expected = FALSE)}\if{html}{\out{</div>}}
+\subsection{\code{NormalDistribution$sample()}}{
+  Draw a random sample from the model variable.
+  \subsection{Usage}{
+    \if{html}{\out{<div class="r">}}
+    \preformatted{NormalDistribution$sample(expected = FALSE)}
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Arguments}{
+    \if{html}{\out{<div class="arguments">}}
+    \describe{
+      \item{\code{expected}}{If TRUE, sets the next value retrieved by a call to
+\code{r()} to be the mean of the distribution.}
+    }
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Returns}{
+    A sample drawn at random.
+  }
 }
 
-\subsection{Arguments}{
-\if{html}{\out{<div class="arguments">}}
-\describe{
-\item{\code{expected}}{If TRUE, sets the next value retrieved by a call to
-\code{r()} to be the mean of the distribution.}
-}
-\if{html}{\out{</div>}}
-}
-\subsection{Returns}{
-A sample drawn at random.
-}
-}
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-NormalDistribution-mean"></a>}}
 \if{latex}{\out{\hypertarget{method-NormalDistribution-mean}{}}}
-\subsection{Method \code{mean()}}{
-Return the mean value of the distribution.
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{NormalDistribution$mean()}\if{html}{\out{</div>}}
+\subsection{\code{NormalDistribution$mean()}}{
+  Return the mean value of the distribution.
+  \subsection{Usage}{
+    \if{html}{\out{<div class="r">}}
+    \preformatted{NormalDistribution$mean()}
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Returns}{
+    Expected value as a numeric value.
+  }
 }
 
-\subsection{Returns}{
-Expected value as a numeric value.
-}
-}
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-NormalDistribution-SD"></a>}}
 \if{latex}{\out{\hypertarget{method-NormalDistribution-SD}{}}}
-\subsection{Method \code{SD()}}{
-Return the standard deviation of the distribution.
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{NormalDistribution$SD()}\if{html}{\out{</div>}}
+\subsection{\code{NormalDistribution$SD()}}{
+  Return the standard deviation of the distribution.
+  \subsection{Usage}{
+    \if{html}{\out{<div class="r">}}
+    \preformatted{NormalDistribution$SD()}
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Returns}{
+    Standard deviation as a numeric value
+  }
 }
 
-\subsection{Returns}{
-Standard deviation as a numeric value
-}
-}
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-NormalDistribution-quantile"></a>}}
 \if{latex}{\out{\hypertarget{method-NormalDistribution-quantile}{}}}
-\subsection{Method \code{quantile()}}{
-Return the quantiles of the Normal uncertainty distribution.
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{NormalDistribution$quantile(probs)}\if{html}{\out{</div>}}
+\subsection{\code{NormalDistribution$quantile()}}{
+  Return the quantiles of the Normal uncertainty distribution.
+  \subsection{Usage}{
+    \if{html}{\out{<div class="r">}}
+    \preformatted{NormalDistribution$quantile(probs)}
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Arguments}{
+    \if{html}{\out{<div class="arguments">}}
+    \describe{
+      \item{\code{probs}}{Vector of probabilities, in range [0,1].}
+    }
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Returns}{
+    Vector of quantiles.
+  }
 }
 
-\subsection{Arguments}{
-\if{html}{\out{<div class="arguments">}}
-\describe{
-\item{\code{probs}}{Vector of probabilities, in range [0,1].}
-}
-\if{html}{\out{</div>}}
-}
-\subsection{Returns}{
-Vector of quantiles.
-}
-}
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-NormalDistribution-clone"></a>}}
 \if{latex}{\out{\hypertarget{method-NormalDistribution-clone}{}}}
-\subsection{Method \code{clone()}}{
-The objects of this class are cloneable with this method.
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{NormalDistribution$clone(deep = FALSE)}\if{html}{\out{</div>}}
+\subsection{\code{NormalDistribution$clone()}}{
+  The objects of this class are cloneable with this method.
+  \subsection{Usage}{
+    \if{html}{\out{<div class="r">}}
+    \preformatted{NormalDistribution$clone(deep = FALSE)}
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Arguments}{
+    \if{html}{\out{<div class="arguments">}}
+    \describe{
+      \item{\code{deep}}{Whether to make a deep clone.}
+    }
+    \if{html}{\out{</div>}}
+  }
 }
 
-\subsection{Arguments}{
-\if{html}{\out{<div class="arguments">}}
-\describe{
-\item{\code{deep}}{Whether to make a deep clone.}
-}
-\if{html}{\out{</div>}}
-}
-}
 }

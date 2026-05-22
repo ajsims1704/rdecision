@@ -4,15 +4,6 @@
 \name{MarkovState}
 \alias{MarkovState}
 \title{A state in a Markov model}
-\value{
-Updated \code{MarkovState} object.
-
-Annual cost; numeric.
-
-Updated \code{MarkovState} object.
-
-Utility; numeric.
-}
 \description{
 An R6 class representing a state in a Markov model.
 }
@@ -25,162 +16,184 @@ from class \code{Node}.
 Andrew J. Sims \email{andrew.sims@newcastle.ac.uk}
 }
 \section{Super class}{
-\code{\link[rdecision:Node]{rdecision::Node}} -> \code{MarkovState}
+\code{\link[rdecision:Node]{Node}} -> \code{MarkovState}
 }
 \section{Methods}{
 \subsection{Public methods}{
-\itemize{
-\item \href{#method-MarkovState-new}{\code{MarkovState$new()}}
-\item \href{#method-MarkovState-name}{\code{MarkovState$name()}}
-\item \href{#method-MarkovState-set_cost}{\code{MarkovState$set_cost()}}
-\item \href{#method-MarkovState-cost}{\code{MarkovState$cost()}}
-\item \href{#method-MarkovState-set_utility}{\code{MarkovState$set_utility()}}
-\item \href{#method-MarkovState-utility}{\code{MarkovState$utility()}}
-\item \href{#method-MarkovState-modvars}{\code{MarkovState$modvars()}}
-\item \href{#method-MarkovState-clone}{\code{MarkovState$clone()}}
+  \itemize{
+    \item \href{#method-MarkovState-initialize}{\code{MarkovState$new()}}
+    \item \href{#method-MarkovState-name}{\code{MarkovState$name()}}
+    \item \href{#method-MarkovState-set_cost}{\code{MarkovState$set_cost()}}
+    \item \href{#method-MarkovState-cost}{\code{MarkovState$cost()}}
+    \item \href{#method-MarkovState-set_utility}{\code{MarkovState$set_utility()}}
+    \item \href{#method-MarkovState-utility}{\code{MarkovState$utility()}}
+    \item \href{#method-MarkovState-modvars}{\code{MarkovState$modvars()}}
+    \item \href{#method-MarkovState-clone}{\code{MarkovState$clone()}}
+  }
 }
-}
-\if{html}{\out{
-<details open><summary>Inherited methods</summary>
+\if{html}{\out{<details open><summary>Inherited methods</summary>
 <ul>
-<li><span class="pkg-link" data-pkg="rdecision" data-topic="Node" data-id="label"><a href='../../rdecision/html/Node.html#method-Node-label'><code>rdecision::Node$label()</code></a></span></li>
-<li><span class="pkg-link" data-pkg="rdecision" data-topic="Node" data-id="type"><a href='../../rdecision/html/Node.html#method-Node-type'><code>rdecision::Node$type()</code></a></span></li>
+  <li><span class="pkg-link" data-pkg="rdecision" data-topic="Node" data-id="label"><a href='../../rdecision/html/Node.html#method-Node-label'><code>Node$label()</code></a></span></li>
+  <li><span class="pkg-link" data-pkg="rdecision" data-topic="Node" data-id="type"><a href='../../rdecision/html/Node.html#method-Node-type'><code>Node$type()</code></a></span></li>
 </ul>
-</details>
-}}
+</details>}}
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-MarkovState-new"></a>}}
-\if{latex}{\out{\hypertarget{method-MarkovState-new}{}}}
-\subsection{Method \code{new()}}{
-Create an object of type \code{MarkovState}.
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{MarkovState$new(name, cost = 0, utility = 1)}\if{html}{\out{</div>}}
-}
-
-\subsection{Arguments}{
-\if{html}{\out{<div class="arguments">}}
-\describe{
-\item{\code{name}}{The name of the state (character string).}
-
-\item{\code{cost}}{The annual cost of state occupancy (numeric or
+\if{html}{\out{<a id="method-MarkovState-initialize"></a>}}
+\if{latex}{\out{\hypertarget{method-MarkovState-initialize}{}}}
+\subsection{\code{MarkovState$new()}}{
+  Create an object of type \code{MarkovState}.
+  \subsection{Usage}{
+    \if{html}{\out{<div class="r">}}
+    \preformatted{MarkovState$new(name, cost = 0, utility = 1)}
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Arguments}{
+    \if{html}{\out{<div class="arguments">}}
+    \describe{
+      \item{\code{name}}{The name of the state (character string).}
+      \item{\code{cost}}{The annual cost of state occupancy (numeric or
 \code{ModVar}). Default 0.0.}
-
-\item{\code{utility}}{The utility associated with being in the state (numeric
+      \item{\code{utility}}{The utility associated with being in the state (numeric
 or \code{ModVar}).}
-}
-\if{html}{\out{</div>}}
-}
-\subsection{Details}{
-Utility must be in the range \code{[-Inf,1]}. If it is of type
+    }
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Details}{
+    Utility must be in the range \code{[-Inf,1]}. If it is of type
 numeric, the range is checked on object creation.
+  }
+  \subsection{Returns}{
+    An object of type \code{MarkovState}.
+  }
 }
 
-\subsection{Returns}{
-An object of type \code{MarkovState}.
-}
-}
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-MarkovState-name"></a>}}
 \if{latex}{\out{\hypertarget{method-MarkovState-name}{}}}
-\subsection{Method \code{name()}}{
-Accessor function to retrieve the state name.
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{MarkovState$name()}\if{html}{\out{</div>}}
+\subsection{\code{MarkovState$name()}}{
+  Accessor function to retrieve the state name.
+  \subsection{Usage}{
+    \if{html}{\out{<div class="r">}}
+    \preformatted{MarkovState$name()}
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Returns}{
+    State name.
+  }
 }
 
-\subsection{Returns}{
-State name.
-}
-}
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-MarkovState-set_cost"></a>}}
 \if{latex}{\out{\hypertarget{method-MarkovState-set_cost}{}}}
-\subsection{Method \code{set_cost()}}{
-Set the annual occupancy cost.
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{MarkovState$set_cost(cost)}\if{html}{\out{</div>}}
+\subsection{\code{MarkovState$set_cost()}}{
+  Set the annual occupancy cost.
+  \subsection{Usage}{
+    \if{html}{\out{<div class="r">}}
+    \preformatted{MarkovState$set_cost(cost)}
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Arguments}{
+    \if{html}{\out{<div class="arguments">}}
+    \describe{
+      \item{\code{cost}}{The annual cost of state occupancy}
+    }
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Returns}{
+    Updated \code{MarkovState} object.
+  }
 }
 
-\subsection{Arguments}{
-\if{html}{\out{<div class="arguments">}}
-\describe{
-\item{\code{cost}}{The annual cost of state occupancy}
-}
-\if{html}{\out{</div>}}
-}
-}
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-MarkovState-cost"></a>}}
 \if{latex}{\out{\hypertarget{method-MarkovState-cost}{}}}
-\subsection{Method \code{cost()}}{
-Gets the annual cost of state occupancy.
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{MarkovState$cost()}\if{html}{\out{</div>}}
+\subsection{\code{MarkovState$cost()}}{
+  Gets the annual cost of state occupancy.
+  \subsection{Usage}{
+    \if{html}{\out{<div class="r">}}
+    \preformatted{MarkovState$cost()}
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Returns}{
+    Annual cost; numeric.
+  }
 }
 
-}
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-MarkovState-set_utility"></a>}}
 \if{latex}{\out{\hypertarget{method-MarkovState-set_utility}{}}}
-\subsection{Method \code{set_utility()}}{
-Set the utility of the state.
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{MarkovState$set_utility(utility)}\if{html}{\out{</div>}}
+\subsection{\code{MarkovState$set_utility()}}{
+  Set the utility of the state.
+  \subsection{Usage}{
+    \if{html}{\out{<div class="r">}}
+    \preformatted{MarkovState$set_utility(utility)}
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Arguments}{
+    \if{html}{\out{<div class="arguments">}}
+    \describe{
+      \item{\code{utility}}{The utility associated with being in the state (numeric
+or \code{ModVar}).}
+    }
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Returns}{
+    Updated \code{MarkovState} object.
+  }
 }
 
-\subsection{Arguments}{
-\if{html}{\out{<div class="arguments">}}
-\describe{
-\item{\code{utility}}{The utility associated with being in the state (numeric
-or \code{ModVar}).}
-}
-\if{html}{\out{</div>}}
-}
-}
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-MarkovState-utility"></a>}}
 \if{latex}{\out{\hypertarget{method-MarkovState-utility}{}}}
-\subsection{Method \code{utility()}}{
-Gets the utility associated with the state.
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{MarkovState$utility()}\if{html}{\out{</div>}}
+\subsection{\code{MarkovState$utility()}}{
+  Gets the utility associated with the state.
+  \subsection{Usage}{
+    \if{html}{\out{<div class="r">}}
+    \preformatted{MarkovState$utility()}
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Returns}{
+    Utility; numeric.
+  }
 }
 
-}
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-MarkovState-modvars"></a>}}
 \if{latex}{\out{\hypertarget{method-MarkovState-modvars}{}}}
-\subsection{Method \code{modvars()}}{
-Find all the model variables.
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{MarkovState$modvars()}\if{html}{\out{</div>}}
-}
-
-\subsection{Details}{
-Find variables of type \code{ModVar} that have been
+\subsection{\code{MarkovState$modvars()}}{
+  Find all the model variables.
+  \subsection{Usage}{
+    \if{html}{\out{<div class="r">}}
+    \preformatted{MarkovState$modvars()}
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Details}{
+    Find variables of type \code{ModVar} that have been
 specified as values associated with this \code{MarkovState}.
 Includes operands of these \code{ModVar}s, if they are expressions.
+  }
+  \subsection{Returns}{
+    A list of \code{ModVar}s.
+  }
 }
 
-\subsection{Returns}{
-A list of \code{ModVar}s.
-}
-}
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-MarkovState-clone"></a>}}
 \if{latex}{\out{\hypertarget{method-MarkovState-clone}{}}}
-\subsection{Method \code{clone()}}{
-The objects of this class are cloneable with this method.
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{MarkovState$clone(deep = FALSE)}\if{html}{\out{</div>}}
+\subsection{\code{MarkovState$clone()}}{
+  The objects of this class are cloneable with this method.
+  \subsection{Usage}{
+    \if{html}{\out{<div class="r">}}
+    \preformatted{MarkovState$clone(deep = FALSE)}
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Arguments}{
+    \if{html}{\out{<div class="arguments">}}
+    \describe{
+      \item{\code{deep}}{Whether to make a deep clone.}
+    }
+    \if{html}{\out{</div>}}
+  }
 }
 
-\subsection{Arguments}{
-\if{html}{\out{<div class="arguments">}}
-\describe{
-\item{\code{deep}}{Whether to make a deep clone.}
-}
-\if{html}{\out{</div>}}
-}
-}
 }

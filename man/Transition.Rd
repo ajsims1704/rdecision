@@ -18,123 +18,127 @@ transition.
 Andrew J. Sims \email{andrew.sims@newcastle.ac.uk}
 }
 \section{Super classes}{
-\code{\link[rdecision:Edge]{rdecision::Edge}} -> \code{\link[rdecision:Arrow]{rdecision::Arrow}} -> \code{Transition}
+\code{\link[rdecision:Edge]{Edge}} -> \code{\link[rdecision:Arrow]{Arrow}} -> \code{Transition}
 }
 \section{Methods}{
 \subsection{Public methods}{
-\itemize{
-\item \href{#method-Transition-new}{\code{Transition$new()}}
-\item \href{#method-Transition-modvars}{\code{Transition$modvars()}}
-\item \href{#method-Transition-set_cost}{\code{Transition$set_cost()}}
-\item \href{#method-Transition-cost}{\code{Transition$cost()}}
-\item \href{#method-Transition-clone}{\code{Transition$clone()}}
+  \itemize{
+    \item \href{#method-Transition-initialize}{\code{Transition$new()}}
+    \item \href{#method-Transition-modvars}{\code{Transition$modvars()}}
+    \item \href{#method-Transition-set_cost}{\code{Transition$set_cost()}}
+    \item \href{#method-Transition-cost}{\code{Transition$cost()}}
+    \item \href{#method-Transition-clone}{\code{Transition$clone()}}
+  }
 }
-}
-\if{html}{\out{
-<details open><summary>Inherited methods</summary>
+\if{html}{\out{<details open><summary>Inherited methods</summary>
 <ul>
-<li><span class="pkg-link" data-pkg="rdecision" data-topic="Edge" data-id="endpoints"><a href='../../rdecision/html/Edge.html#method-Edge-endpoints'><code>rdecision::Edge$endpoints()</code></a></span></li>
-<li><span class="pkg-link" data-pkg="rdecision" data-topic="Edge" data-id="is_same_edge"><a href='../../rdecision/html/Edge.html#method-Edge-is_same_edge'><code>rdecision::Edge$is_same_edge()</code></a></span></li>
-<li><span class="pkg-link" data-pkg="rdecision" data-topic="Edge" data-id="label"><a href='../../rdecision/html/Edge.html#method-Edge-label'><code>rdecision::Edge$label()</code></a></span></li>
-<li><span class="pkg-link" data-pkg="rdecision" data-topic="Arrow" data-id="source"><a href='../../rdecision/html/Arrow.html#method-Arrow-source'><code>rdecision::Arrow$source()</code></a></span></li>
-<li><span class="pkg-link" data-pkg="rdecision" data-topic="Arrow" data-id="target"><a href='../../rdecision/html/Arrow.html#method-Arrow-target'><code>rdecision::Arrow$target()</code></a></span></li>
+  <li><span class="pkg-link" data-pkg="rdecision" data-topic="Edge" data-id="endpoints"><a href='../../rdecision/html/Edge.html#method-Edge-endpoints'><code>Edge$endpoints()</code></a></span></li>
+  <li><span class="pkg-link" data-pkg="rdecision" data-topic="Edge" data-id="is_same_edge"><a href='../../rdecision/html/Edge.html#method-Edge-is_same_edge'><code>Edge$is_same_edge()</code></a></span></li>
+  <li><span class="pkg-link" data-pkg="rdecision" data-topic="Edge" data-id="label"><a href='../../rdecision/html/Edge.html#method-Edge-label'><code>Edge$label()</code></a></span></li>
+  <li><span class="pkg-link" data-pkg="rdecision" data-topic="Arrow" data-id="source"><a href='../../rdecision/html/Arrow.html#method-Arrow-source'><code>Arrow$source()</code></a></span></li>
+  <li><span class="pkg-link" data-pkg="rdecision" data-topic="Arrow" data-id="target"><a href='../../rdecision/html/Arrow.html#method-Arrow-target'><code>Arrow$target()</code></a></span></li>
 </ul>
-</details>
-}}
+</details>}}
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-Transition-new"></a>}}
-\if{latex}{\out{\hypertarget{method-Transition-new}{}}}
-\subsection{Method \code{new()}}{
-Create an object of type \code{MarkovTransition}.
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{Transition$new(source_state, target_state, cost = 0, label = "")}\if{html}{\out{</div>}}
-}
-
-\subsection{Arguments}{
-\if{html}{\out{<div class="arguments">}}
-\describe{
-\item{\code{source_state}}{\code{MarkovState} from which the transition starts.}
-
-\item{\code{target_state}}{\code{MarkovState} to which the transition ends.}
-
-\item{\code{cost}}{Cost associated with the transition.}
-
-\item{\code{label}}{Character string containing a label for the transition (the
+\if{html}{\out{<a id="method-Transition-initialize"></a>}}
+\if{latex}{\out{\hypertarget{method-Transition-initialize}{}}}
+\subsection{\code{Transition$new()}}{
+  Create an object of type \code{MarkovTransition}.
+  \subsection{Usage}{
+    \if{html}{\out{<div class="r">}}
+    \preformatted{Transition$new(source_state, target_state, cost = 0, label = "")}
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Arguments}{
+    \if{html}{\out{<div class="arguments">}}
+    \describe{
+      \item{\code{source_state}}{\code{MarkovState} from which the transition starts.}
+      \item{\code{target_state}}{\code{MarkovState} to which the transition ends.}
+      \item{\code{cost}}{Cost associated with the transition.}
+      \item{\code{label}}{Character string containing a label for the transition (the
 name of the event).}
+    }
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Returns}{
+    A new \code{Transition} object.
+  }
 }
-\if{html}{\out{</div>}}
-}
-\subsection{Returns}{
-A new \code{Transition} object.
-}
-}
+
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-Transition-modvars"></a>}}
 \if{latex}{\out{\hypertarget{method-Transition-modvars}{}}}
-\subsection{Method \code{modvars()}}{
-Find all the model variables.
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{Transition$modvars()}\if{html}{\out{</div>}}
-}
-
-\subsection{Details}{
-Find variables of type \code{ModVar} that have been
+\subsection{\code{Transition$modvars()}}{
+  Find all the model variables.
+  \subsection{Usage}{
+    \if{html}{\out{<div class="r">}}
+    \preformatted{Transition$modvars()}
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Details}{
+    Find variables of type \code{ModVar} that have been
 specified as values associated with this \code{MarkovTransition}.
 Includes operands of these \code{ModVar}s, if they are expressions.
+  }
+  \subsection{Returns}{
+    A list of \code{ModVar}s.
+  }
 }
 
-\subsection{Returns}{
-A list of \code{ModVar}s.
-}
-}
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-Transition-set_cost"></a>}}
 \if{latex}{\out{\hypertarget{method-Transition-set_cost}{}}}
-\subsection{Method \code{set_cost()}}{
-Set the cost associated with the transition.
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{Transition$set_cost(c = 0)}\if{html}{\out{</div>}}
+\subsection{\code{Transition$set_cost()}}{
+  Set the cost associated with the transition.
+  \subsection{Usage}{
+    \if{html}{\out{<div class="r">}}
+    \preformatted{Transition$set_cost(c = 0)}
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Arguments}{
+    \if{html}{\out{<div class="arguments">}}
+    \describe{
+      \item{\code{c}}{Cost associated with the transition.}
+    }
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Returns}{
+    Updated \code{Transition} object.
+  }
 }
 
-\subsection{Arguments}{
-\if{html}{\out{<div class="arguments">}}
-\describe{
-\item{\code{c}}{Cost associated with the transition.}
-}
-\if{html}{\out{</div>}}
-}
-\subsection{Returns}{
-Updated \code{Transition} object.
-}
-}
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-Transition-cost"></a>}}
 \if{latex}{\out{\hypertarget{method-Transition-cost}{}}}
-\subsection{Method \code{cost()}}{
-Return the cost associated with traversing the edge.
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{Transition$cost()}\if{html}{\out{</div>}}
+\subsection{\code{Transition$cost()}}{
+  Return the cost associated with traversing the edge.
+  \subsection{Usage}{
+    \if{html}{\out{<div class="r">}}
+    \preformatted{Transition$cost()}
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Returns}{
+    Cost.
+  }
 }
 
-\subsection{Returns}{
-Cost.
-}
-}
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-Transition-clone"></a>}}
 \if{latex}{\out{\hypertarget{method-Transition-clone}{}}}
-\subsection{Method \code{clone()}}{
-The objects of this class are cloneable with this method.
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{Transition$clone(deep = FALSE)}\if{html}{\out{</div>}}
+\subsection{\code{Transition$clone()}}{
+  The objects of this class are cloneable with this method.
+  \subsection{Usage}{
+    \if{html}{\out{<div class="r">}}
+    \preformatted{Transition$clone(deep = FALSE)}
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Arguments}{
+    \if{html}{\out{<div class="arguments">}}
+    \describe{
+      \item{\code{deep}}{Whether to make a deep clone.}
+    }
+    \if{html}{\out{</div>}}
+  }
 }
 
-\subsection{Arguments}{
-\if{html}{\out{<div class="arguments">}}
-\describe{
-\item{\code{deep}}{Whether to make a deep clone.}
-}
-\if{html}{\out{</div>}}
-}
-}
 }

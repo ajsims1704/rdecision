@@ -23,7 +23,8 @@ vignette: >
 knitr::opts_chunk$set(
   echo = FALSE,
   collapse = TRUE,
-  comment = "#>"
+  comment = "#>",
+  dev = "svg"
 )
 ```
 
@@ -177,6 +178,7 @@ stopifnot(
 #| results = "hide",
 #| fig.keep = "all",
 #| fig.align = "center",
+#| out.width = "90%",
 #| fig.cap = "Figure 1. Decision tree for the Sumatriptan model"
 dt$draw(border = TRUE)
 ```

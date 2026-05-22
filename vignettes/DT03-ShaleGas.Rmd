@@ -23,7 +23,8 @@ vignette: >
 knitr::opts_chunk$set(
   collapse = TRUE,
   echo = FALSE,
-  comment = "#>"
+  comment = "#>",
+  dev = "svg"
 )
 ```
 
@@ -186,7 +187,8 @@ local({
 #| results = "hide",
 #| fig.keep = "all",
 #| fig.align = "center",
-#| fig.cap = "Decision tree used in the shale gas problem"
+#| fig.cap = "Decision tree used in the shale gas problem",
+#| out.width = "90%",
 DT$draw(border = TRUE)
 ```
 

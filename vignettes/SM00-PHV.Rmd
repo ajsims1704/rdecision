@@ -112,79 +112,113 @@ local({
 
 The model can be saved as a graph object and rendered as a diagram. Method
 `as_gml()` creates a representation of the graph in GML format, which can 
-be opened and plotted using the `igraph` package, optionally with additional
+be opened and plotted using the `DiagrammeR` package, optionally with
 manipulation of the graph's appearance to achieve the desired effect, as
 below.
 
 ```{r}
+#| label = "model",
+#| fig.align = "center",
+#| fig.asp = "1.0",
+#| out.width = "90%",
 local({
-  # create an igraph object (requires square plot region)
+  # name of SVG file
+  svgfile <- tempfile(fileext = ".svg")
+  # save the graph as a GML file
   gml <- m$as_gml()
   gmlfile <- tempfile(fileext = ".gml")
   writeLines(gml, con = gmlfile)
-  ig <- igraph::read_graph(gmlfile, format = "gml")
-  # match layout to Sonnenberg and Beck, fig 3
-  vxy <- matrix(
-    data = c(
-      -0.75, +0.75, +0.00,
-      +0.75, +0.75, -0.75
-    ),
-    ncol = 2L,
-    dimnames = list(c("Well", "Disabled", "Dead"), c("x", "y"))
+  # import it to DiagrammeR
+  g <- DiagrammeR::import_graph(gmlfile, file_type = "gml")
+  # set global attributes
+  g <- DiagrammeR::add_global_graph_attrs(
+    g,
+    attr = "layout",
+    value = "neato",
+    attr_type = "graph"
   )
-  layout <- matrix(
-    data = c(
-      vapply(X = igraph::V(ig), FUN.VALUE = 1.0, FUN = function(v) {
-        lbl <- igraph::vertex_attr(ig, "label", v)
-        vxy[[lbl, "x"]]
-      }),
-      vapply(X = igraph::V(ig), FUN.VALUE = 1.0, FUN = function(v) {
-        lbl <- igraph::vertex_attr(ig, "label", v)
-        vxy[[lbl, "y"]]
-      })
-    ),
-    byrow = FALSE,
-    ncol = 2L
+  # set global attributes
+  g <- DiagrammeR::add_global_graph_attrs(
+    g,
+    attr = "fontsize",
+    value = 8L,
+    attr_type = "node"
   )
-  # loop angles
-  loopa <- vapply(X = igraph::E(ig), FUN.VALUE = 1.0, FUN = function(e) {
-    # find source and target labels
-    trg <- igraph::head_of(ig, e)
-    trgl <- igraph::vertex_attr(ig, name = "label", index = trg)
-    src <- igraph::tail_of(ig, e)
-    srcl <- igraph::vertex_attr(ig, name = "label", index = src)
-    la <- if (trgl == srcl) {
-      if (trgl == "Well") {
-        pi
-      } else if (trgl == "Dead") {
-        pi / 2.0
-      } else {
-        0.0
-      }
-    } else {
-      0.0
-    }
-  })
-  # plot into png file
-  withr::with_par(
-    new = list(
-      oma = c(0L, 0L, 0L, 0L),
-      mar = c(3L, 3L, 3L, 3L),
-      xpd = NA
-    ),
-    code = plot(
-      ig,
-      rescale = FALSE, asp = 0L,
-      vertex.shape = "circle", vertex.size = 60.0,
-      vertex.color = "white", vertex.label.color = "black",
-      edge.color = "black",
-      edge.arrow.size = 0.75,
-      frame = FALSE,
-      layout = layout,
-      loop.size = 0.8,
-      edge.loop.angle = loopa
-    )
+  g <- DiagrammeR::add_global_graph_attrs(
+    g,
+    attr = "shape",
+    value = "circle",
+    attr_type = "node"
   )
+  g <- DiagrammeR::add_global_graph_attrs(
+    g,
+    attr = "color",
+    value = "black",
+    attr_type = "node"
+  )
+  g <- DiagrammeR::add_global_graph_attrs(
+    g,
+    attr = "fillcolor",
+    value = "white",
+    attr_type = "node"
+  )
+  g <- DiagrammeR::add_global_graph_attrs(
+    g,
+    attr = "fontcolor",
+    value = "black",
+    attr_type = "node"
+  )
+  g <- DiagrammeR::add_global_graph_attrs(
+    g,
+    attr = "color",
+    value = "black",
+    attr_type = "edge"
+  )
+  g <- DiagrammeR::add_global_graph_attrs(
+    g,
+    attr = "penwidth",
+    value = 0.5,
+    attr_type = "edge"
+  )
+  # get the node ids
+  nodes <- DiagrammeR::get_node_attrs(g, node_attr = "label")
+  nwell <- which(nodes == "Well")
+  ndisabled <- which(nodes == "Disabled")
+  ndead <- which(nodes == "Dead")
+  # set layout
+  g <- DiagrammeR::set_node_position(g, node = nwell, x = 1L, y = 3L)
+  g <- DiagrammeR::set_node_position(g, node = ndisabled, x = 3L, y = 3L)
+  g <- DiagrammeR::set_node_position(g, node = ndead, x = 2L, y = 1L)
+  # set loop directions
+  g <- DiagrammeR::set_edge_attrs(
+    g,
+    edge_attr = "tailport",
+    values = "nw",
+    from = nwell,
+    to = nwell
+  )
+  g <- DiagrammeR::set_edge_attrs(
+    g,
+    edge_attr = "tailport",
+    values = "ne",
+    from = ndisabled,
+    to = ndisabled
+  )
+  g <- DiagrammeR::set_edge_attrs(
+    g,
+    edge_attr = "tailport",
+    values = "sw",
+    from = ndead,
+    to = ndead
+  )
+  # render it as an svg file
+  DiagrammeR::export_graph(
+    g,
+    file_name = svgfile,
+    file_type = "svg",
+    width = 480L
+  )
+  knitr::include_graphics(path = svgfile, rel_path = FALSE)
 })
 ```
 

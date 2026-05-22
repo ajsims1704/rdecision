@@ -1,4 +1,3 @@
-
 <!-- README.md is generated from README.Rmd. Please edit that file -->
 
 # rdecision
@@ -7,6 +6,7 @@
 
 [![CRAN status](https://www.r-pkg.org/badges/version/rdecision)](https://cran.r-project.org/package=rdecision)
 [![Codecov test coverage](https://codecov.io/gh/ajsims1704/rdecision/branch/master/graph/badge.svg)](https://app.codecov.io/gh/ajsims1704/rdecision?branch=master)
+
 <!-- badges: end -->
 
 The goal of `rdecision` is to provide methods for assessing health care
@@ -14,8 +14,8 @@ interventions using cohort models (decision trees and semi-Markov models) which
 can be constructed using only a few lines of R code. Mechanisms
 are provided for associating an uncertainty distribution with each source
 variable and for ensuring transparency of the mathematical relationships between
-variables. The package terminology follows Briggs *et al* “Decision Modelling
-for Health Economic Evaluation”<sup>1</sup>.
+variables. The package terminology follows Briggs *et al* "Decision Modelling
+for Health Economic Evaluation"^1^.
 
 ## Installation
 
@@ -44,9 +44,9 @@ avoided against the incremental cost of the exercise programme.
 
 The cost to a healthcare provider of the interventional procedure
 (e.g., inserting a stent) is 5000 GBP; the cost of providing the current form of
-lifestyle advice, an appointment with a dietician (“diet”), is 50 GBP and the
+lifestyle advice, an appointment with a dietician ("diet"), is 50 GBP and the
 cost of providing an alternative form, attendance at an exercise
-programme (“exercise”), is 750 GBP. None of the costs are subject to
+programme ("exercise"), is 750 GBP. None of the costs are subject to
 uncertainty, and are modelled as constant model variables.
 
 ``` r
@@ -56,9 +56,9 @@ cost_stent <- ConstModVar$new("Cost of stent intervention", "GBP", 5000.0)
 ```
 
 If an advice programme is successful, there is no need for an interventional
-procedure. In a small trial of the “diet” programme, 12 out of 68 patients
+procedure. In a small trial of the "diet" programme, 12 out of 68 patients
 (17.6%) avoided having a procedure, and in a separate small trial of the
-“exercise” programme 18 out of 58 patients (31.0%) avoided the procedure. It
+"exercise" programme 18 out of 58 patients (31.0%) avoided the procedure. It
 is assumed that the baseline characteristics in the two trials were comparable.
 The trial results are represented as scalar integers.
 
@@ -169,7 +169,7 @@ dt <- DecisionTree$new(
 )
 ```
 
-<img src="man/figures/lifestyle.png" width="480" />
+![A decision tree](man/figures/lifestyle.svg)
 
 The method `evaluate` is used to calculate the costs and utilities associated
 with the decision problem. By default, it evaluates it once with all the model
@@ -199,10 +199,10 @@ rs <- dt$evaluate(setvars = "random", by = "run", N = N)
 The confidence interval of the net cost difference (net cost of the diet
 programme minus the net cost of the exercise programme) is estimated from
 the resulting data frame. From 1000 runs, the mean net cost difference is
--18.98 GBP with 95% confidence interval
--775.04 GBP
-to 766.98 GBP,
-with 47% runs having a lower
+-18.6 GBP with 95% confidence interval
+-757.73 GBP
+to 696.41 GBP,
+with 48% runs having a lower
 net cost for the exercise programme. Although the point estimate net cost of
 the exercise programme exceeds that of the diet programme, due to the
 uncertainties of the effectiveness of
@@ -218,8 +218,8 @@ subject to uncertainty.
 
 ### A three-state Markov model
 
-Sonnenberg and Beck<sup>2</sup> introduced an illustrative example of a
-semi-Markov process with three states: “Well”, “Disabled” and “Dead” and one
+Sonnenberg and Beck^2^ introduced an illustrative example of a
+semi-Markov process with three states: "Well", "Disabled" and "Dead" and one
 transition between each state, each with a per-cycle probability. In
 `rdecision` such a model is constructed as follows. Note that transitions
 from a state to itself must be specified if allowed, otherwise the state would
@@ -261,7 +261,7 @@ Pt <- matrix(
 M$set_probabilities(Pt)
 ```
 
-<img src="man/figures/phv.png" width="480" style="display: block; margin: auto;" />
+![A three-state Markov model](man/figures/phv.svg)
 
 With a starting population of 10,000, the model can be run for 24 years as
 follows.
@@ -269,171 +269,135 @@ follows.
 ``` r
 # set the starting populations
 M$reset(c(Well = 10000.0, Disabled = 0.0, Dead = 0.0))
-```
-
-``` r
 # cycle
 MT <- M$cycles(24L, hcc.pop = FALSE, hcc.cost = FALSE, hcc.QALY = FALSE)
 ```
 
 The output, after rounding, of the `cycles` function is the Markov trace, shown
-below, which replicates Table 2<sup>2</sup>. In more recent usage,
+below, which replicates Table 2^2^. In more recent usage,
 cumulative utility is normally called incremental utility, and expressed per
 patient (i.e., divided by 10,000).
 
-<div class="kable-table">
+| Years |  Well | Disabled |  Dead | Cumulative Utility |
+|------:|------:|---------:|------:|-------------------:|
+|     0 | 10000 |        0 |     0 |                  0 |
+|     1 |  6000 |     2000 |  2000 |               7400 |
+|     2 |  3600 |     2400 |  4000 |              12680 |
+|     3 |  2160 |     2160 |  5680 |              16352 |
+|    23 |     0 |        1 |  9999 |              23749 |
+|    24 |     0 |        0 | 10000 |              23749 |
 
-| Years |  Well | Disabled | Cumulative.Utility |
-|------:|------:|---------:|-------------------:|
-|     0 | 10000 |        0 |                  0 |
-|     1 |  6000 |     2000 |               7400 |
-|     2 |  3600 |     2400 |              12680 |
-|     3 |  2160 |     2160 |              16352 |
-|    23 |     0 |        1 |              23749 |
-|    24 |     0 |        0 |              23749 |
+## Acknowledgements
 
-</div>
-
-# Acknowledgements
-
-In addition to using base R<sup>3</sup>, `redecision` relies on
-the `R6` implementation of classes<sup>4</sup> and the `rlang` package for
-error handling and non-standard evaluation used in expression model variables<sup>5</sup>. Building the package vignettes and documentation relies on the
-`testthat` package<sup>6</sup>, the `devtools` package<sup>7</sup>,
-`rmarkdown`<sup>10</sup> and `knitr`<sup>11</sup>.
+In addition to using base R^3^, `redecision` relies on
+the `R6` implementation of classes^4^ and the `rlang` package^5^
+for non-standard evaluation used in expression model variables.
+Testing the package relies on the`testthat` package^6^. Preparing
+the package for building makes use of the `devtools` package^7^.
+Building vignettes require
+packages `rmarkdown`^8--10^, `knitr`^11^
+and `DiagrammeR`^12^.
 
 Underpinning graph theory is based on terminology, definitions and
-algorithms from Gross *et al*<sup>12</sup>, the Wikipedia
-glossary<sup>13</sup> and links therein. Topological sorting of graphs
-is based on Kahn’s algorithm<sup>14</sup>. Some of the terminology for decision
-trees was based on the work of Kaminski *et al*<sup>15</sup> and an
-efficient tree drawing algorithm was based on the work of Walker<sup>16</sup>.
-In semi-Markov models, representations are exported in the
-DOT language<sup>17</sup>.
+algorithms from Gross *et al*^13^, the Wikipedia
+glossary^14^ and links therein. Topological sorting of graphs
+is based on Kahn's algorithm^15^. Terminology for decision
+trees draws on the work of Kaminski *et al*^16^ and an
+efficient tree drawing algorithm was based on the work of Walker^17^.
+In semi-Markov models, representations may be exported in the
+DOT^18^ and GML^19^ languages.
 
 Terminology for decision trees and Markov models in health economic evaluation
-was based on the book by Briggs *et al*<sup>1</sup> and the output format
-and terminology follows ISPOR recommendations<sup>19</sup>.
+was based on the book by Briggs *et al*^1^ and the output format
+and terminology follows ISPOR recommendations^20,21^.
 
 Citations for examples used in vignettes are given in applicable vignette
 files.
 
-# References
+## References {#references .unnumbered}
 
-<div id="refs" class="references csl-bib-body" line-spacing="2">
+:::::::::::::::::::::::: {#refs .references .csl-bib-body entry-spacing="0" line-spacing="2"}
+::: {#ref-briggs2006 .csl-entry}
+[1. ]{.csl-left-margin}[Briggs, A., Claxton, K. & Sculpher, M. *Decision modelling for health economic evaluation*. (Oxford University Press, 2006).]{.csl-right-inline}
+:::
 
-<div id="ref-briggs2006" class="csl-entry">
+::: {#ref-sonnenberg1993 .csl-entry}
+[2. ]{.csl-left-margin}[Sonnenberg, F. A. & Beck, J. R. [Markov models in medical decision making: A practical guide](https://doi.org/10.1177/0272989X9301300409). *Medical Decision Making* **13,** 322--338 (1993).]{.csl-right-inline}
+:::
 
-<span class="csl-left-margin">1. </span><span class="csl-right-inline">Briggs, A., Claxton, K. & Sculpher, M. *Decision modelling for health economic evaluation*. (Oxford University Press, 2006).</span>
+::: {#ref-rcoreteam .csl-entry}
+[3. ]{.csl-left-margin}[R Core Team. R: A language and environment for statistical computing. (2025). at \<<https://www.R-project.org/>\>]{.csl-right-inline}
+:::
 
-</div>
+::: {#ref-rr6 .csl-entry}
+[4. ]{.csl-left-margin}[Chang, W. R6: Encapsulated classes with reference semantics. (2025). at \<<https://CRAN.R-project.org/package=R6>\>]{.csl-right-inline}
+:::
 
-<div id="ref-sonnenberg1993" class="csl-entry">
+::: {#ref-rrlang .csl-entry}
+[5. ]{.csl-left-margin}[Henry, L. & Wickham, H. Rlang: Functions for base types and core r and tidyverse features. (2026). at \<<https://CRAN.R-project.org/package=rlang>\>]{.csl-right-inline}
+:::
 
-<span class="csl-left-margin">2. </span><span class="csl-right-inline">Sonnenberg, F. A. & Beck, J. R. [Markov Models in Medical Decision Making: A Practical Guide](https://doi.org/10.1177/0272989X9301300409). *Medical Decision Making* **13,** 322–338 (1993).</span>
+::: {#ref-wickham2011 .csl-entry}
+[6. ]{.csl-left-margin}[Wickham, H. [Testthat: Get started with testing](https://journal.r-project.org/archive/2011-1/RJournal_2011-1_Wickham.pdf). *The R Journal* **3,** 5--10 (2011).]{.csl-right-inline}
+:::
 
-</div>
+::: {#ref-rdevtools .csl-entry}
+[7. ]{.csl-left-margin}[Wickham, H., Hester, J. & Chang, W. Devtools: Tools to make developing r packages easier. (2026). at \<<https://CRAN.R-project.org/package=devtools>\>]{.csl-right-inline}
+:::
 
-<div id="ref-rcoreteam" class="csl-entry">
+::: {#ref-xie2018a .csl-entry}
+[8. ]{.csl-left-margin}[Xie, Y., Allaire, J. J. & Grolemund, G. *R markdown: The definitive guide*. (Chapman; Hall/CRC, 2018). at \<<https://bookdown.org/yihui/rmarkdown>\>]{.csl-right-inline}
+:::
 
-<span class="csl-left-margin">3. </span><span class="csl-right-inline">R Core Team. R: A language and environment for statistical computing. (2021). at \<<https://www.R-project.org/>\></span>
+::: {#ref-rrmarkdown .csl-entry}
+[9. ]{.csl-left-margin}[Allaire, J., Xie, Y., McPherson, J., Luraschi, J., Ushey, K., Atkins, A., Wickham, H., Cheng, J., Chang, W. & Iannone, R. Rmarkdown: Dynamic documents for r. (2026). at \<<https://github.com/rstudio/rmarkdown>\>]{.csl-right-inline}
+:::
 
-</div>
+::: {#ref-xie2020 .csl-entry}
+[10. ]{.csl-left-margin}[Xie, Y., Dervieux, C. & Riederer, E. *R markdown cookbook*. (Chapman; Hall/CRC, 2020). at \<<https://bookdown.org/yihui/rmarkdown-cookbook>\>]{.csl-right-inline}
+:::
 
-<div id="ref-chang2020" class="csl-entry">
+::: {#ref-rknitr .csl-entry}
+[11. ]{.csl-left-margin}[Xie, Y. Knitr: A general-purpose package for dynamic report generation in r. (2025). at \<<https://yihui.org/knitr/>\>]{.csl-right-inline}
+:::
 
-<span class="csl-left-margin">4. </span><span class="csl-right-inline">Chang, W. R6: Encapsulated classes with reference semantics. (2020). at \<<https://CRAN.R-project.org/package=R6>\></span>
+::: {#ref-rdiagrammer .csl-entry}
+[12. ]{.csl-left-margin}[Iannone, R. & Roy, O. DiagrammeR: Graph/network visualization. (2026). doi:[10.32614/CRAN.package.DiagrammeR](https://doi.org/10.32614/CRAN.package.DiagrammeR)]{.csl-right-inline}
+:::
 
-</div>
+::: {#ref-gross2013 .csl-entry}
+[13. ]{.csl-left-margin}[Gross, J. L., Yellen, J. & Zhang, P. *Handbook of graph theory*. (Chapman; Hall/CRC., 2013). at \<<https://doi.org/10.1201/b16132>\>]{.csl-right-inline}
+:::
 
-<div id="ref-henry2020" class="csl-entry">
+::: {#ref-wikipedia2021 .csl-entry}
+[14. ]{.csl-left-margin}[Wikipedia. Glossary of graph theory. *Wikipedia* (2021). at \<<https://en.wikipedia.org/wiki/Glossary_of_graph_theory>\>]{.csl-right-inline}
+:::
 
-<span class="csl-left-margin">5. </span><span class="csl-right-inline">Henry, L. & Wickham, H. Rlang: Functions for base types and core r and tidyverse features. (2020). at \<<https://CRAN.R-project.org/package=rlang>\></span>
+::: {#ref-kahn1962 .csl-entry}
+[15. ]{.csl-left-margin}[Kahn, A. B. [Topological sorting of large networks](https://doi.org/10.1145/368996.369025). *Communications of the ACM* **5,** 558--562 (1962).]{.csl-right-inline}
+:::
 
-</div>
+::: {#ref-kaminski2018 .csl-entry}
+[16. ]{.csl-left-margin}[Kamiński, B., Jakubczyk, M. & Szufel, P. [A framework for sensitivity analysis of decision trees](https://doi.org/10.1007/s10100-017-0479-6). *Central European Journal of Operational Research* **26,** 135--159 (2018).]{.csl-right-inline}
+:::
 
-<div id="ref-wickham2011" class="csl-entry">
+::: {#ref-walker1989 .csl-entry}
+[17. ]{.csl-left-margin}[Walker, J. Q. *A node-positioning algorithm for general trees*. (University of North Carolina, 1989). at \<<http://www.cs.unc.edu/techreports/89-034.pdf>\>]{.csl-right-inline}
+:::
 
-<span class="csl-left-margin">6. </span><span class="csl-right-inline">Wickham, H. [Testthat: Get started with testing](https://journal.r-project.org/archive/2011-1/RJournal_2011-1_Wickham.pdf). *The R Journal* **3,** 5–10 (2011).</span>
+::: {#ref-gansner1993 .csl-entry}
+[18. ]{.csl-left-margin}[Gansner, E. R., Koutsofios, E., North, S. C. & Vo, K.-P. [A technique for drawing directed graphs](https://doi.org/10.1109/32.221135). *IEEE Transactions on Software Engineering* **19,** 214--230 (1993).]{.csl-right-inline}
+:::
 
-</div>
+::: {#ref-himsolt2010 .csl-entry}
+[19. ]{.csl-left-margin}[Himsolt, M. GML: A portable graph file format. in (2010). at \<<https://api.semanticscholar.org/CorpusID:5806388>\>]{.csl-right-inline}
+:::
 
-<div id="ref-wickham2020" class="csl-entry">
+::: {#ref-briggs2012a .csl-entry}
+[20. ]{.csl-left-margin}[Briggs, A. H., Weinstein, M. C., Fenwick, E. A. L., Karnon, J., Sculpher, M. J. & Paltiel, A. D. [Model parameter estimation and uncertainty: A report of the ISPOR-SMDM modeling good research practices task force-6](https://doi.org/10.1016/j.jval.2012.04.014). *Value in Health* **15,** 835--842 (2012).]{.csl-right-inline}
+:::
 
-<span class="csl-left-margin">7. </span><span class="csl-right-inline">Wickham, H., Hester, J. & Chang, W. Devtools: Tools to make developing r packages easier. (2020). at \<<https://CRAN.R-project.org/package=devtools>\></span>
-
-</div>
-
-<div id="ref-xie2018a" class="csl-entry">
-
-<span class="csl-left-margin">8. </span><span class="csl-right-inline">Xie, Y., Allaire, J. J. & Grolemund, G. *R markdown: The definitive guide*. (Chapman; Hall/CRC, 2018). at \<<https://bookdown.org/yihui/rmarkdown>\></span>
-
-</div>
-
-<div id="ref-allaire2020" class="csl-entry">
-
-<span class="csl-left-margin">9. </span><span class="csl-right-inline">Allaire, J., Xie, Y., McPherson, J., Luraschi, J., Ushey, K., Atkins, A., Wickham, H., Cheng, J., Chang, W. & Iannone, R. Rmarkdown: Dynamic documents for r. (2020). at \<<https://github.com/rstudio/rmarkdown>\></span>
-
-</div>
-
-<div id="ref-xie2020" class="csl-entry">
-
-<span class="csl-left-margin">10. </span><span class="csl-right-inline">Xie, Y., Dervieux, C. & Riederer, E. *R markdown cookbook*. (Chapman; Hall/CRC, 2020). at \<<https://bookdown.org/yihui/rmarkdown-cookbook>\></span>
-
-</div>
-
-<div id="ref-xie2024" class="csl-entry">
-
-<span class="csl-left-margin">11. </span><span class="csl-right-inline">Xie, Y. Knitr: A General-Purpose Package for Dynamic Report Generation in R. (2024). at \<<https://yihui.org/knitr/>\></span>
-
-</div>
-
-<div id="ref-gross2013" class="csl-entry">
-
-<span class="csl-left-margin">12. </span><span class="csl-right-inline">Gross, J. L., Yellen, J. & Zhang, P. *Handbook of Graph Theory*. (Chapman; Hall/CRC., 2013). at \<<https://doi.org/10.1201/b16132>\></span>
-
-</div>
-
-<div id="ref-wikipedia2021" class="csl-entry">
-
-<span class="csl-left-margin">13. </span><span class="csl-right-inline">Wikipedia. Glossary of graph theory. *Wikipedia* (2021). at \<<https://en.wikipedia.org/wiki/Glossary_of_graph_theory>\></span>
-
-</div>
-
-<div id="ref-kahn1962" class="csl-entry">
-
-<span class="csl-left-margin">14. </span><span class="csl-right-inline">Kahn, A. B. [Topological sorting of large networks](https://doi.org/10.1145/368996.369025). *Communications of the ACM* **5,** 558–562 (1962).</span>
-
-</div>
-
-<div id="ref-kaminski2018" class="csl-entry">
-
-<span class="csl-left-margin">15. </span><span class="csl-right-inline">Kamiński, B., Jakubczyk, M. & Szufel, P. [A framework for sensitivity analysis of decision trees](https://doi.org/10.1007/s10100-017-0479-6). *Central European Journal of Operational Research* **26,** 135–159 (2018).</span>
-
-</div>
-
-<div id="ref-walker1989" class="csl-entry">
-
-<span class="csl-left-margin">16. </span><span class="csl-right-inline">Walker, J. Q. *A node-positioning algorithm for general trees*. (University of North Carolina, 1989). at \<<http://www.cs.unc.edu/techreports/89-034.pdf>\></span>
-
-</div>
-
-<div id="ref-gansner1993" class="csl-entry">
-
-<span class="csl-left-margin">17. </span><span class="csl-right-inline">Gansner, E. R., Koutsofios, E., North, S. C. & Vo, K.-P. [A technique for drawing directed graphs](https://doi.org/10.1109/32.221135). *IEEE Transactions on Software Engineering* **19,** 214–230 (1993).</span>
-
-</div>
-
-<div id="ref-briggs2012a" class="csl-entry">
-
-<span class="csl-left-margin">18. </span><span class="csl-right-inline">Briggs, A. H., Weinstein, M. C., Fenwick, E. A. L., Karnon, J., Sculpher, M. J. & Paltiel, A. D. [Model Parameter Estimation and Uncertainty: A Report of the ISPOR-SMDM Modeling Good Research Practices Task Force-6](https://doi.org/10.1016/j.jval.2012.04.014). *Value in Health* **15,** 835–842 (2012).</span>
-
-</div>
-
-<div id="ref-siebert2012" class="csl-entry">
-
-<span class="csl-left-margin">19. </span><span class="csl-right-inline">Siebert, U., Alagoz, O., Bayoumi, A. M., Jahn, B., Owens, D. K., Cohen, D. J. & Kuntz, K. M. [State-Transition Modeling: A Report of the ISPOR-SMDM Modeling Good Research Practices Task Force-3](https://doi.org/10.1016/j.jval.2012.06.014). *Value in Health* **15,** 812–820 (2012).</span>
-
-</div>
-
-</div>
+::: {#ref-siebert2012 .csl-entry}
+[21. ]{.csl-left-margin}[Siebert, U., Alagoz, O., Bayoumi, A. M., Jahn, B., Owens, D. K., Cohen, D. J. & Kuntz, K. M. [State-transition modeling: A report of the ISPOR-SMDM modeling good research practices task force-3](https://doi.org/10.1016/j.jval.2012.06.014). *Value in Health* **15,** 812--820 (2012).]{.csl-right-inline}
+:::
+::::::::::::::::::::::::

@@ -16,244 +16,253 @@ to represent edges whose source nodes are \code{ChanceNode}s.
 Andrew J. Sims \email{andrew.sims@newcastle.ac.uk}
 }
 \section{Super classes}{
-\code{\link[rdecision:Edge]{rdecision::Edge}} -> \code{\link[rdecision:Arrow]{rdecision::Arrow}} -> \code{Reaction}
+\code{\link[rdecision:Edge]{Edge}} -> \code{\link[rdecision:Arrow]{Arrow}} -> \code{Reaction}
 }
 \section{Methods}{
 \subsection{Public methods}{
-\itemize{
-\item \href{#method-Reaction-new}{\code{Reaction$new()}}
-\item \href{#method-Reaction-grob}{\code{Reaction$grob()}}
-\item \href{#method-Reaction-modvars}{\code{Reaction$modvars()}}
-\item \href{#method-Reaction-set_probability}{\code{Reaction$set_probability()}}
-\item \href{#method-Reaction-p}{\code{Reaction$p()}}
-\item \href{#method-Reaction-set_cost}{\code{Reaction$set_cost()}}
-\item \href{#method-Reaction-cost}{\code{Reaction$cost()}}
-\item \href{#method-Reaction-set_benefit}{\code{Reaction$set_benefit()}}
-\item \href{#method-Reaction-benefit}{\code{Reaction$benefit()}}
-\item \href{#method-Reaction-clone}{\code{Reaction$clone()}}
+  \itemize{
+    \item \href{#method-Reaction-initialize}{\code{Reaction$new()}}
+    \item \href{#method-Reaction-grob}{\code{Reaction$grob()}}
+    \item \href{#method-Reaction-modvars}{\code{Reaction$modvars()}}
+    \item \href{#method-Reaction-set_probability}{\code{Reaction$set_probability()}}
+    \item \href{#method-Reaction-p}{\code{Reaction$p()}}
+    \item \href{#method-Reaction-set_cost}{\code{Reaction$set_cost()}}
+    \item \href{#method-Reaction-cost}{\code{Reaction$cost()}}
+    \item \href{#method-Reaction-set_benefit}{\code{Reaction$set_benefit()}}
+    \item \href{#method-Reaction-benefit}{\code{Reaction$benefit()}}
+    \item \href{#method-Reaction-clone}{\code{Reaction$clone()}}
+  }
 }
-}
-\if{html}{\out{
-<details open><summary>Inherited methods</summary>
+\if{html}{\out{<details open><summary>Inherited methods</summary>
 <ul>
-<li><span class="pkg-link" data-pkg="rdecision" data-topic="Edge" data-id="endpoints"><a href='../../rdecision/html/Edge.html#method-Edge-endpoints'><code>rdecision::Edge$endpoints()</code></a></span></li>
-<li><span class="pkg-link" data-pkg="rdecision" data-topic="Edge" data-id="is_same_edge"><a href='../../rdecision/html/Edge.html#method-Edge-is_same_edge'><code>rdecision::Edge$is_same_edge()</code></a></span></li>
-<li><span class="pkg-link" data-pkg="rdecision" data-topic="Edge" data-id="label"><a href='../../rdecision/html/Edge.html#method-Edge-label'><code>rdecision::Edge$label()</code></a></span></li>
-<li><span class="pkg-link" data-pkg="rdecision" data-topic="Arrow" data-id="source"><a href='../../rdecision/html/Arrow.html#method-Arrow-source'><code>rdecision::Arrow$source()</code></a></span></li>
-<li><span class="pkg-link" data-pkg="rdecision" data-topic="Arrow" data-id="target"><a href='../../rdecision/html/Arrow.html#method-Arrow-target'><code>rdecision::Arrow$target()</code></a></span></li>
+  <li><span class="pkg-link" data-pkg="rdecision" data-topic="Edge" data-id="endpoints"><a href='../../rdecision/html/Edge.html#method-Edge-endpoints'><code>Edge$endpoints()</code></a></span></li>
+  <li><span class="pkg-link" data-pkg="rdecision" data-topic="Edge" data-id="is_same_edge"><a href='../../rdecision/html/Edge.html#method-Edge-is_same_edge'><code>Edge$is_same_edge()</code></a></span></li>
+  <li><span class="pkg-link" data-pkg="rdecision" data-topic="Edge" data-id="label"><a href='../../rdecision/html/Edge.html#method-Edge-label'><code>Edge$label()</code></a></span></li>
+  <li><span class="pkg-link" data-pkg="rdecision" data-topic="Arrow" data-id="source"><a href='../../rdecision/html/Arrow.html#method-Arrow-source'><code>Arrow$source()</code></a></span></li>
+  <li><span class="pkg-link" data-pkg="rdecision" data-topic="Arrow" data-id="target"><a href='../../rdecision/html/Arrow.html#method-Arrow-target'><code>Arrow$target()</code></a></span></li>
 </ul>
-</details>
-}}
+</details>}}
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-Reaction-new"></a>}}
-\if{latex}{\out{\hypertarget{method-Reaction-new}{}}}
-\subsection{Method \code{new()}}{
-Create an object of type \code{Reaction}. A probability
+\if{html}{\out{<a id="method-Reaction-initialize"></a>}}
+\if{latex}{\out{\hypertarget{method-Reaction-initialize}{}}}
+\subsection{\code{Reaction$new()}}{
+  Create an object of type \code{Reaction}. A probability
 must be assigned
 to the edge. Optionally, a cost and a benefit may be associated
 with traversing the edge. A \dfn{pay-off} (benefit-cost) is sometimes
 used in edges of decision trees; the parametrization used here is more
 general.
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{Reaction$new(
+  \subsection{Usage}{
+    \if{html}{\out{<div class="r">}}
+    \preformatted{Reaction$new(
   source_node,
   target_node,
   p = 0,
   cost = 0,
   benefit = 0,
   label = ""
-)}\if{html}{\out{</div>}}
-}
-
-\subsection{Arguments}{
-\if{html}{\out{<div class="arguments">}}
-\describe{
-\item{\code{source_node}}{Chance node from which the reaction leaves.}
-
-\item{\code{target_node}}{Node which the reaction enters.}
-
-\item{\code{p}}{Conditional probability of traversing the reaction edge. At most
+)}
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Arguments}{
+    \if{html}{\out{<div class="arguments">}}
+    \describe{
+      \item{\code{source_node}}{Chance node from which the reaction leaves.}
+      \item{\code{target_node}}{Node which the reaction enters.}
+      \item{\code{p}}{Conditional probability of traversing the reaction edge. At most
 one Reaction from each chance node may have this set to `NA_real_`, in
 which case it will be replaced by one minus the sum of conditional
 probabilities of the other reaction edges from the node.}
-
-\item{\code{cost}}{Cost associated with traversal of this edge (numeric or
+      \item{\code{cost}}{Cost associated with traversal of this edge (numeric or
 \code{ModVar}), not NA.}
-
-\item{\code{benefit}}{Benefit associated with traversal of the edge (numeric or
+      \item{\code{benefit}}{Benefit associated with traversal of the edge (numeric or
 \code{ModVar}), not NA.}
+      \item{\code{label}}{Character string containing the reaction label.}
+    }
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Returns}{
+    A new \code{Reaction} object.
+  }
+}
 
-\item{\code{label}}{Character string containing the reaction label.}
-}
-\if{html}{\out{</div>}}
-}
-\subsection{Returns}{
-A new \code{Reaction} object.
-}
-}
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-Reaction-grob"></a>}}
 \if{latex}{\out{\hypertarget{method-Reaction-grob}{}}}
-\subsection{Method \code{grob()}}{
-Creates a grid::grob for a reaction edge.
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{Reaction$grob(xs, ys, xt, yt, fs = 0.2)}\if{html}{\out{</div>}}
+\subsection{\code{Reaction$grob()}}{
+  Creates a grid::grob for a reaction edge.
+  \subsection{Usage}{
+    \if{html}{\out{<div class="r">}}
+    \preformatted{Reaction$grob(xs, ys, xt, yt, fs = 0.2)}
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Arguments}{
+    \if{html}{\out{<div class="arguments">}}
+    \describe{
+      \item{\code{xs}}{x coordinate of source of edge, grid::unit object.}
+      \item{\code{ys}}{y coordinate of source of edge, grid::unit object.}
+      \item{\code{xt}}{x coordinate of target of edge, grid::unit object.}
+      \item{\code{yt}}{y coordinate of target of edge, grid::unit object.}
+      \item{\code{fs}}{Fraction of the edge which slopes.}
+    }
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Returns}{
+    A grid::grob containing the symbol and label.
+  }
 }
 
-\subsection{Arguments}{
-\if{html}{\out{<div class="arguments">}}
-\describe{
-\item{\code{xs}}{x coordinate of source of edge, grid::unit object.}
-
-\item{\code{ys}}{y coordinate of source of edge, grid::unit object.}
-
-\item{\code{xt}}{x coordinate of target of edge, grid::unit object.}
-
-\item{\code{yt}}{y coordinate of target of edge, grid::unit object.}
-
-\item{\code{fs}}{Fraction of the edge which slopes.}
-}
-\if{html}{\out{</div>}}
-}
-\subsection{Returns}{
-A grid::grob containing the symbol and label.
-}
-}
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-Reaction-modvars"></a>}}
 \if{latex}{\out{\hypertarget{method-Reaction-modvars}{}}}
-\subsection{Method \code{modvars()}}{
-Find all the model variables of type \code{ModVar} that
+\subsection{\code{Reaction$modvars()}}{
+  Find all the model variables of type \code{ModVar} that
 have been specified as values associated with this Action. Includes
 operands of these \code{ModVar}s, if they are expressions.
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{Reaction$modvars()}\if{html}{\out{</div>}}
+  \subsection{Usage}{
+    \if{html}{\out{<div class="r">}}
+    \preformatted{Reaction$modvars()}
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Returns}{
+    A list of \code{ModVar}s.
+  }
 }
 
-\subsection{Returns}{
-A list of \code{ModVar}s.
-}
-}
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-Reaction-set_probability"></a>}}
 \if{latex}{\out{\hypertarget{method-Reaction-set_probability}{}}}
-\subsection{Method \code{set_probability()}}{
-Set the probability associated with the reaction edge.
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{Reaction$set_probability(p)}\if{html}{\out{</div>}}
-}
-
-\subsection{Arguments}{
-\if{html}{\out{<div class="arguments">}}
-\describe{
-\item{\code{p}}{Conditional probability of traversing the reaction edge. Of type
+\subsection{\code{Reaction$set_probability()}}{
+  Set the probability associated with the reaction edge.
+  \subsection{Usage}{
+    \if{html}{\out{<div class="r">}}
+    \preformatted{Reaction$set_probability(p)}
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Arguments}{
+    \if{html}{\out{<div class="arguments">}}
+    \describe{
+      \item{\code{p}}{Conditional probability of traversing the reaction edge. Of type
 numeric or \code{ModVar}. If numeric, \code{p} must be in the range
 [0,1], or \code{NA_real_}. Note that setting \code{p = NA} will cause
 an error.}
+    }
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Returns}{
+    Updated \code{Reaction} object.
+  }
 }
-\if{html}{\out{</div>}}
-}
-\subsection{Returns}{
-Updated \code{Reaction} object.
-}
-}
+
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-Reaction-p"></a>}}
 \if{latex}{\out{\hypertarget{method-Reaction-p}{}}}
-\subsection{Method \code{p()}}{
-Return the current value of the edge probability, i.e., the
+\subsection{\code{Reaction$p()}}{
+  Return the current value of the edge probability, i.e., the
 conditional probability of traversing the edge.
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{Reaction$p()}\if{html}{\out{</div>}}
+  \subsection{Usage}{
+    \if{html}{\out{<div class="r">}}
+    \preformatted{Reaction$p()}
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Returns}{
+    Numeric value in range [0,1].
+  }
 }
 
-\subsection{Returns}{
-Numeric value in range [0,1].
-}
-}
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-Reaction-set_cost"></a>}}
 \if{latex}{\out{\hypertarget{method-Reaction-set_cost}{}}}
-\subsection{Method \code{set_cost()}}{
-Set the cost associated with the reaction edge.
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{Reaction$set_cost(c = 0)}\if{html}{\out{</div>}}
+\subsection{\code{Reaction$set_cost()}}{
+  Set the cost associated with the reaction edge.
+  \subsection{Usage}{
+    \if{html}{\out{<div class="r">}}
+    \preformatted{Reaction$set_cost(c = 0)}
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Arguments}{
+    \if{html}{\out{<div class="arguments">}}
+    \describe{
+      \item{\code{c}}{Cost associated with traversing the reaction edge. Of type
+numeric or \code{ModVar}.}
+    }
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Returns}{
+    Updated \code{Reaction} object.
+  }
 }
 
-\subsection{Arguments}{
-\if{html}{\out{<div class="arguments">}}
-\describe{
-\item{\code{c}}{Cost associated with traversing the reaction edge. Of type
-numeric or \code{ModVar}.}
-}
-\if{html}{\out{</div>}}
-}
-\subsection{Returns}{
-Updated \code{Reaction} object.
-}
-}
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-Reaction-cost"></a>}}
 \if{latex}{\out{\hypertarget{method-Reaction-cost}{}}}
-\subsection{Method \code{cost()}}{
-Return the cost associated with traversing the edge.
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{Reaction$cost()}\if{html}{\out{</div>}}
+\subsection{\code{Reaction$cost()}}{
+  Return the cost associated with traversing the edge.
+  \subsection{Usage}{
+    \if{html}{\out{<div class="r">}}
+    \preformatted{Reaction$cost()}
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Returns}{
+    Cost.
+  }
 }
 
-\subsection{Returns}{
-Cost.
-}
-}
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-Reaction-set_benefit"></a>}}
 \if{latex}{\out{\hypertarget{method-Reaction-set_benefit}{}}}
-\subsection{Method \code{set_benefit()}}{
-Set the benefit associated with the reaction edge.
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{Reaction$set_benefit(b = 0)}\if{html}{\out{</div>}}
+\subsection{\code{Reaction$set_benefit()}}{
+  Set the benefit associated with the reaction edge.
+  \subsection{Usage}{
+    \if{html}{\out{<div class="r">}}
+    \preformatted{Reaction$set_benefit(b = 0)}
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Arguments}{
+    \if{html}{\out{<div class="arguments">}}
+    \describe{
+      \item{\code{b}}{Benefit associated with traversing the reaction edge. Of type
+numeric or \code{ModVar}.}
+    }
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Returns}{
+    Updated \code{Action} object.
+  }
 }
 
-\subsection{Arguments}{
-\if{html}{\out{<div class="arguments">}}
-\describe{
-\item{\code{b}}{Benefit associated with traversing the reaction edge. Of type
-numeric or \code{ModVar}.}
-}
-\if{html}{\out{</div>}}
-}
-\subsection{Returns}{
-Updated \code{Action} object.
-}
-}
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-Reaction-benefit"></a>}}
 \if{latex}{\out{\hypertarget{method-Reaction-benefit}{}}}
-\subsection{Method \code{benefit()}}{
-Return the benefit associated with traversing the edge.
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{Reaction$benefit()}\if{html}{\out{</div>}}
+\subsection{\code{Reaction$benefit()}}{
+  Return the benefit associated with traversing the edge.
+  \subsection{Usage}{
+    \if{html}{\out{<div class="r">}}
+    \preformatted{Reaction$benefit()}
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Returns}{
+    Benefit.
+  }
 }
 
-\subsection{Returns}{
-Benefit.
-}
-}
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-Reaction-clone"></a>}}
 \if{latex}{\out{\hypertarget{method-Reaction-clone}{}}}
-\subsection{Method \code{clone()}}{
-The objects of this class are cloneable with this method.
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{Reaction$clone(deep = FALSE)}\if{html}{\out{</div>}}
+\subsection{\code{Reaction$clone()}}{
+  The objects of this class are cloneable with this method.
+  \subsection{Usage}{
+    \if{html}{\out{<div class="r">}}
+    \preformatted{Reaction$clone(deep = FALSE)}
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Arguments}{
+    \if{html}{\out{<div class="arguments">}}
+    \describe{
+      \item{\code{deep}}{Whether to make a deep clone.}
+    }
+    \if{html}{\out{</div>}}
+  }
 }
 
-\subsection{Arguments}{
-\if{html}{\out{<div class="arguments">}}
-\describe{
-\item{\code{deep}}{Whether to make a deep clone.}
-}
-\if{html}{\out{</div>}}
-}
-}
 }

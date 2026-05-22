@@ -1,8 +1,10 @@
 ---
 output:
-  github_document:
-    df_print: kable
+  rmarkdown::md_document:
+    variant: "markdown"
     pandoc_args: [
+      "-t", "markdown-simple_tables-multiline_tables+pipe_tables-grid_tables",
+      "--shift-heading-level-by", "0",
       "--wrap", "preserve"
     ]
 bibliography: "vignettes/REFERENCES.bib"
@@ -29,33 +31,30 @@ local({
   writeLines(text = c(
     "<!-- badges: start -->",
     pander::pandoc.link.return(
-      url = paste0(
-        c("https:/", "cran.r-project.org", "package=rdecision"), collapse = "/"
+      url = file.path(
+        "https:/", "cran.r-project.org", "package=rdecision"
       ),
       text = pander::pandoc.image.return(
-        img = paste0(
-          c("https:/", "www.r-pkg.org", "badges", "version", "rdecision"),
-          collapse = "/"
+        img = file.path(
+          "https:/", "www.r-pkg.org", "badges", "version", "rdecision"
         ),
         caption = "CRAN status"
       )
     ),
     pander::pandoc.link.return(
-      url = paste0(
-        c(
-          "https:/", "app.codecov.io", "gh", "ajsims1704",
-          "rdecision?branch=master"
-        ),
-        collapse = "/"
+      url = file.path(
+        "https:/", "app.codecov.io", "gh", "ajsims1704",
+        "rdecision?branch=master"
       ),
       text = pander::pandoc.image.return(
-        img = paste0(
-          c("https:/", "codecov.io", "gh", "ajsims1704", "rdecision", "branch",
-            "master", "graph", "badge.svg"), collapse = "/"
+        img = file.path(
+          "https:/", "codecov.io", "gh", "ajsims1704", "rdecision", "branch",
+          "master", "graph", "badge.svg"
         ),
         caption = "Codecov test coverage"
       )
     ),
+    "",
     "<!-- badges: end -->"
   ))
 })
@@ -243,20 +242,16 @@ dt <- DecisionTree$new(
 ```{r}
 #| fig.align = "center",
 #| include = FALSE
-# draw the model and save it in a PNG file within the `man` folder of the
+# draw the model and save it in an SVG file within the `man` folder of the
 # package, then add a link to it into the README.md script.
-pngfile <- file.path("man", "figures", "lifestyle.png")
-withr::with_png(
-  new = pngfile,
-  code = {
-    dt$draw()
-  }
+svgfile <- file.path("man", "figures", "lifestyle.svg")
+withr::with_svg(
+  new = svgfile,
+  code = dt$draw(fontsize = 12L)
 )
 ```
 
-```{r}
-knitr::include_graphics(path = pngfile)
-```
+![A decision tree](`r svgfile`)
 
 The method `evaluate` is used to calculate the costs and utilities associated
 with the decision problem. By default, it evaluates it once with all the model
@@ -426,90 +421,68 @@ M$set_probabilities(Pt)
 ```{r}
 #| include = FALSE
 # represent the model as a GML script and render it to an image file using
-# the igraph package. The image file is saved in the `man` folder of the package
-# so it is available to the README.md script, to which a link is added to the
+# the DiagrammeR package. The image file is saved in the `man` folder of the
+# package so it is available to the README.md script, to which a link is added
+# to the
 # README.md file.
-pngfile <- file.path("man", "figures", "phv.png")
+svgfile <- file.path("man", "figures", "phv.svg")
 local({
-  # create an igraph object
+  # save the graph as a GML file
   gml <- M$as_gml()
   gmlfile <- tempfile(fileext = ".gml")
   writeLines(gml, con = gmlfile)
-  ig <- igraph::read_graph(gmlfile, format = "gml")
-  # match layout to Sonnenberg and Beck, fig 3
-  vxy <- matrix(
-    data = c(
-      -0.75, +0.75, +0.00,
-      +0.75, +0.75, -0.75
-    ),
-    ncol = 2L,
-    dimnames = list(c("Well", "Disabled", "Dead"), c("x", "y"))
+  # import it to DiagrammeR
+  g <- DiagrammeR::import_graph(gmlfile, file_type = "gml")
+  # get the node ids
+  nodes <- DiagrammeR::get_node_attrs(g, node_attr = "label")
+  nwell <- which(nodes == "Well")
+  ndisabled <- which(nodes == "Disabled")
+  ndead <- which(nodes == "Dead")
+  # set layout
+  g <- DiagrammeR::set_node_position(g, node = nwell, x = 1L, y = 3L)
+  g <- DiagrammeR::set_node_position(g, node = ndisabled, x = 3L, y = 3L)
+  g <- DiagrammeR::set_node_position(g, node = ndead, x = 2L, y = 1L)
+  # set its properties
+  g <- DiagrammeR::set_node_attrs(g, node_attr = fixedsize, values = TRUE)
+  g <- DiagrammeR::set_node_attrs(g, node_attr = height, values = 1L)
+  g <- DiagrammeR::set_node_attrs(g, node_attr = color, values = "black")
+  g <- DiagrammeR::set_node_attrs(g, node_attr = fillcolor, values = "white")
+  g <- DiagrammeR::set_node_attrs(g, node_attr = fontsize, values = 14L)
+  g <- DiagrammeR::set_node_attrs(g, node_attr = fontcolor, values = "black")
+  g <- DiagrammeR::set_edge_attrs(g, edge_attr = color, values = "black")
+  # set loop directions
+  g <- DiagrammeR::set_edge_attrs(
+    g,
+    edge_attr = "tailport",
+    values = "nw",
+    from = nwell,
+    to = nwell
   )
-  layout <- matrix(
-    data = c(
-      vapply(X = igraph::V(ig), FUN.VALUE = 1.0, FUN = function(v) {
-        lbl <- igraph::vertex_attr(ig, "label", v)
-        return(vxy[[lbl, "x"]])
-      }),
-      vapply(X = igraph::V(ig), FUN.VALUE = 1.0, FUN = function(v) {
-        lbl <- igraph::vertex_attr(ig, "label", v)
-        return(vxy[[lbl, "y"]])
-      })
-    ),
-    byrow = FALSE,
-    ncol = 2L
+  g <- DiagrammeR::set_edge_attrs(
+    g,
+    edge_attr = "tailport",
+    values = "ne",
+    from = ndisabled,
+    to = ndisabled
   )
-  # loop angles
-  loopa <- vapply(X = igraph::E(ig), FUN.VALUE = 1.0, FUN = function(e) {
-    # find source and target labels
-    trg <- igraph::head_of(ig, e)
-    trgl <- igraph::vertex_attr(ig, name = "label", index = trg)
-    src <- igraph::tail_of(ig, e)
-    srcl <- igraph::vertex_attr(ig, name = "label", index = src)
-    la <- 0.0
-    if (trgl == srcl) {
-      if (trgl == "Well") {
-        la <- pi
-      } else if (trgl == "Dead") {
-        la <- pi / 2.0
-      }
-    }
-    return(la)
-  })
-  # plot into png file
-  withr::with_png(
-    new = pngfile,
-    code = {
-      withr::with_par(
-        new = list(
-          oma = c(0L, 0L, 0L, 0L),
-          mar = c(3L, 3L, 3L, 3L),
-          xpd = NA
-        ),
-        code = {
-          plot(
-            ig,
-            rescale = FALSE, asp = 0L,
-            vertex.shape = "circle", vertex.size = 60.0,
-            vertex.color = "white", vertex.label.color = "black",
-            edge.color = "black",
-            edge.arrow.size = 0.75,
-            frame = FALSE,
-            layout = layout,
-            loop.size = 0.8,
-            edge.loop.angle = loopa
-          )
-        }
-      )
-    }
+  g <- DiagrammeR::set_edge_attrs(
+    g,
+    edge_attr = "tailport",
+    values = "sw",
+    from = ndead,
+    to = ndead
+  )
+  # render it as an image file with R graphic device default width
+  DiagrammeR::export_graph(
+    g,
+    file_name = svgfile,
+    file_type = "svg",
+    width = 480L
   )
 })
 ```
 
-```{r}
-#| fig.align = "center",
-knitr::include_graphics(path = pngfile)
-```
+![A three-state Markov model](`r svgfile`)
 
 With a starting population of 10,000, the model can be run for 24 years as
 follows.
@@ -517,10 +490,6 @@ follows.
 #| echo = TRUE
 # set the starting populations
 M$reset(c(Well = 10000.0, Disabled = 0.0, Dead = 0.0))
-```
-
-```{r}
-#| echo = TRUE
 # cycle
 MT <- M$cycles(24L, hcc.pop = FALSE, hcc.cost = FALSE, hcc.QALY = FALSE)
 ```
@@ -610,42 +579,53 @@ local({
 ```
 
 ```{r}
-keep <- c("Cycle", "Well", "Disabled", "Dead", "CumulativeUtility")
-rows <- c(1L, 2L, 3L, 4L, 24L, 25L)
-with(data = t2[rows, keep], expr = {
-  data.frame(
-    Years = round(Cycle, digits = 2L),
-    Well = round(Well, digits = 0L),
-    Disabled = round(Disabled, digits = 0L),
-    "Cumulative Utility" = round(CumulativeUtility, digits = 3L),
-    stringsAsFactors = FALSE
+#| results = "asis"
+local({
+  keep <- c("Cycle", "Well", "Disabled", "Dead", "CumulativeUtility")
+  rows <- c(1L, 2L, 3L, 4L, 24L, 25L)
+  tab <- with(data = t2[rows, keep], expr = {
+    data.frame(
+      Years = round(Cycle, digits = 2L),
+      Well = round(Well, digits = 0L),
+      Disabled = round(Disabled, digits = 0L),
+      Dead = round(Dead, digits = 0L),
+      CU = round(CumulativeUtility, digits = 3L),
+      stringsAsFactors = FALSE
+    )
+  })
+  knitr::kable(
+    x = tab,
+    format = "pipe",
+    col.names = c("Years", "Well", "Disabled", "Dead", "Cumulative Utility")
   )
 })
 ```
 
-# Acknowledgements
+## Acknowledgements
 In addition to using base R [@rcoreteam], `redecision` relies on
-the `R6` implementation of classes [@chang2020] and the `rlang` package for
-error handling and non-standard evaluation used in expression model variables
-[@henry2020]. Building the package vignettes and documentation relies on the
-`testthat` package [@wickham2011], the `devtools` package [@wickham2020], 
-`rmarkdown` [@xie2018a,@allaire2020,@xie2020] and `knitr` [@xie2024].
+the `R6` implementation of classes [@rr6] and the `rlang` package [@rrlang]
+for non-standard evaluation used in expression model variables.
+Testing the package relies on the`testthat` package [@wickham2011]. Preparing
+the package for building makes use of the `devtools` package [@rdevtools].
+Building vignettes require
+packages `rmarkdown` [@xie2018a; @rrmarkdown; @xie2020], `knitr` [@rknitr]
+and `DiagrammeR` [@rdiagrammer].
 
 Underpinning graph theory is based on terminology, definitions and
 algorithms from Gross *et al* [-@gross2013], the Wikipedia 
 glossary [@wikipedia2021] and links therein. Topological sorting of graphs
-is based on Kahn's algorithm [-@kahn1962]. Some of the terminology for decision
-trees was based on the work of Kaminski *et al* [-@kaminski2018] and an 
+is based on Kahn's algorithm [-@kahn1962]. Terminology for decision
+trees draws on the work of Kaminski *et al* [-@kaminski2018] and an 
 efficient tree drawing algorithm was based on the work of Walker [-@walker1989].
-In semi-Markov models, representations are exported in the
-DOT language [@gansner1993].
+In semi-Markov models, representations may be exported in the
+DOT [@gansner1993] and GML [@himsolt2010] languages.
 
 Terminology for decision trees and Markov models in health economic evaluation
 was based on the book by Briggs *et al* [-@briggs2006] and the output format
-and terminology follows ISPOR recommendations [@briggs2012a,@siebert2012]. 
+and terminology follows ISPOR recommendations [@briggs2012a; @siebert2012]. 
 
 Citations for examples used in vignettes are given in applicable vignette
 files. 
 
-# References
+## References
 

@@ -26,160 +26,173 @@ from class \code{Distribution}.
 Andrew J. Sims \email{andrew.sims@newcastle.ac.uk}
 }
 \section{Super class}{
-\code{\link[rdecision:Distribution]{rdecision::Distribution}} -> \code{GammaDistribution}
+\code{\link[rdecision:Distribution]{Distribution}} -> \code{GammaDistribution}
 }
 \section{Methods}{
 \subsection{Public methods}{
-\itemize{
-\item \href{#method-GammaDistribution-new}{\code{GammaDistribution$new()}}
-\item \href{#method-GammaDistribution-distribution}{\code{GammaDistribution$distribution()}}
-\item \href{#method-GammaDistribution-mean}{\code{GammaDistribution$mean()}}
-\item \href{#method-GammaDistribution-mode}{\code{GammaDistribution$mode()}}
-\item \href{#method-GammaDistribution-SD}{\code{GammaDistribution$SD()}}
-\item \href{#method-GammaDistribution-sample}{\code{GammaDistribution$sample()}}
-\item \href{#method-GammaDistribution-quantile}{\code{GammaDistribution$quantile()}}
-\item \href{#method-GammaDistribution-clone}{\code{GammaDistribution$clone()}}
+  \itemize{
+    \item \href{#method-GammaDistribution-initialize}{\code{GammaDistribution$new()}}
+    \item \href{#method-GammaDistribution-distribution}{\code{GammaDistribution$distribution()}}
+    \item \href{#method-GammaDistribution-mean}{\code{GammaDistribution$mean()}}
+    \item \href{#method-GammaDistribution-mode}{\code{GammaDistribution$mode()}}
+    \item \href{#method-GammaDistribution-SD}{\code{GammaDistribution$SD()}}
+    \item \href{#method-GammaDistribution-sample}{\code{GammaDistribution$sample()}}
+    \item \href{#method-GammaDistribution-quantile}{\code{GammaDistribution$quantile()}}
+    \item \href{#method-GammaDistribution-clone}{\code{GammaDistribution$clone()}}
+  }
 }
-}
-\if{html}{\out{
-<details open><summary>Inherited methods</summary>
+\if{html}{\out{<details open><summary>Inherited methods</summary>
 <ul>
-<li><span class="pkg-link" data-pkg="rdecision" data-topic="Distribution" data-id="order"><a href='../../rdecision/html/Distribution.html#method-Distribution-order'><code>rdecision::Distribution$order()</code></a></span></li>
-<li><span class="pkg-link" data-pkg="rdecision" data-topic="Distribution" data-id="r"><a href='../../rdecision/html/Distribution.html#method-Distribution-r'><code>rdecision::Distribution$r()</code></a></span></li>
-<li><span class="pkg-link" data-pkg="rdecision" data-topic="Distribution" data-id="varcov"><a href='../../rdecision/html/Distribution.html#method-Distribution-varcov'><code>rdecision::Distribution$varcov()</code></a></span></li>
+  <li><span class="pkg-link" data-pkg="rdecision" data-topic="Distribution" data-id="order"><a href='../../rdecision/html/Distribution.html#method-Distribution-order'><code>Distribution$order()</code></a></span></li>
+  <li><span class="pkg-link" data-pkg="rdecision" data-topic="Distribution" data-id="r"><a href='../../rdecision/html/Distribution.html#method-Distribution-r'><code>Distribution$r()</code></a></span></li>
+  <li><span class="pkg-link" data-pkg="rdecision" data-topic="Distribution" data-id="varcov"><a href='../../rdecision/html/Distribution.html#method-Distribution-varcov'><code>Distribution$varcov()</code></a></span></li>
 </ul>
-</details>
-}}
+</details>}}
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-GammaDistribution-new"></a>}}
-\if{latex}{\out{\hypertarget{method-GammaDistribution-new}{}}}
-\subsection{Method \code{new()}}{
-Create an object of class \code{GammaDistribution}.
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{GammaDistribution$new(shape, scale)}\if{html}{\out{</div>}}
+\if{html}{\out{<a id="method-GammaDistribution-initialize"></a>}}
+\if{latex}{\out{\hypertarget{method-GammaDistribution-initialize}{}}}
+\subsection{\code{GammaDistribution$new()}}{
+  Create an object of class \code{GammaDistribution}.
+  \subsection{Usage}{
+    \if{html}{\out{<div class="r">}}
+    \preformatted{GammaDistribution$new(shape, scale)}
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Arguments}{
+    \if{html}{\out{<div class="arguments">}}
+    \describe{
+      \item{\code{shape}}{shape parameter of the Gamma distribution.}
+      \item{\code{scale}}{scale parameter of the Gamma distribution.}
+    }
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Returns}{
+    An object of class \code{GammaDistribution}.
+  }
 }
 
-\subsection{Arguments}{
-\if{html}{\out{<div class="arguments">}}
-\describe{
-\item{\code{shape}}{shape parameter of the Gamma distribution.}
-
-\item{\code{scale}}{scale parameter of the Gamma distribution.}
-}
-\if{html}{\out{</div>}}
-}
-\subsection{Returns}{
-An object of class \code{GammaDistribution}.
-}
-}
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-GammaDistribution-distribution"></a>}}
 \if{latex}{\out{\hypertarget{method-GammaDistribution-distribution}{}}}
-\subsection{Method \code{distribution()}}{
-Accessor function for the name of the distribution.
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{GammaDistribution$distribution()}\if{html}{\out{</div>}}
+\subsection{\code{GammaDistribution$distribution()}}{
+  Accessor function for the name of the distribution.
+  \subsection{Usage}{
+    \if{html}{\out{<div class="r">}}
+    \preformatted{GammaDistribution$distribution()}
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Returns}{
+    Distribution name as character string.
+  }
 }
 
-\subsection{Returns}{
-Distribution name as character string.
-}
-}
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-GammaDistribution-mean"></a>}}
 \if{latex}{\out{\hypertarget{method-GammaDistribution-mean}{}}}
-\subsection{Method \code{mean()}}{
-Return the expected value of the distribution.
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{GammaDistribution$mean()}\if{html}{\out{</div>}}
+\subsection{\code{GammaDistribution$mean()}}{
+  Return the expected value of the distribution.
+  \subsection{Usage}{
+    \if{html}{\out{<div class="r">}}
+    \preformatted{GammaDistribution$mean()}
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Returns}{
+    Expected value as a numeric value.
+  }
 }
 
-\subsection{Returns}{
-Expected value as a numeric value.
-}
-}
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-GammaDistribution-mode"></a>}}
 \if{latex}{\out{\hypertarget{method-GammaDistribution-mode}{}}}
-\subsection{Method \code{mode()}}{
-Return the mode of the distribution (if \code{shape} >= 1)
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{GammaDistribution$mode()}\if{html}{\out{</div>}}
+\subsection{\code{GammaDistribution$mode()}}{
+  Return the mode of the distribution (if \code{shape} >= 1)
+  \subsection{Usage}{
+    \if{html}{\out{<div class="r">}}
+    \preformatted{GammaDistribution$mode()}
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Returns}{
+    mode as a numeric value.
+  }
 }
 
-\subsection{Returns}{
-mode as a numeric value.
-}
-}
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-GammaDistribution-SD"></a>}}
 \if{latex}{\out{\hypertarget{method-GammaDistribution-SD}{}}}
-\subsection{Method \code{SD()}}{
-Return the standard deviation of the distribution.
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{GammaDistribution$SD()}\if{html}{\out{</div>}}
+\subsection{\code{GammaDistribution$SD()}}{
+  Return the standard deviation of the distribution.
+  \subsection{Usage}{
+    \if{html}{\out{<div class="r">}}
+    \preformatted{GammaDistribution$SD()}
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Returns}{
+    Standard deviation as a numeric value
+  }
 }
 
-\subsection{Returns}{
-Standard deviation as a numeric value
-}
-}
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-GammaDistribution-sample"></a>}}
 \if{latex}{\out{\hypertarget{method-GammaDistribution-sample}{}}}
-\subsection{Method \code{sample()}}{
-Draw and hold a random sample from the distribution.
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{GammaDistribution$sample(expected = FALSE)}\if{html}{\out{</div>}}
+\subsection{\code{GammaDistribution$sample()}}{
+  Draw and hold a random sample from the distribution.
+  \subsection{Usage}{
+    \if{html}{\out{<div class="r">}}
+    \preformatted{GammaDistribution$sample(expected = FALSE)}
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Arguments}{
+    \if{html}{\out{<div class="arguments">}}
+    \describe{
+      \item{\code{expected}}{If TRUE, sets the next value retrieved by a call to
+\code{r()} to be the mean of the distribution.}
+    }
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Returns}{
+    Updated distribution.
+  }
 }
 
-\subsection{Arguments}{
-\if{html}{\out{<div class="arguments">}}
-\describe{
-\item{\code{expected}}{If TRUE, sets the next value retrieved by a call to
-\code{r()} to be the mean of the distribution.}
-}
-\if{html}{\out{</div>}}
-}
-\subsection{Returns}{
-Updated distribution.
-}
-}
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-GammaDistribution-quantile"></a>}}
 \if{latex}{\out{\hypertarget{method-GammaDistribution-quantile}{}}}
-\subsection{Method \code{quantile()}}{
-Return the quantiles of the Gamma uncertainty distribution.
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{GammaDistribution$quantile(probs)}\if{html}{\out{</div>}}
+\subsection{\code{GammaDistribution$quantile()}}{
+  Return the quantiles of the Gamma uncertainty distribution.
+  \subsection{Usage}{
+    \if{html}{\out{<div class="r">}}
+    \preformatted{GammaDistribution$quantile(probs)}
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Arguments}{
+    \if{html}{\out{<div class="arguments">}}
+    \describe{
+      \item{\code{probs}}{Vector of probabilities, in range [0,1].}
+    }
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Returns}{
+    Vector of quantiles.
+  }
 }
 
-\subsection{Arguments}{
-\if{html}{\out{<div class="arguments">}}
-\describe{
-\item{\code{probs}}{Vector of probabilities, in range [0,1].}
-}
-\if{html}{\out{</div>}}
-}
-\subsection{Returns}{
-Vector of quantiles.
-}
-}
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-GammaDistribution-clone"></a>}}
 \if{latex}{\out{\hypertarget{method-GammaDistribution-clone}{}}}
-\subsection{Method \code{clone()}}{
-The objects of this class are cloneable with this method.
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{GammaDistribution$clone(deep = FALSE)}\if{html}{\out{</div>}}
+\subsection{\code{GammaDistribution$clone()}}{
+  The objects of this class are cloneable with this method.
+  \subsection{Usage}{
+    \if{html}{\out{<div class="r">}}
+    \preformatted{GammaDistribution$clone(deep = FALSE)}
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Arguments}{
+    \if{html}{\out{<div class="arguments">}}
+    \describe{
+      \item{\code{deep}}{Whether to make a deep clone.}
+    }
+    \if{html}{\out{</div>}}
+  }
 }
 
-\subsection{Arguments}{
-\if{html}{\out{<div class="arguments">}}
-\describe{
-\item{\code{deep}}{Whether to make a deep clone.}
-}
-\if{html}{\out{</div>}}
-}
-}
 }

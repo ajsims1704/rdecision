@@ -15,162 +15,175 @@ and \code{beta}). Inherits from class \code{Distribution}.
 Andrew J. Sims \email{andrew.sims@newcastle.ac.uk}
 }
 \section{Super class}{
-\code{\link[rdecision:Distribution]{rdecision::Distribution}} -> \code{BetaDistribution}
+\code{\link[rdecision:Distribution]{Distribution}} -> \code{BetaDistribution}
 }
 \section{Methods}{
 \subsection{Public methods}{
-\itemize{
-\item \href{#method-BetaDistribution-new}{\code{BetaDistribution$new()}}
-\item \href{#method-BetaDistribution-distribution}{\code{BetaDistribution$distribution()}}
-\item \href{#method-BetaDistribution-mean}{\code{BetaDistribution$mean()}}
-\item \href{#method-BetaDistribution-mode}{\code{BetaDistribution$mode()}}
-\item \href{#method-BetaDistribution-SD}{\code{BetaDistribution$SD()}}
-\item \href{#method-BetaDistribution-sample}{\code{BetaDistribution$sample()}}
-\item \href{#method-BetaDistribution-quantile}{\code{BetaDistribution$quantile()}}
-\item \href{#method-BetaDistribution-clone}{\code{BetaDistribution$clone()}}
+  \itemize{
+    \item \href{#method-BetaDistribution-initialize}{\code{BetaDistribution$new()}}
+    \item \href{#method-BetaDistribution-distribution}{\code{BetaDistribution$distribution()}}
+    \item \href{#method-BetaDistribution-mean}{\code{BetaDistribution$mean()}}
+    \item \href{#method-BetaDistribution-mode}{\code{BetaDistribution$mode()}}
+    \item \href{#method-BetaDistribution-SD}{\code{BetaDistribution$SD()}}
+    \item \href{#method-BetaDistribution-sample}{\code{BetaDistribution$sample()}}
+    \item \href{#method-BetaDistribution-quantile}{\code{BetaDistribution$quantile()}}
+    \item \href{#method-BetaDistribution-clone}{\code{BetaDistribution$clone()}}
+  }
 }
-}
-\if{html}{\out{
-<details open><summary>Inherited methods</summary>
+\if{html}{\out{<details open><summary>Inherited methods</summary>
 <ul>
-<li><span class="pkg-link" data-pkg="rdecision" data-topic="Distribution" data-id="order"><a href='../../rdecision/html/Distribution.html#method-Distribution-order'><code>rdecision::Distribution$order()</code></a></span></li>
-<li><span class="pkg-link" data-pkg="rdecision" data-topic="Distribution" data-id="r"><a href='../../rdecision/html/Distribution.html#method-Distribution-r'><code>rdecision::Distribution$r()</code></a></span></li>
-<li><span class="pkg-link" data-pkg="rdecision" data-topic="Distribution" data-id="varcov"><a href='../../rdecision/html/Distribution.html#method-Distribution-varcov'><code>rdecision::Distribution$varcov()</code></a></span></li>
+  <li><span class="pkg-link" data-pkg="rdecision" data-topic="Distribution" data-id="order"><a href='../../rdecision/html/Distribution.html#method-Distribution-order'><code>Distribution$order()</code></a></span></li>
+  <li><span class="pkg-link" data-pkg="rdecision" data-topic="Distribution" data-id="r"><a href='../../rdecision/html/Distribution.html#method-Distribution-r'><code>Distribution$r()</code></a></span></li>
+  <li><span class="pkg-link" data-pkg="rdecision" data-topic="Distribution" data-id="varcov"><a href='../../rdecision/html/Distribution.html#method-Distribution-varcov'><code>Distribution$varcov()</code></a></span></li>
 </ul>
-</details>
-}}
+</details>}}
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-BetaDistribution-new"></a>}}
-\if{latex}{\out{\hypertarget{method-BetaDistribution-new}{}}}
-\subsection{Method \code{new()}}{
-Create an object of class \code{BetaDistribution}.
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{BetaDistribution$new(alpha, beta)}\if{html}{\out{</div>}}
+\if{html}{\out{<a id="method-BetaDistribution-initialize"></a>}}
+\if{latex}{\out{\hypertarget{method-BetaDistribution-initialize}{}}}
+\subsection{\code{BetaDistribution$new()}}{
+  Create an object of class \code{BetaDistribution}.
+  \subsection{Usage}{
+    \if{html}{\out{<div class="r">}}
+    \preformatted{BetaDistribution$new(alpha, beta)}
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Arguments}{
+    \if{html}{\out{<div class="arguments">}}
+    \describe{
+      \item{\code{alpha}}{parameter of the Beta distribution.}
+      \item{\code{beta}}{parameter of the Beta distribution.}
+    }
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Returns}{
+    An object of class \code{BetaDistribution}.
+  }
 }
 
-\subsection{Arguments}{
-\if{html}{\out{<div class="arguments">}}
-\describe{
-\item{\code{alpha}}{parameter of the Beta distribution.}
-
-\item{\code{beta}}{parameter of the Beta distribution.}
-}
-\if{html}{\out{</div>}}
-}
-\subsection{Returns}{
-An object of class \code{BetaDistribution}.
-}
-}
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-BetaDistribution-distribution"></a>}}
 \if{latex}{\out{\hypertarget{method-BetaDistribution-distribution}{}}}
-\subsection{Method \code{distribution()}}{
-Accessor function for the name of the uncertainty
+\subsection{\code{BetaDistribution$distribution()}}{
+  Accessor function for the name of the uncertainty
 distribution.
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{BetaDistribution$distribution()}\if{html}{\out{</div>}}
+  \subsection{Usage}{
+    \if{html}{\out{<div class="r">}}
+    \preformatted{BetaDistribution$distribution()}
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Returns}{
+    Distribution name as character string.
+  }
 }
 
-\subsection{Returns}{
-Distribution name as character string.
-}
-}
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-BetaDistribution-mean"></a>}}
 \if{latex}{\out{\hypertarget{method-BetaDistribution-mean}{}}}
-\subsection{Method \code{mean()}}{
-The expected value of the distribution.
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{BetaDistribution$mean()}\if{html}{\out{</div>}}
+\subsection{\code{BetaDistribution$mean()}}{
+  The expected value of the distribution.
+  \subsection{Usage}{
+    \if{html}{\out{<div class="r">}}
+    \preformatted{BetaDistribution$mean()}
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Returns}{
+    Expected value as a numeric value.
+  }
 }
 
-\subsection{Returns}{
-Expected value as a numeric value.
-}
-}
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-BetaDistribution-mode"></a>}}
 \if{latex}{\out{\hypertarget{method-BetaDistribution-mode}{}}}
-\subsection{Method \code{mode()}}{
-The mode of the distribution (if
+\subsection{\code{BetaDistribution$mode()}}{
+  The mode of the distribution (if
 \code{alpha}, \code{beta} > 1)
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{BetaDistribution$mode()}\if{html}{\out{</div>}}
+  \subsection{Usage}{
+    \if{html}{\out{<div class="r">}}
+    \preformatted{BetaDistribution$mode()}
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Returns}{
+    mode as a numeric value.
+  }
 }
 
-\subsection{Returns}{
-mode as a numeric value.
-}
-}
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-BetaDistribution-SD"></a>}}
 \if{latex}{\out{\hypertarget{method-BetaDistribution-SD}{}}}
-\subsection{Method \code{SD()}}{
-The standard deviation of the distribution.
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{BetaDistribution$SD()}\if{html}{\out{</div>}}
+\subsection{\code{BetaDistribution$SD()}}{
+  The standard deviation of the distribution.
+  \subsection{Usage}{
+    \if{html}{\out{<div class="r">}}
+    \preformatted{BetaDistribution$SD()}
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Returns}{
+    Standard deviation as a numeric value
+  }
 }
 
-\subsection{Returns}{
-Standard deviation as a numeric value
-}
-}
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-BetaDistribution-sample"></a>}}
 \if{latex}{\out{\hypertarget{method-BetaDistribution-sample}{}}}
-\subsection{Method \code{sample()}}{
-Draw and hold a random sample from the model variable.
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{BetaDistribution$sample(expected = FALSE)}\if{html}{\out{</div>}}
+\subsection{\code{BetaDistribution$sample()}}{
+  Draw and hold a random sample from the model variable.
+  \subsection{Usage}{
+    \if{html}{\out{<div class="r">}}
+    \preformatted{BetaDistribution$sample(expected = FALSE)}
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Arguments}{
+    \if{html}{\out{<div class="arguments">}}
+    \describe{
+      \item{\code{expected}}{If TRUE, sets the next value retrieved by a call to
+\code{r()} to be the mean of the distribution.}
+    }
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Returns}{
+    Updated distribution.
+  }
 }
 
-\subsection{Arguments}{
-\if{html}{\out{<div class="arguments">}}
-\describe{
-\item{\code{expected}}{If TRUE, sets the next value retrieved by a call to
-\code{r()} to be the mean of the distribution.}
-}
-\if{html}{\out{</div>}}
-}
-\subsection{Returns}{
-Updated distribution.
-}
-}
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-BetaDistribution-quantile"></a>}}
 \if{latex}{\out{\hypertarget{method-BetaDistribution-quantile}{}}}
-\subsection{Method \code{quantile()}}{
-The quantiles of the Beta distribution.
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{BetaDistribution$quantile(probs)}\if{html}{\out{</div>}}
+\subsection{\code{BetaDistribution$quantile()}}{
+  The quantiles of the Beta distribution.
+  \subsection{Usage}{
+    \if{html}{\out{<div class="r">}}
+    \preformatted{BetaDistribution$quantile(probs)}
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Arguments}{
+    \if{html}{\out{<div class="arguments">}}
+    \describe{
+      \item{\code{probs}}{Vector of probabilities, in range [0,1].}
+    }
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Returns}{
+    Vector of quantiles.
+  }
 }
 
-\subsection{Arguments}{
-\if{html}{\out{<div class="arguments">}}
-\describe{
-\item{\code{probs}}{Vector of probabilities, in range [0,1].}
-}
-\if{html}{\out{</div>}}
-}
-\subsection{Returns}{
-Vector of quantiles.
-}
-}
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-BetaDistribution-clone"></a>}}
 \if{latex}{\out{\hypertarget{method-BetaDistribution-clone}{}}}
-\subsection{Method \code{clone()}}{
-The objects of this class are cloneable with this method.
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{BetaDistribution$clone(deep = FALSE)}\if{html}{\out{</div>}}
+\subsection{\code{BetaDistribution$clone()}}{
+  The objects of this class are cloneable with this method.
+  \subsection{Usage}{
+    \if{html}{\out{<div class="r">}}
+    \preformatted{BetaDistribution$clone(deep = FALSE)}
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Arguments}{
+    \if{html}{\out{<div class="arguments">}}
+    \describe{
+      \item{\code{deep}}{Whether to make a deep clone.}
+    }
+    \if{html}{\out{</div>}}
+  }
 }
 
-\subsection{Arguments}{
-\if{html}{\out{<div class="arguments">}}
-\describe{
-\item{\code{deep}}{Whether to make a deep clone.}
-}
-\if{html}{\out{</div>}}
-}
-}
 }

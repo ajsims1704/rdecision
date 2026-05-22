@@ -28,7 +28,8 @@ Useful links:
 
 Authors:
 \itemize{
-  \item Kim Fairbairn \email{kim.fairbairn@nhs.net} (\href{https://orcid.org/0000-0001-5108-6279}{ORCID})
+  \item Andrew Sims \email{andrew.sims@newcastle.ac.uk} (\href{https://orcid.org/0000-0002-9553-7278}{ORCID})
+  \item Kim Keltie \email{kim.keltie@nhs.net} (\href{https://orcid.org/0000-0001-5108-6279}{ORCID})
   \item Paola Cognigni \email{paola.cognigni@nhs.net} (\href{https://orcid.org/0000-0001-5418-3103}{ORCID})
 }
 
