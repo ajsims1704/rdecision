@@ -95,7 +95,8 @@ numeric, the range is checked on object creation.
   \subsection{Arguments}{
     \if{html}{\out{<div class="arguments">}}
     \describe{
-      \item{\code{cost}}{The annual cost of state occupancy}
+      \item{\code{cost}}{The annual cost of state occupancy, which must be a
+non-missing numeric scalar, or a \code{ModVar}.}
     }
     \if{html}{\out{</div>}}
   }
@@ -132,8 +133,8 @@ numeric, the range is checked on object creation.
   \subsection{Arguments}{
     \if{html}{\out{<div class="arguments">}}
     \describe{
-      \item{\code{utility}}{The utility associated with being in the state (numeric
-or \code{ModVar}).}
+      \item{\code{utility}}{The utility associated with being in the state
+(non-missing numeric scalar or a \code{ModVar}).}
     }
     \if{html}{\out{</div>}}
   }

@@ -335,7 +335,7 @@ random sampling.}
   Draw the decision tree to the current graphics output.
   \subsection{Usage}{
     \if{html}{\out{<div class="r">}}
-    \preformatted{DecisionTree$draw(border = FALSE, fontsize = 8)}
+    \preformatted{DecisionTree$draw(border = FALSE, fontsize = 8, fontfamily = NULL)}
     \if{html}{\out{</div>}}
   }
   \subsection{Arguments}{
@@ -344,6 +344,13 @@ random sampling.}
       \item{\code{border}}{If TRUE draw a light grey border around the plot area.}
       \item{\code{fontsize}}{Font size for labels in point. Symbols for nodes scale
 with font size.}
+      \item{\code{fontfamily}}{Name of font family to be passed to \code{grid::gpar}.
+If NULL, the default font family is used. Even if the font family is
+available to R, some graphics devices may not support it, and will
+revert to their default without warning or error. If the specified font
+is not available, the graphics device may throw an error or warning, or
+may ignore it and use the default font family, depending on local
+configuration.}
     }
     \if{html}{\out{</div>}}
   }

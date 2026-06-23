@@ -1,8 +1,12 @@
-# redecision 1.3.0.9001
+# redecision 1.3.0.9002
 
+* Method `draw` in class `DecisionTree` allows a font family to be specified
+  (issue #21).
+* Additional checks to argument `cost` in `MarkovState::set_cost` and `utility`
+  in `MarkovState::set_utility` (issue #22).
 * Switched random node reordering in `Graph` off by default.
 * Modified vignettes to create diagrams in SVG format.
-* Modified vignette graphs to use DiagrammeR.
+* Modified vignette graphs to use DiagrammeR (issue #20).
 * Modified `readme.Rmd` to create and reference diagrams in SVG format.
 * Revised `readme.Rmd` to generate pandoc markdown which validates with
   the markdown linter in Visual Code.

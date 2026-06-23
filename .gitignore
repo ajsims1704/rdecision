@@ -9,6 +9,7 @@ tools
 .Rhistory
 .RData
 .Rproj.user
+/.git/
 /doc/
 /Meta/
 .positai

@@ -53,13 +53,16 @@ MarkovState <- R6::R6Class(
     name = function() self$label(),
 
     #' @description Set the annual occupancy cost.
-    #' @param cost The annual cost of state occupancy
+    #' @param cost The annual cost of state occupancy, which must be a
+    #' non-missing numeric scalar, or a \code{ModVar}.
     #' @returns Updated \code{MarkovState} object.
     set_cost = function(cost) {
       # check that annual cost, then set it
-      abortifnot(
-        !missing(cost),
-        is.numeric(cost) || is_ModVar(cost),
+      abortif(
+        missing(cost),
+        !(is.numeric(cost) || is_ModVar(cost)),
+        (is.numeric(cost) && is.na(cost)),
+        (is.numeric(cost) && length(cost) > 1L),
         message = "'cost' must be provided and of type 'numeric' or 'ModVar'",
         class = "invalid_annual_cost"
       )
@@ -72,14 +75,17 @@ MarkovState <- R6::R6Class(
     cost = function() as_numeric(private$state.cost),
 
     #' @description Set the utility of the state.
-    #' @param utility The utility associated with being in the state (numeric
-    #' or \code{ModVar}).
+    #' @param utility The utility associated with being in the state
+    #' (non-missing numeric scalar or a \code{ModVar}).
     #' @returns Updated \code{MarkovState} object.
     set_utility = function(utility) {
       # check the utility, and in range[-Inf,1] if numeric
-      abortifnot(
-        !missing(utility),
-        (is.numeric(utility) && utility <= 1.0) || is_ModVar(utility),
+      abortif(
+        missing(utility),
+        !(is.numeric(utility) || is_ModVar(utility)),
+        (is.numeric(utility) && is.na(utility)),
+        (is.numeric(utility) && length(utility) > 1L),
+        (is.numeric(utility) && utility > 1.0),
         message = "If utility is numeric it must be in the range [-Inf,1]",
         class = "invalid_utility"
       )

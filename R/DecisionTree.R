@@ -335,14 +335,37 @@ DecisionTree <- R6::R6Class(
     #' @param border If TRUE draw a light grey border around the plot area.
     #' @param fontsize Font size for labels in point. Symbols for nodes scale
     #' with font size.
+    #' @param fontfamily Name of font family to be passed to \code{grid::gpar}.
+    #' If NULL, the default font family is used. Even if the font family is
+    #' available to R, some graphics devices may not support it, and will
+    #' revert to their default without warning or error. If the specified font
+    #' is not available, the graphics device may throw an error or warning, or
+    #' may ignore it and use the default font family, depending on local
+    #' configuration.
     #' @return No return value.
-    draw = function(border = FALSE, fontsize = 8.0) {
+    draw = function(border = FALSE, fontsize = 8.0, fontfamily = NULL) {
+      # check parameters
+      abortifnot(
+        is.logical(border),
+        is.numeric(fontsize),
+        (is.null(fontfamily) || is.character(fontfamily)),
+        message = "incorrect parameter type",
+        class = "incorrect_parameter"
+      )
       # start new page for drawing
       grid::grid.newpage()
+      # if font family is unspecified, use the default
+      if (is.null(fontfamily)) {
+        fontfamily <- grid::get.gpar("fontfamily")
+      }
       # fraction of edge that slopes after leading parent (range 0,1)
       fs <- 0.20
       # create a root viewport with default gpar settings
-      grid::pushViewport(grid::viewport(gp = grid::gpar(fontsize = fontsize)))
+      grid::pushViewport(
+        grid::viewport(
+          gp = grid::gpar(fontsize = fontsize, fontfamily = fontfamily)
+        )
+      )
       # draw border around figure region, if required
       if (border) {
         grid::grid.rect(gp = grid::gpar(col = "lightgrey"))

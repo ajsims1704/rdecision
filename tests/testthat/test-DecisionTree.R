@@ -549,8 +549,26 @@ test_that("long node labels are not clipped", {
     V = list(d1, d2, d3, c1, c2, l1, l2, l3, l4, l5, l6),
     E = list(a1, a2, a3, a4, a5, a6, r1, r2, r3, r4)
   )
-  grDevices::pdf(NULL, width = 7.0, height = 5.0)
-  expect_no_condition(dt$draw(border = TRUE, fontsize = 10.0))
+  # change font from default using a font family known to be supported in R
+  grDevices::pdf(tempfile(fileext = ".pdf"), width = 7.0, height = 5.0)
+  expect_no_condition(
+    dt$draw(border = TRUE, fontsize = 10.0, fontfamily = "serif")
+  )
+  grDevices::dev.off()
+  # check illegal parameter types are caught
+  grDevices::pdf(tempfile(fileext = ".pdf"), width = 7.0, height = 5.0)
+  expect_error(
+    dt$draw(border = TRUE, fontsize = "10.0", fontfamily = "serif"),
+    class = "incorrect_parameter"
+  )
+  grDevices::dev.off()
+  # setting a missing font will create errors and warnings
+  grDevices::pdf(tempfile(fileext = ".pdf"), width = 7.0, height = 5.0)
+  suppressWarnings(
+    expect_error(
+      dt$draw(border = TRUE, fontsize = 10.0, fontfamily = "missingfont")
+    )
+  )
   grDevices::dev.off()
 })
 
