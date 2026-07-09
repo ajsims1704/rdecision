@@ -1,14 +1,11 @@
 ---
 output:
   rmarkdown::md_document:
-    variant: "markdown"
-    pandoc_args: [
-      "-t", "markdown-simple_tables-multiline_tables+pipe_tables-grid_tables",
-      "--shift-heading-level-by", "0",
-      "--wrap", "preserve"
+    variant: "markdown_strict+pipe_tables-raw_html+citations+footnotes"
+    md_extensions: [
+      "+pipe_tables"
     ]
 bibliography: "vignettes/REFERENCES.bib"
-csl: "vignettes/nature-no-et-al.csl"
 ---
 
 <!-- README.md is generated from README.Rmd. Please edit that file -->
