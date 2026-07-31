@@ -1,4 +1,4 @@
-# redecision 1.3.1
+# rdecision 1.3.1
 
 * Deleted redundant @importFrom statements from `rdecison-package` because calls
   to functions in external packages are prefixed with their package name.
