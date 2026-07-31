@@ -103,7 +103,7 @@ DirichletDistribution <- R6::R6Class(
       # populate it
       alpha0 <- sum(private$alpha)
       for (k in seq_len(private$K)) {
-        quan <- stats::qbeta(
+        quan <- qbeta(
           probs,
           shape1 = private$alpha[[k]],
           shape2 = alpha0 - private$alpha[[k]]
@@ -140,7 +140,7 @@ DirichletDistribution <- R6::R6Class(
       } else {
         # sample from gamma distributions
         y <- vapply(seq_len(private$K), FUN.VALUE = 0.5, FUN = function(i) {
-          stats::rgamma(n = 1L, shape = private$alpha[[i]], rate = 1.0)
+          rgamma(n = 1L, shape = private$alpha[[i]], rate = 1.0)
         })
         # normalize and hold
         private$.r <- y / sum(y)

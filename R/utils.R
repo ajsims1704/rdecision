@@ -98,7 +98,7 @@ as_numeric <- function(x) {
 #' @description Formats a number, or list of numbers, into currency.
 #' @details If x is defined using the c() operator and contains elements of
 #' different mode, it will coerce all elements to a common mode. It is safer to
-#' define x as a list because R does not do implicit coercion.
+#' define x as a list to avoid implicit coercion.
 #' @param x Monetary value, or list of values
 #' @param p Logical; if TRUE show value to nearest penny, cent etc. If FALSE
 #' show it to the nearest pound, dollar, euro etc.
@@ -167,6 +167,20 @@ is_Arrow <- function(x) is_class(x, "Arrow")
 #' @noRd
 is_ModVar <- function(x) is_class(x, "ModVar")
 
+#' @title A dummy function to load dependent packages.
+#' @description A dummy function to load methods in some dependent packages, to
+#' satisfy R CMD check. Necessary because objects based on R6 classes are
+#' loaded when a model application runs, not when the package is loaded. R CMD
+#' check incorrectly concludes that some Imported packages are never used if
+#' none of their functions are called from top-level package functions.
+#' @noRd
+rcmdcheck <- function() {
+  rlang::env(x = 42L)
+  grid::nullGrob()
+  R6C <- R6::R6Class()
+  R6C$new()
+}
+
 #' @title Draw a tornado diagram.
 #' @description A function to plot a tornado diagram, given a data frame of
 #' model variable names, their confidence limits and the values of the outcome
@@ -206,7 +220,7 @@ tornado_plot <- function(to, outcome_mean, xlab = "") {
   # make labels (description + units)
   to[, "Label"] <- paste(to[, "Description"], to[, "Units"], sep = ", ")
   # width of the plot in inches
-  dsize <- grDevices::dev.size(unit = "in")
+  dsize <- grDevices::dev.size(units = "in")
   figw <- dsize[[1L]]
   # width of the left outer margin as a proportion of figw
   louter <- 0.4
@@ -238,8 +252,8 @@ tornado_plot <- function(to, outcome_mean, xlab = "") {
         frame.plot = FALSE
       )
       # find the longest label and scale text size accordingly
-      lw <- max(graphics::strwidth(s = to[, "Label"], unit = "in"))
-      lw <- lw + graphics::strwidth("MM", unit = "in")
+      lw <- max(graphics::strwidth(s = to[, "Label"], units = "in"))
+      lw <- lw + graphics::strwidth("MM", units = "in")
       cex_axis <- min((louter * figw) / lw, 1.0)
       # label the y axis
       graphics::axis(
@@ -259,10 +273,10 @@ tornado_plot <- function(to, outcome_mean, xlab = "") {
       }
       # find longest limit labels and adjust label text size
       lmin <- max(
-        graphics::strwidth(s = limtxt(to[, "outcome.min"]), unit = "in")
+        graphics::strwidth(s = limtxt(to[, "outcome.min"]), units = "in")
       )
       lmax <- max(
-        graphics::strwidth(s = limtxt(to[, "outcome.max"]), unit = "in")
+        graphics::strwidth(s = limtxt(to[, "outcome.max"]), units = "in")
       )
       lw <- max(lmin, lmax)
       # add bars and limits

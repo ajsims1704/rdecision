@@ -1,15 +1,22 @@
-# redecision 1.3.0.9002
+# redecision 1.3.0.9003
 
+* Deleted redundant @importFrom statements from `rdecison-package` because calls
+  to functions in external packages are prefixed with their package name.
+* Increased minimum version of R in DESCRIPTION to 4.0.0 to be consistent with
+  function `plot` which requires it, and updated backport linter arguments.
 * Method `draw` in class `DecisionTree` allows a font family to be specified
   (issue #21).
 * Additional checks to argument `cost` in `MarkovState::set_cost` and `utility`
   in `MarkovState::set_utility` (issue #22).
-* Switched random node reordering in `Graph` off by default.
+* Removed automatic random re-ordering of nodes and edges in graphs. Indexes of
+  nodes and edges are now always the same as the order in which they were
+  supplied. In future, optimization of node and edge storage could be achieved
+  through class methods which return new graph objects.
 * Modified vignettes to create diagrams in SVG format.
 * Modified vignette graphs to use DiagrammeR (issue #20).
+* Modified `readme.Rmd` to create markdown file with CommonMark variant, which
+  may be preferred by CRAN.
 * Modified `readme.Rmd` to create and reference diagrams in SVG format.
-* Revised `readme.Rmd` to generate pandoc markdown which validates with
-  the markdown linter in Visual Code.
 * Modified source to comply with default linters added since previous build,
   mostly involving removal of unnecessary return statements.
 * Modified internal functions `abortif` and `abortifnot` to accept arguments

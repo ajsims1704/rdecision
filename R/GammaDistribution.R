@@ -94,7 +94,7 @@ GammaDistribution <- R6::R6Class(
       if (expected) {
         private$.r[[1L]] <- self$mean()
       } else {
-        private$.r[[1L]] <- rgamma(
+        private$.r[[1L]] <- stats::rgamma(
           n = 1L,
           shape = private$shape,
           scale = private$scale

@@ -1,6 +1,3 @@
-# ensure suggested packages needed for testing are loaded
-requireNamespace("igraph", quietly = TRUE)
-
 # tests of digraph creation
 test_that("incorrect node and edge types are rejected", {
   n1 <- Node$new()
@@ -371,48 +368,29 @@ test_that("DOT files of S&B fig 3 are as expected", {
 
 # check GML representation of a graph (Sonnenberg & Beck, 1993, Fig 3)
 test_that("gml representation of S&B fig 3 is as expected", {
-  # graph with some unlabelled nodes
+  # case as described in the paper with labelled nodes
   s1 <- Node$new("Well")
   s2 <- Node$new("Disabled")
-  s3 <- Node$new()
-  e1 <- Arrow$new(s1, s1)
+  s3 <- Node$new("Dead")
+  e1 <- Arrow$new(s1, s1, "ok")
   e2 <- Arrow$new(s1, s2, "ill")
-  e3 <- Arrow$new(s1, s3)
-  e4 <- Arrow$new(s2, s2)
-  e5 <- Arrow$new(s2, s3)
-  e6 <- Arrow$new(s3, s3)
-  s3x <- Node$new()
+  e3 <- Arrow$new(s1, s3, "died")
+  e4 <- Arrow$new(s2, s2, "ill")
+  e5 <- Arrow$new(s2, s3, "died")
+  e6 <- Arrow$new(s3, s3, "dead")
   G <- Digraph$new(V = list(s1, s2, s3), A = list(e1, e2, e3, e4, e5, e6))
   # represent in GML format
   gml <- G$as_gml()
   expect_true(any(grepl(pattern = "Well", fixed = TRUE, x = gml)))
   expect_true(any(grepl(pattern = "ill", fixed = TRUE, x = gml)))
-  # check import to igraph
+  # check export to gml format by importing into DiagrammeR
   gmlfile <- tempfile(fileext = ".gml")
   writeLines(gml, con = gmlfile)
-  ig <- igraph::read_graph(gmlfile, format = "gml")
-  expect_identical(as.integer(igraph::gorder(ig)), 3L)
-  expect_identical(as.integer(igraph::gsize(ig)), 6L)
-  # case as described in the paper
-  s1 <- Node$new("Well")
-  s2 <- Node$new("Disabled")
-  s3 <- Node$new("Dead")
-  e1 <- Arrow$new(s1, s1)
-  e2 <- Arrow$new(s1, s2, "ill")
-  e3 <- Arrow$new(s1, s3)
-  e4 <- Arrow$new(s2, s2)
-  e5 <- Arrow$new(s2, s3)
-  e6 <- Arrow$new(s3, s3)
-  G <- Digraph$new(V = list(s1, s2, s3), A = list(e1, e2, e3, e4, e5, e6))
-  # check import to igraph
-  gmlfile <- tempfile(fileext = ".gml")
-  gml <- G$as_gml()
-  writeLines(gml, con = gmlfile)
-  ig <- igraph::read_graph(gmlfile, format = "gml")
-  expect_identical(as.integer(igraph::gorder(ig)), 3L)
-  expect_identical(as.integer(igraph::gsize(ig)), 6L)
-  vlabels <- igraph::vertex_attr(ig, name = "label")
-  expect_setequal(vlabels, c("Well", "Disabled", "Dead"))
-  elabels <- igraph::edge_attr(ig, name = "label")
-  expect_setequal(elabels, c(rep("", times = 5L), "ill"))
+  ig <- DiagrammeR::import_graph(graph_file = gmlfile, file_type = "gml")
+  expect_identical(as.integer(DiagrammeR::count_nodes(ig)), 3L)
+  expect_identical(as.integer(DiagrammeR::count_edges(ig)), 6L)
+  ni <- DiagrammeR::get_node_info(ig)
+  expect_setequal(ni[, "label"], c("Well", "Disabled", "Dead"))
+  ea <- DiagrammeR::get_edge_attrs(ig, edge_attr = "label")
+  expect_setequal(ea, c("ok", "ill", "died", "ill", "died", "dead"))
 })

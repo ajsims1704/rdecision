@@ -83,7 +83,7 @@ EmpiricalDistribution <- R6::R6Class(
       if (expected) {
         private$.r[[1L]] <- self$mean()
       } else if (private$interpolate.sample) {
-        private$.r[[1L]] <- stats::quantile(
+        private$.r[[1L]] <- quantile(
           x = private$x,
           probs = stats::runif(n = 1L),
           type = 7L

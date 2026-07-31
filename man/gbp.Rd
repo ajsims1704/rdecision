@@ -26,5 +26,5 @@ Formats a number, or list of numbers, into currency.
 \details{
 If x is defined using the c() operator and contains elements of
 different mode, it will coerce all elements to a common mode. It is safer to
-define x as a list because R does not do implicit coercion.
+define x as a list to avoid implicit coercion.
 }

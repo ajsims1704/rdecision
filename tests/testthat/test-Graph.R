@@ -1,6 +1,3 @@
-# ensure suggested packages needed for testing are loaded
-requireNamespace("igraph", quietly = TRUE)
-
 # tests of graph creation
 test_that("incorrect node and edge types are rejected", {
   n1 <- Node$new()
@@ -416,17 +413,17 @@ test_that("Fig 1.1.1 from Gross & Yellen (2013) is drawn correctly", {
   G <- Graph$new(V = list(u, v, w, x), E = list(a, b, c, d, e, f))
   # draw it as a GraphViz dot stream
   expect_silent(G$as_DOT())
-  # draw it as a GML stream and check its properties with igraph
+  # write it as a GML stream and check its properties with DiagrammeR
   gmlfile <- tempfile(fileext = ".gml")
   gml <- G$as_gml()
   writeLines(gml, con = gmlfile)
-  ig <- igraph::read_graph(gmlfile, format = "gml")
-  expect_identical(as.integer(igraph::gorder(ig)), 4L)
-  expect_identical(as.integer(igraph::gsize(ig)), 6L)
-  vlabels <- igraph::vertex_attr(ig, name = "label")
-  expect_setequal(vlabels, c("u", "v", "w", "x"))
-  elabels <- igraph::edge_attr(ig, name = "label")
-  expect_setequal(elabels, c("a", "b", "c", "d", "e", "f"))
-  expect_false(igraph::is_simple(ig))
-  expect_false(igraph::is_dag(ig))
+  ig <- DiagrammeR::import_graph(graph_file = gmlfile, file_type = "gml")
+  expect_identical(as.integer(DiagrammeR::count_nodes(ig)), 4L)
+  expect_identical(as.integer(DiagrammeR::count_edges(ig)), 6L)
+  ni <- DiagrammeR::get_node_info(ig)
+  expect_setequal(ni[, "label"], c("u", "v", "w", "x"))
+  ea <- DiagrammeR::get_edge_attrs(ig, edge_attr = "label")
+  expect_setequal(ea, c("a", "b", "c", "d", "e", "f"))
+  expect_false(DiagrammeR::is_graph_simple(ig))
+  expect_false(DiagrammeR::is_graph_dag(ig))
 })

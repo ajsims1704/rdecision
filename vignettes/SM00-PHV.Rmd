@@ -351,7 +351,7 @@ mt <- m$cycles(25L, hcc.pop = FALSE, hcc.cost = FALSE, hcc.QALY = FALSE)
 stopifnot(
   # check structure of data frame
   all.equal(m$get_elapsed(), as.difftime(25.0 * 365.25, units = "days")),
-  isa(mt, "data.frame"),
+  is.data.frame(mt),
   all.equal(nrow(mt), 26L),
   # check cycle numbers and times
   all.equal(mt[, "Cycle"], seq(from = 0L, to = 25L)),

@@ -419,7 +419,7 @@ Digraph <- R6::R6Class(
     #' addition, the appearance may vary between calls if the node order changes
     #' (specifically, if there is no Hamiltonian path). For greater control over
     #' the appearance of a graph, use the \code{as_gml} function and manipulate
-    #' the graph using igraph or DiagrammeR; please refer to the vignettes for
+    #' the graph using igraph or DiagrammeR; refer to the vignettes for
     #' examples.
     #' @param rankdir One of "LR" (default), "TB", "RL" or "BT".
     #' @param width of the drawing, in inches

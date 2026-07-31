@@ -1,6 +1,6 @@
 linters: all_linters(
   cyclocomp_linter = cyclocomp_linter(complexity_limit = 85L),
-  backport_linter = backport_linter(r_version = "3.6.0", except = "sigma"),
+  backport_linter = backport_linter(r_version = "4.0.0"),
   object_name_linter = NULL
   )
 exclusions: list(

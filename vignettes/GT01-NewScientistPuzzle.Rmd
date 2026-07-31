@@ -63,7 +63,7 @@ there are more than 50." Who is right, or closest to right?
 grid::grid.newpage()
 # functions to transform coordinates and distances in graph space (0:300)
 # to grid space (cm)
-fig.size <- dev.size("cm")
+fig.size <- grDevices::dev.size("cm")
 scale <- max(300.0 / fig.size[[1L]], 300.0 / fig.size[[2L]])
 gx <- function(x) {
   fig.size[[1L]] / 2.0 + (x - 150.0) / scale

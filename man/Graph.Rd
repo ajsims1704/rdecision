@@ -120,9 +120,7 @@ and edges.
     \if{html}{\out{</div>}}
   }
   \subsection{Details}{
-    The list of Node objects is returned in the same order as their
-indexes understood by \code{vertex_index}, \code{vertex_at} and
-\code{vertex_along}, which is not necessarily the same order in which
+    The list of Node objects is returned in the same order as
 they were supplied in the \code{V} argument to \code{new}.
   }
 }
@@ -144,10 +142,8 @@ graph algorithms which iterate vertices.
   }
   \subsection{Returns}{
     A numeric vector of indices from 1 to the order of the graph.
-The vertex at index \eqn{i} is not guaranteed to be the same vertex at
-\code{V[[i]]} of the argument \code{V} to \code{new} (i.e., the order in
-which the vertices are stored internally within the class may differ
-from the order in which they were supplied).
+The vertex at index \eqn{i} is vertex \code{V[[i]]} of the argument
+\code{V} to \code{new}.
   }
 }
 
@@ -169,11 +165,8 @@ from the order in which they were supplied).
     \if{html}{\out{</div>}}
   }
   \subsection{Returns}{
-    Index or indexes of \var{v}. The index of vertex \code{v} is the
-one used internally to the class object, which is not necessarily the
-same as the order of vertices in the \code{V} argument of \code{new}.
-\code{NA} if \var{v} is not a vertex, or is a vertex that is not in the
-graph.
+    Index or indexes of \var{v}, or \code{NA} if \var{v} is not a
+vertex, or is a vertex that is not in the graph.
   }
 }
 
@@ -267,9 +260,7 @@ a vector, with TRUE if v is an element of V(G).
     \if{html}{\out{</div>}}
   }
   \subsection{Details}{
-    The list of Edge objects is returned in the same order as their
-indexes understood by \code{edge_index}, \code{edge_at} and
-\code{edge_along}, which is not necessarily the same order in which they
+    The list of Edge objects is returned in the same order as they
 were supplied in the \code{E} argument to \code{new}.
   }
 }
@@ -292,10 +283,8 @@ graph algorithms which iterate edges. It is equivalent to
   }
   \subsection{Returns}{
     A numeric vector of indices from 1 to the size of the graph.
-The edge at index \eqn{i} is not guaranteed to be the same edge at
-\code{E[[i]]} of the argument \code{E} to \code{new} (i.e., the order in
-which the edges are stored internally within the class may differ
-from the order in which they were supplied).
+The edge at index \eqn{i} is the edge \code{E[[i]]} of the argument
+\code{E} to \code{new}.
   }
 }
 
@@ -315,11 +304,6 @@ from the order in which they were supplied).
       \item{\code{e}}{An edge object, or list of edge objects.}
     }
     \if{html}{\out{</div>}}
-  }
-  \subsection{Details}{
-    The index of edge \code{e} is the one used internally to the
-class object, which is not necessarily the same as the
-order of edges in the \code{E} argument of \code{new}.
   }
   \subsection{Returns}{
     Index, or indexes, of \code{e}. \code{NA} if \var{e} is not an

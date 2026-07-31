@@ -481,7 +481,7 @@ however it gives limited control over details of the appearance. In
 addition, the appearance may vary between calls if the node order changes
 (specifically, if there is no Hamiltonian path). For greater control over
 the appearance of a graph, use the \code{as_gml} function and manipulate
-the graph using igraph or DiagrammeR; please refer to the vignettes for
+the graph using igraph or DiagrammeR; refer to the vignettes for
 examples.
   }
   \subsection{Returns}{

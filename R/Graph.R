@@ -20,8 +20,7 @@ Graph <- R6::R6Class(
   private = list(
     V = NULL,
     E = NULL,
-    AG = NULL,
-    reorder = FALSE
+    AG = NULL
   ),
   public = list(
 
@@ -54,12 +53,6 @@ Graph <- R6::R6Class(
       )
       # save edges, after removing name attributes
       private$E <- unname(E)
-      # reorder the vertices and edges for optimisation of graph algorithms, or
-      # during package testing.
-      if (private$reorder) {
-        private$V <- sample(private$V, size = length(V), replace = FALSE)
-        private$E <- sample(private$E, size = length(E), replace = FALSE)
-      }
       # calculate the adjacency matrix
       private$AG <- self$graph_adjacency_matrix(FALSE)
       # return new graph object
@@ -75,9 +68,7 @@ Graph <- R6::R6Class(
     size = function() length(private$E),
 
     #' @description A list of all the Node objects in the graph.
-    #' @details The list of Node objects is returned in the same order as their
-    #' indexes understood by \code{vertex_index}, \code{vertex_at} and
-    #' \code{vertex_along}, which is not necessarily the same order in which
+    #' @details The list of Node objects is returned in the same order as
     #' they were supplied in the \code{V} argument to \code{new}.
     vertexes = function() private$V,
 
@@ -86,19 +77,14 @@ Graph <- R6::R6Class(
     #' the indices of the vertices in the graph. It is intended for use by
     #' graph algorithms which iterate vertices.
     #' @return A numeric vector of indices from 1 to the order of the graph.
-    #' The vertex at index \eqn{i} is not guaranteed to be the same vertex at
-    #' \code{V[[i]]} of the argument \code{V} to \code{new} (i.e., the order in
-    #' which the vertices are stored internally within the class may differ
-    #' from the order in which they were supplied).
+    #' The vertex at index \eqn{i} is vertex \code{V[[i]]} of the argument
+    #' \code{V} to \code{new}.
     vertex_along = function() seq_along(self$vertexes()),
 
     #' @description Find the index of a vertex in the graph.
     #' @param v A vertex, or list of vertexes.
-    #' @return Index or indexes of \var{v}. The index of vertex \code{v} is the
-    #' one used internally to the class object, which is not necessarily the
-    #' same as the order of vertices in the \code{V} argument of \code{new}.
-    #' \code{NA} if \var{v} is not a vertex, or is a vertex that is not in the
-    #' graph.
+    #' @return Index or indexes of \var{v}, or \code{NA} if \var{v} is not a
+    #' vertex, or is a vertex that is not in the graph.
     vertex_index = function(v) {
       # coerce v to a list, if it is not
       v <- if (is.list(v)) v else list(v)
@@ -165,9 +151,7 @@ Graph <- R6::R6Class(
     },
 
     #' @description A list of all the Edge objects in the graph.
-    #' @details The list of Edge objects is returned in the same order as their
-    #' indexes understood by \code{edge_index}, \code{edge_at} and
-    #' \code{edge_along}, which is not necessarily the same order in which they
+    #' @details The list of Edge objects is returned in the same order as they
     #' were supplied in the \code{E} argument to \code{new}.
     edges = function() private$E,
 
@@ -177,16 +161,11 @@ Graph <- R6::R6Class(
     #' graph algorithms which iterate edges. It is equivalent to
     #' \code{seq_along(g$edges())}, where \code{g} is a graph.
     #' @return A numeric vector of indices from 1 to the size of the graph.
-    #' The edge at index \eqn{i} is not guaranteed to be the same edge at
-    #' \code{E[[i]]} of the argument \code{E} to \code{new} (i.e., the order in
-    #' which the edges are stored internally within the class may differ
-    #' from the order in which they were supplied).
+    #' The edge at index \eqn{i} is the edge \code{E[[i]]} of the argument
+    #' \code{E} to \code{new}.
     edge_along = function() seq_along(self$edges()),
 
     #' @description Find the index of an edge in a graph.
-    #' @details The index of edge \code{e} is the one used internally to the
-    #' class object, which is not necessarily the same as the
-    #' order of edges in the \code{E} argument of \code{new}.
     #' @param e An edge object, or list of edge objects.
     #' @return Index, or indexes, of \code{e}. \code{NA} if \var{e} is not an
     #' edge, or is an edge that is not in the graph.

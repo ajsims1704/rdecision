@@ -222,6 +222,8 @@ test_that("gbp returns in currency format", {
   x <- list(42L, 2L, 0.002, 4.567, "a")
   agbp <- gbp(x, p = TRUE)
   expect_identical(agbp, c("42.00", "2.00", "0.00", "4.57", "NA"))
+  agbp <- gbp(x, p = TRUE, char = FALSE)
+  expect_identical(agbp, c(42.0, 2.0, 0.00, 4.57, NA_real_))
 })
 
 # tests of class type tests
@@ -327,6 +329,12 @@ test_that("is_Arrow detects objects of type Arrow", {
   expect_true(is_Arrow(a))
 })
 
+# test rcmdcheck
+test_that("rcmdcheck dummy function runs without error", {
+  expect_silent(rcmdcheck())
+})
+
+# test tornado plot
 test_that("tornado plot checks arguments as expected", {
   # to is not a data frame
   to <- 42L

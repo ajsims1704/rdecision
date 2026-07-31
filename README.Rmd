@@ -1,10 +1,8 @@
 ---
 output:
   rmarkdown::md_document:
-    variant: "markdown_strict+pipe_tables-raw_html+citations+footnotes"
-    md_extensions: [
-      "+pipe_tables"
-    ]
+    variant: "commonmark"
+    pandoc_args: ["--wrap=preserve"]
 bibliography: "vignettes/REFERENCES.bib"
 ---
 
