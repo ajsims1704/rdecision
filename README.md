@@ -202,10 +202,10 @@ rs <- dt$evaluate(setvars = "random", by = "run", N = N)
 The confidence interval of the net cost difference (net cost of the diet
 programme minus the net cost of the exercise programme) is estimated from
 the resulting data frame. From 1000 runs, the mean net cost difference is
--12.56 GBP with 95% confidence interval
--724.92 GBP
-to 695.79 GBP,
-with 48.7% runs having a lower
+-44.34 GBP with 95% confidence interval
+-824.37 GBP
+to 675.44 GBP,
+with 44.1% runs having a lower
 net cost for the exercise programme. Although the point estimate net cost of
 the exercise programme exceeds that of the diet programme, due to the
 uncertainties of the effectiveness of
@@ -348,7 +348,7 @@ for non-standard evaluation used in expression model variables.
 Testing the package relies on the`testthat` package (Wickham 2011). Preparing
 the package for building makes use of the `devtools` package (Wickham et al. 2026).
 Building vignettes require
-packages `rmarkdown` (Xie et al. 2018, 2020; Allaire et al. 2026), `knitr` (Xie 2025)
+packages `rmarkdown` (Xie, Allaire, et al. 2026; Allaire et al. 2026; Xie, Dervieux, et al. 2026), `knitr` (Xie 2025)
 and `DiagrammeR` (Iannone and Roy 2026).
 
 Underpinning graph theory is based on terminology, definitions and
@@ -487,13 +487,13 @@ Xie, Yihui. 2025. *Knitr: A General-Purpose Package for Dynamic Report Generatio
 
 <div id="ref-xie2018a" class="csl-entry">
 
-Xie, Yihui, J. J. Allaire, and Garrett Grolemund. 2018. *R Markdown: The Definitive Guide*. Chapman; Hall/CRC. <https://bookdown.org/yihui/rmarkdown>.
+Xie, Yihui, J. J. Allaire, and Garrett Grolemund. 2026. *R Markdown: The Definitive Guide*. Chapman; Hall/CRC. <https://pkg.yihui.org/rmarkdown-book/>.
 
 </div>
 
 <div id="ref-xie2020" class="csl-entry">
 
-Xie, Yihui, Christophe Dervieux, and Emily Riederer. 2020. *R Markdown Cookbook*. Chapman; Hall/CRC. <https://bookdown.org/yihui/rmarkdown-cookbook>.
+Xie, Yihui, Christophe Dervieux, and Emily Riederer. 2026. *R Markdown Cookbook*. Chapman; Hall/CRC. <https://pkg.yihui.org/rmarkdown-cookbook/>.
 
 </div>
 
