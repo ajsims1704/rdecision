@@ -31,6 +31,8 @@ Imports:
   withr
 Suggests:
   DiagrammeR,
+  DiagrammeRsvg,
+  rsvg,
   knitr,
   rmarkdown,
   testthat (>= 3.0.0)
