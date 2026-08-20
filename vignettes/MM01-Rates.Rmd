@@ -1,0 +1,622 @@
+---
+title: "States, state and rates"
+author: "Andrew Sims"
+date: "August 2026"
+bibliography: "REFERENCES.bib"
+csl: "nature-no-et-al.csl"
+output: 
+  rmarkdown::html_vignette:
+    fig_width: 7
+    fig_height: 7
+    fig_caption: true
+    df_print: kable
+vignette: >
+  %\VignetteIndexEntry{States, state and rates}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r}
+#| include = FALSE,
+#| purl = FALSE
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  echo = FALSE,
+  comment = "#>"
+)
+```
+
+```{r}
+#| purl = FALSE
+#nolint start
+```
+
+```{r}
+library("rdecision")
+```
+
+```{r}
+#| purl = FALSE
+#nolint end
+```
+
+## Two health states where one is absorbing
+
+Consider a two *health state* model in which subjects start in health state *a*
+and randomly make transitions to an absorbing health state *b* at a constant
+positive rate $r$ transitions per patient per year (figure 1). 
+
+```{r}
+#| fig.align = "center",
+#| fig.cap = "Figure 1. Two health state model with one absorbing state"
+local({
+  g <- DiagrammeR::create_graph()
+  g <- DiagrammeR::add_node(graph = g, label = "a")
+  g <- DiagrammeR::add_node(graph = g, label = "b")
+  g <- DiagrammeR::add_edge(
+    graph = g,
+    from = "a",
+    to = "b"
+  )
+  # get the node ids
+  nodes <- DiagrammeR::get_node_attrs(g, node_attr = "label")
+  na <- which(nodes == "a")
+  nb <- which(nodes == "b")
+  # set layout
+  g <- DiagrammeR::set_node_position(g, node = na, x = 1L, y = 1L)
+  g <- DiagrammeR::set_node_position(g, node = nb, x = 2L, y = 1L)
+  # set global attributes
+  g <- DiagrammeR::add_global_graph_attrs(
+    g,
+    attr = "fontsize",
+    value = 8L,
+    attr_type = "node"
+  )
+  g <- DiagrammeR::add_global_graph_attrs(
+    g,
+    attr = "shape",
+    value = "circle",
+    attr_type = "node"
+  )
+  g <- DiagrammeR::add_global_graph_attrs(
+    g,
+    attr = "color",
+    value = "black",
+    attr_type = "node"
+  )
+  g <- DiagrammeR::add_global_graph_attrs(
+    g,
+    attr = "fillcolor",
+    value = "white",
+    attr_type = "node"
+  )
+  g <- DiagrammeR::add_global_graph_attrs(
+    g,
+    attr = "fontcolor",
+    value = "black",
+    attr_type = "node"
+  )
+  g <- DiagrammeR::add_global_graph_attrs(
+    g,
+    attr = "color",
+    value = "black",
+    attr_type = "edge"
+  )
+  g <- DiagrammeR::add_global_graph_attrs(
+    g,
+    attr = "penwidth",
+    value = 0.5,
+    attr_type = "edge"
+  )
+  # name of SVG file
+  svgfile <- tempfile(fileext = ".svg")
+  # render it as an svg file
+  DiagrammeR::export_graph(
+    g,
+    file_name = svgfile,
+    file_type = "svg",
+    width = 480L
+  )
+  knitr::include_graphics(path = svgfile, rel_path = FALSE)
+})
+```
+
+The number of patients occupying health state *a* at time $t$, $n_a(t)$, reduces
+at a rate proportional to its current value,
+
+$$\frac{dn_a(t)}{dt} = -r n_a(t) \tag{1}$$
+which has solution $\log n_a(t) = -r t + C$ where $C$ is a constant of
+integration. Defining $n_a(t = 0)$ as the population of health state *a* at
+time $t = 0$ gives an expression for its population at time $t$:
+$$n_a(t) = n_a(t = 0) e ^ {-rt} \tag{2}$$
+Equation 2 applies to processes subject to exponential decay, including
+continuous processes, such as the decay of the voltage across a capacitor
+in series with a resistance, and discrete processes, such as a finite population
+of subjects who move from an alive state to a dead state at a constant rate.
+
+An approach to the problem in the discrete case is to consider the transitions
+between health states as a discrete Markov process in continuous time. If it is
+assumed that each subject is identical and interchangeable, the 
+*system state* is fully defined by the vector of health state populations. For
+example, if there are 10 subjects and two health states, there are 11 possible
+system states (10 in health state *a*, zero in health state *b*; nine in health
+state *a*, one in health state *b*, and so on). It is also assumed that the
+number of system states is countable. Transitions between health states are
+assumed to happen at random times, usually at some constant overall rate, which
+requires time to be modelled as a continuous variable. There is usually interest
+in capturing the system state at finite time intervals (months, years etc.),
+known as time cycles.
+
+Figure 2 shows a generalized two health state model as a Markov process diagram.
+Subjects who remain in the same health state over a cycle are assumed to make
+transitions back to their current health state within the cycle; these are
+modelled as self loops. With two health states, there are four possible
+transitions: *u* and *x* are self loops, *v* allows transitions from *a* to *b*
+and *w* vice-versa. The rate associated with *v* is $r$, and the rate
+associated with *w* is zero if *b* is an absorbing health state.
+
+```{r}
+#| fig.align = "center",
+#| fig.cap = "Figure 2. Two health state model as a Markov process"
+local({
+  g <- DiagrammeR::create_graph()
+  g <- DiagrammeR::add_node(graph = g, label = "a")
+  g <- DiagrammeR::add_node(graph = g, label = "b")
+  g <- DiagrammeR::add_edge(
+    graph = g,
+    from = "a",
+    to = "a",
+    edge_aes = DiagrammeR::edge_aes(label = "u")
+  )
+  g <- DiagrammeR::add_edge(
+    graph = g,
+    from = "a",
+    to = "b",
+    edge_aes = DiagrammeR::edge_aes(label = "v")
+  )
+  g <- DiagrammeR::add_edge(
+    graph = g,
+    from = "b",
+    to = "a",
+    edge_aes = DiagrammeR::edge_aes(label = "w")
+  )
+  g <- DiagrammeR::add_edge(
+    graph = g,
+    from = "b",
+    to = "b",
+    edge_aes = DiagrammeR::edge_aes(label = "x")
+  )
+  # get the node ids
+  nodes <- DiagrammeR::get_node_attrs(g, node_attr = "label")
+  na <- which(nodes == "a")
+  nb <- which(nodes == "b")
+  # set layout
+  g <- DiagrammeR::set_node_position(g, node = na, x = 1L, y = 1L)
+  g <- DiagrammeR::set_node_position(g, node = nb, x = 2L, y = 1L)
+  # set global attributes
+  g <- DiagrammeR::add_global_graph_attrs(
+    g,
+    attr = "fontsize",
+    value = 8L,
+    attr_type = "node"
+  )
+  g <- DiagrammeR::add_global_graph_attrs(
+    g,
+    attr = "shape",
+    value = "circle",
+    attr_type = "node"
+  )
+  g <- DiagrammeR::add_global_graph_attrs(
+    g,
+    attr = "color",
+    value = "black",
+    attr_type = "node"
+  )
+  g <- DiagrammeR::add_global_graph_attrs(
+    g,
+    attr = "fillcolor",
+    value = "white",
+    attr_type = "node"
+  )
+  g <- DiagrammeR::add_global_graph_attrs(
+    g,
+    attr = "fontcolor",
+    value = "black",
+    attr_type = "node"
+  )
+  g <- DiagrammeR::add_global_graph_attrs(
+    g,
+    attr = "color",
+    value = "black",
+    attr_type = "edge"
+  )
+  g <- DiagrammeR::add_global_graph_attrs(
+    g,
+    attr = "penwidth",
+    value = 0.5,
+    attr_type = "edge"
+  )
+  # set loop directions
+  g <- DiagrammeR::set_edge_attrs(
+    g,
+    edge_attr = "headport",
+    values = "w",
+    from = na,
+    to = na
+  )
+  g <- DiagrammeR::set_edge_attrs(
+    g,
+    edge_attr = "tailport",
+    values = "w",
+    from = na,
+    to = na
+  )
+  g <- DiagrammeR::set_edge_attrs(
+    g,
+    edge_attr = "headport",
+    values = "e",
+    from = nb,
+    to = nb
+  )
+  g <- DiagrammeR::set_edge_attrs(
+    g,
+    edge_attr = "tailport",
+    values = "e",
+    from = nb,
+    to = nb
+  )
+  # name of SVG file
+  svgfile <- tempfile(fileext = ".svg")
+  # render it as an svg file
+  DiagrammeR::export_graph(
+    g,
+    file_name = svgfile,
+    file_type = "svg",
+    width = 480L
+  )
+  knitr::include_graphics(path = svgfile, rel_path = FALSE)
+})
+```
+
+Generalizing equation 1, the number of subjects in health state *a* at
+time $s + t$ is the number at the start of the interval, $n_a(s)$, multiplied
+by the exponential term; there are no transitions from *b* to *a*:
+$$
+n_a(s + t) = n_a(s) e^{-rt} + 0 \tag{3}
+$$
+Similarly, the number in health state *b* at time $s + t$ is given by the number
+who move from *a* to *b* plus the number already in *b* at time $s$:
+$$
+n_b(s + t) = n_a(s) (1- e^{-rt}) + n_b(s) \tag{4}
+$$
+In matrix form, equations 3 and 4 become
+$$
+\begin{bmatrix}
+n_a(s + t) & n_b(s + t)
+\end{bmatrix} =
+\begin{bmatrix}
+n_a(s) & n_b(s)
+\end{bmatrix} 
+\begin{bmatrix}
+e ^ {-rt} & 1 - e ^ {-rt}\\
+0 & 1\\
+\end{bmatrix} \tag{5}
+$$
+This is expressed more compactly as
+$$S(s + t) = S(s) P(t;s) \tag{6}$$
+where $S$ is the vector of health state populations and $P(t; s)$, or
+$P_{ij}(t; s)$ in matrix notation, is the transition probability matrix: the
+probability that a subject who is in health state $i$ at time $s$ will be in
+health state $j$ at time $t$. Equation 6 provides the mechanism for computing
+the health state populations after a time cycle from the populations at the
+start of the cycle and a matrix of transition probabilities.
+
+In the case where all patients begin in health state *a*, the system has the
+highest probability of making a system state change at time $t = 0$. As patients
+transition to health state *b* and its population increases, the probability of
+system state change reduces, until it reaches zero when all patients are in 
+health state *b*. The probability that the system makes a transition at time
+$t$ is $\frac{\partial P}{\partial t}$. In the case of one of the two health
+states being an absorbing state (equation 6), this becomes:
+$$
+\frac{\partial P(t; s)}{\partial t} = \begin{bmatrix}
+-r e ^ {-rt} & r e ^ {-rt}\\
+0 & 0\\
+\end{bmatrix} =  
+\begin{bmatrix}
+e ^ {-rt} & 1 - e ^ {-rt}\\
+0 & 1\\
+\end{bmatrix}
+\begin{bmatrix} -r & r\\0 & 0 \end{bmatrix} =
+P(t;s) Q(t) \tag{7}
+$$
+where $Q(t)$ is known as the transition rate matrix.
+
+The number of transitions which occur between time $s$ and $s + t$ is given by
+the Hadamard product of the health state populations and the transition
+probability matrix, $S(s) \odot P(t)$,
+$$
+\begin{bmatrix}
+n_a(s) & n_b(s)
+\end{bmatrix} \odot 
+\begin{bmatrix}
+e ^ {-rt} & 1 - e ^ {-rt}\\
+0 & 1
+\end{bmatrix} =
+\begin{bmatrix}
+n_a(s) e ^ {-rt} & n_a(s)(1 - e ^ {-rt})\\
+0 & n_b(s)
+\end{bmatrix} \tag{8}
+$$
+where $n_a(s) e^ {-rt}$ is the number of transitions along edge *u*, 
+$n_a(s) (1 - e ^ {-rt})$ along *v* and $n_b$ along *w*.
+
+## Arbitrarily complex models
+
+Kolmogorov [-@kolmogorov1931] showed that equation 7 can be generalized to
+more complex discrete state space models than the two state model (one of which
+is absorbing) introduced in the previous section:
+$$
+\frac{\partial P}{\partial t} = P(t) Q(t) \tag{9}
+$$
+The system of equations is known as the *Kolmogorov forward equations*. Their
+solution, in matrix form, provides a generalized method to compute the
+transition probability matrix, $P(t;s)$, from the transition rate matrix,
+$Q(t)$. Equation 9 is equivalent to equation 1, generalized for multiple states.
+Their solution [@welton2005] is given in equation 10.
+$$
+P(t;s) = e ^ {tQ(t)} = \sum_{n = 0}^{\infty} \frac{t^n}{n!}Q^n \tag{10}
+$$
+If the transition rates between states are known, and expressed as a matrix,
+then - provided the exponential of the matrix can be found - equation 10 allows
+the transition probability matrix, $P(t;s)$ to be computed, and used in
+equation 6 to calculate state populations after a time cycle.
+
+Matrix $P(t;s)$ has the property that the sum of each of its rows is one;
+subjects must either leave, or stay, in each state. $Q(t)$ has the property that
+the sum of each of its rows is zero; this arises from the constraint that
+subjects cannot be created, or removed, from the population.
+
+Consider the example of the two health state model discussed previously. Writing
+the transition rate from *a* to *b* as $r$, and assuming that state *b* is
+absorbing, then the transition rate matrix is:
+$$
+Q(t) = \begin{bmatrix}-r & r\\0 & 0\end{bmatrix}
+$$
+The upper left value (transition rate from *a* to *a*) is $-r$ to ensure that
+the row sum is zero. Then, as expected:
+$$
+\begin{align*}
+P(t;s) &= 
+\frac{t^0}{0!}\begin{bmatrix}1 & 0\\0 & 1\end{bmatrix} +
+\frac{t^1}{1!}\begin{bmatrix}-r & r\\0 & 0\end{bmatrix} + 
+\frac{t^2}{2!}\begin{bmatrix}r^2 & -r^2\\0 & 0\end{bmatrix} + 
+\frac{t^3}{3!}\begin{bmatrix}-r^3 & r^3\\0 & 0\end{bmatrix} + \:
+\dots\\
+&= \begin{bmatrix}
+1 + (-rt) + \frac{(-rt)^2}{2!} + \frac{(-rt)^3}{3!} + \dots &
+0 - (-rt) - \frac{(-rt)^2}{2!} - \frac{(-rt)^3}{3!} + \dots\\
+0 & 0
+\end{bmatrix}\\
+&= \begin{bmatrix}
+e^{-rt} & 1 - e^{-rt}\\0 & 0
+\end{bmatrix}
+\end{align*}
+$$
+Welton and Ades [@welton2005], for example, provide analytical solutions for a
+two health state model with transitions in both directions, and for a three
+health state model with one absorbing state. But in general, equation 10 is
+solved numerically. For example, R package `expm` [@goulet2021] provides
+methods for computing the exponential of square matrices.
+
+## Multiple transitions per cycle
+
+If the duration of a time cycle, $t$, is greater than zero, and finite, there
+is the possibility that a subject may make more than one transition between
+states in a single cycle. Certain configurations of the health states may
+preclude this, for example two health states of which one is absorbing. But, in
+general, the transition probability matrix should allow for this possibility. 
+
+Consider the three health state model of figure 3. Health state *c* is an
+absorbing state and there is no directly allowable transition from health
+state *a* to health state *c*.
+
+```{r}
+#| fig.align = "center",
+#| fig.cap = "Figure 3. A three health state model"
+local({
+  g <- DiagrammeR::create_graph()
+  g <- DiagrammeR::add_node(graph = g, label = "a")
+  g <- DiagrammeR::add_node(graph = g, label = "b")
+  g <- DiagrammeR::add_node(graph = g, label = "c")
+  g <- DiagrammeR::add_edge(
+    graph = g,
+    from = "a",
+    to = "a"
+  )
+  g <- DiagrammeR::add_edge(
+    graph = g,
+    from = "a",
+    to = "b"
+  )
+  g <- DiagrammeR::add_edge(
+    graph = g,
+    from = "b",
+    to = "b"
+  )
+  g <- DiagrammeR::add_edge(
+    graph = g,
+    from = "b",
+    to = "c"
+  )
+  g <- DiagrammeR::add_edge(
+    graph = g,
+    from = "c",
+    to = "c"
+  )
+  # get the node ids
+  nodes <- DiagrammeR::get_node_attrs(g, node_attr = "label")
+  na <- which(nodes == "a")
+  nb <- which(nodes == "b")
+  nc <- which(nodes == "c")
+  # set layout
+  g <- DiagrammeR::set_node_position(g, node = na, x = 1L, y = 1L)
+  g <- DiagrammeR::set_node_position(g, node = nb, x = 2L, y = 1L)
+  g <- DiagrammeR::set_node_position(g, node = nc, x = 3L, y = 1L)
+  # set global attributes
+  g <- DiagrammeR::add_global_graph_attrs(
+    g,
+    attr = "fontsize",
+    value = 8L,
+    attr_type = "node"
+  )
+  g <- DiagrammeR::add_global_graph_attrs(
+    g,
+    attr = "shape",
+    value = "circle",
+    attr_type = "node"
+  )
+  g <- DiagrammeR::add_global_graph_attrs(
+    g,
+    attr = "color",
+    value = "black",
+    attr_type = "node"
+  )
+  g <- DiagrammeR::add_global_graph_attrs(
+    g,
+    attr = "fillcolor",
+    value = "white",
+    attr_type = "node"
+  )
+  g <- DiagrammeR::add_global_graph_attrs(
+    g,
+    attr = "fontcolor",
+    value = "black",
+    attr_type = "node"
+  )
+  g <- DiagrammeR::add_global_graph_attrs(
+    g,
+    attr = "color",
+    value = "black",
+    attr_type = "edge"
+  )
+  g <- DiagrammeR::add_global_graph_attrs(
+    g,
+    attr = "penwidth",
+    value = 0.5,
+    attr_type = "edge"
+  )
+  # set loop directions
+  g <- DiagrammeR::set_edge_attrs(
+    g,
+    edge_attr = "headport",
+    values = "s",
+    from = na,
+    to = na
+  )
+  g <- DiagrammeR::set_edge_attrs(
+    g,
+    edge_attr = "tailport",
+    values = "s",
+    from = na,
+    to = na
+  )
+  g <- DiagrammeR::set_edge_attrs(
+    g,
+    edge_attr = "headport",
+    values = "s",
+    from = nb,
+    to = nb
+  )
+  g <- DiagrammeR::set_edge_attrs(
+    g,
+    edge_attr = "tailport",
+    values = "s",
+    from = nb,
+    to = nb
+  )
+  g <- DiagrammeR::set_edge_attrs(
+    g,
+    edge_attr = "headport",
+    values = "s",
+    from = nc,
+    to = nc
+  )
+  g <- DiagrammeR::set_edge_attrs(
+    g,
+    edge_attr = "tailport",
+    values = "s",
+    from = nc,
+    to = nc
+  )
+  # name of SVG file
+  svgfile <- tempfile(fileext = ".svg")
+  # render it as an svg file
+  DiagrammeR::export_graph(
+    g,
+    file_name = svgfile,
+    file_type = "svg",
+    width = 480L
+  )
+  knitr::include_graphics(path = svgfile, rel_path = FALSE)
+})
+```
+
+Defining the transition rates between health states *a* and *b*, and between
+*b* and *c* as $r_1$ and $r_2$ respectively, the transition rate matrix is:
+$$
+Q(t) = \begin{bmatrix}
+-r_1 & r_1 & 0\\
+0 & -r_2 & r_2\\
+0 & 0 & 0\\
+\end{bmatrix}
+$$
+From Walton and Ades' analytical solution [-@welton2005], the transition
+probability matrix is:
+$$
+P(t; s) = \begin{bmatrix}
+e^{-r_1t} &
+\frac{r_1 e^{-r_2t}(1 - e^{-(r_1-r_2)t})}{r_1 - r_2} &
+1 - e^{-r_1t} - \frac{r_1 e^{-r_2t}(1 - e^{-(r_1-r_2)t})}{r_1 - r_2}\\
+0 & e^{-r_2t} & 1 - e^{r_2t}\\
+0 & 0 & 1\\
+\end{bmatrix}
+$$
+The probability of starting a cycle in state *b* and finishing in state *c*,
+and vice-versa is identical to the model with two health states (of which one
+is absorbing) which was introduced earlier; the lower right 2x2 submatrix
+of $P(t; s)$ is as expected from the previous result. The top row, which
+represents the probabilities of starting in health state *a*, demonstrates the
+effect of multiple transitions. The population remaining in health state *a* is
+as expected from previous calculations, but the probability of finishing the
+cycle in either health state *b* or *c* includes the possibility that subjects
+moved from *a* to *b* and then to *c* within the cycle. For example, the matrix
+element in the top right is non zero, although there is no direct transition
+from *a* to *c*.
+
+Numerically, assume that 50 out of every 100 subjects in health state *a*
+are at risk of a transition to health state *b* within one year ($r_1$ = 0.5),
+and that 20 out of every 100 subjects in health state *b* are at risk of
+transition to health state *c* within one year ($r_2$ = 0.2).
+
+```{r}
+qm <- matrix(
+  c(-0.5, 0.5, 0.0, 0.0, -0.2, 0.2, 0.0, 0.0, 0.0), nrow = 3L, byrow = TRUE
+)
+pt <- expm::expm(x = qm)
+```
+
+$$
+Q(t) = \begin{bmatrix}
+`r qm[[1L, 1L]]` & `r qm[[1L, 2L]]` & `r qm[[1L, 3L]]`\\
+`r qm[[2L, 1L]]` & `r qm[[2L, 2L]]` & `r qm[[2L, 3L]]`\\
+`r qm[[3L, 1L]]` & `r qm[[3L, 2L]]` & `r qm[[3L, 3L]]`\\
+\end{bmatrix}, \quad
+P(t;s) = \begin{bmatrix}
+`r pt[[1L, 1L]]` & `r pt[[1L, 2L]]` & `r pt[[1L, 3L]]`\\
+`r pt[[2L, 1L]]` & `r pt[[2L, 2L]]` & `r pt[[2L, 3L]]`\\
+`r pt[[3L, 1L]]` & `r pt[[3L, 2L]]` & `r pt[[3L, 3L]]`\\
+\end{bmatrix}
+$$
+
+## References
